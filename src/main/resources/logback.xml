@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+        <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
+    </layout>
+  </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/PodcastServer.log</file>
+        <encoder>
+            <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rotate every day for log collection and archiving -->
+            <fileNamePattern>PodcastServer.%d{yyyyMMdd}.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+  
+  <logger name="lan.dk.podcastserver" level="TRACE"/>
+
+    <!-- Spring MVC -->
+    <!-- ORM
+    <logger name="org.springframework.orm" level="TRACE"/>
+              -->
+    <!-- Hibernate  -->
+    <logger name="org.hibernate.*" level="TRACE"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+
+
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
+
+</configuration>

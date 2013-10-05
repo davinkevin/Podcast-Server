@@ -1,0 +1,263 @@
+package lan.dk.podcastserver.manager;
+
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.service.api.ItemService;
+import lan.dk.podcastserver.utils.WorkerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Controller;
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Controller
+public class ItemDownloadManager implements ApplicationContextAware {
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    //Représnetation de la fils d'attente
+    private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<Item>();
+    //Représentation de la fils en cours de téléchargement
+    private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<Item, Downloader>();
+
+
+    @Autowired
+    ItemService itemService;
+
+    @Value("${concurrentDownload}")
+    private int limitParallelDownload;
+
+    @Value("${rootfolder}")
+    private String rootfolder;
+
+    @Value("${serverURL}")
+    private String serverURL;
+
+    @Value("${fileContainer}")
+    protected String fileContainer;
+
+    @Autowired
+    private WorkerUtils workerUtils;
+
+    private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
+    private boolean isRunning = false;
+
+    ApplicationContext context = null;
+
+    /* GETTER & SETTER */
+    public int getLimitParallelDownload() {
+        return limitParallelDownload;
+    }
+
+    public void setLimitParallelDownload(int limitParallelDownload) {
+
+        boolean addToDownloadList = limitParallelDownload < this.limitParallelDownload;
+
+        this.limitParallelDownload = limitParallelDownload;
+
+        if (addToDownloadList && !isRunning)
+            manageDownload();
+    }
+
+    public ItemDownloadManager() {
+    }
+
+    public Queue<Item> getWaitingQueue() {
+        return waitingQueue;
+    }
+
+    public Map<Item, Downloader> getDownloadingQueue() {
+        return downloadingQueue;
+    }
+
+    public void setWaitingQueue(Queue<Item> waitingQueue) {
+        this.waitingQueue = waitingQueue;
+    }
+
+    public void setDownloadingQueue(Map<Item, Downloader> downloadingQueue) {
+        this.downloadingQueue = downloadingQueue;
+    }
+
+    public ItemDownloadManager(Queue<Item> waitingQueue) {
+
+        this.waitingQueue = waitingQueue;
+    }
+
+    public int getNumberOfCurrentDownload() {
+        return numberOfCurrentDownload.get();
+    }
+
+    public void setNumberOfCurrentDownload(int numberOfCurrentDownload) {
+        this.numberOfCurrentDownload.set(numberOfCurrentDownload);
+    }
+
+
+    public String getRootfolder() {
+        return rootfolder;
+    }
+
+    public void setRootfolder(String rootfolder) {
+        this.rootfolder = rootfolder;
+    }
+
+    public String getServerURL() {
+        return serverURL;
+    }
+
+    public void setServerURL(String serverURL) {
+        this.serverURL = serverURL;
+    }
+
+    public String getFileContainer() {
+        return fileContainer;
+    }
+
+    public void setFileContainer(String fileContainer) {
+        this.fileContainer = fileContainer;
+    }
+
+    /* METHODS */
+    private void manageDownload() {
+
+        if (!isRunning) {
+            isRunning = true;
+            Item currentItem = null;
+
+            while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
+                currentItem = this.getWaitingQueue().poll();
+                if (currentItem.getStatus() == null || currentItem.getStatus().equals("Not Downloaded") || currentItem.getStatus().equals("Stopped")) {
+
+                    getDownloaderByTypeAndRun(currentItem);
+
+                }
+            }
+            isRunning = false;
+        }
+    }
+
+    private void initDownload() {
+        waitingQueue.addAll(itemService.findAllToDownload());
+    }
+
+    public void launchDownload() {
+        this.initDownload();
+        this.manageDownload();
+    }
+
+
+    // Change status of all downloads :
+    public void stopAllDownload() {
+        for (Downloader downloader : downloadingQueue.values()) {
+            downloader.stopDownload();
+        }
+    }
+
+    public void pauseAllDownload() {
+        for (Downloader downloader : downloadingQueue.values()) {
+            downloader.pauseDownload();
+        }
+    }
+
+    public void restartAllDownload() {
+        for (Downloader downloader : downloadingQueue.values()) {
+            if (downloader.getItem().getStatus().equals("Paused")) {
+                getDownloaderByTypeAndRun(downloader.getItem());
+            }
+        }
+    }
+
+    // Change State of id identified download
+    public void stopDownload(int id) {
+        downloadingQueue.get(getItemInDownloadingQueue(id)).stopDownload();
+    }
+
+    public void pauseDownload(int id) {
+        Item item = getItemInDownloadingQueue(id);
+        downloadingQueue.get(item).pauseDownload();
+    }
+
+    public void restartDownload(int id) {
+        getDownloaderByTypeAndRun(downloadingQueue.get(getItemInDownloadingQueue(id)).getItem());
+    }
+
+    public void toogleDownload(int id) {
+        Item item = getItemInDownloadingQueue(id);
+        if (item.getStatus().equals("Paused")) {
+            logger.debug("restart du download");
+            restartDownload(id);
+        } else if (item.getStatus().equals("Started")) {
+            logger.debug("pause du download");
+            pauseDownload(id);
+        }
+    }
+
+    public void addItemToQueue(int id) {
+        waitingQueue.add(itemService.findById(id));
+        manageDownload();
+    }
+
+    public void addItemToQueue(Item item) {
+        waitingQueue.add(item);
+        manageDownload();
+    }
+
+    public void removeItemFromQueue(int id) {
+        waitingQueue.remove(itemService.findById(id));
+    }
+
+    public void removeItemFromQueue(Item item) {
+        waitingQueue.remove(item);
+    }
+
+
+    /* Helpers */
+    public void addACurrentDownload() {
+        this.numberOfCurrentDownload.incrementAndGet();
+    }
+
+    public void removeACurrentDownload(Item item) {
+        this.numberOfCurrentDownload.decrementAndGet();
+        this.downloadingQueue.remove(item);
+        if (!isRunning)
+            manageDownload();
+    }
+
+    public Item getItemInDownloadingQueue(int id) {
+        for (Item item : downloadingQueue.keySet()) {
+            if (item.getId()== id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private void getDownloaderByTypeAndRun(Item item) {
+        if (downloadingQueue.containsKey(item)) { // Cas ou le Worker se met en pause et reste en mémoire // dans la DownloadingQueue
+            Downloader downloader = downloadingQueue.get(item);
+            downloader.startDownload();
+        } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
+            Downloader worker = workerUtils.getDownloaderByType(item);
+
+            if (worker != null) {
+                this.getDownloadingQueue().put(item, worker);
+                new Thread((Runnable) worker).start();
+            }
+        }
+
+    }
+
+    @Override
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
+        logger.debug("Initialisation du Contexte");
+        this.context = applicationContext;
+    }
+}

@@ -1,0 +1,157 @@
+package lan.dk.podcastserver.manager.worker.downloader;
+
+import lan.dk.podcastserver.entity.Item;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Component("RTMPDownloader")
+@Scope("prototype")
+public class RTMPDownloader extends AbstractDownloader {
+
+    private int pid = 0;
+
+    @Value("${rtmpdump}")
+    String rtmpdump;
+
+    @Override
+    public Item download() {
+        logger.debug("Download");
+        itemDownloadManager.addACurrentDownload();
+
+        if (item.getUrl().contains("rtmp://")) {
+            try {
+                target = getTagetFile(item);
+                ProcessBuilder pb = new ProcessBuilder(rtmpdump,
+                        "-r",
+                        item.getUrl(),
+                        "-o",
+                        target.getAbsolutePath());
+
+                pb.directory(new File("/tmp"));
+                logger.debug("Fichier de sortie : " + target.getAbsolutePath());
+
+                final Process p = pb.start();
+                if (p.getClass().getSimpleName().contains("UNIXProcess")) {
+                    Field pidField = p.getClass().getDeclaredField("pid");
+                    pidField.setAccessible(true);
+                    pid = pidField.getInt(p);
+                    logger.debug("PID du process : " + pid);
+                }
+
+                Runnable itemErrorSynchronisation = new Runnable() {
+                    private BufferedReader getBufferedReader(InputStream is) {
+                        return new BufferedReader(new InputStreamReader(is));
+                    }
+
+                    @Override
+                    public void run() {
+                        BufferedReader br = getBufferedReader(p.getErrorStream());
+                        String ligne = "";
+                        Pattern p = Pattern.compile("[^\\(]*\\(([0-9]*).*%\\)");
+                        Matcher m = null;
+                        logger.debug("Lecture du stream d'erreur");
+                        try {
+                            long time = System.currentTimeMillis();
+                            while ((ligne = br.readLine()) != null) {
+                                logger.debug(ligne);
+                                m = p.matcher(ligne);
+                                // Si le dernier traitement date de plus d'une seconde :
+                                if (m.matches() && Integer.parseInt(m.group(1)) > item.getProgression()) {
+                                    item.setProgression(Integer.parseInt(m.group(1)));
+                                    logger.debug("Item Progression : " + item.getProgression());
+
+                                } else if (ligne.toLowerCase().contains("download complete")) {
+                                    logger.info("Fin du téléchargement");
+                                    finishDownload();
+                                    break;
+                                }
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            logger.error("IOException :", e);
+                        }
+                        if (!item.getStatus().equals("Finish") && !stopDownloading.get()) {
+                            logger.debug("Terminaison innatendu, reset du downloader");
+                            resetDownload();
+                        }
+                    }
+                };
+                //new Thread(itemSynchronisation).start();
+                new Thread(itemErrorSynchronisation).start();
+                p.waitFor();
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("IOException :", e);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                logger.error("InterruptedException :", e);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.error("NoSuchFieldException :", e);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.error("IllegalAccessException :", e);
+            }
+        } else {
+            logger.debug("Traiter avec un téléchargeur HTTP");
+            stopDownload();
+        }
+        return this.item;
+    }
+    @Override
+    public void startDownload() {
+        stopDownloading.set(false);
+        this.item.setStatus("Started");
+        itemService.update(this.item, this.item.getId());
+        if (pid != 0) { //Relancement du process UNIX
+            ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
+            try {
+                logger.debug("Reprise du téléchargement");
+                pb.start();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.error("IOException :", e);
+                this.stopDownload();
+            }
+        } else { // Lancement du process simple
+            this.download();
+        }
+    }
+
+    @Override
+    public void pauseDownload() {
+        ProcessBuilder pb = new ProcessBuilder("kill", "-STOP", "" + pid);
+        try {
+            pb.start();
+            super.pauseDownload();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("IOException :", e);
+            this.stopDownload();
+        }
+
+        //stopDownloading.set(true);
+        //this.item.setStatus("Paused");
+        //itemService.update(this.item, this.item.getId());
+    }
+
+    @Override
+    public void stopDownload() {
+        ProcessBuilder pb = new ProcessBuilder("kill", "-2", "" + pid);
+        try {
+            pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("IOException :", e);
+        }   finally {
+            super.stopDownload();
+        }
+
+    }
+}
