@@ -7,14 +7,14 @@
     </layout>
   </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/PodcastServer.log</file>
         <encoder>
             <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rotate every day for log collection and archiving -->
-            <fileNamePattern>PodcastServer.%d{yyyyMMdd}.log</fileNamePattern>
+            <fileNamePattern>logs/PodcastServer.%d{yyyyMMdd}.log</fileNamePattern>
         </rollingPolicy>
     </appender>
   

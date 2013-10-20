@@ -55,12 +55,11 @@ public class UpdatePodcastService {
         IDM.launchDownload();
     }
 
-/*    @Scheduled(fixedDelay = 86400000)
-    @RequestMapping(value = "/updateAndDownloadPodcast", method = RequestMethod.GET, produces = "application/json")
+    @Scheduled(fixedDelay = 86400000)
+    @RequestMapping(value = "/deleteOdlItems", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Transactional
     private void deleteOldItem() {
         updatePodcastController.deleteOldEpisode();
     }
-  */
 }
