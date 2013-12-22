@@ -145,7 +145,11 @@ public class ItemDownloadManager implements ApplicationContextAware {
     }
 
     private void initDownload() {
-        waitingQueue.addAll(itemService.findAllToDownload());
+        for(Item item : itemService.findAllToDownload()) {
+            if (!waitingQueue.contains(item)) {
+                waitingQueue.add(item);
+            }
+        }
     }
 
     public void launchDownload() {
