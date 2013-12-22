@@ -17,6 +17,8 @@ import java.net.URL;
 @Scope("prototype")
 public class HTTPDownloader extends AbstractDownloader {
 
+    protected DownloadInfo info = null;
+
     @Override
     public Item download() {
         logger.debug("Download");
@@ -24,31 +26,6 @@ public class HTTPDownloader extends AbstractDownloader {
         //this.startDownload();
         //int borne = randomGenerator.nextInt(100);
         try {
-        /*
-            for (int cpt = 1; cpt <= borne; cpt++) {
-
-                Thread.sleep(1000L);
-                logger.debug("Téléchargement en cours : " + cpt + "/" + borne);
-
-
-                item.setProgression(cpt*100/borne);
-
-                if (this.item.getStatus().equals("Paused")) {
-                    logger.debug("Download mis en pause");
-                    synchronized (this) {
-                        this.wait();
-                    }
-                    if (this.item.getStatus().equals("Paused"))
-                        this.startDownload();
-
-                }
-                if (this.item.getStatus().equals("Stopped")) {
-                    logger.debug("Download interrompu");
-                    itemDownloadManager.removeACurrentDownload(item);
-                    return null;
-                }
-            }
-         */
             URL url = new URL(item.getUrl());
             // initialize url information object
             info = new DownloadInfo(url);

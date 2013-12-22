@@ -19,6 +19,8 @@ public class RTMPDownloader extends AbstractDownloader {
     @Value("${rtmpdump}")
     String rtmpdump;
 
+    Process p = null;
+
     @Override
     public Item download() {
         logger.debug("Download");
@@ -36,7 +38,7 @@ public class RTMPDownloader extends AbstractDownloader {
                 pb.directory(new File("/tmp"));
                 logger.debug("Fichier de sortie : " + target.getAbsolutePath());
 
-                final Process p = pb.start();
+                p  = pb.start();
                 if (p.getClass().getSimpleName().contains("UNIXProcess")) {
                     Field pidField = p.getClass().getDeclaredField("pid");
                     pidField.setAccessible(true);
@@ -71,6 +73,9 @@ public class RTMPDownloader extends AbstractDownloader {
                                     finishDownload();
                                     break;
                                 }
+                                if (pid == 0) {
+                                    break;
+                                }
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -85,6 +90,8 @@ public class RTMPDownloader extends AbstractDownloader {
                 //new Thread(itemSynchronisation).start();
                 new Thread(itemErrorSynchronisation).start();
                 p.waitFor();
+                pid = 0;
+
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("IOException :", e);
@@ -109,16 +116,10 @@ public class RTMPDownloader extends AbstractDownloader {
         stopDownloading.set(false);
         this.item.setStatus("Started");
         itemService.update(this.item, this.item.getId());
-        if (pid != 0) { //Relancement du process UNIX
-            ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
-            try {
-                logger.debug("Reprise du téléchargement");
-                pb.start();
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                logger.error("IOException :", e);
-                this.stopDownload();
-            }
+        if (pid != 0 && p != null) { //Relancement du process UNIX
+            //ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
+            logger.debug("Reprise du téléchargement");
+            p.destroy();
         } else { // Lancement du process simple
             this.download();
         }
@@ -143,13 +144,10 @@ public class RTMPDownloader extends AbstractDownloader {
 
     @Override
     public void stopDownload() {
-        ProcessBuilder pb = new ProcessBuilder("kill", "-2", "" + pid);
+        //ProcessBuilder pb = new ProcessBuilder("kill", "-2", "" + pid);
         try {
-            pb.start();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
-        }   finally {
+            p.destroy();
+        } finally {
             super.stopDownload();
         }
 

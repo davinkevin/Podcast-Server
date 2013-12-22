@@ -110,6 +110,7 @@ public class jDomUtils {
             Element item_enclosure = new Element("enclosure");
             item_enclosure.setAttribute("url", serveurURL + item.getProxyURL());
             item_enclosure.setAttribute("length", "0");
+
             item_enclosure.setAttribute("type", "video/mp4");
             xml_item.addContent(item_enclosure);
 

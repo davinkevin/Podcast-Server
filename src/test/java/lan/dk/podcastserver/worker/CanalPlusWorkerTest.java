@@ -79,6 +79,19 @@ public class CanalPlusWorkerTest {
 
     }
 
+    @Test
+    public void updateFeedLeTube() {
+
+        canalPlusPodcast = new Podcast("Le Tube", "http://www.canalplus.fr/c-divertissement/pid6427-c-le-tube.html",
+                "", "CanalPlus", new Timestamp(System.currentTimeMillis()), null, new Cover("http://img15.hostingpics.net/pics/966069Capture20131020092150.png", 60, 60));
+        logger.debug("Update");
+        canalPlusUpdater.updateFeed(canalPlusPodcast);
+        //canalPlusPodcast = canalPlusUpdater.updateFeed(canalPlusPodcast);
+        //org.junit.Assert.assertThat(canalPlusPodcast.getItems().size(), org.hamcrest.core.IsNot(0));
+        //assertThat(canalPlusPodcast.getItems().size(), IsNot.not(0));
+
+    }
+
     //@Test
     public void downloadItemCanalPlus() {
         logger.debug("Download");

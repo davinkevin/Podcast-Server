@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 
-@Table(name = "item", schema = "", catalog = "podcastserver")
+@Table(name = "item", schema = "", catalog = "")
 @Entity
 public class Item implements Serializable {
 
@@ -18,17 +18,18 @@ public class Item implements Serializable {
     private String title;
     private String url;
     private Timestamp pubdate;
+    private String description;
+    private String mimeType;
+    private int length;
+    private Cover cover;
 
     /* Value for the Download */
     private String localUrl;
     private String localUri;
     private String status = "Not Downloaded";
-    private Cover cover;
     private int progression;
-
     private Timestamp downloaddate;
     private Podcast podcast;
-    private String description;
 
     public Item() {
     }
@@ -47,6 +48,28 @@ public class Item implements Serializable {
         this.pubdate = pubdate;
     }
 
+    @Column(name = "mimetype")
+    @Basic
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public Item setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+        return this;
+    }
+
+    @Column(name = "length")
+    @Basic
+    public int getLength() {
+        return length;
+    }
+
+    public Item setLength(int length) {
+        this.length = length;
+        return this;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -54,8 +77,9 @@ public class Item implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
+    public Item setId(int id) {
         this.id = id;
+        return this;
     }
 
     @Column(name = "title")
@@ -64,18 +88,20 @@ public class Item implements Serializable {
         return title;
     }
 
-    public void setTitle(String title) {
+    public Item setTitle(String title) {
         this.title = title;
+        return this;
     }
 
-    @Column(name = "url")
+    @Column(name = "url", length = 65535)
     @Basic
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public Item setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     @Column(name = "pubdate")
@@ -84,8 +110,9 @@ public class Item implements Serializable {
         return pubdate;
     }
 
-    public void setPubdate(Timestamp pubdate) {
+    public Item setPubdate(Timestamp pubdate) {
         this.pubdate = pubdate;
+        return this;
     }
 
     @ManyToOne(cascade=CascadeType.MERGE)
@@ -95,8 +122,9 @@ public class Item implements Serializable {
         return podcast;
     }
 
-    public void setPodcast(Podcast podcast) {
+    public Item setPodcast(Podcast podcast) {
         this.podcast = podcast;
+        return this;
     }
 
 //    @Transient
@@ -110,8 +138,9 @@ public class Item implements Serializable {
         return localUrl;
     }
 
-    public void setLocalUrl(String localUrl) {
+    public Item setLocalUrl(String localUrl) {
         this.localUrl = localUrl;
+        return this;
     }
 
     @Column(name = "status")
@@ -120,8 +149,9 @@ public class Item implements Serializable {
         return status;
     }
 
-    public void setStatus(String status) {
+    public Item setStatus(String status) {
         this.status = status;
+        return this;
     }
 
     @Transient
@@ -129,8 +159,9 @@ public class Item implements Serializable {
         return progression;
     }
 
-    public void setProgression(int progression) {
+    public Item setProgression(int progression) {
         this.progression = progression;
+        return this;
     }
 
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
@@ -139,8 +170,9 @@ public class Item implements Serializable {
         return this.cover;
     }
 
-    public void setCover(Cover cover) {
+    public Item setCover(Cover cover) {
         this.cover = cover;
+        return this;
     }
 
     @Column(name = "downloadddate")
@@ -149,18 +181,20 @@ public class Item implements Serializable {
         return downloaddate;
     }
 
-    public void setDownloaddate(Timestamp downloaddate) {
+    public Item setDownloaddate(Timestamp downloaddate) {
         this.downloaddate = downloaddate;
+        return this;
     }
 
-    @Column(name = "description")
+    @Column(name = "description", length = 65535)
     @Basic
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Item setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     @Column(name = "local_uri")
@@ -169,8 +203,9 @@ public class Item implements Serializable {
         return localUri;
     }
 
-    public void setLocalUri(String localUri) {
+    public Item setLocalUri(String localUri) {
         this.localUri = localUri;
+        return this;
     }
 
     @Override
@@ -224,6 +259,5 @@ public class Item implements Serializable {
             }
         }
     }
-
 
 }

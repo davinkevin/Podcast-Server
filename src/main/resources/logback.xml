@@ -2,14 +2,16 @@
 <configuration>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-        <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
-    </layout>
+      <encoder>
+          <charset>UTF-8</charset>
+          <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
+      </encoder>
   </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/PodcastServer.log</file>
         <encoder>
+            <charset>UTF-8</charset>
             <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -18,15 +20,15 @@
         </rollingPolicy>
     </appender>
   
-  <logger name="lan.dk.podcastserver" level="TRACE"/>
+  <logger name="lan.dk.podcastserver" level="DEBUG"/>
 
     <!-- Spring MVC -->
     <!-- ORM
     <logger name="org.springframework.orm" level="TRACE"/>
               -->
     <!-- Hibernate  -->
-    <logger name="org.hibernate.*" level="TRACE"/>
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <logger name="org.hibernate.*" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="DEBUG" />
 
 
   <root level="info">

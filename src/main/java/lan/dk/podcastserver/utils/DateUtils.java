@@ -36,6 +36,20 @@ public class DateUtils {
         }
     }
 
+    public static Timestamp youtubeDateToTimeStamp(String pubDate) throws ParseException{
+        Date javaDate = null;
+        try {
+            String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"; //2013-12-20T22:30:01.000Z
+            SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
+            javaDate = format.parse(pubDate);
+            Timestamp timeStampDate = new Timestamp(javaDate.getTime());
+            return timeStampDate;
+        } catch (ParseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw e;
+        }
+    }
+
     public static String TimeStampToRFC2822 (Timestamp timestamp) {
         return (timestamp != null)
                 ? new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH).format(timestamp)

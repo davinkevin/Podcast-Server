@@ -5,6 +5,7 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.net.MalformedURLException;
-import java.util.List;
 import java.net.URL;
+import java.util.List;
 
 //@Service
 @Controller
@@ -23,6 +24,9 @@ public class PodcastService {
 
     @Resource
     private PodcastRepository podcastRepository;
+
+    @Value("${serverURL}")
+    private String serveurURL;
 
     @Transactional
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, produces = "application/json")
@@ -84,7 +88,7 @@ public class PodcastService {
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
     @ResponseBody
     public String getRss(@PathVariable int id) {
-        return podcastRepository.findOne(id).getRssFeed();
+        return podcastRepository.findOne(id).toXML(serveurURL);
     }
 
 

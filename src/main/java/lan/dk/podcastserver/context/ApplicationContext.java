@@ -80,7 +80,7 @@ public class ApplicationContext {
         jpaProterties.put(PROPERTY_NAME_HIBERNATE_FORMAT_SQL, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_FORMAT_SQL));
         jpaProterties.put(PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY));
         jpaProterties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
-
+        //jpaProterties.put("hibernate.hbm2ddl.auto", "create-drop");
         entityManagerFactoryBean.setJpaProperties(jpaProterties);
 
         return entityManagerFactoryBean;

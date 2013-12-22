@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.api.ItemService;
 import lan.dk.podcastserver.service.api.PodcastService;
+import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Autowired
     protected PodcastService podcastService;
 
-    protected DownloadInfo info = null;
+
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -93,11 +94,14 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         if (target != null) {
             this.item.setStatus("Finish");
             try {
-                File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
-                if (targetWithoutExtension.exists())
-                    targetWithoutExtension.delete();
-                FileUtils.moveFile(target, targetWithoutExtension);
-                target = targetWithoutExtension;
+
+                if (target.getAbsolutePath().contains(temporaryExtension)) { // Si contient l'extention temporaire.
+                    File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
+                    if (targetWithoutExtension.exists())
+                        targetWithoutExtension.delete();
+                    FileUtils.moveFile(target, targetWithoutExtension);
+                    target = targetWithoutExtension;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("IOException :", e);
@@ -106,7 +110,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setLocalUrl(itemDownloadManager.getFileContainer() + "/" + item.getPodcast().getTitle() + "/" + FilenameUtils.getName(String.valueOf(target)));
             this.item.setLocalUri(target.getAbsolutePath());
             this.item.setDownloaddate(new Timestamp(new Date().getTime()));
-
+            this.item.setLength((int) FileUtils.sizeOf(target));
+            this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
             itemService.update(this.item, this.item.getId());
         } else {
             resetDownload();
@@ -116,7 +121,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     public void resetDownload() {
-        item.setStatus("Not Downloaded");
+        item.setStatus("Not Downloaded").setProgression(0);
         itemService.update(item);
         itemDownloadManager.addItemToQueue(item);
     }

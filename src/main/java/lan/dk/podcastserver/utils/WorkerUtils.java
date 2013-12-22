@@ -39,11 +39,19 @@ public class WorkerUtils implements ApplicationContextAware {
         String itemUrl = item.getUrl().toLowerCase();
         if (itemUrl.contains("rtmp")) {
             nameDownloader = "RTMP";
+        } else if (itemUrl.contains("www.youtube.com")) {
+            nameDownloader = "Youtube";
         } else if (itemUrl.contains("http")) {
             nameDownloader = "HTTP";
         }
 
-        Downloader downloader = (Downloader) context.getBean(nameDownloader + "Downloader");
+        Downloader downloader = null;
+        try {
+            downloader = (Downloader) context.getBean(nameDownloader + "Downloader");
+        } catch (BeansException e) {
+            e.printStackTrace();
+            return null;
+        }
 
         if (downloader != null) {
             downloader.setItem(item);

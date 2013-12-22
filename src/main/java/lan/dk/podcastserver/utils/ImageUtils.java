@@ -25,7 +25,8 @@ public class ImageUtils {
         } catch (IOException e) {
             //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.debug("Erreur HTTP : " + e.getMessage());
-            throw e;
+            return null;
+            //throw e;
         }
         try {
             final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);

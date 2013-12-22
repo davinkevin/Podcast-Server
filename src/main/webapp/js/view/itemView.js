@@ -7,11 +7,22 @@ var ItemView = Backbone.View.extend({
     template: _.template($('#item-template').html()),
 
     events: {
-        //'click .thumbnail-picture': 'showDetails'
+        'click .btn-download': 'add_download'
     },
 
     initialize: function() {
         this.render();
+    },
+
+    add_download : function () {
+        console.log(this.model.get("id").toString());
+        $.ajax({
+            type: "POST",
+            url: 'task/downloadManager/queue/add',
+            data: this.model.get("id").toString(),
+            contentType:"application/json; charset=utf-8",
+            dataType:"text"
+        });
     },
 
     render: function() {

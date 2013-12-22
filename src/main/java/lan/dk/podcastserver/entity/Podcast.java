@@ -1,15 +1,18 @@
 package lan.dk.podcastserver.entity;
 
 
+import lan.dk.podcastserver.utils.jDomUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
-@Table(name = "podcast", schema = "", catalog = "podcastserver")
+@Table(name = "podcast", schema = "", catalog = "")
 @Entity
 public class Podcast implements Serializable {
 
@@ -19,10 +22,22 @@ public class Podcast implements Serializable {
     private String signature;
     private String type;
     private Timestamp lastUpdate;
-    private Collection<Item> items = new LinkedHashSet<Item>();
+    private Collection<Item> items = new ArrayList<Item>();
     private Cover cover;
-    private String rssFeed;
     private String description;
+
+    public Podcast() {
+    }
+
+    public Podcast(String title, String url, String signature, String type, Timestamp lastUpdate, Set<Item> items, Cover cover) {
+        this.title = title;
+        this.url = url;
+        this.signature = signature;
+        this.type = type;
+        this.lastUpdate = lastUpdate;
+        this.items = (items != null) ? items : this.items ;
+        this.cover = cover;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,7 +70,7 @@ public class Podcast implements Serializable {
         this.title = title;
     }
 
-    @Column(name = "url")
+    @Column(name = "url", length = 65535)
     @Basic
     public String getUrl() {
         return url;
@@ -105,19 +120,7 @@ public class Podcast implements Serializable {
         this.cover = cover;
     }
 
-
-    @Column(name = "rssfeed")
-    @Basic
-    @JsonIgnore
-    public String getRssFeed() {
-        return rssFeed;
-    }
-
-    public void setRssFeed(String rssFeed) {
-        this.rssFeed = rssFeed;
-    }
-
-    @Column(name = "description")
+    @Column(name = "description", length = 65535 )
     @Basic
     public String getDescription() {
         return description;
@@ -138,7 +141,6 @@ public class Podcast implements Serializable {
                 ", lastUpdate=" + lastUpdate +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -166,17 +168,10 @@ public class Podcast implements Serializable {
         return result;
     }
 
-    public Podcast() {
+    /* XML Methods */
+    @Transient
+    @JsonIgnore
+    public String toXML(String serveurURL) {
+        return jDomUtils.podcastToXMLGeneric(this, serveurURL);
     }
-
-    public Podcast(String title, String url, String signature, String type, Timestamp lastUpdate, Collection<Item> items, Cover cover) {
-        this.title = title;
-        this.url = url;
-        this.signature = signature;
-        this.type = type;
-        this.lastUpdate = lastUpdate;
-        this.items = (items != null) ? items : this.items ;
-        this.cover = cover;
-    }
-
 }

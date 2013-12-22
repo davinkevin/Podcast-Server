@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.DateUtils;
@@ -48,7 +49,7 @@ public class RSSUpdater extends AbstractUpdater {
         Namespace feedburner = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
 
         try {
-            logger.debug("Traitement de la cover");
+            logger.debug("Traitement de la cover général du podcast");
             if (podcast.getCover() != null && !currentCoverURL.equals(podcast.getCover().getURL())) {
                 podcast.setCover(ImageUtils.getCoverFromURL(new URL(currentCoverURL)));
             }
@@ -56,8 +57,21 @@ public class RSSUpdater extends AbstractUpdater {
             // Parcours des éléments :
             for (Element item : podcastXMLSource.getRootElement().getChild("channel").getChildren("item")) {
 
-                Item podcastItem = new Item(item.getChildText("title"), item.getChild("enclosure").getAttributeValue("url"), DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")));
+                Item podcastItem = new Item()
+                                            .setTitle(item.getChildText("title"))
+                                            .setPubdate(DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")))
+                                            .setDescription(item.getChildText("description"))
+                                            .setCover((item.getChild("thumbnail", media) != null) ? ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getAttributeValue("url"))) : null)
+                                            .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
+                                            .setLength(Integer.parseInt(item.getChild("enclosure").getAttributeValue("length")));
+                 // Gestion des cas pour l'url :
+                if (item.getChild("origEnclosureLink", feedburner) != null) {
+                    podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));
+                } else if (item.getChild("enclosure") != null) {
+                    podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
+                }
 
+                // Sauvegarde
                 if ( !podcast.getItems().contains(podcastItem)) {
                     podcast.getItems().add(podcastItem);
                     podcastItem.setPodcast(podcast);
@@ -68,52 +82,6 @@ public class RSSUpdater extends AbstractUpdater {
                 }
 
             }
-            //podcast = podcastService.update(podcast, podcast.getId());
-
-            boolean xpath = false;
-
-
-            logger.debug("Traitement du flux en XPATH");
-
-            XPathFactory xpfac = XPathFactory.instance();
-            XPathExpression xp = null;
-            Element coverURL;
-            for (Item item : podcast.getItems()) {
-                xp = xpfac.compile("//item[enclosure/@url=\"" + item.getUrl() +"\"]", Filters.element());
-                for (Object elem : xp.evaluate(podcastXMLSource)) {
-                    Element element = (Element) elem;
-                    //logger.debug("Item Found in XML " + element.getChildText("title"));
-                    element.getChild("enclosure").setAttribute("url", this.getServerURL() + "/api/item/" + item.getId() + "/download");
-
-                    // Suppression des tags complémentaire :
-                    element.removeChild("origLink", feedburner);
-                    element.removeChild("origEnclosureLink", feedburner);
-
-
-                    try {
-                        //Si le podcast possède un Thumbnail :
-                        coverURL = element.getChild("thumbnail", media);
-                        if (coverURL != null && coverURL.getAttributeValue("url") != null && !coverURL.getAttributeValue("url").equals(item.getCover().getURL())) {
-                            //logger.debug(coverURL.getAttributeValue("url"));
-                            item.setCover(ImageUtils.getCoverFromURL(new URL(coverURL.getAttributeValue("url"))));
-                        } else {
-                            item.setCover(podcast.getCover());
-                        }
-                    } catch (IOException e) {
-                        item.setCover(podcast.getCover());
-                    }
-
-                }
-            }
-
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            Writer writer = new StringWriter();
-            xout.output(podcastXMLSource, writer);
-
-            logger.debug("Sauvegarde du podcast");
-            //logger.debug("RSS Feed : " + writer.toString());
-            podcast.setRssFeed(writer.toString());
-
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (ParseException e) {

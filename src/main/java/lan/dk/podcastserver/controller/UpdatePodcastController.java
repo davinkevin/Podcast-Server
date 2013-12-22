@@ -71,6 +71,8 @@ public class UpdatePodcastController implements ApplicationContextAware  {
                     podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
                     podcast.setSignature(signature);
                     podcast = podcastService.update(podcast);
+                    //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
+                    podcast = podcastService.update(podcast);
 
 
                 } catch (Exception e) {
@@ -97,7 +99,8 @@ public class UpdatePodcastController implements ApplicationContextAware  {
                 podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
                 podcast.setSignature(signature);
                 podcast = podcastService.update(podcast);
-
+                //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
+                podcast = podcastService.update(podcast);
 
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
