@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.manager;
 
+import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.service.api.ItemService;
 import lan.dk.podcastserver.utils.WorkerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
 
     @Autowired
-    ItemService itemService;
+    ItemBusiness itemBusiness;
 
     @Value("${concurrentDownload}")
     private int limitParallelDownload;
@@ -145,7 +145,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
     }
 
     private void initDownload() {
-        for(Item item : itemService.findAllToDownload()) {
+        for(Item item : itemBusiness.findAllToDownload()) {
             if (!waitingQueue.contains(item)) {
                 waitingQueue.add(item);
             }
@@ -205,7 +205,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
     }
 
     public void addItemToQueue(int id) {
-        waitingQueue.add(itemService.findById(id));
+        waitingQueue.add(itemBusiness.findOne(id));
         manageDownload();
     }
 
@@ -215,7 +215,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
     }
 
     public void removeItemFromQueue(int id) {
-        waitingQueue.remove(itemService.findById(id));
+        waitingQueue.remove(itemBusiness.findOne(id));
     }
 
     public void removeItemFromQueue(Item item) {
@@ -263,5 +263,14 @@ public class ItemDownloadManager implements ApplicationContextAware {
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         logger.debug("Initialisation du Contexte");
         this.context = applicationContext;
+    }
+
+    public void removeItemFromQueueAndDownload(Item itemToDelete) {
+        //* Si le téléchargement est en cours ou en attente : *//
+        if (this.getDownloadingQueue().containsKey(itemToDelete)) {
+            this.stopDownload(itemToDelete.getId());
+        } else if (this.getWaitingQueue().contains(itemToDelete)) {
+            this.removeItemFromQueue(itemToDelete);
+        }
     }
 }

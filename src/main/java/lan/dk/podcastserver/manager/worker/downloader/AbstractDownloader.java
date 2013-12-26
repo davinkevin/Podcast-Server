@@ -1,10 +1,8 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import com.github.axet.wget.info.DownloadInfo;
+import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.service.api.ItemService;
-import lan.dk.podcastserver.service.api.PodcastService;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -27,11 +25,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected File target = null;
 
     @Autowired
-    protected ItemService itemService;
-
-    @Autowired
-    protected PodcastService podcastService;
-
+    protected ItemBusiness itemService;
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
@@ -66,7 +60,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void startDownload() {
         stopDownloading.set(false);
         this.item.setStatus("Started");
-        itemService.update(this.item);
+        itemService.save(this.item);
         this.download();
 
     }
@@ -75,14 +69,14 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void pauseDownload() {
         stopDownloading.set(true);
         this.item.setStatus("Paused");
-        itemService.update(this.item, this.item.getId());
+        itemService.save(this.item);
     }
 
     @Override
     public void stopDownload() {
         stopDownloading.set(true);
         this.item.setStatus("Stopped");
-        itemService.update(this.item, this.item.getId());
+        itemService.save(this.item);
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null && target.exists())
             target.delete();
@@ -112,7 +106,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setDownloaddate(new Timestamp(new Date().getTime()));
             this.item.setLength((int) FileUtils.sizeOf(target));
             this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
-            itemService.update(this.item, this.item.getId());
+            itemService.save(this.item);
         } else {
             resetDownload();
         }
@@ -122,7 +116,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     public void resetDownload() {
         item.setStatus("Not Downloaded").setProgression(0);
-        itemService.update(item);
+        itemService.save(item);
         itemDownloadManager.addItemToQueue(item);
     }
 

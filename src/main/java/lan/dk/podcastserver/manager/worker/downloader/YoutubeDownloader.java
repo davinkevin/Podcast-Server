@@ -9,6 +9,7 @@ import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -63,7 +64,14 @@ public class YoutubeDownloader extends AbstractDownloader {
                         case DONE:
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - Téléchargement terminé");
                             itemDownloadManager.removeACurrentDownload(item);
-                            target = v.getTarget();
+                            File fileWithExtension = new File( v.getTarget().getAbsolutePath().replace(".psdownload", "") + "." + downloadInfo.getContentType().substring(downloadInfo.getContentType().lastIndexOf("/")+1) );
+                            fileWithExtension.delete();
+                            try {
+                                FileUtils.moveFile(v.getTarget(), fileWithExtension);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            target = fileWithExtension;
                             finishDownload();
                             break;
                         case RETRYING:
@@ -104,17 +112,18 @@ public class YoutubeDownloader extends AbstractDownloader {
             //user.setUserQuality(VideoQuality.p480);
             File targetFolder = getTagetFile(item);
             targetFolder.delete();
+
             //target.createNewFile();
             v = new VGet(info, targetFolder.getParentFile());
 
             // [OPTIONAL] call v.extract() only if you d like to get video title
             // before start download. or just skip it.
-            //v.extract(user, stopDownloading, itemSynchronisation);
+            v.extract(user, stopDownloading, itemSynchronisation);
             //System.out.println(info.getTitle());
 
-            v.download(user, stopDownloading, itemSynchronisation);
+            v.setTarget(new File(targetFolder.getParentFile(), info.getTitle().replaceAll("[^a-zA-Z0-9.-]", "_").concat(".psdownload")));
 
-            logger.debug("Download lancé avant exception");
+            v.download(user, stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
             for (DownloadInfo.Part p : e.getInfo().getParts()) {
                 Throwable ee = p.getException();

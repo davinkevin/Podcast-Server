@@ -115,7 +115,7 @@ public class RTMPDownloader extends AbstractDownloader {
     public void startDownload() {
         stopDownloading.set(false);
         this.item.setStatus("Started");
-        itemService.update(this.item, this.item.getId());
+        itemService.save(this.item);
         if (pid != 0 && p != null) { //Relancement du process UNIX
             //ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
             logger.debug("Reprise du téléchargement");
@@ -139,7 +139,6 @@ public class RTMPDownloader extends AbstractDownloader {
 
         //stopDownloading.set(true);
         //this.item.setStatus("Paused");
-        //itemService.update(this.item, this.item.getId());
     }
 
     @Override

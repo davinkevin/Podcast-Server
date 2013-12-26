@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.service;
+package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
@@ -6,15 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Queue;
 import java.util.Set;
 
-@Service
+/**
+ * Created by kevin on 26/12/2013.
+ */
+@Controller
 @RequestMapping("/task/downloadManager")
-public class DownloadManagerService {
+public class IDMController {
 
     @Autowired
     ItemDownloadManager IDM;
@@ -113,4 +116,5 @@ public class DownloadManagerService {
     public void addItemToQueue(@RequestBody int id) {
         IDM.addItemToQueue(id);
     }
+
 }

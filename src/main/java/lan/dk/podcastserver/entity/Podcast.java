@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lan.dk.podcastserver.utils.jDomUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;

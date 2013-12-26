@@ -1,6 +1,6 @@
-package lan.dk.podcastserver.service;
+package lan.dk.podcastserver.controller.task;
 
-import lan.dk.podcastserver.controller.UpdatePodcastController;
+import lan.dk.podcastserver.business.UpdatePodcastBusiness;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,47 +19,40 @@ import javax.annotation.Resource;
 public class UpdatePodcastService {
 
     @Resource
-    UpdatePodcastController updatePodcastController;
+    UpdatePodcastBusiness updatePodcastBusiness;
 
     @Resource
     ItemDownloadManager IDM;
 
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Transactional
     private void updatePodcast () {
-        updatePodcastController.updatePodcast();
+        updatePodcastBusiness.updatePodcast();
     }
 
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Transactional
     private void updatePodcast (@RequestBody int id) {
-        updatePodcastController.updatePodcast(id);
+        updatePodcastBusiness.updatePodcast(id);
     }
 
     @RequestMapping(value = "/updatePodcast/force", method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Transactional
     private void updatePodcastForced (@RequestBody int id) {
-        updatePodcastController.forceUpdatePodcast(id);
+        updatePodcastBusiness.forceUpdatePodcast(id);
     }
 
-    //@Scheduled(cron="${updateAndDownload.refresh.cron}")
-    @Scheduled(fixedDelay = 3600000)
     @RequestMapping(value = "/updateAndDownloadPodcast", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Transactional
     private void updateAndDownloadPodcast() {
-        updatePodcastController.updatePodcast();
+        updatePodcastBusiness.updatePodcast();
         IDM.launchDownload();
     }
 
-    @Scheduled(fixedDelay = 86400000)
     @RequestMapping(value = "/deleteOdlItems", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Transactional
     private void deleteOldItem() {
-        updatePodcastController.deleteOldEpisode();
+        updatePodcastBusiness.deleteOldEpisode();
     }
 }
