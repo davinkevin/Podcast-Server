@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.DateUtils;
+import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.jdom2.Document;
@@ -88,6 +89,30 @@ public class YoutubeUpdater extends AbstractUpdater {
     public Podcast findPodcast(String url) {
         return null;
     }
+
+    @Override
+    public String signaturePodcast(Podcast podcast) {
+        // Si l'image de présentation a changé :
+        Document podcastXMLSource = null;
+        try {
+            podcastXMLSource = jDomUtils.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl()));
+        } catch (JDOMException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return null;
+        }
+
+        Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
+        Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+
+        if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0) != null) {
+            return DigestUtils.generateMD5SignatureFromDOM (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));
+        }
+        return "";
+    }
+
 
     //** Helper Youtube **//
     private String gdataUrlFromYoutubeURL(String youtubeUrl) { //

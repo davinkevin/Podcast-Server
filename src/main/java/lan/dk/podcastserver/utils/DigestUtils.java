@@ -7,12 +7,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class DigestUtils {
 
     private static Logger logger = LoggerFactory.getLogger(DigestUtils.class);
 
-    public static String generateMD5Signature(String url) {
+    public static String generateMD5SignatureFromUrl(String url) {
         try {
             logger.debug("Debut de la signature");
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -45,5 +46,25 @@ public class DigestUtils {
             throw new RuntimeException(ex);
         }
 
+    }
+
+    public static String generateMD5SignatureFromDOM(String html) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            md.update(html.getBytes());
+            byte[] digest = md.digest();
+            StringBuffer sb = new StringBuffer();
+            for (byte b : digest) {
+                sb.append(Integer.toHexString((int) (b & 0xff)));
+            }
+            //logger.debug("original:" + html);
+            //logger.debug("digested:" + digest);
+            logger.debug("Signature : " + sb.toString());
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

@@ -104,7 +104,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setLocalUrl(itemDownloadManager.getFileContainer() + "/" + item.getPodcast().getTitle() + "/" + FilenameUtils.getName(String.valueOf(target)));
             this.item.setLocalUri(target.getAbsolutePath());
             this.item.setDownloaddate(new Timestamp(new Date().getTime()));
-            this.item.setLength((int) FileUtils.sizeOf(target));
+            this.item.setLength(FileUtils.sizeOf(target));
             this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
             itemService.save(this.item);
         } else {

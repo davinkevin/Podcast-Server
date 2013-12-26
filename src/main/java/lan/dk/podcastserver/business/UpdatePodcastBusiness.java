@@ -57,13 +57,12 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
         Document podcastXML = null;
         Updater updater;
         for (Podcast podcast : podcasts) {
-            String signature = DigestUtils.generateMD5Signature(podcast.getUrl());
-            if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                try {
+            try {
+                //podcastXML = jDomUtils.jdom2Parse(podcast.getUrl());
+                updater = workerUtils.getUpdaterByType(podcast);
+                String signature = updater.signaturePodcast(podcast);
+                if ( signature != null && !signature.equals(podcast.getSignature()) ) {
                     logger.debug("Traitement du Podcast : " + podcast.toString());
-                    //podcastXML = jDomUtils.jdom2Parse(podcast.getUrl());
-
-                    updater = workerUtils.getUpdaterByType(podcast);
                     podcast = updater.updateFeed(podcast);
 
 
@@ -73,12 +72,12 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                     //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
                     podcast = podcastBusiness.update(podcast);
 
-
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
+
     }
 
     public void updatePodcast(int id) {
@@ -86,25 +85,25 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
         Podcast podcast = podcastBusiness.findOne(id);
         Document podcastXML = null;
         Updater updater;
-        String signature = DigestUtils.generateMD5Signature(podcast.getUrl());
-        if ( signature != null && !signature.equals(podcast.getSignature()) ) {
             try {
                 logger.debug("Traitement du Podcast : " + podcast.toString());
 
                 updater = workerUtils.getUpdaterByType(podcast);
-                podcast = updater.updateFeed(podcast);
+                String signature = updater.signaturePodcast(podcast);
+                if ( signature != null && !signature.equals(podcast.getSignature()) ) {
+                    podcast = updater.updateFeed(podcast);
 
 
-                podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
-                podcast.setSignature(signature);
-                podcast = podcastBusiness.update(podcast);
-                //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
-                podcast = podcastBusiness.update(podcast);
+                    podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
+                    podcast.setSignature(signature);
+                    podcast = podcastBusiness.update(podcast);
+                    //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
+                    podcast = podcastBusiness.update(podcast);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-        }
     }
 
     public void forceUpdatePodcast (int id){
@@ -137,7 +136,15 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
     @PostConstruct
     public void resetItemWithIncorrectState() {
+
+        logger.info("Reset des Started");
+
         for (Item item : itemBusiness.findByStatus("Started")) {
+            itemBusiness.save(item.setStatus("Not Downloaded"));
+        }
+
+        logger.info("Reset des Paused");
+        for (Item item : itemBusiness.findByStatus("Paused")) {
             itemBusiness.save(item.setStatus("Not Downloaded"));
         }
     }

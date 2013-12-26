@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.context.Mock;
 
-import lan.dk.podcastserver.service.api.ItemService;
-import lan.dk.podcastserver.service.api.PodcastService;
+import lan.dk.podcastserver.business.ItemBusiness;
+import lan.dk.podcastserver.business.PodcastBusiness;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MockService {
     @Bean
-    public static ItemService getItemService() {
-        return Mockito.mock(ItemService.class);
+    public static ItemBusiness getItemService() {
+        return Mockito.mock(ItemBusiness.class);
     }
 
     @Bean
-    public static PodcastService getPodcastService() {
-        return Mockito.mock(PodcastService.class);
+    public static PodcastBusiness getPodcastService() {
+        return Mockito.mock(PodcastBusiness.class);
     }
 }

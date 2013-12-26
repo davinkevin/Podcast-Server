@@ -1,26 +1,19 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.DateUtils;
+import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.filter.Filters;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -44,13 +37,17 @@ public class RSSUpdater extends AbstractUpdater {
             return null;
         }
 
-        String currentCoverURL = podcastXMLSource.getRootElement().getChild("channel").getChild("image").getChildText("url");
+        String currentCoverURL =
+                (podcastXMLSource.getRootElement().getChild("channel").getChild("image") != null)
+                        ? podcastXMLSource.getRootElement().getChild("channel").getChild("image").getChildText("url")
+                        : null;
+
         Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
         Namespace feedburner = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
 
         try {
             logger.debug("Traitement de la cover général du podcast");
-            if (podcast.getCover() != null && !currentCoverURL.equals(podcast.getCover().getURL())) {
+            if (podcast.getCover() != null && currentCoverURL != null && !currentCoverURL.equals(podcast.getCover().getURL())) {
                 podcast.setCover(ImageUtils.getCoverFromURL(new URL(currentCoverURL)));
             }
             logger.debug("Traitement des Items");
@@ -63,7 +60,7 @@ public class RSSUpdater extends AbstractUpdater {
                                             .setDescription(item.getChildText("description"))
                                             .setCover((item.getChild("thumbnail", media) != null) ? ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getAttributeValue("url"))) : null)
                                             .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
-                                            .setLength(Integer.parseInt(item.getChild("enclosure").getAttributeValue("length")));
+                                            .setLength(Long.parseLong(item.getChild("enclosure").getAttributeValue("length")));
                  // Gestion des cas pour l'url :
                 if (item.getChild("origEnclosureLink", feedburner) != null) {
                     podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));
@@ -112,4 +109,11 @@ public class RSSUpdater extends AbstractUpdater {
         }
         return podcast;
     }
+
+    @Override
+    public String signaturePodcast(Podcast podcast) {
+        return DigestUtils.generateMD5SignatureFromUrl(podcast.getUrl());
+    }
+
+
 }

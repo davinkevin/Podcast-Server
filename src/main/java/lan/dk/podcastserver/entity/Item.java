@@ -20,7 +20,7 @@ public class Item implements Serializable {
     private Timestamp pubdate;
     private String description;
     private String mimeType;
-    private int length;
+    private long length;
     private Cover cover;
 
     /* Value for the Download */
@@ -61,11 +61,11 @@ public class Item implements Serializable {
 
     @Column(name = "length")
     @Basic
-    public int getLength() {
+    public long getLength() {
         return length;
     }
 
-    public Item setLength(int length) {
+    public Item setLength(long length) {
         this.length = length;
         return this;
     }

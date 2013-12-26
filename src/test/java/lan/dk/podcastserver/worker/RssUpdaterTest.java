@@ -54,4 +54,19 @@ public class RssUpdaterTest {
         rssUpdater.updateFeed(podcast);
         logger.debug(podcast.toString());
     }
+    @Test
+    public void podMyDev() {
+        logger.debug("Download");
+        Podcast podcast = new Podcast("PodMyDev", "http://pipes.yahoo.com/pipes/pipe.run?URL=http%3A%2F%2Fwww.podmydev.com%2F%3Ffeed%3Dpodcast&_id=1c04fdbe524a909e33308bc4fab9d5ae&_render=rss", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null);
+        rssUpdater.updateFeed(podcast);
+        logger.debug(podcast.toString());
+    }
+
+    @Test
+    public void twig() {
+        logger.debug("Download");
+        Podcast podcast = new Podcast("TWIG", "http://feeds.twit.tv/twig_video_hd", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null);
+        rssUpdater.updateFeed(podcast);
+        logger.debug(podcast.toString());
+    }
 }

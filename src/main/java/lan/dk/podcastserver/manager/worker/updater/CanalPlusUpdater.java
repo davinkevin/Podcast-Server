@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.DateUtils;
+import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.jdom2.JDOMException;
@@ -82,6 +83,35 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     public Podcast findPodcast(String url) {
         return null; // retourne un Podcast à partir de l'url fournie
+    }
+
+    @Override
+    public String signaturePodcast(Podcast podcast) {
+        Document page = null;
+
+        try {
+            page = Jsoup.connect(podcast.getUrl()).get();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("IOException :", e);
+        }
+
+        // Si la page possède un planifier :
+        if ( !page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+            return DigestUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
+        }
+
+
+        // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
+        if ( !podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+            return DigestUtils.generateMD5SignatureFromUrl(this.getPodcastURLFromFrontTools(podcast.getUrl()));
+        }
+
+        // Si l'url est une front-tools et que la liste est encore vide :
+        if (podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+            return DigestUtils.generateMD5SignatureFromUrl(podcast.getUrl());
+        }
+        return "";
     }
 
 

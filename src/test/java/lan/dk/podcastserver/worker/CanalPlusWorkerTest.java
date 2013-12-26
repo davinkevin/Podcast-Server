@@ -92,6 +92,21 @@ public class CanalPlusWorkerTest {
 
     }
 
+    @Test
+    public void updateBefore() {
+
+        canalPlusPodcast = new Podcast("Le Before", "http://www.canalplus.fr/c-divertissement/c-le-before-du-grand-journal/pid6429-l-emission.html",
+                "", "CanalPlus", new Timestamp(System.currentTimeMillis()), null, new Cover("http://img15.hostingpics.net/pics/966069Capture20131020092150.png", 60, 60));
+        logger.debug("Update");
+        canalPlusUpdater.updateFeed(canalPlusPodcast);
+        canalPlusUpdater.updateFeed(canalPlusPodcast);
+        canalPlusUpdater.updateFeed(canalPlusPodcast);
+        //canalPlusPodcast = canalPlusUpdater.updateFeed(canalPlusPodcast);
+        //org.junit.Assert.assertThat(canalPlusPodcast.getItems().size(), org.hamcrest.core.IsNot(0));
+        //assertThat(canalPlusPodcast.getItems().size(), IsNot.not(0));
+
+    }
+
     //@Test
     public void downloadItemCanalPlus() {
         logger.debug("Download");
