@@ -2,6 +2,7 @@ package lan.dk.podcastserver.utils;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -98,28 +99,30 @@ public class jDomUtils {
         channel.addContent(image);
 
         for (Item item : podcast.getItems()) {
-            Element xml_item = new Element("item");
+            Element xmlItem = new Element("item");
 
             Element item_title = new Element("title");
             item_title.addContent(new Text(item.getTitle()));
-            xml_item.addContent(item_title);
+            xmlItem.addContent(item_title);
 
             Element item_description = new Element("description");
             item_description.addContent(new Text(item.getDescription()));
-            xml_item.addContent(item_description);
+            xmlItem.addContent(item_description);
 
             Element item_enclosure = new Element("enclosure");
             item_enclosure.setAttribute("url", serveurURL + item.getProxyURL());
             item_enclosure.setAttribute("length", String.valueOf(item.getLength()));
 
-            item_enclosure.setAttribute("type", item.getMimeType());
-            xml_item.addContent(item_enclosure);
+            if (StringUtils.isNotEmpty(item.getMimeType()))
+                item_enclosure.setAttribute("type", item.getMimeType());
+
+            xmlItem.addContent(item_enclosure);
 
             Element item_pubdate = new Element("pubDate");
             item_pubdate.addContent(new Text(DateUtils.TimeStampToRFC2822(item.getPubdate())));
-            xml_item.addContent(item_pubdate);
+            xmlItem.addContent(item_pubdate);
 
-             channel.addContent(xml_item);
+             channel.addContent(xmlItem);
         }
 
         Element rss = new Element("rss");
