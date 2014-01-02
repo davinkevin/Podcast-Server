@@ -7,7 +7,7 @@
     </layout>
   </appender>
   
-  <logger name="lan.dk.podcastserver" level="TRACE"/>
+  <logger name="lan.dk.podcastserver" level="DEBUG"/>
 
     <!-- Spring MVC -->
     <!---->

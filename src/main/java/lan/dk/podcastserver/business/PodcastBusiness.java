@@ -65,7 +65,7 @@ public class PodcastBusiness {
     }
     //*****//
 
-    public Podcast generatePodcastFromURL(@RequestBody String URL) {
+    public Podcast generatePodcastFromURL(String URL) {
         logger.debug("URL = " + URL);
         try {
             return jDomUtils.getPodcastFromURL(new java.net.URL(URL));
@@ -80,7 +80,7 @@ public class PodcastBusiness {
     }
 
     @Transactional(readOnly = true)
-    public String getRss(@PathVariable int id) {
+    public String getRss(int id) {
         return podcastRepository.findOne(id).toXML(serveurURL);
     }
 }

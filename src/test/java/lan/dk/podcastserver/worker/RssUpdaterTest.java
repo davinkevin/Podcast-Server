@@ -69,4 +69,14 @@ public class RssUpdaterTest {
         rssUpdater.updateFeed(podcast);
         logger.debug(podcast.toString());
     }
+    @Test
+    public void appleKeynotes() {
+        logger.debug("Download");
+        //INSERT INTO `podcast` (`id`, `description`, `last_update`, `signature`, `title`, `type`, `url`, `cover_id`) VALUES
+        //(47, NULL, NULL, NULL, 'Apple - Keynotes', 'RSS', 'http://itstreaming.apple.com/podcasts/apple_keynotes_1080p/apple_keynotes_1080p.xml', 909);
+
+        Podcast podcast = new Podcast("Apple Keynote", "http://itstreaming.apple.com/podcasts/apple_keynotes_1080p/apple_keynotes_1080p.xml", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null);
+        rssUpdater.updateFeed(podcast);
+        logger.debug(podcast.toString());
+    }
 }

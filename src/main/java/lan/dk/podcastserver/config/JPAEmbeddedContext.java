@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
@@ -37,6 +40,11 @@ public class JPAEmbeddedContext {
 
     @Bean
     public DataSource dataSource() {
+        /*
+            EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+            EmbeddedDatabase ed = builder.setType(EmbeddedDatabaseType.H2).addScript("test-script.sql").build();
+        */
+
         BoneCPDataSource dataSource = new BoneCPDataSource();
 
         logger.info("Instanciation de la database embarquée");

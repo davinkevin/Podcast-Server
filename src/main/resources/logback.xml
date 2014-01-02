@@ -24,8 +24,9 @@
 
     <!-- Spring MVC -->
     <!-- ORM
-    <logger name="org.springframework.orm" level="TRACE"/>
               -->
+    <logger name="org.springframework.web" level="TRACE"/>
+
     <!-- Hibernate  -->
     <logger name="org.hibernate.*" level="DEBUG"/>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="DEBUG" />

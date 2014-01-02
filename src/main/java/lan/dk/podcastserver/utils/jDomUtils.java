@@ -88,6 +88,7 @@ public class jDomUtils {
         Element image_url = new Element("url");
         Element image_width = new Element("width");
         Element image_height = new Element("height");
+
         image_url.addContent(podcast.getCover().getURL());
         image_width.addContent(String.valueOf(podcast.getCover().getWidth()));
         image_height.addContent(String.valueOf(podcast.getCover().getHeight()));
@@ -109,9 +110,9 @@ public class jDomUtils {
 
             Element item_enclosure = new Element("enclosure");
             item_enclosure.setAttribute("url", serveurURL + item.getProxyURL());
-            item_enclosure.setAttribute("length", "0");
+            item_enclosure.setAttribute("length", String.valueOf(item.getLength()));
 
-            item_enclosure.setAttribute("type", "video/mp4");
+            item_enclosure.setAttribute("type", item.getMimeType());
             xml_item.addContent(item_enclosure);
 
             Element item_pubdate = new Element("pubDate");

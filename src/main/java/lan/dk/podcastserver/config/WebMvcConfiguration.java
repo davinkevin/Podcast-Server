@@ -4,10 +4,12 @@ import lan.dk.podcastserver.utils.jackson.HibernateAwareObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -66,11 +68,18 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void configureMessageConverters (List<HttpMessageConverter<?>> converters) {
 
+        super.configureMessageConverters(converters);
+
         //Ajout de la librairie de désierialization spécifiques à Hibernate pour Jackson
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-
         converters.add(mappingJackson2HttpMessageConverter);
+
+        //Ajout du mapping string par défaut :
+        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+        converters.add(stringHttpMessageConverter);
+
+
     }
 
 
