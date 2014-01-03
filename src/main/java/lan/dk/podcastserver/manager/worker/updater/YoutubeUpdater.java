@@ -116,7 +116,9 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     //** Helper Youtube **//
     private String gdataUrlFromYoutubeURL(String youtubeUrl) { //
-        if ( youtubeUrl.matches(".*www.youtube.com/channel/.*") || youtubeUrl.matches(".*www.youtube.com/user/.*") ) { //www.youtube.com/channel/UCe2YQ986DdKliHNvE8va4kQ
+        if ( youtubeUrl.matches(".*www.youtube.com/channel/.*") ||
+                youtubeUrl.matches(".*www.youtube.com/user/.*") ||
+                youtubeUrl.matches(".*www.youtube.com/.*") ) { //www.youtube.com/[channel|user]*/nom
             return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads?max-results=50"; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
         } else if (true) {
             return "";

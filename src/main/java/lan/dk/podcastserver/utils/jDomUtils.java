@@ -66,13 +66,15 @@ public class jDomUtils {
     }
 
     public static String podcastToXMLGeneric (Podcast podcast, String serveurURL) {
+        Namespace itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+
         Element channel = new Element("channel");
 
         Element title = new Element("title");
         title.addContent(new Text(podcast.getTitle()));
 
         Element url = new Element("link");
-        url.addContent(new Text(podcast.getUrl()));
+        url.addContent(new Text("http://localhost:8080/api/podcast/" + podcast.getId() + "/rss"));
 
         Element lastUpdate = new Element("pubDate");
         lastUpdate.addContent(new Text(DateUtils.TimeStampToRFC2822(podcast.getLastUpdate())));
@@ -80,23 +82,54 @@ public class jDomUtils {
         Element description = new Element("description");
         description.addContent(new Text(podcast.getDescription()));
 
+        Element itunesSub = new Element("subtitle", itunesNS);
+        itunesSub.addContent(new Text(podcast.getDescription()));
+
+        Element itunesSummary = new Element("summary", itunesNS);
+        itunesSummary.addContent(new Text(podcast.getDescription()));
+
+        Element language = new Element("language");
+        language.addContent(new Text("fr-fr"));
+
+        //Element copyright = new Element("copyright");
+        //copyright.addContent(new Text(podcast.getTitle()));
+
+        Element itunesAuthor = new Element("author", itunesNS);
+        itunesAuthor.addContent(new Text(podcast.getType()));
+
+        Element itunesCategory = new Element("category", itunesNS);
+
+
         channel.addContent(url);
         channel.addContent(title);
         channel.addContent(lastUpdate);
         channel.addContent(description);
+        channel.addContent(itunesSub);
+        channel.addContent(itunesSummary);
+        channel.addContent(language);
+        //channel.addContent(copyright);
+        channel.addContent(itunesAuthor);
+        channel.addContent(itunesCategory);
 
-        Element image = new Element("image");
-        Element image_url = new Element("url");
-        Element image_width = new Element("width");
-        Element image_height = new Element("height");
 
-        image_url.addContent(podcast.getCover().getURL());
-        image_width.addContent(String.valueOf(podcast.getCover().getWidth()));
-        image_height.addContent(String.valueOf(podcast.getCover().getHeight()));
-        image.addContent(image_height);
-        image.addContent(image_url);
-        image.addContent(image_width);
-        channel.addContent(image);
+        Element itunesImage = new Element("image", itunesNS);
+        if (podcast.getCover() != null) {
+            Element image = new Element("image");
+            Element image_url = new Element("url");
+            Element image_width = new Element("width");
+            Element image_height = new Element("height");
+
+            itunesImage.addContent(new Text(podcast.getCover().getURL()));
+
+            image_url.addContent(podcast.getCover().getURL());
+            image_width.addContent(String.valueOf(podcast.getCover().getWidth()));
+            image_height.addContent(String.valueOf(podcast.getCover().getHeight()));
+            image.addContent(image_height);
+            image.addContent(image_url);
+            image.addContent(image_width);
+            channel.addContent(image);
+            channel.addContent(itunesImage);
+        }
 
         for (Item item : podcast.getItems()) {
             Element xmlItem = new Element("item");
@@ -109,8 +142,11 @@ public class jDomUtils {
             item_description.addContent(new Text(item.getDescription()));
             xmlItem.addContent(item_description);
 
+            xmlItem.addContent(itunesImage.clone());
+
             Element item_enclosure = new Element("enclosure");
-            item_enclosure.setAttribute("url", serveurURL + item.getProxyURL());
+
+            item_enclosure.setAttribute("url", serveurURL + item.getProxyURL() + MimeTypeUtils.getExtention(item) );
             item_enclosure.setAttribute("length", String.valueOf(item.getLength()));
 
             if (StringUtils.isNotEmpty(item.getMimeType()))
@@ -122,11 +158,29 @@ public class jDomUtils {
             item_pubdate.addContent(new Text(DateUtils.TimeStampToRFC2822(item.getPubdate())));
             xmlItem.addContent(item_pubdate);
 
-             channel.addContent(xmlItem);
+            Element itunesExplicite = new Element("explicit", itunesNS);
+            itunesExplicite.addContent(new Text("No"));
+            xmlItem.addContent(itunesExplicite);
+
+            Element itunesItemSub = new Element("subtitle", itunesNS);
+            itunesItemSub.addContent(new Text(item.getTitle()));
+            xmlItem.addContent(itunesItemSub);
+
+            Element itunesItemSummary = new Element("summary", itunesNS);
+            itunesItemSummary.addContent(new Text(item.getDescription()));
+            xmlItem.addContent(itunesItemSummary);
+
+            Element guid = new Element("guid");
+            guid.addContent(new Text(serveurURL + item.getProxyURL()));
+            xmlItem.addContent(guid);
+
+            xmlItem.addContent(itunesAuthor.clone());
+
+            channel.addContent(xmlItem);
         }
 
         Element rss = new Element("rss");
-        rss.addNamespaceDeclaration(Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd"));
+        rss.addNamespaceDeclaration(itunesNS);
         rss.addContent(channel);
 
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());

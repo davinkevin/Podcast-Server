@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.utils;
 
+import lan.dk.podcastserver.entity.Item;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -32,6 +33,19 @@ public class MimeTypeUtils {
         } else {
             return "unknown/" + extension;
         }
+    }
+
+    public static String getExtention(Item item) {
+        if (item.getMimeType() != null) {
+            return item.getMimeType().replace("audio/", ".").replace("video/", ".");
+        }
+        if (item.getPodcast().getType() == "Youtube") {
+            return ".mp4";
+        } else {
+            return item.getUrl().substring(item.getUrl().lastIndexOf("."));
+        }
+
+
     }
 
 }

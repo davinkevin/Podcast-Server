@@ -82,7 +82,7 @@ public class ItemController {
         return itemBusiness.findAllToDelete();
     }
 
-    @RequestMapping(value="{id:[\\d]+}/download", method = RequestMethod.GET)
+    @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
     public void getEpisodeFile(@PathVariable int id, HttpServletResponse response) {
         try {
             response.sendRedirect(itemBusiness.getEpisodeFile(id));

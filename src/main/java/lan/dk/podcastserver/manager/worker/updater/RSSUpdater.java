@@ -53,33 +53,33 @@ public class RSSUpdater extends AbstractUpdater {
             logger.debug("Traitement des Items");
             // Parcours des éléments :
             for (Element item : podcastXMLSource.getRootElement().getChild("channel").getChildren("item")) {
-
-                Item podcastItem = new Item()
-                                            .setTitle(item.getChildText("title"))
-                                            .setPubdate(DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")))
-                                            .setDescription(item.getChildText("description"))
-                                            .setCover((item.getChild("thumbnail", media) != null) ? ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getAttributeValue("url"))) : null)
-                                            .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
-                                            .setLength((item.getChild("enclosure").getAttributeValue("length") != null)
-                                                    ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
-                                                    : 0L);
-                 // Gestion des cas pour l'url :
-                if (item.getChild("origEnclosureLink", feedburner) != null) {
-                    podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));
-                } else if (item.getChild("enclosure") != null) {
-                    podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
-                }
-
-                // Sauvegarde
-                if ( !podcast.getItems().contains(podcastItem)) {
-                    podcast.getItems().add(podcastItem);
-                    podcastItem.setPodcast(podcast);
-                    if (podcastItem.getCover() == null) {
-                        podcastItem.setCover(podcast.getCover());
+                if (item.getChild("enclosure") != null || item.getChild("origEnclosureLink", feedburner) != null)   { // est un podcast utilisable
+                    Item podcastItem = new Item()
+                                                .setTitle(item.getChildText("title"))
+                                                .setPubdate(DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")))
+                                                .setDescription(item.getChildText("description"))
+                                                .setCover((item.getChild("thumbnail", media) != null) ? ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getAttributeValue("url"))) : null)
+                                                .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
+                                                .setLength((item.getChild("enclosure").getAttributeValue("length") != null)
+                                                        ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
+                                                        : 0L);
+                     // Gestion des cas pour l'url :
+                    if (item.getChild("origEnclosureLink", feedburner) != null) {
+                        podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));
+                    } else if (item.getChild("enclosure") != null) {
+                        podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
                     }
-                    logger.debug("Ajout du nouvel episode : " + podcastItem.toString());
-                }
 
+                    // Sauvegarde
+                    if ( !podcast.getItems().contains(podcastItem)) {
+                        podcast.getItems().add(podcastItem);
+                        podcastItem.setPodcast(podcast);
+                        if (podcastItem.getCover() == null) {
+                            podcastItem.setCover(podcast.getCover());
+                        }
+                        logger.debug("Ajout du nouvel episode : " + podcastItem.toString());
+                    }
+                }
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

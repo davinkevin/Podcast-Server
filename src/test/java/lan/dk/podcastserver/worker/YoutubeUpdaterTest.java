@@ -58,5 +58,13 @@ public class YoutubeUpdaterTest {
         logger.debug(podcast.toString());
 
     }
+    @Test
+    public void updateNowTechTvFr() {
+        Podcast podcast = new Podcast("NowTechTvFr", "https://www.youtube.com/nowtechtvfr", "", "Youtube", null, null, new Cover());
+        youtubeUpdater.updateFeed(podcast);
+
+        logger.debug(podcast.toString());
+
+    }
 
 }
