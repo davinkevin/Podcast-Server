@@ -120,8 +120,8 @@ public class YoutubeUpdater extends AbstractUpdater {
                 youtubeUrl.matches(".*www.youtube.com/user/.*") ||
                 youtubeUrl.matches(".*www.youtube.com/.*") ) { //www.youtube.com/[channel|user]*/nom
             return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads?max-results=50"; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
-        } else if (true) {
-            return "";
+        } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
+            return youtubeUrl + "?max-results=50";
         }
         return null;
 

@@ -67,4 +67,13 @@ public class YoutubeUpdaterTest {
 
     }
 
+    @Test
+    public void androTechPlayslist() {
+        Podcast podcast = new Podcast("AndroTech", "http://gdata.youtube.com/feeds/api/playlists/PLN6bvn-Db2BoPcPRqSgtvi-TjZgIB9PvW", "", "Youtube", null, null, new Cover());
+        youtubeUpdater.updateFeed(podcast);
+
+        logger.debug(podcast.toString());
+
+    }
+
 }
