@@ -50,14 +50,21 @@ public class YoutubeUpdater extends AbstractUpdater {
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
         Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
         for (Element item : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
-            logger.debug("Entry : {}", item.getChildText("title", defaultNamespace));
             try {
                 Item podcastItem = new Item()
                                             .setTitle(item.getChildText("title", defaultNamespace))
                                             .setDescription(item.getChildText("content", defaultNamespace))
                                             .setPubdate(DateUtils.youtubeDateToTimeStamp(item.getChildText("published", defaultNamespace)))
-                                            .setPodcast(podcast)
-                                            .setUrl(YOUTUBE_VIDEO_URL + item.getChildText("id", defaultNamespace).substring(item.getChildText("id", defaultNamespace).lastIndexOf("/")+1));
+                                            .setPodcast(podcast);
+                                            //.setUrl(YOUTUBE_VIDEO_URL + item.getChildText("id", defaultNamespace).substring(item.getChildText("id", defaultNamespace).lastIndexOf("/")+1));
+
+                for (Element link : item.getChildren("link", defaultNamespace)) {
+                    if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
+                        podcastItem.setUrl(link.getAttributeValue("href", null, ""));
+                        break;
+                    }
+                }
+
 
                 if (!podcast.getItems().contains(podcastItem)) {
                     if (    item.getChild("group", media) != null &&

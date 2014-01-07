@@ -72,6 +72,8 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                     //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
                     podcast = podcastBusiness.update(podcast);
 
+                } else {
+                    logger.info("Podcast non traité car signature identique : {}" + podcast.toString());
                 }
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

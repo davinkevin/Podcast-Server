@@ -84,8 +84,10 @@ public class HTTPDownloader extends AbstractDownloader {
             }
         } catch (DownloadInterruptedError e) {
             logger.debug("Arrêt du téléchargement");
+            stopDownload();
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            stopDownload();
         }
         //logger.debug("Download termine");
         //finishDownload();

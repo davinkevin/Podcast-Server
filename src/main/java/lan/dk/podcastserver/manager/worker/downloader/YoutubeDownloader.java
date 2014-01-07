@@ -125,6 +125,7 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             v.download(user, stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
+            stopDownload();
             for (DownloadInfo.Part p : e.getInfo().getParts()) {
                 Throwable ee = p.getException();
                 if (ee != null)
@@ -132,10 +133,10 @@ public class YoutubeDownloader extends AbstractDownloader {
             }
         } catch (DownloadInterruptedError e) {
             logger.debug("Arrêt du téléchargement");
+            stopDownload();
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();
+            stopDownload();
         }
         logger.debug("Download termine");
         return null;  //To change body of implemented methods use File | Settings | File Templates.

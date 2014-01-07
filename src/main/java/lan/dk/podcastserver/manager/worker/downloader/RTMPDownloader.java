@@ -61,7 +61,7 @@ public class RTMPDownloader extends AbstractDownloader {
                         try {
                             long time = System.currentTimeMillis();
                             while ((ligne = br.readLine()) != null) {
-                                logger.debug(ligne);
+                                //logger.debug(ligne);
                                 m = p.matcher(ligne);
                                 // Si le dernier traitement date de plus d'une seconde :
                                 if (m.matches() && Integer.parseInt(m.group(1)) > item.getProgression()) {
@@ -95,15 +95,19 @@ public class RTMPDownloader extends AbstractDownloader {
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("IOException :", e);
+                stopDownload();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 logger.error("InterruptedException :", e);
+                stopDownload();
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 logger.error("NoSuchFieldException :", e);
+                stopDownload();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 logger.error("IllegalAccessException :", e);
+                stopDownload();
             }
         } else {
             logger.debug("Traiter avec un téléchargeur HTTP");

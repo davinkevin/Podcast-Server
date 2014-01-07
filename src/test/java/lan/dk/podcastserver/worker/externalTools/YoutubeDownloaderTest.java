@@ -27,7 +27,7 @@ public class YoutubeDownloaderTest {
     @Test
     public void getYoutubeVideo() {
         Item item = new Item()
-                            .setUrl("http://www.youtube.com/watch?v=FNTWrCBwhdQ")
+                            .setUrl("http://www.youtube.com/watch?v=E-0WGB9WCRY&amp;feature=youtube_gdata")
                             .setPodcast(new Podcast());
         item.getPodcast().setTitle("Test");
 
