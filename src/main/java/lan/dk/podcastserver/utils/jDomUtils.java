@@ -146,7 +146,7 @@ public class jDomUtils {
 
             Element item_enclosure = new Element("enclosure");
 
-            item_enclosure.setAttribute("url", serveurURL + item.getProxyURL() + MimeTypeUtils.getExtention(item) );
+            item_enclosure.setAttribute("url", serveurURL + item.getProxyURL() + MimeTypeUtils.getExtension(item) );
             item_enclosure.setAttribute("length", String.valueOf(item.getLength()));
 
             if (StringUtils.isNotEmpty(item.getMimeType()))

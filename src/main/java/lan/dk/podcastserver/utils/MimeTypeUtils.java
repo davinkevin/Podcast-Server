@@ -35,11 +35,11 @@ public class MimeTypeUtils {
         }
     }
 
-    public static String getExtention(Item item) {
+    public static String getExtension(Item item) {
         if (item.getMimeType() != null) {
             return item.getMimeType().replace("audio/", ".").replace("video/", ".");
         }
-        if (item.getPodcast().getType() == "Youtube") {
+        if (item.getPodcast().getType() == "Youtube" || item.getUrl().lastIndexOf(".") == -1 ) {
             return ".mp4";
         } else {
             return item.getUrl().substring(item.getUrl().lastIndexOf("."));
