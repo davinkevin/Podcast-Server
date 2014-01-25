@@ -36,4 +36,16 @@ public class YoutubeDownloaderTest {
         youtubeDownloader.download();
     }
 
+    @Test
+    public void getShortVideo() {
+        Item item = new Item()
+                            .setUrl("http://www.youtube.com/watch?v=Hzgzim5m7oU")
+                            .setPodcast(new Podcast());
+        item.getPodcast().setTitle("Test");
+
+        //Downloader downloader = workerUtils.getDownloaderByType(canalPlusPodcast.getItems().iterator().next());
+        youtubeDownloader.setItem(item);
+        youtubeDownloader.download();
+    }
+
 }

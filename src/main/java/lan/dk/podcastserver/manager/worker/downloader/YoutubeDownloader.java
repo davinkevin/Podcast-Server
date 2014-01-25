@@ -9,6 +9,7 @@ import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
@@ -18,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,16 +65,8 @@ public class YoutubeDownloader extends AbstractDownloader {
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
                             break;
                         case DONE:
-                            logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - Téléchargement terminé");
-                            itemDownloadManager.removeACurrentDownload(item);
-                            File fileWithExtension = new File( v.getTarget().getAbsolutePath().replace(".psdownload", "") + "." + downloadInfo.getContentType().substring(downloadInfo.getContentType().lastIndexOf("/")+1) );
-                            fileWithExtension.delete();
-                            try {
-                                FileUtils.moveFile(v.getTarget(), fileWithExtension);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            target = fileWithExtension;
+                            logger.debug("{} - Téléchargement terminé", FilenameUtils.getName( v.getTarget().getAbsolutePath() ));
+                            //itemDownloadManager.removeACurrentDownload(item);
                             finishDownload();
                             break;
                         case RETRYING:
@@ -110,18 +105,17 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             VideoInfoUser user = new VideoInfoUser();
             //user.setUserQuality(VideoQuality.p480);
-            File targetFolder = getTagetFile(item);
-            targetFolder.delete();
+            //File targetFolder = getFolderDestination(item);
 
             //target.createNewFile();
-            v = new VGet(info, targetFolder.getParentFile());
+            v = new VGet(info, null);
 
             // [OPTIONAL] call v.extract() only if you d like to get video title
             // before start download. or just skip it.
             v.extract(user, stopDownloading, itemSynchronisation);
             //System.out.println(info.getTitle());
 
-            v.setTarget(new File(targetFolder.getParentFile(), info.getTitle().replaceAll("[^a-zA-Z0-9.-]", "_").concat(".psdownload")));
+            v.setTarget(getTagetFile(item, info.getTitle()));
 
             v.download(user, stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
@@ -141,4 +135,29 @@ public class YoutubeDownloader extends AbstractDownloader {
         logger.debug("Download termine");
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    private File getTagetFile(Item item, String youtubleTitle) {
+       File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
+       if (!file.getParentFile().exists()) {
+           file.getParentFile().mkdirs();
+       }
+       target = file;
+       return target;
+    }
+
+    @Override
+    public void finishDownload() {
+        File fileWithExtension = new File( v.getTarget().getAbsolutePath().replace(temporaryExtension, "") + "." + downloadInfo.getContentType().substring(downloadInfo.getContentType().lastIndexOf("/")+1) );
+        if (fileWithExtension.exists()) {
+            fileWithExtension.delete();
+        }
+        try {
+            FileUtils.moveFile(v.getTarget(), fileWithExtension);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        target = fileWithExtension;
+        super.finishDownload();
+    }
+
 }
