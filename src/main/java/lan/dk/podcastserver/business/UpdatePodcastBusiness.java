@@ -53,7 +53,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
     @Transactional
     public void updatePodcast() {
         logger.debug("Lancement de l'update");
-        List<Podcast> podcasts = podcastBusiness.findAll();
+        List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
         Document podcastXML = null;
         Updater updater;
         for (Podcast podcast : podcasts) {
@@ -104,7 +104,8 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.warn("Erreur d'update", e);
+                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
     }
 

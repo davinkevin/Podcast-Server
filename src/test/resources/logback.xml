@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-    </layout>
-  </appender>
-  
-  <logger name="lan.dk.podcastserver" level="DEBUG"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/PodcastServer.log</file>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rotate every day for log collection and archiving -->
+            <fileNamePattern>logs/PodcastServer.%d{yyyyMMdd}.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="lan.dk.podcastserver" level="DEBUG"/>
 
     <!-- Spring MVC -->
-    <!---->
+    <!-- ORM
+              -->
+    <logger name="org.springframework.web" level="TRACE"/>
+
+    <!-- Hibernate  -->
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
 
 
-    <!-- Hibernate -->
-    <logger name="org.hibernate.*" level="WARN"/>
-
-  <root level="info">
-    <appender-ref ref="STDOUT" />
-  </root>
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
 
 </configuration>

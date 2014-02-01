@@ -9,6 +9,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import javax.servlet.MultipartConfigElement;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -78,9 +79,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         //Ajout du mapping string par défaut :
         StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         converters.add(stringHttpMessageConverter);
-
-
     }
-
 
 }

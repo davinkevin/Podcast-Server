@@ -28,6 +28,7 @@ public class WorkerUtils implements ApplicationContextAware {
         Updater updater = (Updater) context.getBean(podcast.getType() + "Updater");
 
         if (updater == null) {
+            logger.warn("No updater for the type {}", podcast.getType());
             throw new Exception("No Updater for the type " + podcast.getType());
         } else
             return updater;

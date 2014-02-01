@@ -50,6 +50,20 @@ public class DateUtils {
         }
     }
 
+    public static Timestamp folderDateToTimestamp(String pubDate) throws ParseException {
+        Date javaDate = null;
+        try {
+            String pattern = "yyyy-MM-dd"; //2013-12-20
+            SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
+            javaDate = format.parse(pubDate);
+            Timestamp timeStampDate = new Timestamp(javaDate.getTime());
+            return timeStampDate;
+        } catch (ParseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw e;
+        }
+    }
+
     public static String TimeStampToRFC2822 (Timestamp timestamp) {
         return (timestamp != null)
                 ? new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH).format(timestamp)

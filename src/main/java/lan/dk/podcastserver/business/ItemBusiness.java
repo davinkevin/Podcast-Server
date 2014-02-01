@@ -33,9 +33,9 @@ import java.util.List;
 public class ItemBusiness {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private @Resource ItemRepository itemRepository;
+    @Resource ItemRepository itemRepository;
     protected @Resource ItemDownloadManager itemDownloadManager;
-    private @Value("${numberofdaytodownload}") int numberOfDayToDownload;
+    @Value("${numberofdaytodownload}") int numberOfDayToDownload;
 
     //** Delegation Repository **//
     public List<Item> findAll() {
@@ -70,6 +70,10 @@ public class ItemBusiness {
 
     public void delete(Item entity) {
         itemRepository.delete(entity);
+    }
+
+    public void deleteAll() {
+        itemRepository.deleteAll();
     }
 
     public List<Item> findAllItemNotDownloadedNewerThan(Date date) {

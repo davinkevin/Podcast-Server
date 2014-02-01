@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Table(name = "podcast", schema = "", catalog = "")
+@Table(name = "podcast")
 @Entity
 public class Podcast implements Serializable {
 
@@ -25,11 +25,12 @@ public class Podcast implements Serializable {
     private Collection<Item> items = new ArrayList<Item>();
     private Cover cover;
     private String description;
+    private Boolean hasToBeDeleted;
 
     public Podcast() {
     }
 
-    public Podcast(String title, String url, String signature, String type, Timestamp lastUpdate, Set<Item> items, Cover cover) {
+    public Podcast(String title, String url, String signature, String type, Timestamp lastUpdate, Set<Item> items, Cover cover, String description, Boolean hasToBeDeleted) {
         this.title = title;
         this.url = url;
         this.signature = signature;
@@ -37,6 +38,8 @@ public class Podcast implements Serializable {
         this.lastUpdate = lastUpdate;
         this.items = (items != null) ? items : this.items ;
         this.cover = cover;
+        this.description = description;
+        this.hasToBeDeleted = hasToBeDeleted;
     }
 
     @Id
@@ -128,6 +131,16 @@ public class Podcast implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Column(name = "hasToBeDeleted")
+    @Basic
+    public Boolean getHasToBeDeleted() {
+        return hasToBeDeleted;
+    }
+
+    public void setHasToBeDeleted(Boolean hasToBeDeleted) {
+        this.hasToBeDeleted = hasToBeDeleted;
     }
 
     @Override

@@ -43,7 +43,7 @@ public class YoutubeUpdaterTest {
 
     @Test
     public void updateCauet() {
-        Podcast podcast = new Podcast("Cauet", "http://www.youtube.com/channel/UCe2YQ986DdKliHNvE8va4kQ", "", "Youtube", null, null, new Cover());
+        Podcast podcast = new Podcast("Cauet", "http://www.youtube.com/channel/UCe2YQ986DdKliHNvE8va4kQ", "", "Youtube", null, null, new Cover(), null, null);
         youtubeUpdater.updateFeed(podcast);
 
         logger.debug(podcast.toString());
@@ -52,7 +52,7 @@ public class YoutubeUpdaterTest {
 
     @Test
     public void updateWillAndCo() {
-        Podcast podcast = new Podcast("Will & Co", "http://www.youtube.com/channel/UCzMawL8sevUd5nZ14x4wRpg", "", "Youtube", null, null, new Cover());
+        Podcast podcast = new Podcast("Will & Co", "http://www.youtube.com/channel/UCzMawL8sevUd5nZ14x4wRpg", "", "Youtube", null, null, new Cover(), null, null);
         youtubeUpdater.updateFeed(podcast);
 
         logger.debug(podcast.toString());
@@ -60,7 +60,7 @@ public class YoutubeUpdaterTest {
     }
     @Test
     public void updateNowTechTvFr() {
-        Podcast podcast = new Podcast("NowTechTvFr", "https://www.youtube.com/nowtechtvfr", "", "Youtube", null, null, new Cover());
+        Podcast podcast = new Podcast("NowTechTvFr", "https://www.youtube.com/nowtechtvfr", "", "Youtube", null, null, new Cover(), null, null);
         youtubeUpdater.updateFeed(podcast);
 
         logger.debug(podcast.toString());
@@ -69,7 +69,7 @@ public class YoutubeUpdaterTest {
 
     @Test
     public void androTechPlayslist() {
-        Podcast podcast = new Podcast("AndroTech", "http://gdata.youtube.com/feeds/api/playlists/PLN6bvn-Db2BoPcPRqSgtvi-TjZgIB9PvW", "", "Youtube", null, null, new Cover());
+        Podcast podcast = new Podcast("AndroTech", "http://gdata.youtube.com/feeds/api/playlists/PLN6bvn-Db2BoPcPRqSgtvi-TjZgIB9PvW", "", "Youtube", null, null, new Cover(), null, null);
         youtubeUpdater.updateFeed(podcast);
 
         logger.debug(podcast.toString());

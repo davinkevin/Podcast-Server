@@ -14,20 +14,9 @@ import org.springframework.core.io.ClassPathResource;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@PropertySource("classpath:application.properties")
-//@ComponentScan(basePackages = {"lan.dk.podcastserver.manager.worker"})
-@ComponentScan(basePackages = {"lan.dk.podcastserver.manager", "lan.dk.podcastserver.utils"})
+@ComponentScan(basePackages = {"lan.dk.podcastserver.manager.worker"})
+//@ComponentScan(basePackages = {"lan.dk.podcastserver.manager", "lan.dk.podcastserver.utils"})
 public class MockWorkerContextConfiguration {
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer GlobalPropertySourcesPlaceholderConfigurer() {
-        PropertySourcesPlaceholderConfigurer p = new PropertySourcesPlaceholderConfigurer();
-        org.springframework.core.io.Resource[] resourceLocations = new org.springframework.core.io.Resource[] {
-                new ClassPathResource("application.properties")
-        };
-        p.setLocations(resourceLocations);
-        return p;
-    }
 
     @Bean
     public static ItemDownloadManager getItemDownloadManager() {
