@@ -52,7 +52,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
     @Transactional
     public void updatePodcast() {
-        logger.debug("Lancement de l'update");
+        logger.info("Lancement de l'update");
         List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
         Document podcastXML = null;
         Updater updater;
@@ -62,7 +62,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                 updater = workerUtils.getUpdaterByType(podcast);
                 String signature = updater.signaturePodcast(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    logger.debug("Traitement du Podcast : " + podcast.toString());
+                    logger.info("Traitement du Podcast : " + podcast.toString());
                     podcast = updater.updateFeed(podcast);
 
 
@@ -88,7 +88,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
         Document podcastXML = null;
         Updater updater;
             try {
-                logger.debug("Traitement du Podcast : " + podcast.toString());
+                logger.info("Traitement du Podcast : " + podcast.toString());
 
                 updater = workerUtils.getUpdaterByType(podcast);
                 String signature = updater.signaturePodcast(podcast);
@@ -110,7 +110,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
     }
 
     public void forceUpdatePodcast (int id){
-        logger.debug("Lancement de l'update forcé");
+        logger.info("Lancement de l'update forcé");
         Podcast podcast = podcastBusiness.findOne(id);
         podcast.setSignature("");
         podcastBusiness.update(podcast);
@@ -140,13 +140,13 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
     @PostConstruct
     public void resetItemWithIncorrectState() {
 
-        logger.info("Reset des Started");
+        logger.debug("Reset des Started");
 
         for (Item item : itemBusiness.findByStatus("Started")) {
             itemBusiness.save(item.setStatus("Not Downloaded"));
         }
 
-        logger.info("Reset des Paused");
+        logger.debug("Reset des Paused");
         for (Item item : itemBusiness.findByStatus("Paused")) {
             itemBusiness.save(item.setStatus("Not Downloaded"));
         }

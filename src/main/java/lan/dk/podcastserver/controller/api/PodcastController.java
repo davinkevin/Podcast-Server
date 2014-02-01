@@ -80,14 +80,14 @@ public class PodcastController {
     @RequestMapping(value="{id:[\\d]+}/upload", method=RequestMethod.POST)
     @ResponseBody
     public String handleFileUpload(@PathVariable Integer id, @RequestParam("file") MultipartFile file) throws PodcastNotFoundException {
-        logger.debug("Envoie du fichier : {}", file.getName());
+        logger.info("Envoie du fichier : {}", file.getName());
         if (!file.isEmpty()) {
             try {
                 podcastBusiness.addItemByUpload(id, file);
                 logger.debug("Réception de {} effectuée", file.getName());
                 return "You successfully uploaded " + file.getName();
             } catch (Exception e) {
-                logger.debug("Réception de {} échouée", file.getName());
+                logger.error("Réception de {} échouée", file.getName());
                 return "You failed to upload " + file.getName() + " => " + e.getMessage();
             }
         } else {

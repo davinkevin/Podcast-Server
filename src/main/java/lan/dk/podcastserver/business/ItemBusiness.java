@@ -108,13 +108,13 @@ public class ItemBusiness {
         Item item = this.findOne(id);
         try {
             if (item.getLocalUrl() != null) {
-                logger.debug("Interne - Item " + id + " : " + item.getLocalUrl());
+                logger.info("Interne - Item " + id + " : " + item.getLocalUrl());
                 URL redirectionURL = new URL(item.getLocalUrl());
                 URI redirectionURI = new URI(redirectionURL.getProtocol(), null, redirectionURL.getHost(), redirectionURL.getPort(), redirectionURL.getPath(), null, null);
                 return redirectionURI.toASCIIString();
             }
             else {
-                logger.debug("Externe - Item " + id + " : " + item.getUrl());
+                logger.info("Externe - Item " + id + " : " + item.getUrl());
                 return item.getUrl();
             }
         } catch (IOException e) {
