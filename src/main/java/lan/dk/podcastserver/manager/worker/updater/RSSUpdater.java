@@ -46,10 +46,11 @@ public class RSSUpdater extends AbstractUpdater {
         Namespace feedburner = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
 
         try {
-            logger.debug("Traitement de la cover général du podcast");
-            if (podcast.getCover() != null && currentCoverURL != null && !currentCoverURL.equals(podcast.getCover().getURL())) {
+            if (podcast.getCover() == null) {
+                logger.debug("Traitement de la cover général du podcast");
                 podcast.setCover(ImageUtils.getCoverFromURL(new URL(currentCoverURL)));
             }
+
             logger.debug("Traitement des Items");
             // Parcours des éléments :
             for (Element item : podcastXMLSource.getRootElement().getChild("channel").getChildren("item")) {
