@@ -107,7 +107,7 @@ public class PodcastBusiness {
     }
 
     @Transactional
-    public boolean addItemByUpload(Integer idPodcast, MultipartFile file) throws PodcastNotFoundException, ParseException, IOException {
+    public boolean addItemByUpload(Integer idPodcast, MultipartFile file, String name) throws PodcastNotFoundException, ParseException, IOException {
         Podcast podcast = podcastRepository.findOne(idPodcast);
         if (podcast == null) {
             throw new PodcastNotFoundException();
@@ -117,8 +117,8 @@ public class PodcastBusiness {
         // 1er temps : Template en dure : {title} - {date} - {title}.mp3
 
         Item item = new Item();
-        String fileName = file.getOriginalFilename();
-        File fileToSave = new File(rootfolder + File.separator + podcast.getTitle() + File.separator + fileName);
+        //String name = name;
+        File fileToSave = new File(rootfolder + File.separator + podcast.getTitle() + File.separator + name);
         if (fileToSave.exists()) {
             fileToSave.delete();
         }
@@ -126,13 +126,13 @@ public class PodcastBusiness {
 
         file.transferTo(fileToSave);
 
-        item.setTitle(fileName.split(" - ")[2])
-            .setPubdate(DateUtils.folderDateToTimestamp(fileName.split(" - ")[1]))
+        item.setTitle(FilenameUtils.removeExtension(name.split(" - ")[2]))
+            .setPubdate(DateUtils.folderDateToTimestamp(name.split(" - ")[1]))
             .setUrl(null)
             .setLength(file.getSize())
-            .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(fileName)))
+            .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
             .setDescription(podcast.getDescription())
-            .setLocalUrl(fileContainer + "/" + podcast.getTitle() + "/" + fileName)
+            .setLocalUrl(fileContainer + "/" + podcast.getTitle() + "/" + name)
             .setLocalUri(fileToSave.getAbsolutePath())
             .setDownloaddate(new Timestamp(new Date().getTime()))
             .setPodcast(podcast)
