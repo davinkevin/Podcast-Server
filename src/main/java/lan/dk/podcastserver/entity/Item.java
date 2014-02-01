@@ -2,6 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.persistence.*;
@@ -258,6 +259,12 @@ public class Item implements Serializable {
                 fileToDelete.delete();
             }
         }
+    }
+
+    @Transient
+    @JsonProperty("cover")
+    public Cover getCoverOfItemOrPodcast() {
+        return (this.cover == null) ? podcast.getCover() : this.cover;
     }
 
 }
