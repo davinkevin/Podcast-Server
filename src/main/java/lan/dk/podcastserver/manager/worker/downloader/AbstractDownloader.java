@@ -58,8 +58,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void startDownload() {
-        stopDownloading.set(false);
         this.item.setStatus("Started");
+        stopDownloading.set(false);
         itemService.save(this.item);
         this.download();
 
@@ -67,15 +67,15 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void pauseDownload() {
-        stopDownloading.set(true);
         this.item.setStatus("Paused");
+        stopDownloading.set(true);
         itemService.save(this.item);
     }
 
     @Override
     public void stopDownload() {
-        stopDownloading.set(true);
         this.item.setStatus("Stopped");
+        stopDownloading.set(true);
         itemService.save(this.item);
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null && target.exists())

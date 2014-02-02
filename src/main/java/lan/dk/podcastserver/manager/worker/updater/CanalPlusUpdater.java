@@ -14,7 +14,9 @@ import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -234,11 +236,16 @@ public class CanalPlusUpdater extends AbstractUpdater {
         org.jdom2.Element xml_MEDIA = xmlAboutCurrentEpisode.getRootElement().getChild("VIDEO").getChild("MEDIA");
 
         try {
-            currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"));
-            currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
-            currentEpisode.setPubdate(DateUtils.canalPlusDateToTimeStamp(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")));
-            currentEpisode.setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))));
-            currentEpisode.setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
+            currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"))
+                .setPubdate(DateUtils.canalPlusDateToTimeStamp(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
+                .setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
+                .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
+
+            if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null) {
+                currentEpisode.setUrl(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
+            } else {
+                currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
+            }
             //currentEpisode.setDescription((xml_INFOS.getChildText("DESCRIPTION").equals("")) ? xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE") : xml_INFOS.getChildText("DESCRIPTION"));
 
 //                    if (!podcast.getItems().contains(currentEpisode)) {
@@ -258,5 +265,27 @@ public class CanalPlusUpdater extends AbstractUpdater {
             logger.error("IOException :", e);
         }
     return currentEpisode;
+    }
+
+    private String getM3U8UrlFromCanalPlusService(String standardM3UURL) {
+        String urlToReturn = null;
+
+        if (standardM3UURL == null)
+            return null;
+
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new URL(standardM3UURL).openStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                if (!inputLine.startsWith("#")) {
+                    urlToReturn = inputLine;
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return urlToReturn;
     }
 }
