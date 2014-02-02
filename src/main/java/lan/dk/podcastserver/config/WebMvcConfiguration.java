@@ -21,6 +21,7 @@ import java.util.List;
 @ComponentScan("lan.dk.podcastserver.controller")
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
+    public static final int CACHE_PERIOD = 31556926;
     private List<HttpMessageConverter<?>> messageConverters; // Cached: this is not a bean.
 
     /**
@@ -40,7 +41,11 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        super.addResourceHandlers(registry);
+        //super.addResourceHandlers(registry);
+        registry.addResourceHandler("/css/**").addResourceLocations("/static/css/").setCachePeriod(CACHE_PERIOD);
+        registry.addResourceHandler("/img/**").addResourceLocations("/static/img/").setCachePeriod(CACHE_PERIOD);
+        registry.addResourceHandler("/js/**").addResourceLocations("/static/js/").setCachePeriod(CACHE_PERIOD);
+        registry.addResourceHandler("/font/**").addResourceLocations("/static/font/").setCachePeriod(CACHE_PERIOD);
     }
 
     /**

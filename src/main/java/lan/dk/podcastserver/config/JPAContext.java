@@ -22,7 +22,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = {"lan.dk.podcastserver.repository", "lan.dk.podcastserver.entity"})
 @EnableJpaRepositories("lan.dk.podcastserver.repository")
-@Profile("data-mysql")
+@Profile("!data-embedded")
 public class JPAContext {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

@@ -9,7 +9,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * Created by kevin on 26/12/2013.
  */
 @Configuration
-@PropertySource("classpath:application.properties")
+@PropertySource(value = {"classpath:application.properties", "file:${catalina.home}/conf/podcastserver.propertiesA"}, ignoreResourceNotFound = true)
 public class PropertyConfig {
 
     @Bean
