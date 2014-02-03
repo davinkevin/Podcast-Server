@@ -68,8 +68,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
                     podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
                     podcast.setSignature(signature);
-                    podcast = podcastBusiness.update(podcast);
-                    //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
+                    podcast.setItems(itemBusiness.save(podcast.getItems()));
                     podcast = podcastBusiness.update(podcast);
 
                 } else {
@@ -98,8 +97,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
                     podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
                     podcast.setSignature(signature);
-                    podcast = podcastBusiness.update(podcast);
-                    //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, serverURL));
+                    podcast.setItems(itemBusiness.save(podcast.getItems()));
                     podcast = podcastBusiness.update(podcast);
                 }
 

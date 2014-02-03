@@ -13,27 +13,110 @@
     </div>
 </div>
 <div class="col-md-8">
-    <ul class="listItems">
-        <li ng-repeat="item in podcast.items | filter:query | orderBy:pubdate" style="clear: both;">
-            <div class="col-xs-12 pull-left">
-                <a href="#/item/{{item.id}}" class="thumb" >
-                    <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
-                </a>
+
+    <tabset>
+        <tab heading="Episodes">
+            <br/>
+            <ul class="listItems">
+                <li ng-repeat="item in podcast.items | filter:query | orderBy:pubdate" style="clear: both;">
+                    <div class="col-xs-12 pull-left">
+                        <a href="#/item/{{item.id}}" class="thumb" >
+                            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+                        </a>
                 <span class="pull-left description">
                     <p>{{item.title}}</p>
                     <p>{{item.pubdate | momentDDMMYYYY }}</p>
                 </span>
-                <div class="pull-right">
-                    <button ng-click="download(item)" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
-                    <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-globe"></span></a>
-                    <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
-                    <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
-                </div>
+                        <div class="pull-right">
+                            <button ng-click="download(item)" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                            <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-globe"></span></a>
+                            <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                            <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                        </div>
 
-            </div>
+                    </div>
+                    <br/>
+                </li>
+            </ul>
+        </tab>
+        <tab heading="Modification">
+
             <br/>
-        </li>
-    </ul>
+            <accordion close-others="true">
+                <accordion-group heading="Podcast" is-open="true">
+                    <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="title" class="col-sm-2 control-label">Titre</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="title" ng-model="podcast.title" required placeholder="Titre">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="url" class="col-sm-2 control-label">URL</label>
+                        <div class="col-sm-10">
+                            <input type="url" class="form-control" id="url" ng-model="podcast.url" required placeholder="url">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox col-sm-offset-3">
+                            <label>
+                                <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="height" class="col-sm-2 control-label" >Type</label>
+                        <div class="col-sm-10" ng-model="podcast.type">
+                            <select class="form-control">
+                                <option value="CanalPlus">Canal+</option>
+                                <option value="RSS">RSS</option>
+                                <option value="send">Send</option>
+                                <option value="Youtube">Youtube</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button ng-click="save()" class="btn btn-default">Sauvegarder</button>
+                        </div>
+                    </div>
+                </form>
+                </accordion-group>
+                <accordion-group heading="Cover">
+                    <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="url" class="col-sm-2 control-label">URL</label>
+                        <div class="col-sm-10">
+                            <input type="url" class="form-control" id="url" ng-model="podcast.cover.url" required placeholder="url">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="width" class="col-sm-2 control-label">Lageur</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="width" ng-model="podcast.cover.width" required placeholder="url">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="height" class="col-sm-2 control-label">Hauteur</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="height" ng-model="podcast.cover.height" required placeholder="url">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button ng-click="save()" class="btn btn-default">Sauvegarder</button>
+                        </div>
+                    </div>
+                        </form>
+                </accordion-group>
+            </accordion>
+
+        </tab>
+    </tabset>
+
+
 </div>
 
 

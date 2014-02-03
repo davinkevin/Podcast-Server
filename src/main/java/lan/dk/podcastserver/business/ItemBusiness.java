@@ -50,6 +50,10 @@ public class ItemBusiness {
         return itemRepository.findAll(pageable);
     }
 
+    public List<Item> save(Iterable<Item> entities) {
+        return itemRepository.save(entities);
+    }
+
     public Item save(Item entity) {
         return itemRepository.save(entity);
     }

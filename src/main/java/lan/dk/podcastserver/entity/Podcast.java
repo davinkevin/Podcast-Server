@@ -103,7 +103,7 @@ public class Podcast implements Serializable {
         this.lastUpdate = lastUpdate;
     }
 
-    @OneToMany(mappedBy = "podcast", fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy = "podcast", fetch = FetchType.EAGER, orphanRemoval=true)
     @OrderBy("pubdate DESC")
     public Collection<Item> getItems() {
         return items;

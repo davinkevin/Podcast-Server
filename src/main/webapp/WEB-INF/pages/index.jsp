@@ -55,7 +55,7 @@
     };
 </script>
 <script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>
-<script src="<c:url value="/js/lib/momentjs/moment.min.js"/>"></script>
+<script src="<c:url value="/js/lib/momentjs/moment.js"/>"></script>
 <script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-resource/angular-resource.js"/>"></script>

@@ -46,6 +46,7 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
+    @ResponseBody
     public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) {
         podcast.setId(id);
         return podcastBusiness.save(podcast);

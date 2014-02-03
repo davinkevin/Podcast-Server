@@ -31,8 +31,7 @@ import java.util.List;
 public class ItemController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Resource
-    private ItemBusiness itemBusiness;
+    @Resource private ItemBusiness itemBusiness;
 
     @Autowired
     protected ItemDownloadManager itemDownloadManager;

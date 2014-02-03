@@ -31,7 +31,7 @@ podcastApp.config(['$routeProvider',
                                 controller: 'DownloadCtrl'
                             }).
                             otherwise({
-                                redirectTo: '/podcasts'
+                                redirectTo: '/items'
                             });
     }]);
 

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
 
@@ -13,6 +14,7 @@ import java.sql.Timestamp;
 
 @Table(name = "item", schema = "", catalog = "")
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Item implements Serializable {
 
     private int id;
@@ -116,7 +118,7 @@ public class Item implements Serializable {
         return this;
     }
 
-    @ManyToOne(cascade=CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name = "podcast_id", referencedColumnName = "id")
     @JsonBackReference("podcast-item")
     public Podcast getPodcast() {
@@ -240,6 +242,7 @@ public class Item implements Serializable {
 
     /* Helpers */
     @Transient
+    @JsonProperty("proxyURL")
     public String getProxyURL() {
         return "/api/item/" + this.id + "/download";
     }

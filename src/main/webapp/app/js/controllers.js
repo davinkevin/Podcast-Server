@@ -1,7 +1,7 @@
 var podcastControllers = angular.module('podcastControllers', []);
 
 podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routeParams, Restangular) {
-    Restangular.one("item/pagination").get({size: 12, page :0, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+    /*Restangular.one("item/pagination").get({size: 12, page :0, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
         $scope.items = itemsResponse.content;
 
         $scope.totalItems = itemsResponse.totalElements;
@@ -9,7 +9,7 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
         $scope.itemsperpage = 12;
         $scope.maxSize = 10;
     });
-
+    */
 
     //$scope.selectPage = function (pageNo) {
     $scope.$watch('currentPage', function(newPage){
@@ -20,7 +20,7 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
             $scope.maxSize = 10;
         });
     });
-
+    $scope.currentPage = 1;
 
     $scope.download = function(item) {
         $http.get('/api/item/' + item.id + "/addtoqueue");
@@ -44,7 +44,9 @@ podcastControllers.controller('PodcastsListCtrl', function ($scope, $http, Resta
 
 podcastControllers.controller('PodcastDetailCtrl', function ($scope, $http, $routeParams, Restangular) {
     //$scope.podcast = Podcast.get({podcastId: $routeParams.podcastId});
-    $scope.podcast = Restangular.one("podcast", $routeParams.podcastId).get().$object;
+    Restangular.one("podcast", $routeParams.podcastId).get().then(function(data) {
+        $scope.podcast = data;
+    });
 
 
     $scope.download = function(item) {
@@ -58,10 +60,15 @@ podcastControllers.controller('PodcastDetailCtrl', function ($scope, $http, $rou
         });
     }
     $scope.refresh = function() {
-        $http.post("/api/task/updateManager/updatePodcast/force", $scope.podcast.id);
+        $http.post("/api/task/updateManager/updatePodcast/force", $scope.podcast.id).success(function() {
+            $scope.podcast.get();
+        });
     }
     $scope.goToRSS = function() {
         $http.post("/api/task/updateManager/updatePodcast/force", $scope.podcast.id);
+    }
+    $scope.save = function() {
+        $scope.podcast.put();
     }
 });
 
