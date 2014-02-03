@@ -1,0 +1,90 @@
+.thumbnail {
+    min-height: 263px;
+  @media (min-width: 992px){
+    min-height: 263px;
+  }
+  @media (min-width: 1200px){
+    min-height: 263px;
+  }
+
+}
+
+.listItems {
+  list-style: none;
+    .titleItem {
+
+    }
+    li {
+        clear: both;
+        max-height: 100px;
+        height: 100px;
+        line-height: 25px;
+        img {
+          float : left;
+        }
+        .description {
+          padding-left: 25px;
+          vertical-align: middle;
+        }
+    }
+}
+
+.downloadingItems {
+  list-style: none;
+  .progress {
+    margin-top: 5px;
+  }
+}
+
+.box {
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.25), 0 0 50px rgba(0,0,0,0.1) inset;
+  border-radius: 0%     0%     25%     25% /     0%     0%     3%     3%;
+}
+.box:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  bottom: 15px;
+  left: 10px;
+  width: 50%;
+  height: 20%;
+  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.7);
+  -webkit-transform: rotate(-3deg) skew(-0deg);
+  -moz-transform: rotate(-3deg) skew(-0deg);
+  -ms-transform: rotate(-3deg) skew(-0deg);
+  -o-transform: rotate(-3deg) skew(-0deg);
+  transform: rotate(-3deg) skew(-0deg);
+}
+.box:after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  bottom: 15px;
+  right: 10px;
+  width: 50%;
+  height: 20%;
+  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.7);
+  -webkit-transform: rotate(3deg) skew(0deg);
+  -moz-transform: rotate(3deg) skew(0deg);
+  -ms-transform: rotate(3deg) skew(0deg);
+  -o-transform: rotate(3deg) skew(0deg);
+  transform: rotate(3deg) skew(0deg);
+}
+
+.itemInList {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    //margin: 5px;
+    img {
+      padding-bottom: 15px;
+    }
+    .itemTitle {
+      height: 40px;
+
+    }
+    .row-button {
+      padding-bottom: 10px;
+    }
+}

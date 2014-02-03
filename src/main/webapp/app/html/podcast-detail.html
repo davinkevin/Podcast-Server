@@ -1,0 +1,40 @@
+
+<div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+    <div class="thumbnail">
+        <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">
+        <div class="caption">
+            <h5 class="text-center "><strong>{{ podcast.title }}</strong></h5>
+            <p class="text-center">Nombre d'épisode : {{podcast.items.length }}</p>
+            <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12 text-center">
+                <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+                <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank">RSS</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-8">
+    <ul class="listItems">
+        <li ng-repeat="item in podcast.items | filter:query | orderBy:pubdate" style="clear: both;">
+            <div class="col-xs-12 pull-left">
+                <a href="#/item/{{item.id}}" class="thumb" >
+                    <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+                </a>
+                <span class="pull-left description">
+                    <p>{{item.title}}</p>
+                    <p>{{item.pubdate | momentDDMMYYYY }}</p>
+                </span>
+                <div class="pull-right">
+                    <button ng-click="download(item)" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                    <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-globe"></span></a>
+                    <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                    <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                </div>
+
+            </div>
+            <br/>
+        </li>
+    </ul>
+</div>
+
+
+

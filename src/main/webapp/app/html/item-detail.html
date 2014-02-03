@@ -1,0 +1,11 @@
+<img ng-src="{{item.cover.url}}">
+
+<h1>{{item.title}}</h1>
+
+<p>{{item.description}}</p>
+
+<p>Issue du podcast : {{item.podcast.title}}</p>
+
+<p>Pubdate : {{item.pubdate | momentDDMMYYYY }}</p>
+
+<p><button ng-click="download()">Download</button></p>

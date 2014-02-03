@@ -16,7 +16,7 @@ import java.util.Set;
  * Created by kevin on 26/12/2013.
  */
 @Controller
-@RequestMapping("/task/downloadManager")
+@RequestMapping("/api/task/downloadManager")
 public class IDMController {
 
     @Autowired

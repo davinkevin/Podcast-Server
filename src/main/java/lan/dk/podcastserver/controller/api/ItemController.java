@@ -82,6 +82,12 @@ public class ItemController {
         return itemBusiness.findAllToDelete();
     }
 
+    @RequestMapping(value="{id:[\\d]+}/addtoqueue", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public void addToDownloadList(@PathVariable(value = "id") int id) {
+        itemDownloadManager.addItemToQueue(id);
+    }
+
     @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
     public void getEpisodeFile(@PathVariable int id, HttpServletResponse response) {
         try {

@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 
 
 @Controller
-@RequestMapping("/task/updateManager")
+@RequestMapping("/api/task/updateManager")
 public class UpdatePodcastService {
 
     @Resource

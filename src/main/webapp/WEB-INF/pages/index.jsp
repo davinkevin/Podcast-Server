@@ -1,102 +1,74 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-    <jsp:include page="include/head.jsp" >
-        <jsp:param name="title" value="Podcast Server" />
-    </jsp:include>
-    <body>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-    <jsp:include page="include/header.jsp" />
+<!doctype html>
+<html ng-app="podcastApp">
+<head>
 
-    <div id="listItem" class="container">
-        <div class="row">
-            <ul class="thumbnails"></ul>
-        </div>
-        <div clas="row">
-            <div class="pagination pagination-centered">
+    <link href="/js/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet/less" type="text/css" href="less/angularpodcast.less" />
+</head>
+<body>
 
-            </div>
-        </div>
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#/items">Podcast Server</a>
     </div>
-
-    <script type="text/template" id="item-pagination-template">
-        <ul>
-            <@ if ( (currentPage < 4 && lastPage < 7) || (currentPage > 4 && lastPage < 7) ) { var borneInf=firstPage; var borneSup=lastPage; }  @>
-            <@ if (currentPage < 4 && lastPage > 7) { var borneInf=firstPage; var borneSup=7; }  @>
-            <@ if (currentPage >= 4 && lastPage > 7) { var borneInf=currentPage-3; var borneSup=currentPage+3; }  @>
-            <@ if (currentPage > lastPage-3 && lastPage > 7) { var borneInf=lastPage-7; var borneSup=lastPage; }  @>
-
-            <li><a class="first" href="#">«</a></li>
-            <@ if (currentPage == firstPage) { @>
-                <li class="disabled"><a class="prev" href="#">Prev</a></li>
-            <@ } else { @>
-                <li><a class="prev" href="#">Prev</a></li>
-            <@ } @>
-
-            <@ for( p=borneInf;    p < currentPage;  p++) { @>
-            <li ><a class="page" href="#"><@= p @></a></li>
-            <@ } @>
-            <li class="active"><a href="#" ><@= p @></a></li>
-            <@ for( p=currentPage+1;    p < borneSup+1;  p++) { @>
-            <li><a class="page" href="#"><@= p @></a></li>
-            <@ } @>
-
-
-            <@ if (currentPage == lastPage) { @>
-                <li class="disabled"><a class="next" href="#">Next</a></li>
-            <@ } else { @>
-                <li><a class="next" href="#">Next</a></li>
-            <@ } @>
-            <li><a class="last" href="#">»</a></li>
-
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="#/podcasts">
+                        Podcast
+                </a>
+            </li>
+            <li>
+                <a href="#/ajouter">
+                    Ajouter
+                </a>
+            </li>
+            <li>
+                <a href="#/download">
+                    Téléchargement
+                </a>
+            </li>
         </ul>
-    </script>
-    <!-- Template Backbone -->
-    <script type="text/template" id="item-template">
-        <div class="thumbnail right-caption">
-            <span class="logo">
-                <img src="<@= cover.url @>" width="<@= cover.width @>" height="<@= cover.height @>" alt="">
-            </span>
-            <div class="caption">
-                <h6><@= title @></h6>
-                <span class="btn-caption ">
-                    <@ if (localUrl == null) { @>
-                    <a class="btn btn-download">
-                        <i class="icon-download-alt"></i>
-                    </a>
-                    <a class="btn" href="<@= url @>">
-                        <i class="icon-globe"></i>
-                    </a>
-                    <@ } else { @>
-                    <a class="btn btn-play" href="<@= localUrl @>">
-                        <i class="icon-play"></i>
-                    </a>
-                    <@ } @>
-                </span>
-            </div>
-        </div>
-    </script>
+    </div>
+</nav>
 
-  <jsp:include page="include/libJavascript.jsp" />
-
-    <!-- Backbone Element -->
-    <script src="../../js/model/item.js"></script>
-    <script src="../../js/collection/items.js"></script>
-    <script src="../../js/collection/itemsPaginated.js"></script>
-    <script src="../../js/view/itemView.js"></script>
-    <script src="../../js/view/itemsView.js"></script>
-    <script>
-        //var items = new Items();
-        //items.fetch();
+    <div ng-view></div>
 
 
-        var itemsPaginated = new ItemsPaginated();
-        itemsPaginated.fetch();
-        var itemsView = new ItemsView({ collection: itemsPaginated });
+<script type="text/javascript">
+    less = {
+        env: "development", // or "production"
+        async: false,       // load imports async
+        fileAsync: false,   // load imports async when in a page under
+        // a file protocol
+        poll: 1000,         // when in watch mode, time in ms between polls
+        functions: {},      // user functions, keyed by name
+        dumpLineNumbers: "comments", // or "mediaQuery" or "all"
+        relativeUrls: false,// whether to adjust url's to be relative
+        // if false, url's are already relative to the
+        // entry less file
+        //rootpath: ":/a.com/"// a path to add on to the start of every url
+        //resource
+    };
+</script>
+<script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>
+<script src="<c:url value="/js/lib/momentjs/moment.min.js"/>"></script>
+<script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-resource/angular-resource.js"/>"></script>
+<script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
+<script src="<c:url value="/js/lib/restangular/src/restangular.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.js"/>"></script>
 
 
+<script src="<c:url value="/js/services.js"/>"></script>
+<script src="<c:url value="/js/filters.js"/>"></script>
+<script src="<c:url value="/js/controllers.js"/>"></script>
+<script src="<c:url value="/js/app.js"/>"></script>
 
-    </script>
-
-    </body>
+</body>
 </html>
