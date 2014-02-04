@@ -75,9 +75,9 @@ public class RSSUpdater extends AbstractUpdater {
                     if ( !podcast.getItems().contains(podcastItem)) {
                         podcast.getItems().add(podcastItem);
                         podcastItem.setPodcast(podcast);
-                        if (podcastItem.getCover() == null) {
+                        /*if (podcastItem.getCover() == null) {
                             podcastItem.setCover(podcast.getCover());
-                        }
+                        }*/
                         logger.debug("Ajout du nouvel episode : " + podcastItem.toString());
                     }
                 }

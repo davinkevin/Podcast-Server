@@ -61,14 +61,18 @@ podcastControllers.controller('PodcastDetailCtrl', function ($scope, $http, $rou
     }
     $scope.refresh = function() {
         $http.post("/api/task/updateManager/updatePodcast/force", $scope.podcast.id).success(function() {
-            $scope.podcast.get();
+            $scope.podcast.get().then(function(podcast) {
+                $scope.podcast.items = podcast.items;
+            });
         });
     }
     $scope.goToRSS = function() {
         $http.post("/api/task/updateManager/updatePodcast/force", $scope.podcast.id);
     }
     $scope.save = function() {
-        $scope.podcast.put();
+        var podcastToUpdate = _.cloneDeep($scope.podcast);
+        podcastToUpdate.items = null;
+        $scope.podcast.patch(podcastToUpdate);
     }
 });
 

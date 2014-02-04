@@ -28,7 +28,8 @@
     -->
 
     <!-- Hibernate  -->
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <!--<logger name="org.hibernate" level="TRACE" />-->
+    <!--<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />-->
 
 
   <root level="info">

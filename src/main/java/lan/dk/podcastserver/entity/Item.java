@@ -118,7 +118,7 @@ public class Item implements Serializable {
         return this;
     }
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JoinColumn(name = "podcast_id", referencedColumnName = "id")
     @JsonBackReference("podcast-item")
     public Podcast getPodcast() {

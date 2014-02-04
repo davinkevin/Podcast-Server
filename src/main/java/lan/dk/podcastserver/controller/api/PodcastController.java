@@ -52,6 +52,13 @@ public class PodcastController {
         return podcastBusiness.save(podcast);
     }
 
+    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH, produces = "application/json")
+    @ResponseBody
+    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) throws PodcastNotFoundException {
+        podcast.setId(id);
+        return podcastBusiness.patchUpdate(podcast);
+    }
+
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete (@PathVariable int id) {

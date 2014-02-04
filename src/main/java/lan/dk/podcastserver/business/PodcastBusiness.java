@@ -1,8 +1,10 @@
 package lan.dk.podcastserver.business;
 
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
+import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
@@ -28,6 +30,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -40,8 +44,8 @@ public class PodcastBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Resource
-    private PodcastRepository podcastRepository;
+    @Resource private PodcastRepository podcastRepository;
+    @Resource private ItemRepository itemRepository;
 
     @Value("${rootfolder}")
     private String rootfolder;
@@ -86,6 +90,24 @@ public class PodcastBusiness {
     }
 
     //*****//
+
+    public Podcast patchUpdate(Podcast patchPodcast) throws PodcastNotFoundException {
+        Podcast podcastToUpdate = podcastRepository.findOne(patchPodcast.getId());
+
+        if (podcastToUpdate == null)
+            throw new PodcastNotFoundException();
+
+        podcastToUpdate.setTitle(patchPodcast.getTitle());
+        podcastToUpdate.setUrl(patchPodcast.getUrl());
+        podcastToUpdate.setSignature(patchPodcast.getSignature());
+        podcastToUpdate.setType(patchPodcast.getType());
+        podcastToUpdate.setLastUpdate(patchPodcast.getLastUpdate());
+        podcastToUpdate.setCover(patchPodcast.getCover());
+        podcastToUpdate.setDescription(patchPodcast.getDescription());
+        podcastToUpdate.setHasToBeDeleted(patchPodcast.getHasToBeDeleted());
+
+        return podcastRepository.save(podcastToUpdate);
+    }
 
     public Podcast generatePodcastFromURL(String URL) {
         logger.debug("URL = " + URL);
@@ -140,7 +162,9 @@ public class PodcastBusiness {
 
         podcast.getItems().add(item);
 
+        itemRepository.save(item);
         podcastRepository.save(podcast);
+
         return (item.getId() != 0);
     }
 }

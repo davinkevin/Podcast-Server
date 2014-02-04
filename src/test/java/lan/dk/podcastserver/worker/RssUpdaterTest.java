@@ -1,8 +1,12 @@
 package lan.dk.podcastserver.worker;
 
+import lan.dk.podcastserver.business.PodcastBusiness;
+import lan.dk.podcastserver.config.BeanConfigScan;
+import lan.dk.podcastserver.config.JPAEmbeddedContext;
 import lan.dk.podcastserver.context.Mock.MockRepository;
 import lan.dk.podcastserver.context.Mock.MockService;
 import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
+import lan.dk.podcastserver.context.PropertyConfigTest;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
@@ -16,9 +20,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 
 import static org.junit.Assert.assertThat;
@@ -27,13 +33,17 @@ import static org.junit.Assert.assertThat;
  * Created by kevin on 14/12/2013.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {MockWorkerContextConfiguration.class, MockRepository.class, MockService.class})
+@ContextConfiguration(classes = {JPAEmbeddedContext.class, BeanConfigScan.class, PropertyConfigTest.class})
+@ActiveProfiles("data-embedded")
 public class RssUpdaterTest {
 
     private final Logger logger = LoggerFactory.getLogger(CanalPlusWorkerTest.class);
 
     @Autowired
     RSSUpdater rssUpdater;
+
+    @Resource
+    PodcastBusiness podcastBusiness;
 
     @Autowired
     WorkerUtils workerUtils;
@@ -70,12 +80,13 @@ public class RssUpdaterTest {
         logger.debug(podcast.toString());
     }
     @Test
-    public void appleKeynotes() {
+    public void rmcAfterFoot() {
         logger.debug("Download");
-        //INSERT INTO `podcast` (`id`, `description`, `last_update`, `signature`, `title`, `type`, `url`, `cover_id`) VALUES
-        //(47, NULL, NULL, NULL, 'Apple - Keynotes', 'RSS', 'http://itstreaming.apple.com/podcasts/apple_keynotes_1080p/apple_keynotes_1080p.xml', 909);
+        Podcast podcast = new Podcast("After Foot", "http://podcast.rmc.fr/channel59/RMCInfochannel59.xml", "", "RSS", new Timestamp(System.currentTimeMillis()), null, new Cover("http://rmc.bfmtv.com/img/podcast/picto_afterfoot.jpg", 200, 200), null, null);
+        podcastBusiness.save(podcast);
 
-        Podcast podcast = new Podcast("Apple Keynote", "http://itstreaming.apple.com/podcasts/apple_keynotes_1080p/apple_keynotes_1080p.xml", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null, null, null);
+        podcast = podcastBusiness.findOne(podcast.getId());
+
         rssUpdater.updateFeed(podcast);
         logger.debug(podcast.toString());
     }

@@ -23,6 +23,7 @@ import java.util.List;
 
 
 @Component
+@Transactional
 public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -68,7 +69,6 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
                     podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
                     podcast.setSignature(signature);
-                    podcast.setItems(itemBusiness.save(podcast.getItems()));
                     podcast = podcastBusiness.update(podcast);
 
                 } else {
@@ -81,6 +81,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
     }
 
+    @Transactional
     public void updatePodcast(int id) {
         logger.debug("Lancement de l'update");
         Podcast podcast = podcastBusiness.findOne(id);
@@ -97,7 +98,6 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
                     podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
                     podcast.setSignature(signature);
-                    podcast.setItems(itemBusiness.save(podcast.getItems()));
                     podcast = podcastBusiness.update(podcast);
                 }
 

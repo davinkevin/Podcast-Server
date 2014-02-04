@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 
 import static org.junit.Assert.assertThat;
@@ -56,6 +57,7 @@ public class CanalPlusWorkerTest {
     }
 
     @Test
+    @Transactional
     public void updateFeedLaMeteoDeDoria() {
 
         canalPlusPodcast = new Podcast("La Météo de Doria", "http://www.canalplus.fr/c-divertissement/c-le-grand-journal/pid4688-la-meteo-de-doria.html",
