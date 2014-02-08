@@ -3,13 +3,11 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.github.axet.vget.VGet;
 import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.vget.info.VideoInfoUser;
-import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
@@ -19,9 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by kevin on 14/12/2013.
@@ -127,7 +122,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             }
         } catch (DownloadInterruptedError e) {
             logger.debug("Arrêt du téléchargement");
-            stopDownload();
+            //stopDownload();
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             stopDownload();

@@ -59,11 +59,18 @@ public class RSSUpdater extends AbstractUpdater {
                                                 .setTitle(item.getChildText("title"))
                                                 .setPubdate(DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")))
                                                 .setDescription(item.getChildText("description"))
-                                                .setCover((item.getChild("thumbnail", media) != null) ? ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getAttributeValue("url"))) : null)
                                                 .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
                                                 .setLength((item.getChild("enclosure").getAttributeValue("length") != null)
                                                         ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
                                                         : 0L);
+
+                    if ((item.getChild("thumbnail", media) != null)) {
+                        if (item.getChild("thumbnail", media).getAttributeValue("url") != null) {
+                            podcastItem.setCover(ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getAttributeValue("url"))));
+                        } else {
+                            podcastItem.setCover(ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getText())));
+                        }
+                    }
                      // Gestion des cas pour l'url :
                     if (item.getChild("origEnclosureLink", feedburner) != null) {
                         podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));

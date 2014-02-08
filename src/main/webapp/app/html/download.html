@@ -1,36 +1,68 @@
 <div class="container">
 
     <div class="row">
+        <div class="col-xs-offset-1 col-xs-3 col-sm-2 col-md-2 col-lg-2">
+            <input ng-model="numberOfSimDl" ng-change="updateNumberOfSimDl()" type="number" class="form-control pull-left" placeholder="Number of download">
+        </div>
         <div class="btn-group pull-right">
             <button ng-click="restartAllDownload()" type="button" class="btn btn-default">Démarrer</button>
             <button ng-click="pauseAllDownload()" type="button" class="btn btn-default">Pause</button>
             <button ng-click="stopAllDownload()" type="button" class="btn btn-default">Stop</button>
         </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
     </div>
-
-    <div class="text-center">
-        <ul class="downloadingItems">
-            <li ng-repeat="item in items | filter:query | orderBy:progression" style="clear: both;">
-                <div class="col-md-2 col-xs-2 col-lg-2 col-sm-2">
-                    <img ng-src="{{item.cover.url}}" width="75" height="75" style="">
-                </div>
-                <div class="row col-md-8 col-xs-8 col-lg-8 col-sm-8">
-                    <div class="">
-                        <span class="pull-left description">
-                            <p>{{item.title}}</p>
-                        </span>
+    <div class="row">
+        <div class="text-center">
+            <ul class="downloadingItems">
+                <li ng-repeat="item in items | filter:query | orderBy:progression" style="clear: both;">
+                    <div class="col-md-2 col-xs-2 col-lg-2 col-sm-2">
+                        <img ng-src="{{item.cover.url}}" width="75" height="75" style="">
                     </div>
-                </div>
-                <div class="row col-md-8 col-xs-8 col-lg-8 col-sm-8">
-                    <progressbar class="progress-striped active" animate="false" value="item.progression" type="info">{{item.progression}}%</progressbar>
-                </div>
-                <div class="text-center col-md-2 col-xs-2 col-lg-2 col-sm-2">
-                    <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
-                    <button ng-click="stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
-                </div>
-            </li>
-        </ul>
+                    <div class="row col-md-8 col-xs-8 col-lg-8 col-sm-8">
+                        <div class="">
+                            <span class="pull-left description">
+                                <p>{{item.title}}</p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row col-md-8 col-xs-8 col-lg-8 col-sm-8">
+                        <progressbar class="progress-striped active" animate="false" value="item.progression" type="info">{{item.progression}}%</progressbar>
+                    </div>
+                    <div class="text-center col-md-2 col-xs-2 col-lg-2 col-sm-2">
+                        <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+                        <button ng-click="stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
+    <div class="container">
+        <br/>
 
+        <accordion close-others="true">
+            <accordion-group heading="Liste d'attente" is-open="false">
+                <ul class="downloadingItems">
+                    <li ng-repeat="item in waitingitems" style="clear: both;">
+                        <div class="col-md-2 col-xs-2 col-lg-2 col-sm-2">
+                            <img ng-src="{{item.cover.url}}" width="75" height="75" style="">
+                        </div>
+                        <div class="row col-md-8 col-xs-8 col-lg-8 col-sm-8">
+                            <div class="">
+                                <span class="pull-left description">
+                                    <p>{{item.title}}</p>
+                                </span>
+                            </div>
+                        </div>
+                        <!--<div class="text-center col-md-2 col-xs-2 col-lg-2 col-sm-2">-->
+                            <!--<button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>-->
+                        <!--</div>-->
+                    </li>
+                </ul>
+            </accordion-group>
+        </accordion>
+    </div>
 
 </div>

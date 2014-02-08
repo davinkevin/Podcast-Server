@@ -1,17 +1,14 @@
 package lan.dk.podcastserver.worker.externalTools;
 
-import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by kevin on 31/12/2013.

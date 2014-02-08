@@ -3,13 +3,11 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
-import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.WorkerUtils;
 import org.jdom2.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -17,9 +15,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 
 @Component
@@ -28,26 +28,17 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    PodcastBusiness podcastBusiness;
+    @Resource PodcastBusiness podcastBusiness;
+    @Resource ItemBusiness itemBusiness;
+    @Resource WorkerUtils workerUtils;
+    @Resource Executor asyncExecutor;
 
-    @Autowired
-    ItemBusiness itemBusiness;
+    @Value("${rootfolder}") protected String rootFolder;
+    @Value("${serverURL}") protected String serverURL;
+    @Value("${fileContainer}") protected String fileContainer;
+    @Value("${numberofdaytodownload}") private int numberofdaytodownload;
 
-    @Value("${rootfolder}")
-    protected String rootFolder;
 
-    @Value("${serverURL}")
-    protected String serverURL;
-
-    @Value("${fileContainer}")
-    protected String fileContainer;
-
-    @Value("${numberofdaytodownload}")
-    private int numberofdaytodownload;
-
-    @Autowired
-    WorkerUtils workerUtils;
 
     ApplicationContext context = null;
 
@@ -64,7 +55,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                 String signature = updater.signaturePodcast(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
                     logger.info("Traitement du Podcast : " + podcast.toString());
-                    podcast = updater.updateFeed(podcast);
+                    updater.updateFeed(podcast);
 
 
                     podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
@@ -78,7 +69,18 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
-
+        /*while (true) {
+            if (((ThreadPoolTaskExecutor) asyncExecutor).getThreadPoolExecutor().getActiveCount() != 0) {
+                try {
+                    logger.info("{} Thread Actif", ((ThreadPoolTaskExecutor) asyncExecutor).getThreadPoolExecutor().getActiveCount());
+                    Thread.sleep(5000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else  {
+                return;
+            }
+        }  */
     }
 
     @Transactional

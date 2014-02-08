@@ -6,6 +6,7 @@ import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,48 +30,48 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 public class CanalPlusUpdater extends AbstractUpdater {
 
-   public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateFeed(Podcast podcast) {
 
-       Elements listingEpisodes = null;
-       Document page = null;
+        Elements listingEpisodes = null;
+        Document page = null;
 
-       Set<Item> itemSet = null;
+        Set<Item> itemSet = null;
 
-       try {
-           page = Jsoup.connect(podcast.getUrl()).get();
-       } catch (IOException e) {
-           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-           logger.error("IOException :", e);
-       }
+        try {
+            page = Jsoup.connect(podcast.getUrl()).get();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("IOException :", e);
+        }
 
 
-       // Si la page possède un planifier :
-       if ( !page.select(".planifier .cursorPointer").isEmpty() && itemSet == null ) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-           //podcast.setUrl();
-           itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
-       }
+        // Si la page possède un planifier :
+        if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet == null) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+            //podcast.setUrl();
+            itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
+        }
 
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
-        if ( !podcast.getUrl().contains("front_tools") && (itemSet == null) ) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+        if (!podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
             //podcast.setUrl();
             itemSet = this.getSetItemToPodcastFromFrontTools(
-                                this.getPodcastURLFromFrontTools(podcast.getUrl())
-                            );
+                    this.getPodcastURLFromFrontTools(podcast.getUrl())
+            );
         }
 
         // Si l'url est une front-tools et que la liste est encore vide :
         if (podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-           //podcast.setUrl();
-           itemSet = this.getSetItemToPodcastFromFrontTools(podcast.getUrl());
+            //podcast.setUrl();
+            itemSet = this.getSetItemToPodcastFromFrontTools(podcast.getUrl());
         }
 
-       for(Item item : itemSet) {
-        if (!podcast.getItems().contains(item)) {
-            item.setPodcast(podcast);
-            podcast.getItems().add(item);
+        for (Item item : itemSet) {
+            if (!podcast.getItems().contains(item)) {
+                item.setPodcast(podcast);
+                podcast.getItems().add(item);
             }
-         }
+        }
 
 
         //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, this.getServerURL()));
@@ -99,13 +100,13 @@ public class CanalPlusUpdater extends AbstractUpdater {
         }
 
         // Si la page possède un planifier :
-        if ( !page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+        if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
             return DigestUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
         }
 
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
-        if ( !podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+        if (!podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
             return DigestUtils.generateMD5SignatureFromUrl(this.getPodcastURLFromFrontTools(podcast.getUrl()));
         }
 
@@ -117,7 +118,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
 
-    /******* Partie spécifique au Front Tools *******/
+    /**
+     * **** Partie spécifique au Front Tools ******
+     */
 
     private String getPodcastURLFromFrontTools(String canalPlusDirectShowUrl) {
         if (canalPlusDirectShowUrl.contains("front_tools"))
@@ -142,9 +145,10 @@ public class CanalPlusUpdater extends AbstractUpdater {
             pid = Integer.parseInt(m.group(1));
             ztid = Integer.parseInt(m.group(2));
         }
-        return "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid="+ pid +"&ztid="+ztid+"&nbPlusVideos0=1";
+        return "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=" + pid + "&ztid=" + ztid + "&nbPlusVideos0=1";
     }
-    private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) throws MalformedURLException{
+
+    private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) throws MalformedURLException {
 
         Document page = null;
 
@@ -155,7 +159,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         logger.debug("Parsing de l'url pour récupérer l'identifiant du tab");
         if (m.find()) {
-            nbPlusVideos=Integer.parseInt(m.group(1));
+            nbPlusVideos = Integer.parseInt(m.group(1));
             logger.debug("nbPlusVideos = " + nbPlusVideos);
         } else {
             throw new MalformedURLException("nbPlusVideos Introuvable pour le show " + canalPlusFrontToolsUrl);
@@ -169,6 +173,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         }
         return page.select("ul.features").get(nbPlusVideos).select("li");
     }
+
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
         Set<Item> itemList = new LinkedHashSet<Item>();
         try {
@@ -200,12 +205,12 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Pattern idDuPodcastPatern = Pattern.compile(".*\\(([0-9]*).*\\);");
         Matcher matcher;
         Item itemToAdd;
-        for (Element cursorPointer : page.select(".planifier .cursorPointer") ) {
+        for (Element cursorPointer : page.select(".planifier .cursorPointer")) {
             matcher = idDuPodcastPatern.matcher(cursorPointer.attr("onclick"));
             if (matcher.find()) {
                 logger.debug(cursorPointer.select("h3 a").text());
                 itemToAdd = getItemFromVideoId(Integer.valueOf(matcher.group(1)))
-                                .setTitle(cursorPointer.select("h3 a").text());
+                        .setTitle(cursorPointer.select("h3 a").text());
                 itemSet.add(itemToAdd);
             }
         }
@@ -213,7 +218,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     /**
-     *
      * Helper permettant de créer un item à partir d'un ID de Video Canal+
      *
      * @param idCanalPlusVideo
@@ -237,11 +241,11 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         try {
             currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"))
-                .setPubdate(DateUtils.canalPlusDateToTimeStamp(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
-                .setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
-                .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
+                    .setPubdate(DateUtils.canalPlusDateToTimeStamp(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
+                    .setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
+                    .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
-            if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null) {
+            if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null && StringUtils.isNotEmpty(xml_MEDIA.getChild("VIDEOS").getChildText("HLS"))) {
                 currentEpisode.setUrl(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
             } else {
                 currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
@@ -259,12 +263,12 @@ public class CanalPlusUpdater extends AbstractUpdater {
             logger.error("ParseException :", e);
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("MalformedURLException :", e);
+            logger.error("MalformedURLException pour l'item d'id Canal+ {}", idCanalPlusVideo, e);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
         }
-    return currentEpisode;
+        return currentEpisode;
     }
 
     private String getM3U8UrlFromCanalPlusService(String standardM3UURL) {

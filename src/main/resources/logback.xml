@@ -21,6 +21,7 @@
     </appender>
   
   <logger name="lan.dk.podcastserver" level="DEBUG"/>
+  <logger name="lan.dk.podcastserver.utils" level="ERROR"/>
 
     <!-- Spring MVC -->
     <!-- ORM

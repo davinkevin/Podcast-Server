@@ -48,6 +48,12 @@ public class IDMController {
         return IDM.getNumberOfCurrentDownload();
     }
 
+    @RequestMapping(value="/limit", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public int setLimitParallelDownload () {
+        return IDM.getLimitParallelDownload();
+    }
+
     @RequestMapping(value="/limit", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public void setLimitParallelDownload (@RequestBody int setLimitParallelDownload) {
@@ -115,6 +121,12 @@ public class IDMController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void addItemToQueue(@RequestBody int id) {
         IDM.addItemToQueue(id);
+    }
+
+    @RequestMapping(value="/queue", method = RequestMethod.DELETE, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void emptyQueue() {
+        IDM.getWaitingQueue().clear();
     }
 
 }

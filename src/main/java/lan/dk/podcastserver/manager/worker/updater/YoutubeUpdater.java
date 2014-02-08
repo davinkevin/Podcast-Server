@@ -29,7 +29,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     private String GDATA_USER_FEED = "http://gdata.youtube.com/feeds/api/users/";
     private String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
 
-    @Override
+
     public Podcast updateFeed(Podcast podcast) {
 
         String realPodcastURl = this.gdataUrlFromYoutubeURL(podcast.getUrl());

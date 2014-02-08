@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.File;
@@ -96,8 +97,9 @@ public class Item implements Serializable {
         return this;
     }
 
-    @Column(name = "url", length = 65535)
+    @Column(name = "url", length = 65535, unique = true)
     @Basic
+    @NotEmpty
     public String getUrl() {
         return url;
     }

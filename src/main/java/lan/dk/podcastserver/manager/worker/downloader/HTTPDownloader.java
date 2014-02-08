@@ -56,6 +56,9 @@ public class HTTPDownloader extends AbstractDownloader {
                                 item.setProgression((int) (info.getCount()*100 / (float) info.getLength()));
                             }
                             break;
+                        case STOP:
+                            logger.debug("Pause / Arrêt du téléchargement du téléchargement");
+                            break;
                         default:
                             break;
                     }
@@ -83,8 +86,8 @@ public class HTTPDownloader extends AbstractDownloader {
                     ee.printStackTrace();
             }
         } catch (DownloadInterruptedError e) {
-            logger.debug("Arrêt du téléchargement");
-            stopDownload();
+            logger.error("", e);
+            //stopDownload();
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             stopDownload();
