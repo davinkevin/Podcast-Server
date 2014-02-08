@@ -14,10 +14,12 @@ import org.jdom2.Namespace;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Set;
 
 /**
  * Created by kevin on 21/12/2013.
@@ -73,7 +75,13 @@ public class YoutubeUpdater extends AbstractUpdater {
                         Cover cover = ImageUtils.getCoverFromURL(new URL(item.getChild("group", media).getChildren("thumbnail", media).get(0).getAttributeValue("url")));
                         podcastItem.setCover(cover);
                     }
-                    podcast.getItems().add(podcastItem);
+
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(podcastItem);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
                 }
 
 

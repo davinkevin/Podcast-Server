@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.util.concurrent.Future;
 
 //@Component
@@ -16,10 +17,9 @@ public abstract class AbstractUpdater implements Updater {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${serverURL}")
-    private String serverURL;
-
+    @Value("${serverURL}") private String serverURL;
     @Resource PodcastRepository podcastRepository;
+    @Resource(name="Validator") Validator validator;
 
     public Future<Podcast> updateFeedAsync(Podcast podcast) {
         return new AsyncResult<>(podcastRepository.save(updateFeed(podcast)));

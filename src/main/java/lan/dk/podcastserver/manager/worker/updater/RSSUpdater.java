@@ -13,10 +13,12 @@ import org.jdom2.Namespace;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Set;
 
 //@Scope("prototype")
 @Component("RSSUpdater")
@@ -80,12 +82,16 @@ public class RSSUpdater extends AbstractUpdater {
 
                     // Sauvegarde
                     if ( !podcast.getItems().contains(podcastItem)) {
-                        podcast.getItems().add(podcastItem);
-                        podcastItem.setPodcast(podcast);
+                        Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
+                        if (constraintViolations.isEmpty()) {
+                            podcast.getItems().add(podcastItem);
+                            podcastItem.setPodcast(podcast);
+                        } else {
+                            logger.error(constraintViolations.toString());
                         /*if (podcastItem.getCover() == null) {
                             podcastItem.setCover(podcast.getCover());
                         }*/
-                        logger.debug("Ajout du nouvel episode : " + podcastItem.toString());
+                        }
                     }
                 }
             }

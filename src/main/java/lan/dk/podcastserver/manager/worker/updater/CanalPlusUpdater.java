@@ -15,6 +15,7 @@ import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ConstraintViolation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -68,8 +69,15 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         for (Item item : itemSet) {
             if (!podcast.getItems().contains(item)) {
-                item.setPodcast(podcast);
-                podcast.getItems().add(item);
+
+                // Si le bean est valide :
+                Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
+                if (constraintViolations.isEmpty()) {
+                    item.setPodcast(podcast);
+                    podcast.getItems().add(item);
+                } else {
+                    logger.error(constraintViolations.toString());
+                }
             }
         }
 
