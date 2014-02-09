@@ -41,6 +41,8 @@ public class HTTPDownloader extends AbstractDownloader {
                         case EXTRACTING_DONE:
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
                             break;
+                        case ERROR:
+                            break;
                         case DONE:
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - Téléchargement terminé");
                             finishDownload();
@@ -51,7 +53,7 @@ public class HTTPDownloader extends AbstractDownloader {
                             break;
                         case DOWNLOADING:
                             long now = System.currentTimeMillis();
-                            if (now - 1000 > last) {
+                            if (now - 1000 > last && info.getLength() != null && info.getLength() != 0L) {
                                 last = now;
                                 item.setProgression((int) (info.getCount()*100 / (float) info.getLength()));
                             }

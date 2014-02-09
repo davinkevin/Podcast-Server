@@ -119,7 +119,7 @@ public class RTMPDownloader extends AbstractDownloader {
     public void startDownload() {
         stopDownloading.set(false);
         this.item.setStatus("Started");
-        itemService.save(this.item);
+        this.saveSyncWithPodcast(this.item);
         if (pid != 0 && p != null) { //Relancement du process UNIX
             //ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
             logger.debug("Reprise du téléchargement");

@@ -6,6 +6,7 @@ import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -20,7 +21,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Set;
 
-//@Scope("prototype")
 @Component("RSSUpdater")
 @Scope("prototype")
 public class RSSUpdater extends AbstractUpdater {
@@ -62,7 +62,7 @@ public class RSSUpdater extends AbstractUpdater {
                                                 .setPubdate(DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")))
                                                 .setDescription(item.getChildText("description"))
                                                 .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
-                                                .setLength((item.getChild("enclosure").getAttributeValue("length") != null)
+                                                .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
                                                         ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
                                                         : 0L);
 
@@ -88,9 +88,6 @@ public class RSSUpdater extends AbstractUpdater {
                             podcastItem.setPodcast(podcast);
                         } else {
                             logger.error(constraintViolations.toString());
-                        /*if (podcastItem.getCover() == null) {
-                            podcastItem.setCover(podcast.getCover());
-                        }*/
                         }
                     }
                 }

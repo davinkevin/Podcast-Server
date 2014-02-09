@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.business.ItemBusiness;
+import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -24,8 +26,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected String temporaryExtension = ".psdownload";
     protected File target = null;
 
-    @Autowired
-    protected ItemBusiness itemService;
+    @Autowired protected ItemBusiness itemService;
+    @Resource protected PodcastBusiness podcastBusiness;
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
@@ -60,7 +62,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void startDownload() {
         this.item.setStatus("Started");
         stopDownloading.set(false);
-        itemService.save(this.item);
+        this.saveSyncWithPodcast(this.item);
         this.download();
 
     }
@@ -69,14 +71,14 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void pauseDownload() {
         this.item.setStatus("Paused");
         stopDownloading.set(true);
-        itemService.save(this.item);
+        this.saveSyncWithPodcast(this.item);
     }
 
     @Override
     public void stopDownload() {
         this.item.setStatus("Stopped");
         stopDownloading.set(true);
-        itemService.save(this.item);
+        this.saveSyncWithPodcast(this.item);
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null && target.exists())
             target.delete();
@@ -106,7 +108,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setDownloaddate(new Timestamp(new Date().getTime()));
             this.item.setLength(FileUtils.sizeOf(target));
             this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
-            itemService.save(this.item);
+
+            this.saveSyncWithPodcast(this.item);
         } else {
             resetDownload();
         }
@@ -130,5 +133,12 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         return file;
     }
 
+    protected Item saveSyncWithPodcast(Item item) {
+        this.item.setPodcast(podcastBusiness.findOne(this.item.getPodcast().getId()));
+        this.item.getPodcast().getItems().remove(this.item);
+        this.item.getPodcast().getItems().add(this.item);
+
+        return itemService.save(this.item);
+    }
 
 }

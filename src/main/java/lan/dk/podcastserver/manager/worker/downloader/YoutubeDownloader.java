@@ -121,10 +121,11 @@ public class YoutubeDownloader extends AbstractDownloader {
                     ee.printStackTrace();
             }
         } catch (DownloadInterruptedError e) {
-            logger.debug("Arrêt du téléchargement");
+            logger.debug("Arrêt du téléchargement par l'interface");
             //stopDownload();
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("Url malformée : {}", item.getUrl(), e);
             stopDownload();
         }
         logger.debug("Download termine");

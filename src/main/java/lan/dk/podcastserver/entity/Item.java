@@ -120,7 +120,7 @@ public class Item implements Serializable {
         return this;
     }
 
-    @ManyToOne(cascade=CascadeType.MERGE)
+    @ManyToOne(cascade={CascadeType.MERGE})
     @JoinColumn(name = "podcast_id", referencedColumnName = "id")
     @JsonBackReference("podcast-item")
     public Podcast getPodcast() {
@@ -131,11 +131,6 @@ public class Item implements Serializable {
         this.podcast = podcast;
         return this;
     }
-
-//    @Transient
-//    public Cover getPodcastCover() {
-//        return this.podcast.getCover();
-//    }
 
     @Column(name = "local_url")
     @Basic

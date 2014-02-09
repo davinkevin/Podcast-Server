@@ -2,19 +2,14 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.utils.URLUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component("M3U8Downloader")
 @Scope("prototype")
@@ -126,7 +121,7 @@ public class M3U8Downloader extends AbstractDownloader {
     public void startDownload() {
         this.item.setStatus("Started");
         stopDownloading.set(false);
-        itemService.save(this.item);
+        this.saveSyncWithPodcast(this.item);
 
         if (runnableDownloader == null) {
             this.download();
