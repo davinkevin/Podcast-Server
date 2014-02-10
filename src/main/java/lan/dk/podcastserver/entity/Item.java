@@ -5,15 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.AssertTrue;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 
-@Table(name = "item", schema = "", catalog = "")
+@Table(name = "item")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Item implements Serializable {
@@ -99,7 +101,6 @@ public class Item implements Serializable {
 
     @Column(name = "url", length = 65535, unique = true)
     @Basic
-    @NotEmpty
     public String getUrl() {
         return url;
     }
@@ -215,14 +216,21 @@ public class Item implements Serializable {
 
         Item item = (Item) o;
 
-        if (!url.equals(item.url)) return false;
+        if (localUrl != null ? !localUrl.equals(item.localUrl) : item.localUrl != null) return false;
+        if (!podcast.equals(item.podcast)) return false;
+        if (title != null ? !title.equals(item.title) : item.title != null) return false;
+        if (url != null ? !url.equals(item.url) : item.url != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return url.hashCode();
+        int result = title != null ? title.hashCode() : 0;
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (localUrl != null ? localUrl.hashCode() : 0);
+        result = 31 * result + podcast.hashCode();
+        return result;
     }
 
     @Override
@@ -267,4 +275,10 @@ public class Item implements Serializable {
         return (this.cover == null) ? podcast.getCover() : this.cover;
     }
 
+    @Transient
+    @JsonIgnore
+    @AssertTrue
+    public boolean hasValidURL() {
+        return (!StringUtils.isEmpty(this.url)) || (this.podcast.getType().equals("send"));
+    }
 }

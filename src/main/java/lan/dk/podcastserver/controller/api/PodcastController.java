@@ -3,10 +3,8 @@ package lan.dk.podcastserver.controller.api;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
-import lan.dk.podcastserver.utils.jDomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -95,7 +89,7 @@ public class PodcastController {
                 logger.debug("Réception de {} effectuée", name);
                 return "You successfully uploaded " + name;
             } catch (Exception e) {
-                logger.error("Réception de {} échouée", name);
+                logger.error("Réception de {} échouée", name, e);
                 return "You failed to upload " + name + " => " + e.getMessage();
             }
         } else {
