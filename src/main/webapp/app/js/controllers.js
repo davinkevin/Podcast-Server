@@ -123,3 +123,15 @@ podcastControllers.controller('DownloadCtrl', function ($scope, $http, $routePar
         $interval.cancel(refreshIntervalId);
     });
 });
+
+podcastControllers.controller('PodcastAddCtrl', function ($scope, Restangular) {
+    var podcasts = Restangular.all("podcast");
+
+    $scope.podcast = {};
+    $scope.podcast.hasToBeDeleted = true;
+
+
+    $scope.save = function() {
+        podcasts.post($scope.podcast);
+    }
+});

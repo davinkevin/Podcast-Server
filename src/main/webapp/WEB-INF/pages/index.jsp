@@ -6,7 +6,7 @@
 <head>
 
     <link href="/js/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet/less" type="text/css" href="less/angularpodcast.less" />
+    <link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />
 </head>
 <body>
 
@@ -22,7 +22,7 @@
                 </a>
             </li>
             <li>
-                <a href="#/ajouter">
+                <a href="#/podcast/add">
                     Ajouter
                 </a>
             </li>
@@ -55,6 +55,7 @@
     };
 </script>
 <script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>
+<script src="<c:url value="/js/lib/holderjs/holder.js"/>"></script>
 <script src="<c:url value="/js/lib/momentjs/moment.js"/>"></script>
 <script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>

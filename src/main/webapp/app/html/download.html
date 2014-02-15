@@ -1,18 +1,23 @@
+<!--<div class="jumbotron">-->
+    <!--<div class="container">-->
+        <!--<h1>Téléchargement</h1>-->
+    <!--</div>-->
+<!--</div>-->
+
 <div class="container">
 
-    <div class="row">
-        <div class="col-xs-offset-1 col-xs-3 col-sm-2 col-md-2 col-lg-2">
-            <input ng-model="numberOfSimDl" ng-change="updateNumberOfSimDl()" type="number" class="form-control pull-left" placeholder="Number of download">
+    <div class="row form-horizontal" style="margin-top: 15px;">
+        <div class="col-xs-offset-1 col-md-offset-1 col-sm-offset-1 col-lg-offset-1 form-group col-md-6 col-lg-6 col-xs-6 col-sm-6 ">
+            <label class="pull-left control-label">Téléchargements simultanés</label>
+            <div class="col-md-3 col-lg-3 col-xs-3 col-sm-3">
+                <input ng-model="numberOfSimDl" ng-change="updateNumberOfSimDl()" type="number" class="form-control" placeholder="Number of download">
+            </div>
         </div>
         <div class="btn-group pull-right">
             <button ng-click="restartAllDownload()" type="button" class="btn btn-default">Démarrer</button>
             <button ng-click="pauseAllDownload()" type="button" class="btn btn-default">Pause</button>
             <button ng-click="stopAllDownload()" type="button" class="btn btn-default">Stop</button>
         </div>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
     </div>
     <div class="row">
         <div class="text-center">

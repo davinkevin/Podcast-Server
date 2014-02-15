@@ -14,6 +14,10 @@ podcastApp.config(['$routeProvider',
                                 templateUrl: 'html/podcasts-list.html',
                                 controller: 'PodcastsListCtrl'
                             }).
+                            when('/podcast/add', {
+                                templateUrl: 'html/podcast-add.html',
+                                controller: 'PodcastAddCtrl'
+                            }).
                             when('/podcast/:podcastId', {
                                 templateUrl: 'html/podcast-detail.html',
                                 controller: 'PodcastDetailCtrl'
