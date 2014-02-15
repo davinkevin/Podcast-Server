@@ -11,6 +11,9 @@
     "jquery": "=1.10.2",
     "less": "~1.6.2",
     "momentjs": "~2.5.1",
-    "holderjs": "~2.3.1"
+    "holderjs": "~2.3.1",
+    "AngularStomp": "*",
+    "stomp-websocket": "~2.3.0",
+    "sockjs": "~0.3.4"
   }
 }

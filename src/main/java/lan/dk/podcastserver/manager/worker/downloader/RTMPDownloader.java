@@ -67,7 +67,7 @@ public class RTMPDownloader extends AbstractDownloader {
                                 if (m.matches() && Integer.parseInt(m.group(1)) > item.getProgression()) {
                                     item.setProgression(Integer.parseInt(m.group(1)));
                                     logger.debug("Item Progression : " + item.getProgression());
-
+                                    convertAndSaveBroadcast();
                                 } else if (ligne.toLowerCase().contains("download complete")) {
                                     logger.info("Fin du téléchargement");
                                     finishDownload();
@@ -155,4 +155,5 @@ public class RTMPDownloader extends AbstractDownloader {
         }
 
     }
+
 }

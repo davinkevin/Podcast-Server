@@ -53,9 +53,15 @@ public class HTTPDownloader extends AbstractDownloader {
                             break;
                         case DOWNLOADING:
                             long now = System.currentTimeMillis();
+                            int progression = 0;
                             if (now - 1000 > last && info.getLength() != null && info.getLength() != 0L) {
                                 last = now;
-                                item.setProgression((int) (info.getCount()*100 / (float) info.getLength()));
+                                progression = (int) (info.getCount()*100 / (float) info.getLength());
+                                if (item.getProgression() < progression) {
+                                    item.setProgression(progression);
+                                    logger.debug("Progression de {} : {}%", item.getTitle(), progression);
+                                    convertAndSaveBroadcast();
+                                }
                             }
                             break;
                         case STOP:

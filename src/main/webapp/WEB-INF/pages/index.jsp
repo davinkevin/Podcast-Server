@@ -57,13 +57,17 @@
 <script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>
 <script src="<c:url value="/js/lib/holderjs/holder.js"/>"></script>
 <script src="<c:url value="/js/lib/momentjs/moment.js"/>"></script>
+<script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
+<script src="<c:url value="/js/lib/sockjs/sockjs.js"/>"></script>
+<script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.js"/>"></script>
+
 <script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-resource/angular-resource.js"/>"></script>
-<script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
 <script src="<c:url value="/js/lib/restangular/src/restangular.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.js"/>"></script>
+<script src="<c:url value="/js/lib/AngularStomp/angular-stomp.js"/>"></script>
 
 
 <script src="<c:url value="/js/services.js"/>"></script>

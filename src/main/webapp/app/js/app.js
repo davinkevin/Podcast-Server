@@ -4,7 +4,8 @@ var podcastApp = angular.module('podcastApp', [
     'podcastFilters',
     'podcastServices',
     'restangular',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'AngularStomp'
 ]);
 
 podcastApp.config(['$routeProvider',

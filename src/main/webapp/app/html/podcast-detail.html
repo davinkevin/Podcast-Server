@@ -1,4 +1,4 @@
-
+<br/>
 <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
     <div class="thumbnail">
         <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">
@@ -23,15 +23,25 @@
                         <a href="#/item/{{item.id}}" class="thumb" >
                             <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
                         </a>
-                <span class="pull-left description">
-                    <p>{{item.title}}</p>
-                    <p>{{item.pubdate | momentDDMMYYYY }}</p>
-                </span>
-                        <div class="pull-right">
-                            <button ng-click="download(item)" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
-                            <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-globe"></span></a>
-                            <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
-                            <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                        <span class="pull-left description">
+                            <p>{{item.title}}</p>
+                            <p>{{item.pubdate | momentDDMMYYYY }}</p>
+                        </span>
+                        <div class="col-md-3 pull-right">
+                            <div class="row ">
+                                <span ng-if="item.status == 'Started' || item.status == 'Paused'" >
+                                    <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+                                    <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
+                                </span>
+
+                                <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                                <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
+
+                                <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                                <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                            </div>
+
+
                         </div>
 
                     </div>

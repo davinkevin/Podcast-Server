@@ -82,6 +82,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                             if (item.getProgression() < currentState) {
                                 item.setProgression(currentState);
                                 logger.debug("{} - {}%", item.getTitle(), item.getProgression());
+                                convertAndSaveBroadcast();
                             }
                             break;
                         default:
@@ -133,7 +134,11 @@ public class YoutubeDownloader extends AbstractDownloader {
     }
 
     private File getTagetFile(Item item, String youtubleTitle) {
-       File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
+
+        if (target != null)
+            return target;
+
+        File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
        if (!file.getParentFile().exists()) {
            file.getParentFile().mkdirs();
        }

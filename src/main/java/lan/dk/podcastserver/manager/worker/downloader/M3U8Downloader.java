@@ -62,6 +62,7 @@ public class M3U8Downloader extends AbstractDownloader {
                                 }
                                 item.setProgression((100*cpt)/urlList.size());
                                 logger.debug("Progression : {}", item.getProgression());
+                                convertAndSaveBroadcast();
                                 is.close();
 
                                 if (stopDownloading.get()) {
@@ -109,6 +110,10 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public File getTagetFile (Item item) {
+
+        if (target != null)
+            return target;
+
         File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + URLUtils.getFileNameFromCanalPlusM3U8Url(item.getUrl()) );
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
         //logger.debug(file.getAbsolutePath());
@@ -139,7 +144,7 @@ public class M3U8Downloader extends AbstractDownloader {
         this.item.setStatus("Started");
         stopDownloading.set(false);
         this.saveSyncWithPodcast(this.item);
-
+        convertAndSaveBroadcast();
         if (runnableDownloader == null) {
             this.download();
         } else {

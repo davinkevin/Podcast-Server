@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public abstract class AbstractDownloader implements Runnable, Downloader {
+    public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
+    public static final String WS_TOPIC_PODCAST = "/topic/podcast/";
     @Autowired
     protected ItemDownloadManager itemDownloadManager;
     protected Item item;
@@ -28,6 +31,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Autowired protected ItemBusiness itemService;
     @Resource protected PodcastBusiness podcastBusiness;
+    @Resource SimpMessagingTemplate template;
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
@@ -63,8 +67,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         this.item.setStatus("Started");
         stopDownloading.set(false);
         this.saveSyncWithPodcast(this.item);
+        this.convertAndSaveBroadcast();
         this.download();
-
     }
 
     @Override
@@ -72,6 +76,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         this.item.setStatus("Paused");
         stopDownloading.set(true);
         this.saveSyncWithPodcast(this.item);
+        this.convertAndSaveBroadcast();
     }
 
     @Override
@@ -82,6 +87,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null && target.exists())
             target.delete();
+        this.convertAndSaveBroadcast();
     }
 
     @Override
@@ -110,6 +116,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
 
             this.saveSyncWithPodcast(this.item);
+            this.convertAndSaveBroadcast();
         } else {
             resetDownload();
         }
@@ -124,6 +131,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     public File getTagetFile (Item item) {
+
+        if (target != null)
+            return target;
+
         File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(item.getUrl())) );
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
         //logger.debug(file.getAbsolutePath());
@@ -154,6 +165,11 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         this.item.getPodcast().getItems().add(this.item);
 
         return itemService.save(this.item);
+    }
+
+    protected void convertAndSaveBroadcast() {
+        this.template.convertAndSend(WS_TOPIC_DOWNLOAD, this.item );
+        this.template.convertAndSend(WS_TOPIC_PODCAST.concat(String.valueOf(item.getPodcast().getId())), this.item );
     }
 
 }
