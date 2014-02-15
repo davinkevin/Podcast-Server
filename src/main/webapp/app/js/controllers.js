@@ -1,6 +1,6 @@
 var podcastControllers = angular.module('podcastControllers', []);
 
-podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routeParams, Restangular) {
+podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp) {
     /*Restangular.one("item/pagination").get({size: 12, page :0, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
         $scope.items = itemsResponse.content;
 
@@ -26,6 +26,17 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
         $http.get('/api/item/' + item.id + "/addtoqueue");
     }
 
+    $scope.wsClient = ngstomp('/download', SockJS);
+    $scope.wsClient.connect("user", "password", function(){
+        $scope.wsClient.subscribe("/topic/download", function(message) {
+            var item = JSON.parse(message.body);
+
+            var elemToUpdate = _.find($scope.items, { 'id': item.id });
+            if (elemToUpdate)
+                _.assign(elemToUpdate, item);
+        });
+    });
+
 });
 
 podcastControllers.controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Item) {
@@ -47,7 +58,7 @@ podcastControllers.controller('PodcastDetailCtrl', function ($scope, $http, $rou
     Restangular.one("podcast", $routeParams.podcastId).get().then(function(data) {
         $scope.podcast = data;
 
-        $scope.wsClient = ngstomp("/download", SockJS, function(str) { console.log(str)});
+        $scope.wsClient = ngstomp("/download", SockJS);
         $scope.wsClient.connect("user", "password", function(){
             $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function(message) {
                 var item = JSON.parse(message.body);
