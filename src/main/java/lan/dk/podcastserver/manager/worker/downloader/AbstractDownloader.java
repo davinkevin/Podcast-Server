@@ -124,13 +124,28 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     public File getTagetFile (Item item) {
-        File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(item.getUrl())) + temporaryExtension );
-        logger.debug("Création du fichier : " + itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(item.getUrl())) + temporaryExtension );
+        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(item.getUrl())) );
+        logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
         //logger.debug(file.getAbsolutePath());
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+
+        if (!finalFile.getParentFile().exists()) {
+            finalFile.getParentFile().mkdirs();
         }
-        return file;
+
+        if (finalFile.exists() || new File(finalFile.getAbsolutePath().concat(temporaryExtension)).exists()) {
+            logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
+            try {
+                finalFile  = File.createTempFile(
+                        FilenameUtils.getBaseName(item.getUrl()).concat("-"),
+                        ".".concat(FilenameUtils.getExtension(item.getUrl())),
+                        finalFile.getParentFile());
+                finalFile.delete();
+            } catch (IOException e) {
+                logger.error("Erreur lors du renommage d'un doublon", e);
+            }
+        }
+
+        return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
     }
 
     protected Item saveSyncWithPodcast(Item item) {

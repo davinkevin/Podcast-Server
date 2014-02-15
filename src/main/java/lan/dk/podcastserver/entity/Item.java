@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
@@ -216,12 +215,16 @@ public class Item implements Serializable {
 
         Item item = (Item) o;
 
+        /*if (url != null ? !url.equals(item.url) : item.url != null) return false;
         if (localUrl != null ? !localUrl.equals(item.localUrl) : item.localUrl != null) return false;
         if (!podcast.equals(item.podcast)) return false;
-        if (title != null ? !title.equals(item.title) : item.title != null) return false;
-        if (url != null ? !url.equals(item.url) : item.url != null) return false;
+        if (title != null ? !title.equals(item.title) : item.title != null) return false;*/
+        if (localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl))
+            return true;
+        if (url != null && item.url != null && url.equals(item.url))
+            return true;
 
-        return true;
+        return false;
     }
 
     @Override
@@ -229,7 +232,7 @@ public class Item implements Serializable {
         int result = title != null ? title.hashCode() : 0;
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (localUrl != null ? localUrl.hashCode() : 0);
-        result = 31 * result + podcast.hashCode();
+        //result = 31 * result + podcast.hashCode();
         return result;
     }
 
