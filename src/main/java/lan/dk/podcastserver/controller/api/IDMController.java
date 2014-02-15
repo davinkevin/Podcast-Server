@@ -123,6 +123,12 @@ public class IDMController {
         IDM.addItemToQueue(id);
     }
 
+    @RequestMapping(value="/queue/{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void removeItemFromQueue(@PathVariable int id) {
+        IDM.removeItemFromQueue(id);
+    }
+
     @RequestMapping(value="/queue", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void emptyQueue() {

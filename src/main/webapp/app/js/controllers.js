@@ -106,38 +106,20 @@ podcastControllers.controller('DownloadCtrl', function ($scope, $http, $routePar
             $http.get("/api/task/downloadManager/restartAllCurrentDownload");
     }
 
+    $scope.removeFromQueue = function(item) {
+        $http.delete("/api/task/downloadManager/queue/" + item.id);
+    }
+
     var refreshIntervalId = $interval(function() {
-
-        //$scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
         Restangular.all("task/downloadManager/downloading").getList().then(function(items) {
-            // Mise à jour des provenant de la nouvelle liste :
-            items.forEach(function(item, key, collection) {
-                var itemToUpdate = _.find($scope.items, {'id' : item.id});
-                if (itemToUpdate != null) {
-                    itemToUpdate.progression = item.progression;
-                    itemToUpdate.isUpdate = true;
-                } else {
-                    item.isUpdate = true;
-                    $scope.items.push(item);
-                }
-            });
-
-            $scope.items.forEach(function(item, key, collection) {
-                if (!item.hasOwnProperty("isUpdate")) {
-                    $scope.items.splice(key, 1);
-                } else {
-                    delete item.isUpdate;
-                }
-            });
+            $scope.items = items;
         });
-
-
-        $scope.waitingitems = Restangular.all("task/downloadManager/queue").getList().$object;
-
-        //TODO : Use Lo-Dash to update the models
+        Restangular.all("task/downloadManager/queue").getList().then(function(waitingitems) {
+            $scope.waitingitems = waitingitems;
+        });
     }, 3000);
 
-    $scope.$on('$destroy', function () {
+     $scope.$on('$destroy', function () {
         $interval.cancel(refreshIntervalId);
     });
 });

@@ -136,7 +136,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
                 currentItem = this.getWaitingQueue().poll();
                 if (currentItem.getStatus() == null || currentItem.getStatus().equals("Not Downloaded") || currentItem.getStatus().equals("Stopped")) {
 
-                    getDownloaderByTypeAndRun(currentItem);
+                     getDownloaderByTypeAndRun(currentItem);
 
                 }
             }
@@ -205,17 +205,20 @@ public class ItemDownloadManager implements ApplicationContextAware {
     }
 
     public void addItemToQueue(int id) {
-        waitingQueue.add(itemBusiness.findOne(id));
-        manageDownload();
+        this.addItemToQueue(itemBusiness.findOne(id));
     }
 
     public void addItemToQueue(Item item) {
+
+        if (waitingQueue.contains(item) || downloadingQueue.containsKey(item))
+            return;
+
         waitingQueue.add(item);
         manageDownload();
     }
 
     public void removeItemFromQueue(int id) {
-        waitingQueue.remove(itemBusiness.findOne(id));
+        this.removeItemFromQueue(itemBusiness.findOne(id));
     }
 
     public void removeItemFromQueue(Item item) {
