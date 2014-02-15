@@ -82,10 +82,10 @@ public class RSSUpdater extends AbstractUpdater {
 
                     // Sauvegarde
                     if ( !podcast.getItems().contains(podcastItem)) {
+                        podcastItem.setPodcast(podcast);
                         Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
                         if (constraintViolations.isEmpty()) {
                             podcast.getItems().add(podcastItem);
-                            podcastItem.setPodcast(podcast);
                         } else {
                             logger.error(constraintViolations.toString());
                         }

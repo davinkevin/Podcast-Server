@@ -25,6 +25,12 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
     $scope.download = function(item) {
         $http.get('/api/item/' + item.id + "/addtoqueue");
     }
+    $scope.stopDownload = function(item) {
+        $http.post("/api/task/downloadManager/stopDownload", item.id);
+    }
+    $scope.toggleDownload = function(item) {
+        $http.post("/api/task/downloadManager/toogleDownload", item.id);
+    }
 
     $scope.wsClient = ngstomp('/download', SockJS);
     $scope.wsClient.connect("user", "password", function(){

@@ -71,9 +71,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
             if (!podcast.getItems().contains(item)) {
 
                 // Si le bean est valide :
+                item.setPodcast(podcast);
                 Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
                 if (constraintViolations.isEmpty()) {
-                    item.setPodcast(podcast);
                     podcast.getItems().add(item);
                 } else {
                     logger.error(constraintViolations.toString());

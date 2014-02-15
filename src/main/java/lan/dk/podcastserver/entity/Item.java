@@ -282,6 +282,6 @@ public class Item implements Serializable {
     @JsonIgnore
     @AssertTrue
     public boolean hasValidURL() {
-        return (!StringUtils.isEmpty(this.url)) || (this.podcast.getType().equals("send"));
+        return (!StringUtils.isEmpty(this.url)) || (this.podcast.getType() != null && this.podcast.getType().equals("send"));
     }
 }
