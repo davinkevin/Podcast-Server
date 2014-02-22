@@ -48,14 +48,12 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         // Si la page possède un planifier :
         if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet == null) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            //podcast.setUrl();
             itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
         }
 
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
         if (!podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            //podcast.setUrl();
             itemSet = this.getSetItemToPodcastFromFrontTools(
                     this.getPodcastURLFromFrontTools(podcast.getUrl())
             );
@@ -63,7 +61,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         // Si l'url est une front-tools et que la liste est encore vide :
         if (podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            //podcast.setUrl();
             itemSet = this.getSetItemToPodcastFromFrontTools(podcast.getUrl());
         }
 
@@ -254,9 +251,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
                     .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
             if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null && StringUtils.isNotEmpty(xml_MEDIA.getChild("VIDEOS").getChildText("HLS"))) {
-                currentEpisode.setUrl(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
+                currentEpisode.setUrlAndHash(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
             } else {
-                currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
+                currentEpisode.setUrlAndHash(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
             }
             //currentEpisode.setDescription((xml_INFOS.getChildText("DESCRIPTION").equals("")) ? xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE") : xml_INFOS.getChildText("DESCRIPTION"));
 

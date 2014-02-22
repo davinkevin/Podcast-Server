@@ -109,11 +109,11 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
             item.setCover(ImageUtils.getCoverFromURL(new URL(xml_item.getChildText("visuel_clip"))));
 
             if (StringUtils.isNotEmpty(xml_item.getChildText("url_video_hq"))) {
-                item.setUrl(xml_item.getChildText("url_video_hq"));
+                item.setUrlAndHash(xml_item.getChildText("url_video_hq"));
             } else if (StringUtils.isNotEmpty(xml_item.getChildText("url_video_sd"))) {
-                item.setUrl(xml_item.getChildText("url_video_sd"));
+                item.setUrlAndHash(xml_item.getChildText("url_video_sd"));
             } else if (StringUtils.isNotEmpty(xml_item.getChildText("url_video_3g"))) {
-                item.setUrl(xml_item.getChildText("url_video_3g"));
+                item.setUrlAndHash(xml_item.getChildText("url_video_3g"));
             }
 
         } catch (MalformedURLException e) {

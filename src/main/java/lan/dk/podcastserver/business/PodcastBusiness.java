@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.business;
 
-import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -9,7 +8,6 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,21 +15,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -150,7 +143,7 @@ public class PodcastBusiness {
 
         item.setTitle(FilenameUtils.removeExtension(name.split(" - ")[2]))
             .setPubdate(DateUtils.folderDateToTimestamp(name.split(" - ")[1]))
-            .setUrl(null)
+            .setUrlAndHash(fileContainer + "/" + podcast.getTitle() + "/" + name)
             .setLength(file.getSize())
             .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
             .setDescription(podcast.getDescription())

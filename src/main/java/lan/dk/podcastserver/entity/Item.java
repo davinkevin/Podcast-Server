@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lan.dk.podcastserver.utils.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,6 +23,7 @@ public class Item implements Serializable {
     private int id;
     private String title;
     private String url;
+    private String hashUrl;
     private Timestamp pubdate;
     private String description;
     private String mimeType;
@@ -106,6 +108,24 @@ public class Item implements Serializable {
 
     public Item setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    @Column(name = "hash_url", length = 70, unique = true)
+    @Basic
+    public String getHashUrl() {
+        return hashUrl;
+    }
+
+    public void setHashUrl(String hashUrl) {
+        this.hashUrl = hashUrl;
+    }
+
+    @Transient
+    @JsonIgnore
+    public Item setUrlAndHash(String url) {
+        this.url = url;
+        this.hashUrl = DigestUtils.generateMD5SignatureFromURL(url);
         return this;
     }
 

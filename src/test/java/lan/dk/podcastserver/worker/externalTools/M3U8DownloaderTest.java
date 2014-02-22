@@ -31,7 +31,7 @@ public class M3U8DownloaderTest {
     @Test
     public void getSpecificVideo() throws InterruptedException {
         Item item = new Item()
-                .setUrl("http://us-cplus-aka.canal-plus.com/i/1401/LE_PETIT_JOURNAL_BONUS_140110_CAN_396168_video_,MOB,L,H,HD,.mp4.csmil/index_3_av.m3u8")
+                .setUrlAndHash("http://us-cplus-aka.canal-plus.com/i/1401/LE_PETIT_JOURNAL_BONUS_140110_CAN_396168_video_,MOB,L,H,HD,.mp4.csmil/index_3_av.m3u8")
                 .setPodcast(new Podcast());
         item.getPodcast().setTitle("TestM3U8");
 

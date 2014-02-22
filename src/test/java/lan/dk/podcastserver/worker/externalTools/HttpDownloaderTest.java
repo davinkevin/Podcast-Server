@@ -6,7 +6,6 @@ import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader;
-import lan.dk.podcastserver.manager.worker.downloader.YoutubeDownloader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +26,7 @@ public class HttpDownloaderTest {
     @Test
     public void getBerneWithProblem() {
         Item item = new Item()
-                            .setUrl("http://rtl.proxycast.org/m/media/273073201584.mp3?c=DIVERTISSEMENT&p=a-la-bonne-heure&l3=&l4=&media_url=http%3A%2F%2Fadmedia.rtl.fr%2Fonline%2Fsound%2F2014%2F0127%2F7769188939_l-integrale-philippe-lellouche-et-vanessa-demouy.mp3")
+                            .setUrlAndHash("http://rtl.proxycast.org/m/media/273073201584.mp3?c=DIVERTISSEMENT&p=a-la-bonne-heure&l3=&l4=&media_url=http%3A%2F%2Fadmedia.rtl.fr%2Fonline%2Fsound%2F2014%2F0127%2F7769188939_l-integrale-philippe-lellouche-et-vanessa-demouy.mp3")
                             .setPodcast(new Podcast());
         item.getPodcast().setTitle("Test");
 

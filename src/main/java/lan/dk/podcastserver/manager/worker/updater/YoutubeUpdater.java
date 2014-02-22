@@ -58,11 +58,10 @@ public class YoutubeUpdater extends AbstractUpdater {
                                             .setDescription(item.getChildText("content", defaultNamespace))
                                             .setPubdate(DateUtils.youtubeDateToTimeStamp(item.getChildText("published", defaultNamespace)))
                                             .setPodcast(podcast);
-                                            //.setUrl(YOUTUBE_VIDEO_URL + item.getChildText("id", defaultNamespace).substring(item.getChildText("id", defaultNamespace).lastIndexOf("/")+1));
 
                 for (Element link : item.getChildren("link", defaultNamespace)) {
                     if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
-                        podcastItem.setUrl(link.getAttributeValue("href", null, ""));
+                        podcastItem.setUrlAndHash(link.getAttributeValue("href", null, ""));
                         break;
                     }
                 }

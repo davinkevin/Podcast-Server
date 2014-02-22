@@ -58,13 +58,15 @@ public class DigestUtils {
             for (byte b : digest) {
                 sb.append(Integer.toHexString((int) (b & 0xff)));
             }
-            //logger.debug("original:" + html);
-            //logger.debug("digested:" + digest);
             logger.debug("Signature : " + sb.toString());
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static String generateMD5SignatureFromURL(String url) {
+        return generateMD5SignatureFromDOM(url);
     }
 }
