@@ -215,10 +215,6 @@ public class Item implements Serializable {
 
         Item item = (Item) o;
 
-        /*if (url != null ? !url.equals(item.url) : item.url != null) return false;
-        if (localUrl != null ? !localUrl.equals(item.localUrl) : item.localUrl != null) return false;
-        if (!podcast.equals(item.podcast)) return false;
-        if (title != null ? !title.equals(item.title) : item.title != null) return false;*/
         if (localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl))
             return true;
         if (url != null && item.url != null && url.equals(item.url))

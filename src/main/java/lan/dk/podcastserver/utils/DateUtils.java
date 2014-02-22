@@ -80,7 +80,22 @@ public class DateUtils {
             Timestamp timeStampDate = new Timestamp(javaDate.getTime());
             return timeStampDate;
         } catch (ParseException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw e;
+        }
+    }
+
+    public static Timestamp jeuxVideoFrToTimeStamp(String text) throws ParseException {
+        // Format : 21/02/2014
+        Date javaDate = null;
+        try {
+            String pattern = "dd/MM/yyyy";
+            SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
+            javaDate = format.parse(text);
+            Timestamp timeStampDate = new Timestamp(javaDate.getTime());
+            return timeStampDate;
+        } catch (ParseException e) {
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             throw e;
         }
     }
