@@ -2,6 +2,12 @@ package lan.dk.podcastserver.utils;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+
 /**
  * Created by kevin on 01/02/2014.
  */
@@ -20,5 +26,27 @@ public class URLUtils {
         int posLastSlash = urlWithoutAllBandwith.lastIndexOf("/");
 
         return FilenameUtils.getName(urlWithoutAllBandwith.substring(0, posLastSlash).replace(".csmil", ""));
+    }
+
+    public static boolean isAValidURL(String url) {
+        URL u = null;
+        HttpURLConnection huc = null;
+        try {
+            u = new URL(url);
+            huc =  (HttpURLConnection)  u.openConnection();
+            huc.setRequestMethod("HEAD");
+            huc.connect();
+            return (huc.getResponseCode() == HttpURLConnection.HTTP_OK);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (huc != null)
+                huc.disconnect();
+        }
+        return false;
     }
 }

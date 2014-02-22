@@ -69,4 +69,19 @@ public class DateUtils {
                 ? new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH).format(timestamp)
                 : new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH).format(new Timestamp(new Date().getTime()));
     }
+
+    public static Timestamp beInSportDateToTimeStamp(String beInSportDate) throws ParseException {
+        // Format : Feb 17 2014, 10:26
+        Date javaDate = null;
+        try {
+            String pattern = "MMM dd yyyy, HH:mm";
+            SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
+            javaDate = format.parse(beInSportDate);
+            Timestamp timeStampDate = new Timestamp(javaDate.getTime());
+            return timeStampDate;
+        } catch (ParseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw e;
+        }
+    }
 }
