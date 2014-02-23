@@ -117,9 +117,9 @@ public class BeInSportUpdater extends AbstractUpdater {
             }
 
             if (vodUrl != null && URLUtils.isAValidURL(vodUrl)) {
-                item.setUrlAndHash(vodUrl);
+                item.setUrl(vodUrl);
             } else {
-                item.setUrlAndHash(externalUrl);
+                item.setUrl(externalUrl);
             }
 
         } catch (ParseException e) {

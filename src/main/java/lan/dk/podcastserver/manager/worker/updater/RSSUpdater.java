@@ -75,9 +75,9 @@ public class RSSUpdater extends AbstractUpdater {
                     }
                      // Gestion des cas pour l'url :
                     if (item.getChild("origEnclosureLink", feedburner) != null) {
-                        podcastItem.setUrlAndHash(item.getChildText("origEnclosureLink", feedburner));
+                        podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));
                     } else if (item.getChild("enclosure") != null) {
-                        podcastItem.setUrlAndHash(item.getChild("enclosure").getAttributeValue("url"));
+                        podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
                     }
 
                     // Sauvegarde

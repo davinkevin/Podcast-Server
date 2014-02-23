@@ -61,7 +61,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
                 for (Element link : item.getChildren("link", defaultNamespace)) {
                     if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
-                        podcastItem.setUrlAndHash(link.getAttributeValue("href", null, ""));
+                        podcastItem.setUrl(link.getAttributeValue("href", null, ""));
                         break;
                     }
                 }

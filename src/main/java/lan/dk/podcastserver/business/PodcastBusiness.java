@@ -143,7 +143,7 @@ public class PodcastBusiness {
 
         item.setTitle(FilenameUtils.removeExtension(name.split(" - ")[2]))
             .setPubdate(DateUtils.folderDateToTimestamp(name.split(" - ")[1]))
-            .setUrlAndHash(fileContainer + "/" + podcast.getTitle() + "/" + name)
+            .setUrl(fileContainer + "/" + podcast.getTitle() + "/" + name)
             .setLength(file.getSize())
             .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
             .setDescription(podcast.getDescription())

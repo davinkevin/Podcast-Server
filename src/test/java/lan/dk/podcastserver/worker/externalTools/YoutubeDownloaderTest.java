@@ -26,7 +26,7 @@ public class YoutubeDownloaderTest {
     @Test
     public void getYoutubeVideo() {
         Item item = new Item()
-                            .setUrlAndHash("http://www.youtube.com/watch?v=E-0WGB9WCRY&amp;feature=youtube_gdata")
+                            .setUrl("http://www.youtube.com/watch?v=E-0WGB9WCRY&amp;feature=youtube_gdata")
                             .setPodcast(new Podcast());
         item.getPodcast().setTitle("Test");
 
@@ -38,7 +38,7 @@ public class YoutubeDownloaderTest {
     @Test
     public void getShortVideo() {
         Item item = new Item()
-                            .setUrlAndHash("http://www.youtube.com/watch?v=Hzgzim5m7oU")
+                            .setUrl("http://www.youtube.com/watch?v=Hzgzim5m7oU")
                             .setPodcast(new Podcast());
         item.getPodcast().setTitle("Test");
 

@@ -251,9 +251,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
                     .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
             if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null && StringUtils.isNotEmpty(xml_MEDIA.getChild("VIDEOS").getChildText("HLS"))) {
-                currentEpisode.setUrlAndHash(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
+                currentEpisode.setUrl(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
             } else {
-                currentEpisode.setUrlAndHash(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
+                currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
             }
             //currentEpisode.setDescription((xml_INFOS.getChildText("DESCRIPTION").equals("")) ? xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE") : xml_INFOS.getChildText("DESCRIPTION"));
 

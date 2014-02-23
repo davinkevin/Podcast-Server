@@ -3,9 +3,6 @@ package lan.dk.podcastserver.worker.externalTools;
 import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.config.JPAEmbeddedContext;
 import lan.dk.podcastserver.config.PropertyConfig;
-import lan.dk.podcastserver.context.Mock.MockRepository;
-import lan.dk.podcastserver.context.Mock.MockService;
-import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.M3U8Downloader;
@@ -31,7 +28,7 @@ public class M3U8DownloaderTest {
     @Test
     public void getSpecificVideo() throws InterruptedException {
         Item item = new Item()
-                .setUrlAndHash("http://us-cplus-aka.canal-plus.com/i/1401/LE_PETIT_JOURNAL_BONUS_140110_CAN_396168_video_,MOB,L,H,HD,.mp4.csmil/index_3_av.m3u8")
+                .setUrl("http://us-cplus-aka.canal-plus.com/i/1401/LE_PETIT_JOURNAL_BONUS_140110_CAN_396168_video_,MOB,L,H,HD,.mp4.csmil/index_3_av.m3u8")
                 .setPodcast(new Podcast());
         item.getPodcast().setTitle("TestM3U8");
 
