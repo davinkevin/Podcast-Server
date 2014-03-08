@@ -69,7 +69,7 @@ public class JPAContext {
         if (environment.containsProperty(PROPERTY_NAME_DATABASE_PASSWORD))
             dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
 
-        if (environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL).contains(":h2") && environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL).contains(":tcp") )
+        if (environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL).contains(":h2:tcp://"))
             h2Server();
 
         return dataSource;
