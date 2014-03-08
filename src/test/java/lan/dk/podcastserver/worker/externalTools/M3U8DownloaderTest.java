@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.worker.externalTools;
 
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.JPAEmbeddedContext;
+import lan.dk.podcastserver.config.JPAEmbeddedConfig;
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  * Created by kevin on 02/02/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, BeanConfigScan.class, JPAEmbeddedContext.class})
+@ContextConfiguration(classes = {PropertyConfig.class, BeanConfigScan.class, JPAEmbeddedConfig.class})
 @ActiveProfiles("data-embedded")
 public class M3U8DownloaderTest {
 

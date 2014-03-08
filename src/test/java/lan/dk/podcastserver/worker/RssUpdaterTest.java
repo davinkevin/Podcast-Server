@@ -2,18 +2,12 @@ package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.JPAEmbeddedContext;
-import lan.dk.podcastserver.context.Mock.MockRepository;
-import lan.dk.podcastserver.context.Mock.MockService;
-import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
+import lan.dk.podcastserver.config.JPAEmbeddedConfig;
 import lan.dk.podcastserver.context.PropertyConfigTest;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.manager.worker.updater.CanalPlusUpdater;
 import lan.dk.podcastserver.manager.worker.updater.RSSUpdater;
 import lan.dk.podcastserver.utils.WorkerUtils;
-import org.hamcrest.core.IsNot;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +27,7 @@ import static org.junit.Assert.assertThat;
  * Created by kevin on 14/12/2013.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {JPAEmbeddedContext.class, BeanConfigScan.class, PropertyConfigTest.class})
+@ContextConfiguration(classes = {JPAEmbeddedConfig.class, BeanConfigScan.class, PropertyConfigTest.class})
 @ActiveProfiles("data-embedded")
 public class RssUpdaterTest {
 

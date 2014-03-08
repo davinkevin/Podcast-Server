@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.hibernate4.HibernateExceptionTranslator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
@@ -28,7 +29,7 @@ import java.util.Properties;
 @ComponentScan(basePackages = {"lan.dk.podcastserver.repository", "lan.dk.podcastserver.entity"})
 @EnableJpaRepositories("lan.dk.podcastserver.repository")
 @Profile("!data-embedded")
-public class JPAContext {
+public class JPAConfig {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -120,6 +121,12 @@ public class JPAContext {
 
         return entityManagerFactoryBean;
     }
+
+    @Bean
+    public HibernateExceptionTranslator hibernateExceptionTranslator() {
+        return new HibernateExceptionTranslator();
+    }
+
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public Server h2Server() throws SQLException {

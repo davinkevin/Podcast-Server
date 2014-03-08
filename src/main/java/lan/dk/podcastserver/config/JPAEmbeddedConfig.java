@@ -4,12 +4,12 @@ import com.jolbox.bonecp.BoneCPDataSource;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
@@ -21,7 +21,7 @@ import java.util.Properties;
 @ComponentScan(basePackages = {"lan.dk.podcastserver.repository", "lan.dk.podcastserver.entity"})
 @EnableJpaRepositories("lan.dk.podcastserver.repository")
 @Profile("data-embedded")
-public class JPAEmbeddedContext {
+public class JPAEmbeddedConfig {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -99,6 +99,11 @@ public class JPAEmbeddedContext {
         // Initialisation de la database
         jpaProperties.put(PROPERTY_NAME_HBM2DDL_AUTO, "create-drop");
 
+        // Gestion du cache :
+        //jpaProperties.setProperty("hibernate.cache.use_second_level_cache", "true");
+        //jpaProperties.setProperty("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
+        //jpaProperties.setProperty("hibernate.cache.use_query_cache", "true");
+        jpaProperties.setProperty("hibernate.generate_statistics", "true");
 
         //jpaProperties.put(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER, "ram");
         //jpaProperties.put(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE));

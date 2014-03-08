@@ -8,14 +8,15 @@
     <name>Podcast Server</name>
 
     <properties>
-        <spring.version>4.0.1.RELEASE</spring.version>
-        <spring-data.version>1.4.3.RELEASE</spring-data.version>
-        <hibernate.version>4.3.1.Final</hibernate.version>
-        <jackson.version>2.3.0</jackson.version>
-        <mysql.connector.version>5.1.28</mysql.connector.version>
-        <slf4j.version>1.7.5</slf4j.version>
+        <spring.version>4.0.2.RELEASE</spring.version>
+        <spring-data.version>1.5.0.RELEASE</spring-data.version>
+        <hibernate.version>4.3.4.Final</hibernate.version>
+        <jackson.version>2.3.2</jackson.version>
+        <slf4j.version>1.7.6</slf4j.version>
         <javax.servlet-api.version>3.0.1</javax.servlet-api.version>
         <mockito.version>1.9.5</mockito.version>
+
+        <mysql.connector.version>5.1.28</mysql.connector.version>
 
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
@@ -104,6 +105,12 @@
             <version>${hibernate.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
         <!-- Bean Validation -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -187,7 +194,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.13</version>
+            <version>1.1.1</version>
         </dependency>
 
         <!-- Others -->
@@ -206,7 +213,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.7.2</version>
+            <version>1.7.3</version>
         </dependency>
 
         <dependency>

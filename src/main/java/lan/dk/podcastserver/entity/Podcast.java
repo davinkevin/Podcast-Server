@@ -3,13 +3,14 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lan.dk.podcastserver.utils.jDomUtils;
+import org.springframework.cache.annotation.Cacheable;
+
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Table(name = "podcast")
@@ -105,6 +106,7 @@ public class Podcast implements Serializable {
 
     @OneToMany(mappedBy = "podcast", fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
     @OrderBy("pubdate DESC")
+    @Cacheable("item")
     public Collection<Item> getItems() {
         return items;
     }

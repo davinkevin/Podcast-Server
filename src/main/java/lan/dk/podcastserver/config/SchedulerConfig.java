@@ -7,6 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 @ComponentScan(basePackages = {"lan.dk.podcastserver.scheduled"})
-public class SchedulerContext {
+public class SchedulerConfig {
 
 }

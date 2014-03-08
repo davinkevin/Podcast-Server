@@ -27,7 +27,7 @@ public class WebApplicationInitialisation extends AbstractAnnotationConfigDispat
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{WebMvcConfiguration.class};
+        return new Class[]{WebMvcConfig.class};
     }
 
     @Override

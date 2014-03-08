@@ -19,7 +19,7 @@ import java.util.List;
  */
 @EnableWebMvc
 @ComponentScan("lan.dk.podcastserver.controller")
-public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     public static final int CACHE_PERIOD = 31556926;
     private List<HttpMessageConverter<?>> messageConverters; // Cached: this is not a bean.

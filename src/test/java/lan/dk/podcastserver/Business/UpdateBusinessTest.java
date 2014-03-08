@@ -3,7 +3,7 @@ package lan.dk.podcastserver.Business;
 import junit.framework.Assert;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.JPAEmbeddedContext;
+import lan.dk.podcastserver.config.JPAEmbeddedConfig;
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -24,7 +24,7 @@ import java.util.*;
  * Created by kevin on 01/02/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, JPAEmbeddedContext.class, BeanConfigScan.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {PropertyConfig.class, JPAEmbeddedConfig.class, BeanConfigScan.class}, loader=AnnotationConfigContextLoader.class)
 @ActiveProfiles("data-embedded")
 public class UpdateBusinessTest {
 

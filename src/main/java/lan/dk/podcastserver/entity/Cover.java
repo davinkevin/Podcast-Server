@@ -2,7 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import javax.persistence.*;
 
-@Table(name = "cover", schema = "", catalog = "")
+@Table(name = "cover")
 @Entity
 public class Cover {
 
