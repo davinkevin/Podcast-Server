@@ -56,26 +56,27 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
                 try {
                     item.setPubdate(DateUtils.jeuxVideoFrToTimeStamp(element.select("a span").text()));
                 } catch (ParseException e) {
-                    logger.error("Non Parseable : {}", element.select("a span").text(), e);
+                    logger.error("Non Parseable date : {}", element.select("a span").text());
                 }
 
                 Matcher m = ID_JEUXVIDEOFR_PATTERN.matcher(element.select("a").attr("href"));
-                if (m.find()) {
+                if (m.find() && !m.group(1).equals("0") ) {
                     item = getDetailFromXML(item, Integer.valueOf(m.group(1)));
-                } else {
-                    break;
+
+                    if (!podcastContains(podcast, item)) {
+                        // Si le bean est valide :
+                        item.setPodcast(podcast);
+                        Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
+                        if (constraintViolations.isEmpty()) {
+
+                            podcast.getItems().add(item);
+                        } else {
+                            logger.error(constraintViolations.toString());
+                        }
+                    }
+
                 }
 
-                if (!podcastContains(podcast, item)) {
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                }
 
             }
 

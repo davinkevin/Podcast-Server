@@ -42,7 +42,7 @@ public class JeuxVideoFrWorker {
     }
 
     @Test
-    public void updateFeedExpresso() {
+    public void updateFeedDefisJVFR() {
 
         Podcast defisJVFR = new Podcast("Les défis de la rédaction de JeuxVideoFr", "http://www.jeuxvideo.fr/video/defis-de-la-redaction/",
                 "", "JeuxVideoFr", new Timestamp(System.currentTimeMillis()), null, new Cover("http://1.im6.fr/00C3006E3541664-c1-photo-oYToxOntzOjE6InciO2k6MTk1O30%3D-defi-chaine.jpg", 250, 166), null, true);
