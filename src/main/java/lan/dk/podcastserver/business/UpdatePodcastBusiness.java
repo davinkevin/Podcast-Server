@@ -128,7 +128,9 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
             logger.info("Suppression du fichier associé à l'item " + fileToDelete.getAbsolutePath());
             if (fileToDelete.exists() && fileToDelete.delete()) {
                 logger.debug("Suppression effectuée");
-                item.setStatus("Deleted");
+                item.setStatus("Deleted")
+                        .setLocalUri(null)
+                        .setLocalUrl(null);
                 itemBusiness.save(item);
             }
         }
