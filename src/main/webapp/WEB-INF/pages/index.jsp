@@ -9,29 +9,37 @@
     <link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />
 </head>
 <body>
-
 <nav class="navbar navbar-inverse" role="navigation">
-    <div class="navbar-header">
-        <a class="navbar-brand" href="#/items">Podcast Server</a>
-    </div>
-    <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav">
-            <li>
-                <a href="#/podcasts">
-                        Podcast
-                </a>
-            </li>
-            <li>
-                <a href="#/podcast/add">
-                    Ajouter
-                </a>
-            </li>
-            <li>
-                <a href="#/download">
-                    Téléchargement
-                </a>
-            </li>
-        </ul>
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#compact-panel">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#/items">Podcast Server</a>
+        </div>
+
+        <div class="collapse navbar-collapse navbar-ex1-collapse" id="compact-panel">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#/podcasts">
+                            Podcast
+                    </a>
+                </li>
+                <li>
+                    <a href="#/podcast/add">
+                        Ajouter
+                    </a>
+                </li>
+                <li>
+                    <a href="#/download">
+                        Téléchargement
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
@@ -60,6 +68,8 @@
 <script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
 <script src="<c:url value="/js/lib/sockjs/sockjs.js"/>"></script>
 <script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.js"/>"></script>
+<script src="<c:url value="/js/lib/jquery/jquery.js"/>"></script>
+<script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.js"/>"></script>
 
 <script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>
