@@ -1,10 +1,14 @@
 package lan.dk.podcastserver.config;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+import org.h2.tools.Server;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -12,6 +16,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -42,6 +47,8 @@ public class JPAContext {
     private static final String PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER = "hibernate.search.default.directory_provider";
     private static final String PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE = "hibernate.search.default.indexBase";
 
+    public static final String[] PARAMETER_H2_SERVER = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", "9999"};
+
     @Resource
     private Environment environment;
 
@@ -51,7 +58,7 @@ public class JPAContext {
      * @return
      */
     @Bean
-    public DataSource dataSource() {
+    public DataSource dataSource() throws SQLException {
         BoneCPDataSource dataSource = new BoneCPDataSource();
 
         dataSource.setDriverClass(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
@@ -61,6 +68,9 @@ public class JPAContext {
             dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
         if (environment.containsProperty(PROPERTY_NAME_DATABASE_PASSWORD))
             dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
+
+        if (environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL).contains(":h2") && environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL).contains(":tcp") )
+            h2Server();
 
         return dataSource;
     }
@@ -72,7 +82,7 @@ public class JPAContext {
      * @throws ClassNotFoundException
      */
     @Bean
-    public JpaTransactionManager transactionManager() throws ClassNotFoundException {
+    public JpaTransactionManager transactionManager() throws ClassNotFoundException, SQLException {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
 
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
@@ -88,7 +98,7 @@ public class JPAContext {
      */
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws ClassNotFoundException {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws ClassNotFoundException, SQLException {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
         entityManagerFactoryBean.setDataSource(dataSource());
@@ -109,6 +119,11 @@ public class JPAContext {
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
         return entityManagerFactoryBean;
+    }
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public Server h2Server() throws SQLException {
+        return Server.createTcpServer(PARAMETER_H2_SERVER);
     }
 
 }
