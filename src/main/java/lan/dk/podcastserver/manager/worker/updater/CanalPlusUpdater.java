@@ -40,17 +40,16 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         try {
             page = Jsoup.connect(podcast.getUrl()).get();
+
+            // Si la page possède un planifier :
+            if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet == null) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+                itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
+            }
+
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
         }
-
-
-        // Si la page possède un planifier :
-        if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet == null) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
-        }
-
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
         if (!podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
@@ -64,16 +63,18 @@ public class CanalPlusUpdater extends AbstractUpdater {
             itemSet = this.getSetItemToPodcastFromFrontTools(podcast.getUrl());
         }
 
-        for (Item item : itemSet) {
-            if (!podcast.getItems().contains(item)) {
+        if (itemSet != null) {
+            for (Item item : itemSet) {
+                if (!podcast.getItems().contains(item)) {
 
-                // Si le bean est valide :
-                item.setPodcast(podcast);
-                Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                if (constraintViolations.isEmpty()) {
-                    podcast.getItems().add(item);
-                } else {
-                    logger.error(constraintViolations.toString());
+                    // Si le bean est valide :
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
                 }
             }
         }

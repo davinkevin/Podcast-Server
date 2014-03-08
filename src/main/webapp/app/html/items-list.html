@@ -18,9 +18,9 @@
                                     </span>
 
                         <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
-                        <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
+                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
 
-                        <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
                         <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
                 </div>
