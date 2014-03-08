@@ -44,6 +44,7 @@ public class Cover {
     public void setURL(String URL) {
         this.URL = URL;
     }
+
     @Column(name = "width")
     @Basic
     public int getWidth() {

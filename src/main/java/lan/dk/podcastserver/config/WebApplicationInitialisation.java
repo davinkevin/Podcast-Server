@@ -46,11 +46,11 @@ public class WebApplicationInitialisation extends AbstractAnnotationConfigDispat
         // Définition des profiles actifs :
         //System.setProperty("spring.profiles.active", "data-mysql");
 
-        if (System.getProperty("spring.profiles.active") != null && System.getProperty("spring.profiles.active").contains("data-embedded")) {
-            ServletRegistration.Dynamic h2Servlet = servletContext.addServlet("h2console", WebServlet.class);
-            h2Servlet.setLoadOnStartup(2);
-            h2Servlet.addMapping("/console/database/*");
-        }
+
+        ServletRegistration.Dynamic h2Servlet = servletContext.addServlet("h2console", WebServlet.class);
+        h2Servlet.setLoadOnStartup(2);
+        h2Servlet.addMapping("/console/database/*");
+
 
         super.onStartup(servletContext);
     }
