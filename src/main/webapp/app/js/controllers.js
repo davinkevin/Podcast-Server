@@ -1,6 +1,6 @@
 var podcastControllers = angular.module('podcastControllers', []);
 
-podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp) {
+podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp) {
     /*Restangular.one("item/pagination").get({size: 12, page :0, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
         $scope.items = itemsResponse.content;
 
@@ -11,16 +11,29 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
     });
     */
 
+    // Gestion du cache de la pagination :
+    var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+
     //$scope.selectPage = function (pageNo) {
-    $scope.$watch('currentPage', function(newPage){
+    $scope.changePage = function(newPage) {
+        cache.put('currentPage', newPage);
         Restangular.one("item/pagination").get({size: 12, page :newPage-1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
 
-            $scope.totalItems = itemsResponse.totalElements;
-            $scope.maxSize = 10;
+            $scope.currentPage = newPage;
+            $scope.totalItems = parseInt(itemsResponse.totalElements);
+
         });
-    });
-    $scope.currentPage = 1;
+    }
+    // Longeur inconnu au chargement :
+    $scope.totalItems = Number.MAX_VALUE;
+    $scope.maxSize = 10;
+
+    $scope.currentPage = cache.get("currentPage") || 1;
+
+
+    $scope.changePage($scope.currentPage);
+
 
     $scope.download = function(item) {
         $http.get('/api/item/' + item.id + "/addtoqueue");
