@@ -103,7 +103,7 @@ public class JPAEmbeddedConfig {
         //jpaProperties.setProperty("hibernate.cache.use_second_level_cache", "true");
         //jpaProperties.setProperty("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
         //jpaProperties.setProperty("hibernate.cache.use_query_cache", "true");
-        jpaProperties.setProperty("hibernate.generate_statistics", "true");
+        //jpaProperties.setProperty("hibernate.generate_statistics", "true");
 
         //jpaProperties.put(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER, "ram");
         //jpaProperties.put(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE));

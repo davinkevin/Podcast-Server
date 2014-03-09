@@ -12,6 +12,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -50,6 +52,7 @@ public class PodcastBusiness {
     protected String fileContainer;
 
     //** Delegate du Repository **//
+    @Cacheable( value = "podcast")
     public List<Podcast> findAll() {
         return podcastRepository.findAll();
     }
@@ -62,18 +65,22 @@ public class PodcastBusiness {
         return podcastRepository.findAll(pageable);
     }
 
+    @CacheEvict(value = "podcast", allEntries = true)
     public Podcast save(Podcast entity) {
         return podcastRepository.save(entity);
     }
 
+    @Cacheable( value = "podcast")
     public Podcast findOne(Integer integer) {
         return podcastRepository.findOne(integer);
     }
 
+    @CacheEvict(value = "podcast", allEntries = true)
     public void delete(Integer integer) {
         podcastRepository.delete(integer);
     }
 
+    @CacheEvict(value = "podcast", allEntries = true)
     public void delete(Podcast entity) {
         podcastRepository.delete(entity);
     }
@@ -112,8 +119,9 @@ public class PodcastBusiness {
         return null;
     }
 
+    @CacheEvict(value = "podcast", allEntries = true)
     public Podcast update(Podcast podcast) {
-        return podcastRepository.save(podcast);
+        return this.save(podcast);
     }
 
     @Transactional(readOnly = true)
