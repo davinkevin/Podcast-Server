@@ -52,7 +52,6 @@ public class PodcastBusiness {
     protected String fileContainer;
 
     //** Delegate du Repository **//
-    @Cacheable( value = "podcast")
     public List<Podcast> findAll() {
         return podcastRepository.findAll();
     }
@@ -65,22 +64,18 @@ public class PodcastBusiness {
         return podcastRepository.findAll(pageable);
     }
 
-    @CacheEvict(value = "podcast", allEntries = true)
     public Podcast save(Podcast entity) {
         return podcastRepository.save(entity);
     }
 
-    @Cacheable( value = "podcast")
     public Podcast findOne(Integer integer) {
         return podcastRepository.findOne(integer);
     }
 
-    @CacheEvict(value = "podcast", allEntries = true)
     public void delete(Integer integer) {
         podcastRepository.delete(integer);
     }
 
-    @CacheEvict(value = "podcast", allEntries = true)
     public void delete(Podcast entity) {
         podcastRepository.delete(entity);
     }
@@ -92,7 +87,7 @@ public class PodcastBusiness {
     //*****//
 
     public Podcast patchUpdate(Podcast patchPodcast) throws PodcastNotFoundException {
-        Podcast podcastToUpdate = podcastRepository.findOne(patchPodcast.getId());
+        Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
 
         if (podcastToUpdate == null)
             throw new PodcastNotFoundException();
@@ -106,7 +101,7 @@ public class PodcastBusiness {
         podcastToUpdate.setDescription(patchPodcast.getDescription());
         podcastToUpdate.setHasToBeDeleted(patchPodcast.getHasToBeDeleted());
 
-        return podcastRepository.save(podcastToUpdate);
+        return this.save(podcastToUpdate);
     }
 
     public Podcast generatePodcastFromURL(String URL) {
@@ -119,19 +114,18 @@ public class PodcastBusiness {
         return null;
     }
 
-    @CacheEvict(value = "podcast", allEntries = true)
     public Podcast update(Podcast podcast) {
         return this.save(podcast);
     }
 
     @Transactional(readOnly = true)
     public String getRss(int id) {
-        return podcastRepository.findOne(id).toXML(serveurURL);
+        return this.findOne(id).toXML(serveurURL);
     }
 
     @Transactional
     public boolean addItemByUpload(Integer idPodcast, MultipartFile file, String name) throws PodcastNotFoundException, ParseException, IOException {
-        Podcast podcast = podcastRepository.findOne(idPodcast);
+        Podcast podcast = this.findOne(idPodcast);
         if (podcast == null) {
             throw new PodcastNotFoundException();
         }
@@ -164,7 +158,7 @@ public class PodcastBusiness {
         podcast.getItems().add(item);
 
         itemRepository.save(item);
-        podcastRepository.save(podcast);
+        this.save(podcast);
 
         return (item.getId() != 0);
     }

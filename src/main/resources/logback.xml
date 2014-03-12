@@ -22,6 +22,7 @@
   
   <logger name="lan.dk.podcastserver" level="DEBUG"/>
   <logger name="lan.dk.podcastserver.utils" level="ERROR"/>
+  <logger name="org.springframework.cache" level="TRACE"/>
 
     <!-- Spring MVC -->
     <!-- ORM
@@ -29,8 +30,7 @@
     -->
 
     <!-- Hibernate  -->
-    <!--<logger name="org.hibernate" level="TRACE" />-->
-    <!--<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />-->
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
 
 
   <root level="info">

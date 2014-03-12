@@ -85,6 +85,7 @@ public class RSSUpdater extends AbstractUpdater {
                         podcastItem.setPodcast(podcast);
                         Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
                         if (constraintViolations.isEmpty()) {
+                            logger.debug("Ajout de l'épisode {}", podcastItem);
                             podcast.getItems().add(podcastItem);
                         } else {
                             logger.error(constraintViolations.toString());
