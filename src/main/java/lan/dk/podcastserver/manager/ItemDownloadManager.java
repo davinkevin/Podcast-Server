@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.Resource;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,12 +25,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ItemDownloadManager implements ApplicationContextAware {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String WS_TOPIC_WAITINGLIST = "/topic/waitingList";
 
     //Représnetation de la fils d'attente
     private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<Item>();
     //Représentation de la fils en cours de téléchargement
     private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<Item, Downloader>();
-
+    @Resource SimpMessagingTemplate template;
 
     @Autowired
     ItemBusiness itemBusiness;
@@ -142,6 +145,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
             }
             isRunning = false;
         }
+        this.convertAndSendWaitingQueue();
     }
 
     private void initDownload() {
@@ -206,6 +210,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
     public void addItemToQueue(int id) {
         this.addItemToQueue(itemBusiness.findOne(id));
+        this.convertAndSendWaitingQueue();
     }
 
     public void addItemToQueue(Item item) {
@@ -219,6 +224,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
     public void removeItemFromQueue(int id) {
         this.removeItemFromQueue(itemBusiness.findOne(id));
+        this.convertAndSendWaitingQueue();
     }
 
     public void removeItemFromQueue(Item item) {
@@ -259,7 +265,6 @@ public class ItemDownloadManager implements ApplicationContextAware {
                 new Thread((Runnable) worker).start();
             }
         }
-
     }
 
     @Override
@@ -275,5 +280,13 @@ public class ItemDownloadManager implements ApplicationContextAware {
         } else if (this.getWaitingQueue().contains(itemToDelete)) {
             this.removeItemFromQueue(itemToDelete);
         }
+        this.convertAndSendWaitingQueue();
     }
+
+    protected void convertAndSendWaitingQueue() {
+        this.template.convertAndSend(WS_TOPIC_WAITINGLIST, this.waitingQueue);
+    }
+
+
+
 }
