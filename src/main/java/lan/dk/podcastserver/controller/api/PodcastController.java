@@ -63,7 +63,14 @@ public class PodcastController {
     @ResponseBody
     @Transactional(readOnly = true)
     public List<Podcast> findAll() {
-        return podcastBusiness.findAll();
+
+        //TODO : Using JSONVIEW or Waiting https://jira.spring.io/browse/SPR-7156 to be solved in 1/JUL/2014
+        List<Podcast> podcastList = podcastBusiness.findAll();
+        for(Podcast podcast : podcastList) {
+            podcast.setItems(null);
+        }
+
+        return podcastList;
     }
 
     @RequestMapping(value="generatePodcastFromURL", method = RequestMethod.POST, produces = "application/json")
