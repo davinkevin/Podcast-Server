@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html ng-app="psgp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Podcast Server</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/psgp.css" />
+    <!--
+    <link rel="stylesheet/less" type="text/css" href="css/psgp.less" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.0/less.min.js"></script>
+    -->
+</head>
+<body data-spy="scroll" data-target=".navbar" ng-controller="psgpCtrl">
+    <div class="jumbotron text-center">
+        <h1>Podcast Server</h1>
+        <p>All your podcasts available in one place... <strong>Your place !</strong></p>
+        <div>
+            <img src="img/Desktop.png" width="600px" height="480px" ></img>
+            <img src="img/Phone.png" height="440px"></img>
+        </div>
+    </div>
+    <nav data-spy="affix" data-offset-top="721" data-offset-bottom="0" class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Podcast Server</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav text-center">
+                    <li>
+                        <a href="#description">Description</a>
+                    </li>
+                    <li>
+                        <a href="#installation">Installation</a>
+                    </li>
+                    <li>
+                        <a href="#compatibility">Compatibility</a>
+                    </li>
+                    <li>
+                        <a href="#framework">FrameWork</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="description" class="container">
+
+        <div class="media">
+            <a class="pull-left" href="#">
+                <img class="media-object" src="img/html5css3.png" width="128px">
+            </a>
+            <div class="media-body">
+                <h4 class="media-heading">One app to gather them all</h4>
+                <div>
+                    This web-application allow you to centralize and synchronize all your favorite podcast in one place inside your Home Network (or even in the cloud).
+                </div>
+                <div>
+                    You can use all your regular devices with that application, or even the Web interface to show the last episode downloaded.
+                </div>
+                <div>
+                    The Podcast Server application is used like a proxy to download the episode in one place and send them back to your device.
+                </div>
+            </div>
+        </div>
+
+        <div class="media">
+            <a class="pull-right" href="#">
+                <img class="media-object" width="128px" src="img/responsive.png">
+            </a>
+            <div class="media-body text-right">
+                <h4 class="media-heading">Responsive Design</h4>
+                <div>
+                    You can use your favorite Podcast Player (iTunes, BeyondPod ...), but this application provides you a simple and intuitive interface to browse all the episodes of your Podcast
+                </div>
+                <div>
+                    The interface is totally responsive, in order to presents you the best interface for your Phone, Tablet or Desktop.
+                </div>
+                <div>
+                    All the screens are totally dynamic, based on Web-socket. You don't need to refresh the screen to see the latest information
+                </div>
+            </div>
+        </div>
+
+        <div class="media">
+            <a class="pull-left" href="#">
+                <img class="media-object" src="img/opensource.png" width="128">
+            </a>
+            <div class="media-body">
+                <h4 class="media-heading">Totally Open-Source</h4>
+                <div>
+                    This developpement is initialised by myself (Davin Kevin) and I really want to share this app with all people who, like me, need to centralize their Podcast (exclusively because I have a low bandwidth and a lot of device and I don't want to download episode over and over again).
+                </div>
+                <div>
+                    I spend my (free) time to improve this application, but if you think you can help (adding Worker, improving IHM and other), I encourage you to fork this project !
+                </div>
+            </div>
+        </div>
+
+        <h1 id="installation" class="page-header">Installation</h1>
+        <div>This application is built with Maven (maybe Gradle soon) and uses a lot of embeddebale stack (Embedded Database, Embedded Message Queuing Server...) limiting the dependancy...</div>
+        <div>So, to install the application you just have to build it with Maven with the <kbd>mvn install</kbd> command to generate the War Application and deploy it to your favorite Java container</div>
+        <div>In following version, you will be able to build and run the application directly from maven with an embedded web-server</div>
+        <p>If you want to tweak the application, you have to create an application.properties (based upon application-example.properties template) to change the default value of the application</p>
+        <pre>
+            db.url=XXXX
+            db.url=XXXX
+        </pre>
+
+        <h1 id="compatibility" class="page-header">Compatibility</h1>
+        <p>This application used a concept of "Worker". A worker is a module whose can update and download podcast from different sources. RSS is the standard sources for Podcast, but you can use Youtube Channel or Canal+ replay TV as podcast.</p>
+
+        <div class="row text-center">
+
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
+                    <img src="img/worker/rss.png" alt="...">
+                    <div class="caption">
+                        <h3>RSS</h3>
+                        <p>The standard Really Simple Syndication Worker, compatible with RSS / ATOM and iTunes Podcast</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
+                    <img src="img/worker/canalplus.png" >
+                    <div class="caption">
+                        <h3>Canal+</h3>
+                        <p>A worker dedicated to the Canal+ Website, working on the Show URL</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
+                    <img src="img/worker/youtube.png" alt="...">
+                    <div class="caption">
+                        <h3>Youtube</h3>
+                        <p>You can transform your favorite Channels or Playlist into a Podcast. Developpement based on Axet/vget</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
+                    <img src="img/worker/beinsport.png" alt="...">
+                    <div class="caption">
+                        <h3>BeInSport</h3>
+                        <p>A worker dedicated to the show available on the BeInSport France Channel. A little part of the show is now compatible</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
+                    <img src="img/worker/jeuxvideofr.png" alt="...">
+                    <div class="caption">
+                        <h3>Jeux Video FR</h3>
+                        <p>A special worker for catching the video from the video game website JeuxVideo.fr</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
+                    <img src="img/upload.png" alt="...">
+                    <div class="caption">
+                        <h3>Upload</h3>
+                        <p>If you create your own podcast (by ripping some Radio Stream for exemple), your can upload episodes directly on your Podcast Server.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <h1 id="framework">Framework</h1>
+            <p>In order to build this App, I use a lot of open-sources framework, you can find a list and why I use them thereafter</p>
+            <div class="col-lg-4">
+                <ul class="list-group">
+                    <li ng-repeat="framework in frameworkList" ng-mouseover="frameworkHover(framework)" class="list-group-item" ng-bind-html="getAsHTML(framework.name)"></li>
+                </ul>
+            </div>
+            <div class="col-lg-8 frameworkdescription">
+                <a href="{{ currentFramework.link }}" class="col-lg-5">
+                    <img ng-src="{{ currentFramework.image }}" width="150" class="col-lg-6"></img>
+                </a>
+                <div class="col-lg-7">
+                    <p ng-bind-html="getAsHTML(currentFramework.description)"></p>
+                </div>
+            </div>
+        </div>
+
+        <h1 id="moretocome">More to come...</h1>
+        <p>I really want to improve this application, so this is the todo list for the next week</p>
+        <ul>
+            <li>Adding a search engine, based on Hibernate Search</li>
+            <li>Keep the framework up-to-date (Spring 4.0.3, Hibernate... )</li>
+            <li>Adding more jUnit test (I was really lazy in the pas about that subject)</li>
+            <li>Add some kind of tags on the podcast, to filter the main view by simple / multiple tags (usefull if you have like me a lots of podcast)</li>
+            <li>Create new Worker / Downloader to support other source and other protocol</li>
+            <li>Improving the IHM with AngularJS Animation and better presentation</li>
+            <li>And more... (keeping this page updated !!)</li>
+        </ul>
+    </div>
+
+    <div id="footer">
+        <div class="container">
+            <p class="text-muted">Hosted on GitHub - All trademarks mentioned herein belong to their respective owners</p>
+        </div>
+    </div>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/holder/2.3.1/holder.js"></script>
+<script>
+    var psgp = angular.module('psgp', []);
+
+    psgp.controller('psgpCtrl', function ($scope, $sce) {
+        $scope.frameworkList = [
+            { id: "h2", name: "H2 Database", image: "img/framework/h2.png", description: '<ul><li>Very fast, open source, JDBC API </li><li>Embedded and server modes; in-memory databases </li><li>Browser based Console application </li><li>Small footprint: around 1.5 MB jar file size </li></ul>', link : "http://www.h2database.com/" },
+            { id: "tomcat", name: "Apache Tomcat", image: "img/framework/tomcat.png", description: '<div class="text"><p>Apache Tomcat is an open source software implementation of the Java Servlet and JavaServer Pages technologies. The Java Servlet and JavaServer Pages specifications are developed under the <a href="http://jcp.org/en/introduction/overview" rel="nofollow">Java Community Process</a>.</p><p>Apache Tomcat is developed in an open and participatory environment and released under the <a href="http://www.apache.org/licenses">Apache License version 2</a>.  Apache Tomcat is intended to be a collaboration of the best-of-breed developers from around the world.  We invite you to participate in this open development project.  To learn more about getting involved, <a href="getinvolved.html">click here</a>.  </p> <p>Apache Tomcat powers numerous large-scale, mission-critical web applications across a diverse range of industries and organizations.  Some of these users and their stories are listed on the <a href="http://wiki.apache.org/tomcat/PoweredBy">PoweredBy</a> wiki page.</p> </div>', link : "http://tomcat.apache.org/" },
+            { id: "hibernate", name: "Hibernate ORM", image: "img/framework/hibernate.png", description: '<p>Hibernate ORM enables developers to more easily write applications whose data outlives the application process. As an Object/Relational Mapping (ORM) framework, Hibernate is concerned with data persistence as it applies to relational databases (via JDBC). Unfamilar with the notion of ORM? <a href="/orm/what-is-an-orm/">Read here</a>.</p>', link : "http://hibernate.org/orm/" },
+            { id: "spring", name: "Spring Framework", image: "img/framework/Spring.png", description: '<p>The Spring Framework provides a comprehensive programming and configuration model for modern Java-based enterprise applications - on any kind of deployment platform. A key element of Spring is infrastructural support at the application level: Spring focuses on the "plumbing" of enterprise applications so that teams can focus on application-level business logic, without unnecessary ties to specific deployment environments.</p><ul><li>Dependency Injection</li><li>Aspect-Oriented Programming including Spring\'s declarative transaction management</li><li>Spring MVC web application and RESTful web service framework</li><li>Foundational support for JDBC, JPA, JMS</li><li>Much more...</li></ul>', link : "http://spring.io/" },
+            { id: "angular", name: "AngularJS", image: "img/framework/angular.png", description: 'HTML is great for declaring static documents, but it falters when we try to use it for declaring dynamic views in web-applications. AngularJS lets you extend HTML vocabulary for your application. The resulting environment is extraordinarily expressive, readable, and quick to develop.', link : "http://angularjs.org/" },
+            { id: "bootstrap", name: "Twitter Bootstrap", image: "img/framework/TwitterBootstrap.png", description: '<h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2><p class="lead">Bootstrap makes front-end web development faster and easier. It\'s made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>', link : "http://getbootstrap.com/" },
+            { id: "intelliJ", name: "Developped with <strong>IntelliJ IDEA</strong>", image: "img/framework/IntelliJ.png", description: '<h2 class="center-align">The Most Intelligent IDE<br>for the Java Platform</h2><div class="blockcenter block75"><p class="intr -color center-align">Out of the box, IntelliJ IDEA provides a comprehensive feature set including tools and integrations with the most important modern technologies and frameworks for enterprise and web development with <strong>Java, Scala, Groovy</strong> and other languages.</p></div>', link : "http://www.jetbrains.com/idea/" }
+        ];
+
+        $scope.frameworkHover = function(framework) {
+            $scope.currentFramework = framework;
+        };
+
+        $scope.frameworkHover($scope.frameworkList[0]);
+
+        $scope.getAsHTML = function(text) {
+            return $sce.trustAsHtml(text);
+        };
+    });
+
+</script>
+
+</body>
+</html>

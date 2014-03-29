@@ -1,0 +1,55 @@
+.jumbotron {
+  margin-bottom: 0px;
+  background-color: #f2f2f2;
+  background-image: -webkit-linear-gradient(left, #f2f2f2, #a1a1a1);
+  background-image: -moz-linear-gradient(left, #f2f2f2, #a1a1a1);
+  background-image: -o-linear-gradient(left, #f2f2f2, #a1a1a1);
+  background-image: -ms-linear-gradient(left, #f2f2f2, #a1a1a1);
+  background-image: linear-gradient(left, #f2f2f2, #a1a1a1);
+}
+.navbar {
+  border-radius: 0px;
+}
+nav.affix-top .navbar-header {
+  display: none;
+}
+nav.affix-top .navbar-nav {
+  width: 100%;
+}
+nav.affix-top .navbar-nav li {
+  width: 25%;
+}
+nav.affix {
+  top: 0px;
+  width: 100%;
+  z-index: 1000;
+}
+nav.affix .navbar-nav {
+  width: 80%;
+}
+nav.affix .navbar-nav li {
+  width: 25%;
+}
+#footer {
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+#footer .container .text-muted {
+  margin: 20px 0;
+}
+#footer .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.thumbnail img {
+  height: 100px;
+}
+.media {
+  padding-bottom: 30px;
+}
+.frameworkdescription img {
+  width: 300px;
+}

@@ -1,0 +1,80 @@
+
+// Mixin :
+
+.gradient (@origin: left, @start: #f2f2f2, @stop: #a1a1a1) {
+  background-color: @start;
+  background-image: -webkit-linear-gradient(@origin, @start, @stop);
+  background-image: -moz-linear-gradient(@origin, @start, @stop);
+  background-image: -o-linear-gradient(@origin, @start, @stop);
+  background-image: -ms-linear-gradient(@origin, @start, @stop);
+  background-image: linear-gradient(@origin, @start, @stop);
+}
+
+.jumbotron {
+  margin-bottom: 0px;
+  .gradient()
+}
+
+.navbar {
+  border-radius: 0px;
+}
+
+nav.affix-top {
+  .navbar-header {
+    display: none;
+  }
+  .navbar-nav {
+    width: 100%;
+    li {
+      width: 25%;
+    }
+  }
+}
+
+nav.affix {
+
+  .navbar-nav {
+    width: 80%;
+    li {
+      width: 25%;
+    }
+  }
+
+    top: 0px;
+    width: 100%;
+    z-index: 1000;
+}
+
+#footer {
+  //position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+
+  .container .text-muted {
+    margin: 20px 0;
+  }
+
+  .container {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+}
+
+.thumbnail {
+  img {
+    height: 100px;
+  }
+}
+
+.media {
+  padding-bottom: 30px;
+}
+
+.frameworkdescription {
+  img {
+      width: 300px;
+  }
+}
