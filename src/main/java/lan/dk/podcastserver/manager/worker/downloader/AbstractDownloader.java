@@ -15,6 +15,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -113,7 +114,16 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setLocalUri(target.getAbsolutePath());
             this.item.setDownloaddate(new Timestamp(new Date().getTime()));
             this.item.setLength(FileUtils.sizeOf(target));
-            this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
+
+            try {
+                this.item.setMimeType(Files.probeContentType(target.toPath()));
+                if (this.item.getMimeType() == null) {
+                    this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
+            }
 
             this.saveSyncWithPodcast(this.item);
             this.convertAndSaveBroadcast();
