@@ -62,20 +62,30 @@ podcastControllers.controller('ItemDetailCtrl', function ($scope, $routeParams, 
     }
 });
 
-podcastControllers.controller('PodcastsListCtrl', function ($scope, $http, Restangular) {
+podcastControllers.controller('PodcastsListCtrl', function ($scope, Restangular, localStorageService) {
+    $scope.podcasts = localStorageService.get('podcastslist');
     Restangular.all("podcast").getList().then(function(podcasts) {
         $scope.podcasts = podcasts;
+        localStorageService.add('podcastslist', podcasts);
     });
 });
 
-podcastControllers.controller('PodcastDetailCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp) {
-    //$scope.podcast = Podcast.get({podcastId: $routeParams.podcastId});
-    Restangular.one("podcast", $routeParams.podcastId).get().then(function(data) {
-        $scope.podcast = data;
+podcastControllers.controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService) {
+    var idPodcast = $routeParams.podcastId;
+
+    // LocalStorage de la valeur du podcast :
+    $scope.$watch('podcast', function(newval, oldval) {
+        localStorageService.add("podcast/" + idPodcast, newval);
+    });
+
+    $scope.podcast = localStorageService.get("podcast/" + idPodcast ) || {};
+
+    Restangular.one("podcast", $routeParams.podcastId).get().then(function(podcast) {
+        $scope.podcast = podcast;
 
         $scope.wsClient = ngstomp("/download", SockJS);
         $scope.wsClient.connect("user", "password", function(){
-            $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function(message) {
+            $scope.wsClient.subscribe("/topic/podcast/" + idPodcast, function(message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
                 _.assign(elemToUpdate, item);
