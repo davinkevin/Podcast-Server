@@ -79,6 +79,7 @@
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.js"/>"></script>
 <script src="<c:url value="/js/lib/AngularStomp/angular-stomp.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.js" />"></script>
+<script src="<c:url value="/js/lib/angular-truncate/dist/angular-truncate.js" />"></script>
 
 
 <script src="<c:url value="/js/services.js"/>"></script>

@@ -24,7 +24,7 @@
                             <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
                         </a>
                         <span class="pull-left description">
-                            <p>{{item.title}}</p>
+                            <p>{{item.title | characters:60}}</p>
                             <p>{{item.pubdate | momentDDMMYYYY }}</p>
                         </span>
                         <div class="col-md-3 pull-right">
