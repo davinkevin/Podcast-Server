@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-xs-6 col-sm-4 col-md-3 col-lg-3" ng-repeat="podcast in podcasts">
             <div class="thumbnail">
-                <a href="#/podcast/{{ podcast.id }}" >
+                <a ng-href="#/podcast/{{ podcast.id }}" >
                     <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">
                     <div class="caption">
                         <h5 class="text-center">{{ podcast.title }}</h5>
