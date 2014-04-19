@@ -38,8 +38,10 @@
                         <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
 
-                    <a class="pull-left" href="#">
-                        <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+                    <a class="pull-left" href="#/item/{{item.id}}">
+
+                            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+
                     </a>
                     <div class="media-body">
                         <h4 class="media-heading">{{item.title | characters:60}}</h4>

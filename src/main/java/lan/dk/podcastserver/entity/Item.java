@@ -282,4 +282,10 @@ public class Item implements Serializable {
     public boolean hasValidURL() {
         return (!StringUtils.isEmpty(this.url)) || (this.podcast.getType() != null && this.podcast.getType().equals("send"));
     }
+
+    @Transient
+    @JsonProperty("podcastId")
+    public Integer getPodcastId() {
+        return (podcast != null) ? podcast.getId() : null;
+    }
 }

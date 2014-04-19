@@ -1,15 +1,6 @@
 var podcastControllers = angular.module('podcastControllers', []);
 
 podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp) {
-    /*Restangular.one("item/pagination").get({size: 12, page :0, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
-        $scope.items = itemsResponse.content;
-
-        $scope.totalItems = itemsResponse.totalElements;
-        $scope.currentPage = itemsResponse.number+1;
-        $scope.itemsperpage = 12;
-        $scope.maxSize = 10;
-    });
-    */
 
     // Gestion du cache de la pagination :
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
@@ -24,7 +15,8 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
             $scope.totalItems = parseInt(itemsResponse.totalElements);
 
         });
-    }
+    };
+
     // Longeur inconnu au chargement :
     $scope.totalItems = Number.MAX_VALUE;
     $scope.maxSize = 10;
@@ -33,13 +25,13 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
 
     $scope.download = function(item) {
         Restangular.one("item").customGET(item.id + "/addtoqueue");
-    }
+    };
     $scope.stopDownload = function(item) {
         Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
-    }
+    };
     $scope.toggleDownload = function(item) {
         Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
-    }
+    };
 
     $scope.wsClient = ngstomp('/download', SockJS);
     $scope.wsClient.connect("user", "password", function(){
@@ -54,12 +46,42 @@ podcastControllers.controller('ItemsListCtrl', function ($scope, $http, $routePa
 
 });
 
-podcastControllers.controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Item) {
-    $scope.item = Item.get({itemId: $routeParams.itemId});
+podcastControllers.controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, ngstomp) {
+    var idItem = $routeParams.itemId;
 
-    $scope.download = function() {
+    Restangular.one("item", idItem).get().then(function(item) {
+        $scope.item = item;
+        $scope.wsClient = ngstomp("/download", SockJS);
+        $scope.wsClient.connect("user", "password", function(){
+            $scope.wsClient.subscribe("/topic/podcast/" + item.podcastId, function(message) {
+                var itemFromWS = JSON.parse(message.body);
+
+                if (itemFromWS.id == $scope.item.id) {
+                    _.assign($scope.item, itemFromWS);
+                }
+            });
+        });
+    });
+
+    $scope.download = function(item) {
         Restangular.one("item").customGET(item.id + "/addtoqueue");
-    }
+    };
+
+    $scope.remove = function(item) {
+        Restangular.one("item", item.id).remove().then(function() {
+            $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
+                return (elem.id == item.id);
+            });
+        });
+    };
+
+    $scope.stopDownload = function(item) {
+        Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+    };
+    $scope.toggleDownload = function(item) {
+        Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+    };
+
 });
 
 podcastControllers.controller('PodcastsListCtrl', function ($scope, Restangular, localStorageService) {
@@ -89,7 +111,6 @@ podcastControllers.controller('PodcastDetailCtrl', function ($scope, $routeParam
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
                 _.assign(elemToUpdate, item);
-                console.log(item);
             });
         });
 
@@ -98,33 +119,34 @@ podcastControllers.controller('PodcastDetailCtrl', function ($scope, $routeParam
 
     $scope.download = function(item) {
         Restangular.one("item").customGET(item.id + "/addtoqueue");
-    }
+    };
+
     $scope.remove = function(item) {
         Restangular.one("item", item.id).remove().then(function() {
             $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
                 return (elem.id == item.id);
             });
         });
-    }
+    };
     $scope.refresh = function() {
         Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force").then(function() {
             $scope.podcast.get().then(function(podcast) {
                 $scope.podcast.items = podcast.items;
             });
         });
-    }
+    };
     $scope.stopDownload = function(item) {
         Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
-    }
+    };
     $scope.toggleDownload = function(item) {
         Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
-    }
+    };
 
     $scope.save = function() {
         var podcastToUpdate = _.cloneDeep($scope.podcast);
         podcastToUpdate.items = null;
         $scope.podcast.patch(podcastToUpdate);
-    }
+    };
 });
 
 podcastControllers.controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp) {

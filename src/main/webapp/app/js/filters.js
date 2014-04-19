@@ -1,6 +1,7 @@
 angular.module('podcastFilters', [])
-    .filter('momentDDMMYYYY', function() {
-        return function(input) {
-            return moment(input).format("DD/MM/YYYY");
-        };
-});
+    .filter('htmlToPlaintext', function() {
+        return function(text) {
+            return String(text).replace(/<[^>]+>/gm, '');
+        }
+    }
+);
