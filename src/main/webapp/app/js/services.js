@@ -44,7 +44,7 @@ podcastServices.factory('DonwloadManager', function(Restangular) {
 
     downloadManager.updateNumberOfSimDl = function(number) {
         Restangular.one("task").customPOST(number, "downloadManager/limit");
-    }
+    };
 
     return downloadManager;
 });
