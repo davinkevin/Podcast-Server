@@ -5,26 +5,31 @@
 
     <div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-            <a ng-href="{{ item.localUrl || item.url }}">
-                <img class="center-block" ng-src="{{item.cover.url}}" width="200" height="200">
-            </a>
-            <br/>
-            <div class="buttonList text-center">
-                <!-- Téléchargement en cours -->
-                            <span ng-if="item.status == 'Started' || item.status == 'Paused'" >
-                                <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
-                                <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
-                            </span>
+            <div class="thumbnail">
+                <a ng-href="{{ item.localUrl || item.url }}">
+                    <img class="center-block" ng-src="{{item.cover.url}}" width="200" height="200">
+                </a>
 
-                <!-- Lancer le téléchargement -->
-                <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                <div class="caption">
 
-                <!-- Accéder au fichier -->
-                <a ng-href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
-                <a ng-href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                    <div class="buttonList text-center">
+                        <!-- Téléchargement en cours -->
+                                <span ng-if="item.status == 'Started' || item.status == 'Paused'" >
+                                    <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+                                    <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
+                                </span>
 
-                <!-- Supprimer l'item -->
-                <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                        <!-- Lancer le téléchargement -->
+                        <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+
+                        <!-- Accéder au fichier -->
+                        <a ng-href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
+                        <a ng-href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+
+                        <!-- Supprimer l'item -->
+                        <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
             </div>
         </div>
 
