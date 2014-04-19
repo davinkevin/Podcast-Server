@@ -5,7 +5,9 @@
 
     <div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-            <img class="center-block" ng-src="{{item.cover.url}}" width="200" height="200">
+            <a ng-href="{{ item.localUrl || item.url }}">
+                <img class="center-block" ng-src="{{item.cover.url}}" width="200" height="200">
+            </a>
             <br/>
             <div class="buttonList text-center">
                 <!-- Téléchargement en cours -->
@@ -18,8 +20,8 @@
                 <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
                 <!-- Accéder au fichier -->
-                <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
-                <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                <a ng-href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
+                <a ng-href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
 
                 <!-- Supprimer l'item -->
                 <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
