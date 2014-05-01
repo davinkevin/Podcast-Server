@@ -9,7 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 
 //@Scope("prototype")
@@ -96,7 +96,7 @@ public class HTTPDownloader extends AbstractDownloader {
         } catch (DownloadInterruptedError e) {
             logger.error("", e);
             //stopDownload();
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             stopDownload();
         }
