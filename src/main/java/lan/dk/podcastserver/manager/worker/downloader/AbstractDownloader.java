@@ -24,12 +24,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractDownloader implements Runnable, Downloader {
     public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
     public static final String WS_TOPIC_PODCAST = "/topic/podcast/";
-    @Autowired
-    protected ItemDownloadManager itemDownloadManager;
+
     protected Item item;
     protected String temporaryExtension = ".psdownload";
     protected File target = null;
 
+    @Autowired protected ItemDownloadManager itemDownloadManager;
     @Autowired protected ItemBusiness itemService;
     @Resource protected PodcastBusiness podcastBusiness;
     @Resource SimpMessagingTemplate template;
@@ -135,9 +135,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     public void resetDownload() {
-        item.setStatus("Not Downloaded").setProgression(0);
-        itemService.save(item);
-        itemDownloadManager.addItemToQueue(item);
+        this.stopDownload();
+        //item.setStatus("Not Downloaded").setProgression(0);
+        //itemService.save(item);
+        //itemDownloadManager.addItemToQueue(item);
     }
 
     public File getTagetFile (Item item) {
@@ -181,5 +182,4 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         this.template.convertAndSend(WS_TOPIC_DOWNLOAD, this.item );
         this.template.convertAndSend(WS_TOPIC_PODCAST.concat(String.valueOf(item.getPodcast().getId())), this.item );
     }
-
 }

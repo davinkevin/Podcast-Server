@@ -4,8 +4,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 /**
@@ -37,10 +35,6 @@ public class URLUtils {
             huc.setRequestMethod("HEAD");
             huc.connect();
             return (huc.getResponseCode() == HttpURLConnection.HTTP_OK);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
