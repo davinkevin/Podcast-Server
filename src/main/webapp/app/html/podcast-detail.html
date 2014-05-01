@@ -1,4 +1,12 @@
-<br xmlns="http://www.w3.org/1999/html"/>
+<div class="container">
+
+<br/>
+<ol class="breadcrumb">
+    <li><a href="/#/podcasts">Podcasts</a></li>
+    <li><a class="active"> {{ podcast.title }}</a></li>
+</ol>
+
+
 <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
     <div class="thumbnail">
         <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">
@@ -132,6 +140,7 @@
 
 
 </div>
+    </div>
 
 
 

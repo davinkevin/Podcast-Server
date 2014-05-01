@@ -45,6 +45,9 @@ podcastControllers.controller('ItemDetailCtrl', function ($scope, $routeParams, 
 
     Restangular.one("item", idItem).get().then(function(item) {
         $scope.item = item;
+
+        $scope.parentPodcast = Restangular.one("podcast", item.podcastId).get().$object;
+
         $scope.wsClient = ngstomp("/download", SockJS);
         $scope.wsClient.connect("user", "password", function(){
             $scope.wsClient.subscribe("/topic/podcast/" + item.podcastId, function(message) {
