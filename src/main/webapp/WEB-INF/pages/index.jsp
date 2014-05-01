@@ -68,7 +68,7 @@
 <script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
 <script src="<c:url value="/js/lib/sockjs/sockjs.js"/>"></script>
 <script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.js"/>"></script>
-<script src="<c:url value="/js/lib/jquery/jquery.js"/>"></script>
+<script src="<c:url value="/js/lib/jquery/dist/jquery.js"/>"></script>
 <script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.js"/>"></script>
 
 <script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
