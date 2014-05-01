@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Set;
@@ -31,9 +30,15 @@ import java.util.regex.Pattern;
 public class BeInSportUpdater extends AbstractUpdater {
 
     public static String EPISODE_LISTING_URL = "http://www.beinsports.fr/replay/category/{idBeInSport}/page/1/size/8/ajax/true";
-    public static String HTTP_VOD_PREFIX_URL = "http://vod.beinsports1.aka.oss1.performgroup.com/";
     public static String XML_PREFIX_DESCRIPTOR_URL = "http://www.beinsports.fr/fragment/beINSport/xml/vodConfig/videoId/";
     public static String BEINSPORTS_HOST_URL = "http://www.beinsports.fr/";
+    /* Prefixe for HTTP content over RTMP */
+    public static String[] HTTP_VOD_PREFIX_URL = {
+                                        "http://vod.beinsports1.aka.oss1.performgroup.com/",
+                                        "http://vod.cms.download.performgroup.com/beinsport/"
+    };
+
+    /* Patter to extract value from URL */
     public static Pattern IDBEINSPORT_PATTERN = Pattern.compile(".*/category/([^/]*)/.*");
     public static Pattern SUBSTRING_VIDEO_URL_PATTERN = Pattern.compile(".*/([0-9]*/.*)$");
 
@@ -113,20 +118,19 @@ public class BeInSportUpdater extends AbstractUpdater {
             Matcher m = SUBSTRING_VIDEO_URL_PATTERN.matcher(externalUrl);
             String vodUrl = null;
             if (m.find()) {
-                vodUrl = HTTP_VOD_PREFIX_URL.concat(m.group(1));
+                for (String prefix : HTTP_VOD_PREFIX_URL) {
+                    vodUrl = prefix.concat(m.group(1));
+                    if (URLUtils.isAValidURL(vodUrl)) {
+                        break;
+                    } else {
+                        vodUrl = null;
+                    }
+                }
             }
 
-            if (vodUrl != null && URLUtils.isAValidURL(vodUrl)) {
-                item.setUrl(vodUrl);
-            } else {
-                item.setUrl(externalUrl);
-            }
+            item.setUrl((vodUrl != null) ? vodUrl : externalUrl);
 
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
 
