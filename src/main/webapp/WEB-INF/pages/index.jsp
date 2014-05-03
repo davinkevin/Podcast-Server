@@ -6,7 +6,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/js/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />
+    <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
+    <%--<link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />--%>
 </head>
 <body>
 <nav class="navbar navbar-inverse" role="navigation">
@@ -46,23 +47,23 @@
     <div ng-view></div>
 
 
-<script type="text/javascript">
-    less = {
-        env: "development", // or "production"
-        async: false,       // load imports async
-        fileAsync: false,   // load imports async when in a page under
-        // a file protocol
-        poll: 1000,         // when in watch mode, time in ms between polls
-        functions: {},      // user functions, keyed by name
-        dumpLineNumbers: "comments", // or "mediaQuery" or "all"
-        relativeUrls: false,// whether to adjust url's to be relative
-        // if false, url's are already relative to the
-        // entry less file
-        //rootpath: ":/a.com/"// a path to add on to the start of every url
-        //resource
-    };
-</script>
-<script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>
+<%--<script type="text/javascript">--%>
+    <%--less = {--%>
+        <%--env: "development", // or "production"--%>
+        <%--async: false,       // load imports async--%>
+        <%--fileAsync: false,   // load imports async when in a page under--%>
+        <%--// a file protocol--%>
+        <%--poll: 1000,         // when in watch mode, time in ms between polls--%>
+        <%--functions: {},      // user functions, keyed by name--%>
+        <%--dumpLineNumbers: "comments", // or "mediaQuery" or "all"--%>
+        <%--relativeUrls: false,// whether to adjust url's to be relative--%>
+        <%--// if false, url's are already relative to the--%>
+        <%--// entry less file--%>
+        <%--//rootpath: ":/a.com/"// a path to add on to the start of every url--%>
+        <%--//resource--%>
+    <%--};--%>
+<%--</script>--%>
+<%--<script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>--%>
 <script src="<c:url value="/js/lib/holderjs/holder.js"/>"></script>
 <script src="<c:url value="/js/lib/momentjs/moment.js"/>"></script>
 <script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
@@ -72,6 +73,7 @@
 <script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.js"/>"></script>
 
 <script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-animate/angular-animate.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-resource/angular-resource.js"/>"></script>
 <script src="<c:url value="/js/lib/restangular/src/restangular.js"/>"></script>

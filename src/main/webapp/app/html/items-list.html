@@ -1,7 +1,10 @@
-<div class="container">
+<div class="container item-listing">
     <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->
+    <div class="text-center">
+        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" page="currentPage" on-select-page="changePage(page)" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
         <div class="row">
-            <div ng-repeat="item in items" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">
+            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">
                 <div class="box">
                     <div class="">
                         <a ng-href="#/item/{{item.id}}" >

@@ -7,7 +7,8 @@ var podcastApp = angular.module('podcastApp', [
     'ui.bootstrap',
     'AngularStomp',
     'LocalStorageModule',
-    'truncate'
+    'truncate',
+    'ngAnimate'
 ]);
 
 podcastApp.config(['$routeProvider',

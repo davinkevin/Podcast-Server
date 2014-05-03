@@ -77,24 +77,66 @@
   transform: rotate(3deg) skew(0deg);
 }
 
-.itemInList {
-    padding-top: 15px;
-    padding-bottom: 15px;
-    //margin: 5px;
-    img {
-      padding-bottom: 15px;
-      margin : auto;
-      max-width : 100%;
-      max-height : 174px;
-      height : 174px // Pour le ratio 16/9
-    }
-    .itemTitle {
-      height: 40px;
+.item-listing {
 
+  .pagination {
+    margin-bottom: 0px;
+  }
+
+  .itemInList {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      //margin: 5px;
+      img {
+        padding-bottom: 15px;
+        margin : auto;
+        max-width : 100%;
+        max-height : 174px;
+        height : 174px // Pour le ratio 16/9
+      }
+      .itemTitle {
+        height: 40px;
+
+      }
+      .row-button {
+        padding-bottom: 10px;
+      }
+    &.ng-enter,
+    &.ng-leave
+    {
+      -webkit-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+      -moz-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+      -ms-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+      -o-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+      transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+      position: relative;
+      display: block;
     }
-    .row-button {
-      padding-bottom: 10px;
+
+    &.ng-enter.ng-enter-active,
+    &.ng-leave {
+      opacity: 1;
+      //right: 0;
+      //height: 30px;
     }
+
+    &.ng-leave.ng-leave-active,
+    &.ng-enter {
+      opacity: 0;
+      //right: -30px;
+      //height: 0px;
+    }
+    &.ng-enter-stagger {
+      /* this will have a 100ms delay between each successive leave animation */
+      //-webkit-transition-delay: 0.04s;
+      //transition-delay: 0.04s;
+
+      /* in case the stagger doesn't work then these two values
+       must be set to 0 to avoid an accidental CSS inheritance */
+      -webkit-transition-duration: 0s;
+      transition-duration: 0s;
+    }
+  }
 }
 
 .navbar {
@@ -110,5 +152,43 @@
     .buttonList {
       padding-top: 24px;
     }
+  }
+}
+
+.media {
+  &.ng-enter,
+  &.ng-leave
+  {
+    -webkit-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    position: relative;
+    display: block;
+  }
+
+  &.ng-enter.ng-enter-active,
+  &.ng-leave {
+    opacity: 1;
+    //right: 0;
+    //height: 30px;
+  }
+
+  &.ng-leave.ng-leave-active,
+  &.ng-enter {
+    opacity: 0;
+    //right: -50px;
+    //height: 0px;
+  }
+  &.ng-enter-stagger {
+    /* this will have a 100ms delay between each successive leave animation */
+    -webkit-transition-delay: 0.08s;
+    transition-delay: 0.08s;
+
+    /* in case the stagger doesn't work then these two values
+     must be set to 0 to avoid an accidental CSS inheritance */
+    -webkit-transition-duration: 0s;
+    transition-duration: 0s;
   }
 }

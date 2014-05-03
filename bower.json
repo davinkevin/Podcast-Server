@@ -17,5 +17,6 @@
     "sockjs": "~0.3.4",
     "angular-local-storage": "~0.0.1",
     "angular-truncate": "*",
+    "angular-animate": "~1.2.16"
   }
 }

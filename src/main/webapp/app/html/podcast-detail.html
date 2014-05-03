@@ -26,7 +26,7 @@
         <tab heading="Episodes">
             <br/>
 
-                <div class="media"  ng-repeat="item in podcast.items | orderBy:pubdate">
+                <div class="media"  ng-repeat="item in podcast.items track by item.id | orderBy:pubdate">
 
                     <div class="buttonList pull-right">
                         <!-- Téléchargement en cours -->
