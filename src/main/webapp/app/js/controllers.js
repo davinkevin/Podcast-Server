@@ -141,7 +141,6 @@ podcastControllers.controller('DownloadCtrl', function ($scope, $http, $routePar
             $scope.waitingitems = waitingitems;
         });
     }();
-    //$scope.refreshWaitingItems();
 
     Restangular.one("task/downloadManager/limit").get().then(function(data) {
         $scope.numberOfSimDl = parseInt(data);
@@ -179,14 +178,13 @@ podcastControllers.controller('DownloadCtrl', function ($scope, $http, $routePar
                 case 'Stopped' :
                 case 'Finish' :
                     if (elemToUpdate)
-                        _.remove($scope.items, function(item) { return item.id == elemToUpdate.id})
+                        _.remove($scope.items, function(item) { return item.id === elemToUpdate.id; });
                     break;
             }
         });
         $scope.wsClient.subscribe("/topic/waitingList", function(message) {
             var items = JSON.parse(message.body);
             $scope.waitingitems = items;
-            //console.log(item);
         });
     });
 
@@ -201,5 +199,5 @@ podcastControllers.controller('PodcastAddCtrl', function ($scope, Restangular) {
 
     $scope.save = function() {
         podcasts.post($scope.podcast);
-    }
+    };
 });
