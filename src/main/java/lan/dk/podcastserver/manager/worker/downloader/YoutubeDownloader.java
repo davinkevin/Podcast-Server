@@ -59,6 +59,9 @@ public class YoutubeDownloader extends AbstractDownloader {
                         case EXTRACTING_DONE:
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
                             break;
+                        case ERROR:
+                            stopDownload();
+                            break;
                         case DONE:
                             logger.debug("{} - Téléchargement terminé", FilenameUtils.getName( v.getTarget().getAbsolutePath() ));
                             //itemDownloadManager.removeACurrentDownload(item);
@@ -84,6 +87,10 @@ public class YoutubeDownloader extends AbstractDownloader {
                                 logger.debug("{} - {}%", item.getTitle(), item.getProgression());
                                 convertAndSaveBroadcast();
                             }
+                            break;
+                        case STOP:
+                            logger.debug("Pause / Arrêt du téléchargement du téléchargement");
+                            stopDownload();
                             break;
                         default:
                             break;
@@ -115,12 +122,12 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             v.download(user, stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
-            stopDownload();
             for (DownloadInfo.Part p : e.getInfo().getParts()) {
                 Throwable ee = p.getException();
                 if (ee != null)
                     ee.printStackTrace();
             }
+            stopDownload();
         } catch (DownloadInterruptedError e) {
             logger.debug("Arrêt du téléchargement par l'interface");
             //stopDownload();

@@ -42,6 +42,7 @@ public class HTTPDownloader extends AbstractDownloader {
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
                             break;
                         case ERROR:
+                            stopDownload();
                             break;
                         case DONE:
                             logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - Téléchargement terminé");
@@ -66,6 +67,7 @@ public class HTTPDownloader extends AbstractDownloader {
                             break;
                         case STOP:
                             logger.debug("Pause / Arrêt du téléchargement du téléchargement");
+                            stopDownload();
                             break;
                         default:
                             break;
@@ -93,8 +95,9 @@ public class HTTPDownloader extends AbstractDownloader {
                 if (ee != null)
                     ee.printStackTrace();
             }
+            stopDownload();
         } catch (DownloadInterruptedError e) {
-            logger.error("", e);
+            logger.debug("", e);
             //stopDownload();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
