@@ -1,4 +1,4 @@
-var podcastServices = angular.module('podcastServices', ['ngResource']);
+var podcastServices = angular.module('podcastServices', [/*'ngResource'*/]);
 
 /*
 podcastServices.factory('Podcast', ['$resource',
