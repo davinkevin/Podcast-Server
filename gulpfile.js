@@ -57,5 +57,9 @@ gulp.task('watch', function() {
     gulp.watch(lessLocation, ['less']);
 });
 
+gulp.task('watch-scripts', function() {
+    gulp.watch(jsLocation, ['scripts']);
+});
+
 // Default Task
 gulp.task('default', ['lint', 'less', 'watch', 'scripts']);

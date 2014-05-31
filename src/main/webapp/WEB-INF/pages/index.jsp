@@ -46,42 +46,21 @@
 
     <div ng-view></div>
 
+<script src="<c:url value="/js/lib/jquery/dist/jquery.min.js"/>"></script>
+<script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.min.js"/>"></script>
+<script src="<c:url value="/js/lib/lodash/dist/lodash.min.js"/>"></script>
+<script src="<c:url value="/js/lib/sockjs/sockjs.min.js"/>"></script>
+<script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.min.js"/>"></script>
 
-<%--<script type="text/javascript">--%>
-    <%--less = {--%>
-        <%--env: "development", // or "production"--%>
-        <%--async: false,       // load imports async--%>
-        <%--fileAsync: false,   // load imports async when in a page under--%>
-        <%--// a file protocol--%>
-        <%--poll: 1000,         // when in watch mode, time in ms between polls--%>
-        <%--functions: {},      // user functions, keyed by name--%>
-        <%--dumpLineNumbers: "comments", // or "mediaQuery" or "all"--%>
-        <%--relativeUrls: false,// whether to adjust url's to be relative--%>
-        <%--// if false, url's are already relative to the--%>
-        <%--// entry less file--%>
-        <%--//rootpath: ":/a.com/"// a path to add on to the start of every url--%>
-        <%--//resource--%>
-    <%--};--%>
-<%--</script>--%>
-<%--<script src="<c:url value="/js/lib/less/dist/less-1.6.2.js"/>"></script>--%>
-<%--<script src="<c:url value="/js/lib/holderjs/holder.js"/>"></script>--%>
-<%--<script src="<c:url value="/js/lib/momentjs/moment.js"/>"></script>--%>
-<script src="<c:url value="/js/lib/lodash/dist/lodash.js"/>"></script>
-<script src="<c:url value="/js/lib/sockjs/sockjs.js"/>"></script>
-<script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.js"/>"></script>
-<script src="<c:url value="/js/lib/jquery/dist/jquery.js"/>"></script>
-<script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.js"/>"></script>
-
-<script src="<c:url value="/js/lib/angular/angular.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-animate/angular-animate.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-route/angular-route.js"/>"></script>
-<%--<script src="<c:url value="/js/lib/angular-resource/angular-resource.js"/>"></script>--%>
-<script src="<c:url value="/js/lib/restangular/src/restangular.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.js"/>"></script>
+<script src="<c:url value="/js/lib/angular/angular.min.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-animate/angular-animate.min.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-route/angular-route.min.js"/>"></script>
+<script src="<c:url value="/js/lib/restangular/dist/restangular.min.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.min.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"/>"></script>
 <script src="<c:url value="/js/lib/AngularStomp/angular-stomp.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.js" />"></script>
-<script src="<c:url value="/js/lib/angular-truncate/dist/angular-truncate.js" />"></script>
+<script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.min.js" />"></script>
+<script src="<c:url value="/js/lib/angular-truncate/dist/angular-truncate.min.js" />"></script>
 
 
 <%--
@@ -89,6 +68,9 @@
 <script src="<c:url value="/js/filters.js"/>"></script>
 <script src="<c:url value="/js/controllers.js"/>"></script>
 <script src="<c:url value="/js/app.js"/>"></script>
+--%>
+<%--
+<script src="<c:url value="/js/all.js"/>"></script>
 --%>
 <script src="<c:url value="/js/all.min.js"/>"></script>
 
