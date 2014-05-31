@@ -6,6 +6,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/js/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/js/lib/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet" type="text/css">
     <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
     <%--<link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />--%>
 </head>
@@ -61,6 +62,7 @@
 <script src="<c:url value="/js/lib/AngularStomp/angular-stomp.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.min.js" />"></script>
 <script src="<c:url value="/js/lib/angular-truncate/dist/angular-truncate.min.js" />"></script>
+<script src="<c:url value="/js/lib/angular-loading-bar/build/loading-bar.min.js" />"></script>
 
 
 <%--
