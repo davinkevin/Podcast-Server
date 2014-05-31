@@ -154,7 +154,7 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="container item-listing">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
     '    <div class="text-center">\n' +
-    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" page="currentPage" on-select-page="changePage(page)" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
+    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
     '            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">\n' +
@@ -186,7 +186,7 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    <!--</div>-->\n' +
     '    <div class="text-center row">\n' +
-    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" page="currentPage" on-select-page="changePage(page)" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
+    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '</div>\n' +
     '');
@@ -531,14 +531,11 @@ var podcastControllers = angular.module('podcastControllers', [])
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
     //$scope.selectPage = function (pageNo) {
-    $scope.changePage = function(newPage) {
-        cache.put('currentPage', newPage);
-        Restangular.one("item/pagination").get({size: 12, page :newPage-1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+    $scope.changePage = function() {
+        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
-
-            $scope.currentPage = newPage;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
-
+            cache.put('currentPage', $scope.currentPage);
         });
     };
 
@@ -546,7 +543,7 @@ var podcastControllers = angular.module('podcastControllers', [])
     $scope.totalItems = Number.MAX_VALUE;
     $scope.maxSize = 10;
     $scope.currentPage = cache.get("currentPage") || 1;
-    $scope.changePage($scope.currentPage);
+    $scope.changePage();
 
     $scope.download = DonwloadManager.download;
     $scope.stopDownload = DonwloadManager.stopDownload;

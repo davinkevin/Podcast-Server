@@ -5,14 +5,11 @@ var podcastControllers = angular.module('podcastControllers', [])
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
     //$scope.selectPage = function (pageNo) {
-    $scope.changePage = function(newPage) {
-        cache.put('currentPage', newPage);
-        Restangular.one("item/pagination").get({size: 12, page :newPage-1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+    $scope.changePage = function() {
+        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
-
-            $scope.currentPage = newPage;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
-
+            cache.put('currentPage', $scope.currentPage);
         });
     };
 
@@ -20,7 +17,7 @@ var podcastControllers = angular.module('podcastControllers', [])
     $scope.totalItems = Number.MAX_VALUE;
     $scope.maxSize = 10;
     $scope.currentPage = cache.get("currentPage") || 1;
-    $scope.changePage($scope.currentPage);
+    $scope.changePage();
 
     $scope.download = DonwloadManager.download;
     $scope.stopDownload = DonwloadManager.stopDownload;
