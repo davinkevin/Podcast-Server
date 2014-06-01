@@ -41,19 +41,23 @@ var podcastControllers = angular.module('podcastControllers', [])
 
         Restangular.one("item", idItem).get().then(function(item) {
             $scope.item = item;
+        }).then(function() {
+            $scope.item.one("podcast").get().then(function(podcast) {
 
-            $scope.wsClient = ngstomp("/download", SockJS);
-            $scope.wsClient.connect("user", "password", function(){
-                $scope.wsClient.subscribe("/topic/podcast/" + item.podcastId, function(message) {
-                    var itemFromWS = JSON.parse(message.body);
+                $scope.item.podcast = podcast;
 
-                    if (itemFromWS.id == $scope.item.id) {
-                        _.assign($scope.item, itemFromWS);
-                    }
+                $scope.wsClient = ngstomp("/download", SockJS);
+                $scope.wsClient.connect("user", "password", function(){
+                    $scope.wsClient.subscribe("/topic/podcast/" + podcast.id, function(message) {
+                        var itemFromWS = JSON.parse(message.body);
+
+                        if (itemFromWS.id == $scope.item.id) {
+                            _.assign($scope.item, itemFromWS);
+                        }
+                    });
                 });
             });
-        }).then(function() {
-            $scope.parentPodcast = $scope.item.one("podcast").get().$object;
+
         });
 
         $scope.remove = function(item) {
