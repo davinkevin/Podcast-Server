@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/js/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="/js/lib/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet" type="text/css">
+    <link href="/js/lib/animate.css/animate.min.css" rel="stylesheet" type="text/css">
     <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
     <%--<link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />--%>
 </head>

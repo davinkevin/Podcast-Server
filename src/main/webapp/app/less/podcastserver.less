@@ -156,35 +156,12 @@
 }
 
 .media {
-  &.ng-enter,
-  &.ng-leave
-  {
-    -webkit-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -moz-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -ms-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -o-transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    transition: 275ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    position: relative;
-    display: block;
-  }
-
-  &.ng-enter.ng-enter-active,
   &.ng-leave {
-    opacity: 1;
-    //right: 0;
-    //height: 30px;
+    -webkit-animation: fadeOutRight 0.5s;
+    animation: fadeOutRight 0.5s;
   }
-
-  &.ng-leave.ng-leave-active,
   &.ng-enter {
-    opacity: 0;
-    //right: -50px;
-    //height: 0px;
-  }
-  &.ng-enter-stagger {
-    -webkit-transition-delay: 0.08s;
-    transition-delay: 0.08s;
-    -webkit-transition-duration: 0s;
-    transition-duration: 0s;
+    -webkit-animation: fadeInLeft 0.5s;
+    animation: fadeInLeft 0.5s;
   }
 }

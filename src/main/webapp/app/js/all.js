@@ -613,8 +613,8 @@ var podcastControllers = angular.module('podcastControllers', [])
         var idPodcast = $routeParams.podcastId;
 
         // LocalStorage de la valeur du podcast :
-        $scope.$watch('podcast', function(newval, oldval) {
-            localStorageService.add("podcast/" + idPodcast, newval);
+        $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
+            localStorageService.add("podcast/" + idPodcast, newval[0]);
         });
 
         $scope.podcast = localStorageService.get("podcast/" + idPodcast ) || {};
