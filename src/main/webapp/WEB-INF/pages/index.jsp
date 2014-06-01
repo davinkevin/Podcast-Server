@@ -45,7 +45,7 @@
     </div>
 </nav>
 
-    <div ng-view></div>
+    <div ng-view autoscroll=""></div>
 
 <script src="<c:url value="/js/lib/jquery/dist/jquery.min.js"/>"></script>
 <script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.min.js"/>"></script>
