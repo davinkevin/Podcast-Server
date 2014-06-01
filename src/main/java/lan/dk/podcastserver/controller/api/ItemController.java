@@ -2,25 +2,20 @@ package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -42,6 +37,16 @@ public class ItemController {
     public Item findById(@PathVariable int id) {
         return itemBusiness.findOne(id);
     }
+
+    @RequestMapping(value="{id:[\\d]+}/podcast", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Podcast findPodcastByItemsId(@PathVariable int id) {
+        Podcast podcast = itemBusiness.findOne(id).getPodcast();
+        podcast.setItems(null);
+
+        return podcast;
+    }
+
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
     public Item update(@RequestBody Item item, @PathVariable(value = "id") int id) {

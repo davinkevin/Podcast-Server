@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.business.PodcastBusiness;
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,7 +38,15 @@ public class PodcastController {
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Podcast findById(@PathVariable int id) {
-        return podcastBusiness.findOne(id);
+        Podcast podcast = podcastBusiness.findOne(id);
+        podcast.setItems(null);
+        return podcast;
+    }
+
+    @RequestMapping(value="{id:[\\d]+}/items", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<Item> findItemsByPodcastId(@PathVariable int id) {
+        return podcastBusiness.findOne(id).getItems();
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
