@@ -9,7 +9,8 @@ var podcastApp = angular.module('podcastApp', [
     'LocalStorageModule',
     'truncate',
     'ngAnimate',
-    'angular-loading-bar'
+    'angular-loading-bar',
+    'PodcastAppPartial'
 ]);
 
 podcastApp
@@ -46,8 +47,7 @@ podcastApp
         }])
     .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
-    }]);
-
-podcastApp.config(function(RestangularProvider) {
-    RestangularProvider.setBaseUrl('/api/');
+    }])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api/');
 });

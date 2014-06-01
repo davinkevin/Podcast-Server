@@ -5,7 +5,7 @@ try {
   module = angular.module('PodcastAppPartial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/html/download.html',
+  $templateCache.put('html/download.html',
     '<!--<div class="jumbotron">-->\n' +
     '    <!--<div class="container">-->\n' +
     '        <!--<h1>Téléchargement</h1>-->\n' +
@@ -82,7 +82,7 @@ try {
   module = angular.module('PodcastAppPartial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/html/item-detail.html',
+  $templateCache.put('html/item-detail.html',
     '\n' +
     '<div class="container">\n' +
     '\n' +
@@ -150,7 +150,7 @@ try {
   module = angular.module('PodcastAppPartial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/html/items-list.html',
+  $templateCache.put('html/items-list.html',
     '<div class="container item-listing">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
     '    <div class="text-center">\n' +
@@ -200,7 +200,7 @@ try {
   module = angular.module('PodcastAppPartial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/html/podcast-add.html',
+  $templateCache.put('html/podcast-add.html',
     '<div class="jumbotron">\n' +
     '    <div class="container">\n' +
     '        <h1>Ajouter un Podcast</h1>\n' +
@@ -295,7 +295,7 @@ try {
   module = angular.module('PodcastAppPartial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/html/podcast-detail.html',
+  $templateCache.put('html/podcast-detail.html',
     '<div class="container">\n' +
     '\n' +
     '<br/>\n' +
@@ -455,7 +455,7 @@ try {
   module = angular.module('PodcastAppPartial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/html/podcasts-list.html',
+  $templateCache.put('html/podcasts-list.html',
     '<div id="listItem" class="container" style="margin-top: 15px;">\n' +
     '    <div class="row">\n' +
     '        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-3" ng-repeat="podcast in podcasts">\n' +
@@ -487,7 +487,8 @@ var podcastApp = angular.module('podcastApp', [
     'LocalStorageModule',
     'truncate',
     'ngAnimate',
-    'angular-loading-bar'
+    'angular-loading-bar',
+    'PodcastAppPartial'
 ]);
 
 podcastApp

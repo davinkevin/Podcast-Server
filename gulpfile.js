@@ -29,7 +29,7 @@ gulp.task('scripts', function() {
     gulp.src(htmlLocation)
     .pipe(ngHtml2Js({
         moduleName: "PodcastAppPartial",
-        prefix: "/html/"
+        prefix: "html/"
     }))
     .pipe(concat("partials.js"))
     //.pipe(gulp.dest(jsDestination))
