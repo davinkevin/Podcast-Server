@@ -90,7 +90,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                             break;
                         case STOP:
                             logger.debug("Pause / Arrêt du téléchargement du téléchargement");
-                            stopDownload();
+                            //stopDownload();
                             break;
                         default:
                             break;

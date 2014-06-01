@@ -67,7 +67,7 @@ public class HTTPDownloader extends AbstractDownloader {
                             break;
                         case STOP:
                             logger.debug("Pause / Arrêt du téléchargement du téléchargement");
-                            stopDownload();
+                            //stopDownload();
                             break;
                         default:
                             break;
@@ -97,7 +97,7 @@ public class HTTPDownloader extends AbstractDownloader {
             }
             stopDownload();
         } catch (DownloadInterruptedError e) {
-            logger.debug("", e);
+            logger.debug("Arrêt du téléchargement");
             //stopDownload();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
