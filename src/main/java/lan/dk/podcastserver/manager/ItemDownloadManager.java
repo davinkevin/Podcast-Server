@@ -137,10 +137,8 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
             while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
                 currentItem = this.getWaitingQueue().poll();
-                if (currentItem.getStatus() == null || currentItem.getStatus().equals("Not Downloaded") || currentItem.getStatus().equals("Stopped")) {
-
+                if ( !"Started".equals(currentItem.getStatus()) && !"Finish".equals(currentItem.getStatus()) ) {
                      getDownloaderByTypeAndRun(currentItem);
-
                 }
             }
             isRunning = false;
