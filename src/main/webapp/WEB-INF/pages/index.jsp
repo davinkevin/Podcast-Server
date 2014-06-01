@@ -72,9 +72,9 @@
 <script src="<c:url value="/js/controllers.js"/>"></script>
 <script src="<c:url value="/js/app.js"/>"></script>
 --%>
-<script src="<c:url value="/js/all.js"/>"></script>
-<%--
 <script src="<c:url value="/js/all.min.js"/>"></script>
+<%--
+<script src="<c:url value="/js/all.js"/>"></script>
 --%>
 
 </body>
