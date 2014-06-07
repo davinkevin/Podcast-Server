@@ -1,8 +1,8 @@
 (function(module) {
 try {
-  module = angular.module('PodcastAppPartial');
+  module = angular.module('podcast.partial');
 } catch (e) {
-  module = angular.module('PodcastAppPartial', []);
+  module = angular.module('podcast.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/download.html',
@@ -77,9 +77,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('PodcastAppPartial');
+  module = angular.module('podcast.partial');
 } catch (e) {
-  module = angular.module('PodcastAppPartial', []);
+  module = angular.module('podcast.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/item-detail.html',
@@ -145,9 +145,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('PodcastAppPartial');
+  module = angular.module('podcast.partial');
 } catch (e) {
-  module = angular.module('PodcastAppPartial', []);
+  module = angular.module('podcast.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/items-list.html',
@@ -195,9 +195,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('PodcastAppPartial');
+  module = angular.module('podcast.partial');
 } catch (e) {
-  module = angular.module('PodcastAppPartial', []);
+  module = angular.module('podcast.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcast-add.html',
@@ -290,9 +290,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('PodcastAppPartial');
+  module = angular.module('podcast.partial');
 } catch (e) {
-  module = angular.module('PodcastAppPartial', []);
+  module = angular.module('podcast.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcast-detail.html',
@@ -450,9 +450,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('PodcastAppPartial');
+  module = angular.module('podcast.partial');
 } catch (e) {
-  module = angular.module('PodcastAppPartial', []);
+  module = angular.module('podcast.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcasts-list.html',
@@ -476,22 +476,20 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-var podcastApp = angular.module('podcastApp', [
+angular.module('podcastApp', [
+    'podcast.controller',
+    'podcast.filters',
+    'podcast.services',
+    'podcast.partial',
     'ngRoute',
-    'podcastControllers',
-    'podcastFilters',
-    'podcastServices',
     'restangular',
-    'ui.bootstrap',
     'AngularStomp',
     'LocalStorageModule',
-    'truncate',
     'ngAnimate',
-    'angular-loading-bar',
-    'PodcastAppPartial'
-]);
-
-podcastApp
+    'truncate',
+    'ui.bootstrap',
+    'angular-loading-bar'
+])
     .config(['$routeProvider',
         function($routeProvider) {
             $routeProvider.
@@ -525,12 +523,11 @@ podcastApp
         }])
     .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
-    }]);
-
-podcastApp.config(function(RestangularProvider) {
-    RestangularProvider.setBaseUrl('/api/');
+    }])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api/');
 });
-var podcastControllers = angular.module('podcastControllers', [])
+angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
     // Gestion du cache de la pagination :
@@ -757,14 +754,14 @@ var podcastControllers = angular.module('podcastControllers', [])
             podcasts.post($scope.podcast);
         };
 });
-angular.module('podcastFilters', [])
+angular.module('podcast.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
             return String(text).replace(/<[^>]+>/gm, '');
         };
     }
 );
-var podcastServices = angular.module('podcastServices', [/*'ngResource'*/]);
+var podcastServices = angular.module('podcast.services', [/*'ngResource'*/]);
 
 /*
 podcastServices.factory('Podcast', ['$resource',

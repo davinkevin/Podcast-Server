@@ -28,7 +28,7 @@ gulp.task('lint', function() {
 gulp.task('scripts', function() {
     gulp.src(htmlLocation)
     .pipe(ngHtml2Js({
-        moduleName: "PodcastAppPartial",
+        moduleName: "podcast.partial",
         prefix: "html/"
     }))
     .pipe(concat("partials.js"))

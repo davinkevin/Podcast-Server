@@ -1,4 +1,4 @@
-var podcastControllers = angular.module('podcastControllers', [])
+angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
     // Gestion du cache de la pagination :

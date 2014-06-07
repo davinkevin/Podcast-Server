@@ -1,19 +1,17 @@
-var podcastApp = angular.module('podcastApp', [
+angular.module('podcastApp', [
+    'podcast.controller',
+    'podcast.filters',
+    'podcast.services',
+    'podcast.partial',
     'ngRoute',
-    'podcastControllers',
-    'podcastFilters',
-    'podcastServices',
     'restangular',
-    'ui.bootstrap',
     'AngularStomp',
     'LocalStorageModule',
-    'truncate',
     'ngAnimate',
-    'angular-loading-bar',
-    'PodcastAppPartial'
-]);
-
-podcastApp
+    'truncate',
+    'ui.bootstrap',
+    'angular-loading-bar'
+])
     .config(['$routeProvider',
         function($routeProvider) {
             $routeProvider.

@@ -53,17 +53,23 @@ public class M3U8Downloader extends AbstractDownloader {
                             for (int cpt = 0; cpt < urlList.size(); cpt++) {
                                 String urlFragmentToDownload = urlList.get(cpt);
 
-                                InputStream is = new URL(urlFragmentToDownload).openStream();
-                                int read = 0;
-                                byte[] bytes = new byte[1024];
+                                logger.debug("URL : {}", urlFragmentToDownload);
+                                try {
+                                    InputStream is = new URL(urlFragmentToDownload).openStream();
+                                    int read = 0;
+                                    byte[] bytes = new byte[1024];
 
-                                while ((read = is.read(bytes)) != -1) {
-                                    outputStream.write(bytes, 0, read);
+                                    while ((read = is.read(bytes)) != -1) {
+                                        outputStream.write(bytes, 0, read);
+                                    }
+                                    item.setProgression((100*cpt)/urlList.size());
+                                    logger.debug("Progression : {}", item.getProgression());
+                                    convertAndSaveBroadcast();
+                                    is.close();
+                                } catch (FileNotFoundException e) {
+                                    logger.error("Fichier introuvable : {}", urlFragmentToDownload, e);
                                 }
-                                item.setProgression((100*cpt)/urlList.size());
-                                logger.debug("Progression : {}", item.getProgression());
-                                convertAndSaveBroadcast();
-                                is.close();
+
 
                                 if (stopDownloading.get()) {
                                     if (item.getStatus().equals("Stopped")) {
@@ -81,9 +87,7 @@ public class M3U8Downloader extends AbstractDownloader {
                             if (item.getStatus().equals("Started")) {
                                 finishDownload();
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
+                        } catch (IOException | InterruptedException e) {
                             e.printStackTrace();
                         } finally {
                             try {
