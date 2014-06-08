@@ -12,8 +12,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +27,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -41,6 +40,8 @@ public class PodcastBusiness {
 
     @Resource private PodcastRepository podcastRepository;
     @Resource private ItemRepository itemRepository;
+    @Resource private TagBusiness tagBusiness;
+    @Resource private CoverBusiness coverBusiness;
 
     @Value("${rootfolder}")
     private String rootfolder;
@@ -85,7 +86,6 @@ public class PodcastBusiness {
     }
 
     //*****//
-
     public Podcast patchUpdate(Podcast patchPodcast) throws PodcastNotFoundException {
         Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
 
@@ -97,9 +97,15 @@ public class PodcastBusiness {
         podcastToUpdate.setSignature(patchPodcast.getSignature());
         podcastToUpdate.setType(patchPodcast.getType());
         podcastToUpdate.setLastUpdate(patchPodcast.getLastUpdate());
-        podcastToUpdate.setCover(patchPodcast.getCover());
+        podcastToUpdate.setCover(
+                coverBusiness.findOne(patchPodcast.getCover().getId())
+                    .setHeight(patchPodcast.getCover().getHeight())
+                    .setURL(patchPodcast.getCover().getURL())
+                    .setWidth(patchPodcast.getCover().getWidth())
+        );
         podcastToUpdate.setDescription(patchPodcast.getDescription());
         podcastToUpdate.setHasToBeDeleted(patchPodcast.getHasToBeDeleted());
+        podcastToUpdate.setTags(patchPodcast.getTags());
 
         return this.save(podcastToUpdate);
     }
@@ -161,5 +167,10 @@ public class PodcastBusiness {
         this.save(podcast);
 
         return (item.getId() != 0);
+    }
+
+
+    public Set<Item> getItems(int id){
+        return this.findOne(id).getItems();
     }
 }

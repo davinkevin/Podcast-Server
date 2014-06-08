@@ -153,6 +153,12 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/items-list.html',
     '<div class="container item-listing">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
+    '    <div class="col-sm-12">\n' +
+    '        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
+    '            <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
+    '        </tags-input>\n' +
+    '    </div>\n' +
+    '\n' +
     '    <div class="text-center">\n' +
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
@@ -230,6 +236,17 @@ module.run(['$templateCache', function($templateCache) {
     '                </label>\n' +
     '            </div>\n' +
     '        </div>\n' +
+    '\n' +
+    '        <div class="form-group">\n' +
+    '            <label for="url" class="col-sm-1 control-label">Tags</label>\n' +
+    '            <div class="col-sm-10">\n' +
+    '                <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">\n' +
+    '                    <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
+    '                </tags-input>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '\n' +
+    '\n' +
     '        <div class="form-group">\n' +
     '            <label for="height" class="col-sm-1 control-label">Type</label>\n' +
     '\n' +
@@ -385,6 +402,14 @@ module.run(['$templateCache', function($templateCache) {
     '                        </div>\n' +
     '                    </div>\n' +
     '                    <div class="form-group">\n' +
+    '                        <label for="url" class="col-sm-2 control-label">Tags</label>\n' +
+    '                        <div class="col-sm-10">\n' +
+    '                            <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">\n' +
+    '                                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
+    '                            </tags-input>\n' +
+    '                        </div>\n' +
+    '                    </div>\n' +
+    '                    <div class="form-group">\n' +
     '                        <label for="height" class="col-sm-2 control-label" >Type</label>\n' +
     '                        <div class="col-sm-10" >\n' +
     '                            <select class="form-control" ng-model="podcast.type">\n' +
@@ -488,7 +513,8 @@ angular.module('podcastApp', [
     'ngAnimate',
     'truncate',
     'ui.bootstrap',
-    'angular-loading-bar'
+    'angular-loading-bar',
+    'ngTagsInput'
 ])
     .config(['$routeProvider',
         function($routeProvider) {
@@ -530,12 +556,17 @@ angular.module('podcastApp', [
 angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
+    var tags = Restangular.all("tag");
+    $scope.loadTags = function() {
+        return tags.getList();
+    };
+
     // Gestion du cache de la pagination :
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentPage', $scope.currentPage);
@@ -610,9 +641,10 @@ angular.module('podcast.controller', [])
             localStorageService.add('podcastslist', podcasts);
         });
 })
-    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager) {
+    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log) {
 
-        var idPodcast = $routeParams.podcastId;
+        var idPodcast = $routeParams.podcastId,
+            tags = Restangular.all("tag");;
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -655,6 +687,9 @@ angular.module('podcast.controller', [])
                 .then(refreshItems);
         };
 
+        $scope.loadTags = function() {
+            return tags.getList();
+        };
 
         $scope.download = DonwloadManager.download;
         $scope.stopDownload = DonwloadManager.stopDownload;
@@ -663,7 +698,10 @@ angular.module('podcast.controller', [])
         $scope.save = function() {
             var podcastToUpdate = _.cloneDeep($scope.podcast);
             podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate);
+            $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
+                $log.debug(patchedPodcast);
+                _.assign($scope.podcast, patchedPodcast);
+            });
         };
 })
     .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager) {
@@ -724,7 +762,8 @@ angular.module('podcast.controller', [])
 
 })
     .controller('PodcastAddCtrl', function ($scope, Restangular) {
-        var podcasts = Restangular.all("podcast");
+        var podcasts = Restangular.all("podcast"),
+            tags = Restangular.all("tag");
 
         $scope.podcast = {
             hasToBeDeleted : true,
@@ -732,6 +771,10 @@ angular.module('podcast.controller', [])
                 height: 200,
                 width: 200
             }
+        };
+
+        $scope.loadTags = function() {
+            return tags.getList();
         };
 
         $scope.changeType = function() {

@@ -228,8 +228,6 @@ public class Item implements Serializable {
     public int hashCode() {
         int result = title != null ? title.hashCode() : 0;
         result = 31 * result + (url != null ? url.hashCode() : 0);
-        result = 31 * result + (localUrl != null ? localUrl.hashCode() : 0);
-        //result = 31 * result + podcast.hashCode();
         return result;
     }
 

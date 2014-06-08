@@ -11,6 +11,9 @@ public class Cover {
     private int width;
     private int height;
 
+    private Item item;
+    private Podcast podcast;
+
     public Cover(String URL, int width, int height) {
         this.URL = URL;
         this.width = width;
@@ -41,8 +44,9 @@ public class Cover {
         return URL;
     }
 
-    public void setURL(String URL) {
+    public Cover setURL(String URL) {
         this.URL = URL;
+        return this;
     }
 
     @Column(name = "width")
@@ -51,8 +55,9 @@ public class Cover {
         return width;
     }
 
-    public void setWidth(int width) {
+    public Cover setWidth(int width) {
         this.width = width;
+        return this;
     }
 
     @Column(name = "height")
@@ -61,9 +66,30 @@ public class Cover {
         return height;
     }
 
-    public void setHeight(int height) {
+    public Cover setHeight(int height) {
         this.height = height;
+        return this;
     }
+
+   /* @JsonIgnore
+    @OneToOne(mappedBy = "cover", fetch = FetchType.LAZY)
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "cover", fetch = FetchType.LAZY)
+    public Podcast getPodcast() {
+        return podcast;
+    }
+
+    public void setPodcast(Podcast podcast) {
+        this.podcast = podcast;
+    }*/
 
     @Override
     public boolean equals(Object o) {

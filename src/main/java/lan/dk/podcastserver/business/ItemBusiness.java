@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.isInTags;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -38,12 +40,12 @@ public class ItemBusiness {
         return itemRepository.findAll();
     }
 
-    public List<Item> findAll(Sort sort) {
-        return itemRepository.findAll(sort);
-    }
-
     public Page<Item> findAll(Pageable pageable) {
         return itemRepository.findAll(pageable);
+    }
+
+    public Page<Item> findAllByPodcastTags(List<Tag> tags, Pageable pageable) {
+        return itemRepository.findAll(isInTags(tags.toArray(new Tag[tags.size()])), pageable);
     }
 
     public List<Item> save(Iterable<Item> entities) {

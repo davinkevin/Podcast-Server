@@ -3,13 +3,15 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lan.dk.podcastserver.utils.jDomUtils;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Table(name = "podcast")
 @Entity
@@ -21,10 +23,12 @@ public class Podcast implements Serializable {
     private String signature;
     private String type;
     private Timestamp lastUpdate;
-    private Collection<Item> items = new ArrayList<Item>();
+    private Set<Item> items = new TreeSet<>();
     private Cover cover;
     private String description;
     private Boolean hasToBeDeleted;
+    private Set<Tag> tags = new HashSet<>();
+
 
     public Podcast() {
     }
@@ -104,15 +108,16 @@ public class Podcast implements Serializable {
 
     @OneToMany(mappedBy = "podcast", fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
     @OrderBy("pubdate DESC")
-    public Collection<Item> getItems() {
+    @Fetch(FetchMode.SUBSELECT)
+    public Set<Item> getItems() {
         return items;
     }
 
-    public void setItems(Collection<Item> items) {
+    public void setItems(Set<Item> items) {
         this.items = items;
     }
 
-    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval=true)
     @JoinColumn(name="cover_id")
     public Cover getCover() {
         return cover;
@@ -140,6 +145,20 @@ public class Podcast implements Serializable {
 
     public void setHasToBeDeleted(Boolean hasToBeDeleted) {
         this.hasToBeDeleted = hasToBeDeleted;
+    }
+
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @JoinTable(name="PODCAST_TAG",
+            joinColumns={@JoinColumn(name="PODCAST_ID", referencedColumnName="ID")},
+            inverseJoinColumns={@JoinColumn(name="TAG_ID", referencedColumnName="ID")})
+    @Fetch(FetchMode.SUBSELECT)
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public Podcast setTags(Set<Tag> tags) {
+        this.tags = tags;
+        return this;
     }
 
     @Override
@@ -185,5 +204,12 @@ public class Podcast implements Serializable {
     @JsonIgnore
     public String toXML(String serveurURL) {
         return jDomUtils.podcastToXMLGeneric(this, serveurURL);
+    }
+
+    @Transient
+    @JsonIgnore
+    public Podcast addTag(Tag tag) {
+        this.tags.add(tag);
+        return this;
     }
 }

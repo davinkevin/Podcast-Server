@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.business.PodcastBusiness;
+import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,14 +25,13 @@ public class PodcastController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Resource
-    private PodcastBusiness podcastBusiness;
+    @Resource private PodcastBusiness podcastBusiness;
+    @Resource private TagBusiness tagBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, produces = "application/json")
     @ResponseBody
     public Podcast create(@RequestBody Podcast podcast) {
-        logger.debug("Creation of Podcast : " + podcast.toString());
-        return podcastBusiness.save(podcast);
+        return podcastBusiness.save(podcast.setTags(tagBusiness.getTagListByName(podcast.getTags())));
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
@@ -46,21 +45,23 @@ public class PodcastController {
     @RequestMapping(value="{id:[\\d]+}/items", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Item> findItemsByPodcastId(@PathVariable int id) {
-        return podcastBusiness.findOne(id).getItems();
+        return podcastBusiness.getItems(id);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
     @ResponseBody
     public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) {
         podcast.setId(id);
-        return podcastBusiness.save(podcast);
+        return podcastBusiness.save(podcast.setTags(tagBusiness.getTagListByName(podcast.getTags())));
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH, produces = "application/json")
     @ResponseBody
     public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) throws PodcastNotFoundException {
         podcast.setId(id);
-        return podcastBusiness.patchUpdate(podcast);
+        Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast.setTags(tagBusiness.getTagListByName(podcast.getTags())));
+        patchedPodcast.setItems(null);
+        return patchedPodcast;
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
@@ -71,7 +72,6 @@ public class PodcastController {
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    @Transactional(readOnly = true)
     public List<Podcast> findAll() {
 
         //TODO : Using JSONVIEW or Waiting https://jira.spring.io/browse/SPR-7156 to be solved in 1/JUL/2014

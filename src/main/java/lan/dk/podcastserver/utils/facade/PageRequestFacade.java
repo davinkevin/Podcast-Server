@@ -12,7 +12,7 @@ public class PageRequestFacade {
     //@RequestParam(value = "size", required = false, defaultValue = "10")
     private Integer size = 10;
     //@RequestParam(value = "direction", required = false, defaultValue = "ASC")
-    private String direction = "ASC";
+    private String direction = "DESC";
     //@RequestParam(value = "properties", required = false)
     private String properties = null;
 
@@ -34,32 +34,36 @@ public class PageRequestFacade {
         return page;
     }
 
-    public void setPage(Integer page) {
+    public PageRequestFacade setPage(Integer page) {
         this.page = page;
+        return this;
     }
 
     public Integer getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
+    public PageRequestFacade setSize(Integer size) {
         this.size = size;
+        return this;
     }
 
     public String getDirection() {
         return direction;
     }
 
-    public void setDirection(String direction) {
+    public PageRequestFacade setDirection(String direction) {
         this.direction = direction;
+        return this;
     }
 
     public String getProperties() {
         return properties;
     }
 
-    public void setProperties(String properties) {
+    public PageRequestFacade setProperties(String properties) {
         this.properties = properties;
+        return this;
     }
 
     public PageRequest toPageRequest() {

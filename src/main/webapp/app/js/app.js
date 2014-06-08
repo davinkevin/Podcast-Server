@@ -10,7 +10,8 @@ angular.module('podcastApp', [
     'ngAnimate',
     'truncate',
     'ui.bootstrap',
-    'angular-loading-bar'
+    'angular-loading-bar',
+    'ngTagsInput'
 ])
     .config(['$routeProvider',
         function($routeProvider) {

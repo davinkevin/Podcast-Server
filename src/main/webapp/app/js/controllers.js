@@ -1,12 +1,17 @@
 angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
+    var tags = Restangular.all("tag");
+    $scope.loadTags = function() {
+        return tags.getList();
+    };
+
     // Gestion du cache de la pagination :
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentPage', $scope.currentPage);
@@ -81,9 +86,10 @@ angular.module('podcast.controller', [])
             localStorageService.add('podcastslist', podcasts);
         });
 })
-    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager) {
+    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log) {
 
-        var idPodcast = $routeParams.podcastId;
+        var idPodcast = $routeParams.podcastId,
+            tags = Restangular.all("tag");;
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -126,6 +132,9 @@ angular.module('podcast.controller', [])
                 .then(refreshItems);
         };
 
+        $scope.loadTags = function() {
+            return tags.getList();
+        };
 
         $scope.download = DonwloadManager.download;
         $scope.stopDownload = DonwloadManager.stopDownload;
@@ -134,7 +143,10 @@ angular.module('podcast.controller', [])
         $scope.save = function() {
             var podcastToUpdate = _.cloneDeep($scope.podcast);
             podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate);
+            $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
+                $log.debug(patchedPodcast);
+                _.assign($scope.podcast, patchedPodcast);
+            });
         };
 })
     .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager) {
@@ -195,7 +207,8 @@ angular.module('podcast.controller', [])
 
 })
     .controller('PodcastAddCtrl', function ($scope, Restangular) {
-        var podcasts = Restangular.all("podcast");
+        var podcasts = Restangular.all("podcast"),
+            tags = Restangular.all("tag");
 
         $scope.podcast = {
             hasToBeDeleted : true,
@@ -203,6 +216,10 @@ angular.module('podcast.controller', [])
                 height: 200,
                 width: 200
             }
+        };
+
+        $scope.loadTags = function() {
+            return tags.getList();
         };
 
         $scope.changeType = function() {

@@ -8,12 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate4.HibernateExceptionTranslator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -26,9 +27,9 @@ import java.util.Properties;
  */
 
 @Configuration
-@ComponentScan(basePackages = {"lan.dk.podcastserver.repository", "lan.dk.podcastserver.entity"})
+@ComponentScan(basePackages = {"lan.dk.podcastserver.repository", "lan.dk.podcastserver.entity", "lan.dk.podcastserver.business"})
 @EnableJpaRepositories("lan.dk.podcastserver.repository")
-@Profile("!data-embedded")
+@EnableTransactionManagement
 public class JPAConfig {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -83,7 +84,7 @@ public class JPAConfig {
      * @throws ClassNotFoundException
      */
     @Bean
-    public JpaTransactionManager transactionManager() throws ClassNotFoundException, SQLException {
+    public PlatformTransactionManager transactionManager() throws ClassNotFoundException, SQLException {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
 
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());

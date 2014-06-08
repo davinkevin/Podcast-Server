@@ -8,10 +8,10 @@
     <name>Podcast Server</name>
 
     <properties>
-        <spring.version>4.0.2.RELEASE</spring.version>
+        <spring.version>4.0.5.RELEASE</spring.version>
         <spring-data.version>1.6.0.RELEASE</spring-data.version>
-        <hibernate.version>4.3.4.Final</hibernate.version>
-        <jackson.version>2.3.2</jackson.version>
+        <hibernate.version>4.3.5.Final</hibernate.version>
+        <jackson.version>2.4.0</jackson.version>
         <slf4j.version>1.7.6</slf4j.version>
         <javax.servlet-api.version>3.0.1</javax.servlet-api.version>
         <mockito.version>1.9.5</mockito.version>

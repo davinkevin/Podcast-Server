@@ -87,6 +87,14 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="url" class="col-sm-2 control-label">Tags</label>
+                        <div class="col-sm-10">
+                            <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">
+                                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
+                            </tags-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="height" class="col-sm-2 control-label" >Type</label>
                         <div class="col-sm-10" >
                             <select class="form-control" ng-model="podcast.type">

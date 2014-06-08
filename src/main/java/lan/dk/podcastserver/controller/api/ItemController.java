@@ -4,6 +4,7 @@ import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.utils.facade.ItemByPodcastTagsPageRequestWrapper;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,5 +101,10 @@ public class ItemController {
             e.printStackTrace();
         }
     }
-
+    @RequestMapping(value="pagination/tags", method = RequestMethod.POST, produces = "application/json" )
+    @ResponseBody
+    //public Page<Item> findAllByPodcastTags(@RequestBody List<Tag> tags) {
+    public Page<Item> findAllByPodcastTags(@RequestBody ItemByPodcastTagsPageRequestWrapper itemByPodcastTagsPageRequestWrapper) {
+        return itemBusiness.findAllByPodcastTags(itemByPodcastTagsPageRequestWrapper.getTags(), itemByPodcastTagsPageRequestWrapper.toPageRequest());
+    }
 }
