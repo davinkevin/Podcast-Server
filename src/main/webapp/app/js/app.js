@@ -4,6 +4,7 @@ angular.module('podcastApp', [
     'podcast.services',
     'podcast.partial',
     'ngRoute',
+    'cfp.hotkeys',
     'restangular',
     'AngularStomp',
     'LocalStorageModule',
@@ -26,7 +27,13 @@ angular.module('podcastApp', [
                 }).
                 when('/podcast/:podcastId', {
                     templateUrl: 'html/podcast-detail.html',
-                    controller: 'PodcastDetailCtrl'
+                    controller: 'PodcastDetailCtrl',
+                    hotkeys: [
+                        ['r', 'Refresh', 'refreshItems()'],
+                        ['f', 'Force Refresh', 'refresh()'],
+                        ['l', 'List of Items', 'tabs[0].active = true'],
+                        ['m', 'Modification of Podcast', 'tabs[1].active = true']
+                    ]
                 }).
                 when('/items', {
                     templateUrl: 'html/items-list.html',

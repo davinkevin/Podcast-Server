@@ -9,6 +9,7 @@
     <link href="/js/lib/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet" type="text/css">
     <link href="/js/lib/animate.css/animate.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/js/lib/ng-tags-input/ng-tags-input.min.css">
+    <link rel="stylesheet" href="/js/lib/angular-hotkeys/build/hotkeys.min.css">
     <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
     <%--<link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />--%>
 </head>
@@ -63,6 +64,7 @@
 <script src="<c:url value="/js/lib/angular/angular.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-animate/angular-animate.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.min.js"/>"></script>
+<script src="<c:url value="/js/lib/angular-hotkeys/build/hotkeys.min.js"/>"></script>
 <script src="<c:url value="/js/lib/restangular/dist/restangular.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"/>"></script>

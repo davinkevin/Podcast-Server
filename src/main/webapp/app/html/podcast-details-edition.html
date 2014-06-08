@@ -1,0 +1,81 @@
+<br/>
+<accordion close-others="true">
+    <accordion-group heading="Podcast" is-open="true">
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label for="title" class="col-sm-2 control-label">Titre</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="title" ng-model="podcast.title" required placeholder="Titre">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="url" class="col-sm-2 control-label">URL</label>
+                <div class="col-sm-10">
+                    <input type="url" class="form-control" id="url" ng-model="podcast.url" required placeholder="url">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox col-sm-offset-3">
+                    <label>
+                        <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="url" class="col-sm-2 control-label">Tags</label>
+                <div class="col-sm-10">
+                    <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">
+                        <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
+                    </tags-input>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="height" class="col-sm-2 control-label" >Type</label>
+                <div class="col-sm-10" >
+                    <select class="form-control" ng-model="podcast.type">
+                        <option value="BeInSports">Be In Sports</option>
+                        <option value="CanalPlus">Canal+</option>
+                        <option value="JeuxVideoFR">Jeux Video Fr</option>
+                        <option value="RSS">RSS</option>
+                        <option value="send">Send</option>
+                        <option value="Youtube">Youtube</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button ng-click="save()" class="btn btn-default">Sauvegarder</button>
+                </div>
+            </div>
+        </form>
+    </accordion-group>
+    <accordion-group heading="Cover">
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label for="url" class="col-sm-2 control-label">URL</label>
+                <div class="col-sm-10">
+                    <input type="url" class="form-control" id="url" ng-model="podcast.cover.url" required placeholder="url">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="width" class="col-sm-2 control-label">Lageur</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" id="width" ng-model="podcast.cover.width" required placeholder="url">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="height" class="col-sm-2 control-label">Hauteur</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" id="height" ng-model="podcast.cover.height" required placeholder="url">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button ng-click="save()" class="btn btn-default">Sauvegarder</button>
+                </div>
+            </div>
+        </form>
+    </accordion-group>
+</accordion>

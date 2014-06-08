@@ -388,128 +388,8 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="col-md-8 col-xs-12 col-sm-12 col-lg-8">\n' +
     '\n' +
     '    <tabset>\n' +
-    '        <tab heading="Episodes">\n' +
-    '            <br/>\n' +
-    '\n' +
-    '                <div class="media"  ng-repeat="item in podcast.items track by item.id | orderBy:pubdate">\n' +
-    '\n' +
-    '                    <div class="buttonList pull-right">\n' +
-    '                        <!-- Téléchargement en cours -->\n' +
-    '                        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
-    '                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
-    '                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
-    '                        </span>\n' +
-    '\n' +
-    '                        <!-- Lancer le téléchargement -->\n' +
-    '                        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
-    '\n' +
-    '                        <!-- Accéder au fichier -->\n' +
-    '                        <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
-    '                        <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
-    '\n' +
-    '                        <!-- Supprimer l\'item -->\n' +
-    '                        <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
-    '                    </div>\n' +
-    '\n' +
-    '                    <a class="pull-left" ng-href="#/item/{{item.id}}">\n' +
-    '\n' +
-    '                            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
-    '\n' +
-    '                    </a>\n' +
-    '                    <div class="media-body">\n' +
-    '                        <h4 class="media-heading">{{item.title | characters:60}}</h4>\n' +
-    '                        <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n' +
-    '                        <p><strong>{{item.pubdate | date : \'dd/MM/yyyy à HH:mm\' }}</strong></p>\n' +
-    '                    </div>\n' +
-    '                </div>\n' +
-    '\n' +
-    '\n' +
-    '\n' +
-    '        </tab>\n' +
-    '        <tab heading="Modification">\n' +
-    '\n' +
-    '            <br/>\n' +
-    '            <accordion close-others="true">\n' +
-    '                <accordion-group heading="Podcast" is-open="true">\n' +
-    '                    <form class="form-horizontal" role="form">\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="title" class="col-sm-2 control-label">Titre</label>\n' +
-    '                        <div class="col-sm-10">\n' +
-    '                            <input type="text" class="form-control" id="title" ng-model="podcast.title" required placeholder="Titre">\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="url" class="col-sm-2 control-label">URL</label>\n' +
-    '                        <div class="col-sm-10">\n' +
-    '                            <input type="url" class="form-control" id="url" ng-model="podcast.url" required placeholder="url">\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                    <div class="form-group">\n' +
-    '                        <div class="checkbox col-sm-offset-3">\n' +
-    '                            <label>\n' +
-    '                                <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto\n' +
-    '                            </label>\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="url" class="col-sm-2 control-label">Tags</label>\n' +
-    '                        <div class="col-sm-10">\n' +
-    '                            <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">\n' +
-    '                                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
-    '                            </tags-input>\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="height" class="col-sm-2 control-label" >Type</label>\n' +
-    '                        <div class="col-sm-10" >\n' +
-    '                            <select class="form-control" ng-model="podcast.type">\n' +
-    '                                <option value="BeInSports">Be In Sports</option>\n' +
-    '                                <option value="CanalPlus">Canal+</option>\n' +
-    '                                <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
-    '                                <option value="RSS">RSS</option>\n' +
-    '                                <option value="send">Send</option>\n' +
-    '                                <option value="Youtube">Youtube</option>\n' +
-    '                            </select>\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '\n' +
-    '                    <div class="form-group">\n' +
-    '                        <div class="col-sm-offset-2 col-sm-10">\n' +
-    '                            <button ng-click="save()" class="btn btn-default">Sauvegarder</button>\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                </form>\n' +
-    '                </accordion-group>\n' +
-    '                <accordion-group heading="Cover">\n' +
-    '                    <form class="form-horizontal" role="form">\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="url" class="col-sm-2 control-label">URL</label>\n' +
-    '                        <div class="col-sm-10">\n' +
-    '                            <input type="url" class="form-control" id="url" ng-model="podcast.cover.url" required placeholder="url">\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="width" class="col-sm-2 control-label">Lageur</label>\n' +
-    '                        <div class="col-sm-10">\n' +
-    '                            <input type="number" class="form-control" id="width" ng-model="podcast.cover.width" required placeholder="url">\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                    <div class="form-group">\n' +
-    '                        <label for="height" class="col-sm-2 control-label">Hauteur</label>\n' +
-    '                        <div class="col-sm-10">\n' +
-    '                            <input type="number" class="form-control" id="height" ng-model="podcast.cover.height" required placeholder="url">\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '\n' +
-    '                    <div class="form-group">\n' +
-    '                        <div class="col-sm-offset-2 col-sm-10">\n' +
-    '                            <button ng-click="save()" class="btn btn-default">Sauvegarder</button>\n' +
-    '                        </div>\n' +
-    '                    </div>\n' +
-    '                        </form>\n' +
-    '                </accordion-group>\n' +
-    '            </accordion>\n' +
-    '\n' +
+    '        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">\n' +
+    '            <ng-include src="tab.templateUrl" ></ng-include>\n' +
     '        </tab>\n' +
     '    </tabset>\n' +
     '\n' +
@@ -520,6 +400,148 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('podcast.partial');
+} catch (e) {
+  module = angular.module('podcast.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/podcast-details-edition.html',
+    '<br/>\n' +
+    '<accordion close-others="true">\n' +
+    '    <accordion-group heading="Podcast" is-open="true">\n' +
+    '        <form class="form-horizontal" role="form">\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="title" class="col-sm-2 control-label">Titre</label>\n' +
+    '                <div class="col-sm-10">\n' +
+    '                    <input type="text" class="form-control" id="title" ng-model="podcast.title" required placeholder="Titre">\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="url" class="col-sm-2 control-label">URL</label>\n' +
+    '                <div class="col-sm-10">\n' +
+    '                    <input type="url" class="form-control" id="url" ng-model="podcast.url" required placeholder="url">\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="form-group">\n' +
+    '                <div class="checkbox col-sm-offset-3">\n' +
+    '                    <label>\n' +
+    '                        <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto\n' +
+    '                    </label>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="url" class="col-sm-2 control-label">Tags</label>\n' +
+    '                <div class="col-sm-10">\n' +
+    '                    <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">\n' +
+    '                        <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
+    '                    </tags-input>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="height" class="col-sm-2 control-label" >Type</label>\n' +
+    '                <div class="col-sm-10" >\n' +
+    '                    <select class="form-control" ng-model="podcast.type">\n' +
+    '                        <option value="BeInSports">Be In Sports</option>\n' +
+    '                        <option value="CanalPlus">Canal+</option>\n' +
+    '                        <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
+    '                        <option value="RSS">RSS</option>\n' +
+    '                        <option value="send">Send</option>\n' +
+    '                        <option value="Youtube">Youtube</option>\n' +
+    '                    </select>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <div class="form-group">\n' +
+    '                <div class="col-sm-offset-2 col-sm-10">\n' +
+    '                    <button ng-click="save()" class="btn btn-default">Sauvegarder</button>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </form>\n' +
+    '    </accordion-group>\n' +
+    '    <accordion-group heading="Cover">\n' +
+    '        <form class="form-horizontal" role="form">\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="url" class="col-sm-2 control-label">URL</label>\n' +
+    '                <div class="col-sm-10">\n' +
+    '                    <input type="url" class="form-control" id="url" ng-model="podcast.cover.url" required placeholder="url">\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="width" class="col-sm-2 control-label">Lageur</label>\n' +
+    '                <div class="col-sm-10">\n' +
+    '                    <input type="number" class="form-control" id="width" ng-model="podcast.cover.width" required placeholder="url">\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="form-group">\n' +
+    '                <label for="height" class="col-sm-2 control-label">Hauteur</label>\n' +
+    '                <div class="col-sm-10">\n' +
+    '                    <input type="number" class="form-control" id="height" ng-model="podcast.cover.height" required placeholder="url">\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <div class="form-group">\n' +
+    '                <div class="col-sm-offset-2 col-sm-10">\n' +
+    '                    <button ng-click="save()" class="btn btn-default">Sauvegarder</button>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </form>\n' +
+    '    </accordion-group>\n' +
+    '</accordion>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('podcast.partial');
+} catch (e) {
+  module = angular.module('podcast.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/podcast-details-episodes.html',
+    '\n' +
+    '<br/>\n' +
+    '\n' +
+    '<div class="media"  ng-repeat="item in podcast.items track by item.id | orderBy:pubdate">\n' +
+    '\n' +
+    '    <div class="buttonList pull-right">\n' +
+    '        <!-- Téléchargement en cours -->\n' +
+    '                        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
+    '                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
+    '                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
+    '                        </span>\n' +
+    '\n' +
+    '        <!-- Lancer le téléchargement -->\n' +
+    '        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '\n' +
+    '        <!-- Accéder au fichier -->\n' +
+    '        <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
+    '        <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
+    '\n' +
+    '        <!-- Supprimer l\'item -->\n' +
+    '        <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
+    '    </div>\n' +
+    '\n' +
+    '    <a class="pull-left" ng-href="#/item/{{item.id}}">\n' +
+    '\n' +
+    '        <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
+    '\n' +
+    '    </a>\n' +
+    '    <div class="media-body">\n' +
+    '        <h4 class="media-heading">{{item.title | characters:60}}</h4>\n' +
+    '        <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n' +
+    '        <p><strong>{{item.pubdate | date : \'dd/MM/yyyy à HH:mm\' }}</strong></p>\n' +
+    '    </div>\n' +
+    '</div>\n' +
+    '\n' +
+    '\n' +
+    '\n' +
+    '        ');
 }]);
 })();
 
@@ -557,6 +579,7 @@ angular.module('podcastApp', [
     'podcast.services',
     'podcast.partial',
     'ngRoute',
+    'cfp.hotkeys',
     'restangular',
     'AngularStomp',
     'LocalStorageModule',
@@ -579,7 +602,13 @@ angular.module('podcastApp', [
                 }).
                 when('/podcast/:podcastId', {
                     templateUrl: 'html/podcast-detail.html',
-                    controller: 'PodcastDetailCtrl'
+                    controller: 'PodcastDetailCtrl',
+                    hotkeys: [
+                        ['r', 'Refresh', 'refreshItems()'],
+                        ['f', 'Force Refresh', 'refresh()'],
+                        ['l', 'List of Items', 'tabs[0].active = true'],
+                        ['m', 'Modification of Podcast', 'tabs[1].active = true']
+                    ]
                 }).
                 when('/items', {
                     templateUrl: 'html/items-list.html',
@@ -734,7 +763,11 @@ angular.module('podcast.controller', [])
     .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log) {
 
         var idPodcast = $routeParams.podcastId,
-            tags = Restangular.all("tag");;
+            tags = Restangular.all("tag");
+        $scope.tabs = [
+            { title:'Episodes', templateUrl:'html/podcast-details-episodes.html', active : true },
+            { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
+        ];
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -743,7 +776,7 @@ angular.module('podcast.controller', [])
 
         $scope.podcast = localStorageService.get("podcast/" + idPodcast ) || {};
 
-        var refreshItems = function() {
+        $scope.refreshItems = function() {
             $scope.podcast.getList("items").then(function(items) {
                 $scope.podcast.items = items;
             });
@@ -762,7 +795,7 @@ angular.module('podcast.controller', [])
                     _.assign(elemToUpdate, item);
                 });
             });
-        }).then(refreshItems);
+        }).then($scope.refreshItems );
 
 
         $scope.remove = function(item) {
@@ -774,7 +807,7 @@ angular.module('podcast.controller', [])
         };
         $scope.refresh = function() {
             Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
+                .then($scope.refreshItems );
         };
 
         $scope.loadTags = function(query) {
@@ -791,7 +824,7 @@ angular.module('podcast.controller', [])
             $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
                 $log.debug(patchedPodcast);
                 _.assign($scope.podcast, patchedPodcast);
-            }).then(refreshItems);
+            }).then($scope.refreshItems );
         };
 })
     .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log) {

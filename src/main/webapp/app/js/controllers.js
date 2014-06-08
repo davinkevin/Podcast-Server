@@ -125,7 +125,11 @@ angular.module('podcast.controller', [])
     .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log) {
 
         var idPodcast = $routeParams.podcastId,
-            tags = Restangular.all("tag");;
+            tags = Restangular.all("tag");
+        $scope.tabs = [
+            { title:'Episodes', templateUrl:'html/podcast-details-episodes.html', active : true },
+            { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
+        ];
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -134,7 +138,7 @@ angular.module('podcast.controller', [])
 
         $scope.podcast = localStorageService.get("podcast/" + idPodcast ) || {};
 
-        var refreshItems = function() {
+        $scope.refreshItems = function() {
             $scope.podcast.getList("items").then(function(items) {
                 $scope.podcast.items = items;
             });
@@ -153,7 +157,7 @@ angular.module('podcast.controller', [])
                     _.assign(elemToUpdate, item);
                 });
             });
-        }).then(refreshItems);
+        }).then($scope.refreshItems );
 
 
         $scope.remove = function(item) {
@@ -165,7 +169,7 @@ angular.module('podcast.controller', [])
         };
         $scope.refresh = function() {
             Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
+                .then($scope.refreshItems );
         };
 
         $scope.loadTags = function(query) {
@@ -182,7 +186,7 @@ angular.module('podcast.controller', [])
             $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
                 $log.debug(patchedPodcast);
                 _.assign($scope.podcast, patchedPodcast);
-            }).then(refreshItems);
+            }).then($scope.refreshItems );
         };
 })
     .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log) {
