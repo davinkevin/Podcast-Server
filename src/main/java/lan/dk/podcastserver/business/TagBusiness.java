@@ -27,7 +27,7 @@ public class TagBusiness {
     }
 
     public List<Tag> findByNameLike(String name) {
-        return tagRepository.findByNameContains(name);
+        return tagRepository.findByNameContainsIgnoreCase(name);
     }
 
     public Set<Tag> getTagListByName(Set<Tag> tagList) {
