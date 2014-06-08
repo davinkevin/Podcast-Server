@@ -620,7 +620,11 @@ angular.module('podcastApp', [
                 }).
                 when('/item/search', {
                     templateUrl: 'html/items-search.html',
-                    controller: 'ItemsSearchCtrl'
+                    controller: 'ItemsSearchCtrl',
+                    hotkeys: [
+                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
+                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
+                    ]
                 }).
                 when('/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
@@ -649,9 +653,7 @@ angular.module('podcast.controller', [])
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        $log.debug($scope.currentPage );
         $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
-        $log.debug($scope.currentPage );
         Restangular.one("item/pagination").get({size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
@@ -683,7 +685,8 @@ angular.module('podcast.controller', [])
 })
     .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
-    var tags = Restangular.all("tag");
+    var tags = Restangular.all("tag"),
+        numberByPage = 12;
     $scope.loadTags = function(query) {
         return tags.post(null, {name : query});
     };
@@ -693,7 +696,8 @@ angular.module('podcast.controller', [])
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+        $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
+        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentSearchPage', $scope.currentPage);
