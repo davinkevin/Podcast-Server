@@ -119,9 +119,9 @@ public class jDomUtils {
             Element image_width = new Element("width");
             Element image_height = new Element("height");
 
-            itunesImage.addContent(new Text(podcast.getCover().getURL()));
+            itunesImage.addContent(new Text(podcast.getCover().getUrl()));
 
-            image_url.addContent(podcast.getCover().getURL());
+            image_url.addContent(podcast.getCover().getUrl());
             image_width.addContent(String.valueOf(podcast.getCover().getWidth()));
             image_height.addContent(String.valueOf(podcast.getCover().getHeight()));
             image.addContent(image_height);

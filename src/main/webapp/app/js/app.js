@@ -32,6 +32,10 @@ angular.module('podcastApp', [
                     templateUrl: 'html/items-list.html',
                     controller: 'ItemsListCtrl'
                 }).
+                when('/item/search', {
+                    templateUrl: 'html/items-search.html',
+                    controller: 'ItemsSearchCtrl'
+                }).
                 when('/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl'

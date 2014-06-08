@@ -25,9 +25,9 @@
 
     <!-- Spring MVC -->
     <!-- ORM | Hibernate
-      <logger name="org.springframework.transaction" level="TRACE"/>
-      <logger name="org.springframework.web" level="DEBUG"/>
-      <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+          <logger name="org.springframework.transaction" level="TRACE"/>
+          <logger name="org.springframework.web" level="DEBUG"/>
+          <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
     -->
 
 

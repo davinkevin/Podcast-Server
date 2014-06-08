@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CoverRepository extends JpaRepository<Cover, Integer> {
 
+    Cover findByUrl(String url);
 }

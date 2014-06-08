@@ -31,7 +31,7 @@ public class PodcastController {
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, produces = "application/json")
     @ResponseBody
     public Podcast create(@RequestBody Podcast podcast) {
-        return podcastBusiness.save(podcast.setTags(tagBusiness.getTagListByName(podcast.getTags())));
+        return podcastBusiness.reatachAndSave(podcast);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
@@ -52,14 +52,14 @@ public class PodcastController {
     @ResponseBody
     public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) {
         podcast.setId(id);
-        return podcastBusiness.save(podcast.setTags(tagBusiness.getTagListByName(podcast.getTags())));
+        return podcastBusiness.reatachAndSave(podcast);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH, produces = "application/json")
     @ResponseBody
     public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) throws PodcastNotFoundException {
         podcast.setId(id);
-        Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast.setTags(tagBusiness.getTagListByName(podcast.getTags())));
+        Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
         patchedPodcast.setItems(null);
         return patchedPodcast;
     }

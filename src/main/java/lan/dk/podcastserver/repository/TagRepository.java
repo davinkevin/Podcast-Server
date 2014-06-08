@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,4 +14,5 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
 
     public Set<Tag> findByNameIn(Collection<String> names);
     public Tag findByName(String name);
+    public List<Tag> findByNameContains(String name);
 }

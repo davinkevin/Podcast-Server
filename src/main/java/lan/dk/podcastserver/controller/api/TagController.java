@@ -27,4 +27,8 @@ public class TagController {
         return tagBusiness.findAll();
     }
 
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public List<Tag> findByNameLike(@RequestParam String name) {
+        return tagBusiness.findByNameLike(name);
+    }
 }

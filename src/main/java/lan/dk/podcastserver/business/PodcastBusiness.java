@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -100,14 +101,14 @@ public class PodcastBusiness {
         podcastToUpdate.setCover(
                 coverBusiness.findOne(patchPodcast.getCover().getId())
                     .setHeight(patchPodcast.getCover().getHeight())
-                    .setURL(patchPodcast.getCover().getURL())
+                    .setUrl(patchPodcast.getCover().getUrl())
                     .setWidth(patchPodcast.getCover().getWidth())
         );
         podcastToUpdate.setDescription(patchPodcast.getDescription());
         podcastToUpdate.setHasToBeDeleted(patchPodcast.getHasToBeDeleted());
         podcastToUpdate.setTags(patchPodcast.getTags());
 
-        return this.save(podcastToUpdate);
+        return this.reatachAndSave(podcastToUpdate);
     }
 
     public Podcast generatePodcastFromURL(String URL) {
@@ -172,5 +173,19 @@ public class PodcastBusiness {
 
     public Set<Item> getItems(int id){
         return this.findOne(id).getItems();
+    }
+
+    public Podcast reatachAndSave(Podcast podcast) {
+
+        Cover coverToSave = podcast.getCover();
+        //podcast.setCover(coverBusiness.reatachCover(podcast.getCover()));
+        podcast.setTags(tagBusiness.getTagListByName(podcast.getTags()));
+
+        podcast.getCover()
+            .setHeight(coverToSave.getHeight())
+            .setWidth(coverToSave.getWidth())
+            .setUrl(coverToSave.getUrl());
+
+        return save(podcast);
     }
 }

@@ -153,8 +153,58 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/items-list.html',
     '<div class="container item-listing">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
+    '    <div class="text-center">\n' +
+    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
+    '    </div>\n' +
+    '        <div class="row">\n' +
+    '            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">\n' +
+    '                <div class="box">\n' +
+    '                    <div class="">\n' +
+    '                        <a ng-href="#/item/{{item.id}}" >\n' +
+    '                            <img ng-src="{{ item.cover.url }}" alt="" class="img-rounded img-responsive" />\n' +
+    '                        </a>\n' +
+    '                    </div>\n' +
+    '                    <div class="text-center clearfix itemTitle" >\n' +
+    '                        <p>\n' +
+    '                            {{ item.title | characters:50 }}\n' +
+    '                        </p>\n' +
+    '                    </div>\n' +
+    '                    <div class="text-center row-button">\n' +
+    '                        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
+    '                                        <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
+    '                                        <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
+    '                                    </span>\n' +
+    '\n' +
+    '                        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
+    '\n' +
+    '                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
+    '                        <button ng-click="remove(item)" ng-if="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
+    '                    </div>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    <!--</div>-->\n' +
+    '    <div class="text-center row">\n' +
+    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
+    '    </div>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('podcast.partial');
+} catch (e) {
+  module = angular.module('podcast.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/items-search.html',
+    '<div class="container item-listing">\n' +
+    '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
     '    <div class="col-sm-12">\n' +
-    '        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
+    '        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentSearchPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
     '            <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
     '        </tags-input>\n' +
     '    </div>\n' +
@@ -535,6 +585,10 @@ angular.module('podcastApp', [
                     templateUrl: 'html/items-list.html',
                     controller: 'ItemsListCtrl'
                 }).
+                when('/item/search', {
+                    templateUrl: 'html/items-search.html',
+                    controller: 'ItemsSearchCtrl'
+                }).
                 when('/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl'
@@ -556,17 +610,12 @@ angular.module('podcastApp', [
 angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
-    var tags = Restangular.all("tag");
-    $scope.loadTags = function() {
-        return tags.getList();
-    };
-
     // Gestion du cache de la pagination :
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentPage', $scope.currentPage);
@@ -577,6 +626,47 @@ angular.module('podcast.controller', [])
     $scope.totalItems = Number.MAX_VALUE;
     $scope.maxSize = 10;
     $scope.currentPage = cache.get("currentPage") || 1;
+    $scope.changePage();
+
+    $scope.download = DonwloadManager.download;
+    $scope.stopDownload = DonwloadManager.stopDownload;
+    $scope.toggleDownload = DonwloadManager.toggleDownload;
+
+    $scope.wsClient = ngstomp('/download', SockJS);
+    $scope.wsClient.connect("user", "password", function(){
+        $scope.wsClient.subscribe("/topic/download", function(message) {
+            var item = JSON.parse(message.body);
+
+            var elemToUpdate = _.find($scope.items, { 'id': item.id });
+            if (elemToUpdate)
+                _.assign(elemToUpdate, item);
+        });
+    });
+
+})
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
+
+    var tags = Restangular.all("tag");
+    $scope.loadTags = function(query) {
+        return tags.post(null, {name : query});
+    };
+
+    // Gestion du cache de la pagination :
+    var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+
+    //$scope.selectPage = function (pageNo) {
+    $scope.changePage = function() {
+        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+            $scope.items = itemsResponse.content;
+            $scope.totalItems = parseInt(itemsResponse.totalElements);
+            cache.put('currentSearchPage', $scope.currentPage);
+        });
+    };
+
+    // Longeur inconnu au chargement :
+    $scope.totalItems = Number.MAX_VALUE;
+    $scope.maxSize = 10;
+    $scope.currentPage = cache.get("currentSearchPage") || 1;
     $scope.changePage();
 
     $scope.download = DonwloadManager.download;
@@ -687,8 +777,8 @@ angular.module('podcast.controller', [])
                 .then(refreshItems);
         };
 
-        $scope.loadTags = function() {
-            return tags.getList();
+        $scope.loadTags = function(query) {
+            return tags.post(null, {name : query});
         };
 
         $scope.download = DonwloadManager.download;
@@ -701,10 +791,10 @@ angular.module('podcast.controller', [])
             $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
                 $log.debug(patchedPodcast);
                 _.assign($scope.podcast, patchedPodcast);
-            });
+            }).then(refreshItems);
         };
 })
-    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager) {
+    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log) {
     $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
 
     $scope.refreshWaitingItems = function() {
@@ -773,8 +863,8 @@ angular.module('podcast.controller', [])
             }
         };
 
-        $scope.loadTags = function() {
-            return tags.getList();
+        $scope.loadTags = function(query) {
+            return tags.post(null, {name : query});
         };
 
         $scope.changeType = function() {

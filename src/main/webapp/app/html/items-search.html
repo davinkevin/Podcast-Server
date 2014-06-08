@@ -1,5 +1,11 @@
 <div class="container item-listing">
     <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->
+    <div class="col-sm-12">
+        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentSearchPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">
+            <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
+        </tags-input>
+    </div>
+
     <div class="text-center">
         <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
     </div>

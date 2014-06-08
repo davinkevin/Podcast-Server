@@ -1,17 +1,12 @@
 angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
 
-    var tags = Restangular.all("tag");
-    $scope.loadTags = function() {
-        return tags.getList();
-    };
-
     // Gestion du cache de la pagination :
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentPage', $scope.currentPage);
@@ -22,6 +17,47 @@ angular.module('podcast.controller', [])
     $scope.totalItems = Number.MAX_VALUE;
     $scope.maxSize = 10;
     $scope.currentPage = cache.get("currentPage") || 1;
+    $scope.changePage();
+
+    $scope.download = DonwloadManager.download;
+    $scope.stopDownload = DonwloadManager.stopDownload;
+    $scope.toggleDownload = DonwloadManager.toggleDownload;
+
+    $scope.wsClient = ngstomp('/download', SockJS);
+    $scope.wsClient.connect("user", "password", function(){
+        $scope.wsClient.subscribe("/topic/download", function(message) {
+            var item = JSON.parse(message.body);
+
+            var elemToUpdate = _.find($scope.items, { 'id': item.id });
+            if (elemToUpdate)
+                _.assign(elemToUpdate, item);
+        });
+    });
+
+})
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
+
+    var tags = Restangular.all("tag");
+    $scope.loadTags = function(query) {
+        return tags.post(null, {name : query});
+    };
+
+    // Gestion du cache de la pagination :
+    var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+
+    //$scope.selectPage = function (pageNo) {
+    $scope.changePage = function() {
+        Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+            $scope.items = itemsResponse.content;
+            $scope.totalItems = parseInt(itemsResponse.totalElements);
+            cache.put('currentSearchPage', $scope.currentPage);
+        });
+    };
+
+    // Longeur inconnu au chargement :
+    $scope.totalItems = Number.MAX_VALUE;
+    $scope.maxSize = 10;
+    $scope.currentPage = cache.get("currentSearchPage") || 1;
     $scope.changePage();
 
     $scope.download = DonwloadManager.download;
@@ -132,8 +168,8 @@ angular.module('podcast.controller', [])
                 .then(refreshItems);
         };
 
-        $scope.loadTags = function() {
-            return tags.getList();
+        $scope.loadTags = function(query) {
+            return tags.post(null, {name : query});
         };
 
         $scope.download = DonwloadManager.download;
@@ -146,10 +182,10 @@ angular.module('podcast.controller', [])
             $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
                 $log.debug(patchedPodcast);
                 _.assign($scope.podcast, patchedPodcast);
-            });
+            }).then(refreshItems);
         };
 })
-    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager) {
+    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log) {
     $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
 
     $scope.refreshWaitingItems = function() {
@@ -218,8 +254,8 @@ angular.module('podcast.controller', [])
             }
         };
 
-        $scope.loadTags = function() {
-            return tags.getList();
+        $scope.loadTags = function(query) {
+            return tags.post(null, {name : query});
         };
 
         $scope.changeType = function() {

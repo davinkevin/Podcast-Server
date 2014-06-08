@@ -28,4 +28,22 @@ public class CoverBusiness {
     public Cover save(Cover cover) {
         return coverRepository.save(cover);
     }
+
+    public Cover findByUrl(String url) {
+        return coverRepository.findByUrl(url);
+    }
+
+    public Cover reatachCover(Cover cover) {
+        Cover coverByUrl = findByUrl(cover.getUrl());
+
+        if (coverByUrl != null) {
+            return coverByUrl;
+        }
+
+        if (cover.getId() != null) {
+            return findOne(cover.getId());
+        }
+
+        return cover;
+    }
 }

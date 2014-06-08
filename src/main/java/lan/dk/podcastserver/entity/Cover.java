@@ -6,16 +6,16 @@ import javax.persistence.*;
 @Entity
 public class Cover {
 
-    private int id;
-    private String URL;
+    private Integer id;
+    private String url;
     private int width;
     private int height;
 
     private Item item;
     private Podcast podcast;
 
-    public Cover(String URL, int width, int height) {
-        this.URL = URL;
+    public Cover(String url, int width, int height) {
+        this.url = url;
         this.width = width;
         this.height = height;
     }
@@ -23,29 +23,29 @@ public class Cover {
     public Cover() {
     }
 
-    public Cover(String URL) {
-        this.URL = URL;
+    public Cover(String url) {
+        this.url = url;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     @Column(name = "url")
     @Basic
-    public String getURL() {
-        return URL;
+    public String getUrl() {
+        return url;
     }
 
-    public Cover setURL(String URL) {
-        this.URL = URL;
+    public Cover setUrl(String url) {
+        this.url = url;
         return this;
     }
 
@@ -98,13 +98,13 @@ public class Cover {
 
         Cover cover = (Cover) o;
 
-        if (!URL.equals(cover.URL)) return false;
+        if (!url.equals(cover.url)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return URL.hashCode();
+        return url.hashCode();
     }
 }

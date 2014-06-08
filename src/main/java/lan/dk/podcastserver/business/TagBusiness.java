@@ -26,23 +26,23 @@ public class TagBusiness {
         return tagRepository.findOne(integer);
     }
 
+    public List<Tag> findByNameLike(String name) {
+        return tagRepository.findByNameContains(name);
+    }
+
     public Set<Tag> getTagListByName(Set<Tag> tagList) {
         Collection<String> tagsName = new ArrayList<>();
         Set<Tag> tagResult = new HashSet<>();
 
         for(Tag tag : tagList) {
             if (tag.getId() != null) {
-                Tag tmpTag = tagRepository.findByName(tag.getName());
-                if (tmpTag == null ) {
-                    tagResult.add(tmpTag);
-                } else {
-                    tagsName.add(tag.getName());
-                }
+                Tag tmpTag = tagRepository.findOne(tag.getId());
+                tagResult.add(tmpTag);
             } else {
                 tagResult.add(tag);
             }
         }
-        tagResult.addAll(tagRepository.findByNameIn(tagsName));
+        //tagResult.addAll(tagRepository.findByNameIn(tagsName));
         return tagResult;
     }
 }
