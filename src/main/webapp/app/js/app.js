@@ -37,7 +37,11 @@ angular.module('podcastApp', [
                 }).
                 when('/items', {
                     templateUrl: 'html/items-list.html',
-                    controller: 'ItemsListCtrl'
+                    controller: 'ItemsListCtrl',
+                    hotkeys: [
+                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
+                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
+                    ]
                 }).
                 when('/item/search', {
                     templateUrl: 'html/items-search.html',

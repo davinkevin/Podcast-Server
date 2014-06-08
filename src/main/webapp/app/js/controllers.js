@@ -1,12 +1,14 @@
 angular.module('podcast.controller', [])
-    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
+    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log) {
 
     // Gestion du cache de la pagination :
-    var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+    var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
+        numberByPage = 12;
 
     //$scope.selectPage = function (pageNo) {
     $scope.changePage = function() {
-        Restangular.one("item/pagination").get({size: 12, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+        $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
+        Restangular.one("item/pagination").get({size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentPage', $scope.currentPage);
