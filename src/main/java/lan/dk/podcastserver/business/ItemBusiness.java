@@ -33,7 +33,7 @@ public class ItemBusiness {
 
     @Resource ItemRepository itemRepository;
     protected @Resource ItemDownloadManager itemDownloadManager;
-    @Value("${numberofdaytodownload}") int numberOfDayToDownload;
+    @Value("${numberofdaytodownload:3}") int numberOfDayToDownload;
 
     //** Delegation Repository **//
     public List<Item> findAll() {

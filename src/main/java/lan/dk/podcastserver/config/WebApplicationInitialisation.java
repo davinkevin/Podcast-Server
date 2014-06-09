@@ -17,7 +17,7 @@ import javax.servlet.ServletRegistration;
 @Order(1)
 public class WebApplicationInitialisation extends AbstractAnnotationConfigDispatcherServletInitializer {
 
-    @Value("${numberofdaytodownload}")
+    @Value("${numberofdaytodownload:3}")
     private int numberofdaytodownload;
 
     @Override

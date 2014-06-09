@@ -32,14 +32,15 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
     @Resource PodcastBusiness podcastBusiness;
     @Resource ItemBusiness itemBusiness;
     @Resource WorkerUtils workerUtils;
+
     @Resource
     @Qualifier("UpdateExecutor")
     Executor asyncExecutor;
 
-    @Value("${rootfolder}") protected String rootFolder;
-    @Value("${serverURL}") protected String serverURL;
-    @Value("${fileContainer}") protected String fileContainer;
-    @Value("${numberofdaytodownload}") private int numberofdaytodownload;
+    @Value("${rootfolder:${catalina.home}/webapp/podcast/}") protected String rootFolder;
+    @Value("${serverURL:http://localhost:8080}") protected String serverURL;
+    @Value("${fileContainer:http://localhost:8080/podcast}") protected String fileContainer;
+    @Value("${numberofdaytodownload:3}") private int numberofdaytodownload;
 
 
 
@@ -72,18 +73,6 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
-        /*while (true) {
-            if (((ThreadPoolTaskExecutor) asyncExecutor).getThreadPoolExecutor().getActiveCount() != 0) {
-                try {
-                    logger.info("{} Thread Actif", ((ThreadPoolTaskExecutor) asyncExecutor).getThreadPoolExecutor().getActiveCount());
-                    Thread.sleep(5000L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else  {
-                return;
-            }
-        }  */
     }
 
     @Transactional

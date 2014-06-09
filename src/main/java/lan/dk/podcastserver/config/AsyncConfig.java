@@ -18,7 +18,7 @@ import java.util.concurrent.Executor;
 @ComponentScan(basePackages = { "lan.dk.podcastserver.manager"})
 public class AsyncConfig implements AsyncConfigurer {
 
-    @Value("${maxUpdateParallels}") private int concurrentDownload;
+    @Value("${maxUpdateParallels:3}") private int concurrentDownload;
 
     @Bean(name = "UpdateExecutor")
     @Override

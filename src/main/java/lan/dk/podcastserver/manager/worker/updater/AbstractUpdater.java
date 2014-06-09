@@ -18,7 +18,7 @@ public abstract class AbstractUpdater implements Updater {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0";
 
-    @Value("${serverURL}") private String serverURL;
+    @Value("${serverURL:http://localhost:8080}") private String serverURL;
     @Resource PodcastRepository podcastRepository;
     @Resource(name="Validator") Validator validator;
 

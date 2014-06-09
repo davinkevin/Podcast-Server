@@ -36,16 +36,16 @@ public class ItemDownloadManager implements ApplicationContextAware {
     @Autowired
     ItemBusiness itemBusiness;
 
-    @Value("${concurrentDownload}")
+    @Value("${concurrentDownload:3}")
     private int limitParallelDownload;
 
-    @Value("${rootfolder}")
+    @Value("${rootfolder:${catalina.home}/webapp/podcast/}")
     private String rootfolder;
 
-    @Value("${serverURL}")
+    @Value("${serverURL:http://localhost:8080}")
     private String serverURL;
 
-    @Value("${fileContainer}")
+    @Value("${fileContainer:http://localhost:8080/podcast}")
     protected String fileContainer;
 
     @Autowired
