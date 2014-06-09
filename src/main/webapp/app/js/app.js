@@ -15,164 +15,72 @@ angular.module('podcastApp', [
     'ngTagsInput'
 ])
     .config(function($routeProvider) {
+
+        var commonKey = [
+            ['h', 'Goto Home', function (event) {
+                event.preventDefault();
+                window.location.href = '#/items';
+            }],
+            ['s', 'Goto Search', function (event) {
+                event.preventDefault();
+                window.location.href = '#/item/search';
+            }],
+            ['p', 'Goto Podcast List', function (event) {
+                event.preventDefault();
+                window.location.href = '#/podcasts';
+            }],
+            ['d', 'Goto Download List', function (event) {
+                event.preventDefault();
+                window.location.href = '#/download';
+            }]
+        ];
+
             $routeProvider.
                 when('/podcasts', {
                     templateUrl: 'html/podcasts-list.html',
                     controller: 'PodcastsListCtrl',
-                    hotkeys: [
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false],
-                        ['d', 'Goto Download List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/download';
-                        }, false]
-                    ]
+                    hotkeys: commonKey
                 }).
                 when('/podcast/add', {
                     templateUrl: 'html/podcast-add.html',
                     controller: 'PodcastAddCtrl',
-                    hotkeys: [
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false],
-                        ['d', 'Goto Download List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/download';
-                        }, false]
-                    ]
+                    hotkeys: commonKey
                 }).
                 when('/podcast/:podcastId', {
                     templateUrl: 'html/podcast-detail.html',
                     controller: 'PodcastDetailCtrl',
                     hotkeys: [
-                        ['r', 'Refresh', 'refreshItems()', false],
-                        ['f', 'Force Refresh', 'refresh()', false],
-                        ['l', 'List of Items', 'tabs[0].active = true', false],
-                        ['m', 'Modification of Podcast', 'tabs[1].active = true', false],
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false],
-                        ['d', 'Goto Download List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/download';
-                        }, false]
-                    ]
+                        ['r', 'Refresh', 'refreshItems()'],
+                        ['f', 'Force Refresh', 'refresh()'],
+                        ['l', 'List of Items', 'tabs[0].active = true'],
+                        ['m', 'Modification of Podcast', 'tabs[1].active = true']
+                    ].concat(commonKey)
                 }).
                 when('/items', {
                     templateUrl: 'html/items-list.html',
                     controller: 'ItemsListCtrl',
                     hotkeys: [
-                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();', false],
-                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();', false],
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false]                      ,
-                        ['d', 'Goto Download List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/download';
-                        }, false]
-                    ]
+                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
+                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();'],
+                    ].concat(commonKey)
                 }).
                 when('/item/search', {
                     templateUrl: 'html/items-search.html',
                     controller: 'ItemsSearchCtrl',
                     hotkeys: [
-                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();', false],
-                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();', false],
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false],
-                        ['d', 'Goto Download List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/download';
-                        }, false]
-                    ]
+                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
+                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
+                    ].concat(commonKey)
                 }).
                 when('/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl',
-                    hotkeys: [
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false],
-                        ['d', 'Goto Download List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/download';
-                        }, false],
-                    ]
+                    hotkeys: commonKey
                 }).
                 when('/download', {
                     templateUrl: 'html/download.html',
                     controller: 'DownloadCtrl',
-                    hotkeys: [
-                        ['h', 'Goto Home', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/items';
-                        }, false],
-                        ['s', 'Goto Search', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/item/search';
-                        }, false],
-                        ['p', 'Goto Podcast List', function (event) {
-                            event.preventDefault();
-                            window.location.href = '#/podcasts';
-                        }, false]
-                    ]
+                    hotkeys: commonKey
                 }).
                 otherwise({
                     redirectTo: '/items'
