@@ -64,4 +64,4 @@ gulp.task('watch-scripts', function() {
 });
 
 // Default Task
-gulp.task('default', ['lint', 'less', 'watch', 'scripts']);
+gulp.task('default', ['less', 'scripts']);

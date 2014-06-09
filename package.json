@@ -12,13 +12,14 @@
     "gulp-uglify" : "*",
     "ng-html2js" : "~1.1.0",
     "gulp-ng-html2js" : "*",
-    "gulp-add-src" : "*"
+    "gulp-add-src" : "*",
+    "bower" : "*"
   },
   "devDependencies": {
     
   },
   "scripts": {
-    "test": "test"
+    "postinstall" : "./node_modules/bower/bin/bower install"
   },
   "repository": {
     "type": "git",

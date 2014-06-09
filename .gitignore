@@ -7,3 +7,5 @@ Podcast Server.iml
 src/main/resources/application.properties
 node_modules/
 node/
+node_tmp/
+
