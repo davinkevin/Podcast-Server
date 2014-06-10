@@ -70,7 +70,7 @@
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"/>"></script>
 <script src="<c:url value="/js/lib/AngularStomp/angular-stomp.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.min.js" />"></script>
-<script src="<c:url value="/js/lib/angular-truncate/dist/angular-truncate.min.js" />"></script>
+<script src="<c:url value="/js/lib/angular-truncate/src/truncate.js" />"></script>
 <script src="<c:url value="/js/lib/angular-loading-bar/build/loading-bar.min.js" />"></script>
 <script src="<c:url value="/js/lib/ng-tags-input/ng-tags-input.min.js" />"></script>
 
