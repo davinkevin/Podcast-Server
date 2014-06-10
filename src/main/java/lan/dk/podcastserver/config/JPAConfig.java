@@ -33,21 +33,45 @@ import java.util.Properties;
 public class JPAConfig {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    /*
+    hibernate.dialect=org.hibernate.dialect.H2Dialect
+    hibernate.format_sql=true
+    hibernate.ejb.naming_strategy=org.hibernate.cfg.ImprovedNamingStrategy
+    hibernate.show_sql=true
+    entitymanager.packages.to.scan=lan.dk.podcastserver.entity
+     */
 
-    private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
-    private static final String PROPERTY_NAME_DATABASE_PASSWORD = "db.password";
-    private static final String PROPERTY_NAME_DATABASE_URL = "db.url";
-    private static final String PROPERTY_NAME_DATABASE_USERNAME = "db.username";
+    // DATASOURCE VALUES :
+    private static final String PROPERTY_DATABASEDRIVER_NAME = "db.driver";
+    private static final String PROPERTY_DATABASEDRIVER_DEFAULT = "org.h2.Driver";
 
-    private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
-    private static final String PROPERTY_NAME_HIBERNATE_FORMAT_SQL = "hibernate.format_sql";
-    private static final String PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY = "hibernate.ejb.naming_strategy";
-    private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
-    private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
-    private static final String PROPERTY_NAME_HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
+    private static final String PROPERTY_DATABASEURL_NAME = "db.url";
+    private static final String PROPERTY_DATABASEURL_DEFAULT = "jdbc:h2:mem:podcastserver";
 
-    private static final String PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER = "hibernate.search.default.directory_provider";
-    private static final String PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE = "hibernate.search.default.indexBase";
+    private static final String PROPERTY_DATABASEUSERNAME_NAME = "db.username";
+    private static final String PROPERTY_DATABASEUSERNAME_DEFAULT = "sa";
+
+    private static final String PROPERTY_DATABASEPASSWORD_NAME = "db.password";
+    private static final String PROPERTY_DATABASEPASSWORD_DEFAULT = "";
+
+    // HIBERNATE VALUES :
+    private static final String PROPERTY_HIBERNATEDIALECT_NAME = "hibernate.dialect";
+    private static final String PROPERTY_HIBERNATEDIALECT_DEFAULT = "org.hibernate.dialect.H2Dialect";
+
+    private static final String PROPERTY_HIBERNATEFORMATSQL_NAME = "hibernate.format_sql";
+    private static final String PROPERTY_HIBERNATEFORMATSQL_DEFAULT = "false";
+
+    private static final String PROPERTY_HIBERNATENAMINGSTRATEGY_NAME = "hibernate.ejb.naming_strategy";
+    private static final String PROPERTY_HIBERNATENAMINGSTRATEGY_DEFAULT = "org.hibernate.cfg.ImprovedNamingStrategy";
+
+    private static final String PROPERTY_HIBERNATESHOWSQL_NAME = "hibernate.show_sql";
+    private static final String PROPERTY_HIBERNATESHOWSQL_DEFAULT = "false";
+
+    private static final String PROPERTY_ENTITYMANAGERPACKAGESTOSCAN_NAME = "entitymanager.packages.to.scan";
+    private static final String PROPERTY_ENTITYMANAGER_PACKAGES_TO_SCAN_DEFAULT = "lan.dk.podcastserver.entity";
+
+    private static final String PROPERTY_HBM2DDLAUTO_NAME = "hibernate.hbm2ddl.auto";
+    private static final String PROPERTY_HBM2DDLAUTO_DEFAULT = "update";
 
     public static final String[] PARAMETER_H2_SERVER = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", "9999"};
 
@@ -63,15 +87,12 @@ public class JPAConfig {
     public DataSource dataSource() throws SQLException {
         BoneCPDataSource dataSource = new BoneCPDataSource();
 
-        dataSource.setDriverClass(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
-        dataSource.setJdbcUrl(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
+        dataSource.setDriverClass(environment.getProperty(PROPERTY_DATABASEDRIVER_NAME, PROPERTY_DATABASEDRIVER_DEFAULT));
+        dataSource.setJdbcUrl(environment.getProperty(PROPERTY_DATABASEURL_NAME, PROPERTY_DATABASEURL_DEFAULT));
+        dataSource.setUsername(environment.getProperty(PROPERTY_DATABASEUSERNAME_NAME, PROPERTY_DATABASEUSERNAME_DEFAULT));
+        dataSource.setPassword(environment.getProperty(PROPERTY_DATABASEPASSWORD_NAME, PROPERTY_DATABASEPASSWORD_DEFAULT));
 
-        if (environment.containsProperty(PROPERTY_NAME_DATABASE_USERNAME))
-            dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
-        if (environment.containsProperty(PROPERTY_NAME_DATABASE_PASSWORD))
-            dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
-
-        if (environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL).contains(":h2:tcp://"))
+        if (environment.getProperty(PROPERTY_DATABASEURL_NAME, PROPERTY_DATABASEURL_DEFAULT).contains(":h2:tcp://"))
             h2Server();
 
         return dataSource;
@@ -104,19 +125,15 @@ public class JPAConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
         entityManagerFactoryBean.setDataSource(dataSource());
-        entityManagerFactoryBean.setPackagesToScan(environment.getRequiredProperty(PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN));
+        entityManagerFactoryBean.setPackagesToScan(environment.getProperty(PROPERTY_ENTITYMANAGERPACKAGESTOSCAN_NAME, PROPERTY_ENTITYMANAGER_PACKAGES_TO_SCAN_DEFAULT));
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
 
         Properties jpaProperties = new Properties();
-        jpaProperties.put(PROPERTY_NAME_HIBERNATE_DIALECT, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT));
-        jpaProperties.put(PROPERTY_NAME_HIBERNATE_FORMAT_SQL, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_FORMAT_SQL));
-        jpaProperties.put(PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY));
-        jpaProperties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
-
-        //jpaProperties.put(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER));
-        //jpaProperties.put(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SEARCH_DEFAULT_INDEXBASE));
-
-        jpaProperties.put(PROPERTY_NAME_HBM2DDL_AUTO, "update");
+        jpaProperties.put(PROPERTY_HIBERNATEDIALECT_NAME, environment.getProperty(PROPERTY_HIBERNATEDIALECT_NAME, PROPERTY_HIBERNATEDIALECT_DEFAULT));
+        jpaProperties.put(PROPERTY_HIBERNATEFORMATSQL_NAME, environment.getProperty(PROPERTY_HIBERNATEFORMATSQL_NAME, PROPERTY_HIBERNATEFORMATSQL_DEFAULT));
+        jpaProperties.put(PROPERTY_HIBERNATENAMINGSTRATEGY_NAME, environment.getProperty(PROPERTY_HIBERNATENAMINGSTRATEGY_NAME, PROPERTY_HIBERNATENAMINGSTRATEGY_DEFAULT));
+        jpaProperties.put(PROPERTY_HIBERNATESHOWSQL_NAME, environment.getProperty(PROPERTY_HIBERNATESHOWSQL_NAME, PROPERTY_HIBERNATESHOWSQL_DEFAULT));
+        jpaProperties.put(PROPERTY_HBM2DDLAUTO_NAME, environment.getProperty(PROPERTY_HBM2DDLAUTO_NAME, PROPERTY_HBM2DDLAUTO_DEFAULT));
 
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
