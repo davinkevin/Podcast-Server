@@ -5,13 +5,24 @@
 <html ng-app="podcastApp">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/js/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="/js/lib/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet" type="text/css">
-    <link href="/js/lib/animate.css/animate.min.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/js/lib/ng-tags-input/ng-tags-input.min.css">
-    <link rel="stylesheet" href="/js/lib/angular-hotkeys/build/hotkeys.min.css">
+    <%--
+        <link href="/js/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="/js/lib/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet" type="text/css">
+        <link href="/js/lib/animate.css/animate.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/js/lib/ng-tags-input/ng-tags-input.min.css">
+        <link rel="stylesheet" href="/js/lib/angular-hotkeys/build/hotkeys.min.css">
+        <link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />
+    --%>
+
+    <!-- inject:css -->
+        <link rel="stylesheet" href="/js/lib/angular-loading-bar/src/loading-bar.css">
+        <link rel="stylesheet" href="/js/lib/animate.css/animate.css">
+        <link rel="stylesheet" href="/js/lib/ng-tags-input/ng-tags-input.min.css">
+        <link rel="stylesheet" href="/js/lib/bootstrap/dist/css/bootstrap.css">
+        <link rel="stylesheet" href="/js/lib/angular-hotkeys/build/hotkeys.min.css">
+    <!-- endinject -->
     <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
-    <%--<link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />--%>
+
 </head>
 <body>
 <nav class="navbar navbar-inverse" role="navigation">
@@ -54,26 +65,45 @@
 </nav>
 
     <div ng-view autoscroll=""></div>
-
+<%--
 <script src="<c:url value="/js/lib/jquery/dist/jquery.min.js"/>"></script>
 <script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.min.js"/>"></script>
 <script src="<c:url value="/js/lib/lodash/dist/lodash.min.js"/>"></script>
 <script src="<c:url value="/js/lib/sockjs/sockjs.min.js"/>"></script>
-<script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.min.js"/>"></script>
+<script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.min.js"/>"></script> XX
 
 <script src="<c:url value="/js/lib/angular/angular.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-animate/angular-animate.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-route/angular-route.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-hotkeys/build/hotkeys.min.js"/>"></script>
 <script src="<c:url value="/js/lib/restangular/dist/restangular.min.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"/>"></script>
 <script src="<c:url value="/js/lib/AngularStompDK/dist/angular-stomp.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.min.js" />"></script>
 <script src="<c:url value="/js/lib/angular-truncate/src/truncate.js" />"></script>
 <script src="<c:url value="/js/lib/angular-loading-bar/build/loading-bar.min.js" />"></script>
 <script src="<c:url value="/js/lib/ng-tags-input/ng-tags-input.min.js" />"></script>
+--%>
 
+<!-- inject:js -->
+<script src="/js/lib/angular/angular.js"></script>
+<script src="/js/lib/angular-route/angular-route.js"></script>
+<script src="/js/lib/angular-animate/angular-animate.js"></script>
+<script src="/js/lib/angular-sanitize/angular-sanitize.js"></script>
+<script src="/js/lib/jquery/dist/jquery.js"></script>
+<script src="/js/lib/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="/js/lib/lodash/dist/lodash.compat.js"></script>
+<script src="/js/lib/stomp-websocket/lib/stomp.js"></script>
+<script src="/js/lib/sockjs/sockjs.js"></script>
+<script src="/js/lib/angular-local-storage/angular-local-storage.js"></script>
+<script src="/js/lib/angular-truncate/src/truncate.js"></script>
+<script src="/js/lib/angular-loading-bar/src/loading-bar.js"></script>
+<script src="/js/lib/ng-tags-input/ng-tags-input.min.js"></script>
+<script src="/js/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="/js/lib/restangular/dist/restangular.js"></script>
+<script src="/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>
+<script src="/js/lib/angular-hotkeys/build/hotkeys.min.js"></script>
+<!-- endinject -->
 
 <%--
 <script src="<c:url value="/js/services.js"/>"></script>
