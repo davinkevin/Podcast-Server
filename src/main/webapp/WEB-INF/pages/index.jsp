@@ -68,7 +68,7 @@
 <script src="<c:url value="/js/lib/restangular/dist/restangular.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"/>"></script>
-<script src="<c:url value="/js/lib/AngularStomp/angular-stomp.js"/>"></script>
+<script src="<c:url value="/js/lib/AngularStompDK/dist/angular-stomp.min.js"/>"></script>
 <script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.min.js" />"></script>
 <script src="<c:url value="/js/lib/angular-truncate/src/truncate.js" />"></script>
 <script src="<c:url value="/js/lib/angular-loading-bar/build/loading-bar.min.js" />"></script>
