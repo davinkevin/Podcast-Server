@@ -8,4 +8,4 @@ src/main/resources/application.properties
 node_modules/
 node/
 node_tmp/
-
+bower_components/

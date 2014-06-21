@@ -58,8 +58,8 @@ gulp.task('less', function () {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.watch(jsLocation, ['lint']);
-    gulp.watch(jsLocation, ['scripts']);
+    //gulp.watch(jsLocation, ['lint']);
+    gulp.watch([jsLocation, htmlLocation], ['scripts']);
     gulp.watch(lessLocation, ['less']);
 });
 

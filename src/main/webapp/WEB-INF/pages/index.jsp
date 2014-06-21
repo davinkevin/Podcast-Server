@@ -5,14 +5,6 @@
 <html ng-app="podcastApp">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%--
-        <link href="/js/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-        <link href="/js/lib/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet" type="text/css">
-        <link href="/js/lib/animate.css/animate.min.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="/js/lib/ng-tags-input/ng-tags-input.min.css">
-        <link rel="stylesheet" href="/js/lib/angular-hotkeys/build/hotkeys.min.css">
-        <link rel="stylesheet/less" type="text/css" href="less/podcastserver.less" />
-    --%>
 
     <!-- inject:css -->
         <link rel="stylesheet" href="/js/lib/angular-loading-bar/src/loading-bar.css">
@@ -21,11 +13,12 @@
         <link rel="stylesheet" href="/js/lib/bootstrap/dist/css/bootstrap.css">
         <link rel="stylesheet" href="/js/lib/angular-hotkeys/build/hotkeys.min.css">
     <!-- endinject -->
+
     <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
 
 </head>
 <body>
-<nav class="navbar navbar-inverse" role="navigation">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#compact-panel">
@@ -65,25 +58,6 @@
 </nav>
 
     <div ng-view autoscroll=""></div>
-<%--
-<script src="<c:url value="/js/lib/jquery/dist/jquery.min.js"/>"></script>
-<script src="<c:url value="/js/lib/bootstrap/dist/js/bootstrap.min.js"/>"></script>
-<script src="<c:url value="/js/lib/lodash/dist/lodash.min.js"/>"></script>
-<script src="<c:url value="/js/lib/sockjs/sockjs.min.js"/>"></script>
-<script src="<c:url value="/js/lib/stomp-websocket/lib/stomp.min.js"/>"></script> XX
-
-<script src="<c:url value="/js/lib/angular/angular.min.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-animate/angular-animate.min.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-route/angular-route.min.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-hotkeys/build/hotkeys.min.js"/>"></script>
-<script src="<c:url value="/js/lib/restangular/dist/restangular.min.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"/>"></script>
-<script src="<c:url value="/js/lib/AngularStompDK/dist/angular-stomp.min.js"/>"></script>
-<script src="<c:url value="/js/lib/angular-local-storage/angular-local-storage.min.js" />"></script>
-<script src="<c:url value="/js/lib/angular-truncate/src/truncate.js" />"></script>
-<script src="<c:url value="/js/lib/angular-loading-bar/build/loading-bar.min.js" />"></script>
-<script src="<c:url value="/js/lib/ng-tags-input/ng-tags-input.min.js" />"></script>
---%>
 
 <!-- inject:js -->
 <script src="/js/lib/angular/angular.js"></script>
@@ -105,12 +79,6 @@
 <script src="/js/lib/angular-hotkeys/build/hotkeys.min.js"></script>
 <!-- endinject -->
 
-<%--
-<script src="<c:url value="/js/services.js"/>"></script>
-<script src="<c:url value="/js/filters.js"/>"></script>
-<script src="<c:url value="/js/controllers.js"/>"></script>
-<script src="<c:url value="/js/app.js"/>"></script>
---%>
 <script src="<c:url value="/js/all.min.js"/>"></script>
 <%--
 <script src="<c:url value="/js/all.js"/>"></script>
