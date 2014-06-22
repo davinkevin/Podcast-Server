@@ -65,9 +65,9 @@ gulp.task('watch', function() {
 
 gulp.task('inject', function() {
     gulp.src(indexLocation)
-        .pipe(inject(bowerFiles({read: false, debugging : false}), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
+        .pipe(inject(bowerFiles({read: false, debugging : false, env : 'production'}), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
         .pipe(gulp.dest("src/main/webapp/WEB-INF/pages/"));
-    bowerFiles({checkExistence : true, read: true, debugging : true}).pipe(gulp.dest("src/main/webapp/app/js/lib/"));
+    bowerFiles({checkExistence : true, read: true, debugging : true, env : 'production'}).pipe(gulp.dest("src/main/webapp/app/js/lib/"));
 });
 
 // Default Task
