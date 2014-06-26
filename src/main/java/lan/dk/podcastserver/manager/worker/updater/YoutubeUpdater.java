@@ -11,14 +11,15 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -28,75 +29,78 @@ import java.util.Set;
 @Scope("prototype")
 public class YoutubeUpdater extends AbstractUpdater {
 
+    private static final Integer YOUTUBE_MAX_RESULTS = 50;
     private String GDATA_USER_FEED = "http://gdata.youtube.com/feeds/api/users/";
     private String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
-
+    @Value("${numberofdaytodownload:3}") int numberOfDayToDownload;
 
     public Podcast updateFeed(Podcast podcast) {
 
-        String realPodcastURl = this.gdataUrlFromYoutubeURL(podcast.getUrl());
-        logger.debug("URL = {}", realPodcastURl);
-
-        // Si l'image de présentation a changé :
-        Document podcastXMLSource = null;
-        try {
-            podcastXMLSource = jDomUtils.jdom2Parse(realPodcastURl);
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
-        }
-
-        Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
+        Integer borne = 1;
+        String realPodcastURl = null;
+        Date maxDate = DateUtils.findDateNDateAgo(numberOfDayToDownload);
         Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
-        for (Element item : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
+
+        while (true) {
+            // Si l'image de présentation a changé :
+            realPodcastURl = this.gdataUrlFromYoutubeURL(podcast.getUrl(), borne);
+            logger.debug("URL = {}", realPodcastURl);
+            Document podcastXMLSource = null;
             try {
-                Item podcastItem = new Item()
-                                            .setTitle(item.getChildText("title", defaultNamespace))
-                                            .setDescription(item.getChildText("content", defaultNamespace))
-                                            .setPubdate(DateUtils.youtubeDateToTimeStamp(item.getChildText("published", defaultNamespace)))
-                                            .setPodcast(podcast);
+                podcastXMLSource = jDomUtils.jdom2Parse(realPodcastURl);
+                Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
-                for (Element link : item.getChildren("link", defaultNamespace)) {
-                    if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
-                        podcastItem.setUrl(link.getAttributeValue("href", null, ""));
-                        break;
-                    }
+                if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).size() == 0) {
+                    return podcast;
                 }
 
+                for (Element item : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
+                    Item podcastItem = new Item()
+                            .setTitle(item.getChildText("title", defaultNamespace))
+                            .setDescription(item.getChildText("content", defaultNamespace))
+                            .setPubdate(DateUtils.youtubeDateToTimeStamp(item.getChildText("published", defaultNamespace)))
+                            .setPodcast(podcast);
 
-                if (!podcast.getItems().contains(podcastItem)) {
-                    if (    item.getChild("group", media) != null &&
-                            !item.getChild("group", media).getChildren("thumbnail", media).isEmpty() &&
-                            item.getChild("group", media).getChildren("thumbnail", media).get(0) != null) {
-                        Cover cover = ImageUtils.getCoverFromURL(new URL(item.getChild("group", media).getChildren("thumbnail", media).get(0).getAttributeValue("url")));
-                        podcastItem.setCover(cover);
+                    if (podcastItem.getPubdate().before(maxDate)) {
+                        return podcast;
                     }
 
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(podcastItem);
-                    } else {
-                        logger.error(constraintViolations.toString());
+                    for (Element link : item.getChildren("link", defaultNamespace)) {
+                        if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
+                            podcastItem.setUrl(link.getAttributeValue("href", null, ""));
+                            break;
+                        }
                     }
+
+
+                    if (!podcast.getItems().contains(podcastItem)) {
+                        if (    item.getChild("group", media) != null &&
+                                !item.getChild("group", media).getChildren("thumbnail", media).isEmpty() &&
+                                item.getChild("group", media).getChildren("thumbnail", media).get(0) != null) {
+                            Cover cover = ImageUtils.getCoverFromURL(new URL(item.getChild("group", media).getChildren("thumbnail", media).get(0).getAttributeValue("url")));
+                            podcastItem.setCover(cover);
+                        }
+
+                        Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
+                        if (constraintViolations.isEmpty()) {
+                            podcast.getItems().add(podcastItem);
+                        } else {
+                            logger.error(constraintViolations.toString());
+                        }
+                    }
+
                 }
 
-
-
-            } catch (ParseException e) {
+            } catch (JDOMException | IOException | ParseException e) {
                 e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                return podcast;
             }
 
+            borne += YOUTUBE_MAX_RESULTS;
         }
 
 
-        return podcast;
+        //return podcast;
     }
 
     @Override
@@ -109,7 +113,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         // Si l'image de présentation a changé :
         Document podcastXMLSource = null;
         try {
-            podcastXMLSource = jDomUtils.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl()));
+            podcastXMLSource = jDomUtils.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl(), null));
         } catch (JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return null;
@@ -129,13 +133,18 @@ public class YoutubeUpdater extends AbstractUpdater {
 
 
     //** Helper Youtube **//
-    private String gdataUrlFromYoutubeURL(String youtubeUrl) { //
+    private String gdataUrlFromYoutubeURL(String youtubeUrl, Integer startIndex) { //
+        String queryParam = "?max-results=".concat(String.valueOf(YOUTUBE_MAX_RESULTS))
+                .concat((startIndex != null)
+                        ? "&start-index=" + startIndex.toString()
+                        : "");
+
         if ( youtubeUrl.matches(".*www.youtube.com/channel/.*") ||
                 youtubeUrl.matches(".*www.youtube.com/user/.*") ||
                 youtubeUrl.matches(".*www.youtube.com/.*") ) { //www.youtube.com/[channel|user]*/nom
-            return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads?max-results=50"; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
+            return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
         } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
-            return youtubeUrl + "?max-results=50";
+            return youtubeUrl + queryParam;
         }
         return null;
 
