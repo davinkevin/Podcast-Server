@@ -34,7 +34,7 @@
         <div class="media-body">
             <h5 class="media-heading">{{item.title | characters:100}}</h5>
             <br/>
-            <progressbar class="progress-striped active" animate="false" value="item.progression" type="info">{{item.progression}}%</progressbar>
+            <progressbar class="progress-striped active" animate="false" value="item.progression" type="{{ getTypeFromStatus(item) }}">{{item.progression}}%</progressbar>
         </div>
     </div>
 

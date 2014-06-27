@@ -42,7 +42,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <div class="media-body">\n' +
     '            <h5 class="media-heading">{{item.title | characters:100}}</h5>\n' +
     '            <br/>\n' +
-    '            <progressbar class="progress-striped active" animate="false" value="item.progression" type="info">{{item.progression}}%</progressbar>\n' +
+    '            <progressbar class="progress-striped active" animate="false" value="item.progression" type="{{ getTypeFromStatus(item) }}">{{item.progression}}%</progressbar>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '\n' +
@@ -878,6 +878,11 @@ angular.module('podcast.controller', [])
         $scope.numberOfSimDl = parseInt(data);
     });
 
+    $scope.getTypeFromStatus = function(item) {
+        if (item.status === "Paused")
+            return "warning";
+        return "info";
+    };
     $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
 
     /** Spécifique aux éléments de la liste : **/

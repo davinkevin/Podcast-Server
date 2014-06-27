@@ -208,6 +208,11 @@ angular.module('podcast.controller', [])
         $scope.numberOfSimDl = parseInt(data);
     });
 
+    $scope.getTypeFromStatus = function(item) {
+        if (item.status === "Paused")
+            return "warning";
+        return "info";
+    };
     $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
 
     /** Spécifique aux éléments de la liste : **/
