@@ -126,8 +126,16 @@ public class IDMController {
     @RequestMapping(value="/queue/{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeItemFromQueue(@PathVariable int id) {
-        IDM.removeItemFromQueue(id);
+        IDM.removeItemFromQueue(id, false);
     }
+
+    @RequestMapping(value="/queue/{id:[\\d]+}/andstop", method = RequestMethod.DELETE, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void removeItemFromQueueAndStopped(@PathVariable int id) {
+        IDM.removeItemFromQueue(id, true);
+
+    }
+
 
     @RequestMapping(value="/queue", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)

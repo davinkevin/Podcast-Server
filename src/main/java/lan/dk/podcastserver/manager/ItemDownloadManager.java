@@ -220,8 +220,13 @@ public class ItemDownloadManager implements ApplicationContextAware {
         manageDownload();
     }
 
-    public void removeItemFromQueue(int id) {
-        this.removeItemFromQueue(itemBusiness.findOne(id));
+    public void removeItemFromQueue(int id, Boolean stopItem) {
+        Item item = itemBusiness.findOne(id);
+        this.removeItemFromQueue(item);
+
+        if (stopItem)
+            itemBusiness.save(item.setStatus("Stopped"));
+
         this.convertAndSendWaitingQueue();
     }
 

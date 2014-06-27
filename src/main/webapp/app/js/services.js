@@ -46,5 +46,9 @@ podcastServices.factory('DonwloadManager', function(Restangular) {
         Restangular.one("task").customPOST(number, "downloadManager/limit");
     };
 
+    downloadManager.dontDonwload = function(item) {
+        Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+    };
+
     return downloadManager;
 });

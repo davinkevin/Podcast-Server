@@ -195,13 +195,14 @@ angular.module('podcast.controller', [])
 })
     .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log) {
     $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
+    $scope.waitingitems = [];
 
     $scope.refreshWaitingItems = function() {
         var scopeWaitingItems = $scope.waitingitems || Restangular.all("task/downloadManager/queue");
         scopeWaitingItems.getList().then(function(waitingitems) {
             $scope.waitingitems = waitingitems;
         });
-    }();
+    };
 
     Restangular.one("task/downloadManager/limit").get().then(function(data) {
         $scope.numberOfSimDl = parseInt(data);
@@ -219,14 +220,13 @@ angular.module('podcast.controller', [])
     $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
     $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
     $scope.removeFromQueue = DonwloadManager.removeFromQueue;
+    $scope.dontDonwload = DonwloadManager.dontDonwload;
 
     $scope.wsClient = ngstomp('/download', SockJS);
     $scope.wsClient.connect("user", "password", function(){
         $scope.wsClient.subscribe("/topic/download", function(message) {
             var item = JSON.parse(message.body);
-
             var elemToUpdate = _.find($scope.items, { 'id': item.id });
-
             switch (item.status) {
                 case 'Started' :
                 case 'Paused' :
@@ -243,12 +243,26 @@ angular.module('podcast.controller', [])
                     break;
             }
         });
-        $scope.wsClient.subscribe("/topic/waitingList", function(message) {
-            var items = JSON.parse(message.body);
-            $scope.waitingitems = items;
+        $scope.wsClient.subscribe("/app/waitingList", function(message) {
+            $scope.waitingitems = JSON.parse(message.body);
+        });
+        $scope.wsClient.subscribe("/topic/waitingList", function(message){
+            var newDownloadQueue = JSON.parse(message.body);
+
+            angular.forEach(newDownloadQueue, function(item, key) {
+                var indexOfCurrentElement = _.findIndex($scope.waitingitems, { 'id': item.id });
+                if (indexOfCurrentElement === -1) {
+                    $scope.waitingitems.push(item);
+                }
+            });
+            angular.forEach($scope.waitingitems, function(item, key) {
+                var indexOfCurrentElement = _.findIndex(newDownloadQueue, { 'id': item.id });
+                if (indexOfCurrentElement === -1) {
+                    $scope.waitingitems.splice(key, 1);
+                }
+            });
         });
     });
-
 })
     .controller('PodcastAddCtrl', function ($scope, Restangular) {
         var podcasts = Restangular.all("podcast"),
