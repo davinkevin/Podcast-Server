@@ -131,9 +131,10 @@ public class YoutubeDownloader extends AbstractDownloader {
         } catch (DownloadInterruptedError e) {
             logger.debug("Arrêt du téléchargement par l'interface");
             //stopDownload();
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | NullPointerException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("Url malformée : {}", item.getUrl(), e);
+            //logger.error("Url malformée : {}", item.getUrl(), e);
+            logger.error("Exception tierce : ", e);
             stopDownload();
         }
         logger.debug("Download termine");

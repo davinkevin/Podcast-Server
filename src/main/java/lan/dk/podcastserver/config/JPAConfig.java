@@ -46,7 +46,7 @@ public class JPAConfig {
     private static final String PROPERTY_DATABASEDRIVER_DEFAULT = "org.h2.Driver";
 
     private static final String PROPERTY_DATABASEURL_NAME = "db.url";
-    private static final String PROPERTY_DATABASEURL_DEFAULT = "jdbc:h2:mem:podcastserver";
+    private static final String PROPERTY_DATABASEURL_DEFAULT = "jdbc:h2:mem:podcastserver;MVCC=TRUE";
 
     private static final String PROPERTY_DATABASEUSERNAME_NAME = "db.username";
     private static final String PROPERTY_DATABASEUSERNAME_DEFAULT = "sa";

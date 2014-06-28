@@ -40,10 +40,12 @@ public class ItemBusiness {
         return itemRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Page<Item> findAll(Pageable pageable) {
         return itemRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<Item> findAllByPodcastTags(List<Tag> tags, Pageable pageable) {
         return itemRepository.findAll(isInTags(tags.toArray(new Tag[tags.size()])), pageable);
     }
@@ -56,6 +58,7 @@ public class ItemBusiness {
         return itemRepository.save(entity);
     }
 
+    @Transactional(readOnly = true)
     public Item findOne(Integer integer) {
         return itemRepository.findOne(integer);
     }
@@ -79,20 +82,24 @@ public class ItemBusiness {
         itemRepository.deleteAll();
     }
 
+    @Transactional(readOnly = true)
     public List<Item> findAllItemNotDownloadedNewerThan(Date date) {
         return itemRepository.findAllItemNotDownloadedNewerThan(date);
     }
 
+    @Transactional(readOnly = true)
     public List<Item> findAllItemDownloadedOlderThan(Date date) {
         return itemRepository.findAllItemDownloadedOlderThan(date);
     }
 
+    @Transactional(readOnly = true)
     public List<Item> findByStatus(String status) {
         return itemRepository.findByStatus(status);
     }
 
     //****************************//
 
+    @Transactional(readOnly = true)
     public List<Item> findAllToDownload() {
         Calendar c = Calendar.getInstance();
         c.setTime(c.getTime());
@@ -100,6 +107,7 @@ public class ItemBusiness {
         return this.findAllItemNotDownloadedNewerThan(c.getTime());
     }
 
+    @Transactional(readOnly = true)
     public List<Item> findAllToDelete() {
         Calendar c = Calendar.getInstance();
         c.setTime(c.getTime());
