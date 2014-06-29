@@ -73,13 +73,14 @@
 <script src="/js/lib/angular-truncate/src/truncate.js"></script>
 <script src="/js/lib/angular-loading-bar/build/loading-bar.min.js"></script>
 <script src="/js/lib/ng-tags-input/ng-tags-input.min.js"></script>
+<script src="/js/lib/angular-notification/angular-notification.min.js"></script>
 <script src="/js/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/js/lib/restangular/dist/restangular.min.js"></script>
 <script src="/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>
 <script src="/js/lib/angular-hotkeys/build/hotkeys.min.js"></script>
 <!-- endinject -->
 
-<script src="<c:url value="/js/all.min.js"/>"></script>
+<script src="<c:url value="/js/all.js"/>"></script>
 <%--
 <script src="<c:url value="/js/all.js"/>"></script>
 --%>

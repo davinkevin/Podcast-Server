@@ -71,4 +71,4 @@ gulp.task('inject', function() {
 });
 
 // Default Task
-gulp.task('default', ['less', 'scripts']);
+gulp.task('default', ['less', 'scripts', 'inject']);

@@ -12,7 +12,8 @@ angular.module('podcastApp', [
     'truncate',
     'ui.bootstrap',
     'angular-loading-bar',
-    'ngTagsInput'
+    'ngTagsInput',
+    'notification'
 ])
     .config(function($routeProvider) {
 
