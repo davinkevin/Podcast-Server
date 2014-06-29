@@ -80,7 +80,7 @@
 <script src="/js/lib/angular-hotkeys/build/hotkeys.min.js"></script>
 <!-- endinject -->
 
-<script src="<c:url value="/js/all.js"/>"></script>
+<script src="<c:url value="/js/all.min.js"/>"></script>
 <%--
 <script src="<c:url value="/js/all.js"/>"></script>
 --%>
