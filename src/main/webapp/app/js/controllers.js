@@ -213,7 +213,7 @@ angular.module('podcast.controller', [])
         //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
         // Issue fixed in the M37 of Chrome :
         $scope.activeNotification = {
-            state : ($window.Notification.permission != 'granted'),
+            state : (('Notification' in $window) && $window.Notification.permission != 'granted'),
             manuallyactivate : Notification.requestPermission
         };
 
