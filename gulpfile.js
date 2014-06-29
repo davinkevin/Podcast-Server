@@ -43,7 +43,7 @@ gulp.task('scripts', function() {
     .pipe(ngmin())
     .pipe(rename('all.min.js'))
     .pipe(uglify({
-            mangle : false
+            mangle : true
         }))
     .pipe(gulp.dest(jsDestination));
 });

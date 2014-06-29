@@ -90,6 +90,6 @@ angular.module('podcastApp', [
     .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
     }])
-    .config(function(RestangularProvider) {
+    .config(['RestangularProvider', function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
-});
+    }]);

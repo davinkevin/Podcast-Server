@@ -669,9 +669,9 @@ angular.module('podcastApp', [
     .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
     }])
-    .config(function(RestangularProvider) {
+    .config(['RestangularProvider', function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
-});
+    }]);
 angular.module('podcast.controller', [])
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log) {
 
