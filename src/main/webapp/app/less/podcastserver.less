@@ -57,10 +57,12 @@
 
 .box {
   position: relative;
+  border-radius : 5px;
   background-color: #fff;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.25), 0 0 50px rgba(0,0,0,0.1) inset;
-  border-radius: 0%     0%     25%     25% /     0%     0%     3%     3%;
+  box-shadow: 0 0 15px 0px rgba(0,0,0,.1);
+  border: 1px solid #ddd;
 }
+/*
 .box:before {
   content: '';
   position: absolute;
@@ -90,7 +92,7 @@
   -ms-transform: rotate(3deg) skew(0deg);
   -o-transform: rotate(3deg) skew(0deg);
   transform: rotate(3deg) skew(0deg);
-}
+}*/
 
 .item-listing {
 
@@ -154,6 +156,14 @@
   }
 }
 
+.tab-content {
+  border-right: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  .tab-pane {
+    background-color: #ffffff;
+  }
+}
+
 .navbar {
   margin-bottom: 0px;
   border-radius: 0px;
@@ -161,6 +171,13 @@
 
 .downloadList {
   .media {
+    background-color : white;
+    margin-left: 5px;
+    padding-right: 5px;
+    margin-right: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 5px 5px 5px 0 rgba(0,0,0,.1);
     .media-heading {
       padding-top: 10px;
     }
@@ -170,7 +187,10 @@
   }
 }
 
+
 .media {
+  margin-left: 5px;
+  margin-right: 5px;
   &.ng-leave {
     -webkit-animation: fadeOutRight 0.5s;
     animation: fadeOutRight 0.5s;
