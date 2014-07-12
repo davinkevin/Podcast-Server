@@ -20,8 +20,6 @@
 .item-listing .itemInList.ng-enter.ng-enter-active,.item-listing .itemInList.ng-leave{opacity:1}
 .item-listing .itemInList.ng-enter,.item-listing .itemInList.ng-leave.ng-leave-active{opacity:0}
 .item-listing .itemInList.ng-enter-stagger{-webkit-transition-duration:0s;transition-duration:0s}
-.tab-content{border-right:1px solid #ddd;border-left:1px solid #ddd}
-.tab-content .tab-pane{background-color:#fff}
 .navbar{margin-bottom:0;border-radius:0}
 .downloadList .media{background-color:#fff;margin-left:5px;padding-right:5px;margin-right:5px;border:1px solid #ddd;border-radius:5px;box-shadow:5px 5px 5px 0 rgba(0,0,0,.1)}
 .downloadList .media .media-heading{padding-top:10px}
