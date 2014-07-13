@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Table(name = "podcast")
 @Entity
@@ -23,7 +22,7 @@ public class Podcast implements Serializable {
     private String signature;
     private String type;
     private Timestamp lastUpdate;
-    private Set<Item> items = new TreeSet<>();
+    private Set<Item> items = new HashSet<>();
     private Cover cover;
     private String description;
     private Boolean hasToBeDeleted;
@@ -211,5 +210,11 @@ public class Podcast implements Serializable {
     public Podcast addTag(Tag tag) {
         this.tags.add(tag);
         return this;
+    }
+
+    @Transient
+    @JsonIgnore
+    public boolean containsItem(Item item) {
+        return items.contains(item);
     }
 }

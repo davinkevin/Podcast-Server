@@ -2,7 +2,10 @@ package lan.dk.podcastserver.utils;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -42,5 +45,15 @@ public class URLUtils {
                 huc.disconnect();
         }
         return false;
+    }
+
+    public static Reader getReaderFromURL (String url) {
+        try {
+            URL urlObject = new URL(url);
+            return new BufferedReader(new InputStreamReader(urlObject.openStream(), "UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

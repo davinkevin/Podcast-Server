@@ -20,9 +20,10 @@
         </rollingPolicy>
     </appender>
   
-  <logger name="lan.dk.podcastserver" level="DEBUG"/>
+  <logger name="lan.dk.podcastserver" level="INFO"/>
   <logger name="lan.dk.podcastserver.utils" level="ERROR"/>
   <logger name="org.hibernate" level="OFF" />
+  <logger name="org.hibernate.validator" level="OFF" />
 
     <!-- Spring MVC -->
     <!-- ORM | Hibernate

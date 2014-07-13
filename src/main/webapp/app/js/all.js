@@ -309,6 +309,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <option value="BeInSports">Be In Sports</option>\n' +
     '                    <option value="CanalPlus">Canal+</option>\n' +
     '                    <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
+    '                    <option value="Parleys">Parleys</option>\n' +
     '                    <option value="RSS">RSS</option>\n' +
     '                    <option value="send">Send</option>\n' +
     '                    <option value="Youtube">Youtube</option>\n' +
@@ -453,6 +454,7 @@ module.run(['$templateCache', function($templateCache) {
     '                        <option value="BeInSports">Be In Sports</option>\n' +
     '                        <option value="CanalPlus">Canal+</option>\n' +
     '                        <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
+    '                        <option value="Parleys">Parleys</option>\n' +
     '                        <option value="RSS">RSS</option>\n' +
     '                        <option value="send">Send</option>\n' +
     '                        <option value="Youtube">Youtube</option>\n' +
@@ -996,6 +998,8 @@ angular.module('podcast.controller', [])
                 $scope.podcast.type = "CanalPlus";
             } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "JeuxVideoFR";
+            } else if (/parleys\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Parleys";
             } else if (/youtube\.com/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "Youtube";
             } else if ($scope.podcast.url.length > 0) {

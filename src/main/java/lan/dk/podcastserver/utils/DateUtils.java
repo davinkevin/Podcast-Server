@@ -102,6 +102,20 @@ public class DateUtils {
         }
     }
 
+    public static Timestamp parleysToTimeStamp(String text) throws ParseException {
+        // Format : Thu Jun 26 06:34:41 UTC 2014
+        Date javaDate = null;
+        try {
+            String pattern = "EEE MMM dd HH:mm:ss z yyyy";
+            SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
+            javaDate = format.parse(text);
+            return new Timestamp(javaDate.getTime());
+        } catch (ParseException e) {
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw e;
+        }
+    }
+
     public static Date findDateNDateAgo(Integer ago) {
         Date today = new Date();
         Calendar cal = new GregorianCalendar();

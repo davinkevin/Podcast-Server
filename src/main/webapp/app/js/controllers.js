@@ -322,6 +322,8 @@ angular.module('podcast.controller', [])
                 $scope.podcast.type = "CanalPlus";
             } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "JeuxVideoFR";
+            } else if (/parleys\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Parleys";
             } else if (/youtube\.com/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "Youtube";
             } else if ($scope.podcast.url.length > 0) {
