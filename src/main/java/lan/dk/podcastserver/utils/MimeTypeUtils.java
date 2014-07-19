@@ -22,6 +22,7 @@ public class MimeTypeUtils {
         MimeMap.put("mp3", "audio/mp3");
         MimeMap.put("flv", "video/flv");
         MimeMap.put("webm", "video/webm");
+        MimeMap.put("", "video/mp4");
     }
 
     public static String getMimeType(String extension) {

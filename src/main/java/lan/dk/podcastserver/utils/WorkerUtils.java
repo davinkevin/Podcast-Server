@@ -44,6 +44,8 @@ public class WorkerUtils implements ApplicationContextAware {
             nameDownloader = "Youtube";
         } else if (itemUrl.endsWith("m3u8")) {
             nameDownloader = "M3U8";
+        } else if (itemUrl.contains("parleys")) {
+            nameDownloader = "Parleys";
         } else if (itemUrl.contains("http")) {
             nameDownloader = "HTTP";
         }

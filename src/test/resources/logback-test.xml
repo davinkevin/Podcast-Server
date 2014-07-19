@@ -21,7 +21,7 @@
     </appender>
 
     <logger name="lan.dk.podcastserver" level="DEBUG"/>
-    <logger name="lan.dk.podcastserver.utils" level="ERROR"/>
+    <logger name="lan.dk.podcastserver.utils" level="WARN"/>
     <logger name="org.hibernate" level="OFF" />
     <logger name="org.springframework" level="OFF" />
 
