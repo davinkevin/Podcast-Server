@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.utils.FfmpegUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
@@ -12,6 +13,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -37,6 +39,9 @@ public class ParleysDownloader extends AbstractDownloader{
     protected DownloadInfo info = null;
     private Long totalSize;
     private int avancementIntermediaire = 0;
+
+    @Resource
+    FfmpegUtils ffmpegUtils;
 
 
     @Override
@@ -109,12 +114,16 @@ public class ParleysDownloader extends AbstractDownloader{
         }
 
         target = getTagetFile(item);
+        target = new File(target.getParentFile(), FilenameUtils.removeExtension(target.getName()).concat(".mp4"));
         List<File> listOfFilesToConcat = getListOfFiles(listOfAssets);
         logger.info("Finalisation du téléchargement");
 
         logger.info("Concatenation des vidéos");
+        ffmpegUtils.concatDemux(target, listOfFilesToConcat.toArray(new File[listOfFilesToConcat.size()]));
 
-
+        for(File partFile : listOfFilesToConcat) {
+            partFile.delete();
+        }
 
         finishDownload();
         itemDownloadManager.removeACurrentDownload(item);

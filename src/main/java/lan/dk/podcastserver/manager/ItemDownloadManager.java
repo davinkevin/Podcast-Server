@@ -39,7 +39,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
     @Value("${concurrentDownload:3}")
     private int limitParallelDownload;
 
-    @Value("${rootfolder:${catalina.home}/webapp/podcast/}")
+    @Value("${rootfolder:${catalina.home}/webapps/podcast/}")
     private String rootfolder;
 
     @Value("${serverURL:http://localhost:8080}")

@@ -31,7 +31,7 @@ public class ParleysUpdater extends AbstractUpdater {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/{ID_VIDEO}?index=0&size=10&text=&orderBy=date";
+    public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/{ID_VIDEO}?index=0&size=100&text=&orderBy=date";
     public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/{ID_VIDEO}?view=true";
     public static final String PARLEYS_ITEM_URL = "http://www.parleys.com/play/{ID_VIDEO}";
 

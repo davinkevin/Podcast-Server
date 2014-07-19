@@ -14,7 +14,7 @@ var gulp = require('gulp'),
     debug = require('gulp-debug');
 
     // Location Files :
-var jsLocation = ['src/main/webapp/app/js/*.js', '!src/main/webapp/app/js/all*.js', '!src/main/webapp/app/js/*.min.js'],
+var jsLocation = ['src/main/webapp/app/js/**/*.js', '!src/main/webapp/app/js/all*.js', '!src/main/webapp/app/js/*.min.js', '!src/main/webapp/app/js/lib/**/*.js'],
     lessLocation = 'src/main/webapp/app/less/*.less',
     htmlLocation = 'src/main/webapp/app/html/*.html',
     indexLocation = 'src/main/webapp/WEB-INF/pages/index.jsp';
