@@ -60,6 +60,7 @@ angular.module('podcastApp', [
                 when('/items', {
                     templateUrl: 'html/items-list.html',
                     controller: 'ItemsListCtrl',
+                    reloadOnSearch: false,
                     hotkeys: [
                         ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
                         ['left', 'Previous page', 'currentPage = currentPage-1; changePage();'],
@@ -68,6 +69,7 @@ angular.module('podcastApp', [
                 when('/item/search', {
                     templateUrl: 'html/items-search.html',
                     controller: 'ItemsSearchCtrl',
+                    reloadOnSearch: false,
                     hotkeys: [
                         ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
                         ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']

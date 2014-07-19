@@ -1,5 +1,5 @@
 angular.module('podcast.controller', [])
-    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log) {
+    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location) {
 
     // Gestion du cache de la pagination :
     var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
@@ -12,8 +12,16 @@ angular.module('podcast.controller', [])
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentPage', $scope.currentPage);
+            $location.search("page", $scope.currentPage);
         });
     };
+
+    $scope.$on('$routeUpdate', function(){
+            if ($scope.currentPage !== $location.search().page) {
+            $scope.currentPage = $location.search().page;
+            $scope.changePage();
+            }
+        });
 
     // Longeur inconnu au chargement :
     $scope.totalItems = Number.MAX_VALUE;
@@ -40,7 +48,7 @@ angular.module('podcast.controller', [])
     });
 
 })
-    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager) {
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager) {
 
     var tags = Restangular.all("tag"),
         numberByPage = 12;
@@ -58,8 +66,16 @@ angular.module('podcast.controller', [])
             $scope.items = itemsResponse.content;
             $scope.totalItems = parseInt(itemsResponse.totalElements);
             cache.put('currentSearchPage', $scope.currentPage);
+            $location.search("page", $scope.currentPage);
         });
     };
+
+    $scope.$on('$routeUpdate', function(){
+        if ($scope.currentPage !== $location.search().page) {
+            $scope.currentPage = $location.search().page;
+            $scope.changePage();
+        }
+    });
 
     // Longeur inconnu au chargement :
     $scope.totalItems = Number.MAX_VALUE;
