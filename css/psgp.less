@@ -45,7 +45,7 @@ nav.affix {
     z-index: 1000;
 }
 
-#footer {
+.footer {
   //position: absolute;
   bottom: 0;
   width: 100%;
@@ -77,4 +77,16 @@ nav.affix {
   img {
       width: 300px;
   }
+}
+
+.carousel-control {
+  &.left, &.right {
+    background: none;
+    color: #000000;
+  }
+}
+
+div[id] {
+  padding-top: 40px;
+  margin-top: -40px;
 }

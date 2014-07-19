@@ -30,17 +30,17 @@ nav.affix .navbar-nav {
 nav.affix .navbar-nav li {
   width: 25%;
 }
-#footer {
+.footer {
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
   background-color: #f5f5f5;
 }
-#footer .container .text-muted {
+.footer .container .text-muted {
   margin: 20px 0;
 }
-#footer .container {
+.footer .container {
   padding-right: 15px;
   padding-left: 15px;
 }
@@ -52,4 +52,13 @@ nav.affix .navbar-nav li {
 }
 .frameworkdescription img {
   width: 300px;
+}
+.carousel-control.left,
+.carousel-control.right {
+  background: none;
+  color: #000000;
+}
+div[id] {
+  padding-top: 40px;
+  margin-top: -40px;
 }

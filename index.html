@@ -10,50 +10,56 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.0/less.min.js"></script>
     -->
 </head>
-<body data-spy="scroll" data-target=".navbar" ng-controller="psgpCtrl">
+<body  ng-controller="psgpCtrl">
 <a href="https://github.com/davinkevin/Podcast-Server"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
-    <div class="jumbotron text-center">
-        <h1>Podcast Server</h1>
-        <p>All your podcasts available in one place... <strong>Your place !</strong></p>
-        <div>
-            <img src="img/Desktop.png" width="600px" height="480px" ></img>
-            <img src="img/Phone.png" height="440px"></img>
+<div class="jumbotron text-center">
+    <h1>Podcast Server</h1>
+    <p>All your podcasts available in one place... <strong>Your place !</strong></p>
+
+    <carousel interval="myInterval">
+        <slide ng-repeat="slide in slides" active="slide.active">
+            <img ng-src="{{slide.image}}" style="margin:auto; max-width: 700px; max-height: 400px; height: 400px">
+        </slide>
+    </carousel>
+
+    <!--
+    <div>
+        <img src="img/Desktop.png" width="600px" height="480px" ></img>
+        <img src="img/Phone.png" height="440px"></img>
+    </div>-->
+</div>
+<nav data-spy="affix" data-offset-top="638" data-offset-bottom="0" class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Podcast Server</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav text-center">
+                <li>
+                    <a href="#description">Description</a>
+                </li>
+                <li>
+                    <a href="#installation">Installation</a>
+                </li>
+                <li>
+                    <a href="#compatibility">Compatibility</a>
+                </li>
+                <li>
+                    <a href="#framework">FrameWork</a>
+                </li>
+            </ul>
         </div>
     </div>
-    <nav data-spy="affix" data-offset-top="721" data-offset-bottom="0" class="navbar navbar-inverse" role="navigation">
-        <div class="container-fluid">
+</nav>
 
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Podcast Server</a>
-            </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav text-center">
-                    <li>
-                        <a href="#description">Description</a>
-                    </li>
-                    <li>
-                        <a href="#installation">Installation</a>
-                    </li>
-                    <li>
-                        <a href="#compatibility">Compatibility</a>
-                    </li>
-                    <li>
-                        <a href="#framework">FrameWork</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div id="description" class="container">
+<div class="container">
+    <div id="description">
 
         <div class="media">
             <a class="pull-left" href="#">
@@ -105,18 +111,22 @@
                 </div>
             </div>
         </div>
-
-        <h1 id="installation" class="page-header">Installation</h1>
-        <div>This application is built with Maven (maybe Gradle soon) and uses a lot of embeddebale stack (Embedded Database, Embedded Message Queuing Server...) limiting the dependancy...</div>
-        <div>So, to install the application you just have to build it with Maven with the <kbd>mvn install</kbd> command to generate the War Application and deploy it to your favorite Java container</div>
-        <div>In following version, you will be able to build and run the application directly from maven with an embedded web-server</div>
-        <p>If you want to tweak the application, you have to create an application.properties (based upon application-example.properties template) to change the default value of the application</p>
-        <pre>
-            db.url=XXXX
-            db.url=XXXX
-        </pre>
-
-        <h1 id="compatibility" class="page-header">Compatibility</h1>
+    </div>
+    <div id="installation">
+        <h1 class="page-header">Installation</h1>
+        <p>This application is built with Maven (maybe Gradle soon) and uses a lot of embeddebale stack (Embedded Database, Embedded Container, Embedded Message Queuing Server...) limiting the dependancy...</p>
+        <p>So, to test the application you just have to clone the repo and launch it with the embedded Tomcat Server</p>
+        <pre>$ git clone https://github.com/davinkevin/Podcast-Server.git
+$ cd Podcast-Server/ && mvn clean install tomcat7:run-war-only</pre>
+        <p>If you want to tweak the application, you have to create an application.properties (based upon <a href="https://github.com/davinkevin/Podcast-Server/blob/master/src/test/resources/application.properties">application-example.properties</a> template) to change the default value of the application</p>
+        <pre>db.driver=com.mysql.jdbc.Driver
+db.url=jdbc:mysql://YOUR_DOMAIN_NAME/YOUR_DATABASE
+db.username=MY_DATABASE_USER
+db.password=MY_PASSWORD
+        ...</pre>
+    </div>
+    <div id="compatibility">
+        <h1 class="page-header">Compatibility</h1>
         <p>This application used a concept of "Worker". A worker is a module whose can update and download podcast from different sources. RSS is the standard sources for Podcast, but you can use Youtube Channel or Canal+ replay TV as podcast.</p>
 
         <div class="row text-center">
@@ -170,6 +180,15 @@
             </div>
             <div class="col-sm-4 col-md-3">
                 <div class="thumbnail">
+                    <img src="img/worker/parleys.png" alt="...">
+                    <div class="caption">
+                        <h3>Parleys</h3>
+                        <p>A worker to download video from the famous conference site Parleys</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-3">
+                <div class="thumbnail">
                     <img src="img/upload.png" alt="...">
                     <div class="caption">
                         <h3>Upload</h3>
@@ -178,51 +197,55 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <h1 id="framework">Framework</h1>
-            <p>In order to build this App, I use a lot of open-sources framework, you can find a list and why I use them thereafter</p>
-            <div class="col-lg-4">
-                <ul class="list-group">
-                    <li ng-repeat="framework in frameworkList" ng-mouseover="frameworkHover(framework)" class="list-group-item" ng-bind-html="getAsHTML(framework.name)"></li>
-                </ul>
-            </div>
-            <div class="col-lg-8 frameworkdescription">
-                <a ng-href="{{ currentFramework.link }}" class="col-lg-5">
-                    <img ng-src="{{ currentFramework.image }}" width="150" class="col-lg-6"></img>
-                </a>
-                <div class="col-lg-7">
-                    <p ng-bind-html="getAsHTML(currentFramework.description)"></p>
-                </div>
+    <div id="framework" class="clearfix">
+        <h1>Framework</h1>
+        <p>In order to build this App, I use a lot of open-sources framework, you can find a list and why I use them thereafter</p>
+        <div class="col-lg-4">
+            <ul class="list-group">
+                <li ng-repeat="framework in frameworkList" ng-mouseover="frameworkHover(framework)" class="list-group-item" ng-bind-html="getAsHTML(framework.name)"></li>
+            </ul>
+        </div>
+        <div class="col-lg-8 frameworkdescription">
+            <a ng-href="{{ currentFramework.link }}" class="col-lg-5">
+                <img ng-src="{{ currentFramework.image }}" width="150" class="col-lg-6"></img>
+            </a>
+            <div class="col-lg-7">
+                <p ng-bind-html="getAsHTML(currentFramework.description)"></p>
             </div>
         </div>
+    </div>
 
-        <h1 id="moretocome">More to come...</h1>
-        <p>I really want to improve this application, so this is the todo list for the next week</p>
+    <div id="moretocome">
+        <h1>More to come...</h1>
+        <p>I really want to improve this application, so this enhancement is a kind of roadmap...</p>
         <ul>
             <li>Adding a search engine, based on Hibernate Search</li>
-            <li>Keep the framework up-to-date (Spring 4.0.3, Hibernate... )</li>
-            <li>Adding more jUnit test (I was really lazy in the pas about that subject)</li>
-            <li>Add some kind of tags on the podcast, to filter the main view by simple / multiple tags (usefull if you have like me a lots of podcast)</li>
+            <li>Keep the framework up-to-date (Spring, Hibernate... )</li>
+            <li>Adding more jUnit test (I was really lazy in the past about that subject)</li>
             <li>Create new Worker / Downloader to support other source and other protocol</li>
-            <li>Improving the IHM with AngularJS Animation and better presentation</li>
             <li>And more... (keeping this page updated !!)</li>
+            <li><span class="glyphicon glyphicon-ok"></span><b>Done </b><del>Improving the IHM with AngularJS Animation and better presentation</del></li>
+            <li><span class="glyphicon glyphicon-ok"></span><b>Done </b> <del>Add some kind of tags on the podcast, to filter the main view by simple / multiple tags (usefull if you have like me a lots of podcast)</del></li>
         </ul>
     </div>
 
-    <div id="footer">
-        <div class="container">
-            <p class="text-muted">Hosted on GitHub - All trademarks mentioned herein belong to their respective owners</p>
-        </div>
+</div>
+
+<div class="footer">
+    <div class="container">
+        <p class="text-muted">Hosted on GitHub - All trademarks mentioned herein belong to their respective owners</p>
     </div>
+</div>
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/holder/2.3.1/holder.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.0/ui-bootstrap-tpls.min.js"></script>
 <script>
-    var psgp = angular.module('psgp', []);
+    var psgp = angular.module('psgp', ['ui.bootstrap']);
 
     psgp.controller('psgpCtrl', function ($scope, $sce) {
         $scope.frameworkList = [
@@ -244,6 +267,15 @@
         $scope.getAsHTML = function(text) {
             return $sce.trustAsHtml(text);
         };
+
+        $scope.myInterval = 5000;
+        var slides = $scope.slides = [
+            {image : "/img/slider/01_Home_Desktop.png", text : "Simple design" },
+            {image : "/img/slider/02_Download_Desktop.png", text : "Simple design" },
+            {image : "/img/slider/03_PodcastList_Mobile.png", text : "Simple design" },
+            {image : "/img/slider/04_PodcastDetails_Deskop.png", text : "Simple design" },
+            {image : "/img/slider/05_ItemSearch_Mobile.png", text : "Simple design" }
+        ];
     });
 
 </script>
