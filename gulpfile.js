@@ -15,17 +15,19 @@ var gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps')
     args = require('yargs').argv;
 
-    // Location Files :
-var angularAppLocation = [  'src/main/webapp/app/js/**/*.js', '!src/main/webapp/app/js/all*.js',
-                            '!src/main/webapp/app/js/*.min.js', '!src/main/webapp/app/js/lib/**/*.js',
-                            '!src/main/webapp/app/js/**/*.module.js'],
-    angularAppModule = ['src/main/webapp/app/js/**/*.module.js'],
-    lessLocation = 'src/main/webapp/app/less/*.less',
-    htmlLocation = 'src/main/webapp/app/html/*.html',
-    indexLocation = 'src/main/webapp/WEB-INF/pages/index.html';
+var fileAppLocation = 'src/main/webapp/app/';
 
-var cssDestionation = 'src/main/webapp/app/css',
-    jsDestination = 'src/main/webapp/app/js';
+    // Location Files :
+var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fileAppLocation).concat('js/all*.js'),
+                            '!'.concat(fileAppLocation).concat('js/*.min.js'), '!'.concat(fileAppLocation).concat('js/lib/**/*.js'),
+                            '!'.concat(fileAppLocation).concat('js/**/*.module.js')],
+    angularAppModule = [fileAppLocation.concat('js/**/*.module.js')],
+    lessLocation = fileAppLocation.concat('less/*.less'),
+    htmlLocation = fileAppLocation.concat('html/*.html'),
+    indexLocation = 'src/main/webapp/WEB-INF/pages/index.jsp';
+
+var cssDestionation = fileAppLocation.concat('css'),
+    jsDestination = fileAppLocation.concat('js');
 
 var environnement = (args.environnement == undefined) ? 'production' : args.environnement;
 
@@ -51,8 +53,9 @@ gulp.task('js', function() {
         .pipe(gulp.dest(jsDestination))
         .pipe(ngAnnotate())
         .pipe(uglify())
-        .pipe(sourcemaps.write())
         .pipe(rename('all.min.js'))
+        //.pipe(sourcemaps.write())
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDestination));
 });
 
@@ -66,7 +69,8 @@ gulp.task('less', function () {
 // Watch Files For Changes
 gulp.task('watch', function() {
     //gulp.watch(angularAppLocation, ['lint']);
-    gulp.watch([angularAppLocation, htmlLocation], ['scripts']);
+    gulp.start("js", "less");
+    gulp.watch([angularAppLocation, htmlLocation], ['js']);
     gulp.watch(lessLocation, ['less']);
 });
 
@@ -74,6 +78,7 @@ gulp.task('inject', function() {
     gulp.src(indexLocation)
         .pipe(inject(bowerFiles({read: false, debugging : false, env : environnement}), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
         .pipe(gulp.dest("src/main/webapp/WEB-INF/pages/"));
+
     bowerFiles({checkExistence : true, read: true, debugging : false, env : environnement}).pipe(gulp.dest("src/main/webapp/app/js/lib/"));
 });
 

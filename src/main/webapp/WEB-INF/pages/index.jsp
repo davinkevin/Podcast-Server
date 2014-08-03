@@ -1,3 +1,6 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!doctype html>
 <html ng-app="podcastApp">
 <head>
@@ -32,7 +35,7 @@
             <ul class="nav navbar-nav">
                 <li>
                     <a href="#/podcasts">
-                            Podcast
+                        Podcast
                     </a>
                 </li>
                 <li>
@@ -55,7 +58,7 @@
     </div>
 </nav>
 
-    <div ng-view autoscroll=""></div>
+<div ng-view autoscroll=""></div>
 
 <!-- inject:js -->
 <script src="/js/lib//angular/angular.min.js"></script>
@@ -80,9 +83,9 @@
 <!-- endinject -->
 
 <script src="/js/all.min.js"></script>
-<!--
+<%--
 <script src="/js/all.js"></script>
--->
+--%>
 
 </body>
 </html>
