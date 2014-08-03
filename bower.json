@@ -28,7 +28,7 @@
     "angular": {
       "main": {
         "developpement": "angular.js",
-        "production": "angular.min.js"
+        "production": ["angular.min.js", "angular.min.js.map"]
       }
     },
     "angular-animate": {

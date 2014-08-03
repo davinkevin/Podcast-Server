@@ -13,26 +13,4 @@ public class RedirectionController {
     private String homePodcast() {
         return "index";
     }
-    /*
-    @RequestMapping(value = {"list"}, method = RequestMethod.GET)
-    private String listPodcast() {
-        return "podcasts";
-    }
-
-    @RequestMapping(value = "add", method = RequestMethod.GET)
-    private String addPodcast() {
-        return "addPodcast";
-    }
-
-    @RequestMapping(value = "downloadList", method = RequestMethod.GET)
-    private String downloadList() {
-        return "downloadList";
-    }
-
-    @RequestMapping(value = "angular", method = RequestMethod.GET)
-    private String angular() {
-        return "podcastserver";
-    }
-    */
-
 }
