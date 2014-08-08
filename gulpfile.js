@@ -10,9 +10,9 @@ var gulp = require('gulp'),
     ngHtml2Js = require("gulp-ng-html2js"),
     addsrc = require('gulp-add-src'),
     inject = require("gulp-inject"),
-    bowerFiles = require('gulp-bower-files'),
+    bowerFiles = require('main-bower-files'),
     debug = require('gulp-debug'),
-    sourcemaps = require('gulp-sourcemaps')
+    sourcemaps = require('gulp-sourcemaps'),
     args = require('yargs').argv,
     plumber = require('gulp-plumber');
 
@@ -78,10 +78,11 @@ gulp.task('watch', function() {
 
 gulp.task('inject', function() {
     gulp.src(indexLocation)
-        .pipe(inject(bowerFiles({read: false, debugging : false, env : environnement}), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
+        .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : environnement})), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
         .pipe(gulp.dest("src/main/webapp/WEB-INF/pages/"));
 
-    bowerFiles({checkExistence : true, read: true, debugging : false, env : environnement}).pipe(gulp.dest("src/main/webapp/app/js/lib/"));
+    gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : environnement}))
+        .pipe(gulp.dest("src/main/webapp/app/js/lib/"));
 });
 
 // Default Task

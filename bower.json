@@ -170,6 +170,12 @@
         "developpement": "lib/stomp.js",
         "production": "lib/stomp.min.js"
       }
+    },
+    "mousetrap": {
+      "main": {
+          "developpement": "mousetrap.js",
+          "production": "mousetrap.min.js"
+      }
     }
   }
 }

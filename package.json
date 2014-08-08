@@ -6,7 +6,7 @@
     "bower": "latest",
     "gulp": "latest",
     "gulp-add-src": "latest",
-    "gulp-bower-files": "latest",
+    "main-bower-files": "latest",
     "gulp-concat": "latest",
     "gulp-inject": "latest",
     "gulp-less": "latest",
