@@ -13,7 +13,8 @@ var gulp = require('gulp'),
     bowerFiles = require('gulp-bower-files'),
     debug = require('gulp-debug'),
     sourcemaps = require('gulp-sourcemaps')
-    args = require('yargs').argv;
+    args = require('yargs').argv,
+    plumber = require('gulp-plumber');
 
 var fileAppLocation = 'src/main/webapp/app/';
 
@@ -40,6 +41,7 @@ gulp.task('lint', function() {
 
 gulp.task('js', function() {
     gulp.src(htmlLocation)
+        .pipe(plumber())
         .pipe(ngHtml2Js({
             moduleName: "podcast.partial",
             prefix: "html/"
