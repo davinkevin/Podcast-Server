@@ -8,11 +8,11 @@
     <meta charset="UTF-8">
 
     <!-- inject:css -->
-    <link rel="stylesheet" href="/js/lib//angular-loading-bar/build/loading-bar.min.css">
-    <link rel="stylesheet" href="/js/lib//animate.css/animate.min.css">
-    <link rel="stylesheet" href="/js/lib//ng-tags-input/ng-tags-input.min.css">
-    <link rel="stylesheet" href="/js/lib//bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/js/lib//angular-hotkeys/build/hotkeys.min.css">
+    <link rel="stylesheet" href="/js/lib//angular-loading-bar/build/loading-bar.css">
+    <link rel="stylesheet" href="/js/lib//animate.css/animate.css">
+    <link rel="stylesheet" href="/js/lib//ng-tags-input/ng-tags-input.css">
+    <link rel="stylesheet" href="/js/lib//bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/js/lib//angular-hotkeys/build/hotkeys.css">
     <!-- endinject -->
 
     <link href="/css/podcastserver.css" rel="stylesheet" type="text/css">
@@ -61,25 +61,25 @@
 <div ng-view autoscroll=""></div>
 
 <!-- inject:js -->
-<script src="/js/lib//angular/angular.min.js"></script>
-<script src="/js/lib//angular-route/angular-route.min.js"></script>
-<script src="/js/lib//angular-animate/angular-animate.min.js"></script>
-<script src="/js/lib//angular-sanitize/angular-sanitize.min.js"></script>
-<script src="/js/lib//jquery/dist/jquery.min.js"></script>
-<script src="/js/lib//angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-<script src="/js/lib//lodash/dist/lodash.compat.min.js"></script>
-<script src="/js/lib//stomp-websocket/lib/stomp.min.js"></script>
-<script src="/js/lib//sockjs/sockjs.min.js"></script>
-<script src="/js/lib//angular-local-storage/angular-local-storage.min.js"></script>
+<script src="/js/lib//angular/angular.js"></script>
+<script src="/js/lib//angular-route/angular-route.js"></script>
+<script src="/js/lib//angular-animate/angular-animate.js"></script>
+<script src="/js/lib//angular-sanitize/angular-sanitize.js"></script>
+<script src="/js/lib//jquery/dist/jquery.js"></script>
+<script src="/js/lib//angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="/js/lib//lodash/dist/lodash.compat.js"></script>
+<script src="/js/lib//stomp-websocket/lib/stomp.js"></script>
+<script src="/js/lib//sockjs/sockjs.js"></script>
+<script src="/js/lib//angular-local-storage/angular-local-storage.js"></script>
 <script src="/js/lib//angular-truncate/src/truncate.js"></script>
-<script src="/js/lib//angular-loading-bar/build/loading-bar.min.js"></script>
-<script src="/js/lib//ng-tags-input/ng-tags-input.min.js"></script>
+<script src="/js/lib//angular-loading-bar/build/loading-bar.js"></script>
+<script src="/js/lib//ng-tags-input/ng-tags-input.js"></script>
 <script src="/js/lib//mousetrap/mousetrap.js"></script>
-<script src="/js/lib//angular-notification/angular-notification.min.js"></script>
-<script src="/js/lib//bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="/js/lib//restangular/dist/restangular.min.js"></script>
-<script src="/js/lib//AngularStompDK/dist/angular-stomp.min.js"></script>
-<script src="/js/lib//angular-hotkeys/build/hotkeys.min.js"></script>
+<script src="/js/lib//angular-notification/angular-notification.js"></script>
+<script src="/js/lib//bootstrap/dist/js/bootstrap.js"></script>
+<script src="/js/lib//restangular/dist/restangular.js"></script>
+<script src="/js/lib//AngularStompDK/lib/angular-stomp.js"></script>
+<script src="/js/lib//angular-hotkeys/build/hotkeys.js"></script>
 <!-- endinject -->
 
 <script src="/js/all.min.js"></script>

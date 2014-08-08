@@ -1,5 +1,5 @@
 angular.module('podcast.controller')
-    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log) {
+    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log, $location) {
 
         var idPodcast = $routeParams.podcastId,
             tags = Restangular.all("tag");
@@ -68,4 +68,11 @@ angular.module('podcast.controller')
                 _.assign($scope.podcast, patchedPodcast);
             }).then($scope.refreshItems );
         };
-    })
+
+        $scope.deletePodcast = function () {
+            $scope.podcast.remove().then(function () {
+                $location.path('/podcasts');
+            });
+        };
+
+    });

@@ -8,9 +8,9 @@
     <name>Podcast Server</name>
 
     <properties>
-        <spring.version>4.0.5.RELEASE</spring.version>
-        <spring-data.version>1.6.0.RELEASE</spring-data.version>
-        <hibernate.version>4.3.5.Final</hibernate.version>
+        <spring.version>4.0.6.RELEASE</spring.version>
+        <spring-data.version>1.6.2.RELEASE</spring-data.version>
+        <hibernate.version>4.3.6.Final</hibernate.version>
         <jackson.version>2.3.2</jackson.version>
         <slf4j.version>1.7.6</slf4j.version>
         <javax.servlet-api.version>3.0.1</javax.servlet-api.version>
@@ -131,25 +131,11 @@
             <version>0.8.0.RELEASE</version>
         </dependency>
 
-        <!-- MYSQL -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.connector.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.3.175</version>
         </dependency>
-
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
-        </dependency>
-
 
         <!-- Servlet API 3.0 -->
 

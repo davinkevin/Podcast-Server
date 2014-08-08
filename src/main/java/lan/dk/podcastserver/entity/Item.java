@@ -259,7 +259,7 @@ public class Item implements Serializable {
     //* CallBack Method JPA *//
     @PreRemove
     public void preRemove() {
-        if (this.getLocalUri() != null && !this.getLocalUri().equals("")) {
+        if (this.podcast.getHasToBeDeleted() && !StringUtils.isEmpty(this.getLocalUri())) {
             File fileToDelete = new File(this.getLocalUri());
             if (fileToDelete.exists()) {
                 fileToDelete.delete();
@@ -277,6 +277,6 @@ public class Item implements Serializable {
     @JsonIgnore
     @AssertTrue
     public boolean hasValidURL() {
-        return (!StringUtils.isEmpty(this.url)) || (this.podcast.getType() != null && this.podcast.getType().equals("send"));
+        return (!StringUtils.isEmpty(this.url)) || "send".equals(this.podcast.getType());
     }
 }
