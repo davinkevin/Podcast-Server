@@ -31,20 +31,18 @@ public class ParleysUpdater extends AbstractUpdater {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/{ID_VIDEO}?index=0&size=100&text=&orderBy=date";
-    public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/{ID_VIDEO}?view=true";
-    public static final String PARLEYS_ITEM_URL = "http://www.parleys.com/play/{ID_VIDEO}";
+    public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/%s?index=0&size=%s&text=&orderBy=date";
+    public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/%s?view=true";
+    public static final String PARLEYS_ITEM_URL = "http://www.parleys.com/play/%s";
 
     /* Patter to extract value from URL */
     public static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)/.*");
 
     @Override
     public Podcast updateFeed(Podcast podcast) {
-        JSONParser parser = new JSONParser();
-
 
         try {
-            JSONObject responseObject = (JSONObject) getParseJsonObject(podcast.getUrl());
+            JSONObject responseObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
 
             JSONArray resultArray = getParleysPresentationResultsArray(responseObject);
 
@@ -88,8 +86,8 @@ public class ParleysUpdater extends AbstractUpdater {
         return DigestUtils.generateMD5SignatureFromUrl(getParleysPresentationUrl(podcast.getUrl()));
     }
 
-    private JSONObject getParseJsonObject(String url) throws IOException, ParseException {
-        return (JSONObject) new JSONParser().parse(URLUtils.getReaderFromURL(getParleysPresentationUrl(url)));
+    private JSONObject getParseJsonObject(String url, Integer numberOfItem) throws IOException, ParseException {
+        return (JSONObject) new JSONParser().parse(URLUtils.getReaderFromURL(getParleysPresentationUrl(url, numberOfItem)));
     }
 
     private JSONArray getParleysPresentationResultsArray(JSONObject responseObject) {
@@ -108,7 +106,7 @@ public class ParleysUpdater extends AbstractUpdater {
                             .setDescription((String) responseObject.get("description"))
                             .setPubdate(DateUtils.parleysToTimeStamp((String) responseObject.get("publishedOn")))
                             .setCover(ImageUtils.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
-                            .setUrl(PARLEYS_ITEM_URL.replace("{ID_VIDEO}", id));
+                            .setUrl(String.format(PARLEYS_ITEM_URL, id));
 
 
         } catch (IOException | ParseException | java.text.ParseException e) {
@@ -119,11 +117,15 @@ public class ParleysUpdater extends AbstractUpdater {
     }
 
     private String getItemUrl(String id) {
-        return PARLEYS_ITEM_API_URL.replace("{ID_VIDEO}", id);
+        return String.format(PARLEYS_ITEM_API_URL, id);
     }
 
     private String getParleysPresentationUrl(String url) {
-        return PARLEYS_CHANNEL_API_URL.replace("{ID_VIDEO}", getParleysId(url));
+        return getParleysPresentationUrl(url, null);
+    }
+
+    private String getParleysPresentationUrl(String url, Integer numberOfItem) {
+        return String.format(PARLEYS_CHANNEL_API_URL, getParleysId(url), (numberOfItem == null) ? "1" : numberOfItem.toString());
     }
 
     private String getParleysId(String url) {
@@ -133,5 +135,10 @@ public class ParleysUpdater extends AbstractUpdater {
             return m.group(1);
         }
         return "";
+    }
+
+    private Integer getNumberOfItem(String url) throws IOException, ParseException {
+        JSONObject responseObject = getParseJsonObject(url, 1);
+        return (responseObject.get("count") != null) ? ((Long) responseObject.get("count")).intValue() : 100 ;
     }
 }

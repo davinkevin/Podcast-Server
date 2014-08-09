@@ -44,7 +44,7 @@ public class ParleysUpdaterTest {
     @Test
     public void updateFeedParleys() {
         Podcast podcast = parleysUpdater.updateFeed(DEVOXX_FRANCE_2014);
-        Assert.assertEquals(100, podcast.getItems().size());
+        Assert.assertEquals(111, podcast.getItems().size());
     }
 
 }
