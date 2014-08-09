@@ -36,6 +36,7 @@ public class Item implements Serializable {
     private int progression;
     private Timestamp downloaddate;
     private Podcast podcast;
+    private int numberOfTry;
 
     public Item() {
     }
@@ -206,6 +207,26 @@ public class Item implements Serializable {
 
     public Item setLocalUri(String localUri) {
         this.localUri = localUri;
+        return this;
+    }
+
+    @JsonIgnore
+    @Transient
+    public int getNumberOfTry() {
+        return numberOfTry;
+    }
+
+    @JsonIgnore
+    @Transient
+    public Item setNumberOfTry(int numberOfTry) {
+        this.numberOfTry = numberOfTry;
+        return this;
+    }
+
+    @JsonIgnore
+    @Transient
+    public Item addATry() {
+        this.numberOfTry++;
         return this;
     }
 

@@ -39,6 +39,10 @@ public class ItemDownloadManager implements ApplicationContextAware {
     @Value("${concurrentDownload:3}")
     private int limitParallelDownload;
 
+    @Value("${numberOfTry:10}")
+    private int numberOfTry;
+
+
     @Value("${rootfolder:${catalina.home}/webapps/podcast/}")
     private String rootfolder;
 
@@ -47,6 +51,8 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
     @Value("${fileContainer:http://localhost:8080/podcast}")
     protected String fileContainer;
+
+
 
     @Autowired
     private WorkerUtils workerUtils;
@@ -270,6 +276,17 @@ public class ItemDownloadManager implements ApplicationContextAware {
         }
     }
 
+    public void resetDownload(Item item) {
+        if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
+            item.addATry();
+            Downloader worker = workerUtils.getDownloaderByType(item);
+            if (worker != null) {
+                this.getDownloadingQueue().put(item, worker);
+                new Thread((Runnable) worker).start();
+            }
+        }
+    }
+
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         logger.debug("Initialisation du Contexte");
@@ -290,6 +307,10 @@ public class ItemDownloadManager implements ApplicationContextAware {
         this.template.convertAndSend(WS_TOPIC_WAITINGLIST, this.waitingQueue);
     }
 
+
+    public boolean canBeReseted(Item item) {
+        return item.getNumberOfTry()+1 <= numberOfTry;
+    }
 
 
 }
