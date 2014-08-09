@@ -83,7 +83,14 @@ public class ParleysUpdater extends AbstractUpdater {
 
     @Override
     public String signaturePodcast(Podcast podcast) {
-        return DigestUtils.generateMD5SignatureFromUrl(getParleysPresentationUrl(podcast.getUrl()));
+        try {
+            JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
+            podcastRepresentation.remove("completedIn");
+            return DigestUtils.generateMD5SignatureFromDOM(podcastRepresentation.toJSONString());
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private JSONObject getParseJsonObject(String url, Integer numberOfItem) throws IOException, ParseException {
