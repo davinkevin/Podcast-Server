@@ -410,6 +410,8 @@ angular.module('podcast.controller')
                 $scope.podcast.type = "JeuxVideoFR";
             } else if (/parleys\.com/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "Parleys";
+            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Pluzz";
             } else if (/youtube\.com/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "Youtube";
             } else if ($scope.podcast.url.length > 0) {
@@ -693,7 +695,7 @@ module.run(['$templateCache', function($templateCache) {
     '</div>\n' +
     '\n' +
     '<div class="container">\n' +
-    '    <form class="form-horizontal" role="form">\n' +
+    '    <form class="form-horizontal" role="form" novalidate>\n' +
     '        <div class="form-group">\n' +
     '            <label for="title" class="col-sm-1 control-label">Titre</label>\n' +
     '\n' +
@@ -711,7 +713,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <div class="form-group">\n' +
     '            <div class="checkbox col-sm-offset-2">\n' +
     '                <label>\n' +
-    '                    <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto\n' +
+    '                    <input type="checkbox" ng-model="podcast.hasToBeDeleted"> Suppression Automatique\n' +
     '                </label>\n' +
     '            </div>\n' +
     '        </div>\n' +
@@ -735,6 +737,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <option value="CanalPlus">Canal+</option>\n' +
     '                    <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
     '                    <option value="Parleys">Parleys</option>\n' +
+    '                    <option value="Pluzz">Pluzz</option>\n' +
     '                    <option value="RSS">RSS</option>\n' +
     '                    <option value="send">Send</option>\n' +
     '                    <option value="Youtube">Youtube</option>\n' +
@@ -860,7 +863,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <div class="form-group">\n' +
     '                <div class="checkbox col-sm-offset-3">\n' +
     '                    <label>\n' +
-    '                        <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto\n' +
+    '                        <input type="checkbox" ng-model="podcast.hasToBeDeleted"> Suppression Auto\n' +
     '                    </label>\n' +
     '                </div>\n' +
     '            </div>\n' +
