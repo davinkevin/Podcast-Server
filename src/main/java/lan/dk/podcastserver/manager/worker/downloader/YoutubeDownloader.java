@@ -137,9 +137,11 @@ public class YoutubeDownloader extends AbstractDownloader {
             logger.error("Exception tierce : ", e);
             stopDownload();
         } catch (NullPointerException e) {
+            logger.error("NullPointerException", e);
             if (itemDownloadManager.canBeReseted(item)) {
-                logger.info("Reset du téléchargement Youtube");
+                logger.info("Reset du téléchargement Youtube {}", item.getTitle());
                 itemDownloadManager.resetDownload(item);
+                return null;
             }
             stopDownload();
         }
