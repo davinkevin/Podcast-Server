@@ -2,10 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DateUtils;
-import lan.dk.podcastserver.utils.DigestUtils;
-import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Jsoup;
@@ -16,9 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -252,7 +247,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
                     .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
             if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null && StringUtils.isNotEmpty(xml_MEDIA.getChild("VIDEOS").getChildText("HLS"))) {
-                currentEpisode.setUrl(this.getM3U8UrlFromCanalPlusService(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
+                currentEpisode.setUrl(URLUtils.getM3U8UrlFormMultiStreamFile(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
             } else {
                 currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
             }
@@ -275,27 +270,5 @@ public class CanalPlusUpdater extends AbstractUpdater {
             logger.error("IOException :", e);
         }
         return currentEpisode;
-    }
-
-    private String getM3U8UrlFromCanalPlusService(String standardM3UURL) {
-        String urlToReturn = null;
-
-        if (standardM3UURL == null)
-            return null;
-
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(new URL(standardM3UURL).openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                if (!inputLine.startsWith("#")) {
-                    urlToReturn = inputLine;
-                }
-            }
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return urlToReturn;
     }
 }

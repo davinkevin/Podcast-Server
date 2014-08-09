@@ -42,7 +42,7 @@ public class WorkerUtils implements ApplicationContextAware {
             nameDownloader = "RTMP";
         } else if (itemUrl.contains("www.youtube.com")) {
             nameDownloader = "Youtube";
-        } else if (itemUrl.endsWith("m3u8")) {
+        } else if (itemUrl.contains("m3u8")) {
             nameDownloader = "M3U8";
         } else if (itemUrl.contains("parleys")) {
             nameDownloader = "Parleys";

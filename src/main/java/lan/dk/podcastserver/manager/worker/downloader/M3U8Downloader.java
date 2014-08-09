@@ -26,11 +26,11 @@ public class M3U8Downloader extends AbstractDownloader {
         logger.debug("Download");
         itemDownloadManager.addACurrentDownload();
 
-        if (item.getUrl().endsWith("m3u8")) {
+        if (item.getUrl().contains("m3u8")) {
             URL urlListFile = null;
             try {
                 urlListFile = new URL(item.getUrl());
-                urlList = new ArrayList<String>();
+                urlList = new ArrayList<>();
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlListFile.openStream()));
                 String inputLine;

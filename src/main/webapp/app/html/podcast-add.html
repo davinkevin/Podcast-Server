@@ -5,7 +5,7 @@
 </div>
 
 <div class="container">
-    <form class="form-horizontal" role="form">
+    <form class="form-horizontal" role="form" novalidate>
         <div class="form-group">
             <label for="title" class="col-sm-1 control-label">Titre</label>
 
@@ -23,7 +23,7 @@
         <div class="form-group">
             <div class="checkbox col-sm-offset-2">
                 <label>
-                    <input type="checkbox" ng-model="podcast.hasToBeDeleted" required> Suppression Auto
+                    <input type="checkbox" ng-model="podcast.hasToBeDeleted"> Suppression Automatique
                 </label>
             </div>
         </div>
@@ -47,6 +47,7 @@
                     <option value="CanalPlus">Canal+</option>
                     <option value="JeuxVideoFR">Jeux Video Fr</option>
                     <option value="Parleys">Parleys</option>
+                    <option value="Pluzz">Pluzz</option>
                     <option value="RSS">RSS</option>
                     <option value="send">Send</option>
                     <option value="Youtube">Youtube</option>

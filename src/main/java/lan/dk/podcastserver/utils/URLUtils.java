@@ -56,4 +56,26 @@ public class URLUtils {
         }
         return null;
     }
+
+    public static String getM3U8UrlFormMultiStreamFile(String url) {
+        String urlToReturn = null;
+
+        if (url == null)
+            return null;
+
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                if (!inputLine.startsWith("#")) {
+                    urlToReturn = inputLine;
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return urlToReturn;
+    }
 }
