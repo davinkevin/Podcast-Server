@@ -214,7 +214,7 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
     public void addItemToQueue(int id) {
         this.addItemToQueue(itemBusiness.findOne(id));
-        this.convertAndSendWaitingQueue();
+        //this.convertAndSendWaitingQueue();
     }
 
     public void addItemToQueue(Item item) {
