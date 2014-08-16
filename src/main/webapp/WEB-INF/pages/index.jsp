@@ -22,7 +22,7 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#compact-panel">
+            <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" >
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -31,7 +31,7 @@
             <a class="navbar-brand" href="#/items">Podcast Server</a>
         </div>
 
-        <div class="collapse navbar-collapse navbar-ex1-collapse" id="compact-panel">
+        <div class="collapse navbar-collapse navbar-ex1-collapse" collapse="navCollapsed">
             <ul class="nav navbar-nav">
                 <li>
                     <a href="#/podcasts">
@@ -61,12 +61,12 @@
 <div ng-view autoscroll=""></div>
 
 <!-- inject:js -->
+<script src="/app/js/lib//jquery/dist/jquery.min.js"></script>
 <script src="/app/js/lib//angular/angular.min.js"></script>
 <script src="/app/js/lib//angular-route/angular-route.min.js"></script>
 <script src="/app/js/lib//angular-animate/angular-animate.min.js"></script>
 <script src="/app/js/lib//angular-sanitize/angular-sanitize.min.js"></script>
 <script src="/app/js/lib//angular-touch/angular-touch.min.js"></script>
-<script src="/app/js/lib//jquery/dist/jquery.min.js"></script>
 <script src="/app/js/lib//angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="/app/js/lib//lodash/dist/lodash.compat.min.js"></script>
 <script src="/app/js/lib//stomp-websocket/lib/stomp.min.js"></script>
