@@ -4,6 +4,7 @@ angular.module('podcastApp', [
     'podcast.services',
     'podcast.partial',
     'ngRoute',
+    'ngTouch',
     'cfp.hotkeys',
     'restangular',
     'AngularStomp',

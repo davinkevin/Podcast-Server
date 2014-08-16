@@ -1,9 +1,10 @@
 angular.module('podcast.controller')
-    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location) {
+    .constant('ItemPerPage', 12)
+    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location, ItemPerPage) {
 
         // Gestion du cache de la pagination :
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
-            numberByPage = 12;
+            numberByPage = ItemPerPage;
 
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
@@ -18,10 +19,15 @@ angular.module('podcast.controller')
 
         $scope.$on('$routeUpdate', function(){
             if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page;
+                $scope.currentPage = $location.search().page || 1;
                 $scope.changePage();
             }
         });
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.changePage();
+        };
 
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;
@@ -36,9 +42,9 @@ angular.module('podcast.controller')
         $scope.wsClient = ngstomp('/download', SockJS);
         $scope.wsClient.connect("user", "password", function(){
             $scope.wsClient.subscribe("/topic/download", function(message) {
-                var item = JSON.parse(message.body);
+                var item = JSON.parse(message.body),
+                    elemToUpdate = _.find($scope.items, { 'id': item.id });
 
-                var elemToUpdate = _.find($scope.items, { 'id': item.id });
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
             });

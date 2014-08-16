@@ -1,8 +1,8 @@
 angular.module('podcast.controller')
-    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager) {
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager, ItemPerPage) {
 
         var tags = Restangular.all("tag"),
-            numberByPage = 12;
+            numberByPage = ItemPerPage;
         $scope.loadTags = function(query) {
             return tags.post(null, {name : query});
         };
@@ -23,10 +23,15 @@ angular.module('podcast.controller')
 
         $scope.$on('$routeUpdate', function(){
             if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page;
+                $scope.currentPage = $location.search().page || 1;
                 $scope.changePage();
             }
         });
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.changePage();
+        };
 
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;

@@ -4,6 +4,7 @@ angular.module('podcastApp', [
     'podcast.services',
     'podcast.partial',
     'ngRoute',
+    'ngTouch',
     'cfp.hotkeys',
     'restangular',
     'AngularStomp',
@@ -301,11 +302,12 @@ angular.module('podcast.controller')
 
     });
 angular.module('podcast.controller')
-    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location) {
+    .constant('ItemPerPage', 12)
+    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location, ItemPerPage) {
 
         // Gestion du cache de la pagination :
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
-            numberByPage = 12;
+            numberByPage = ItemPerPage;
 
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
@@ -320,10 +322,15 @@ angular.module('podcast.controller')
 
         $scope.$on('$routeUpdate', function(){
             if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page;
+                $scope.currentPage = $location.search().page || 1;
                 $scope.changePage();
             }
         });
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.changePage();
+        };
 
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;
@@ -338,9 +345,9 @@ angular.module('podcast.controller')
         $scope.wsClient = ngstomp('/download', SockJS);
         $scope.wsClient.connect("user", "password", function(){
             $scope.wsClient.subscribe("/topic/download", function(message) {
-                var item = JSON.parse(message.body);
+                var item = JSON.parse(message.body),
+                    elemToUpdate = _.find($scope.items, { 'id': item.id });
 
-                var elemToUpdate = _.find($scope.items, { 'id': item.id });
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
             });
@@ -351,10 +358,10 @@ angular.module('podcast.controller')
 
     });
 angular.module('podcast.controller')
-    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager) {
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager, ItemPerPage) {
 
         var tags = Restangular.all("tag"),
-            numberByPage = 12;
+            numberByPage = ItemPerPage;
         $scope.loadTags = function(query) {
             return tags.post(null, {name : query});
         };
@@ -375,10 +382,15 @@ angular.module('podcast.controller')
 
         $scope.$on('$routeUpdate', function(){
             if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page;
+                $scope.currentPage = $location.search().page || 1;
                 $scope.changePage();
             }
         });
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.changePage();
+        };
 
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;
@@ -563,7 +575,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/items-list.html',
-    '<div class="container item-listing">\n' +
+    '<div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
     '    <div class="text-center">\n' +
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
@@ -613,7 +625,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/items-search.html',
-    '<div class="container item-listing">\n' +
+    '<div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
     '    <div class="col-sm-12">\n' +
     '        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentSearchPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +

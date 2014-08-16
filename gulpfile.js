@@ -75,7 +75,6 @@ gulp.task('watch', function() {
 });
 
 gulp.task('inject', function() {
-    console.log(env);
     gulp.src(indexLocation)
         .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { ignorePath : "/bower_components/", addPrefix : "/app/js/lib/"}))
         .pipe(gulp.dest("src/main/webapp/WEB-INF/pages/"));

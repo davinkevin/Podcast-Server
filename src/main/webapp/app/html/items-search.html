@@ -1,4 +1,4 @@
-<div class="container item-listing">
+<div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">
     <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->
     <div class="col-sm-12">
         <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentSearchPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">
