@@ -28,6 +28,7 @@ angular.module('podcast.controller')
                 return "warning";
             return "info";
         };
+
         $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
 
         /** Spécifique aux éléments de la liste : **/
@@ -74,19 +75,10 @@ angular.module('podcast.controller')
                 $scope.waitingitems = JSON.parse(message.body);
             });
             $scope.wsClient.subscribe("/topic/waitingList", function (message) {
-                var newDownloadQueue = JSON.parse(message.body);
+                var remoteWaitingItems = JSON.parse(message.body);
 
-                angular.forEach(newDownloadQueue, function (item, key) {
-                    var indexOfCurrentElement = _.findIndex($scope.waitingitems, { 'id': item.id });
-                    if (indexOfCurrentElement === -1) {
-                        $scope.waitingitems.push(item);
-                    }
-                });
-                angular.forEach($scope.waitingitems, function (item, key) {
-                    var indexOfCurrentElement = _.findIndex(newDownloadQueue, { 'id': item.id });
-                    if (indexOfCurrentElement === -1) {
-                        $scope.waitingitems.splice(key, 1);
-                    }
+                _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
+                    return _.findIndex(inArray, { 'id': elem.id });
                 });
             });
         });

@@ -103,6 +103,35 @@ angular.module('podcast.filters', [])
         };
     }
 );
+/**
+ * Created by kevin on 14/08/2014.
+ */
+
+_.mixin({
+    // Update in place, does not preserve order
+    updateinplace : function(localArray, remoteArray, comparisonFunction) {
+        // Default function working on the === operator by the indexOf function:
+        var comparFunc = comparisonFunction || function (inArray, elem) {
+            return inArray.indexOf(elem);
+        };
+
+        // Remove from localArray what is not in the remote array :
+        _.forEachRight(localArray.slice(), function (elem, key) {
+            if (comparFunc(remoteArray, elem) === -1) {
+                localArray.splice(key, 1);
+            }
+        });
+
+        // Add to localArray what is new in the remote array :
+        _.forEach(remoteArray, function (elem) {
+            if (comparFunc(localArray, elem) === -1) {
+                localArray.push(elem);
+            }
+        });
+
+        return localArray;
+    }
+});
 var podcastServices = angular.module('podcast.services', [/*'ngResource'*/]);
 
 podcastServices.factory('DonwloadManager', function(Restangular) {
@@ -171,6 +200,7 @@ angular.module('podcast.controller')
                 return "warning";
             return "info";
         };
+
         $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
 
         /** Spécifique aux éléments de la liste : **/
@@ -217,19 +247,10 @@ angular.module('podcast.controller')
                 $scope.waitingitems = JSON.parse(message.body);
             });
             $scope.wsClient.subscribe("/topic/waitingList", function (message) {
-                var newDownloadQueue = JSON.parse(message.body);
+                var remoteWaitingItems = JSON.parse(message.body);
 
-                angular.forEach(newDownloadQueue, function (item, key) {
-                    var indexOfCurrentElement = _.findIndex($scope.waitingitems, { 'id': item.id });
-                    if (indexOfCurrentElement === -1) {
-                        $scope.waitingitems.push(item);
-                    }
-                });
-                angular.forEach($scope.waitingitems, function (item, key) {
-                    var indexOfCurrentElement = _.findIndex(newDownloadQueue, { 'id': item.id });
-                    if (indexOfCurrentElement === -1) {
-                        $scope.waitingitems.splice(key, 1);
-                    }
+                _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
+                    return _.findIndex(inArray, { 'id': elem.id });
                 });
             });
         });
@@ -278,7 +299,7 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-    })
+    });
 angular.module('podcast.controller')
     .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location) {
 
@@ -328,7 +349,7 @@ angular.module('podcast.controller')
             $scope.wsClient.disconnect(function(){});
         });
 
-    })
+    });
 angular.module('podcast.controller')
     .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager) {
 
@@ -383,47 +404,6 @@ angular.module('podcast.controller')
             $scope.wsClient.disconnect(function(){});
         });
 
-    })
-angular.module('podcast.controller')
-    .controller('PodcastAddCtrl', function ($scope, Restangular) {
-        var podcasts = Restangular.all("podcast"),
-            tags = Restangular.all("tag");
-
-        $scope.podcast = {
-            hasToBeDeleted : true,
-            cover : {
-                height: 200,
-                width: 200
-            }
-        };
-
-        $scope.loadTags = function(query) {
-            return tags.post(null, {name : query});
-        };
-
-        $scope.changeType = function() {
-            if (/beinsports\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "BeInSports";
-            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "CanalPlus";
-            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "JeuxVideoFR";
-            } else if (/parleys\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Parleys";
-            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Pluzz";
-            } else if (/youtube\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Youtube";
-            } else if ($scope.podcast.url.length > 0) {
-                $scope.podcast.type = "RSS";
-            } else {
-                $scope.podcast.type = "Send";
-            }
-        };
-
-        $scope.save = function() {
-            podcasts.post($scope.podcast);
-        };
     });
 (function(module) {
 try {
@@ -1013,6 +993,47 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 angular.module('podcast.controller')
+    .controller('PodcastAddCtrl', function ($scope, Restangular) {
+        var podcasts = Restangular.all("podcast"),
+            tags = Restangular.all("tag");
+
+        $scope.podcast = {
+            hasToBeDeleted : true,
+            cover : {
+                height: 200,
+                width: 200
+            }
+        };
+
+        $scope.loadTags = function(query) {
+            return tags.post(null, {name : query});
+        };
+
+        $scope.changeType = function() {
+            if (/beinsports\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "BeInSports";
+            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "CanalPlus";
+            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "JeuxVideoFR";
+            } else if (/parleys\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Parleys";
+            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Pluzz";
+            } else if (/youtube\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Youtube";
+            } else if ($scope.podcast.url.length > 0) {
+                $scope.podcast.type = "RSS";
+            } else {
+                $scope.podcast.type = "Send";
+            }
+        };
+
+        $scope.save = function() {
+            podcasts.post($scope.podcast);
+        };
+    });
+angular.module('podcast.controller')
     .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log, $location) {
 
         var idPodcast = $routeParams.podcastId,
@@ -1098,4 +1119,4 @@ angular.module('podcast.controller')
             $scope.podcasts = podcasts;
             localStorageService.add('podcastslist', podcasts);
         });
-    })
+    });

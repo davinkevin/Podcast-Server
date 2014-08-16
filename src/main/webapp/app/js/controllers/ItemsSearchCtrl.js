@@ -52,4 +52,4 @@ angular.module('podcast.controller')
             $scope.wsClient.disconnect(function(){});
         });
 
-    })
+    });

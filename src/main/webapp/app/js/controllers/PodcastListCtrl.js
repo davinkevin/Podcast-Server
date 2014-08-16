@@ -6,4 +6,4 @@ angular.module('podcast.controller')
             $scope.podcasts = podcasts;
             localStorageService.add('podcastslist', podcasts);
         });
-    })
+    });

@@ -39,4 +39,4 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-    })
+    });
