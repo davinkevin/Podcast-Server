@@ -465,6 +465,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <div class="media"  ng-repeat="item in waitingitems" >\n' +
     '\n' +
     '                <div class="pull-right">\n' +
+    '                    <br/>\n' +
     '                    <button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>\n' +
     '                    <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>\n' +
     '                </div>\n' +
@@ -474,7 +475,7 @@ module.run(['$templateCache', function($templateCache) {
     '                </a>\n' +
     '\n' +
     '                <div class="media-body">\n' +
-    '                    <h4 class="media-heading">{{item.title | characters:100}}</h4>\n' +
+    '                    <h5 class="media-heading">{{item.title | characters:100}}</h5>\n' +
     '                </div>\n' +
     '            </div>\n' +
     '\n' +

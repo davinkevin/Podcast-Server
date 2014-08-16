@@ -50,6 +50,7 @@
             <div class="media"  ng-repeat="item in waitingitems" >
 
                 <div class="pull-right">
+                    <br/>
                     <button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>
                     <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>
                 </div>
@@ -59,7 +60,7 @@
                 </a>
 
                 <div class="media-body">
-                    <h4 class="media-heading">{{item.title | characters:100}}</h4>
+                    <h5 class="media-heading">{{item.title | characters:100}}</h5>
                 </div>
             </div>
 
