@@ -30,7 +30,7 @@ var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fil
 var cssDestionation = fileAppLocation.concat('css'),
     jsDestination = fileAppLocation.concat('js');
 
-var environnement = (args.environnement == undefined) ? 'production' : args.environnement;
+var env = args.env  || 'prod';
 
 // Lint Task
 gulp.task('lint', function() {
@@ -47,7 +47,6 @@ gulp.task('js', function() {
             prefix: "html/"
         }))
         .pipe(concat("partials.js"))
-        //.pipe(gulp.dest(jsDestination))
         .pipe(addsrc(angularAppModule))
         .pipe(addsrc(angularAppLocation))
         .pipe(sourcemaps.init())
@@ -56,7 +55,6 @@ gulp.task('js', function() {
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(rename('all.min.js'))
-        //.pipe(sourcemaps.write())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDestination));
 });
@@ -71,17 +69,18 @@ gulp.task('less', function () {
 // Watch Files For Changes
 gulp.task('watch', function() {
     //gulp.watch(angularAppLocation, ['lint']);
-    gulp.start("js", "less");
+    gulp.start("js", "less", 'inject');
     gulp.watch([angularAppLocation, htmlLocation], ['js']);
     gulp.watch(lessLocation, ['less']);
 });
 
 gulp.task('inject', function() {
+    console.log(env);
     gulp.src(indexLocation)
-        .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : environnement})), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
+        .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { ignorePath : "/bower_components/", addPrefix : "/js/lib/"}))
         .pipe(gulp.dest("src/main/webapp/WEB-INF/pages/"));
 
-    gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : environnement}))
+    gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})
         .pipe(gulp.dest("src/main/webapp/app/js/lib/"));
 });
 
