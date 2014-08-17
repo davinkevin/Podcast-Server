@@ -33,13 +33,6 @@ import java.util.Properties;
 public class JPAConfig {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    /*
-    hibernate.dialect=org.hibernate.dialect.H2Dialect
-    hibernate.format_sql=true
-    hibernate.ejb.naming_strategy=org.hibernate.cfg.ImprovedNamingStrategy
-    hibernate.show_sql=true
-    entitymanager.packages.to.scan=lan.dk.podcastserver.entity
-     */
 
     // DATASOURCE VALUES :
     private static final String PROPERTY_DATABASEDRIVER_NAME = "db.driver";
