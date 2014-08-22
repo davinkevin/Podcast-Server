@@ -2,7 +2,7 @@ package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.JPAEmbeddedConfig;
+import lan.dk.podcastserver.config.JPAConfig;
 import lan.dk.podcastserver.context.PropertyConfigTest;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertThat;
  * Created by kevin on 14/12/2013.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {JPAEmbeddedConfig.class, BeanConfigScan.class, PropertyConfigTest.class})
+@ContextConfiguration(classes = {JPAConfig.class, BeanConfigScan.class, PropertyConfigTest.class})
 @ActiveProfiles("data-embedded")
 public class RssUpdaterTest {
 

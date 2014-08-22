@@ -3,7 +3,7 @@ package lan.dk.podcastserver.Business;
 import junit.framework.Assert;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.JPAEmbeddedConfig;
+import lan.dk.podcastserver.config.JPAConfig;
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -18,13 +18,16 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by kevin on 01/02/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, JPAEmbeddedConfig.class, BeanConfigScan.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {PropertyConfig.class, JPAConfig.class, BeanConfigScan.class}, loader=AnnotationConfigContextLoader.class)
 @ActiveProfiles("data-embedded")
 public class UpdateBusinessTest {
 
