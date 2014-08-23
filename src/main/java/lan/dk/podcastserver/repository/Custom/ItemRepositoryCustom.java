@@ -9,5 +9,7 @@ public interface ItemRepositoryCustom {
 
     List<Item> findAllItemNotDownloadedNewerThan(Date date);
     List<Item> findAllItemDownloadedOlderThan(Date date);
+    void reindex() throws InterruptedException;
+    List<Integer> fullTextSearch(String term);
 
 }

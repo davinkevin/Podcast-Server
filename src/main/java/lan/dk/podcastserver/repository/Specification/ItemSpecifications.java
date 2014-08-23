@@ -15,6 +15,10 @@ import java.util.List;
  */
 public class ItemSpecifications {
 
+    public static Specification<Item> isInTags(List<Tag> tags) {
+        return isInTags(tags.toArray(new Tag[tags.size()]));
+    }
+
     public static Specification<Item> isInTags(final Tag... tags) {
         return new Specification<Item>() {
             @Override
@@ -27,6 +31,15 @@ public class ItemSpecifications {
                 }
 
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+    }
+
+    public static Specification<Item> hasId(final List<Integer> ids) {
+        return new Specification<Item>() {
+            @Override
+            public Predicate toPredicate(Root<Item> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return root.<Integer>get("id").in(ids);
             }
         };
     }

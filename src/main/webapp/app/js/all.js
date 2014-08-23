@@ -1,3 +1,4 @@
+angular.module('podcast.controller', []);
 angular.module('podcastApp', [
     'podcast.controller',
     'podcast.filters',
@@ -96,7 +97,6 @@ angular.module('podcastApp', [
     .config(['RestangularProvider', function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
     }]);
-angular.module('podcast.controller', []);
 angular.module('podcast.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -362,6 +362,8 @@ angular.module('podcast.controller')
 
         var tags = Restangular.all("tag"),
             numberByPage = ItemPerPage;
+
+
         $scope.loadTags = function(query) {
             return tags.post(null, {name : query});
         };
@@ -371,11 +373,13 @@ angular.module('podcast.controller')
 
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
-            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
-            Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+            $scope.currentPage = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
+            Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
                 $scope.items = itemsResponse.content;
                 $scope.totalItems = parseInt(itemsResponse.totalElements);
                 cache.put('currentSearchPage', $scope.currentPage);
+                cache.put('currentSearchWord', $scope.term);
+                cache.put('currentSearchTags', $scope.searchTags);
                 $location.search("page", $scope.currentPage);
             });
         };
@@ -396,6 +400,8 @@ angular.module('podcast.controller')
         $scope.totalItems = Number.MAX_VALUE;
         $scope.maxSize = 10;
         $scope.currentPage = cache.get("currentSearchPage") || 1;
+        $scope.term = cache.get("currentSearchWord") || "";
+        $scope.searchTags = cache.get("currentSearchTags") || undefined;
         $scope.changePage();
 
         $scope.download = DonwloadManager.download;
@@ -627,10 +633,17 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/items-search.html',
     '<div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
-    '    <div class="col-sm-12">\n' +
-    '        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentSearchPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
-    '            <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
-    '        </tags-input>\n' +
+    '\n' +
+    '    <div class="form-inline search-bar">\n' +
+    '        <div class="form-group col-sm-4">\n' +
+    '            <input type="text" class="form-control" ng-model="term" placeholder="Recherche globale" ng-change="currentSearchPage=1; changePage()" ng-model-options="{ debounce: 500 }">\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div class="col-sm-6">\n' +
+    '            <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
+    '                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
+    '            </tags-input>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '\n' +
     '    <div class="text-center">\n' +

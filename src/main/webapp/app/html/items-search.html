@@ -1,9 +1,16 @@
 <div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">
     <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->
-    <div class="col-sm-12">
-        <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" min-length="1" class="bootstrap" on-tag-added="currentSearchPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">
-            <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
-        </tags-input>
+
+    <div class="form-inline search-bar">
+        <div class="form-group col-sm-4">
+            <input type="text" class="form-control" ng-model="term" placeholder="Recherche globale" ng-change="currentSearchPage=1; changePage()" ng-model-options="{ debounce: 500 }">
+        </div>
+
+        <div class="col-sm-6">
+            <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">
+                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
+            </tags-input>
+        </div>
     </div>
 
     <div class="text-center">

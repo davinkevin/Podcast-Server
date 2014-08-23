@@ -3,6 +3,8 @@ angular.module('podcast.controller')
 
         var tags = Restangular.all("tag"),
             numberByPage = ItemPerPage;
+
+
         $scope.loadTags = function(query) {
             return tags.post(null, {name : query});
         };
@@ -12,11 +14,13 @@ angular.module('podcast.controller')
 
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
-            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
-            Restangular.one("item/pagination/tags").post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+            $scope.currentPage = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
+            Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
                 $scope.items = itemsResponse.content;
                 $scope.totalItems = parseInt(itemsResponse.totalElements);
                 cache.put('currentSearchPage', $scope.currentPage);
+                cache.put('currentSearchWord', $scope.term);
+                cache.put('currentSearchTags', $scope.searchTags);
                 $location.search("page", $scope.currentPage);
             });
         };
@@ -37,6 +41,8 @@ angular.module('podcast.controller')
         $scope.totalItems = Number.MAX_VALUE;
         $scope.maxSize = 10;
         $scope.currentPage = cache.get("currentSearchPage") || 1;
+        $scope.term = cache.get("currentSearchWord") || "";
+        $scope.searchTags = cache.get("currentSearchTags") || undefined;
         $scope.changePage();
 
         $scope.download = DonwloadManager.download;

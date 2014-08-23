@@ -4,11 +4,14 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +24,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.hasId;
 import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.isInTags;
+import static org.springframework.data.jpa.domain.Specifications.where;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -45,9 +50,24 @@ public class ItemBusiness {
         return itemRepository.findAll(pageable);
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public Page<Item> findAllByPodcastTags(List<Tag> tags, Pageable pageable) {
-        return itemRepository.findAll(isInTags(tags.toArray(new Tag[tags.size()])), pageable);
+        return itemRepository.findAll(isInTags(tags), pageable);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, PageRequest page) {
+        return itemRepository.findAll(
+                getSearchSpecifications(term, tags), page);
+    }
+
+    private Specifications<Item> getSearchSpecifications(String term, List<Tag> tags) {
+        if (StringUtils.isEmpty(term)) {
+            return where(isInTags(tags));
+        }
+
+        return where( hasId(itemRepository.fullTextSearch(term)) ).and( isInTags(tags) );
     }
 
     public List<Item> save(Iterable<Item> entities) {
@@ -137,5 +157,7 @@ public class ItemBusiness {
     }
 
 
-
+    public void reindex() throws InterruptedException {
+        itemRepository.reindex();
+    }
 }

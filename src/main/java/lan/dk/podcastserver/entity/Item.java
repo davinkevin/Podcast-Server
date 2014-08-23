@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
@@ -16,6 +19,7 @@ import java.sql.Timestamp;
 
 @Table(name = "item")
 @Entity
+@Indexed
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Item implements Serializable {
 
@@ -78,6 +82,7 @@ public class Item implements Serializable {
     }
 
     @Id
+    @DocumentId
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     public int getId() {
@@ -91,6 +96,7 @@ public class Item implements Serializable {
 
     @Column(name = "title")
     @Basic
+    @Field
     public String getTitle() {
         return title;
     }
@@ -190,6 +196,7 @@ public class Item implements Serializable {
 
     @Column(name = "description", length = 65535)
     @Basic
+    @Field
     public String getDescription() {
         return description;
     }

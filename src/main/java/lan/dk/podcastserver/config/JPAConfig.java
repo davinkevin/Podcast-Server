@@ -66,6 +66,17 @@ public class JPAConfig {
     private static final String PROPERTY_HBM2DDLAUTO_NAME = "hibernate.hbm2ddl.auto";
     private static final String PROPERTY_HBM2DDLAUTO_DEFAULT = "update";
 
+    // Hibernate Search :
+    private static final String PROPERTY_INDEXMANAGER_NAME = "hibernate.search.default.indexmanager";
+    private static final String PROPERTY_INDEXMANAGER_DEFAULT = "near-real-time";
+
+    private static final String PROPERTY_DIRECTORYPROVIDER_NAME = "hibernate.search.default.directory_provider";
+    private static final String PROPERTY_DIRECTORYPROVIDER_DEFAULT = "filesystem";
+
+    private static final String PROPERTY_INDEXBASE_NAME = "hibernate.search.default.indexBase";
+    private static final String PROPERTY_INDEXBASE_DEFAULT = "/tmp/lucene";
+
+    // H2 Database :
     public static final String[] PARAMETER_H2_SERVER = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", "9999"};
 
     @Resource
@@ -127,6 +138,12 @@ public class JPAConfig {
         jpaProperties.put(PROPERTY_HIBERNATENAMINGSTRATEGY_NAME, environment.getProperty(PROPERTY_HIBERNATENAMINGSTRATEGY_NAME, PROPERTY_HIBERNATENAMINGSTRATEGY_DEFAULT));
         jpaProperties.put(PROPERTY_HIBERNATESHOWSQL_NAME, environment.getProperty(PROPERTY_HIBERNATESHOWSQL_NAME, PROPERTY_HIBERNATESHOWSQL_DEFAULT));
         jpaProperties.put(PROPERTY_HBM2DDLAUTO_NAME, environment.getProperty(PROPERTY_HBM2DDLAUTO_NAME, PROPERTY_HBM2DDLAUTO_DEFAULT));
+
+        // Hibernate Search :
+        jpaProperties.put(PROPERTY_INDEXMANAGER_NAME, environment.getProperty(PROPERTY_INDEXMANAGER_NAME, PROPERTY_INDEXMANAGER_DEFAULT));
+        jpaProperties.put(PROPERTY_DIRECTORYPROVIDER_NAME, environment.getProperty(PROPERTY_DIRECTORYPROVIDER_NAME, PROPERTY_DIRECTORYPROVIDER_DEFAULT));
+        jpaProperties.put(PROPERTY_INDEXBASE_NAME, environment.getProperty(PROPERTY_INDEXBASE_NAME, PROPERTY_INDEXBASE_DEFAULT));
+
 
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
