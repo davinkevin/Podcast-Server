@@ -15,12 +15,17 @@ angular.module('podcast.controller')
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
             $scope.currentPage = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
-            Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+            Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}).then(function(itemsResponse) {
                 $scope.items = itemsResponse.content;
-                $scope.totalItems = parseInt(itemsResponse.totalElements);
-                cache.put('currentSearchPage', $scope.currentPage);
-                cache.put('currentSearchWord', $scope.term);
-                cache.put('currentSearchTags', $scope.searchTags);
+                $scope.totalPages = itemsResponse.totalPages;
+                $scope.totalItems = itemsResponse.totalElements;
+
+                cache.put('search:currentPage', $scope.currentPage);
+                cache.put('search:currentWord', $scope.term);
+                cache.put('search:currentTags', $scope.searchTags);
+                cache.put("search:direction", $scope.direction);
+                cache.put("search:properties", $scope.properties);
+
                 $location.search("page", $scope.currentPage);
             });
         };
@@ -40,9 +45,13 @@ angular.module('podcast.controller')
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;
         $scope.maxSize = 10;
-        $scope.currentPage = cache.get("currentSearchPage") || 1;
-        $scope.term = cache.get("currentSearchWord") || "";
-        $scope.searchTags = cache.get("currentSearchTags") || undefined;
+
+        $scope.currentPage = cache.get("search:currentPage") || 1;
+        $scope.term = cache.get("search:currentWord") || "";
+        $scope.searchTags = cache.get("search:currentTags") || undefined;
+        $scope.direction = cache.get("search:direction") || undefined;
+        $scope.properties = cache.get("search:properties") || undefined;
+
         $scope.changePage();
 
         $scope.download = DonwloadManager.download;

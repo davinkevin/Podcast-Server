@@ -1,19 +1,32 @@
 <div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">
     <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->
 
-    <div class="form-inline search-bar">
-        <div class="form-group col-sm-4">
+    <div class="form-inline search-bar row">
+        <div class="form-group col-sm-3">
             <input type="text" class="form-control" ng-model="term" placeholder="Recherche globale" ng-change="currentSearchPage=1; changePage()" ng-model-options="{ debounce: 500 }">
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-5">
             <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">
                 <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
             </tags-input>
         </div>
+
+        <div class="col-sm-2">
+            <select class="form-control" ng-model="properties" ng-change="changePage()">
+                <option value="pertinence">Pertinence</option>
+                <option value="pubdate">Date publication</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <select class="form-control" ng-model="direction" ng-change="changePage()" ng-disabled="properties === 'pertinence'">
+                <option value="DESC">Descendant</option>
+                <option value="ASC">Ascendant</option>
+            </select>
+        </div>
     </div>
 
-    <div class="text-center">
+    <div class="text-center row" ng-show="totalPages > 1">
         <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
     </div>
         <div class="row">
@@ -45,7 +58,7 @@
             </div>
         </div>
     <!--</div>-->
-    <div class="text-center row">
+    <div class="text-center row" ng-show="totalPages > 1">
         <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
     </div>
 </div>

@@ -87,8 +87,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
         fullTextEntityManager
                             .createIndexer(Item.class)
-                            .batchSizeToLoadObjects( 25 )
-                            .cacheMode( CacheMode.NORMAL )
+                            .batchSizeToLoadObjects(25)
+                            .cacheMode(CacheMode.NORMAL)
                             .idFetchSize(150)
                             .progressMonitor(new SimpleIndexingProgressMonitor(100))
                             .startAndWait();
@@ -111,12 +111,18 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                             .matching(term).createQuery();
 
         List results = fullTextEntityManager.createFullTextQuery(luceneQuery, Item.class)
+                //.setSort(new org.apache.lucene.search.Sort(new SortField(null, SortField.SCORE, getLuceneOrder(direction))))
                 .setProjection("id")
                 .setResultTransformer(new HibernateIdExtractor())
                 .getResultList();
 
         logger.info(results.toString());
-
         return results;
     }
+
+    /*
+    private Boolean getLuceneOrder(Sort.Direction direction) {
+        return "DESC".equals(direction.name());
+    }
+    */
 }

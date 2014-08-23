@@ -58,8 +58,11 @@ public class ItemBusiness {
 
     @SuppressWarnings("unchecked")
     public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, PageRequest page) {
-        return itemRepository.findAll(
-                getSearchSpecifications(term, tags), page);
+        if (page.getSort().getOrderFor("pertinence") == null) {
+            return itemRepository.findAll(getSearchSpecifications(term, tags), page);
+        }
+
+        return itemRepository.findAll(getSearchSpecifications(term, tags), new PageRequest(page.getPageNumber(), page.getPageSize()));
     }
 
     private Specifications<Item> getSearchSpecifications(String term, List<Tag> tags) {

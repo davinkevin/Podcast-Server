@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.Business;
 
-import junit.framework.Assert;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.config.JPAConfig;
@@ -22,6 +21,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 01/02/2014.
@@ -65,7 +66,7 @@ public class UpdateBusinessTest {
         podcastRepository.save(podcastToBeDeleted);
 
         List<Item> hasToBeDeleted = itemBusiness.findAllToDelete();
-        Assert.assertEquals(1, hasToBeDeleted.size());
+        assertThat(hasToBeDeleted).hasSize(1);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class UpdateBusinessTest {
         podcastRepository.save(podcastToBeKept);
 
         List<Item> hasToBeDeleted = itemBusiness.findAllToDelete();
-        Assert.assertEquals(0, hasToBeDeleted.size());
+        assertThat(hasToBeDeleted).hasSize(0);
     }
 
 }

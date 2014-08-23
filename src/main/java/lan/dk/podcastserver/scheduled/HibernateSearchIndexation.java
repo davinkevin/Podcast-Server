@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.scheduled;
 
 import lan.dk.podcastserver.business.ItemBusiness;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -13,7 +14,7 @@ public class HibernateSearchIndexation {
 
     @Resource ItemBusiness itemBusiness;
 
-    //@Scheduled(fixedDelay = 86400000, initialDelay = 10000)
+    @Scheduled(fixedDelay = 86400000)
     private void refreshIndex() throws InterruptedException {
         itemBusiness.reindex();
     }

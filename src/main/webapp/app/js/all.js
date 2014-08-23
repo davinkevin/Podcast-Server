@@ -1,4 +1,3 @@
-angular.module('podcast.controller', []);
 angular.module('podcastApp', [
     'podcast.controller',
     'podcast.filters',
@@ -97,6 +96,7 @@ angular.module('podcastApp', [
     .config(['RestangularProvider', function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
     }]);
+angular.module('podcast.controller', []);
 angular.module('podcast.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -374,12 +374,17 @@ angular.module('podcast.controller')
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
             $scope.currentPage = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
-            Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
+            Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}).then(function(itemsResponse) {
                 $scope.items = itemsResponse.content;
-                $scope.totalItems = parseInt(itemsResponse.totalElements);
-                cache.put('currentSearchPage', $scope.currentPage);
-                cache.put('currentSearchWord', $scope.term);
-                cache.put('currentSearchTags', $scope.searchTags);
+                $scope.totalPages = itemsResponse.totalPages;
+                $scope.totalItems = itemsResponse.totalElements;
+
+                cache.put('search:currentPage', $scope.currentPage);
+                cache.put('search:currentWord', $scope.term);
+                cache.put('search:currentTags', $scope.searchTags);
+                cache.put("search:direction", $scope.direction);
+                cache.put("search:properties", $scope.properties);
+
                 $location.search("page", $scope.currentPage);
             });
         };
@@ -399,9 +404,13 @@ angular.module('podcast.controller')
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;
         $scope.maxSize = 10;
-        $scope.currentPage = cache.get("currentSearchPage") || 1;
-        $scope.term = cache.get("currentSearchWord") || "";
-        $scope.searchTags = cache.get("currentSearchTags") || undefined;
+
+        $scope.currentPage = cache.get("search:currentPage") || 1;
+        $scope.term = cache.get("search:currentWord") || "";
+        $scope.searchTags = cache.get("search:currentTags") || undefined;
+        $scope.direction = cache.get("search:direction") || undefined;
+        $scope.properties = cache.get("search:properties") || undefined;
+
         $scope.changePage();
 
         $scope.download = DonwloadManager.download;
@@ -634,19 +643,32 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">\n' +
     '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
     '\n' +
-    '    <div class="form-inline search-bar">\n' +
-    '        <div class="form-group col-sm-4">\n' +
+    '    <div class="form-inline search-bar row">\n' +
+    '        <div class="form-group col-sm-3">\n' +
     '            <input type="text" class="form-control" ng-model="term" placeholder="Recherche globale" ng-change="currentSearchPage=1; changePage()" ng-model-options="{ debounce: 500 }">\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="col-sm-6">\n' +
+    '        <div class="col-sm-5">\n' +
     '            <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
     '                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
     '            </tags-input>\n' +
     '        </div>\n' +
+    '\n' +
+    '        <div class="col-sm-2">\n' +
+    '            <select class="form-control" ng-model="properties" ng-change="changePage()">\n' +
+    '                <option value="pertinence">Pertinence</option>\n' +
+    '                <option value="pubdate">Date publication</option>\n' +
+    '            </select>\n' +
+    '        </div>\n' +
+    '        <div class="col-sm-2">\n' +
+    '            <select class="form-control" ng-model="direction" ng-change="changePage()" ng-disabled="properties === \'pertinence\'">\n' +
+    '                <option value="DESC">Descendant</option>\n' +
+    '                <option value="ASC">Ascendant</option>\n' +
+    '            </select>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '\n' +
-    '    <div class="text-center">\n' +
+    '    <div class="text-center row" ng-show="totalPages > 1">\n' +
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
@@ -678,7 +700,7 @@ module.run(['$templateCache', function($templateCache) {
     '            </div>\n' +
     '        </div>\n' +
     '    <!--</div>-->\n' +
-    '    <div class="text-center row">\n' +
+    '    <div class="text-center row" ng-show="totalPages > 1">\n' +
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '</div>\n' +
