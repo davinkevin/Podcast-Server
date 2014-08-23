@@ -42,6 +42,12 @@ angular.module('podcast.controller')
             $scope.changePage();
         };
 
+        $scope.remove = function (item) {
+            return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+                return $scope.changePage();
+            });
+        };
+
         // Longeur inconnu au chargement :
         $scope.totalItems = Number.MAX_VALUE;
         $scope.maxSize = 10;

@@ -260,7 +260,7 @@ angular.module('podcast.controller')
         });
     });
 angular.module('podcast.controller')
-    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, ngstomp, DonwloadManager) {
+    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, ngstomp, DonwloadManager, $location) {
 
         var idItem = $routeParams.itemId;
 
@@ -289,10 +289,8 @@ angular.module('podcast.controller')
         });
 
         $scope.remove = function(item) {
-            Restangular.one("item", item.id).remove().then(function() {
-                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
-                    return (elem.id == item.id);
-                });
+            return item.remove().then(function() {
+                $location.path('/podcast/'.concat($scope.item.podcast.id));
             });
         };
 
@@ -330,6 +328,12 @@ angular.module('podcast.controller')
         $scope.swipePage = function(val) {
             $scope.currentPage += val;
             $scope.changePage();
+        };
+
+        $scope.remove = function (item) {
+           return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+              return $scope.changePage();
+           });
         };
 
         // Longeur inconnu au chargement :
@@ -399,6 +403,12 @@ angular.module('podcast.controller')
         $scope.swipePage = function(val) {
             $scope.currentPage += val;
             $scope.changePage();
+        };
+
+        $scope.remove = function (item) {
+            return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+                return $scope.changePage();
+            });
         };
 
         // Longeur inconnu au chargement :
