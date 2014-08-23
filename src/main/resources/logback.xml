@@ -22,6 +22,8 @@
   
   <logger name="lan.dk.podcastserver" level="DEBUG"/>
   <logger name="lan.dk.podcastserver.utils" level="ERROR"/>
+  <logger name="org.hibernate.search.impl" level="INFO" />
+
   <logger name="org.hibernate" level="OFF" />
   <logger name="org.hibernate.validator" level="OFF" />
 
@@ -34,7 +36,6 @@
 
 
   <root level="info">
-    <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
   </root>
 

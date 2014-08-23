@@ -5,6 +5,8 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.Custom.ItemRepositoryCustom;
 import lan.dk.podcastserver.utils.hibernate.transformer.HibernateIdExtractor;
 import org.apache.lucene.search.Query;
+import org.hibernate.CacheMode;
+import org.hibernate.search.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -85,10 +87,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
         fullTextEntityManager
                             .createIndexer(Item.class)
+                            .batchSizeToLoadObjects( 25 )
+                            .cacheMode( CacheMode.NORMAL )
+                            .idFetchSize(150)
+                            .progressMonitor(new SimpleIndexingProgressMonitor(100))
                             .startAndWait();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Integer> fullTextSearch(String term) {
         FullTextEntityManager fullTextEntityManager =
                 org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
