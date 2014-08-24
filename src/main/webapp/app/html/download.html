@@ -22,7 +22,7 @@
             <button ng-click="stopAllDownload()" type="button" class="btn btn-default">Stop</button>
         </div>
     </div>
-    <div class="media"  ng-repeat="item in items track by item.id | orderBy:progression" >
+    <div class="media"  ng-repeat="item in items | orderBy:'-progression' track by item.id" >
 
         <div class="buttonList pull-right">
             <br/>
@@ -31,7 +31,7 @@
         </div>
 
         <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
-            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+            <img ng-src="{{item.cover.url}}" >
         </a>
 
         <div class="media-body">
@@ -47,7 +47,7 @@
     <accordion close-others="true">
         <accordion-group heading="Liste d'attente" is-open="false">
 
-            <div class="media"  ng-repeat="item in waitingitems" >
+            <div class="media clearfix"  ng-repeat="item in waitingitems"  >
 
                 <div class="pull-right">
                     <br/>
@@ -56,7 +56,7 @@
                 </div>
 
                 <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
-                    <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+                    <img ng-src="{{item.cover.url}}">
                 </a>
 
                 <div class="media-body">

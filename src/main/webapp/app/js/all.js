@@ -509,7 +509,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <button ng-click="stopAllDownload()" type="button" class="btn btn-default">Stop</button>\n' +
     '        </div>\n' +
     '    </div>\n' +
-    '    <div class="media"  ng-repeat="item in items track by item.id | orderBy:progression" >\n' +
+    '    <div class="media"  ng-repeat="item in items | orderBy:\'-progression\' track by item.id" >\n' +
     '\n' +
     '        <div class="buttonList pull-right">\n' +
     '            <br/>\n' +
@@ -518,7 +518,7 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '\n' +
     '        <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">\n' +
-    '            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
+    '            <img ng-src="{{item.cover.url}}" >\n' +
     '        </a>\n' +
     '\n' +
     '        <div class="media-body">\n' +
@@ -534,7 +534,7 @@ module.run(['$templateCache', function($templateCache) {
     '    <accordion close-others="true">\n' +
     '        <accordion-group heading="Liste d\'attente" is-open="false">\n' +
     '\n' +
-    '            <div class="media"  ng-repeat="item in waitingitems" >\n' +
+    '            <div class="media clearfix"  ng-repeat="item in waitingitems"  >\n' +
     '\n' +
     '                <div class="pull-right">\n' +
     '                    <br/>\n' +
@@ -543,7 +543,7 @@ module.run(['$templateCache', function($templateCache) {
     '                </div>\n' +
     '\n' +
     '                <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">\n' +
-    '                    <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
+    '                    <img ng-src="{{item.cover.url}}">\n' +
     '                </a>\n' +
     '\n' +
     '                <div class="media-body">\n' +
@@ -960,6 +960,7 @@ module.run(['$templateCache', function($templateCache) {
     '                        <option value="CanalPlus">Canal+</option>\n' +
     '                        <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
     '                        <option value="Parleys">Parleys</option>\n' +
+    '                        <option value="Pluzz">Pluzz</option>\n' +
     '                        <option value="RSS">RSS</option>\n' +
     '                        <option value="send">Send</option>\n' +
     '                        <option value="Youtube">Youtube</option>\n' +
