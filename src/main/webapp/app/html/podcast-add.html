@@ -55,7 +55,7 @@
             </div>
         </div>
         <div class="col-md-2 col-md-offset-1">
-            <img ng-src="{{ podcast.cover.url }}" class="img-thumbnail" bs-Holder>
+            <img ng-src="{{ podcast.cover.url || 'http://placehold.it/200x200' }}" class="img-thumbnail">
         </div>
         <div class="col-md-9">
             <div class="form-group">

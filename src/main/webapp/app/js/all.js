@@ -822,7 +822,7 @@ module.run(['$templateCache', function($templateCache) {
     '            </div>\n' +
     '        </div>\n' +
     '        <div class="col-md-2 col-md-offset-1">\n' +
-    '            <img ng-src="{{ podcast.cover.url }}" class="img-thumbnail" bs-Holder>\n' +
+    '            <img ng-src="{{ podcast.cover.url || \'http://placehold.it/200x200\' }}" class="img-thumbnail">\n' +
     '        </div>\n' +
     '        <div class="col-md-9">\n' +
     '            <div class="form-group">\n' +
@@ -1184,7 +1184,7 @@ angular.module('podcast.controller')
 
     });
 angular.module('podcast.controller')
-    .controller('PodcastAddCtrl', function ($scope, Restangular) {
+    .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
         var podcasts = Restangular.all("podcast"),
             tags = Restangular.all("tag");
 
@@ -1221,7 +1221,9 @@ angular.module('podcast.controller')
         };
 
         $scope.save = function() {
-            podcasts.post($scope.podcast);
+            podcasts.post($scope.podcast).then(function (podcast) {
+                $location.path('/podcast/' + podcast.id);
+            });
         };
     });
 angular.module('podcast.controller')
