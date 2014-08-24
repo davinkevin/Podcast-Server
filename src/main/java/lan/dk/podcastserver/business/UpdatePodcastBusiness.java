@@ -40,7 +40,7 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
     @Value("${rootfolder:${catalina.home}/webapp/podcast/}") protected String rootFolder;
     @Value("${serverURL:http://localhost:8080}") protected String serverURL;
     @Value("${fileContainer:http://localhost:8080/podcast}") protected String fileContainer;
-    @Value("${numberofdaytodownload:3}") private int numberofdaytodownload;
+    @Value("${numberofdaytodownload:30}") private int numberofdaytodownload;
 
 
 

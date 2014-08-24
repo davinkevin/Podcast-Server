@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.config;
 
 import org.h2.server.web.WebServlet;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -16,9 +15,6 @@ import javax.servlet.ServletRegistration;
 
 @Order(1)
 public class WebApplicationInitialisation extends AbstractAnnotationConfigDispatcherServletInitializer {
-
-    @Value("${numberofdaytodownload:3}")
-    private int numberofdaytodownload;
 
     @Override
     protected Class<?>[] getRootConfigClasses() {

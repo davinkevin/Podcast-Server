@@ -32,7 +32,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final Integer YOUTUBE_MAX_RESULTS = 50;
     private String GDATA_USER_FEED = "http://gdata.youtube.com/feeds/api/users/";
     private String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
-    @Value("${numberofdaytodownload:3}") int numberOfDayToDownload;
+    @Value("${numberofdaytodownload:30}") int numberOfDayToDownload;
 
     public Podcast updateFeed(Podcast podcast) {
 

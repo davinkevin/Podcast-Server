@@ -41,7 +41,7 @@ public class ItemBusiness {
     @Resource ItemRepository itemRepository;
     @Resource PodcastBusiness podcastBusiness;
 
-    @Value("${numberofdaytodownload:3}") int numberOfDayToDownload;
+    @Value("${numberofdaytodownload:30}") int numberOfDayToDownload;
 
     //** Delegation Repository **//
     public List<Item> findAll() {
