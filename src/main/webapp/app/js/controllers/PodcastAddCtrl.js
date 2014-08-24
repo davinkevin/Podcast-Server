@@ -1,5 +1,5 @@
 angular.module('podcast.controller')
-    .controller('PodcastAddCtrl', function ($scope, Restangular) {
+    .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
         var podcasts = Restangular.all("podcast"),
             tags = Restangular.all("tag");
 
@@ -36,6 +36,8 @@ angular.module('podcast.controller')
         };
 
         $scope.save = function() {
-            podcasts.post($scope.podcast);
+            podcasts.post($scope.podcast).then(function (podcast) {
+                $location.path('/podcast/' + podcast.id);
+            });
         };
     });
