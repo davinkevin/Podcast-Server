@@ -1041,7 +1041,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
     '\n' +
     '\n' +
-    '        <div class="btn-group" dropdown is-open="status.isopen">\n' +
+    '        <div class="btn-group" dropdown is-open="isopen">\n' +
     '            <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
     '            <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
     '                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
@@ -1105,8 +1105,6 @@ angular.module('podcast.controller')
             { title:'Episodes', templateUrl:'html/podcast-details-episodes.html', active : true },
             { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
         ];
-
-
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -1175,7 +1173,7 @@ angular.module('podcast.controller')
             });
         };
 
-        $scope.resetItem = function (item) {
+        $scope.reset = function (item) {
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);

@@ -9,8 +9,6 @@ angular.module('podcast.controller')
             { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
         ];
 
-
-
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
             localStorageService.add("podcast/" + idPodcast, newval[0]);
@@ -78,7 +76,7 @@ angular.module('podcast.controller')
             });
         };
 
-        $scope.resetItem = function (item) {
+        $scope.reset = function (item) {
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);

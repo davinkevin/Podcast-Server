@@ -84,10 +84,10 @@
 <script src="/app/js/lib/angular-hotkeys/build/hotkeys.min.js"></script>
 <!-- endinject -->
 
-<script src="/app/js/all.min.js"></script>
 <%--
-<script src="/app/js/all.js"></script>
+<script src="/app/js/all.min.js"></script>
 --%>
+<script src="/app/js/all.js"></script>
 
 </body>
 </html>

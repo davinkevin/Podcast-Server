@@ -19,7 +19,7 @@
         <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
 
 
-        <div class="btn-group" dropdown is-open="status.isopen">
+        <div class="btn-group" dropdown is-open="isopen">
             <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>
             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                 <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>
