@@ -21,6 +21,7 @@ public class jDomUtils {
 
     private static Logger logger = LoggerFactory.getLogger(jDomUtils.class);
 
+    @Deprecated
     public static Podcast getPodcastFromURL(URL url) {
         Podcast podcast = new Podcast();
         podcast.setUrl(url.toString());

@@ -312,5 +312,8 @@ public class ItemDownloadManager implements ApplicationContextAware {
         return item.getNumberOfTry()+1 <= numberOfTry;
     }
 
+    public Boolean isInDownloadingQueue(Item item) {
+        return downloadingQueue.containsKey(item);
+    }
 
 }

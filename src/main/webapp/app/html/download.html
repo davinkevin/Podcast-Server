@@ -30,7 +30,7 @@
             <button ng-click="stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
         </div>
 
-        <a class="pull-left" ng-href="#/item/{{item.id}}">
+        <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
             <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
         </a>
 
@@ -55,7 +55,7 @@
                     <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>
                 </div>
 
-                <a class="pull-left" ng-href="#/item/{{item.id}}">
+                <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
                     <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
                 </a>
 

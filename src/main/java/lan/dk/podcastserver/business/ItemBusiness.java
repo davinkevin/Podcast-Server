@@ -36,8 +36,11 @@ import static org.springframework.data.jpa.domain.Specifications.where;
 public class ItemBusiness {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Resource ItemDownloadManager itemDownloadManager;
+
     @Resource ItemRepository itemRepository;
-    protected @Resource ItemDownloadManager itemDownloadManager;
+    @Resource PodcastBusiness podcastBusiness;
+
     @Value("${numberofdaytodownload:3}") int numberOfDayToDownload;
 
     //** Delegation Repository **//
@@ -138,6 +141,13 @@ public class ItemBusiness {
         return this.findAllItemDownloadedOlderThan(c.getTime());
     }
 
+    @Transactional(readOnly = true)
+    public List<Item> findByPodcast(Integer idPodcast) {
+        return itemRepository.findByPodcast(podcastBusiness.findOne(idPodcast));
+    }
+
+
+
     public String getEpisodeFile(int id) {
         Item item = this.findOne(id);
         try {
@@ -151,9 +161,7 @@ public class ItemBusiness {
                 logger.info("Externe - Item " + id + " : " + item.getUrl());
                 return item.getUrl();
             }
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return "";
@@ -162,5 +170,14 @@ public class ItemBusiness {
 
     public void reindex() throws InterruptedException {
         itemRepository.reindex();
+    }
+
+    public Item reset(Integer id) {
+        Item itemToReset = findOne(id);
+
+        if (itemDownloadManager.isInDownloadingQueue(itemToReset))
+            return null;
+
+        return save(itemToReset.reset());
     }
 }

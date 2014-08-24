@@ -76,7 +76,7 @@ gulp.task('watch', function() {
 
 gulp.task('inject', function() {
     gulp.src(indexLocation)
-        .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { ignorePath : "/bower_components/", addPrefix : "/app/js/lib/"}))
+        .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { ignorePath : "/bower_components/", addPrefix : "/app/js/lib"}))
         .pipe(gulp.dest("src/main/webapp/WEB-INF/pages/"));
 
     gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})

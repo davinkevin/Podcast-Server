@@ -1,8 +1,6 @@
 package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.business.PodcastBusiness;
-import lan.dk.podcastserver.business.TagBusiness;
-import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import org.slf4j.Logger;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,7 +23,6 @@ public class PodcastController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource private PodcastBusiness podcastBusiness;
-    @Resource private TagBusiness tagBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, produces = "application/json")
     @ResponseBody
@@ -34,7 +30,7 @@ public class PodcastController {
         return podcastBusiness.reatachAndSave(podcast);
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
     @ResponseBody
     public Podcast findById(@PathVariable int id) {
         Podcast podcast = podcastBusiness.findOne(id);
@@ -42,11 +38,13 @@ public class PodcastController {
         return podcast;
     }
 
+    /*
     @RequestMapping(value="{id:[\\d]+}/items", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Item> findItemsByPodcastId(@PathVariable int id) {
         return podcastBusiness.getItems(id);
     }
+    */
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
     @ResponseBody
@@ -83,13 +81,6 @@ public class PodcastController {
         return podcastList;
     }
 
-    @RequestMapping(value="generatePodcastFromURL", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
-    public Podcast generatePodcastFromURL(@RequestBody String URL) {
-       return podcastBusiness.generatePodcastFromURL(URL);
-    }
-
-
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
     @ResponseBody
     public String getRss(@PathVariable int id) {
@@ -114,5 +105,4 @@ public class PodcastController {
             return "You failed to upload " + name + " because the file was empty.";
         }
     }
-
 }

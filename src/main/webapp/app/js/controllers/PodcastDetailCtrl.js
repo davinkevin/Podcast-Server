@@ -3,10 +3,13 @@ angular.module('podcast.controller')
 
         var idPodcast = $routeParams.podcastId,
             tags = Restangular.all("tag");
+
         $scope.tabs = [
             { title:'Episodes', templateUrl:'html/podcast-details-episodes.html', active : true },
             { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
         ];
+
+
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -41,7 +44,7 @@ angular.module('podcast.controller')
 
 
         $scope.remove = function(item) {
-            Restangular.one("item", item.id).remove().then(function() {
+            item.remove().then(function() {
                 $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
                     return (elem.id == item.id);
                 });
@@ -56,7 +59,7 @@ angular.module('podcast.controller')
             return tags.post(null, {name : query});
         };
 
-        $scope.download = DonwloadManager.download;
+
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
@@ -72,6 +75,13 @@ angular.module('podcast.controller')
         $scope.deletePodcast = function () {
             $scope.podcast.remove().then(function () {
                 $location.path('/podcasts');
+            });
+        };
+
+        $scope.resetItem = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
             });
         };
 

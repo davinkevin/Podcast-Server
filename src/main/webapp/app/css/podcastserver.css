@@ -26,7 +26,8 @@
 .downloadList .media{background-color:#fff;margin-left:5px;padding-right:5px;margin-right:5px;border:1px solid #ddd;border-radius:5px;box-shadow:5px 5px 5px 0 rgba(0,0,0,.1)}
 .downloadList .media .media-heading{padding-top:10px}
 .downloadList .media .buttonList{padding-top:24px}
-.media{margin-left:5px;margin-right:5px}
+.media{margin-left:5px;margin-right:5px;overflow:visible}
+.media .btn{border:none}
 .media.ng-leave{-webkit-animation:fadeOutRight .5s;animation:fadeOutRight .5s}
 .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fadeInLeft .5s}
 .bootstrap .tags{background-color:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;-webkit-appearance:inherit}

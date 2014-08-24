@@ -6,11 +6,19 @@ angular.module('podcast.controller')
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
             numberByPage = ItemPerPage;
 
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value, key) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        };
+
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
             Restangular.one("item/pagination").get({size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
-                $scope.items = itemsResponse.content;
+                $scope.items = restangularizedItems(itemsResponse.content);
                 $scope.totalItems = parseInt(itemsResponse.totalElements);
                 cache.put('currentPage', $scope.currentPage);
                 $location.search("page", $scope.currentPage);
@@ -30,7 +38,7 @@ angular.module('podcast.controller')
         };
 
         $scope.remove = function (item) {
-           return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+           return item.remove().then(function(){
               return $scope.changePage();
            });
         };

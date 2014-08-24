@@ -76,7 +76,7 @@ angular.module('podcastApp', [
                         ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
                     ].concat(commonKey)
                 }).
-                when('/item/:itemId', {
+                when('/podcast/:podcastId/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl',
                     hotkeys: commonKey
@@ -95,4 +95,10 @@ angular.module('podcastApp', [
     }])
     .config(['RestangularProvider', function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
+
+        RestangularProvider.addElementTransformer('items', false, function(item) {
+            item.addRestangularMethod('reset', 'get', 'reset');
+            item.addRestangularMethod('download', 'get', 'addtoqueue');
+            return item;
+        });
     }]);

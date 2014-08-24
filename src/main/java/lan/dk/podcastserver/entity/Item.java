@@ -23,6 +23,9 @@ import java.sql.Timestamp;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Item implements Serializable {
 
+    private static final String STATUS_NOT_DOWNLOADED = "Not Downloaded";
+    private static final String PROXY_URL = "/api/podcast/%s/items/%s/download";
+
     private int id;
     private String title;
     private String url;
@@ -36,7 +39,7 @@ public class Item implements Serializable {
     /* Value for the Download */
     private String localUrl;
     private String localUri;
-    private String status = "Not Downloaded";
+    private String status = STATUS_NOT_DOWNLOADED;
     private int progression;
     private Timestamp downloaddate;
     private Podcast podcast;
@@ -275,7 +278,7 @@ public class Item implements Serializable {
     @Transient
     @JsonProperty("proxyURL")
     public String getProxyURL() {
-        return "/api/item/" + this.id + "/download";
+        return String.format(PROXY_URL, podcast.getId(), id);
     }
 
     @Transient
@@ -302,9 +305,23 @@ public class Item implements Serializable {
     }
 
     @Transient
+    @JsonProperty("podcastId")
+    public Integer getPodcastId() { return (podcast == null) ? null : podcast.getId();}
+
+    @Transient
     @JsonIgnore
     @AssertTrue
     public boolean hasValidURL() {
         return (!StringUtils.isEmpty(this.url)) || "send".equals(this.podcast.getType());
+    }
+
+    @Transient @JsonIgnore
+    public Item reset() {
+        preRemove();
+        setStatus(STATUS_NOT_DOWNLOADED);
+        setLocalUrl(null);
+        setLocalUri(null);
+        setDownloaddate(null);
+        return this;
     }
 }

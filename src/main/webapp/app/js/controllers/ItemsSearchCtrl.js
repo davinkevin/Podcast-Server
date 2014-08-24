@@ -9,6 +9,14 @@ angular.module('podcast.controller')
             return tags.post(null, {name : query});
         };
 
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value, key) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        };
+
         // Gestion du cache de la pagination :
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
@@ -16,7 +24,7 @@ angular.module('podcast.controller')
         $scope.changePage = function() {
             $scope.currentPage = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
             Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}).then(function(itemsResponse) {
-                $scope.items = itemsResponse.content;
+                $scope.items = restangularizedItems(itemsResponse.content);
                 $scope.totalPages = itemsResponse.totalPages;
                 $scope.totalItems = itemsResponse.totalElements;
 
@@ -43,7 +51,7 @@ angular.module('podcast.controller')
         };
 
         $scope.remove = function (item) {
-            return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+            return item.remove().then(function(){
                 return $scope.changePage();
             });
         };
@@ -60,7 +68,6 @@ angular.module('podcast.controller')
 
         $scope.changePage();
 
-        $scope.download = DonwloadManager.download;
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 

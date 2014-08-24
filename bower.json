@@ -2,15 +2,15 @@
   "name": "Podcast Server",
   "version": "1.0.0",
   "dependencies": {
-    "angular": "~1.3.0-beta.18",
-    "angular-route": "~1.3.0-beta.18",
-    "angular-animate": "~1.3.0-beta.18",
-    "angular-sanitize": "~1.3.0-beta.18",
-    "angular-touch": "~1.3.0-beta.18",
+    "angular": "1.3.0-beta.19",
+    "angular-route": "1.3.0-beta.19",
+    "angular-animate": "1.3.0-beta.19",
+    "angular-sanitize": "1.3.0-beta.19",
+    "angular-touch": "1.3.0-beta.19",
     "bootstrap": "~3.2.0",
     "jquery": "~2.1.1",
     "angular-bootstrap": "~0.11.0",
-    "restangular": "~1.3.1",
+    "restangular": "~1.4.0",
     "AngularStompDK": "~0.0.6",
     "stomp-websocket": "~2.3.0",
     "sockjs": "~0.3.4",
@@ -20,16 +20,20 @@
     "animate.css": "~3.1.1",
     "ng-tags-input": "~2.0.1",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.3.0",
-    "angular-notification": "~0.2.3"
+    "angular-notification": "~0.2.3",
+    "ionicons": "~1.5.2"
   },
   "resolutions": {
-    "angular": "1.3.0-build.3051+sha.a191314"
+    "angular": "1.3.0-beta.19"
   },
   "overrides": {
     "angular": {
       "main": {
         "dev": "angular.js",
-        "prod": ["angular.min.js", "angular.min.js.map"]
+        "prod": [
+          "angular.min.js",
+          "angular.min.js.map"
+        ]
       }
     },
     "angular-animate": {
@@ -181,8 +185,8 @@
     },
     "mousetrap": {
       "main": {
-          "dev": "mousetrap.js",
-          "prod": "mousetrap.min.js"
+        "dev": "mousetrap.js",
+        "prod": "mousetrap.min.js"
       }
     }
   }

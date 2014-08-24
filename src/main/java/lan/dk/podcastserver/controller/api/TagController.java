@@ -17,17 +17,17 @@ public class TagController {
     @Resource
     TagBusiness tagBusiness;
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
     public Tag findById(@PathVariable Integer id) {
         return tagBusiness.findOne(id);
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET)
     public List<Tag> findAll() {
         return tagBusiness.findAll();
     }
 
-    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(method = RequestMethod.POST)
     public List<Tag> findByNameLike(@RequestParam String name) {
         return tagBusiness.findByNameLike(name);
     }

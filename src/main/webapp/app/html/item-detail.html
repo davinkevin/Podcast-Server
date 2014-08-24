@@ -25,7 +25,7 @@
                                 </span>
 
                         <!-- Lancer le téléchargement -->
-                        <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <button ng-click="item.download()" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
                         <!-- Accéder au fichier -->
                         <a ng-href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
@@ -33,6 +33,10 @@
 
                         <!-- Supprimer l'item -->
                         <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+
+                        <!-- Reset de l'itam -->
+                        <button ng-click="reset(item)" ng-hide="item.status == 'Started' || item.status == 'Paused'" type="button" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span></button>
+
                     </div>
                 </div>
             </div>

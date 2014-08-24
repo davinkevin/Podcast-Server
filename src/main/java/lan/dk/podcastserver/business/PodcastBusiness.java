@@ -111,6 +111,7 @@ public class PodcastBusiness {
         return this.reatachAndSave(podcastToUpdate);
     }
 
+    @Deprecated
     public Podcast generatePodcastFromURL(String URL) {
         logger.debug("URL = " + URL);
         try {

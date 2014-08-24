@@ -76,7 +76,7 @@ angular.module('podcastApp', [
                         ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
                     ].concat(commonKey)
                 }).
-                when('/item/:itemId', {
+                when('/podcast/:podcastId/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl',
                     hotkeys: commonKey
@@ -95,6 +95,12 @@ angular.module('podcastApp', [
     }])
     .config(['RestangularProvider', function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
+
+        RestangularProvider.addElementTransformer('items', false, function(item) {
+            item.addRestangularMethod('reset', 'get', 'reset');
+            item.addRestangularMethod('download', 'get', 'addtoqueue');
+            return item;
+        });
     }]);
 angular.module('podcast.controller', []);
 angular.module('podcast.filters', [])
@@ -260,37 +266,51 @@ angular.module('podcast.controller')
         });
     });
 angular.module('podcast.controller')
-    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, ngstomp, DonwloadManager, $location) {
+    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, ngstomp, DonwloadManager, $location, $q) {
 
-        var idItem = $routeParams.itemId;
+        var idItem = $routeParams.itemId,
+            idPodcast = $routeParams.podcastId,
+            basePodcast = Restangular.one("podcast", idPodcast);
+            baseItem = basePodcast.one("items", idItem);
 
-        Restangular.one("item", idItem).get().then(function(item) {
-            $scope.item = item;
-        }).then(function() {
-            $scope.item.one("podcast").get().then(function(podcast) {
 
-                $scope.item.podcast = podcast;
+        /*basePodcast.get().then(function (podcastFromServer) {
+            $scope.podcast = podcastFromServer;
+            return $scope.podcast.one("items", idItem).get();
+        }).then(function (itemFromServer) {
+            $scope.item = itemFromServer;
+            itemFromServer.podcast = $scope.podcast;
+            return itemFromServer;
+        })*/
+        $q.all([basePodcast.get(), baseItem.get()]).then(function (arrayOfResult) {
+            $scope.item = arrayOfResult[1];
+            $scope.item.podcast = arrayOfResult[0];
+        }).then(function () {
+            $scope.wsClient = ngstomp("/download", SockJS);
+            $scope.wsClient.connect("user", "password", function(){
+                $scope.wsClient.subscribe("/topic/podcast/" + $scope.item.podcast.id, function(message) {
+                    var itemFromWS = JSON.parse(message.body);
 
-                $scope.wsClient = ngstomp("/download", SockJS);
-                $scope.wsClient.connect("user", "password", function(){
-                    $scope.wsClient.subscribe("/topic/podcast/" + podcast.id, function(message) {
-                        var itemFromWS = JSON.parse(message.body);
-
-                        if (itemFromWS.id == $scope.item.id) {
-                            _.assign($scope.item, itemFromWS);
-                        }
-                    });
-                });
-                $scope.$on('$destroy', function () {
-                    $scope.wsClient.disconnect(function(){});
+                    if (itemFromWS.id == $scope.item.id) {
+                        _.assign($scope.item, itemFromWS);
+                    }
                 });
             });
-
+            $scope.$on('$destroy', function () {
+                $scope.wsClient.disconnect(function(){});
+            });
         });
+
 
         $scope.remove = function(item) {
             return item.remove().then(function() {
                 $location.path('/podcast/'.concat($scope.item.podcast.id));
+            });
+        };
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                _.assign($scope.item, itemReseted);
             });
         };
 
@@ -307,11 +327,19 @@ angular.module('podcast.controller')
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
             numberByPage = ItemPerPage;
 
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value, key) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        };
+
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
             Restangular.one("item/pagination").get({size: numberByPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'}).then(function(itemsResponse) {
-                $scope.items = itemsResponse.content;
+                $scope.items = restangularizedItems(itemsResponse.content);
                 $scope.totalItems = parseInt(itemsResponse.totalElements);
                 cache.put('currentPage', $scope.currentPage);
                 $location.search("page", $scope.currentPage);
@@ -331,7 +359,7 @@ angular.module('podcast.controller')
         };
 
         $scope.remove = function (item) {
-           return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+           return item.remove().then(function(){
               return $scope.changePage();
            });
         };
@@ -372,6 +400,14 @@ angular.module('podcast.controller')
             return tags.post(null, {name : query});
         };
 
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value, key) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        };
+
         // Gestion du cache de la pagination :
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
 
@@ -379,7 +415,7 @@ angular.module('podcast.controller')
         $scope.changePage = function() {
             $scope.currentPage = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / numberByPage)) ? Math.ceil($scope.totalItems / numberByPage) : $scope.currentPage;
             Restangular.one("item/search/" + $scope.term).post(null, {tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}).then(function(itemsResponse) {
-                $scope.items = itemsResponse.content;
+                $scope.items = restangularizedItems(itemsResponse.content);
                 $scope.totalPages = itemsResponse.totalPages;
                 $scope.totalItems = itemsResponse.totalElements;
 
@@ -406,7 +442,7 @@ angular.module('podcast.controller')
         };
 
         $scope.remove = function (item) {
-            return Restangular.restangularizeElement(null, item, "item").remove().then(function(){
+            return item.remove().then(function(){
                 return $scope.changePage();
             });
         };
@@ -423,7 +459,6 @@ angular.module('podcast.controller')
 
         $scope.changePage();
 
-        $scope.download = DonwloadManager.download;
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
@@ -482,7 +517,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>\n' +
     '        </div>\n' +
     '\n' +
-    '        <a class="pull-left" ng-href="#/item/{{item.id}}">\n' +
+    '        <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">\n' +
     '            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
     '        </a>\n' +
     '\n' +
@@ -507,7 +542,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>\n' +
     '                </div>\n' +
     '\n' +
-    '                <a class="pull-left" ng-href="#/item/{{item.id}}">\n' +
+    '                <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">\n' +
     '                    <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
     '                </a>\n' +
     '\n' +
@@ -559,7 +594,7 @@ module.run(['$templateCache', function($templateCache) {
     '                                </span>\n' +
     '\n' +
     '                        <!-- Lancer le téléchargement -->\n' +
-    '                        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '                        <button ng-click="item.download()" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '\n' +
     '                        <!-- Accéder au fichier -->\n' +
     '                        <a ng-href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
@@ -567,6 +602,10 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '                        <!-- Supprimer l\'item -->\n' +
     '                        <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
+    '\n' +
+    '                        <!-- Reset de l\'itam -->\n' +
+    '                        <button ng-click="reset(item)" ng-hide="item.status == \'Started\' || item.status == \'Paused\'" type="button" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span></button>\n' +
+    '\n' +
     '                    </div>\n' +
     '                </div>\n' +
     '            </div>\n' +
@@ -609,7 +648,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">\n' +
     '                <div class="box">\n' +
     '                    <div class="">\n' +
-    '                        <a ng-href="#/item/{{item.id}}" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
     '                            <img ng-src="{{ item.cover.url }}" alt="" class="img-rounded img-responsive" />\n' +
     '                        </a>\n' +
     '                    </div>\n' +
@@ -624,7 +663,7 @@ module.run(['$templateCache', function($templateCache) {
     '                                        <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
     '                                    </span>\n' +
     '\n' +
-    '                        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '                        <button ng-click="item.download()" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
     '\n' +
     '                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
@@ -685,7 +724,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">\n' +
     '                <div class="box">\n' +
     '                    <div class="">\n' +
-    '                        <a ng-href="#/item/{{item.id}}" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
     '                            <img ng-src="{{ item.cover.url }}" alt="" class="img-rounded img-responsive" />\n' +
     '                        </a>\n' +
     '                    </div>\n' +
@@ -700,7 +739,7 @@ module.run(['$templateCache', function($templateCache) {
     '                                        <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
     '                                    </span>\n' +
     '\n' +
-    '                        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '                        <button ng-click="item.download()" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
     '\n' +
     '                        <a href="{{ item.proxyURL }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
@@ -984,28 +1023,34 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '<br/>\n' +
     '\n' +
-    '<div class="media"  ng-repeat="item in podcast.items track by item.id | orderBy:pubdate">\n' +
-    '\n' +
+    '<div class="media clearfix"  ng-repeat="item in podcast.items | orderBy:\'-pubdate\' track by item.id">\n' +
     '    <div class="buttonList pull-right">\n' +
     '        <!-- Téléchargement en cours -->\n' +
-    '                        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
-    '                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
-    '                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
-    '                        </span>\n' +
+    '        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
+    '            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
+    '            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
+    '        </span>\n' +
     '\n' +
     '        <!-- Lancer le téléchargement -->\n' +
-    '        <button ng-click="download(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '        <button ng-click="item.download()" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '\n' +
     '        <!-- Accéder au fichier -->\n' +
-    '        <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
     '        <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
     '\n' +
     '        <!-- Supprimer l\'item -->\n' +
     '        <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
+    '\n' +
+    '\n' +
+    '        <div class="btn-group" dropdown is-open="status.isopen">\n' +
+    '            <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
+    '            <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
+    '                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
+    '                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
+    '            </ul>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '\n' +
-    '    <a class="pull-left" ng-href="#/item/{{item.id}}">\n' +
-    '\n' +
+    '    <a class="pull-left" ng-href="#/podcast/{{podcast.id}}/item/{{item.id}}">\n' +
     '        <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
     '\n' +
     '    </a>\n' +
@@ -1055,10 +1100,13 @@ angular.module('podcast.controller')
 
         var idPodcast = $routeParams.podcastId,
             tags = Restangular.all("tag");
+
         $scope.tabs = [
             { title:'Episodes', templateUrl:'html/podcast-details-episodes.html', active : true },
             { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
         ];
+
+
 
         // LocalStorage de la valeur du podcast :
         $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
@@ -1093,7 +1141,7 @@ angular.module('podcast.controller')
 
 
         $scope.remove = function(item) {
-            Restangular.one("item", item.id).remove().then(function() {
+            item.remove().then(function() {
                 $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
                     return (elem.id == item.id);
                 });
@@ -1108,7 +1156,7 @@ angular.module('podcast.controller')
             return tags.post(null, {name : query});
         };
 
-        $scope.download = DonwloadManager.download;
+
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
@@ -1124,6 +1172,13 @@ angular.module('podcast.controller')
         $scope.deletePodcast = function () {
             $scope.podcast.remove().then(function () {
                 $location.path('/podcasts');
+            });
+        };
+
+        $scope.resetItem = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
             });
         };
 

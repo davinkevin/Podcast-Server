@@ -1,28 +1,34 @@
 
 <br/>
 
-<div class="media"  ng-repeat="item in podcast.items track by item.id | orderBy:pubdate">
-
+<div class="media clearfix"  ng-repeat="item in podcast.items | orderBy:'-pubdate' track by item.id">
     <div class="buttonList pull-right">
         <!-- Téléchargement en cours -->
-                        <span ng-if="item.status == 'Started' || item.status == 'Paused'" >
-                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
-                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
-                        </span>
+        <span ng-if="item.status == 'Started' || item.status == 'Paused'" >
+            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
+        </span>
 
         <!-- Lancer le téléchargement -->
-        <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+        <button ng-click="item.download()" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
         <!-- Accéder au fichier -->
-        <a href="{{ item.url }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
         <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
 
         <!-- Supprimer l'item -->
         <button ng-click="remove(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+
+
+        <div class="btn-group" dropdown is-open="status.isopen">
+            <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>
+                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>
+            </ul>
+        </div>
     </div>
 
-    <a class="pull-left" ng-href="#/item/{{item.id}}">
-
+    <a class="pull-left" ng-href="#/podcast/{{podcast.id}}/item/{{item.id}}">
         <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
 
     </a>

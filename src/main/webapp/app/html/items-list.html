@@ -7,7 +7,7 @@
             <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">
                 <div class="box">
                     <div class="">
-                        <a ng-href="#/item/{{item.id}}" >
+                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >
                             <img ng-src="{{ item.cover.url }}" alt="" class="img-rounded img-responsive" />
                         </a>
                     </div>
@@ -22,7 +22,7 @@
                                         <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
                                     </span>
 
-                        <button ng-click="download(item)" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <button ng-click="item.download()" ng-if="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
                         <a href="{{ item.proxyURL }}" ng-if="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
 
                         <a href="{{ item.proxyURL }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
