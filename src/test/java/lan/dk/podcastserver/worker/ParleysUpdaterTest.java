@@ -29,13 +29,13 @@ public class ParleysUpdaterTest {
     @Resource
     ParleysUpdater parleysUpdater;
 
-    Podcast DEVOXX_FRANCE_2014 = new Podcast("Devoxx France 2014", "http://www.parleys.com/channel/5355419ce4b0524a2f28bca0/presentations?sort=date&state=public",
+    Podcast DEVOXX_FRANCE_2014 = new Podcast("Devoxx France 2014", "http://www.parleys.com/channel/5355419ce4b0524a2f28bca0/",
             "", "Parleys", new Timestamp(System.currentTimeMillis()), null, new Cover("http://www.devoxx.com/download/attachments/5342010/logo_devoxx_france_big.jpg?version=2&modificationDate=1321095236000", 250, 166), null, true);
 
 
     @Test
     public void signatureFeedParleys() {
-        String signature = parleysUpdater.signaturePodcast(DEVOXX_FRANCE_2014);
+        String signature =  parleysUpdater.signaturePodcast(DEVOXX_FRANCE_2014);
         String signature2 = parleysUpdater.signaturePodcast(DEVOXX_FRANCE_2014);
 
         Assert.assertEquals(signature, signature2);
