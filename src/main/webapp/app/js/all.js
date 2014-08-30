@@ -1097,21 +1097,15 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcasts-list.html',
-    '<div id="listItem" class="container" style="margin-top: 15px;">\n' +
+    '<div class="container podcastlist" style="margin-top: 15px;">\n' +
     '    <div class="row">\n' +
-    '        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-3" ng-repeat="podcast in podcasts">\n' +
-    '            <div class="thumbnail">\n' +
-    '                <a ng-href="#/podcast/{{ podcast.id }}" >\n' +
-    '                    <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">\n' +
-    '                    <div class="caption">\n' +
-    '                        <h5 class="text-center">{{ podcast.title }}</h5>\n' +
-    '                    </div>\n' +
-    '                </a>\n' +
-    '            </div>\n' +
+    '        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in podcasts">\n' +
+    '            <a ng-href="#/podcast/{{ podcast.id }}" >\n' +
+    '                <img class="img-responsive img-rounded" ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" />\n' +
+    '            </a>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '</div>\n' +
-    '\n' +
     '\n' +
     '');
 }]);
