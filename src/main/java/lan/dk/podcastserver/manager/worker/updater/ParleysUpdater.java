@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,40 +40,39 @@ public class ParleysUpdater extends AbstractUpdater {
 
     @Override
     public Podcast updateFeed(Podcast podcast) {
+        try {
+            JSONObject responseObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
+
+            JSONArray resultArray = getParleysPresentationResultsArray(responseObject);
+
+            for (Object jsonObject : resultArray) {
+
+                JSONObject currentObject = (JSONObject) jsonObject;
+
+                String _id = (String) currentObject.get("_id");
+                Item item = getParleysItem(_id);
+
+                logger.debug(item.toString());
+
+                if (!podcast.containsItem(item)) {
+
+                    // Si le bean est valide :
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                }
+
+            }
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
         return podcast;
-//        try {
-//            JSONObject responseObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
-//
-//            JSONArray resultArray = getParleysPresentationResultsArray(responseObject);
-//
-//            for (Object jsonObject : resultArray) {
-//
-//                JSONObject currentObject = (JSONObject) jsonObject;
-//
-//                String _id = (String) currentObject.get("_id");
-//                Item item = getParleysItem(_id);
-//
-//                logger.debug(item.toString());
-//
-//                if (!podcast.containsItem(item)) {
-//
-//                    // Si le bean est valide :
-//                    item.setPodcast(podcast);
-//                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-//                    if (constraintViolations.isEmpty()) {
-//                        podcast.getItems().add(item);
-//                    } else {
-//                        logger.error(constraintViolations.toString());
-//                    }
-//                }
-//
-//            }
-//
-//        } catch (IOException | ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return podcast;
     }
 
     @Override
@@ -84,7 +85,6 @@ public class ParleysUpdater extends AbstractUpdater {
         try {
             JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
             podcastRepresentation.remove("completedIn");
-            podcastRepresentation.remove("results");
             return DigestUtils.generateMD5SignatureFromDOM(podcastRepresentation.toJSONString());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
