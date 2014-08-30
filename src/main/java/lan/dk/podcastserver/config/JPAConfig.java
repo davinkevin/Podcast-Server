@@ -71,7 +71,7 @@ public class JPAConfig {
     private static final String PROPERTY_INDEXMANAGER_DEFAULT = "near-real-time";
 
     private static final String PROPERTY_DIRECTORYPROVIDER_NAME = "hibernate.search.default.directory_provider";
-    private static final String PROPERTY_DIRECTORYPROVIDER_DEFAULT = "filesystem";
+    private static final String PROPERTY_DIRECTORYPROVIDER_DEFAULT = "ram";
 
     private static final String PROPERTY_INDEXBASE_NAME = "hibernate.search.default.indexBase";
     private static final String PROPERTY_INDEXBASE_DEFAULT = "/tmp/lucene";
@@ -142,7 +142,10 @@ public class JPAConfig {
         // Hibernate Search :
         jpaProperties.put(PROPERTY_INDEXMANAGER_NAME, environment.getProperty(PROPERTY_INDEXMANAGER_NAME, PROPERTY_INDEXMANAGER_DEFAULT));
         jpaProperties.put(PROPERTY_DIRECTORYPROVIDER_NAME, environment.getProperty(PROPERTY_DIRECTORYPROVIDER_NAME, PROPERTY_DIRECTORYPROVIDER_DEFAULT));
-        jpaProperties.put(PROPERTY_INDEXBASE_NAME, environment.getProperty(PROPERTY_INDEXBASE_NAME, PROPERTY_INDEXBASE_DEFAULT));
+
+        if ("filesystem".equals(environment.getProperty(PROPERTY_DIRECTORYPROVIDER_NAME, PROPERTY_DIRECTORYPROVIDER_DEFAULT))) {
+            jpaProperties.put(PROPERTY_INDEXBASE_NAME, environment.getProperty(PROPERTY_INDEXBASE_NAME, PROPERTY_INDEXBASE_DEFAULT));
+        }
 
 
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
