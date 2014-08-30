@@ -2,6 +2,7 @@ package lan.dk.podcastserver.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 @Table(name = "podcast")
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Podcast implements Serializable {
 
     private int id;

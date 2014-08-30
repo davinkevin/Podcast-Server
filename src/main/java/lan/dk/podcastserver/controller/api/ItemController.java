@@ -3,14 +3,15 @@ package lan.dk.podcastserver.controller.api;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -24,10 +25,10 @@ public class ItemController {
     @Autowired
     protected ItemDownloadManager itemDownloadManager;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public List<Item> findAll(@PathVariable Integer idPodcast) {
-        return itemBusiness.findByPodcast(idPodcast);
+    public Page<Item> findAll(@PathVariable Integer idPodcast, @RequestBody PageRequestFacade pageRequestFacade) {
+        return itemBusiness.findByPodcast(idPodcast, pageRequestFacade.toPageRequest());
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)

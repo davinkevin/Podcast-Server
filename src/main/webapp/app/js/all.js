@@ -1,4 +1,5 @@
 angular.module('podcastApp', [
+    'podcast',
     'podcast.controller',
     'podcast.filters',
     'podcast.services',
@@ -56,7 +57,12 @@ angular.module('podcastApp', [
                         ['f', 'Force Refresh', 'refresh()'],
                         ['l', 'List of Items', 'tabs[0].active = true'],
                         ['m', 'Modification of Podcast', 'tabs[1].active = true']
-                    ].concat(commonKey)
+                    ].concat(commonKey),
+                    resolve : {
+                        podcast : function (Restangular, $route) {
+                            return Restangular.one('podcast', $route.current.params.podcastId).get();
+                        }
+                    }
                 }).
                 when('/items', {
                     templateUrl: 'html/items-list.html',
@@ -110,6 +116,11 @@ angular.module('podcast.filters', [])
         };
     }
 );
+angular.module('podcast', [
+    'podcast.details.episodes',
+    'podcast.details.edition'
+]);
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -333,7 +344,7 @@ angular.module('podcast.controller')
                 restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
             });
             return restangularList;
-        };
+        }
 
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {
@@ -887,7 +898,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">\n' +
     '        <div class="caption">\n' +
     '            <h5 class="text-center "><strong>{{ podcast.title }}</strong></h5>\n' +
-    '            <p class="text-center">Nombre d\'épisode : {{podcast.items.length }}</p>\n' +
+    '            <p class="text-center">Nombre d\'épisode : {{ podcast.totalItems }}</p>\n' +
     '            <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12 text-center">\n' +
     '                <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>\n' +
     '                <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank">RSS</a>\n' +
@@ -898,8 +909,16 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="col-md-8 col-xs-12 col-sm-12 col-lg-8">\n' +
     '\n' +
     '    <tabset>\n' +
+    '        <!--\n' +
     '        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">\n' +
     '            <ng-include src="tab.templateUrl" ></ng-include>\n' +
+    '        </tab>\n' +
+    '        -->\n' +
+    '        <tab heading="Episodes" active="tab.active" disabled="tab.disabled">\n' +
+    '            <podcast-items-list podcast="podcast"></podcast-items-list>\n' +
+    '        </tab>\n' +
+    '        <tab heading="Edition">\n' +
+    '            <podcast-edition podcast="podcast"></podcast-edition>\n' +
     '        </tab>\n' +
     '    </tabset>\n' +
     '\n' +
@@ -1021,48 +1040,50 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcast-details-episodes.html',
-    '\n' +
     '<br/>\n' +
-    '\n' +
-    '<div class="media clearfix"  ng-repeat="item in podcast.items | orderBy:\'-pubdate\' track by item.id">\n' +
-    '    <div class="buttonList pull-right">\n' +
-    '        <!-- Téléchargement en cours -->\n' +
+    '<div ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">\n' +
+    '    <div class="media clearfix"  ng-repeat="item in podcast.items | orderBy:\'-pubdate\' track by item.id">\n' +
+    '        <div class="buttonList pull-right">\n' +
+    '            <!-- Téléchargement en cours -->\n' +
     '        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
     '            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
     '            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
     '        </span>\n' +
     '\n' +
-    '        <!-- Lancer le téléchargement -->\n' +
-    '        <button ng-click="item.download()" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
+    '            <!-- Lancer le téléchargement -->\n' +
+    '            <button ng-click="item.download()" ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '\n' +
-    '        <!-- Accéder au fichier -->\n' +
-    '        <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
+    '            <!-- Accéder au fichier -->\n' +
+    '            <a href="{{ item.localUrl }}" ng-if="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
     '\n' +
-    '        <!-- Supprimer l\'item -->\n' +
-    '        <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
+    '            <!-- Supprimer l\'item -->\n' +
+    '            <button ng-click="remove(item)" ng-if="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
     '\n' +
     '\n' +
-    '        <div class="btn-group" dropdown is-open="isopen">\n' +
-    '            <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
-    '            <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
-    '                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
-    '                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
-    '            </ul>\n' +
+    '            <div class="btn-group" dropdown is-open="isopen">\n' +
+    '                <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
+    '                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
+    '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
+    '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
+    '                </ul>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <a class="pull-left" ng-href="#/podcast/{{podcast.id}}/item/{{item.id}}">\n' +
+    '            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
+    '\n' +
+    '        </a>\n' +
+    '        <div class="media-body">\n' +
+    '            <h4 class="media-heading">{{item.title | characters:60}}</h4>\n' +
+    '            <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n' +
+    '            <p><strong>{{item.pubdate | date : \'dd/MM/yyyy à HH:mm\' }}</strong></p>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '\n' +
-    '    <a class="pull-left" ng-href="#/podcast/{{podcast.id}}/item/{{item.id}}">\n' +
-    '        <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
-    '\n' +
-    '    </a>\n' +
-    '    <div class="media-body">\n' +
-    '        <h4 class="media-heading">{{item.title | characters:60}}</h4>\n' +
-    '        <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n' +
-    '        <p><strong>{{item.pubdate | date : \'dd/MM/yyyy à HH:mm\' }}</strong></p>\n' +
+    '    <div class="text-center">\n' +
+    '        <pagination items-per-page="itemPerPage" max-size="10" boundary-links="true" total-items="podcast.totalItems    " ng-model="currentPage" ng-change="loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '</div>\n' +
-    '\n' +
-    '\n' +
     '\n' +
     '        ');
 }]);
@@ -1097,89 +1118,19 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 angular.module('podcast.controller')
-    .controller('PodcastDetailCtrl', function ($scope, $routeParams, Restangular, ngstomp, localStorageService, DonwloadManager, $log, $location) {
+    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular, ngstomp, $log, $location) {
 
-        var idPodcast = $routeParams.podcastId,
-            tags = Restangular.all("tag");
+        $scope.podcast = podcast;
 
-        $scope.tabs = [
-            { title:'Episodes', templateUrl:'html/podcast-details-episodes.html', active : true },
-            { title:'Modification', templateUrl:'html/podcast-details-edition.html', active : false }
-        ];
+        function refreshItems () {
+            $scope.$broadcast('podcastItems:refresh');
+        }
 
-        // LocalStorage de la valeur du podcast :
-        $scope.$watchGroup(['podcast', 'podcast.items'], function(newval, oldval) {
-            localStorageService.add("podcast/" + idPodcast, newval[0]);
-        });
-
-        $scope.podcast = localStorageService.get("podcast/" + idPodcast ) || {};
-
-        $scope.refreshItems = function() {
-            $scope.podcast.getList("items").then(function(items) {
-                $scope.podcast.items = items;
-            });
-        };
-
-        Restangular.one("podcast", $routeParams.podcastId).get().then(function(podcast) {
-            podcast.items = $scope.podcast.items || [];
-            $scope.podcast = podcast;
-
-
-            $scope.wsClient = ngstomp("/download", SockJS);
-            $scope.wsClient.connect("user", "password", function(){
-                $scope.wsClient.subscribe("/topic/podcast/" + idPodcast, function(message) {
-                    var item = JSON.parse(message.body);
-                    var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                    _.assign(elemToUpdate, item);
-                });
-            });
-            $scope.$on('$destroy', function () {
-                $scope.wsClient.disconnect(function(){});
-            });
-        }).then($scope.refreshItems );
-
-
-        $scope.remove = function(item) {
-            item.remove().then(function() {
-                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
-                    return (elem.id == item.id);
-                });
-            });
-        };
-        $scope.refresh = function() {
+        $scope.refresh = function () {
             Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then($scope.refreshItems );
+                .then(refreshItems);
         };
-
-        $scope.loadTags = function(query) {
-            return tags.post(null, {name : query});
-        };
-
-
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-
-        $scope.save = function() {
-            var podcastToUpdate = _.cloneDeep($scope.podcast);
-            podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate).then(function(patchedPodcast){
-                $log.debug(patchedPodcast);
-                _.assign($scope.podcast, patchedPodcast);
-            }).then($scope.refreshItems );
-        };
-
-        $scope.deletePodcast = function () {
-            $scope.podcast.remove().then(function () {
-                $location.path('/podcasts');
-            });
-        };
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-            });
-        };
+        $scope.$on("podcastEdition:save", refreshItems);
 
     });
 angular.module('podcast.controller')
@@ -1233,4 +1184,120 @@ angular.module('podcast.controller')
             $scope.podcasts = podcasts;
             localStorageService.add('podcastslist', podcasts);
         });
+    });
+'use strict';
+
+angular.module('podcast.details.edition', [])
+    .directive('podcastEdition', function () {
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-edition.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastEditionCtrl'
+        };
+    })
+    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
+        var tags = Restangular.all("tag");
+
+        $scope.loadTags = function (query) {
+            return tags.post(null, {name : query});
+        };
+
+        $scope.save = function () {
+            var podcastToUpdate = _.cloneDeep($scope.podcast);
+            podcastToUpdate.items = null;
+            $scope.podcast.patch(podcastToUpdate)
+                .then(function (patchedPodcast){
+                    _.assign($scope.podcast, patchedPodcast);
+                })
+                .then(function () {
+                    $scope.$emit('podcastEdition:save');
+                });
+        };
+        $scope.deletePodcast = function () {
+            $scope.podcast.remove().then(function () {
+                $location.path('/podcasts');
+            });
+        };
+    });
+
+'use strict';
+
+angular.module('podcast.details.episodes', [])
+    .directive('podcastItemsList', function($log){
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-episodes.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastItemsListCtrl'
+        };
+    })
+    .constant('PodcastItemPerPage', 10)
+    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage) {
+        $scope.currentPage = 1;
+        $scope.itemPerPage = PodcastItemPerPage;
+
+        /* Connection au Web-socket */
+        $scope.wsClient = ngstomp("/download", SockJS);
+        $scope.wsClient.connect("user", "password", function () {
+            $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function (message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+                _.assign(elemToUpdate, item);
+            });
+        });
+        $scope.$on('$destroy', function () {
+            $scope.wsClient.disconnect(function () {});
+        });
+
+
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        }
+
+
+        $scope.loadPage = function() {
+            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
+            return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
+                .then(function(itemsResponse) {
+                    $scope.podcast.items = restangularizedItems(itemsResponse.content);
+                    $scope.podcast.totalItems = itemsResponse.totalElements;
+                });
+        };
+
+        $scope.loadPage();
+        $scope.$on("podcastItems:refresh", function () {
+            $scope.currentPage = 1;
+            $scope.loadPage();
+        });
+
+        $scope.remove = function (item) {
+            item.remove().then(function() {
+                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
+                    return (elem.id === item.id);
+                });
+            });
+        };
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+            });
+        };
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.loadPage();
+        };
+
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
     });

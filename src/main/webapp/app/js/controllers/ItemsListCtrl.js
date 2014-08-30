@@ -12,7 +12,7 @@ angular.module('podcast.controller')
                 restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
             });
             return restangularList;
-        };
+        }
 
         //$scope.selectPage = function (pageNo) {
         $scope.changePage = function() {

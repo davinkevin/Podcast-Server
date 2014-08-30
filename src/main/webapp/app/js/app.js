@@ -1,4 +1,5 @@
 angular.module('podcastApp', [
+    'podcast',
     'podcast.controller',
     'podcast.filters',
     'podcast.services',
@@ -56,7 +57,12 @@ angular.module('podcastApp', [
                         ['f', 'Force Refresh', 'refresh()'],
                         ['l', 'List of Items', 'tabs[0].active = true'],
                         ['m', 'Modification of Podcast', 'tabs[1].active = true']
-                    ].concat(commonKey)
+                    ].concat(commonKey),
+                    resolve : {
+                        podcast : function (Restangular, $route) {
+                            return Restangular.one('podcast', $route.current.params.podcastId).get();
+                        }
+                    }
                 }).
                 when('/items', {
                     templateUrl: 'html/items-list.html',

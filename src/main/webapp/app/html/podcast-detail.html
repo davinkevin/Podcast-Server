@@ -12,7 +12,7 @@
         <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">
         <div class="caption">
             <h5 class="text-center "><strong>{{ podcast.title }}</strong></h5>
-            <p class="text-center">Nombre d'épisode : {{podcast.items.length }}</p>
+            <p class="text-center">Nombre d'épisode : {{ podcast.totalItems }}</p>
             <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12 text-center">
                 <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
                 <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank">RSS</a>
@@ -23,8 +23,16 @@
 <div class="col-md-8 col-xs-12 col-sm-12 col-lg-8">
 
     <tabset>
+        <!--
         <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
             <ng-include src="tab.templateUrl" ></ng-include>
+        </tab>
+        -->
+        <tab heading="Episodes" active="tab.active" disabled="tab.disabled">
+            <podcast-items-list podcast="podcast"></podcast-items-list>
+        </tab>
+        <tab heading="Edition">
+            <podcast-edition podcast="podcast"></podcast-edition>
         </tab>
     </tabset>
 

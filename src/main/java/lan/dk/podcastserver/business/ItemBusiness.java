@@ -142,8 +142,8 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true)
-    public List<Item> findByPodcast(Integer idPodcast) {
-        return itemRepository.findByPodcast(podcastBusiness.findOne(idPodcast));
+    public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
+        return itemRepository.findByPodcast(podcastBusiness.findOne(idPodcast), pageRequest);
     }
 
 
