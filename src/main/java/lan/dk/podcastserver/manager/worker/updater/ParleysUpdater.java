@@ -85,6 +85,7 @@ public class ParleysUpdater extends AbstractUpdater {
         try {
             JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
             podcastRepresentation.remove("completedIn");
+            podcastRepresentation.remove("results");
             return DigestUtils.generateMD5SignatureFromDOM(podcastRepresentation.toJSONString());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
