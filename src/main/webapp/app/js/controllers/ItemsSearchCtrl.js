@@ -85,4 +85,11 @@ angular.module('podcast.controller')
             $scope.wsClient.disconnect(function(){});
         });
 
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+            });
+        };
+
     });

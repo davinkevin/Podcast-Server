@@ -399,6 +399,12 @@ angular.module('podcast.controller')
             $scope.wsClient.disconnect(function(){});
         });
 
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+            });
+        };
     });
 angular.module('podcast.controller')
     .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager, ItemPerPage) {
@@ -486,6 +492,13 @@ angular.module('podcast.controller')
         $scope.$on('$destroy', function () {
             $scope.wsClient.disconnect(function(){});
         });
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+            });
+        };
 
     });
 (function(module) {
@@ -656,17 +669,48 @@ module.run(['$templateCache', function($templateCache) {
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
-    '            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">\n' +
+    '            <div ng-repeat="item in items track by item.id" class="col-lg-2 col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
     '                <div class="box">\n' +
     '                    <div class="">\n' +
-    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
-    '                            <img ng-src="{{ item.cover.url }}" alt="" class="img-rounded img-responsive" />\n' +
+    '                        <img ng-class="{\'img-grayscale\' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />\n' +
+    '                        <div class="overlay-button">\n' +
+    '                            <div class="btn-group" dropdown is-open="isopen">\n' +
+    '                                <button type="button" class="btn dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
+    '                                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
+    '                                    <li ng-if="item.status == \'Started\' || item.status == \'Paused\'">\n' +
+    '                                        <a ng-if="item.status == \'Started\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Mettre en pause</a>\n' +
+    '                                        <a ng-if="item.status == \'Paused\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Reprendre</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-if="item.status == \'Started\' || item.status == \'Paused\'">\n' +
+    '                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop"></span> Stopper</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null">\n' +
+    '                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save"></span> Télécharger</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-if="item.localUrl == null" >\n' +
+    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a>\n' +
+    '                                    </li>\n' +
+    '                                    <!--\n' +
+    '                                    <li ng-if="item.localUrl != null">\n' +
+    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>\n' +
+    '                                    </li> -->\n' +
+    '                                    <li ng-if="item.localUrl != null">\n' +
+    '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li>\n' +
+    '                                        <a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>\n' +
+    '                                    </li>\n' +
+    '                                </ul>\n' +
+    '                            </div>\n' +
+    '                        </div>\n' +
+    '                        <a class="overlay-main-button" ng-href="{{ item.proxyURL  }}" >\n' +
+    '                            <span ng-class="{\'glyphicon-globe\' : (item.localUrl == null), \'glyphicon-play\' : (item.localUrl != null)}" class="glyphicon "></span>\n' +
     '                        </a>\n' +
     '                    </div>\n' +
-    '                    <div class="text-center clearfix itemTitle" >\n' +
-    '                        <p>\n' +
-    '                            {{ item.title | characters:50 }}\n' +
-    '                        </p>\n' +
+    '                    <div class="text-center clearfix itemTitle center" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
+    '                            {{ item.title | characters:30 }}\n' +
+    '                        </a>\n' +
     '                    </div>\n' +
     '                    <div class="text-center row-button">\n' +
     '                        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
@@ -732,17 +776,48 @@ module.run(['$templateCache', function($templateCache) {
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
-    '            <div ng-repeat="item in items track by item.id" class="col-xs-6 col-sm-4 col-md-3 col-lg-3 itemInList">\n' +
+    '            <div ng-repeat="item in items track by item.id" class="col-lg-2 col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
     '                <div class="box">\n' +
     '                    <div class="">\n' +
-    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
-    '                            <img ng-src="{{ item.cover.url }}" alt="" class="img-rounded img-responsive" />\n' +
+    '                        <img ng-class="{\'img-grayscale\' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />\n' +
+    '                        <div class="overlay-button">\n' +
+    '                            <div class="btn-group" dropdown is-open="isopen">\n' +
+    '                                <button type="button" class="btn dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
+    '                                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
+    '                                    <li ng-if="item.status == \'Started\' || item.status == \'Paused\'">\n' +
+    '                                        <a ng-if="item.status == \'Started\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Mettre en pause</a>\n' +
+    '                                        <a ng-if="item.status == \'Paused\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Reprendre</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-if="item.status == \'Started\' || item.status == \'Paused\'">\n' +
+    '                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop"></span> Stopper</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-if="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null">\n' +
+    '                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save"></span> Télécharger</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-if="item.localUrl == null" >\n' +
+    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a>\n' +
+    '                                    </li>\n' +
+    '                                    <!--\n' +
+    '                                    <li ng-if="item.localUrl != null">\n' +
+    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>\n' +
+    '                                    </li> -->\n' +
+    '                                    <li ng-if="item.localUrl != null">\n' +
+    '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li>\n' +
+    '                                        <a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>\n' +
+    '                                    </li>\n' +
+    '                                </ul>\n' +
+    '                            </div>\n' +
+    '                        </div>\n' +
+    '                        <a class="overlay-main-button" ng-href="{{ item.proxyURL  }}" >\n' +
+    '                            <span ng-class="{\'glyphicon-globe\' : (item.localUrl == null), \'glyphicon-play\' : (item.localUrl != null)}" class="glyphicon "></span>\n' +
     '                        </a>\n' +
     '                    </div>\n' +
-    '                    <div class="text-center clearfix itemTitle" >\n' +
-    '                        <p>\n' +
-    '                            {{ item.title | characters:50 }}\n' +
-    '                        </p>\n' +
+    '                    <div class="text-center clearfix itemTitle center" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
+    '                            {{ item.title | characters:30 }}\n' +
+    '                        </a>\n' +
     '                    </div>\n' +
     '                    <div class="text-center row-button">\n' +
     '                        <span ng-if="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
@@ -1080,8 +1155,8 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '\n' +
-    '    <div class="text-center">\n' +
-    '        <pagination items-per-page="itemPerPage" max-size="10" boundary-links="true" total-items="podcast.totalItems    " ng-model="currentPage" ng-change="loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
+    '    <div ng-show="podcast.totalItems > itemPerPage" class="text-center">\n' +
+    '        <pagination items-per-page="itemPerPage" max-size="10" boundary-links="true" total-items="podcast.totalItems" ng-model="currentPage" ng-change="loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '</div>\n' +
     '\n' +
