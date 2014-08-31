@@ -38,8 +38,8 @@
         </div>
     </div>
 
-    <div class="text-center">
-        <pagination items-per-page="itemPerPage" max-size="10" boundary-links="true" total-items="podcast.totalItems    " ng-model="currentPage" ng-change="loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    <div ng-show="podcast.totalItems > itemPerPage" class="text-center">
+        <pagination items-per-page="itemPerPage" max-size="10" boundary-links="true" total-items="podcast.totalItems" ng-model="currentPage" ng-change="loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
     </div>
 </div>
 
