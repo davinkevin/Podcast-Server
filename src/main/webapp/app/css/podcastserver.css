@@ -24,7 +24,7 @@
 .item-listing .itemInList .overlay-button{opacity:1;position:absolute;top:0;right:0}
 .item-listing .itemInList .overlay-button:hover{opacity:1}
 .item-listing .itemInList .overlay-button .btn-group .btn{background-color:transparent;color:#fff}
-.item-listing .itemInList .overlay-main-button{opacity:0;position:absolute;top:14%;left:20%;font-size:1000%;width:33%;color:rgba(255,255,255,.82)}
+.item-listing .itemInList .overlay-main-button{opacity:0;position:absolute;top:14%;left:20%;font-size:1000%;width:33%;color:rgba(255,255,255,.82);height:0}
 .item-listing .itemInList .overlay-main-button:hover{opacity:1}
 @media screen and (min-width:1200px){.item-listing .itemInList .overlay-main-button{top:6%;font-size:108px}}
 .item-listing .itemInList .itemTitle{padding:2px}
