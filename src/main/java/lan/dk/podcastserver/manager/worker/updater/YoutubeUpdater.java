@@ -61,7 +61,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                             .setPubdate(DateUtils.youtubeDateToTimeStamp(item.getChildText("published", defaultNamespace)))
                             .setPodcast(podcast);
 
-                    if (podcastItem.getPubdate().before(maxDate)) {
+                    if (podcastItem.getPubdate().before(maxDate) && borne > YOUTUBE_MAX_RESULTS) {
                         return podcast;
                     }
 
@@ -139,9 +139,9 @@ public class YoutubeUpdater extends AbstractUpdater {
                         ? "&start-index=" + startIndex.toString()
                         : "");
 
-        if ( youtubeUrl.matches(".*www.youtube.com/channel/.*") ||
-                youtubeUrl.matches(".*www.youtube.com/user/.*") ||
-                youtubeUrl.matches(".*www.youtube.com/.*") ) { //www.youtube.com/[channel|user]*/nom
+        if ( youtubeUrl.matches(".*.youtube.com/channel/.*") ||
+                youtubeUrl.matches(".*.youtube.com/user/.*") ||
+                youtubeUrl.matches(".*.youtube.com/.*") ) { //www.youtube.com/[channel|user]*/nom
             return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
         } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
             return youtubeUrl + queryParam;
