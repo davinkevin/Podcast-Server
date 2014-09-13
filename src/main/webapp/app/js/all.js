@@ -959,16 +959,33 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcast-detail.html',
+    '\n' +
+    '\n' +
     '<div class="container">\n' +
+    '    <br/>\n' +
+    '    <ol class="breadcrumb">\n' +
+    '        <li><a href="/#/podcasts">Podcasts</a></li>\n' +
+    '        <li><a class="active"> {{ podcast.title }}</a></li>\n' +
+    '    </ol>\n' +
     '\n' +
+    '    <div>\n' +
+    '        <div class="jumbotron podcast-details-header" ng-style="{ \'background-image\' : \'url(\'+ podcast.cover.url + \')\'}">\n' +
+    '            <div class="information-area">\n' +
+    '                <div class="information-text">\n' +
+    '                    <h3><strong>{{ podcast.title }}</strong></h3>\n' +
+    '                    <p>{{ podcast.totalItems }} Episodes</p>\n' +
+    '                </div>\n' +
+    '                <div class="action-button pull-right">\n' +
+    '                    <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>\n' +
+    '                    <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank">RSS</a>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
     '<br/>\n' +
-    '<ol class="breadcrumb">\n' +
-    '    <li><a href="/#/podcasts">Podcasts</a></li>\n' +
-    '    <li><a class="active"> {{ podcast.title }}</a></li>\n' +
-    '</ol>\n' +
     '\n' +
     '\n' +
-    '<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">\n' +
+    '<!--<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">\n' +
     '    <div class="thumbnail">\n' +
     '        <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">\n' +
     '        <div class="caption">\n' +
@@ -980,8 +997,8 @@ module.run(['$templateCache', function($templateCache) {
     '            </div>\n' +
     '        </div>\n' +
     '    </div>\n' +
-    '</div>\n' +
-    '<div class="col-md-8 col-xs-12 col-sm-12 col-lg-8">\n' +
+    '</div>-->\n' +
+    '<div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">\n' +
     '\n' +
     '    <tabset>\n' +
     '        <!--\n' +

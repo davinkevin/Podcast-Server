@@ -49,3 +49,9 @@
 .bootstrap .tags .tag-item button{background:0 0;color:#000;opacity:.4}
 .bootstrap .autocomplete{border-radius:4px}
 .bootstrap .autocomplete .tag-item.selected{color:#262626;background-color:#e9e9e9}
+.podcast-details-header{background-size:100%;background-repeat:no-repeat;background-position:center center;width:100%;height:200px;padding-left:0!important;padding-right:0!important}
+.information-area{padding-top:95px}
+@media screen and (max-width:768px){.information-area{padding-top:115px}}
+.information-area .action-button{display:inline-block;padding:6px}
+.information-area .information-text{display:inline-block;padding-left:8px;padding-right:8px;border-radius:5px;background-color:rgba(245,245,245,.58)}
+.information-area .information-text h3,.information-area .information-text p{margin:0}
