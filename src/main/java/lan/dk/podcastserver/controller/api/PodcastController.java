@@ -89,6 +89,7 @@ public class PodcastController {
 
     @RequestMapping(value="{id:[\\d]+}/upload", method=RequestMethod.POST)
     @ResponseBody
+    @Deprecated
     public String handleFileUpload(@PathVariable Integer id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name) throws PodcastNotFoundException {
         logger.info("Envoie du fichier : {}", name);
         if (!file.isEmpty()) {

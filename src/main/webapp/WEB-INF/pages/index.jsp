@@ -78,6 +78,7 @@
 <script src="/app/js/lib/ng-tags-input/ng-tags-input.min.js"></script>
 <script src="/app/js/lib/mousetrap/mousetrap.min.js"></script>
 <script src="/app/js/lib/angular-notification/angular-notification.min.js"></script>
+<script src="/app/js/lib/ng-file-upload/angular-file-upload.min.js"></script>
 <script src="/app/js/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/app/js/lib/restangular/dist/restangular.min.js"></script>
 <script src="/app/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>

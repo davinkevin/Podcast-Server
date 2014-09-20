@@ -53,6 +53,14 @@ public class PodcastBusiness {
     @Value("${fileContainer:http://localhost:8080/podcast}")
     protected String fileContainer;
 
+    public String getRootfolder() {
+        return rootfolder;
+    }
+
+    public String getFileContainer() {
+        return fileContainer;
+    }
+
     //** Delegate du Repository **//
     public List<Podcast> findAll() {
         return podcastRepository.findAll();
@@ -132,6 +140,7 @@ public class PodcastBusiness {
     }
 
     @Transactional
+    @Deprecated
     public boolean addItemByUpload(Integer idPodcast, MultipartFile file, String name) throws PodcastNotFoundException, ParseException, IOException {
         Podcast podcast = this.findOne(idPodcast);
         if (podcast == null) {

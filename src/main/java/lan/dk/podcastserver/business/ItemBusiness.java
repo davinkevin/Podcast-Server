@@ -1,9 +1,14 @@
 package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Tag;
+import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.utils.DateUtils;
+import lan.dk.podcastserver.utils.MimeTypeUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +19,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -179,5 +188,44 @@ public class ItemBusiness {
             return null;
 
         return save(itemToReset.reset());
+    }
+
+    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws PodcastNotFoundException, IOException, ParseException {
+        Podcast podcast = podcastBusiness.findOne(podcastId);
+        if (podcast == null) {
+            throw new PodcastNotFoundException();
+        }
+
+        //TODO utiliser BEAN_UTIL pour faire du dynamique :
+        // 1er temps : Template en dure : {title} - {date} - {title}.mp3
+
+        Item item = new Item();
+        //String name = name;
+        File fileToSave = new File(podcastBusiness.getRootfolder() + File.separator + podcast.getTitle() + File.separator + uploadedFile.getOriginalFilename());
+        if (fileToSave.exists()) {
+            fileToSave.delete();
+        }
+        fileToSave.mkdirs();
+
+        uploadedFile.transferTo(fileToSave);
+
+        item.setTitle(FilenameUtils.removeExtension(uploadedFile.getOriginalFilename().split(" - ")[2]))
+                .setPubdate(DateUtils.folderDateToTimestamp(uploadedFile.getOriginalFilename().split(" - ")[1]))
+                .setUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
+                .setLength(uploadedFile.getSize())
+                .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(uploadedFile.getOriginalFilename())))
+                .setDescription(podcast.getDescription())
+                .setLocalUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
+                .setLocalUri(fileToSave.getAbsolutePath())
+                .setDownloaddate(new Timestamp(new Date().getTime()))
+                .setPodcast(podcast)
+                .setStatus("Finish");
+
+        podcast.getItems().add(item);
+
+        item = itemRepository.save(item);
+        podcastBusiness.save(podcast);
+
+        return item;
     }
 }

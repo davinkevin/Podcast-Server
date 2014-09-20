@@ -55,3 +55,6 @@
 .information-area .action-button{display:inline-block;padding:6px}
 .information-area .information-text{display:inline-block;padding-left:8px;padding-right:8px;border-radius:5px;background-color:rgba(245,245,245,.58)}
 .information-area .information-text h3,.information-area .information-text p{margin:0}
+.upload-item .drop-box{background:#F8F8F8;border:5px dashed #DDD;height:100px;text-align:center}
+.upload-item .drop-box .upload-text{height:100%;padding-top:5%}
+.upload-item .drop-box.dropping{background:#C7C7C7}

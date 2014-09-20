@@ -51,6 +51,9 @@
         <tab heading="Edition">
             <podcast-edition podcast="podcast"></podcast-edition>
         </tab>
+        <tab heading="Upload" ng-show="podcast.type == 'send'">
+            <podcast-upload podcast="podcast"></podcast-upload>
+        </tab>
     </tabset>
 
 
