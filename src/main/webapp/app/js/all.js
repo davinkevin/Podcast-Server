@@ -686,7 +686,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
-    '            <div ng-repeat="item in items track by item.id" class="col-lg-2 col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
+    '            <div ng-repeat="item in items track by item.id" class="col-lg-3 col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
     '                <div class="box">\n' +
     '                    <div class="">\n' +
     '                        <img ng-class="{\'img-grayscale\' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />\n' +
@@ -1186,7 +1186,7 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '        </a>\n' +
     '        <div class="media-body">\n' +
-    '            <h4 class="media-heading">{{item.title | characters:60}}</h4>\n' +
+    '            <h4 class="media-heading">{{ item.title }}</h4>\n' +
     '            <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n' +
     '            <p><strong>{{item.pubdate | date : \'dd/MM/yyyy à HH:mm\' }}</strong></p>\n' +
     '        </div>\n' +

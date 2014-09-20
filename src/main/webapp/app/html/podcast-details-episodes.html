@@ -32,7 +32,7 @@
 
         </a>
         <div class="media-body">
-            <h4 class="media-heading">{{item.title | characters:60}}</h4>
+            <h4 class="media-heading">{{ item.title }}</h4>
             <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>
             <p><strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>
         </div>

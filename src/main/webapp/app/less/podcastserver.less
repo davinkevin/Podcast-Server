@@ -1,6 +1,7 @@
 
 // Import des variables bootstraps
 @import "../../../../../bower_components/bootstrap/less/variables.less";
+@import "../../../../../bower_components/bootstrap/less/mixins.less";
 
 @media screen and (min-width: @screen-sm-min) {
   .navbar-fixed-top {
@@ -94,37 +95,6 @@
   box-shadow: 0 0 15px 0px rgba(0,0,0,.1);
   border: 1px solid #ddd;
 }
-/*
-.box:before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  bottom: 15px;
-  left: 10px;
-  width: 50%;
-  height: 20%;
-  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.7);
-  -webkit-transform: rotate(-3deg) skew(-0deg);
-  -moz-transform: rotate(-3deg) skew(-0deg);
-  -ms-transform: rotate(-3deg) skew(-0deg);
-  -o-transform: rotate(-3deg) skew(-0deg);
-  transform: rotate(-3deg) skew(-0deg);
-}
-.box:after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  bottom: 15px;
-  right: 10px;
-  width: 50%;
-  height: 20%;
-  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.7);
-  -webkit-transform: rotate(3deg) skew(0deg);
-  -moz-transform: rotate(3deg) skew(0deg);
-  -ms-transform: rotate(3deg) skew(0deg);
-  -o-transform: rotate(3deg) skew(0deg);
-  transform: rotate(3deg) skew(0deg);
-}*/
 
 .item-listing {
 
@@ -264,6 +234,7 @@
     }
     .media-heading {
       padding-top: 10px;
+      .text-overflow();
     }
     .buttonList {
       padding-top: 24px;
@@ -276,6 +247,10 @@
   margin-left: 5px;
   margin-right: 5px;
   overflow: visible;
+  .media-heading {
+    .text-overflow();
+  }
+
   .btn {
     border : none;
   }
