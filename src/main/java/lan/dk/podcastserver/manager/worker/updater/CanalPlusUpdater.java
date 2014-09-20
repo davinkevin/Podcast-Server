@@ -34,8 +34,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Set<Item> itemSet = null;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).get();
-
+            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
             // Si la page possède un planifier :
             if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet == null) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
                 itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
@@ -94,15 +93,16 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Document page = null;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).get();
+            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
         }
 
         // Si la page possède un planifier :
-        if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return DigestUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
+        if (page != null) {
+            if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+                return DigestUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
+            }
         }
 
 
@@ -131,22 +131,21 @@ public class CanalPlusUpdater extends AbstractUpdater {
         int ztid = 0;
         Document page = null;
         try {
-            page = Jsoup.connect(canalPlusDirectShowUrl).get();
+            page = Jsoup.connect(canalPlusDirectShowUrl).timeout(5000).get();
+            Pattern p = Pattern.compile(
+                    "^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
+            //logger.debug(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
+            Matcher m = p.matcher(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
+
+            if (m.find()) {
+                pid = Integer.parseInt(m.group(1));
+                ztid = Integer.parseInt(m.group(2));
+            }
+            return "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=" + pid + "&ztid=" + ztid + "&nbPlusVideos0=1";
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
         }
-
-        Pattern p = Pattern.compile(
-                "^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
-        logger.debug(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
-        Matcher m = p.matcher(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
-
-        if (m.find()) {
-            pid = Integer.parseInt(m.group(1));
-            ztid = Integer.parseInt(m.group(2));
-        }
-        return "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=" + pid + "&ztid=" + ztid + "&nbPlusVideos0=1";
+        return "";
     }
 
     private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) throws MalformedURLException {

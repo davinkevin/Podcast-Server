@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -20,7 +21,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
+@Transactional
 public abstract class AbstractDownloader implements Runnable, Downloader {
     public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
     public static final String WS_TOPIC_PODCAST = "/topic/podcast/";

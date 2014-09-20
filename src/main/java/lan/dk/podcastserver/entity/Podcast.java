@@ -107,7 +107,7 @@ public class Podcast implements Serializable {
         this.lastUpdate = lastUpdate;
     }
 
-    @OneToMany(mappedBy = "podcast", fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy = "podcast", fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
     @OrderBy("pubdate DESC")
     @Fetch(FetchMode.SUBSELECT)
     public Set<Item> getItems() {
@@ -148,7 +148,7 @@ public class Podcast implements Serializable {
         this.hasToBeDeleted = hasToBeDeleted;
     }
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(name="PODCAST_TAG",
             joinColumns={@JoinColumn(name="PODCAST_ID", referencedColumnName="ID")},
             inverseJoinColumns={@JoinColumn(name="TAG_ID", referencedColumnName="ID")})

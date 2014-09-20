@@ -95,6 +95,7 @@ public class PluzzUpdater extends AbstractUpdater {
         try {
 
             Connection.Response response = Jsoup.connect(listingUrl)
+                    .timeout(5000)
                     .userAgent(USER_AGENT)
                     .referrer("http://www.google.fr")
                     .execute();
@@ -114,7 +115,7 @@ public class PluzzUpdater extends AbstractUpdater {
         String pluzzId = getPluzzId(url);
 
         if (pluzzId.isEmpty())
-            return null;
+            return new Item();
 
         JSONParser parser = new JSONParser();
         try {
@@ -148,7 +149,7 @@ public class PluzzUpdater extends AbstractUpdater {
         }
 
 
-        return null;
+        return new Item();
     }
 
     private String getPluzzM38uUrl(JSONArray videosArray) {

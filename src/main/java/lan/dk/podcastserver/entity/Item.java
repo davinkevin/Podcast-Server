@@ -98,8 +98,7 @@ public class Item implements Serializable {
     }
 
     @Column(name = "title")
-    @Basic
-    @Field
+    @Basic @Field
     public String getTitle() {
         return title;
     }
@@ -131,7 +130,7 @@ public class Item implements Serializable {
         return this;
     }
 
-    @ManyToOne(cascade={CascadeType.MERGE})
+    @ManyToOne(cascade={CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "podcast_id", referencedColumnName = "id")
     @JsonBackReference("podcast-item")
     public Podcast getPodcast() {
@@ -198,8 +197,7 @@ public class Item implements Serializable {
     }
 
     @Column(name = "description", length = 65535)
-    @Basic
-    @Field
+    @Basic @Field
     public String getDescription() {
         return description;
     }

@@ -43,6 +43,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
         try {
             Connection.Response response = Jsoup.connect(podcast.getUrl())
+                    .timeout(5000)
                     .userAgent(USER_AGENT)
                     .referrer("http://www.google.fr")
                     .execute();
@@ -137,7 +138,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         Document page = null;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).get();
+            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
             return DigestUtils.generateMD5SignatureFromDOM(page.select("#playlist ul li").html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

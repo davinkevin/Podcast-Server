@@ -49,6 +49,7 @@ public class BeInSportUpdater extends AbstractUpdater {
         try {
 
             Connection.Response response = Jsoup.connect(listingUrl)
+                    .timeout(5000)
                     .userAgent(USER_AGENT)
                     .referrer("http://www.google.fr")
                     .execute();
@@ -60,27 +61,29 @@ public class BeInSportUpdater extends AbstractUpdater {
             logger.error("IOException :", e);
         }
 
-        for(Element article : page.select("article")) {
-            Item item = new Item()
-                                .setTitle(article.select(".info h4 a").first().text())
-                                .setDescription(article.select(".info span").first().text());
+        if (page != null) {
+            for(Element article : page.select("article")) {
+                Item item = new Item()
+                                    .setTitle(article.select(".info h4 a").first().text())
+                                    .setDescription(article.select(".info span").first().text());
 
-            item = getDetailOfItemByXML(item, article.select("a").first().className());
+                item = getDetailOfItemByXML(item, article.select("a").first().className());
 
-            logger.debug(item.toString());
+                logger.debug(item.toString());
 
-            if (!podcast.getItems().contains(item)) {
+                if (!podcast.getItems().contains(item)) {
 
-                // Si le bean est valide :
-                item.setPodcast(podcast);
-                Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                if (constraintViolations.isEmpty()) {
-                    podcast.getItems().add(item);
-                } else {
-                    logger.error(constraintViolations.toString());
+                    // Si le bean est valide :
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
                 }
-            }
 
+            }
         }
 
         return podcast;

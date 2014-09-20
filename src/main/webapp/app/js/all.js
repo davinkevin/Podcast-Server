@@ -769,20 +769,23 @@ module.run(['$templateCache', function($templateCache) {
     '            <input type="text" class="form-control" ng-model="term" placeholder="Recherche globale" ng-change="currentSearchPage=1; changePage()" ng-model-options="{ debounce: 500 }">\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="col-sm-5">\n' +
+    '        <div class="form-group col-sm-5">\n' +
     '            <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="searchTags" display-property="name" class="bootstrap" on-tag-added="currentPage=1; changePage()" on-tag-removed="currentPage=1; changePage()">\n' +
     '                <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
     '            </tags-input>\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="col-sm-2">\n' +
+    '        <div class="form-group col-sm-2">\n' +
     '            <select class="form-control" ng-model="properties" ng-change="changePage()">\n' +
+    '                <option value>Tri</option>\n' +
     '                <option value="pertinence">Pertinence</option>\n' +
     '                <option value="pubdate">Date publication</option>\n' +
     '            </select>\n' +
     '        </div>\n' +
-    '        <div class="col-sm-2">\n' +
+    '\n' +
+    '        <div class="form-group col-sm-2">\n' +
     '            <select class="form-control" ng-model="direction" ng-change="changePage()" ng-disabled="properties === \'pertinence\'">\n' +
+    '                <option value>Ordre</option>\n' +
     '                <option value="DESC">Descendant</option>\n' +
     '                <option value="ASC">Ascendant</option>\n' +
     '            </select>\n' +

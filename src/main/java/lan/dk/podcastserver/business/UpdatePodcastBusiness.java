@@ -7,11 +7,8 @@ import lan.dk.podcastserver.utils.WorkerUtils;
 import org.jdom2.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +22,7 @@ import java.util.concurrent.Executor;
 
 @Component
 @Transactional
-public class UpdatePodcastBusiness implements ApplicationContextAware  {
+public class UpdatePodcastBusiness  {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -42,23 +39,17 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
     @Value("${fileContainer:http://localhost:8080/podcast}") protected String fileContainer;
     @Value("${numberofdaytodownload:30}") private int numberofdaytodownload;
 
-
-
-    ApplicationContext context = null;
-
-    @Transactional
+    @Transactional(noRollbackFor=Exception.class)
     public void updatePodcast() {
         logger.info("Lancement de l'update");
         List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
-        Document podcastXML = null;
         Updater updater;
         for (Podcast podcast : podcasts) {
             try {
-                //podcastXML = jDomUtils.jdom2Parse(podcast.getUrl());
+                logger.info("Traitement du Podcast : " + podcast.toString());
                 updater = workerUtils.getUpdaterByType(podcast);
                 String signature = updater.signaturePodcast(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    logger.info("Traitement du Podcast : " + podcast.toString());
                     updater.updateFeed(podcast);
 
 
@@ -73,9 +64,10 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
+        logger.info("Fin du traitement des {} podcasts", podcasts.size());
     }
 
-    @Transactional
+    @Transactional(noRollbackFor=Exception.class)
     public void updatePodcast(int id) {
         logger.debug("Lancement de l'update");
         Podcast podcast = podcastBusiness.findOne(id);
@@ -125,11 +117,6 @@ public class UpdatePodcastBusiness implements ApplicationContextAware  {
         }
     }
 
-    @Override
-    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        logger.debug("Initialisation du Contexte");
-        this.context = applicationContext;
-    }
 
     @PostConstruct
     public void resetItemWithIncorrectState() {

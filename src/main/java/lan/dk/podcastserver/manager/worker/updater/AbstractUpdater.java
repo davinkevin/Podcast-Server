@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
@@ -11,6 +12,7 @@ import java.util.concurrent.Future;
 
 //@Component
 //@Scope("prototype")
+@Transactional(noRollbackFor=Exception.class)
 public abstract class AbstractUpdater implements Updater {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());

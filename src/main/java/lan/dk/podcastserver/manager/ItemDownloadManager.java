@@ -12,17 +12,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Controller
-public class ItemDownloadManager implements ApplicationContextAware {
+@Service
+@Transactional
+public class ItemDownloadManager {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waitingList";
@@ -59,8 +61,6 @@ public class ItemDownloadManager implements ApplicationContextAware {
 
     private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
     private boolean isRunning = false;
-
-    ApplicationContext context = null;
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
@@ -285,12 +285,6 @@ public class ItemDownloadManager implements ApplicationContextAware {
                 new Thread((Runnable) worker).start();
             }
         }
-    }
-
-    @Override
-    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        logger.debug("Initialisation du Contexte");
-        this.context = applicationContext;
     }
 
     public void removeItemFromQueueAndDownload(Item itemToDelete) {

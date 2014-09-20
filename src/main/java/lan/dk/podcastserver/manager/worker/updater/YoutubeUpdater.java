@@ -139,9 +139,9 @@ public class YoutubeUpdater extends AbstractUpdater {
                         ? "&start-index=" + startIndex.toString()
                         : "");
 
-        if ( youtubeUrl.matches(".*.youtube.com/channel/.*") ||
+        if ( (youtubeUrl.matches(".*.youtube.com/channel/.*") ||
                 youtubeUrl.matches(".*.youtube.com/user/.*") ||
-                youtubeUrl.matches(".*.youtube.com/.*") ) { //www.youtube.com/[channel|user]*/nom
+                youtubeUrl.matches(".*.youtube.com/.*")) && !youtubeUrl.contains("gdata") ) { //www.youtube.com/[channel|user]*/nom
             return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
         } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
             return youtubeUrl + queryParam;
