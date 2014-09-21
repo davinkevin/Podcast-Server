@@ -87,8 +87,7 @@ public class RTMPDownloader extends AbstractDownloader {
                         }
                     }
                 };
-                //new Thread(itemSynchronisation).start();
-                new Thread(itemErrorSynchronisation).start();
+                itemErrorSynchronisation.run();
                 p.waitFor();
                 pid = 0;
 

@@ -39,9 +39,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public AbstractDownloader() {
-    }
-
     public ItemDownloadManager getItemDownloadManager() {
         return itemDownloadManager;
     }

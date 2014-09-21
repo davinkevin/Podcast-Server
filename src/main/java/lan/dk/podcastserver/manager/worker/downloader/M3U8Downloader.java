@@ -99,7 +99,7 @@ public class M3U8Downloader extends AbstractDownloader {
                     }
                 };
 
-                new Thread(runnableDownloader).start();
+                runnableDownloader.run();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
