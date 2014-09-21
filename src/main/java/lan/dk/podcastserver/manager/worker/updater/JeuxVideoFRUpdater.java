@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Set;
@@ -50,14 +49,14 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
             page = response.parse();
 
 
-            for (Element element : page.select("#playlist ul li")) {
+            for (Element element : page.select(".block-video-tableVideo tbody tr")) {
                 Item item = new Item()
-                                .setTitle(element.select("a").first().attr("title"))
-                                .setDescription(element.select("a").first().attr("title"));
+                                .setTitle(element.select(".video .bleu2").text())
+                                .setDescription(element.select(".video .bleu2").text());
                 try {
-                    item.setPubdate(DateUtils.jeuxVideoFrToTimeStamp(element.select("a span").text()));
+                    item.setPubdate(DateUtils.jeuxVideoFrToTimeStamp(element.select("td:nth-of-type(3)").text()));
                 } catch (ParseException e) {
-                    logger.error("Non Parseable date : {}", element.select("a span").text());
+                    logger.error("Non Parseable date : {}", element.select("p:contains(Vidéo)").text());
                 }
 
                 Matcher m = ID_JEUXVIDEOFR_PATTERN.matcher(element.select("a").attr("href"));
@@ -118,8 +117,6 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
                 item.setUrl(xml_item.getChildText("url_video_3g"));
             }
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
