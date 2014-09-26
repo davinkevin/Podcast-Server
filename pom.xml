@@ -146,8 +146,9 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.3.175</version>
+            <version>1.4.181</version>
         </dependency>
+
 
         <!-- Servlet API 3.0 -->
 

@@ -8,20 +8,20 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
     ngHtml2Js = require("gulp-ng-html2js"),
-    addsrc = require('gulp-add-src'),
     inject = require("gulp-inject"),
     bowerFiles = require('main-bower-files'),
     debug = require('gulp-debug'),
     sourcemaps = require('gulp-sourcemaps'),
     args = require('yargs').argv,
-    plumber = require('gulp-plumber');
+    plumber = require('gulp-plumber'),
+    es = require('event-stream');
 
 var fileAppLocation = 'src/main/webapp/app/';
 
-    // Location Files :
+// Location Files :
 var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fileAppLocation).concat('js/all*.js'),
-                            '!'.concat(fileAppLocation).concat('js/*.min.js'), '!'.concat(fileAppLocation).concat('js/lib/**/*.js'),
-                            '!'.concat(fileAppLocation).concat('js/**/*.module.js')],
+        '!'.concat(fileAppLocation).concat('js/*.min.js'), '!'.concat(fileAppLocation).concat('js/lib/**/*.js'),
+        '!'.concat(fileAppLocation).concat('js/**/*.module.js')],
     angularAppModule = [fileAppLocation.concat('js/**/*.module.js')],
     lessLocation = fileAppLocation.concat('less/*.less'),
     htmlLocation = fileAppLocation.concat('html/*.html'),
@@ -40,23 +40,19 @@ gulp.task('lint', function() {
 });
 
 gulp.task('js', function() {
-    gulp.src(htmlLocation)
-        .pipe(plumber())
-        .pipe(ngHtml2Js({
-            moduleName: "podcast.partial",
-            prefix: "html/"
-        }))
-        .pipe(concat("partials.js"))
-        .pipe(addsrc(angularAppModule))
-        .pipe(addsrc(angularAppLocation))
-        .pipe(sourcemaps.init())
-        .pipe(concat('all.js'))
-        .pipe(gulp.dest(jsDestination))
-        .pipe(ngAnnotate())
-        .pipe(uglify())
-        .pipe(rename('all.min.js'))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(jsDestination));
+    es.merge(
+        gulp.src(htmlLocation).pipe(plumber()).pipe(ngHtml2Js({ moduleName: "podcast.partial", prefix: "html/" })).pipe(concat("partials.js")),
+        gulp.src(angularAppModule),
+        gulp.src(angularAppLocation)
+    )
+    .pipe(sourcemaps.init())
+    .pipe(concat('all.js'))
+    .pipe(gulp.dest(jsDestination))
+    .pipe(ngAnnotate())
+    .pipe(uglify())
+    .pipe(rename('all.min.js'))
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest(jsDestination));
 });
 
 gulp.task('less', function () {
