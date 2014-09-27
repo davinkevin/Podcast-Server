@@ -304,8 +304,8 @@ public class Item implements Serializable {
         return (this.cover == null) ? podcast.getCover() : this.cover;
     }
 
-    @Transient
     @JsonProperty("podcastId")
+    @Transient
     public Integer getPodcastId() { return (podcast == null) ? null : podcast.getId();}
 
     @Transient

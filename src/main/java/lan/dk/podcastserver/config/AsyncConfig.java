@@ -24,7 +24,7 @@ public class AsyncConfig implements AsyncConfigurer {
     @Bean(name = "UpdateExecutor")
     @Override
     public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();;
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(concurrentDownload);
         executor.setMaxPoolSize(concurrentDownload);
         executor.setThreadNamePrefix("Update-");

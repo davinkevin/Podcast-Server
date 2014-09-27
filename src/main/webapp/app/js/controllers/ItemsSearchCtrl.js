@@ -71,7 +71,7 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-        $scope.wsClient = ngstomp('/download', SockJS);
+        $scope.wsClient = ngstomp('/ws', SockJS);
         $scope.wsClient.connect("user", "password", function(){
             $scope.wsClient.subscribe("/topic/download", function(message) {
                 var item = JSON.parse(message.body);
