@@ -3,25 +3,14 @@ package lan.dk.podcastserver.worker;
 import lan.dk.podcastserver.context.Mock.MockRepository;
 import lan.dk.podcastserver.context.Mock.MockService;
 import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
-import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.manager.worker.updater.CanalPlusUpdater;
 import lan.dk.podcastserver.manager.worker.updater.YoutubeUpdater;
-import lan.dk.podcastserver.utils.WorkerUtils;
-import org.hamcrest.core.IsNot;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.sql.Timestamp;
-
-import static org.junit.Assert.assertThat;
 
 /**
  * Created by kevin on 21/12/2013.
@@ -40,6 +29,7 @@ public class YoutubeUpdaterTest {
     public void initPodcast() {
         logger.debug("InitPodcast");
     }
+/*
 
     @Test
     public void updateCauet() {
@@ -75,5 +65,6 @@ public class YoutubeUpdaterTest {
         logger.debug(podcast.toString());
 
     }
+*/
 
 }

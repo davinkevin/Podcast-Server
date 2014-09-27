@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,15 +97,17 @@ public class BeInSportUpdater extends AbstractUpdater {
         } catch (JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("JDOMException :", e);
+            return new Item();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
+            return new Item();
         }
 
         org.jdom2.Element xml_clip = xmlEpisode.getRootElement().getChild("clip");
 
         try {
-            item.setPubdate(DateUtils.beInSportDateToTimeStamp(xml_clip.getAttributeValue("videoCreationDate")));
+            item.setPubdate(DateUtils.fromBeInSport(xml_clip.getAttributeValue("videoCreationDate")));
             item.setCover(ImageUtils.getCoverFromURL(new URL(BEINSPORTS_HOST_URL.concat(xml_clip.getAttributeValue("videoImageSrc")))));
 
             String externalUrl = null;
@@ -133,7 +134,7 @@ public class BeInSportUpdater extends AbstractUpdater {
 
             item.setUrl((vodUrl != null) ? vodUrl : externalUrl);
 
-        } catch (ParseException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

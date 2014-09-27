@@ -16,9 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.Set;
 
 @Component("RSSUpdater")
@@ -59,7 +57,7 @@ public class RSSUpdater extends AbstractUpdater {
                 if (item.getChild("enclosure") != null || item.getChild("origEnclosureLink", feedburner) != null)   { // est un podcast utilisable
                     Item podcastItem = new Item()
                                                 .setTitle(item.getChildText("title"))
-                                                .setPubdate(DateUtils.rfc2822DateToTimeStamp(item.getChildText("pubDate")))
+                                                .setPubdate(DateUtils.fromRFC822(item.getChildText("pubDate")))
                                                 .setDescription(item.getChildText("description"))
                                                 .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
                                                 .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
@@ -93,10 +91,6 @@ public class RSSUpdater extends AbstractUpdater {
                     }
                 }
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ParseException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

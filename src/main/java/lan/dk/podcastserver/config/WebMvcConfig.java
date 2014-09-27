@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.utils.jackson.HibernateAwareObjectMapper;
+import lan.dk.podcastserver.utils.jackson.CustomObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -83,7 +83,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
         //Ajout de la librairie de désierialization spécifiques à Hibernate pour Jackson
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        mappingJackson2HttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
+        mappingJackson2HttpMessageConverter.setObjectMapper(new CustomObjectMapper());
+
         converters.add(mappingJackson2HttpMessageConverter);
 
         //Ajout du mapping string par défaut :

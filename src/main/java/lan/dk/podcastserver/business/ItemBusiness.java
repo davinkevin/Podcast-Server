@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +39,6 @@ import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.h
 import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.isInTags;
 import static org.springframework.data.jpa.domain.Specifications.where;
 
-/**
- * Created by kevin on 26/12/2013.
- */
 @Component
 @Transactional
 public class ItemBusiness {
@@ -60,12 +59,6 @@ public class ItemBusiness {
     @Transactional(readOnly = true)
     public Page<Item> findAll(Pageable pageable) {
         return itemRepository.findAll(pageable);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
-    public Page<Item> findAllByPodcastTags(List<Tag> tags, Pageable pageable) {
-        return itemRepository.findAll(isInTags(tags), pageable);
     }
 
     @SuppressWarnings("unchecked")
@@ -111,10 +104,6 @@ public class ItemBusiness {
 
     public void delete(Item entity) {
         itemRepository.delete(entity);
-    }
-
-    public void deleteAll() {
-        itemRepository.deleteAll();
     }
 
     @Transactional(readOnly = true)
@@ -210,14 +199,14 @@ public class ItemBusiness {
         uploadedFile.transferTo(fileToSave);
 
         item.setTitle(FilenameUtils.removeExtension(uploadedFile.getOriginalFilename().split(" - ")[2]))
-                .setPubdate(DateUtils.folderDateToTimestamp(uploadedFile.getOriginalFilename().split(" - ")[1]))
+                .setPubdate(DateUtils.fromFolder(uploadedFile.getOriginalFilename().split(" - ")[1]))
                 .setUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
                 .setLength(uploadedFile.getSize())
                 .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(uploadedFile.getOriginalFilename())))
                 .setDescription(podcast.getDescription())
                 .setLocalUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
                 .setLocalUri(fileToSave.getAbsolutePath())
-                .setDownloaddate(new Timestamp(new Date().getTime()))
+                .setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
                 .setPodcast(podcast)
                 .setStatus("Finish");
 

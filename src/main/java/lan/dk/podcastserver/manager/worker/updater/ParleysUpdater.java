@@ -111,12 +111,12 @@ public class ParleysUpdater extends AbstractUpdater {
             return new Item()
                             .setTitle((String) responseObject.get("title"))
                             .setDescription((String) responseObject.get("description"))
-                            .setPubdate(DateUtils.parleysToTimeStamp((String) responseObject.get("publishedOn")))
+                            .setPubdate(DateUtils.fromParleys((String) responseObject.get("publishedOn")))
                             .setCover(ImageUtils.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
                             .setUrl(String.format(PARLEYS_ITEM_URL, id));
 
 
-        } catch (IOException | ParseException | java.text.ParseException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 

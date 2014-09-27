@@ -2,10 +2,7 @@ package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.ValidatorConfig;
-import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.PluzzUpdater;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
-
-import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 12/07/2014.
@@ -29,6 +23,7 @@ public class PluzzUpdaterTest {
 
     @Resource
     PluzzUpdater pluzzUpdater;
+/*
 
     Podcast IRON_MAN = new Podcast("Iron Man", "http://pluzz.francetv.fr/videos/iron_man.html",
             "", "Pluzz", new Timestamp(System.currentTimeMillis()), null, new Cover("http://lol.net/s/date-sortie-iron-man-la-serie-anime-vol-1-dvd.jpg", 250, 166), null, true);
@@ -62,5 +57,6 @@ public class PluzzUpdaterTest {
         assertThat(secretDhistoire).isNotNull();
         assertThat(secretDhistoire.getItems()).isNotEmpty().hasSize(2);
     }
+*/
 
 }

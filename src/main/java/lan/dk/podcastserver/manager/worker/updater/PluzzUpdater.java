@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.URLUtils;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -135,7 +135,7 @@ public class PluzzUpdater extends AbstractUpdater {
             Item itemToReturn = new Item()
                                     .setTitle(responseObject.get("titre").toString().concat(seasonEpisode).concat(responseObject.get("sous_titre").toString()))
                                     .setDescription(responseObject.get("synopsis").toString())
-                                    .setPubdate(new Timestamp((Long) ((JSONObject)responseObject.get("diffusion")).get("timestamp")*1000))
+                                    .setPubdate( DateUtils.fromPluzz((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")) )
                                     .setCover(ImageUtils.getCoverFromURL(new URL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image")))))
                                     .setUrl(getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
 

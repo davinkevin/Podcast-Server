@@ -4,11 +4,8 @@ import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.config.JPAConfig;
 import lan.dk.podcastserver.config.PropertyConfig;
-import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -16,13 +13,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 01/02/2014.
@@ -37,7 +27,7 @@ public class UpdateBusinessTest {
 
     Podcast podcastToBeDeleted;
     Podcast podcastToBeKept;
-
+/*
     @Before
     public void before() {
         itemBusiness.deleteAll();
@@ -87,6 +77,6 @@ public class UpdateBusinessTest {
 
         List<Item> hasToBeDeleted = itemBusiness.findAllToDelete();
         assertThat(hasToBeDeleted).hasSize(0);
-    }
+    }*/
 
 }

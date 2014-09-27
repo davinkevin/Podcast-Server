@@ -4,7 +4,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.utils.WorkerUtils;
-import org.jdom2.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -31,8 +32,7 @@ public class UpdatePodcastBusiness  {
     @Resource WorkerUtils workerUtils;
 
     @Resource
-    @Qualifier("UpdateExecutor")
-    Executor asyncExecutor;
+    @Qualifier("UpdateExecutor") Executor asyncExecutor;
 
     @Value("${rootfolder:${catalina.home}/webapp/podcast/}") protected String rootFolder;
     @Value("${serverURL:http://localhost:8080}") protected String serverURL;
@@ -53,9 +53,9 @@ public class UpdatePodcastBusiness  {
                     updater.updateFeed(podcast);
 
 
-                    podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
+                    podcast.setLastUpdate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
                     podcast.setSignature(signature);
-                    podcast = podcastBusiness.update(podcast);
+                    podcastBusiness.update(podcast);
 
                 } else {
                     logger.info("Podcast non traité car signature identique : {}", podcast.toString());
@@ -71,7 +71,6 @@ public class UpdatePodcastBusiness  {
     public void updatePodcast(int id) {
         logger.debug("Lancement de l'update");
         Podcast podcast = podcastBusiness.findOne(id);
-        Document podcastXML = null;
         Updater updater;
             try {
                 logger.info("Traitement du Podcast : " + podcast.toString());
@@ -82,9 +81,9 @@ public class UpdatePodcastBusiness  {
                     podcast = updater.updateFeed(podcast);
 
 
-                    podcast.setLastUpdate(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
+                    podcast.setLastUpdate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
                     podcast.setSignature(signature);
-                    podcast = podcastBusiness.update(podcast);
+                    podcastBusiness.update(podcast);
                 }
 
             } catch (Exception e) {
@@ -103,7 +102,7 @@ public class UpdatePodcastBusiness  {
 
     public void deleteOldEpisode() {
         logger.info("Suppression des anciens items");
-        File fileToDelete = null;
+        File fileToDelete;
         for (Item item : itemBusiness.findAllToDelete()) {
             fileToDelete = new File(rootFolder + item.getFileURI());
             logger.info("Suppression du fichier associé à l'item " + fileToDelete.getAbsolutePath());

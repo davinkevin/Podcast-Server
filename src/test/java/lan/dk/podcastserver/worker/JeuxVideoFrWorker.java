@@ -2,11 +2,7 @@ package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.ValidatorConfig;
-import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.JeuxVideoFRUpdater;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
 
 /**
  * Created by kevin on 22/02/2014.
@@ -28,7 +23,7 @@ public class JeuxVideoFrWorker {
 
     @Resource JeuxVideoFRUpdater jeuxVideoFRUpdater;
 
-
+/*
     @Test
     public void signatureDefisJVFR() {
 
@@ -59,5 +54,5 @@ public class JeuxVideoFrWorker {
                 "", "JeuxVideoFr", new Timestamp(System.currentTimeMillis()), null, new Cover("http://1.im6.fr/00C3006E3541664-c1-photo-oYToxOntzOjE6InciO2k6MTk1O30%3D-defi-chaine.jpg", 250, 166), null, true);
 
         jeuxVideoFRUpdater.updateFeed(defisJVFR);
-    }
+    }*/
 }

@@ -16,7 +16,6 @@ import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -229,19 +228,16 @@ public class CanalPlusUpdater extends AbstractUpdater {
         org.jdom2.Document xmlAboutCurrentEpisode = null;
         try {
             xmlAboutCurrentEpisode = jDomUtils.jdom2Parse("http://service.canal-plus.com/video/rest/getVideos/cplus/" + idCanalPlusVideo);
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("JDOMException :", e);
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
+        } catch (IOException | JDOMException e) {
+            logger.error("IOException | JDOMException :", e);
+            return new Item();
         }
         org.jdom2.Element xml_INFOS = xmlAboutCurrentEpisode.getRootElement().getChild("VIDEO").getChild("INFOS");
         org.jdom2.Element xml_MEDIA = xmlAboutCurrentEpisode.getRootElement().getChild("VIDEO").getChild("MEDIA");
 
         try {
             currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"))
-                    .setPubdate(DateUtils.canalPlusDateToTimeStamp(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
+                    .setPubdate(DateUtils.fromCanalPlus(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
                     .setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
                     .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
@@ -258,9 +254,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
 //                    }
 
             logger.debug(currentEpisode.toString());
-        } catch (ParseException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("ParseException :", e);
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("MalformedURLException pour l'item d'id Canal+ {}", idCanalPlusVideo, e);

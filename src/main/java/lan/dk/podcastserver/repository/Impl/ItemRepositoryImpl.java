@@ -52,7 +52,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         criteriaQuery.where(wherePridcate);
 
         // Affichage de la requête pour le Debug
-        logger.debug(em.createQuery(criteriaQuery).unwrap(org.hibernate.Query.class).getQueryString());
+        //logger.debug(em.createQuery(criteriaQuery).unwrap(org.hibernate.Query.class).getQueryString());
         return em.createQuery(criteriaQuery).getResultList();
 
     }
@@ -90,6 +90,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                             .batchSizeToLoadObjects(25)
                             .cacheMode(CacheMode.NORMAL)
                             .idFetchSize(150)
+                            .threadsToLoadObjects(1)
                             .progressMonitor(new SimpleIndexingProgressMonitor(100))
                             .startAndWait();
     }

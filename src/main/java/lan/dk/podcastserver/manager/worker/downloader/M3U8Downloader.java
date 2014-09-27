@@ -147,7 +147,7 @@ public class M3U8Downloader extends AbstractDownloader {
     public void startDownload() {
         this.item.setStatus("Started");
         stopDownloading.set(false);
-        this.saveSyncWithPodcast(this.item);
+        this.saveSyncWithPodcast();
         convertAndSaveBroadcast();
         if (runnableDownloader == null) {
             this.download();

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 
 
 public class jDomUtils {
@@ -34,9 +34,7 @@ public class jDomUtils {
             if (podcastXML.getRootElement().getChild("channel").getChild("image").getChildText("url") != null) {
                 podcast.setCover(ImageUtils.getCoverFromURL(new URL(podcastXML.getRootElement().getChild("channel").getChild("image").getChildText("url"))));
             }
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
+        } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return podcast;
@@ -51,13 +49,7 @@ public class jDomUtils {
             url = new URL(urlasString);
             doc = sax.build(url);
             logger.debug("Fin Parsing");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            throw e;
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            throw e;
-        } catch (IOException e) {
+        } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             throw e;
         }
@@ -78,7 +70,8 @@ public class jDomUtils {
         url.addContent(new Text("http://localhost:8080/api/podcast/" + podcast.getId() + "/rss"));
 
         Element lastUpdate = new Element("pubDate");
-        lastUpdate.addContent(new Text(DateUtils.TimeStampToRFC2822(podcast.getLastUpdate())));
+        lastUpdate.addContent(new Text(DateUtils.TimeStampToRFC2822(new Timestamp(podcast.getLastUpdate().getNano()/1_000_000))));
+        lastUpdate.addContent(new Text(DateUtils.toRFC2822(podcast.getLastUpdate())));
 
         Element description = new Element("description");
         description.addContent(new Text(podcast.getDescription()));
@@ -156,7 +149,7 @@ public class jDomUtils {
             xmlItem.addContent(item_enclosure);
 
             Element item_pubdate = new Element("pubDate");
-            item_pubdate.addContent(new Text(DateUtils.TimeStampToRFC2822(item.getPubdate())));
+            item_pubdate.addContent(new Text(DateUtils.toRFC2822(item.getPubdate())));
             xmlItem.addContent(item_pubdate);
 
             Element itunesExplicite = new Element("explicit", itunesNS);

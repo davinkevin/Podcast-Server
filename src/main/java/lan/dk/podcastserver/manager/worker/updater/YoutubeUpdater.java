@@ -18,34 +18,31 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
-import java.text.ParseException;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
-/**
- * Created by kevin on 21/12/2013.
- */
 @Component("YoutubeUpdater")
 @Scope("prototype")
 public class YoutubeUpdater extends AbstractUpdater {
 
     private static final Integer YOUTUBE_MAX_RESULTS = 50;
-    private String GDATA_USER_FEED = "http://gdata.youtube.com/feeds/api/users/";
-    private String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
-    @Value("${numberofdaytodownload:30}") int numberOfDayToDownload;
+    private static final String GDATA_USER_FEED = "http://gdata.youtube.com/feeds/api/users/";
+    //private static final String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
+
+    @Value("${numberofdaytodownload:30}") Integer numberOfDayToDownload;
 
     public Podcast updateFeed(Podcast podcast) {
 
         Integer borne = 1;
-        String realPodcastURl = null;
-        Date maxDate = DateUtils.findDateNDateAgo(numberOfDayToDownload);
+        String realPodcastURl;
+        ZonedDateTime maxDate = ZonedDateTime.now().plusDays(numberOfDayToDownload);
         Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
         while (true) {
             // Si l'image de présentation a changé :
             realPodcastURl = this.gdataUrlFromYoutubeURL(podcast.getUrl(), borne);
             logger.debug("URL = {}", realPodcastURl);
-            Document podcastXMLSource = null;
+            Document podcastXMLSource;
             try {
                 podcastXMLSource = jDomUtils.jdom2Parse(realPodcastURl);
                 Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
@@ -58,13 +55,12 @@ public class YoutubeUpdater extends AbstractUpdater {
                     Item podcastItem = new Item()
                             .setTitle(item.getChildText("title", defaultNamespace))
                             .setDescription(item.getChildText("content", defaultNamespace))
-                            .setPubdate(DateUtils.youtubeDateToTimeStamp(item.getChildText("published", defaultNamespace)))
+                            .setPubdate(DateUtils.fromYoutube(item.getChildText("published", defaultNamespace)))
                             .setPodcast(podcast);
 
-                    if (podcastItem.getPubdate().before(maxDate) && borne > YOUTUBE_MAX_RESULTS) {
+                    if (podcastItem.getPubdate().isBefore(maxDate) && borne > YOUTUBE_MAX_RESULTS) {
                         return podcast;
                     }
-
                     for (Element link : item.getChildren("link", defaultNamespace)) {
                         if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
                             podcastItem.setUrl(link.getAttributeValue("href", null, ""));
@@ -91,7 +87,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
                 }
 
-            } catch (JDOMException | IOException | ParseException e) {
+            } catch (JDOMException | IOException e) {
                 e.printStackTrace();
                 return podcast;
             }
@@ -111,19 +107,18 @@ public class YoutubeUpdater extends AbstractUpdater {
     @Override
     public String signaturePodcast(Podcast podcast) {
         // Si l'image de présentation a changé :
-        Document podcastXMLSource = null;
+        Document podcastXMLSource;
         try {
             podcastXMLSource = jDomUtils.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl(), null));
         } catch (JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
+            return "";
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
+            return "";
         }
 
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
-        Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
         if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0) != null) {
             return DigestUtils.generateMD5SignatureFromDOM (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));

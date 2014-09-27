@@ -4,15 +4,11 @@ import lan.dk.podcastserver.business.UpdatePodcastBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.Mock.MockRepository;
-import lan.dk.podcastserver.context.Mock.MockService;
-import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
-import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.utils.WorkerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -22,7 +18,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +34,7 @@ public class SignatureTest {
     UpdatePodcastBusiness updatePodcastBusiness;
     @Resource WorkerUtils workerUtils;
     List<Podcast> podcastList = new ArrayList<Podcast>();
-
+/*
     @Before
     public void initTest() {
         podcastList.add(new Podcast("Cauet", "http://www.youtube.com/channel/UCe2YQ986DdKliHNvE8va4kQ", "", "Youtube", null, null, new Cover(), null, null));
@@ -58,7 +53,7 @@ public class SignatureTest {
         podcastList.add(new Podcast("Le Before", "http://www.canalplus.fr/c-divertissement/c-le-before-du-grand-journal/pid6429-l-emission.html",
                 "", "CanalPlus", null, null, new Cover("http://img15.hostingpics.net/pics/966069Capture20131020092150.png", 60, 60), null, null));
 
-    }
+    }*/
 
     @After
     public void afterTest() {

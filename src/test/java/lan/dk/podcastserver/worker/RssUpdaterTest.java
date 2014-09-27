@@ -50,7 +50,7 @@ public class RssUpdaterTest {
 //        canalPlusPodcast = new Podcast("La Météo de Doria", "http://www.canalplus.fr/c-divertissement/c-le-grand-journal/pid4688-la-meteo-de-doria.html",
 //                "", "CanalPlus", new Timestamp(System.currentTimeMillis()), null, new Cover("http://media7.canal-plus.net/image/64/4/321644.jpg", 60, 60));
     }
-
+/*
     @Test
     public void geekIncTest() {
         logger.debug("Download");
@@ -93,5 +93,5 @@ public class RssUpdaterTest {
         Podcast podcast = new Podcast("Season1", "http://www.season1.fr/category/Podcast/feed/", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null, null, null);
         rssUpdater.updateFeed(podcast);
         logger.debug(podcast.toString());
-    }
+    }*/
 }

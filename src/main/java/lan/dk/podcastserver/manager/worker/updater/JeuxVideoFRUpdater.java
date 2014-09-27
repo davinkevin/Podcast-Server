@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,8 +53,8 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
                                 .setTitle(element.select(".video .bleu2").text())
                                 .setDescription(element.select(".video .bleu2").text());
                 try {
-                    item.setPubdate(DateUtils.jeuxVideoFrToTimeStamp(element.select("td:nth-of-type(3)").text()));
-                } catch (ParseException e) {
+                    item.setPubdate(DateUtils.fromJeuxVideoFr(element.select("td:nth-of-type(3)").text()));
+                } catch (Exception e) {
                     logger.error("Non Parseable date : {}", element.select("p:contains(Vidéo)").text());
                 }
 

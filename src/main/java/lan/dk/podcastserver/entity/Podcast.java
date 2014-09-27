@@ -6,10 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public class Podcast implements Serializable {
     private String url;
     private String signature;
     private String type;
-    private Timestamp lastUpdate;
+    private ZonedDateTime lastUpdate;
     private Set<Item> items = new HashSet<>();
     private Cover cover;
     private String description;
@@ -32,18 +33,6 @@ public class Podcast implements Serializable {
 
 
     public Podcast() {
-    }
-
-    public Podcast(String title, String url, String signature, String type, Timestamp lastUpdate, Set<Item> items, Cover cover, String description, Boolean hasToBeDeleted) {
-        this.title = title;
-        this.url = url;
-        this.signature = signature;
-        this.type = type;
-        this.lastUpdate = lastUpdate;
-        this.items = (items != null) ? items : this.items ;
-        this.cover = cover;
-        this.description = description;
-        this.hasToBeDeleted = hasToBeDeleted;
     }
 
     @Id
@@ -98,12 +87,12 @@ public class Podcast implements Serializable {
     }
 
     @Column(name = "last_update")
-    @Basic
-    public Timestamp getLastUpdate() {
+    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
+    public ZonedDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(Timestamp lastUpdate) {
+    public void setLastUpdate(ZonedDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 
@@ -181,13 +170,8 @@ public class Podcast implements Serializable {
 
         Podcast that = (Podcast) o;
 
-        if (id != that.id) return false;
-        if (lastUpdate != null ? !lastUpdate.equals(that.lastUpdate) : that.lastUpdate != null) return false;
-        if (signature != null ? !signature.equals(that.signature) : that.signature != null) return false;
-        if (title != null ? !title.equals(that.title) : that.title != null) return false;
-        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        return id == that.id && !(lastUpdate != null ? !lastUpdate.equals(that.lastUpdate) : that.lastUpdate != null) && !(signature != null ? !signature.equals(that.signature) : that.signature != null) && !(title != null ? !title.equals(that.title) : that.title != null) && !(url != null ? !url.equals(that.url) : that.url != null);
 
-        return true;
     }
 
     @Override
@@ -201,21 +185,18 @@ public class Podcast implements Serializable {
     }
 
     /* XML Methods */
-    @Transient
-    @JsonIgnore
+    @Transient @JsonIgnore
     public String toXML(String serveurURL) {
         return jDomUtils.podcastToXMLGeneric(this, serveurURL);
     }
 
-    @Transient
-    @JsonIgnore
+    @Transient @JsonIgnore
     public Podcast addTag(Tag tag) {
         this.tags.add(tag);
         return this;
     }
 
-    @Transient
-    @JsonIgnore
+    @Transient @JsonIgnore
     public boolean containsItem(Item item) {
         return items.contains(item);
     }

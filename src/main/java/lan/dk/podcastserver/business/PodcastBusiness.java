@@ -8,14 +8,8 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
-import lan.dk.podcastserver.utils.jDomUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,21 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by kevin on 26/12/2013.
- */
 @Component
 @Transactional
 public class PodcastBusiness {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource private PodcastRepository podcastRepository;
     @Resource private ItemRepository itemRepository;
@@ -64,14 +53,6 @@ public class PodcastBusiness {
     //** Delegate du Repository **//
     public List<Podcast> findAll() {
         return podcastRepository.findAll();
-    }
-
-    public List<Podcast> findAll(Sort sort) {
-        return podcastRepository.findAll(sort);
-    }
-
-    public Page<Podcast> findAll(Pageable pageable) {
-        return podcastRepository.findAll(pageable);
     }
 
     public Podcast save(Podcast entity) {
@@ -105,7 +86,7 @@ public class PodcastBusiness {
         podcastToUpdate.setUrl(patchPodcast.getUrl());
         podcastToUpdate.setSignature(patchPodcast.getSignature());
         podcastToUpdate.setType(patchPodcast.getType());
-        podcastToUpdate.setLastUpdate(patchPodcast.getLastUpdate());
+
         podcastToUpdate.setCover(
                 coverBusiness.findOne(patchPodcast.getCover().getId())
                     .setHeight(patchPodcast.getCover().getHeight())
@@ -117,17 +98,6 @@ public class PodcastBusiness {
         podcastToUpdate.setTags(patchPodcast.getTags());
 
         return this.reatachAndSave(podcastToUpdate);
-    }
-
-    @Deprecated
-    public Podcast generatePodcastFromURL(String URL) {
-        logger.debug("URL = " + URL);
-        try {
-            return jDomUtils.getPodcastFromURL(new java.net.URL(URL));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return null;
     }
 
     public Podcast update(Podcast podcast) {
@@ -161,14 +131,14 @@ public class PodcastBusiness {
         file.transferTo(fileToSave);
 
         item.setTitle(FilenameUtils.removeExtension(name.split(" - ")[2]))
-            .setPubdate(DateUtils.folderDateToTimestamp(name.split(" - ")[1]))
+            .setPubdate(DateUtils.fromFolder(name.split(" - ")[1]))
             .setUrl(fileContainer + "/" + podcast.getTitle() + "/" + name)
             .setLength(file.getSize())
             .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
             .setDescription(podcast.getDescription())
             .setLocalUrl(fileContainer + "/" + podcast.getTitle() + "/" + name)
             .setLocalUri(fileToSave.getAbsolutePath())
-            .setDownloaddate(new Timestamp(new Date().getTime()))
+            .setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
             .setPodcast(podcast)
             .setStatus("Finish");
 

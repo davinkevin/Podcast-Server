@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 import java.io.File;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 
 @Table(name = "item")
@@ -26,27 +27,28 @@ public class Item implements Serializable {
     private static final String STATUS_NOT_DOWNLOADED = "Not Downloaded";
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download";
 
-    private int id;
+    private Integer id;
     private String title;
     private String url;
 
-    private Timestamp pubdate;
+    private ZonedDateTime pubdate;
     private String description;
     private String mimeType;
-    private long length;
+    private Long length;
     private Cover cover;
 
     /* Value for the Download */
     private String localUrl;
     private String localUri;
     private String status = STATUS_NOT_DOWNLOADED;
-    private int progression;
-    private Timestamp downloaddate;
+    private Integer progression = 0;
+    private ZonedDateTime downloaddate;
     private Podcast podcast;
-    private int numberOfTry;
+    private Integer numberOfTry = 0;
 
     public Item() {
     }
+/*
 
     public Item(String title, String url, Timestamp pubdate, Podcast podcast) {
         this.title = title;
@@ -61,6 +63,7 @@ public class Item implements Serializable {
         this.url = url;
         this.pubdate = pubdate;
     }
+*/
 
     @Column(name = "mimetype")
     @Basic
@@ -75,11 +78,11 @@ public class Item implements Serializable {
 
     @Column(name = "length")
     @Basic
-    public long getLength() {
+    public Long getLength() {
         return length;
     }
 
-    public Item setLength(long length) {
+    public Item setLength(Long length) {
         this.length = length;
         return this;
     }
@@ -88,11 +91,11 @@ public class Item implements Serializable {
     @DocumentId
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public Item setId(int id) {
+    public Item setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -120,12 +123,12 @@ public class Item implements Serializable {
     }
 
     @Column(name = "pubdate")
-    @Basic
-    public Timestamp getPubdate() {
+    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
+    public ZonedDateTime getPubdate() {
         return pubdate;
     }
 
-    public Item setPubdate(Timestamp pubdate) {
+    public Item setPubdate(ZonedDateTime pubdate) {
         this.pubdate = pubdate;
         return this;
     }
@@ -165,11 +168,11 @@ public class Item implements Serializable {
     }
 
     @Transient
-    public int getProgression() {
+    public Integer getProgression() {
         return progression;
     }
 
-    public Item setProgression(int progression) {
+    public Item setProgression(Integer progression) {
         this.progression = progression;
         return this;
     }
@@ -186,12 +189,15 @@ public class Item implements Serializable {
     }
 
     @Column(name = "downloadddate")
-    @Basic
-    public Timestamp getDownloaddate() {
+    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
+    public ZonedDateTime getDownloaddate() {
         return downloaddate;
     }
 
-    public Item setDownloaddate(Timestamp downloaddate) {
+
+    //public Timestamp getDownloaddate() {return new Timestamp(new Date().getTime());}
+
+    public Item setDownloaddate(ZonedDateTime downloaddate) {
         this.downloaddate = downloaddate;
         return this;
     }
@@ -220,13 +226,13 @@ public class Item implements Serializable {
 
     @JsonIgnore
     @Transient
-    public int getNumberOfTry() {
+    public Integer getNumberOfTry() {
         return numberOfTry;
     }
 
     @JsonIgnore
     @Transient
-    public Item setNumberOfTry(int numberOfTry) {
+    public Item setNumberOfTry(Integer numberOfTry) {
         this.numberOfTry = numberOfTry;
         return this;
     }
@@ -245,12 +251,8 @@ public class Item implements Serializable {
 
         Item item = (Item) o;
 
-        if (localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl))
-            return true;
-        if (url != null && item.url != null && url.equals(item.url))
-            return true;
+        return localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl) || url != null && item.url != null && url.equals(item.url);
 
-        return false;
     }
 
     @Override
@@ -319,7 +321,8 @@ public class Item implements Serializable {
         setStatus(STATUS_NOT_DOWNLOADED);
         setLocalUrl(null);
         setLocalUri(null);
-        setDownloaddate(null);
+        //setDownloaddate(null);
+        downloaddate = null;
         return this;
     }
 }

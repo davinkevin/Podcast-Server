@@ -1,19 +1,13 @@
 package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.config.PropertyConfig;
-import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.BeInSportUpdater;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
-import java.sql.Timestamp;
 
 /**
  * Created by kevin on 22/02/2014.
@@ -26,7 +20,7 @@ public class BeInSportWorker {
 
     BeInSportUpdater beInSportUpdater = new BeInSportUpdater();
 
-
+/*
     @Test
     public void signatureFeedExpresso() {
 
@@ -49,5 +43,5 @@ public class BeInSportWorker {
                 "", "BeInSport", new Timestamp(System.currentTimeMillis()), null, new Cover("http://www.beinsports.fr/di/library/bein/52/dd/lexpresso_xyp5eq14bu9m1o275gi8i1xlb.jpg?t=1074981292", 250, 166), null, true);
 
         beInSportUpdater.updateFeed(lexpresso);
-    }
+    }*/
 }

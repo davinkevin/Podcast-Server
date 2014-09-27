@@ -36,6 +36,7 @@ public class CanalPlusWorkerTest {
     WorkerUtils workerUtils;
 
     Podcast canalPlusPodcast;
+/*
 
     @Before
     public void initPodcast() {
@@ -108,6 +109,7 @@ public class CanalPlusWorkerTest {
         //assertThat(canalPlusPodcast.getItems().size(), IsNot.not(0));
 
     }
+*/
 
     //@Test
     public void downloadItemCanalPlus() {

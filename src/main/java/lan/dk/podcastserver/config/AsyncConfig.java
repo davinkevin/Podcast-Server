@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.config;
 
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,5 +30,10 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix("Update-");
         executor.initialize();
         return executor;
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return null;
     }
 }

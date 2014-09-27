@@ -17,12 +17,16 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Transactional
 public abstract class AbstractDownloader implements Runnable, Downloader {
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
     public static final String WS_TOPIC_PODCAST = "/topic/podcast/";
 
@@ -33,19 +37,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Autowired protected ItemDownloadManager itemDownloadManager;
     @Autowired protected ItemBusiness itemService;
     @Resource protected PodcastBusiness podcastBusiness;
-    @Resource SimpMessagingTemplate template;
+    @Resource protected SimpMessagingTemplate template;
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
-
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    public ItemDownloadManager getItemDownloadManager() {
-        return itemDownloadManager;
-    }
-
-    public void setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
-        this.itemDownloadManager = itemDownloadManager;
-    }
 
     public Item getItem() {
         return item;
@@ -65,7 +59,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void startDownload() {
         this.item.setStatus("Started");
         stopDownloading.set(false);
-        this.saveSyncWithPodcast(this.item);
+        this.saveSyncWithPodcast();
         this.convertAndSaveBroadcast();
         this.download();
     }
@@ -74,7 +68,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void pauseDownload() {
         this.item.setStatus("Paused");
         stopDownloading.set(true);
-        this.saveSyncWithPodcast(this.item);
+        this.saveSyncWithPodcast();
         this.convertAndSaveBroadcast();
     }
 
@@ -82,7 +76,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void stopDownload() {
         this.item.setStatus("Stopped");
         stopDownloading.set(true);
-        this.saveSyncWithPodcast(this.item);
+        this.saveSyncWithPodcast();
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null && target.exists())
             target.delete();
@@ -110,7 +104,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
             this.item.setLocalUrl(itemDownloadManager.getFileContainer() + "/" + item.getPodcast().getTitle() + "/" + FilenameUtils.getName(String.valueOf(target)));
             this.item.setLocalUri(target.getAbsolutePath());
-            this.item.setDownloaddate(new Timestamp(new Date().getTime()));
+            this.item.setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
             this.item.setLength(FileUtils.sizeOf(target));
 
             try {
@@ -123,7 +117,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
                 this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
             }
 
-            this.saveSyncWithPodcast(this.item);
+            this.saveSyncWithPodcast();
             this.convertAndSaveBroadcast();
         } else {
             resetDownload();
@@ -168,7 +162,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
     }
 
-    protected Item saveSyncWithPodcast(Item item) {
+    protected Item saveSyncWithPodcast() {
         try {
             this.item.setPodcast(podcastBusiness.findOne(this.item.getPodcast().getId()));
             this.item.getPodcast().getItems().remove(this.item);

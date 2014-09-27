@@ -20,27 +20,19 @@ public class ItemSpecifications {
     }
 
     public static Specification<Item> isInTags(final Tag... tags) {
-        return new Specification<Item>() {
-            @Override
-            public Predicate toPredicate(Root<Item> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Collection<Predicate> predicates = new ArrayList<>();
+        return (root, query, cb) -> {
+            Collection<Predicate> predicates = new ArrayList<>();
 
-                Join<Item, Podcast> itemPodcastJoin = root.join("podcast");
-                for(Tag tag : tags) {
-                    predicates.add(cb.isMember(tag, itemPodcastJoin.<List<Tag>>get("tags")));
-                }
-
-                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            Join<Item, Podcast> itemPodcastJoin = root.join("podcast");
+            for(Tag tag : tags) {
+                predicates.add(cb.isMember(tag, itemPodcastJoin.<List<Tag>>get("tags")));
             }
+
+            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
     }
 
     public static Specification<Item> hasId(final List<Integer> ids) {
-        return new Specification<Item>() {
-            @Override
-            public Predicate toPredicate(Root<Item> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                return root.<Integer>get("id").in(ids);
-            }
-        };
+        return (root, query, cb) -> root.<Integer>get("id").in(ids);
     }
 }
