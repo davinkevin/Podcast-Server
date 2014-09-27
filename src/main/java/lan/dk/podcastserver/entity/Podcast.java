@@ -137,7 +137,7 @@ public class Podcast implements Serializable {
         this.hasToBeDeleted = hasToBeDeleted;
     }
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name="PODCAST_TAG",
             joinColumns={@JoinColumn(name="PODCAST_ID", referencedColumnName="ID")},
             inverseJoinColumns={@JoinColumn(name="TAG_ID", referencedColumnName="ID")})
