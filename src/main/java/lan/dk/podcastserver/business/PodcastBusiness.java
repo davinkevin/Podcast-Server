@@ -143,6 +143,7 @@ public class PodcastBusiness {
             .setStatus("Finish");
 
         podcast.getItems().add(item);
+        podcast.setLastUpdate(ZonedDateTime.now());
 
         itemRepository.save(item);
         this.save(podcast);

@@ -211,6 +211,7 @@ public class ItemBusiness {
                 .setStatus("Finish");
 
         podcast.getItems().add(item);
+        podcast.setLastUpdate(ZonedDateTime.now());
 
         item = itemRepository.save(item);
         podcastBusiness.save(podcast);
