@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -53,7 +51,7 @@ public class UpdatePodcastBusiness  {
                     updater.updateFeed(podcast);
 
 
-                    podcast.setLastUpdate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
+                    podcast.setLastUpdate(ZonedDateTime.now());
                     podcast.setSignature(signature);
                     podcastBusiness.update(podcast);
 
@@ -81,7 +79,7 @@ public class UpdatePodcastBusiness  {
                     podcast = updater.updateFeed(podcast);
 
 
-                    podcast.setLastUpdate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
+                    podcast.setLastUpdate(ZonedDateTime.now());
                     podcast.setSignature(signature);
                     podcastBusiness.update(podcast);
                 }
