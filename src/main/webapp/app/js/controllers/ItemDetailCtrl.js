@@ -19,7 +19,7 @@ angular.module('podcast.controller')
             $scope.item = arrayOfResult[1];
             $scope.item.podcast = arrayOfResult[0];
         }).then(function () {
-            $scope.wsClient = ngstomp("/download", SockJS);
+            $scope.wsClient = ngstomp("/ws", SockJS);
             $scope.wsClient.connect("user", "password", function(){
                 $scope.wsClient.subscribe("/topic/podcast/" + $scope.item.podcast.id, function(message) {
                     var itemFromWS = JSON.parse(message.body);

@@ -17,7 +17,7 @@ angular.module('podcast.details.episodes', [])
         $scope.itemPerPage = PodcastItemPerPage;
 
         /* Connection au Web-socket */
-        $scope.wsClient = ngstomp("/download", SockJS);
+        $scope.wsClient = ngstomp("/ws", SockJS);
         $scope.wsClient.connect("user", "password", function () {
             $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function (message) {
                 var item = JSON.parse(message.body);

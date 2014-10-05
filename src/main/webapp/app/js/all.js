@@ -298,7 +298,7 @@ angular.module('podcast.controller')
             $scope.item = arrayOfResult[1];
             $scope.item.podcast = arrayOfResult[0];
         }).then(function () {
-            $scope.wsClient = ngstomp("/download", SockJS);
+            $scope.wsClient = ngstomp("/ws", SockJS);
             $scope.wsClient.connect("user", "password", function(){
                 $scope.wsClient.subscribe("/topic/podcast/" + $scope.item.podcast.id, function(message) {
                     var itemFromWS = JSON.parse(message.body);
@@ -608,6 +608,85 @@ angular.module('podcast.details.edition', [])
         };
     });
 
+'use strict';
+
+angular.module('podcast.details.episodes', [])
+    .directive('podcastItemsList', function($log){
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-episodes.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastItemsListCtrl'
+        };
+    })
+    .constant('PodcastItemPerPage', 10)
+    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage) {
+        $scope.currentPage = 1;
+        $scope.itemPerPage = PodcastItemPerPage;
+
+        /* Connection au Web-socket */
+        $scope.wsClient = ngstomp("/ws", SockJS);
+        $scope.wsClient.connect("user", "password", function () {
+            $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function (message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+                _.assign(elemToUpdate, item);
+            });
+        });
+        $scope.$on('$destroy', function () {
+            $scope.wsClient.disconnect(function () {});
+        });
+
+
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        }
+
+
+        $scope.loadPage = function() {
+            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
+            return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
+                .then(function(itemsResponse) {
+                    $scope.podcast.items = restangularizedItems(itemsResponse.content);
+                    $scope.podcast.totalItems = itemsResponse.totalElements;
+                });
+        };
+
+        $scope.loadPage();
+        $scope.$on("podcastItems:refresh", function () {
+            $scope.currentPage = 1;
+            $scope.loadPage();
+        });
+
+        $scope.remove = function (item) {
+            item.remove().then(function() {
+                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
+                    return (elem.id === item.id);
+                });
+            });
+        };
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+            });
+        };
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.loadPage();
+        };
+
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+    });
+
 (function(module) {
 try {
   module = angular.module('podcast.partial');
@@ -801,7 +880,7 @@ module.run(['$templateCache', function($templateCache) {
     '                                    <li ng-show="item.localUrl != null">\n' +
     '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>\n' +
     '                                    </li> -->\n' +
-    '                                    <li ng-show="item.localUrl != null">\n' +
+    '                                    <li>\n' +
     '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>\n' +
     '                                    </li>\n' +
     '                                    <li>\n' +
@@ -911,7 +990,7 @@ module.run(['$templateCache', function($templateCache) {
     '                                    <li ng-show="item.localUrl != null">\n' +
     '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>\n' +
     '                                    </li> -->\n' +
-    '                                    <li ng-show="item.localUrl != null">\n' +
+    '                                    <li>\n' +
     '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>\n' +
     '                                    </li>\n' +
     '                                    <li>\n' +
@@ -1338,85 +1417,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-'use strict';
-
-angular.module('podcast.details.episodes', [])
-    .directive('podcastItemsList', function($log){
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-episodes.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastItemsListCtrl'
-        };
-    })
-    .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage) {
-        $scope.currentPage = 1;
-        $scope.itemPerPage = PodcastItemPerPage;
-
-        /* Connection au Web-socket */
-        $scope.wsClient = ngstomp("/download", SockJS);
-        $scope.wsClient.connect("user", "password", function () {
-            $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                _.assign(elemToUpdate, item);
-            });
-        });
-        $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function () {});
-        });
-
-
-        function restangularizedItems(itemList) {
-            var restangularList = [];
-            angular.forEach(itemList, function (value) {
-                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
-            });
-            return restangularList;
-        }
-
-
-        $scope.loadPage = function() {
-            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
-            return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
-                .then(function(itemsResponse) {
-                    $scope.podcast.items = restangularizedItems(itemsResponse.content);
-                    $scope.podcast.totalItems = itemsResponse.totalElements;
-                });
-        };
-
-        $scope.loadPage();
-        $scope.$on("podcastItems:refresh", function () {
-            $scope.currentPage = 1;
-            $scope.loadPage();
-        });
-
-        $scope.remove = function (item) {
-            item.remove().then(function() {
-                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
-                    return (elem.id === item.id);
-                });
-            });
-        };
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-            });
-        };
-
-        $scope.swipePage = function(val) {
-            $scope.currentPage += val;
-            $scope.loadPage();
-        };
-
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-    });
 
 'use strict';
 
