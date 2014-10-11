@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Transactional
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -84,6 +83,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     @Override
+    @Transactional
     public void finishDownload() {
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null) {
@@ -133,6 +133,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         //itemDownloadManager.addItemToQueue(item);
     }
 
+    @Transactional
     public File getTagetFile (Item item) {
 
         if (target != null)
@@ -162,6 +163,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
     }
 
+    @Transactional
     protected Item saveSyncWithPodcast() {
         try {
             this.item.setPodcast(podcastBusiness.findOne(this.item.getPodcast().getId()));
@@ -176,6 +178,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         }
     }
 
+    @Transactional
     protected void convertAndSaveBroadcast() {
         this.template.convertAndSend(WS_TOPIC_DOWNLOAD, this.item );
         this.template.convertAndSend(WS_TOPIC_PODCAST.concat(String.valueOf(item.getPodcast().getId())), this.item );
