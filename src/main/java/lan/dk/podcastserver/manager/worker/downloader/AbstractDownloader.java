@@ -165,13 +165,13 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected Item saveSyncWithPodcast() {
         try {
             this.item.setPodcast(podcastBusiness.findOne(this.item.getPodcast().getId()));
-            this.item.getPodcast().getItems().remove(this.item);
-            this.item.getPodcast().getItems().add(this.item);
+            //this.item.getPodcast().getItems().remove(this.item);
+            //this.item.getPodcast().getItems().add(this.item);
 
             return itemService.save(this.item);
 
         } catch (Exception e) {
-            logger.error("Error during saven and Sync for status {}", this.item.getStatus(), e);
+            logger.error("Error during save and Sync of the item {}", this.item, e);
             return new Item();
         }
     }

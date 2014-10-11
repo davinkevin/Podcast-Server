@@ -6,11 +6,8 @@ import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.utils.WorkerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +58,8 @@ public class ItemDownloadManager {
 
     private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
     private boolean isRunning = false;
+
+
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {

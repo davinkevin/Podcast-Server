@@ -251,7 +251,13 @@ public class Item implements Serializable {
 
         Item item = (Item) o;
 
-        return localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl) || url != null && item.url != null && url.equals(item.url);
+        if (id != null && item.id != null)
+            return id.equals(item.id);
+
+        if (url != null && item.url != null)
+            return url.equals(item.url);
+
+        return localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl);
 
     }
 
@@ -265,12 +271,21 @@ public class Item implements Serializable {
     @Override
     public String toString() {
         return "Item{" +
-                "status='" + status + '\'' +
-                ", localUrl='" + localUrl + '\'' +
-                ", pubdate=" + pubdate +
-                ", url='" + url + '\'' +
+                "id=" + id +
                 ", title='" + title + '\'' +
-                ", id=" + id +
+                ", url='" + url + '\'' +
+                ", pubdate=" + pubdate +
+                ", description='" + description + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                ", length=" + length +
+                ", cover=" + cover +
+                ", localUrl='" + localUrl + '\'' +
+                ", localUri='" + localUri + '\'' +
+                ", status='" + status + '\'' +
+                ", progression=" + progression +
+                ", downloaddate=" + downloaddate +
+                ", podcast=" + podcast +
+                ", numberOfTry=" + numberOfTry +
                 '}';
     }
 
