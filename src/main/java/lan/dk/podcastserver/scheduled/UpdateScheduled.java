@@ -21,7 +21,8 @@ public class UpdateScheduled {
     private @Resource ItemDownloadManager IDM;
 
     //@Scheduled(cron="${updateAndDownload.refresh.cron}")
-    @Scheduled(fixedRate = 3600000)
+    //@Scheduled(fixedRate = 3600000)
+    @Scheduled(cron="0 0 * * * *")
     private void updateAndDownloadPodcast() {
         logger.info(">>> Beginning of the update <<<");
         updatePodcastBusiness.updatePodcast();
