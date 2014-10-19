@@ -108,7 +108,9 @@ angular.module('podcastApp', [
             return item;
         });
     }]);
-angular.module('podcast.controller', []);
+angular.module('podcast.controller', [
+    'podcast.websocket'
+]);
 angular.module('podcast.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -190,7 +192,7 @@ podcastServices.factory('DonwloadManager', function(Restangular) {
     return downloadManager;
 });
 angular.module('podcast.controller')
-    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log, Notification, $window) {
+    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, podcastWebSocket, DonwloadManager, $log, Notification, $window) {
         $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
         $scope.waitingitems = [];
 
@@ -234,9 +236,10 @@ angular.module('podcast.controller')
         $scope.removeFromQueue = DonwloadManager.removeFromQueue;
         $scope.dontDonwload = DonwloadManager.dontDonwload;
 
-        $scope.wsClient = ngstomp('/ws', SockJS);
-        $scope.wsClient.connect("user", "password", function () {
-            $scope.wsClient.subscribe("/topic/download", function (message) {
+
+        /** Websocket Connection */
+        podcastWebSocket
+            .subscribe("/topic/download", function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });
                 switch (item.status) {
@@ -261,55 +264,51 @@ angular.module('podcast.controller')
                         }
                         break;
                 }
-            });
-            $scope.wsClient.subscribe("/app/waitingList", function (message) {
+        })
+            .subscribe("/app/waitingList", function (message) {
                 $scope.waitingitems = JSON.parse(message.body);
-            });
-            $scope.wsClient.subscribe("/topic/waitingList", function (message) {
+            })
+            .subscribe("/topic/waitingList", function (message) {
                 var remoteWaitingItems = JSON.parse(message.body);
-
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
                 });
             });
-        });
+
         $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function(){});
+            podcastWebSocket
+                .unsubscribe("/topic/download")
+                .unsubscribe("/app/waitingList")
+                .unsubscribe("/topic/waitingList");
         });
+
     });
 angular.module('podcast.controller')
-    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, ngstomp, DonwloadManager, $location, $q) {
+    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, podcastWebSocket, DonwloadManager, $location, $q) {
 
         var idItem = $routeParams.itemId,
             idPodcast = $routeParams.podcastId,
-            basePodcast = Restangular.one("podcast", idPodcast);
-            baseItem = basePodcast.one("items", idItem);
+            basePodcast = Restangular.one("podcast", idPodcast),
+            baseItem = basePodcast.one("items", idItem),
+            webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
 
-        /*basePodcast.get().then(function (podcastFromServer) {
-            $scope.podcast = podcastFromServer;
-            return $scope.podcast.one("items", idItem).get();
-        }).then(function (itemFromServer) {
-            $scope.item = itemFromServer;
-            itemFromServer.podcast = $scope.podcast;
-            return itemFromServer;
-        })*/
         $q.all([basePodcast.get(), baseItem.get()]).then(function (arrayOfResult) {
             $scope.item = arrayOfResult[1];
             $scope.item.podcast = arrayOfResult[0];
         }).then(function () {
-            $scope.wsClient = ngstomp("/ws", SockJS);
-            $scope.wsClient.connect("user", "password", function(){
-                $scope.wsClient.subscribe("/topic/podcast/" + $scope.item.podcast.id, function(message) {
+
+            podcastWebSocket
+                .subscribe(webSockedUrl, function(message) {
                     var itemFromWS = JSON.parse(message.body);
 
                     if (itemFromWS.id == $scope.item.id) {
                         _.assign($scope.item, itemFromWS);
                     }
                 });
-            });
+
             $scope.$on('$destroy', function () {
-                $scope.wsClient.disconnect(function(){});
+                podcastWebSocket.unsubscribe(webSockedUrl);
             });
         });
 
@@ -333,11 +332,12 @@ angular.module('podcast.controller')
     });
 angular.module('podcast.controller')
     .constant('ItemPerPage', 12)
-    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location, ItemPerPage) {
+    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, podcastWebSocket, DonwloadManager, $log, $location, ItemPerPage) {
 
         // Gestion du cache de la pagination :
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
-            numberByPage = ItemPerPage;
+            numberByPage = ItemPerPage,
+            webSocketUrl = "/topic/download";
 
         function restangularizedItems(itemList) {
             var restangularList = [];
@@ -386,18 +386,17 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-        $scope.wsClient = ngstomp('/ws', SockJS);
-        $scope.wsClient.connect("user", "password", function(){
-            $scope.wsClient.subscribe("/topic/download", function(message) {
+        podcastWebSocket
+            .subscribe(webSocketUrl, function(message) {
                 var item = JSON.parse(message.body),
                     elemToUpdate = _.find($scope.items, { 'id': item.id });
 
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
             });
-        });
+
         $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function(){});
+            podcastWebSocket.unsubscribe(webSocketUrl);
         });
 
         $scope.reset = function (item) {
@@ -408,10 +407,11 @@ angular.module('podcast.controller')
         };
     });
 angular.module('podcast.controller')
-    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager, ItemPerPage) {
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, podcastWebSocket, DonwloadManager, ItemPerPage) {
 
         var tags = Restangular.all("tag"),
-            numberByPage = ItemPerPage;
+            numberByPage = ItemPerPage,
+            webSocketUrl = "/topic/download";
 
 
         $scope.loadTags = function(query) {
@@ -480,18 +480,17 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-        $scope.wsClient = ngstomp('/ws', SockJS);
-        $scope.wsClient.connect("user", "password", function(){
-            $scope.wsClient.subscribe("/topic/download", function(message) {
+        podcastWebSocket
+            .subscribe(webSocketUrl, function(message) {
                 var item = JSON.parse(message.body);
 
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
             });
-        });
+
         $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function(){});
+            podcastWebSocket.unsubscribe(webSocketUrl);
         });
 
         $scope.reset = function (item) {
@@ -518,175 +517,6 @@ angular.module('podcast.controller')
         $scope.$on("podcastEdition:save", refreshItems);
 
     });
-angular.module('podcast.controller')
-    .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
-        var podcasts = Restangular.all("podcast"),
-            tags = Restangular.all("tag");
-
-        $scope.podcast = {
-            hasToBeDeleted : true,
-            cover : {
-                height: 200,
-                width: 200
-            }
-        };
-
-        $scope.loadTags = function(query) {
-            return tags.post(null, {name : query});
-        };
-
-        $scope.changeType = function() {
-            if (/beinsports\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "BeInSports";
-            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "CanalPlus";
-            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "JeuxVideoFR";
-            } else if (/parleys\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Parleys";
-            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Pluzz";
-            } else if (/youtube\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Youtube";
-            } else if ($scope.podcast.url.length > 0) {
-                $scope.podcast.type = "RSS";
-            } else {
-                $scope.podcast.type = "Send";
-            }
-        };
-
-        $scope.save = function() {
-            podcasts.post($scope.podcast).then(function (podcast) {
-                $location.path('/podcast/' + podcast.id);
-            });
-        };
-    });
-angular.module('podcast.controller')
-    .controller('PodcastsListCtrl', function ($scope, Restangular, localStorageService) {
-
-        $scope.podcasts = localStorageService.get('podcastslist');
-        Restangular.all("podcast").getList().then(function(podcasts) {
-            $scope.podcasts = podcasts;
-            localStorageService.add('podcastslist', podcasts);
-        });
-    });
-'use strict';
-
-angular.module('podcast.details.edition', [])
-    .directive('podcastEdition', function () {
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-edition.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastEditionCtrl'
-        };
-    })
-    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
-        var tags = Restangular.all("tag");
-
-        $scope.loadTags = function (query) {
-            return tags.post(null, {name : query});
-        };
-
-        $scope.save = function () {
-            var podcastToUpdate = _.cloneDeep($scope.podcast);
-            podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate)
-                .then(function (patchedPodcast){
-                    _.assign($scope.podcast, patchedPodcast);
-                })
-                .then(function () {
-                    $scope.$emit('podcastEdition:save');
-                });
-        };
-        $scope.deletePodcast = function () {
-            $scope.podcast.remove().then(function () {
-                $location.path('/podcasts');
-            });
-        };
-    });
-
-'use strict';
-
-angular.module('podcast.details.episodes', [])
-    .directive('podcastItemsList', function($log){
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-episodes.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastItemsListCtrl'
-        };
-    })
-    .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage) {
-        $scope.currentPage = 1;
-        $scope.itemPerPage = PodcastItemPerPage;
-
-        /* Connection au Web-socket */
-        $scope.wsClient = ngstomp("/ws", SockJS);
-        $scope.wsClient.connect("user", "password", function () {
-            $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                _.assign(elemToUpdate, item);
-            });
-        });
-        $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function () {});
-        });
-
-
-        function restangularizedItems(itemList) {
-            var restangularList = [];
-            angular.forEach(itemList, function (value) {
-                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
-            });
-            return restangularList;
-        }
-
-
-        $scope.loadPage = function() {
-            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
-            return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
-                .then(function(itemsResponse) {
-                    $scope.podcast.items = restangularizedItems(itemsResponse.content);
-                    $scope.podcast.totalItems = itemsResponse.totalElements;
-                });
-        };
-
-        $scope.loadPage();
-        $scope.$on("podcastItems:refresh", function () {
-            $scope.currentPage = 1;
-            $scope.loadPage();
-        });
-
-        $scope.remove = function (item) {
-            item.remove().then(function() {
-                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
-                    return (elem.id === item.id);
-                });
-            });
-        };
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-            });
-        };
-
-        $scope.swipePage = function(val) {
-            $scope.currentPage += val;
-            $scope.loadPage();
-        };
-
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-    });
-
 (function(module) {
 try {
   module = angular.module('podcast.partial');
@@ -1417,6 +1247,213 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+angular.module('podcast.controller')
+    .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
+        var podcasts = Restangular.all("podcast"),
+            tags = Restangular.all("tag");
+
+        $scope.podcast = {
+            hasToBeDeleted : true,
+            cover : {
+                height: 200,
+                width: 200
+            }
+        };
+
+        $scope.loadTags = function(query) {
+            return tags.post(null, {name : query});
+        };
+
+        $scope.changeType = function() {
+            if (/beinsports\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "BeInSports";
+            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "CanalPlus";
+            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "JeuxVideoFR";
+            } else if (/parleys\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Parleys";
+            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Pluzz";
+            } else if (/youtube\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Youtube";
+            } else if ($scope.podcast.url.length > 0) {
+                $scope.podcast.type = "RSS";
+            } else {
+                $scope.podcast.type = "Send";
+            }
+        };
+
+        $scope.save = function() {
+            podcasts.post($scope.podcast).then(function (podcast) {
+                $location.path('/podcast/' + podcast.id);
+            });
+        };
+    });
+angular.module('podcast.controller')
+    .controller('PodcastsListCtrl', function ($scope, Restangular, localStorageService) {
+
+        $scope.podcasts = localStorageService.get('podcastslist');
+        Restangular.all("podcast").getList().then(function(podcasts) {
+            $scope.podcasts = podcasts;
+            localStorageService.add('podcastslist', podcasts);
+        });
+    });
+'use strict';
+
+angular.module('podcast.websocket', [
+    'AngularStomp'
+]).service('podcastWebSocket', function (ngstomp, $log, $q) {
+
+    var self = this,
+        wsClient = ngstomp("/ws", SockJS),
+        deferred = $q.defer(),
+        promiseResult = deferred.promise;
+
+
+    this.connect = function(){
+        wsClient.connect("user", "password", function () {
+           self.isConnected = true;
+           $log.info("Connection to the WebSockets");
+           deferred.resolve();
+        });
+        return promiseResult;
+    };
+
+    this.subscribe = function(url, callback) {
+        promiseResult.then(function() {
+            wsClient.subscribe(url, callback);
+        });
+        return self;
+    };
+
+    this.unsubscribe = function(queue, callback) {
+        promiseResult.then(function() {
+            wsClient.unsubscribe(queue, callback);
+        });
+        return self;
+    };
+
+    this.connect();
+    return this;
+});
+'use strict';
+
+angular.module('podcast.details.edition', [])
+    .directive('podcastEdition', function () {
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-edition.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastEditionCtrl'
+        };
+    })
+    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
+        var tags = Restangular.all("tag");
+
+        $scope.loadTags = function (query) {
+            return tags.post(null, {name : query});
+        };
+
+        $scope.save = function () {
+            var podcastToUpdate = _.cloneDeep($scope.podcast);
+            podcastToUpdate.items = null;
+            $scope.podcast.patch(podcastToUpdate)
+                .then(function (patchedPodcast){
+                    _.assign($scope.podcast, patchedPodcast);
+                })
+                .then(function () {
+                    $scope.$emit('podcastEdition:save');
+                });
+        };
+        $scope.deletePodcast = function () {
+            $scope.podcast.remove().then(function () {
+                $location.path('/podcasts');
+            });
+        };
+    });
+
+'use strict';
+
+angular.module('podcast.details.episodes', [
+    'podcast.websocket'
+])
+    .directive('podcastItemsList', function($log){
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-episodes.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastItemsListCtrl'
+        };
+    })
+    .constant('PodcastItemPerPage', 10)
+    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage, podcastWebSocket ) {
+        $scope.currentPage = 1;
+        $scope.itemPerPage = PodcastItemPerPage;
+
+        var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
+
+        podcastWebSocket.subscribe(webSocketUrl, function (message) {
+            var item = JSON.parse(message.body);
+            var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+            _.assign(elemToUpdate, item);
+        });
+
+        $scope.$on('$destroy', function () {
+            podcastWebSocket.unsubscribe(webSocketUrl);
+        });
+
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        }
+
+
+        $scope.loadPage = function() {
+            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
+            return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
+                .then(function(itemsResponse) {
+                    $scope.podcast.items = restangularizedItems(itemsResponse.content);
+                    $scope.podcast.totalItems = itemsResponse.totalElements;
+                });
+        };
+
+        $scope.loadPage();
+        $scope.$on("podcastItems:refresh", function () {
+            $scope.currentPage = 1;
+            $scope.loadPage();
+        });
+
+        $scope.remove = function (item) {
+            item.remove().then(function() {
+                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
+                    return (elem.id === item.id);
+                });
+            });
+        };
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+            });
+        };
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.loadPage();
+        };
+
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+    });
 
 'use strict';
 

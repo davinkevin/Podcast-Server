@@ -1,6 +1,8 @@
 'use strict';
 
-angular.module('podcast.details.episodes', [])
+angular.module('podcast.details.episodes', [
+    'podcast.websocket'
+])
     .directive('podcastItemsList', function($log){
         return {
             restrcit : 'E',
@@ -12,23 +14,21 @@ angular.module('podcast.details.episodes', [])
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage) {
+    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage, podcastWebSocket ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
-        /* Connection au Web-socket */
-        $scope.wsClient = ngstomp("/ws", SockJS);
-        $scope.wsClient.connect("user", "password", function () {
-            $scope.wsClient.subscribe("/topic/podcast/" + $scope.podcast.id, function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                _.assign(elemToUpdate, item);
-            });
-        });
-        $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function () {});
+        var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
+
+        podcastWebSocket.subscribe(webSocketUrl, function (message) {
+            var item = JSON.parse(message.body);
+            var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+            _.assign(elemToUpdate, item);
         });
 
+        $scope.$on('$destroy', function () {
+            podcastWebSocket.unsubscribe(webSocketUrl);
+        });
 
         function restangularizedItems(itemList) {
             var restangularList = [];

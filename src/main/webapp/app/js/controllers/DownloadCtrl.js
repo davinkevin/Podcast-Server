@@ -1,5 +1,5 @@
 angular.module('podcast.controller')
-    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, ngstomp, DonwloadManager, $log, Notification, $window) {
+    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, podcastWebSocket, DonwloadManager, $log, Notification, $window) {
         $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
         $scope.waitingitems = [];
 
@@ -43,9 +43,10 @@ angular.module('podcast.controller')
         $scope.removeFromQueue = DonwloadManager.removeFromQueue;
         $scope.dontDonwload = DonwloadManager.dontDonwload;
 
-        $scope.wsClient = ngstomp('/ws', SockJS);
-        $scope.wsClient.connect("user", "password", function () {
-            $scope.wsClient.subscribe("/topic/download", function (message) {
+
+        /** Websocket Connection */
+        podcastWebSocket
+            .subscribe("/topic/download", function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });
                 switch (item.status) {
@@ -70,19 +71,22 @@ angular.module('podcast.controller')
                         }
                         break;
                 }
-            });
-            $scope.wsClient.subscribe("/app/waitingList", function (message) {
+        })
+            .subscribe("/app/waitingList", function (message) {
                 $scope.waitingitems = JSON.parse(message.body);
-            });
-            $scope.wsClient.subscribe("/topic/waitingList", function (message) {
+            })
+            .subscribe("/topic/waitingList", function (message) {
                 var remoteWaitingItems = JSON.parse(message.body);
-
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
                 });
             });
-        });
+
         $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function(){});
+            podcastWebSocket
+                .unsubscribe("/topic/download")
+                .unsubscribe("/app/waitingList")
+                .unsubscribe("/topic/waitingList");
         });
+
     });

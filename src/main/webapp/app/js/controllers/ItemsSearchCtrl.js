@@ -1,8 +1,9 @@
 angular.module('podcast.controller')
-    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, ngstomp, DonwloadManager, ItemPerPage) {
+    .controller('ItemsSearchCtrl', function ($scope, $http, $routeParams, $cacheFactory, $location, Restangular, podcastWebSocket, DonwloadManager, ItemPerPage) {
 
         var tags = Restangular.all("tag"),
-            numberByPage = ItemPerPage;
+            numberByPage = ItemPerPage,
+            webSocketUrl = "/topic/download";
 
 
         $scope.loadTags = function(query) {
@@ -71,18 +72,17 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-        $scope.wsClient = ngstomp('/ws', SockJS);
-        $scope.wsClient.connect("user", "password", function(){
-            $scope.wsClient.subscribe("/topic/download", function(message) {
+        podcastWebSocket
+            .subscribe(webSocketUrl, function(message) {
                 var item = JSON.parse(message.body);
 
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
             });
-        });
+
         $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function(){});
+            podcastWebSocket.unsubscribe(webSocketUrl);
         });
 
         $scope.reset = function (item) {

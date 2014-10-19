@@ -1,10 +1,11 @@
 angular.module('podcast.controller')
     .constant('ItemPerPage', 12)
-    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, ngstomp, DonwloadManager, $log, $location, ItemPerPage) {
+    .controller('ItemsListCtrl', function ($scope, $http, $routeParams, $cacheFactory, Restangular, podcastWebSocket, DonwloadManager, $log, $location, ItemPerPage) {
 
         // Gestion du cache de la pagination :
         var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache'),
-            numberByPage = ItemPerPage;
+            numberByPage = ItemPerPage,
+            webSocketUrl = "/topic/download";
 
         function restangularizedItems(itemList) {
             var restangularList = [];
@@ -53,18 +54,17 @@ angular.module('podcast.controller')
         $scope.stopDownload = DonwloadManager.stopDownload;
         $scope.toggleDownload = DonwloadManager.toggleDownload;
 
-        $scope.wsClient = ngstomp('/ws', SockJS);
-        $scope.wsClient.connect("user", "password", function(){
-            $scope.wsClient.subscribe("/topic/download", function(message) {
+        podcastWebSocket
+            .subscribe(webSocketUrl, function(message) {
                 var item = JSON.parse(message.body),
                     elemToUpdate = _.find($scope.items, { 'id': item.id });
 
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
             });
-        });
+
         $scope.$on('$destroy', function () {
-            $scope.wsClient.disconnect(function(){});
+            podcastWebSocket.unsubscribe(webSocketUrl);
         });
 
         $scope.reset = function (item) {

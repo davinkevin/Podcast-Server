@@ -1,1 +1,3 @@
-angular.module('podcast.controller', []);
+angular.module('podcast.controller', [
+    'podcast.websocket'
+]);
