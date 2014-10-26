@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,7 +38,32 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     @Override
     public Podcast updateFeed(Podcast podcast) {
 
-        Document page = null;
+        Set<Item> itemSet = getItems(podcast);
+
+        // Si le bean est valide :
+        itemSet.stream()
+                .filter(item -> !podcastContains(podcast, item))
+                .forEach(item -> {
+                    // Si le bean est valide :
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+
+        return podcast;
+    }
+
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
+        Document page;
+        Set<Item> itemSet = new HashSet<>();
 
         try {
             Connection.Response response = Jsoup.connect(podcast.getUrl())
@@ -50,8 +76,8 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
             for (Element element : page.select(".block-video-tableVideo tbody tr")) {
                 Item item = new Item()
-                                .setTitle(element.select(".video .bleu2").text())
-                                .setDescription(element.select(".video .bleu2").text());
+                        .setTitle(element.select(".video .bleu2").text())
+                        .setDescription(element.select(".video .bleu2").text());
                 try {
                     item.setPubdate(DateUtils.fromJeuxVideoFr(element.select("td:nth-of-type(3)").text()));
                 } catch (Exception e) {
@@ -60,23 +86,10 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
                 Matcher m = ID_JEUXVIDEOFR_PATTERN.matcher(element.select("a").attr("href"));
                 if (m.find() && !m.group(1).equals("0") ) {
-                    item = getDetailFromXML(item, Integer.valueOf(m.group(1)));
-
-                    if (!podcastContains(podcast, item)) {
-                        // Si le bean est valide :
-                        item.setPodcast(podcast);
-                        Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                        if (constraintViolations.isEmpty()) {
-
-                            podcast.getItems().add(item);
-                        } else {
-                            logger.error(constraintViolations.toString());
-                        }
-                    }
-
+                    itemSet.add(
+                            getDetailFromXML(item, Integer.valueOf(m.group(1)))
+                    );
                 }
-
-
             }
 
         } catch (IOException e) {
@@ -84,8 +97,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
             logger.error("IOException :", e);
         }
 
-
-        return podcast;
+        return itemSet;
     }
 
     private Item getDetailFromXML(Item item, Integer idJeuxVideoFr) {

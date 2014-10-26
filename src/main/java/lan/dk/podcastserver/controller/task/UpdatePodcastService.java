@@ -3,7 +3,6 @@ package lan.dk.podcastserver.controller.task;
 import lan.dk.podcastserver.business.UpdatePodcastBusiness;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,7 @@ public class UpdatePodcastService {
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     private void updatePodcast () {
-        updatePodcastBusiness.updatePodcast();
+        updatePodcastBusiness.updateAsyncPodcast();
     }
 
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.POST, produces = "application/json")
@@ -46,7 +45,7 @@ public class UpdatePodcastService {
     @RequestMapping(value = "/updateAndDownloadPodcast", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     private void updateAndDownloadPodcast() {
-        updatePodcastBusiness.updatePodcast();
+        updatePodcastBusiness.updateAsyncPodcast();
         IDM.launchDownload();
     }
 

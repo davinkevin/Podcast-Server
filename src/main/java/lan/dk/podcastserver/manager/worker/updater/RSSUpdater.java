@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component("RSSUpdater")
@@ -24,9 +25,30 @@ import java.util.Set;
 public class RSSUpdater extends AbstractUpdater {
 
     public Podcast updateFeed(Podcast podcast) {
+        getItems(podcast)
+                .stream()
+                .filter(item -> !podcast.getItems().contains(item))
+                .forEach(item -> {
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        logger.debug("Ajout de l'épisode {}", item);
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+        return podcast;
+    }
 
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
+        Set<Item> itemSet = new HashSet<>();
         // Si l'image de présentation a changé :
-        Document podcastXMLSource = null;
+        Document podcastXMLSource;
         try {
             podcastXMLSource = jDomUtils.jdom2Parse(podcast.getUrl());
         } catch (JDOMException e) {
@@ -56,13 +78,13 @@ public class RSSUpdater extends AbstractUpdater {
             for (Element item : podcastXMLSource.getRootElement().getChild("channel").getChildren("item")) {
                 if (item.getChild("enclosure") != null || item.getChild("origEnclosureLink", feedburner) != null)   { // est un podcast utilisable
                     Item podcastItem = new Item()
-                                                .setTitle(item.getChildText("title"))
-                                                .setPubdate(DateUtils.fromRFC822(item.getChildText("pubDate")))
-                                                .setDescription(item.getChildText("description"))
-                                                .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
-                                                .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
-                                                        ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
-                                                        : 0L);
+                            .setTitle(item.getChildText("title"))
+                            .setPubdate(DateUtils.fromRFC822(item.getChildText("pubDate")))
+                            .setDescription(item.getChildText("description"))
+                            .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
+                            .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
+                                    ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
+                                    : 0L);
 
                     if ((item.getChild("thumbnail", media) != null)) {
                         if (item.getChild("thumbnail", media).getAttributeValue("url") != null) {
@@ -71,30 +93,20 @@ public class RSSUpdater extends AbstractUpdater {
                             podcastItem.setCover(ImageUtils.getCoverFromURL(new URL(item.getChild("thumbnail", media).getText())));
                         }
                     }
-                     // Gestion des cas pour l'url :
+                    // Gestion des cas pour l'url :
                     if (item.getChild("origEnclosureLink", feedburner) != null) {
                         podcastItem.setUrl(item.getChildText("origEnclosureLink", feedburner));
                     } else if (item.getChild("enclosure") != null) {
                         podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
                     }
 
-                    // Sauvegarde
-                    if ( !podcast.getItems().contains(podcastItem)) {
-                        podcastItem.setPodcast(podcast);
-                        Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
-                        if (constraintViolations.isEmpty()) {
-                            logger.debug("Ajout de l'épisode {}", podcastItem);
-                            podcast.getItems().add(podcastItem);
-                        } else {
-                            logger.error(constraintViolations.toString());
-                        }
-                    }
+                    itemSet.add(podcastItem);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        return podcast;
+        return itemSet;
     }
 
     @Override

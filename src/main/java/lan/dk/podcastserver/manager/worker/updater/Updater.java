@@ -1,15 +1,14 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import org.springframework.scheduling.annotation.Async;
 
-import java.util.concurrent.Future;
+import java.util.Set;
 
 
 public interface Updater {
 
-    @Async("UpdateExecutor")
-    public Future<Podcast> updateFeedAsync(Podcast podcast);
+    public Set<Item> updateFeedAsync(Podcast podcast);
 
     public Podcast updateFeed(Podcast podcast);
 

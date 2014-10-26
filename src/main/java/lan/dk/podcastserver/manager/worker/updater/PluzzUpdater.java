@@ -13,7 +13,6 @@ import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by kevin on 09/08/2014.
@@ -41,8 +41,35 @@ public class PluzzUpdater extends AbstractUpdater {
 
     @Override
     public Podcast updateFeed(Podcast podcast) {
+
+
+        // Si le bean est valide :
+        getItems(podcast)
+                .stream()
+                .filter(item -> !podcast.getItems().contains(item))
+                .forEach(item -> {
+
+                    // Si le bean est valide :
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+
+        return podcast;
+    }
+
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
         Document page;
         String listingUrl = podcast.getUrl();
+        Set<Item> itemList = new HashSet<>();
         try {
 
             Connection.Response response = Jsoup.connect(listingUrl)
@@ -51,37 +78,24 @@ public class PluzzUpdater extends AbstractUpdater {
                     .execute();
             page = response.parse();
 
-            Set<Item> itemList = new HashSet<>();
 
             //get from current page, for the first of the panel
             itemList.add(getPluzzItem(page.select("meta[property=og:url]").attr("content")));
 
             // get from right panel
             Elements listOfEpisodes = page.select(JSOUP_ITEM_SELECTOR);
-            for (Element element : listOfEpisodes.select("a.row")) {
-                itemList.add(getPluzzItem(element.attr("href")));
-            }
-
-            for(Item item : itemList) {
-                if (!podcast.getItems().contains(item)) {
-
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                }
-            }
-
+            itemList.addAll(listOfEpisodes.select("a.row")
+                    .stream()
+                    .map(element -> getPluzzItem(element.attr("href")))
+                    .collect(Collectors.toList()));
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
         }
-        return podcast;
+        return itemList;
+
     }
+
 
     @Override
     public Podcast findPodcast(String url) {

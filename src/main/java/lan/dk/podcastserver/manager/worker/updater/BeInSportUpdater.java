@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +44,30 @@ public class BeInSportUpdater extends AbstractUpdater {
 
     @Override
     public Podcast updateFeed(Podcast podcast) {
-        Document page = null;
+        getItems(podcast).stream()
+                .filter(item -> !podcast.getItems().contains(item))
+                .forEach(item -> {
+                    // Si le bean est valide :
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+
+        return podcast;
+    }
+
+
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
+        Document page;
+        Set<Item> itemSet = new HashSet<>();
         String listingUrl = getListingUrl(podcast);
         try {
 
@@ -58,35 +82,26 @@ public class BeInSportUpdater extends AbstractUpdater {
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
+            return itemSet;
         }
 
-        if (page != null) {
-            for(Element article : page.select("article")) {
-                Item item = new Item()
-                                    .setTitle(article.select(".info h4 a").first().text())
-                                    .setDescription(article.select(".info span").first().text());
 
-                item = getDetailOfItemByXML(item, article.select("a").first().className());
+        for(Element article : page.select("article")) {
+            Item item = new Item()
+                    .setTitle(article.select(".info h4 a").first().text())
+                    .setDescription(article.select(".info span").first().text());
 
-                logger.debug(item.toString());
+            item = getDetailOfItemByXML(item, article.select("a").first().className());
 
-                if (!podcast.getItems().contains(item)) {
+            logger.debug(item.toString());
 
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                }
+            itemSet.add(item);
 
-            }
         }
 
-        return podcast;
+        return itemSet;
     }
+
 
     private Item getDetailOfItemByXML(Item item, String idItemBeInSport) {
         logger.debug("Id BeInSport : {}", idItemBeInSport);

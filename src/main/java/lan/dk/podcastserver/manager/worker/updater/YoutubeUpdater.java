@@ -19,6 +19,7 @@ import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component("YoutubeUpdater")
@@ -32,6 +33,27 @@ public class YoutubeUpdater extends AbstractUpdater {
     @Value("${numberofdaytodownload:30}") Integer numberOfDayToDownload;
 
     public Podcast updateFeed(Podcast podcast) {
+
+        getItems(podcast)
+                .stream()
+                .filter(item -> !podcast.getItems().contains(item))
+                .forEach(item -> {
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+        return podcast;
+    }
+
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
+        Set<Item> itemSet = new HashSet<>();
 
         Integer borne = 1;
         String realPodcastURl;
@@ -48,7 +70,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                 Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
                 if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).size() == 0) {
-                    return podcast;
+                    return itemSet;
                 }
 
                 for (Element item : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
@@ -59,7 +81,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                             .setPodcast(podcast);
 
                     if (podcastItem.getPubdate().isBefore(maxDate) && borne > YOUTUBE_MAX_RESULTS) {
-                        return podcast;
+                        return itemSet;
                     }
                     for (Element link : item.getChildren("link", defaultNamespace)) {
                         if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
@@ -68,35 +90,25 @@ public class YoutubeUpdater extends AbstractUpdater {
                         }
                     }
 
-
-                    if (!podcast.getItems().contains(podcastItem)) {
-                        if (    item.getChild("group", media) != null &&
-                                !item.getChild("group", media).getChildren("thumbnail", media).isEmpty() &&
-                                item.getChild("group", media).getChildren("thumbnail", media).get(0) != null) {
-                            Cover cover = ImageUtils.getCoverFromURL(new URL(item.getChild("group", media).getChildren("thumbnail", media).get(0).getAttributeValue("url")));
-                            podcastItem.setCover(cover);
-                        }
-
-                        Set<ConstraintViolation<Item>> constraintViolations = validator.validate( podcastItem );
-                        if (constraintViolations.isEmpty()) {
-                            podcast.getItems().add(podcastItem);
-                        } else {
-                            logger.error(constraintViolations.toString());
-                        }
+                    if (    item.getChild("group", media) != null &&
+                            !item.getChild("group", media).getChildren("thumbnail", media).isEmpty() &&
+                            item.getChild("group", media).getChildren("thumbnail", media).get(0) != null) {
+                        Cover cover = ImageUtils.getCoverFromURL(new URL(item.getChild("group", media).getChildren("thumbnail", media).get(0).getAttributeValue("url")));
+                        podcastItem.setCover(cover);
                     }
+
+                    itemSet.add(podcastItem);
 
                 }
 
             } catch (JDOMException | IOException e) {
                 e.printStackTrace();
-                return podcast;
+                return itemSet;
             }
 
             borne += YOUTUBE_MAX_RESULTS;
         }
 
-
-        //return podcast;
     }
 
     @Override

@@ -16,6 +16,7 @@ import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -27,60 +28,59 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     public Podcast updateFeed(Podcast podcast) {
 
-        Elements listingEpisodes = null;
-        Document page = null;
+        // Si le bean est valide :
+        getItems(podcast).stream()
+                .filter(item -> !podcast.getItems().contains(item))
+                .forEach(item -> {
 
-        Set<Item> itemSet = null;
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+
+        logger.debug("Nombre d'episode : " + podcast.getItems().size());
+
+        return podcast;
+    }
+
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
+        Document page;
+
+        Set<Item> itemSet = new HashSet<>();
 
         try {
             page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
-            // Si la page possède un planifier :
-            if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet == null) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-                itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
-            }
-
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
+            return itemSet;
+        }
+
+        // Si la page possède un planifier :
+        if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet.isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+            itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
         }
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
-        if (!podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+        if (!podcast.getUrl().contains("front_tools") && (itemSet.isEmpty())) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
             itemSet = this.getSetItemToPodcastFromFrontTools(
                     this.getPodcastURLFromFrontTools(podcast.getUrl())
             );
         }
 
         // Si l'url est une front-tools et que la liste est encore vide :
-        if (podcast.getUrl().contains("front_tools") && (itemSet == null)) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
+        if (podcast.getUrl().contains("front_tools") && (itemSet.isEmpty())) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
             itemSet = this.getSetItemToPodcastFromFrontTools(podcast.getUrl());
         }
-
-        if (itemSet != null) {
-            for (Item item : itemSet) {
-                if (!podcast.getItems().contains(item)) {
-
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                }
-            }
-        }
-
-
-        //podcast.setRssFeed(jDomUtils.podcastToXMLGeneric(podcast, this.getServerURL()));
-
-        logger.debug(podcast.toString());
-        logger.debug("Nombre d'episode : " + podcast.getItems().size());
-        //logger.debug(podcast.getRssFeed());
-
-
-        return podcast;
+        return itemSet;
     }
 
     public Podcast findPodcast(String url) {
@@ -174,7 +174,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
-        Set<Item> itemList = new LinkedHashSet<Item>();
+        Set<Item> itemList = new HashSet<>();
         try {
             Integer idCanalPlusEpisode;
             for (Element episode : getHTMLListingEpisodeFromFrontTools(urlFrontTools)) {

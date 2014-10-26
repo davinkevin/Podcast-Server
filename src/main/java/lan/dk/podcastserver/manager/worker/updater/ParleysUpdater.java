@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +41,33 @@ public class ParleysUpdater extends AbstractUpdater {
 
     @Override
     public Podcast updateFeed(Podcast podcast) {
+
+        // Si le bean est valide :
+        getItems(podcast)
+                .stream()
+                .filter(item -> !podcast.containsItem(item))
+                .forEach(item -> {
+
+                    item.setPodcast(podcast);
+                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
+                    if (constraintViolations.isEmpty()) {
+                        podcast.getItems().add(item);
+                    } else {
+                        logger.error(constraintViolations.toString());
+                    }
+                });
+
+        return podcast;
+    }
+
+
+    public Set<Item> updateFeedAsync(Podcast podcast) {
+        return getItems(podcast);
+    }
+
+    private Set<Item> getItems(Podcast podcast) {
+        Set<Item> itemSet = new HashSet<>();
+
         try {
             JSONObject responseObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
 
@@ -50,29 +78,13 @@ public class ParleysUpdater extends AbstractUpdater {
                 JSONObject currentObject = (JSONObject) jsonObject;
 
                 String _id = (String) currentObject.get("_id");
-                Item item = getParleysItem(_id);
-
-                logger.debug(item.toString());
-
-                if (!podcast.containsItem(item)) {
-
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                }
-
+                itemSet.add(getParleysItem(_id));
             }
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-
-        return podcast;
+        return itemSet;
     }
 
     @Override
