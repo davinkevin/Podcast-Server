@@ -35,11 +35,12 @@
 .item-listing .itemInList.ng-enter-stagger{-webkit-transition-duration:0s;transition-duration:0s}
 .navbar{margin-bottom:0;border-radius:0}
 .downloadList .media{background-color:#fff;margin-left:5px;padding-right:5px;margin-right:5px;border:1px solid #ddd;border-radius:5px;box-shadow:5px 5px 5px 0 rgba(0,0,0,.1)}
-.downloadList .media * img{width:100px;height:90px;border-top-left-radius:5px;border-bottom-left-radius:5px}
+.downloadList .media * img{width:100px;height:90px;border-top-left-radius:5px;border-bottom-left-radius:5px;object-fit:cover}
 .downloadList .media .media-heading{padding-top:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .downloadList .media .buttonList{padding-top:24px}
 .media{margin-left:5px;margin-right:5px;overflow:visible}
 .media .media-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.media img{object-fit:cover}
 .media .btn{border:none}
 .media.ng-leave{-webkit-animation:fadeOutRight .5s;animation:fadeOutRight .5s}
 .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fadeInLeft .5s}
@@ -59,3 +60,4 @@
 .upload-item .drop-box{background:#F8F8F8;border:5px dashed #DDD;height:100px;text-align:center}
 .upload-item .drop-box .upload-text{height:100%;padding-top:5%}
 .upload-item .drop-box.dropping{background:#C7C7C7}
+.item-details .thumbnail img{min-height:200px;object-fit:cover}

@@ -289,14 +289,15 @@ angular.module('podcast.controller')
         var idItem = $routeParams.itemId,
             idPodcast = $routeParams.podcastId,
             basePodcast = Restangular.one("podcast", idPodcast),
-            baseItem = basePodcast.one("items", idItem),
-            webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
+            baseItem = basePodcast.one("items", idItem);
+
 
 
         $q.all([basePodcast.get(), baseItem.get()]).then(function (arrayOfResult) {
             $scope.item = arrayOfResult[1];
             $scope.item.podcast = arrayOfResult[0];
         }).then(function () {
+            var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
             podcastWebSocket
                 .subscribe(webSockedUrl, function(message) {
@@ -608,7 +609,7 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/item-detail.html',
     '\n' +
-    '<div class="container">\n' +
+    '<div class="container item-details">\n' +
     '\n' +
     '    <br/>\n' +
     '    <ol class="breadcrumb">\n' +

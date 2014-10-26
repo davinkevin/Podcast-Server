@@ -231,6 +231,7 @@
       height: 90px;
       border-top-left-radius: 5px;
       border-bottom-left-radius: 5px;
+      object-fit : cover;
     }
     .media-heading {
       padding-top: 10px;
@@ -249,6 +250,10 @@
   overflow: visible;
   .media-heading {
     .text-overflow();
+  }
+
+  img {
+    object-fit : cover;
   }
 
   .btn {
@@ -353,6 +358,16 @@
     }
     &.dropping {
       background: #C7C7C7;
+    }
+  }
+}
+
+
+.item-details {
+  .thumbnail {
+    img {
+      min-height: 200px;
+      object-fit: cover;
     }
   }
 }
