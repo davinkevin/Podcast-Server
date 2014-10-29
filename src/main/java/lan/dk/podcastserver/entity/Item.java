@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -254,8 +255,9 @@ public class Item implements Serializable {
         if (id != null && item.id != null)
             return id.equals(item.id);
 
-        if (url != null && item.url != null)
-            return url.equals(item.url);
+        if (url != null && item.url != null) {
+            return url.equals(item.url) || FilenameUtils.getName(item.url).equals(FilenameUtils.getName(url));
+        }
 
         return localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl);
 
@@ -263,9 +265,10 @@ public class Item implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = title != null ? title.hashCode() : 0;
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder(17, 37).
+                append(title).
+                append(FilenameUtils.getName(url)).
+                toHashCode();
     }
 
     @Override
