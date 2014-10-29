@@ -1,5 +1,5 @@
 angular.module('podcastApp', [
-    'podcast',
+    'podcast.details',
     'podcast.controller',
     'podcast.filters',
     'podcast.services',
