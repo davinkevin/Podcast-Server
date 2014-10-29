@@ -35,11 +35,11 @@ public class PluzzUpdaterTest {
     @Test
     public void signaturePluzz() {
 
-        String signatureSecretDhistoire = pluzzUpdater.signaturePodcast(SECRET_DHISTOIRE);
-        String signatureIronMan = pluzzUpdater.signaturePodcast(IRON_MAN);
+        String signatureSecretDhistoire = pluzzUpdater.generateSignature(SECRET_DHISTOIRE);
+        String signatureIronMan = pluzzUpdater.generateSignature(IRON_MAN);
 
-        String signatureSecretDhistoire2 = pluzzUpdater.signaturePodcast(SECRET_DHISTOIRE);
-        String signatureIronMan2 = pluzzUpdater.signaturePodcast(IRON_MAN);
+        String signatureSecretDhistoire2 = pluzzUpdater.generateSignature(SECRET_DHISTOIRE);
+        String signatureIronMan2 = pluzzUpdater.generateSignature(IRON_MAN);
 
         assertThat(signatureIronMan).isNotEmpty().isNotNull().isEqualTo(signatureIronMan2);
         assertThat(signatureSecretDhistoire).isNotEmpty().isNotNull().isEqualTo(signatureSecretDhistoire2);
@@ -48,8 +48,8 @@ public class PluzzUpdaterTest {
 
     @Test
     public void updateFeedPluzz() {
-        Podcast secretDhistoire = pluzzUpdater.updateFeed(SECRET_DHISTOIRE);
-        Podcast ironMan = pluzzUpdater.updateFeed(IRON_MAN);
+        Podcast secretDhistoire = pluzzUpdater.updateAndAddItems(SECRET_DHISTOIRE);
+        Podcast ironMan = pluzzUpdater.updateAndAddItems(IRON_MAN);
 
         assertThat(ironMan).isNotNull();
         assertThat(ironMan.getItems()).isNotEmpty().hasSize(8);

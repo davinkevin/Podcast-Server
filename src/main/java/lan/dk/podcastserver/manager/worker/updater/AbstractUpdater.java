@@ -1,5 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.util.Set;
 
 //@Component
 //@Scope("prototype")
@@ -19,12 +25,23 @@ public abstract class AbstractUpdater implements Updater {
     @Value("${serverURL:http://localhost:8080}") private String serverURL;
     @Resource(name="Validator") Validator validator;
 
-    public String getServerURL() {
-        return serverURL;
-    }
+    public Pair<Podcast, Set<Item>> update(Podcast podcast) {
+        try {
+            logger.info("Ajout du podcast \"{}\" à l'executor", podcast.getTitle());
+            String signature = generateSignature(podcast);
+            if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
+                podcast.setSignature(signature);
 
-    public void setServerURL(String serverURL) {
-        this.serverURL = serverURL;
-    }
 
+                return new ImmutablePair<>(podcast, getItems(podcast));
+            } else {
+                logger.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ImmutablePair<>(podcast, podcast.getItems());
+    }
 }

@@ -24,7 +24,7 @@ import java.util.Set;
 @Scope("prototype")
 public class RSSUpdater extends AbstractUpdater {
 
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
         getItems(podcast)
                 .stream()
                 .filter(item -> !podcast.getItems().contains(item))
@@ -41,11 +41,7 @@ public class RSSUpdater extends AbstractUpdater {
         return podcast;
     }
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
         // Si l'image de présentation a changé :
         Document podcastXMLSource;
@@ -131,7 +127,7 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         return DigestUtils.generateMD5SignatureFromUrl(podcast.getUrl());
     }
 

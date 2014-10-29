@@ -40,7 +40,7 @@ public class ParleysUpdater extends AbstractUpdater {
     public static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)/.*");
 
     @Override
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
 
         // Si le bean est valide :
         getItems(podcast)
@@ -61,11 +61,7 @@ public class ParleysUpdater extends AbstractUpdater {
     }
 
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
 
         try {
@@ -93,7 +89,7 @@ public class ParleysUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         try {
             JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
             podcastRepresentation.remove("completedIn");

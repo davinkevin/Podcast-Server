@@ -25,7 +25,7 @@ public class UpdateScheduled {
     @Scheduled(cron="0 0 * * * *")
     private void updateAndDownloadPodcast() {
         logger.info(">>> Beginning of the update <<<");
-        updatePodcastBusiness.updatePodcast();
+        updatePodcastBusiness.updateAsyncPodcast();
         IDM.launchDownload();
         logger.info(">>> End of the update <<<");
     }

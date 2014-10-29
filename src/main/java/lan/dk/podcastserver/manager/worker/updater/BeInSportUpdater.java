@@ -43,7 +43,7 @@ public class BeInSportUpdater extends AbstractUpdater {
     public static Pattern SUBSTRING_VIDEO_URL_PATTERN = Pattern.compile(".*/([0-9]*/.*)$");
 
     @Override
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
         getItems(podcast).stream()
                 .filter(item -> !podcast.getItems().contains(item))
                 .forEach(item -> {
@@ -61,11 +61,7 @@ public class BeInSportUpdater extends AbstractUpdater {
     }
 
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Document page;
         Set<Item> itemSet = new HashSet<>();
         String listingUrl = getListingUrl(podcast);
@@ -162,7 +158,7 @@ public class BeInSportUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         String listingUrl = getListingUrl(podcast);
 
         if (!listingUrl.equals("")) {

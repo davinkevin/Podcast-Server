@@ -55,14 +55,14 @@ public class RssUpdaterTest {
     public void geekIncTest() {
         logger.debug("Download");
         Podcast podcast = new Podcast("Geek Inc HD", "http://www.geekinc.fr/rss/geek-inc-hd.xml", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null, null, null);
-        rssUpdater.updateFeed(podcast);
+        rssUpdater.updateAndAddItems(podcast);
         logger.debug(podcast.toString());
     }
     @Test
     public void podMyDev() {
         logger.debug("Download");
         Podcast podcast = new Podcast("PodMyDev", "http://pipes.yahoo.com/pipes/pipe.run?URL=http%3A%2F%2Fwww.podmydev.com%2F%3Ffeed%3Dpodcast&_id=1c04fdbe524a909e33308bc4fab9d5ae&_render=rss", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null, null, null);
-        rssUpdater.updateFeed(podcast);
+        rssUpdater.updateAndAddItems(podcast);
         logger.debug(podcast.toString());
     }
 
@@ -70,7 +70,7 @@ public class RssUpdaterTest {
     public void twig() {
         logger.debug("Download");
         Podcast podcast = new Podcast("TWIG", "http://feeds.twit.tv/twig_video_hd", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null, null, null);
-        rssUpdater.updateFeed(podcast);
+        rssUpdater.updateAndAddItems(podcast);
         logger.debug(podcast.toString());
     }
     @Test
@@ -81,7 +81,7 @@ public class RssUpdaterTest {
 
         podcast = podcastBusiness.findOne(podcast.getId());
 
-        rssUpdater.updateFeed(podcast);
+        rssUpdater.updateAndAddItems(podcast);
         logger.debug(podcast.toString());
     }
     @Test
@@ -91,7 +91,7 @@ public class RssUpdaterTest {
         //(47, NULL, NULL, NULL, 'Apple - Keynotes', 'RSS', 'http://itstreaming.apple.com/podcasts/apple_keynotes_1080p/apple_keynotes_1080p.xml', 909);
 
         Podcast podcast = new Podcast("Season1", "http://www.season1.fr/category/Podcast/feed/", "", "RSS", new Timestamp(System.currentTimeMillis()), null, null, null, null);
-        rssUpdater.updateFeed(podcast);
+        rssUpdater.updateAndAddItems(podcast);
         logger.debug(podcast.toString());
     }*/
 }

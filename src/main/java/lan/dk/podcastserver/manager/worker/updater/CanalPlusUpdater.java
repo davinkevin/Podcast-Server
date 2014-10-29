@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 public class CanalPlusUpdater extends AbstractUpdater {
 
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
 
         // Si le bean est valide :
         getItems(podcast).stream()
@@ -47,11 +47,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         return podcast;
     }
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Document page;
 
         Set<Item> itemSet = new HashSet<>();
@@ -88,7 +84,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         Document page = null;
 
         try {

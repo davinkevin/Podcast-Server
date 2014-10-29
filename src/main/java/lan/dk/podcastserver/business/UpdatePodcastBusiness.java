@@ -4,6 +4,8 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.utils.WorkerUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,13 +35,13 @@ public class UpdatePodcastBusiness  {
 
     @Resource PodcastBusiness podcastBusiness;
     @Resource ItemBusiness itemBusiness;
-    @Resource WorkerUtils workerUtils;
 
     @Resource
     @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
     @Resource(name="Validator") Validator validator;
 
     @Value("${rootfolder:${catalina.home}/webapp/podcast/}") protected String rootFolder;
+    @Resource WorkerUtils workerUtils;
 
 
     @Transactional(noRollbackFor=Exception.class)
@@ -51,9 +53,9 @@ public class UpdatePodcastBusiness  {
             try {
                 logger.info("Traitement du Podcast : " + podcast.toString());
                 updater = workerUtils.getUpdaterByType(podcast);
-                String signature = updater.signaturePodcast(podcast);
+                String signature = updater.generateSignature(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    updater.updateFeed(podcast);
+                    updater.updateAndAddItems(podcast);
 
 
                     podcast.setLastUpdate(ZonedDateTime.now());
@@ -79,9 +81,9 @@ public class UpdatePodcastBusiness  {
                 logger.info("Traitement du Podcast : " + podcast.toString());
 
                 updater = workerUtils.getUpdaterByType(podcast);
-                String signature = updater.signaturePodcast(podcast);
+                String signature = updater.generateSignature(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    podcast = updater.updateFeed(podcast);
+                    podcast = updater.updateAndAddItems(podcast);
 
 
                     podcast.setLastUpdate(ZonedDateTime.now());
@@ -97,34 +99,27 @@ public class UpdatePodcastBusiness  {
 
     public void updateAsyncPodcast() {
         logger.info("Lancement de l'update");
-        Map<Podcast, Future<Set<Item>> > podcastItemsToUpdate = new HashMap<>();
+        Map<String, Future< Pair<Podcast, Set<Item>> > > podcastItemsToUpdate = new HashMap<>();
 
         List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
-        Updater updater;
         for (Podcast podcast : podcasts) {
             try {
-                logger.info("Ajout du podcast {} à l'executor", podcast.toString());
-                updater = workerUtils.getUpdaterByType(podcast);
-                String signature = updater.signaturePodcast(podcast);
-                if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    podcast.setSignature(signature);
-                    podcast.setLastUpdate(ZonedDateTime.now());
-
-                    final Updater finalUpdater = updater;
-                    podcastItemsToUpdate.put(podcast, asyncExecutor.submit(() -> finalUpdater.updateFeedAsync(podcast)));
-
-
-                } else {
-                    logger.info("Podcast non traité car signature identique : {}", podcast.toString());
-                }
+                final Updater updater = workerUtils.getUpdaterByType(podcast);
+                podcastItemsToUpdate.put(podcast.getSignature(), asyncExecutor.submit(() -> updater.update(podcast)));
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
         }
 
-        for (Map.Entry<Podcast, Future<Set<Item>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
+        for (Map.Entry<String, Future<Pair<Podcast, Set<Item>>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
             try {
-                podcastBusiness.update(attachNewItemsToPodcast(podcastAndItems.getKey(), podcastAndItems.getValue().get()));
+                String currentPodcastSignature = podcastAndItems.getKey();
+                Pair<Podcast, Set<Item>> returnPaired = podcastAndItems.getValue().get();
+                if (!StringUtils.equals(currentPodcastSignature, returnPaired.getKey().getSignature())) {
+                    podcastBusiness.update(
+                            attachNewItemsToPodcast(returnPaired.getKey(), returnPaired.getValue())
+                    );
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -158,6 +153,11 @@ public class UpdatePodcastBusiness  {
     }
 
     public Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items) {
+
+        if (podcast.getItems() != null && !podcast.getItems().containsAll(items)) {
+            podcast.setLastUpdate(ZonedDateTime.now());
+        }
+
         items.stream()
                 .filter(item -> !podcast.getItems().contains(item))
                 .forEach(item -> {
@@ -165,6 +165,7 @@ public class UpdatePodcastBusiness  {
                     item.setPodcast(podcast);
                     Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
                     if (constraintViolations.isEmpty()) {
+                        logger.debug("Add an item to {}", podcast.getTitle());
                         podcast.getItems().add(item);
                     } else {
                         logger.error(constraintViolations.toString());

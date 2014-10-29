@@ -32,7 +32,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Value("${numberofdaytodownload:30}") Integer numberOfDayToDownload;
 
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
 
         getItems(podcast)
                 .stream()
@@ -48,11 +48,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         return podcast;
     }
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
 
         Integer borne = 1;
@@ -117,7 +113,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         // Si l'image de présentation a changé :
         Document podcastXMLSource;
         try {

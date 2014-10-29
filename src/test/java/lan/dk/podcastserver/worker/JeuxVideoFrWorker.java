@@ -30,9 +30,9 @@ public class JeuxVideoFrWorker {
         Podcast defisJVFR = new Podcast("Les défis de la rédaction de JeuxVideoFr", "http://www.jeuxvideo.fr/video/defis-de-la-redaction/",
                 "", "JeuxVideoFr", new Timestamp(System.currentTimeMillis()), null, new Cover("http://1.im6.fr/00C3006E3541664-c1-photo-oYToxOntzOjE6InciO2k6MTk1O30%3D-defi-chaine.jpg", 250, 166), null, true);
 
-        String signature = jeuxVideoFRUpdater.signaturePodcast(defisJVFR);
+        String signature = jeuxVideoFRUpdater.generateSignature(defisJVFR);
         logger.info("Signature 1 : {}", signature);
-        String signature2 = jeuxVideoFRUpdater.signaturePodcast(defisJVFR);
+        String signature2 = jeuxVideoFRUpdater.generateSignature(defisJVFR);
         logger.info("Signature 2 : {}", signature2);
 
         Assert.assertEquals(signature, signature2);
@@ -44,7 +44,7 @@ public class JeuxVideoFrWorker {
         Podcast defisJVFR = new Podcast("Les défis de la rédaction de JeuxVideoFr", "http://www.jeuxvideo.fr/video/defis-de-la-redaction/",
                 "", "JeuxVideoFr", new Timestamp(System.currentTimeMillis()), null, new Cover("http://1.im6.fr/00C3006E3541664-c1-photo-oYToxOntzOjE6InciO2k6MTk1O30%3D-defi-chaine.jpg", 250, 166), null, true);
 
-        jeuxVideoFRUpdater.updateFeed(defisJVFR);
+        jeuxVideoFRUpdater.updateAndAddItems(defisJVFR);
     }
 
     @Test
@@ -53,6 +53,6 @@ public class JeuxVideoFrWorker {
         Podcast defisJVFR = new Podcast("Les fails to play de René", "http://www.jeuxvideo.fr/video/les-fails-to-play-de-rene/",
                 "", "JeuxVideoFr", new Timestamp(System.currentTimeMillis()), null, new Cover("http://1.im6.fr/00C3006E3541664-c1-photo-oYToxOntzOjE6InciO2k6MTk1O30%3D-defi-chaine.jpg", 250, 166), null, true);
 
-        jeuxVideoFRUpdater.updateFeed(defisJVFR);
+        jeuxVideoFRUpdater.updateAndAddItems(defisJVFR);
     }*/
 }

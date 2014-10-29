@@ -35,15 +35,15 @@ public class ParleysUpdaterTest {
 
     @Test
     public void signatureFeedParleys() {
-        String signature =  parleysUpdater.signaturePodcast(DEVOXX_FRANCE_2014);
-        String signature2 = parleysUpdater.signaturePodcast(DEVOXX_FRANCE_2014);
+        String signature =  parleysUpdater.generateSignature(DEVOXX_FRANCE_2014);
+        String signature2 = parleysUpdater.generateSignature(DEVOXX_FRANCE_2014);
 
         Assert.assertEquals(signature, signature2);
     }
 
     @Test
     public void updateFeedParleys() {
-        Podcast podcast = parleysUpdater.updateFeed(DEVOXX_FRANCE_2014);
+        Podcast podcast = parleysUpdater.updateAndAddItems(DEVOXX_FRANCE_2014);
         Assert.assertEquals(111, podcast.getItems().size());
     }
 */

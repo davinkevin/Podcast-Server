@@ -36,7 +36,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     public static Pattern ID_JEUXVIDEOFR_PATTERN = Pattern.compile(".*-([0-9]*)\\..*");
 
     @Override
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
 
         Set<Item> itemSet = getItems(podcast);
 
@@ -57,11 +57,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         return podcast;
     }
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Document page;
         Set<Item> itemSet = new HashSet<>();
 
@@ -142,7 +138,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         Document page = null;
 
         try {

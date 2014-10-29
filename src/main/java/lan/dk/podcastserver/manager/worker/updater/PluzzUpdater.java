@@ -40,7 +40,7 @@ public class PluzzUpdater extends AbstractUpdater {
     public static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
 
     @Override
-    public Podcast updateFeed(Podcast podcast) {
+    public Podcast updateAndAddItems(Podcast podcast) {
 
 
         // Si le bean est valide :
@@ -62,11 +62,7 @@ public class PluzzUpdater extends AbstractUpdater {
         return podcast;
     }
 
-    public Set<Item> updateFeedAsync(Podcast podcast) {
-        return getItems(podcast);
-    }
-
-    private Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Document page;
         String listingUrl = podcast.getUrl();
         Set<Item> itemList = new HashSet<>();
@@ -103,7 +99,7 @@ public class PluzzUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String signaturePodcast(Podcast podcast) {
+    public String generateSignature(Podcast podcast) {
         Document page;
         String listingUrl = podcast.getUrl();
         try {
