@@ -96,10 +96,10 @@ angular.module('podcastApp', [
                     redirectTo: '/items'
                 });
         })
-    .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+    .config(function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
-    }])
-    .config(['RestangularProvider', function(RestangularProvider) {
+    })
+    .config(function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
 
         RestangularProvider.addElementTransformer('items', false, function(item) {
@@ -107,4 +107,8 @@ angular.module('podcastApp', [
             item.addRestangularMethod('download', 'get', 'addtoqueue');
             return item;
         });
-    }]);
+    })
+    .config(function($tooltipProvider) {
+        //TODO : fix for problem in angular 1.3.0 : https://github.com/angular-ui/bootstrap/issues/2828
+        $tooltipProvider.options({animation: false});
+    });

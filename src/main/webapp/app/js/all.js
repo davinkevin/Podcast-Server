@@ -96,10 +96,10 @@ angular.module('podcastApp', [
                     redirectTo: '/items'
                 });
         })
-    .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+    .config(function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
-    }])
-    .config(['RestangularProvider', function(RestangularProvider) {
+    })
+    .config(function(RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');
 
         RestangularProvider.addElementTransformer('items', false, function(item) {
@@ -107,7 +107,11 @@ angular.module('podcastApp', [
             item.addRestangularMethod('download', 'get', 'addtoqueue');
             return item;
         });
-    }]);
+    })
+    .config(function($tooltipProvider) {
+        //TODO : fix for problem in angular 1.3.0 : https://github.com/angular-ui/bootstrap/issues/2828
+        $tooltipProvider.options({animation: false});
+    });
 angular.module('podcast.controller', [
     'podcast.websocket'
 ]);
@@ -725,7 +729,7 @@ module.run(['$templateCache', function($templateCache) {
     '                        </a>\n' +
     '                    </div>\n' +
     '                    <div class="text-center clearfix itemTitle center" >\n' +
-    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip="{{ item.title }}" tooltip-placement="bottom" >\n' +
     '                            {{ item.title | characters:30 }}\n' +
     '                        </a>\n' +
     '                    </div>\n' +
@@ -796,7 +800,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
-    '            <div ng-repeat="item in items track by item.id" class="col-lg-2 col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
+    '            <div ng-repeat="item in items track by item.id" class="col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
     '                <div class="box">\n' +
     '                    <div class="">\n' +
     '                        <img ng-class="{\'img-grayscale\' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />\n' +
@@ -835,7 +839,7 @@ module.run(['$templateCache', function($templateCache) {
     '                        </a>\n' +
     '                    </div>\n' +
     '                    <div class="text-center clearfix itemTitle center" >\n' +
-    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip="{{ item.title }}" tooltip-placement="bottom" >\n' +
     '                            {{ item.title | characters:30 }}\n' +
     '                        </a>\n' +
     '                    </div>\n' +
