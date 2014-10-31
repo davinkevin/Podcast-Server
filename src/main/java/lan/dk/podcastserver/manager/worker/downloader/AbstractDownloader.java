@@ -91,7 +91,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             try {
 
                 if (target.getAbsolutePath().contains(temporaryExtension)) { // Si contient l'extention temporaire.
-                    File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
+                    File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, "").substring(0, target.getAbsolutePath().lastIndexOf("?")));
                     if (targetWithoutExtension.exists())
                         targetWithoutExtension.delete();
                     FileUtils.moveFile(target, targetWithoutExtension);
@@ -139,7 +139,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         if (target != null)
             return target;
 
-        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(item.getUrl())) );
+        File finalFile = getTempFile(item);
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
         //logger.debug(file.getAbsolutePath());
 
@@ -161,6 +161,12 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         }
 
         return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
+    }
+
+    private File getTempFile(Item item) {
+        String fileName = FilenameUtils.getName(String.valueOf(item.getUrl()));
+        fileName = fileName.substring(0, fileName.lastIndexOf("?"));
+        return new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + fileName);
     }
 
     @Transactional
