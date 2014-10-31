@@ -91,7 +91,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             try {
 
                 if (target.getAbsolutePath().contains(temporaryExtension)) { // Si contient l'extention temporaire.
-                    File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, "").substring(0, target.getAbsolutePath().lastIndexOf("?")));
+                    File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
                     if (targetWithoutExtension.exists())
                         targetWithoutExtension.delete();
                     FileUtils.moveFile(target, targetWithoutExtension);
