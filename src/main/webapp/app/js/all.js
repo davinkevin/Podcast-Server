@@ -1,5 +1,5 @@
 angular.module('podcastApp', [
-    'podcast',
+    'podcast.details',
     'podcast.controller',
     'podcast.filters',
     'podcast.services',
@@ -122,7 +122,7 @@ angular.module('podcast.filters', [])
         };
     }
 );
-angular.module('podcast', [
+angular.module('podcast.details', [
     'podcast.details.episodes',
     'podcast.details.edition',
     'podcast.details.upload'
@@ -506,22 +506,6 @@ angular.module('podcast.controller')
         };
 
     });
-angular.module('podcast.controller')
-    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular, ngstomp, $log, $location) {
-
-        $scope.podcast = podcast;
-
-        function refreshItems () {
-            $scope.$broadcast('podcastItems:refresh');
-        }
-
-        $scope.refresh = function () {
-            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
-        };
-        $scope.$on("podcastEdition:save", refreshItems);
-
-    });
 (function(module) {
 try {
   module = angular.module('podcast.partial');
@@ -577,8 +561,10 @@ module.run(['$templateCache', function($templateCache) {
     '    <br/>\n' +
     '\n' +
     '    <accordion close-others="true">\n' +
-    '        <accordion-group heading="Liste d\'attente" is-open="false">\n' +
-    '\n' +
+    '        <accordion-group is-open="false">\n' +
+    '            <accordion-heading>\n' +
+    '                Liste d\'attente <span class="pull-right badge">{{ waitingitems.length }}</span></a>\n' +
+    '            </accordion-heading>\n' +
     '            <div class="media clearfix"  ng-repeat="item in waitingitems"  >\n' +
     '\n' +
     '                <div class="pull-right">\n' +
@@ -1253,6 +1239,22 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('podcast.controller')
+    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular, ngstomp, $log, $location) {
+
+        $scope.podcast = podcast;
+
+        function refreshItems () {
+            $scope.$broadcast('podcastItems:refresh');
+        }
+
+        $scope.refresh = function () {
+            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
+                .then(refreshItems);
+        };
+        $scope.$on("podcastEdition:save", refreshItems);
+
+    });
 angular.module('podcast.controller')
     .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
         var podcasts = Restangular.all("podcast"),
