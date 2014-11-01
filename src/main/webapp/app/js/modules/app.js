@@ -1,9 +1,10 @@
 angular.module('podcastApp', [
-    'podcast.details',
-    'podcast.controller',
-    'podcast.filters',
-    'podcast.services',
-    'podcast.partial',
+    'ps.search',
+    'ps.podcast',
+    'ps.item',
+    'ps.download',
+    'ps.partial',
+    'ps.filters',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',
@@ -65,15 +66,6 @@ angular.module('podcastApp', [
                     }
                 }).
                 when('/items', {
-                    templateUrl: 'html/items-list.html',
-                    controller: 'ItemsListCtrl',
-                    reloadOnSearch: false,
-                    hotkeys: [
-                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
-                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();'],
-                    ].concat(commonKey)
-                }).
-                when('/item/search', {
                     templateUrl: 'html/items-search.html',
                     controller: 'ItemsSearchCtrl',
                     reloadOnSearch: false,

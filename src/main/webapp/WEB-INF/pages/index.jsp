@@ -40,11 +40,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#/item/search">
-                        Rechercher
-                    </a>
-                </li>
-                <li>
                     <a href="#/podcast/add">
                         Ajouter
                     </a>

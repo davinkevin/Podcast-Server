@@ -24,29 +24,20 @@ public class ItemSearchController {
     @Resource private ItemBusiness itemBusiness;
 
     @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
     public List<Item> findAll() {
         return itemBusiness.findAll();
     }
 
     @RequestMapping(value="pagination", method = RequestMethod.GET)
-    @ResponseBody
     public Page<Item> findAll(PageRequestFacade pageRequestFacade) {
         return itemBusiness.findAll(pageRequestFacade.toPageRequest());
     }
 
-    @RequestMapping(value= {"search/{term}"}, method = RequestMethod.POST )
-    @ResponseBody
-    public Page<Item> findByDescriptionContaining(@PathVariable("term") String term, @RequestBody SearchItemPageRequestWrapper searchWrapper) {
-        SearchItemPageRequestWrapper searchItemPageRequestWrapper = (searchWrapper == null) ? new SearchItemPageRequestWrapper() : searchWrapper;
-        return itemBusiness.findByTagsAndFullTextTerm(term, searchItemPageRequestWrapper.getTags(), searchItemPageRequestWrapper.toPageRequest());
-    }
-
     @RequestMapping(value= {"search"}, method = RequestMethod.POST )
-    @ResponseBody
     public Page<Item> findByDescriptionContaining(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
-        SearchItemPageRequestWrapper searchItemPageRequestWrapper = (searchWrapper == null) ? new SearchItemPageRequestWrapper() : searchWrapper;
-        return itemBusiness.findByTagsAndFullTextTerm(null, searchItemPageRequestWrapper.getTags(), searchItemPageRequestWrapper.toPageRequest());
+        return searchWrapper.isSearch()
+                ? itemBusiness.findByTagsAndFullTextTerm(searchWrapper.getTerm(), searchWrapper.getTags(), searchWrapper.toPageRequest())
+                : itemBusiness.findAll(searchWrapper.toPageRequest());
     }
 
     @RequestMapping(value="reindex", method = RequestMethod.GET)

@@ -1,9 +1,9 @@
-'use strict';
 
-angular.module('podcast.websocket', [
+
+angular.module('ps.websocket', [
     'AngularStomp'
 ]).service('podcastWebSocket', function (ngstomp, $log, $q) {
-
+    'use strict';
     var self = this,
         wsClient = ngstomp("/ws", SockJS),
         deferred = $q.defer(),

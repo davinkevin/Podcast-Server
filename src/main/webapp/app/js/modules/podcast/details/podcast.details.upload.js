@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('podcast.details.upload', [
+angular.module('ps.podcast.details.upload', [
     'angularFileUpload'
 ])
     .directive('podcastUpload', function ($log) {
@@ -14,9 +14,8 @@ angular.module('podcast.details.upload', [
         };
     })
     .controller('podcastUploadCtrl', function ($scope, $log) {
-
         $scope.onFileSelect = function($files) {
-            var formData
+            var formData;
             angular.forEach($files, function (file) {
                 formData = new FormData();
                 formData.append('file', file);

@@ -1,4 +1,6 @@
-angular.module('podcast.controller')
+angular.module('ps.podcast.creation', [
+    'restangular'
+])
     .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
         var podcasts = Restangular.all("podcast"),
             tags = Restangular.all("tag");

@@ -1,5 +1,10 @@
-angular.module('podcast.controller')
-    .controller('DownloadCtrl', function ($scope, $http, $routeParams, Restangular, podcastWebSocket, DonwloadManager, $log, Notification, $window) {
+angular.module('ps.download', [
+    'ps.websocket',
+    'ps.dataService.donwloadManager',
+    'restangular',
+    'notification'
+])
+    .controller('DownloadCtrl', function ($scope, Restangular, podcastWebSocket, DonwloadManager, Notification, $window) {
         $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
         $scope.waitingitems = [];
 

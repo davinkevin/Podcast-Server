@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('podcast.details.edition', [])
+angular.module('ps.podcast.details.edition', [])
     .directive('podcastEdition', function () {
         return {
             restrcit : 'E',

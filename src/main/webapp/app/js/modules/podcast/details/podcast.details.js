@@ -1,5 +1,10 @@
-angular.module('podcast.controller')
-    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular, ngstomp, $log, $location) {
+angular.module('ps.podcast.details', [
+    'ps.podcast.details',
+    'ps.podcast.details.episodes',
+    'ps.podcast.details.edition',
+    'ps.podcast.details.upload',
+    'restangular'
+]).controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
 
         $scope.podcast = podcast;
 

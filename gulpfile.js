@@ -41,7 +41,7 @@ gulp.task('lint', function() {
 
 gulp.task('js', function() {
     es.merge(
-        gulp.src(htmlLocation).pipe(plumber()).pipe(ngHtml2Js({ moduleName: "podcast.partial", prefix: "html/" })).pipe(concat("partials.js")),
+        gulp.src(htmlLocation).pipe(plumber()).pipe(ngHtml2Js({ moduleName: "ps.partial", prefix: "html/" })).pipe(concat("partials.js")),
         gulp.src(angularAppModule),
         gulp.src(angularAppLocation)
     )

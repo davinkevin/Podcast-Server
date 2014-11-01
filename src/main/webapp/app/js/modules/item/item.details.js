@@ -1,5 +1,9 @@
-angular.module('podcast.controller')
-    .controller('ItemDetailCtrl', function ($scope, $routeParams, $http, Restangular, podcastWebSocket, DonwloadManager, $location, $q) {
+angular.module('ps.item.details', [
+    'restangular',
+    'ps.websocket',
+    'ps.dataService.donwloadManager'
+])
+    .controller('ItemDetailCtrl', function ($scope, $routeParams, Restangular, podcastWebSocket, DonwloadManager, $location, $q) {
 
         var idItem = $routeParams.itemId,
             idPodcast = $routeParams.podcastId,

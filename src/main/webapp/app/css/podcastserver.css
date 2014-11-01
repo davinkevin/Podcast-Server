@@ -18,6 +18,7 @@
 .downloadingItems .progress{margin-top:5px}
 .box{position:relative;border-radius:5px;background-color:#fff;box-shadow:0 0 15px 0 rgba(0,0,0,.1);border:1px solid #ddd}
 .item-listing .pagination{margin-bottom:0}
+.item-listing .search-button{margin-top:20px}
 .item-listing .itemInList{padding-top:15px;padding-bottom:15px}
 .item-listing .itemInList img{height:215px;border-top-left-radius:5px;border-top-right-radius:5px;max-height:219px;width:100%;object-fit:cover}
 @media screen and (min-width:1200px){.item-listing .itemInList img{height:165px}}

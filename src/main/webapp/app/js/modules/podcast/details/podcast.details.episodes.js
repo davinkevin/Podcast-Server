@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('podcast.details.episodes', [
-    'podcast.websocket'
+angular.module('ps.podcast.details.episodes', [
+    'ps.websocket'
 ])
     .directive('podcastItemsList', function($log){
         return {
