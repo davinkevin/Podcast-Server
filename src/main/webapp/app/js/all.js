@@ -561,7 +561,7 @@ module.run(['$templateCache', function($templateCache) {
     '    <br/>\n' +
     '\n' +
     '    <accordion close-others="true">\n' +
-    '        <accordion-group is-open="false">\n' +
+    '        <accordion-group is-open="waitingitems.length > 0">\n' +
     '            <accordion-heading>\n' +
     '                Liste d\'attente <span class="pull-right badge">{{ waitingitems.length }}</span></a>\n' +
     '            </accordion-heading>\n' +
