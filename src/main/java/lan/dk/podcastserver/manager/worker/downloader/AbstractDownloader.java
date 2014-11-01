@@ -165,7 +165,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     private File getTempFile(Item item) {
         String fileName = FilenameUtils.getName(String.valueOf(item.getUrl()));
-        fileName = fileName.substring(0, fileName.lastIndexOf("?"));
+
+        if ( fileName.lastIndexOf("?") != -1 )
+            fileName = fileName.substring(0, fileName.lastIndexOf("?"));
+
         return new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + fileName);
     }
 
