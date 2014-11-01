@@ -265,10 +265,11 @@ public class Item implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).
-                append(title).
-                append(FilenameUtils.getName(url)).
-                toHashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(title)
+                .append(FilenameUtils.getName(url))
+                .append(pubdate.getNano())
+                .toHashCode();
     }
 
     @Override
