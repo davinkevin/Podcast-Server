@@ -118,7 +118,7 @@ angular.module('podcast.controller', [
 angular.module('podcast.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
-            return String(text).replace(/<[^>]+>/gm, '');
+            return String(text || "").replace(/<[^>]+>/gm, '');
         };
     }
 );
@@ -504,6 +504,22 @@ angular.module('podcast.controller')
                 _.assign(itemInList, itemReseted);
             });
         };
+
+    });
+angular.module('podcast.controller')
+    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular, ngstomp, $log, $location) {
+
+        $scope.podcast = podcast;
+
+        function refreshItems () {
+            $scope.$broadcast('podcastItems:refresh');
+        }
+
+        $scope.refresh = function () {
+            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
+                .then(refreshItems);
+        };
+        $scope.$on("podcastEdition:save", refreshItems);
 
     });
 (function(module) {
@@ -1239,22 +1255,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-angular.module('podcast.controller')
-    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular, ngstomp, $log, $location) {
-
-        $scope.podcast = podcast;
-
-        function refreshItems () {
-            $scope.$broadcast('podcastItems:refresh');
-        }
-
-        $scope.refresh = function () {
-            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
-        };
-        $scope.$on("podcastEdition:save", refreshItems);
-
-    });
 angular.module('podcast.controller')
     .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
         var podcasts = Restangular.all("podcast"),
