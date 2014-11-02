@@ -3,34 +3,13 @@ angular.module('ps.item.details', [
     'ps.websocket',
     'ps.dataService.donwloadManager'
 ])
-    .controller('ItemDetailCtrl', function ($scope, $routeParams, Restangular, podcastWebSocket, DonwloadManager, $location, $q) {
+    .controller('ItemDetailCtrl', function ($scope, podcastWebSocket, DonwloadManager, $location, podcast, item) {
 
-        var idItem = $routeParams.itemId,
-            idPodcast = $routeParams.podcastId,
-            basePodcast = Restangular.one("podcast", idPodcast),
-            baseItem = basePodcast.one("items", idItem);
-
-
-
-        $q.all([basePodcast.get(), baseItem.get()]).then(function (arrayOfResult) {
-            $scope.item = arrayOfResult[1];
-            $scope.item.podcast = arrayOfResult[0];
-        }).then(function () {
-            var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
-
-            podcastWebSocket
-                .subscribe(webSockedUrl, function(message) {
-                    var itemFromWS = JSON.parse(message.body);
-
-                    if (itemFromWS.id == $scope.item.id) {
-                        _.assign($scope.item, itemFromWS);
-                    }
-                });
-
-            $scope.$on('$destroy', function () {
-                podcastWebSocket.unsubscribe(webSockedUrl);
-            });
-        });
+        $scope.item = item;
+        $scope.item.podcast = podcast;
+        $scope.download = DonwloadManager.download;
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
 
 
         $scope.remove = function(item) {
@@ -45,8 +24,19 @@ angular.module('ps.item.details', [
             });
         };
 
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
+        podcastWebSocket
+            .subscribe(webSockedUrl, function(message) {
+                var itemFromWS = JSON.parse(message.body);
+
+                if (itemFromWS.id == $scope.item.id) {
+                    _.assign($scope.item, itemFromWS);
+                }
+            });
+
+        $scope.$on('$destroy', function () {
+            podcastWebSocket.unsubscribe(webSockedUrl);
+        });
     });

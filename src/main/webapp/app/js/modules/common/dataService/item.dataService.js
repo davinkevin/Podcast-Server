@@ -7,7 +7,8 @@ angular.module('ps.dataService.item', [
     .factory('itemService', function (Restangular) {
         'use strict';
         return {
-            search: search
+            search: search,
+            findById : findById
         };
 
         function search(searchParameters) {
@@ -18,6 +19,10 @@ angular.module('ps.dataService.item', [
                     responseFromServer.content = restangularizedItems(responseFromServer.content);
                     return responseFromServer;
                 });
+        }
+
+        function findById(podcastId, itemId) {
+            return Restangular.one("podcast", podcastId).one("items", itemId).get();
         }
 
         // Private Function :

@@ -5,6 +5,7 @@ angular.module('podcastApp', [
     'ps.download',
     'ps.partial',
     'ps.filters',
+    'ps.dataservice',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',
@@ -43,7 +44,12 @@ angular.module('podcastApp', [
                 when('/podcasts', {
                     templateUrl: 'html/podcasts-list.html',
                     controller: 'PodcastsListCtrl',
-                    hotkeys: commonKey
+                    hotkeys: commonKey,
+                    resolve : {
+                        podcasts : function(podcastService) {
+                            return podcastService.findAll();
+                        }
+                    }
                 }).
                 when('/podcast/add', {
                     templateUrl: 'html/podcast-add.html',
@@ -77,7 +83,15 @@ angular.module('podcastApp', [
                 when('/podcast/:podcastId/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl',
-                    hotkeys: commonKey
+                    hotkeys: commonKey,
+                    resolve : {
+                        item : function (itemService, $route) {
+                            return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                        },
+                        podcast : function (podcastService, $route) {
+                            return podcastService.findById($route.current.params.podcastId);
+                        }
+                    }
                 }).
                 when('/download', {
                     templateUrl: 'html/download.html',
@@ -113,47 +127,6 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
-angular.module('ps.filters', [])
-    .filter('htmlToPlaintext', function () {
-        return function(text) {
-            return String(text || "").replace(/<[^>]+>/gm, '');
-        };
-    }
-);
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
-/**
- * Created by kevin on 14/08/2014.
- */
-
-_.mixin({
-    // Update in place, does not preserve order
-    updateinplace : function(localArray, remoteArray, comparisonFunction) {
-        // Default function working on the === operator by the indexOf function:
-        var comparFunc = comparisonFunction || function (inArray, elem) {
-            return inArray.indexOf(elem);
-        };
-
-        // Remove from localArray what is not in the remote array :
-        _.forEachRight(localArray.slice(), function (elem, key) {
-            if (comparFunc(remoteArray, elem) === -1) {
-                localArray.splice(key, 1);
-            }
-        });
-
-        // Add to localArray what is new in the remote array :
-        _.forEach(remoteArray, function (elem) {
-            if (comparFunc(localArray, elem) === -1) {
-                localArray.push(elem);
-            }
-        });
-
-        return localArray;
-    }
-});
-
 angular.module('ps.download', [
     'ps.websocket',
     'ps.dataService.donwloadManager',
@@ -251,39 +224,69 @@ angular.module('ps.download', [
         });
 
     });
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
+angular.module('ps.filters', [])
+    .filter('htmlToPlaintext', function () {
+        return function(text) {
+            return String(text || "").replace(/<[^>]+>/gm, '');
+        };
+    }
+);
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
+/**
+ * Created by kevin on 14/08/2014.
+ */
+
+_.mixin({
+    // Update in place, does not preserve order
+    updateinplace : function(localArray, remoteArray, comparisonFunction) {
+        // Default function working on the === operator by the indexOf function:
+        var comparFunc = comparisonFunction || function (inArray, elem) {
+            return inArray.indexOf(elem);
+        };
+
+        // Remove from localArray what is not in the remote array :
+        _.forEachRight(localArray.slice(), function (elem, key) {
+            if (comparFunc(remoteArray, elem) === -1) {
+                localArray.splice(key, 1);
+            }
+        });
+
+        // Add to localArray what is new in the remote array :
+        _.forEach(remoteArray, function (elem) {
+            if (comparFunc(localArray, elem) === -1) {
+                localArray.push(elem);
+            }
+        });
+
+        return localArray;
+    }
+});
+
 angular.module('ps.item.details', [
     'restangular',
     'ps.websocket',
     'ps.dataService.donwloadManager'
 ])
-    .controller('ItemDetailCtrl', function ($scope, $routeParams, Restangular, podcastWebSocket, DonwloadManager, $location, $q) {
+    .controller('ItemDetailCtrl', function ($scope, podcastWebSocket, DonwloadManager, $location, podcast, item) {
 
-        var idItem = $routeParams.itemId,
-            idPodcast = $routeParams.podcastId,
-            basePodcast = Restangular.one("podcast", idPodcast),
-            baseItem = basePodcast.one("items", idItem);
-
-
-
-        $q.all([basePodcast.get(), baseItem.get()]).then(function (arrayOfResult) {
-            $scope.item = arrayOfResult[1];
-            $scope.item.podcast = arrayOfResult[0];
-        }).then(function () {
-            var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
-
-            podcastWebSocket
-                .subscribe(webSockedUrl, function(message) {
-                    var itemFromWS = JSON.parse(message.body);
-
-                    if (itemFromWS.id == $scope.item.id) {
-                        _.assign($scope.item, itemFromWS);
-                    }
-                });
-
-            $scope.$on('$destroy', function () {
-                podcastWebSocket.unsubscribe(webSockedUrl);
-            });
-        });
+        $scope.item = item;
+        $scope.item.podcast = podcast;
+        $scope.download = DonwloadManager.download;
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
 
 
         $scope.remove = function(item) {
@@ -298,10 +301,21 @@ angular.module('ps.item.details', [
             });
         };
 
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
+        podcastWebSocket
+            .subscribe(webSockedUrl, function(message) {
+                var itemFromWS = JSON.parse(message.body);
+
+                if (itemFromWS.id == $scope.item.id) {
+                    _.assign($scope.item, itemFromWS);
+                }
+            });
+
+        $scope.$on('$destroy', function () {
+            podcastWebSocket.unsubscribe(webSockedUrl);
+        });
     });
 /**
  * Created by kevin on 01/11/14.
@@ -356,85 +370,10 @@ angular.module('ps.podcast.creation', [
         };
     });
 angular.module('ps.podcast.list', [
-    'restangular',
-    'LocalStorageModule'
 ])
-    .controller('PodcastsListCtrl', function ($scope, Restangular, localStorageService) {
-        $scope.podcasts = localStorageService.get('podcastslist');
-        Restangular.all("podcast").getList().then(function(podcasts) {
-            $scope.podcasts = podcasts;
-            localStorageService.add('podcastslist', podcasts);
-        });
+    .controller('PodcastsListCtrl', function ($scope, podcasts) {
+        $scope.podcasts = podcasts;
     });
-angular.module('ps.dataService.donwloadManager', [
-    'restangular'
-])
-    .factory('DonwloadManager', function(Restangular) {
-    'use strict';
-    return {
-        download: function (item) {
-            return Restangular.one("item").customGET(item.id + "/addtoqueue");
-        },
-        stopDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
-        },
-        toggleDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
-        },
-        stopAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
-        },
-        pauseAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
-        },
-        restartAllCurrentDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
-        },
-        removeFromQueue: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
-        },
-        updateNumberOfSimDl: function (number) {
-            return Restangular.one("task").customPOST(number, "downloadManager/limit");
-        },
-        dontDonwload: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
-        }
-    };
-});
-/**
- * Created by kevin on 01/11/14.
- */
-angular.module('ps.dataService.item', [
-    'restangular'
-])
-    .factory('itemService', function (Restangular) {
-        'use strict';
-        return {
-            search: search
-        };
-
-        function search(searchParameters) {
-            //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-            return Restangular.one("item/search")
-                .post(null, searchParameters)
-                .then(function (responseFromServer) {
-                    responseFromServer.content = restangularizedItems(responseFromServer.content);
-                    return responseFromServer;
-                });
-        }
-
-        // Private Function :
-
-        // transformation
-        function restangularizedItems(itemList) {
-            var restangularList = [];
-            angular.forEach(itemList, function (value) {
-                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
-            });
-            return restangularList;
-        }
-    });
-
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -587,87 +526,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('ps.partial');
-} catch (e) {
-  module = angular.module('ps.partial', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('html/items-list.html',
-    '<div class="container item-listing" ng-swipe-right="swipePage(-1)" ng-swipe-left="swipePage(1)">\n' +
-    '    <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->\n' +
-    '    <div class="text-center">\n' +
-    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
-    '    </div>\n' +
-    '        <div class="row">\n' +
-    '            <div ng-repeat="item in items track by item.id" class="col-lg-3 col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
-    '                <div class="box">\n' +
-    '                    <div class="">\n' +
-    '                        <img ng-class="{\'img-grayscale\' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />\n' +
-    '                        <div class="overlay-button">\n' +
-    '                            <div class="btn-group" dropdown is-open="isopen">\n' +
-    '                                <button type="button" class="btn dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
-    '                                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
-    '                                    <li ng-show="item.status == \'Started\' || item.status == \'Paused\'">\n' +
-    '                                        <a ng-show="item.status == \'Started\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Mettre en pause</a>\n' +
-    '                                        <a ng-show="item.status == \'Paused\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Reprendre</a>\n' +
-    '                                    </li>\n' +
-    '                                    <li ng-show="item.status == \'Started\' || item.status == \'Paused\'">\n' +
-    '                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop"></span> Stopper</a>\n' +
-    '                                    </li>\n' +
-    '                                    <li ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null">\n' +
-    '                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save"></span> Télécharger</a>\n' +
-    '                                    </li>\n' +
-    '                                    <li ng-show="item.localUrl == null" >\n' +
-    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a>\n' +
-    '                                    </li>\n' +
-    '                                    <!--\n' +
-    '                                    <li ng-show="item.localUrl != null">\n' +
-    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>\n' +
-    '                                    </li> -->\n' +
-    '                                    <li>\n' +
-    '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>\n' +
-    '                                    </li>\n' +
-    '                                    <li>\n' +
-    '                                        <a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>\n' +
-    '                                    </li>\n' +
-    '                                </ul>\n' +
-    '                            </div>\n' +
-    '                        </div>\n' +
-    '                        <a class="overlay-main-button" ng-href="{{ item.proxyURL  }}" >\n' +
-    '                            <span ng-class="{\'glyphicon-globe\' : (item.localUrl == null), \'glyphicon-play\' : (item.localUrl != null)}" class="glyphicon "></span>\n' +
-    '                        </a>\n' +
-    '                    </div>\n' +
-    '                    <div class="text-center clearfix itemTitle center" >\n' +
-    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip="{{ item.title }}" tooltip-placement="bottom" >\n' +
-    '                            {{ item.title | characters:30 }}\n' +
-    '                        </a>\n' +
-    '                    </div>\n' +
-    '                    <div class="text-center row-button">\n' +
-    '                        <span ng-show="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
-    '                                        <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
-    '                                        <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
-    '                                    </span>\n' +
-    '\n' +
-    '                        <button ng-click="item.download()" ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
-    '                        <a href="{{ item.proxyURL }}" ng-show="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
-    '\n' +
-    '                        <a href="{{ item.proxyURL }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
-    '                        <button ng-click="remove(item)" ng-show="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
-    '                    </div>\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '        </div>\n' +
-    '    <!--</div>-->\n' +
-    '    <div class="text-center row">\n' +
-    '        <pagination items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
-    '    </div>\n' +
-    '</div>\n' +
     '');
 }]);
 })();
@@ -1170,6 +1028,102 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.dataService.donwloadManager', [
+    'restangular'
+])
+    .factory('DonwloadManager', function(Restangular) {
+    'use strict';
+    return {
+        download: function (item) {
+            return Restangular.one("item").customGET(item.id + "/addtoqueue");
+        },
+        stopDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+        },
+        toggleDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+        },
+        stopAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
+        },
+        pauseAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
+        },
+        restartAllCurrentDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
+        },
+        removeFromQueue: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
+        },
+        updateNumberOfSimDl: function (number) {
+            return Restangular.one("task").customPOST(number, "downloadManager/limit");
+        },
+        dontDonwload: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+        }
+    };
+});
+/**
+ * Created by kevin on 01/11/14.
+ */
+angular.module('ps.dataService.item', [
+    'restangular'
+])
+    .factory('itemService', function (Restangular) {
+        'use strict';
+        return {
+            search: search,
+            findById : findById
+        };
+
+        function search(searchParameters) {
+            //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
+            return Restangular.one("item/search")
+                .post(null, searchParameters)
+                .then(function (responseFromServer) {
+                    responseFromServer.content = restangularizedItems(responseFromServer.content);
+                    return responseFromServer;
+                });
+        }
+
+        function findById(podcastId, itemId) {
+            return Restangular.one("podcast", podcastId).one("items", itemId).get();
+        }
+
+        // Private Function :
+
+        // transformation
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        }
+    });
+
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataService.podcast', [
+    'restangular'
+]).factory('podcastService', function (Restangular) {
+    'use strict';
+
+    return {
+        findById    :   findById,
+        findAll     :   findAll
+    };
+
+    function findById(podcastId) {
+        return Restangular.one('podcast', podcastId).get();
+    }
+
+    function findAll() {
+        return Restangular.all('podcast').getList();
+    }
+});
 /**
  * Created by kevin on 01/11/14.
  */

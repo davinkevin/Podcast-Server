@@ -5,6 +5,7 @@ angular.module('podcastApp', [
     'ps.download',
     'ps.partial',
     'ps.filters',
+    'ps.dataservice',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',
@@ -43,7 +44,12 @@ angular.module('podcastApp', [
                 when('/podcasts', {
                     templateUrl: 'html/podcasts-list.html',
                     controller: 'PodcastsListCtrl',
-                    hotkeys: commonKey
+                    hotkeys: commonKey,
+                    resolve : {
+                        podcasts : function(podcastService) {
+                            return podcastService.findAll();
+                        }
+                    }
                 }).
                 when('/podcast/add', {
                     templateUrl: 'html/podcast-add.html',
@@ -77,7 +83,15 @@ angular.module('podcastApp', [
                 when('/podcast/:podcastId/item/:itemId', {
                     templateUrl: 'html/item-detail.html',
                     controller: 'ItemDetailCtrl',
-                    hotkeys: commonKey
+                    hotkeys: commonKey,
+                    resolve : {
+                        item : function (itemService, $route) {
+                            return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                        },
+                        podcast : function (podcastService, $route) {
+                            return podcastService.findById($route.current.params.podcastId);
+                        }
+                    }
                 }).
                 when('/download', {
                     templateUrl: 'html/download.html',
