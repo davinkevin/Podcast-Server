@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import com.jolbox.bonecp.BoneCPDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import org.h2.tools.Server;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.slf4j.Logger;
@@ -89,9 +89,10 @@ public class JPAConfig {
      */
     @Bean
     public DataSource dataSource() throws SQLException {
-        BoneCPDataSource dataSource = new BoneCPDataSource();
 
-        dataSource.setDriverClass(environment.getProperty(PROPERTY_DATABASEDRIVER_NAME, PROPERTY_DATABASEDRIVER_DEFAULT));
+        HikariDataSource dataSource = new HikariDataSource();
+
+        dataSource.setDriverClassName(environment.getProperty(PROPERTY_DATABASEDRIVER_NAME, PROPERTY_DATABASEDRIVER_DEFAULT));
         dataSource.setJdbcUrl(environment.getProperty(PROPERTY_DATABASEURL_NAME, PROPERTY_DATABASEURL_DEFAULT));
         dataSource.setUsername(environment.getProperty(PROPERTY_DATABASEUSERNAME_NAME, PROPERTY_DATABASEUSERNAME_DEFAULT));
         dataSource.setPassword(environment.getProperty(PROPERTY_DATABASEPASSWORD_NAME, PROPERTY_DATABASEPASSWORD_DEFAULT));

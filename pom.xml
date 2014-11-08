@@ -145,11 +145,11 @@
             <version>5.0.3.Final</version>
         </dependency>
 
-        <!-- BoneCP -->
+        <!-- HikariCP -->
         <dependency>
-            <groupId>com.jolbox</groupId>
-            <artifactId>bonecp</artifactId>
-            <version>0.8.0.RELEASE</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.2.2</version>
         </dependency>
 
         <dependency>
