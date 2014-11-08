@@ -65,7 +65,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         }
 
         //Si c'est une page à onglet
-        if (!page.select("#contenuOnglet").isEmpty() && itemSet.isEmpty()) {
+        if (!page.select("#contenuOnglet .tab_content").isEmpty() && itemSet.isEmpty()) {
             itemSet = getItemSetFromOnglet(podcast.getUrl());
         }
 
@@ -176,26 +176,27 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
-        Set<Item> itemList = new HashSet<>();
+        Set<Item> itemSet = new HashSet<>();
         try {
             Integer idCanalPlusEpisode;
             for (Element episode : getHTMLListingEpisodeFromFrontTools(urlFrontTools)) {
                 idCanalPlusEpisode = Integer.valueOf(episode.select("li._thumbs").first().id().replace("video_", ""));
-                itemList.add(getItemFromVideoId(idCanalPlusEpisode));
+                Item itemToAdd = getItemFromVideoId(idCanalPlusEpisode);
+                itemSet.add(itemToAdd.setTitle(itemToAdd.getDescription()));
             }
-            return itemList;
+            return itemSet;
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("MalformedURLException :", e);
         }
-        return itemList;
+        return itemSet;
     }
 
 
     public Set<Item> getSetItemToPodcastFromPlanifier(String urlPodcast) {
 
-        Set<Item> itemSet = new HashSet<Item>();
-        Document page = null;
+        Set<Item> itemSet = new HashSet<>();
+        Document page;
         try {
             page = Jsoup.connect(urlPodcast).get();
         } catch (IOException e) {
@@ -280,8 +281,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         for (Element episode : page.select("#contenuOnglet li[id]")) {
             Integer idCanalPlusEpisode = Integer.valueOf(episode.id().replace("video_", ""));
-            logger.info("id : {}", idCanalPlusEpisode);
-            itemSet.add(getItemFromVideoId(idCanalPlusEpisode));
+            Item itemToAdd = getItemFromVideoId(idCanalPlusEpisode);
+            itemSet.add(itemToAdd.setTitle(itemToAdd.getDescription()));
         }
 
         return itemSet;
