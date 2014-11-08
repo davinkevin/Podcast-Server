@@ -269,6 +269,7 @@ public class Item implements Serializable {
                 .append(title)
                 .append(FilenameUtils.getName(url))
                 .append(pubdate.toInstant())
+                .append(description)
                 .toHashCode();
     }
 

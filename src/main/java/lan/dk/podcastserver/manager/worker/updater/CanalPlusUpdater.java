@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +64,11 @@ public class CanalPlusUpdater extends AbstractUpdater {
             itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
         }
 
+        //Si c'est une page à onglet
+        if (!page.select("#contenuOnglet").isEmpty() && itemSet.isEmpty()) {
+            itemSet = getItemSetFromOnglet(podcast.getUrl());
+        }
+
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
         if (!podcast.getUrl().contains("front_tools") && (itemSet.isEmpty())) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
             itemSet = this.getSetItemToPodcastFromFrontTools(
@@ -78,6 +82,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
         }
         return itemSet;
     }
+
+
 
     public Podcast findPodcast(String url) {
         return null; // retourne un Podcast à partir de l'url fournie
@@ -188,13 +194,14 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     public Set<Item> getSetItemToPodcastFromPlanifier(String urlPodcast) {
 
-        Set<Item> itemSet = new LinkedHashSet<Item>();
+        Set<Item> itemSet = new HashSet<Item>();
         Document page = null;
         try {
             page = Jsoup.connect(urlPodcast).get();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
+            return itemSet;
         }
         //Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
         Pattern idDuPodcastPatern = Pattern.compile(".*\\(([0-9]*).*\\);");
@@ -259,4 +266,25 @@ public class CanalPlusUpdater extends AbstractUpdater {
         }
         return currentEpisode;
     }
+
+    private Set<Item> getItemSetFromOnglet(String url) {
+        Document page;
+        Set<Item> itemSet = new HashSet<>();
+        try {
+            page = Jsoup.connect(url).timeout(5000).get();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("IOException :", e);
+            return itemSet;
+        }
+
+        for (Element episode : page.select("#contenuOnglet li[id]")) {
+            Integer idCanalPlusEpisode = Integer.valueOf(episode.id().replace("video_", ""));
+            logger.info("id : {}", idCanalPlusEpisode);
+            itemSet.add(getItemFromVideoId(idCanalPlusEpisode));
+        }
+
+        return itemSet;
+    }
+
 }
