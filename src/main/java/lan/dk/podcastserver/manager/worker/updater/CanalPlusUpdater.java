@@ -155,7 +155,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         int nbPlusVideos = 0;
 
-        Pattern p = Pattern.compile(".*nbPlusVideos([0-9])=1.*");
+        Pattern p = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
         Matcher m = p.matcher(canalPlusFrontToolsUrl);
 
         logger.debug("Parsing de l'url pour récupérer l'identifiant du tab");
