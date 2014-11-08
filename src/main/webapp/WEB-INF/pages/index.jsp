@@ -62,12 +62,11 @@
 <script src="/app/js/lib/angular-animate/angular-animate.min.js"></script>
 <script src="/app/js/lib/angular-sanitize/angular-sanitize.min.js"></script>
 <script src="/app/js/lib/angular-touch/angular-touch.min.js"></script>
-<script src="/app/js/lib/jquery/dist/jquery.js"></script>
 <script src="/app/js/lib/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="/app/js/lib/lodash/dist/lodash.compat.min.js"></script>
 <script src="/app/js/lib/stomp-websocket/lib/stomp.min.js"></script>
 <script src="/app/js/lib/sockjs/sockjs.min.js"></script>
-<script src="/app/js/lib/angular-local-storage/angular-local-storage.min.js"></script>
+<script src="/app/js/lib/angular-local-storage/dist/angular-local-storage.min.js"></script>
 <script src="/app/js/lib/angular-truncate/src/truncate.js"></script>
 <script src="/app/js/lib/angular-loading-bar/build/loading-bar.min.js"></script>
 <script src="/app/js/lib/ng-tags-input/ng-tags-input.min.js"></script>
