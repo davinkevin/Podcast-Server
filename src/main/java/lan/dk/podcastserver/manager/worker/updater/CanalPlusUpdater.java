@@ -181,10 +181,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
             Integer idCanalPlusEpisode;
             for (Element episode : getHTMLListingEpisodeFromFrontTools(urlFrontTools)) {
                 idCanalPlusEpisode = Integer.valueOf(episode.select("li._thumbs").first().id().replace("video_", ""));
-                Item itemToAdd = getItemFromVideoId(idCanalPlusEpisode);
-                itemSet.add(itemToAdd.setTitle(itemToAdd.getDescription()));
+                itemSet.add(getItemFromVideoId(idCanalPlusEpisode));
             }
-            return itemSet;
+            return modificatedItemSet(itemSet);
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("MalformedURLException :", e);
@@ -207,17 +206,13 @@ public class CanalPlusUpdater extends AbstractUpdater {
         //Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
         Pattern idDuPodcastPatern = Pattern.compile(".*\\(([0-9]*).*\\);");
         Matcher matcher;
-        Item itemToAdd;
         for (Element cursorPointer : page.select(".planifier .cursorPointer")) {
             matcher = idDuPodcastPatern.matcher(cursorPointer.attr("onclick"));
             if (matcher.find()) {
-                logger.debug(cursorPointer.select("h3 a").text());
-                itemToAdd = getItemFromVideoId(Integer.valueOf(matcher.group(1)))
-                        .setTitle(cursorPointer.select("h3 a").text());
-                itemSet.add(itemToAdd);
+                itemSet.add(getItemFromVideoId(Integer.valueOf(matcher.group(1))));
             }
         }
-        return itemSet;
+        return modificatedItemSet(itemSet);
     }
 
     /**
@@ -250,12 +245,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
             } else {
                 currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
             }
-            //currentEpisode.setDescription((xml_INFOS.getChildText("DESCRIPTION").equals("")) ? xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE") : xml_INFOS.getChildText("DESCRIPTION"));
-
-//                    if (!podcast.getItems().contains(currentEpisode)) {
-//                        currentEpisode.setPodcast(podcast);
-//                        podcast.getItems().add(currentEpisode);
-//                    }
 
             logger.debug(currentEpisode.toString());
         } catch (MalformedURLException e) {
@@ -285,7 +274,21 @@ public class CanalPlusUpdater extends AbstractUpdater {
             itemSet.add(itemToAdd.setTitle(itemToAdd.getDescription()));
         }
 
+        return modificatedItemSet(itemSet);
+    }
+
+    private Set<Item> modificatedItemSet(Set<Item> itemSet) {
+        return hasDifferentName(itemSet) ? itemSet : replaceTitleByDescription(itemSet);
+    }
+
+    private Set<Item> replaceTitleByDescription(Set<Item> itemSet) {
+        itemSet.stream().forEach(item -> item.setTitle(item.getDescription()));
         return itemSet;
     }
+
+    private Boolean hasDifferentName(Set<Item> itemSet) {
+        return itemSet.stream().map(Item::getTitle).distinct().count() > 1;
+    }
+
 
 }
