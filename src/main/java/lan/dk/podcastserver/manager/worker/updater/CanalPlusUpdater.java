@@ -183,7 +183,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
                 idCanalPlusEpisode = Integer.valueOf(episode.select("li._thumbs").first().id().replace("video_", ""));
                 itemSet.add(getItemFromVideoId(idCanalPlusEpisode));
             }
-            return modificatedItemSet(itemSet);
+            return itemSet;
         } catch (MalformedURLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("MalformedURLException :", e);
@@ -212,7 +212,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
                 itemSet.add(getItemFromVideoId(Integer.valueOf(matcher.group(1))));
             }
         }
-        return modificatedItemSet(itemSet);
+        return itemSet;
     }
 
     /**
@@ -274,20 +274,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
             itemSet.add(itemToAdd.setTitle(itemToAdd.getDescription()));
         }
 
-        return modificatedItemSet(itemSet);
-    }
-
-    private Set<Item> modificatedItemSet(Set<Item> itemSet) {
-        return hasDifferentName(itemSet) ? itemSet : replaceTitleByDescription(itemSet);
-    }
-
-    private Set<Item> replaceTitleByDescription(Set<Item> itemSet) {
-        itemSet.stream().forEach(item -> item.setTitle(item.getDescription()));
         return itemSet;
-    }
-
-    private Boolean hasDifferentName(Set<Item> itemSet) {
-        return itemSet.stream().map(Item::getTitle).distinct().count() > 1;
     }
 
 
