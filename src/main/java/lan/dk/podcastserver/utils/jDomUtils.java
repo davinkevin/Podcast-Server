@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.sql.Timestamp;
 
 
 public class jDomUtils {
@@ -70,7 +69,6 @@ public class jDomUtils {
         url.addContent(new Text("http://localhost:8080/api/podcast/" + podcast.getId() + "/rss"));
 
         Element lastUpdate = new Element("pubDate");
-        lastUpdate.addContent(new Text(DateUtils.TimeStampToRFC2822(new Timestamp(podcast.getLastUpdate().getNano()/1_000_000))));
         lastUpdate.addContent(new Text(DateUtils.toRFC2822(podcast.getLastUpdate())));
 
         Element description = new Element("description");
