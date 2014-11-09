@@ -8,7 +8,9 @@ angular.module('ps.dataService.item', [
         'use strict';
         return {
             search: search,
-            findById : findById
+            findById : findById,
+            getItemForPodcastWithPagination : getItemForPodcastWithPagination,
+            restangularizePodcastItem : restangularizePodcastItem
         };
 
         function search(searchParameters) {
@@ -23,6 +25,14 @@ angular.module('ps.dataService.item', [
 
         function findById(podcastId, itemId) {
             return Restangular.one("podcast", podcastId).one("items", itemId).get();
+        }
+
+        function getItemForPodcastWithPagination(podcast, pageParemeters) {
+            return podcast.one("items").post(null, pageParemeters);
+        }
+
+        function restangularizePodcastItem (podcast, items) {
+            return Restangular.restangularizeCollection(podcast, items, 'items');
         }
 
         // Private Function :

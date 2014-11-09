@@ -14,7 +14,7 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, Restangular, ngstomp, DonwloadManager, PodcastItemPerPage, podcastWebSocket ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, podcastWebSocket, itemService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
@@ -33,9 +33,9 @@ angular.module('ps.podcast.details.episodes', [
 
         $scope.loadPage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
-            return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
+            return itemService.getItemForPodcastWithPagination($scope.podcast, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
                 .then(function(itemsResponse) {
-                    $scope.podcast.items = Restangular.restangularizeCollection(Restangular.one('podcast', $scope.podcast.id), itemsResponse.content, 'items');
+                    $scope.podcast.items = itemService.restangularizePodcastItem($scope.podcast, itemsResponse.content);
                     $scope.podcast.totalItems = itemsResponse.totalElements;
                 });
         };
