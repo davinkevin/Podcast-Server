@@ -20,30 +20,22 @@ angular.module('ps.podcast.details.episodes', [
 
         var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
 
-        podcastWebSocket.subscribe(webSocketUrl, function (message) {
-            var item = JSON.parse(message.body);
-            var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-            _.assign(elemToUpdate, item);
-        });
+        podcastWebSocket
+            .subscribe(webSocketUrl, function (message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+                _.assign(elemToUpdate, item);
+            });
 
         $scope.$on('$destroy', function () {
             podcastWebSocket.unsubscribe(webSocketUrl);
         });
 
-        function restangularizedItems(itemList) {
-            var restangularList = [];
-            angular.forEach(itemList, function (value) {
-                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
-            });
-            return restangularList;
-        }
-
-
         $scope.loadPage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
             return $scope.podcast.one("items").post(null, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
                 .then(function(itemsResponse) {
-                    $scope.podcast.items = restangularizedItems(itemsResponse.content);
+                    $scope.podcast.items = Restangular.restangularizeCollection(Restangular.one('podcast', $scope.podcast.id), itemsResponse.content, 'items');
                     $scope.podcast.totalItems = itemsResponse.totalElements;
                 });
         };
