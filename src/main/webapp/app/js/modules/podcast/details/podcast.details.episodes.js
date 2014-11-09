@@ -59,8 +59,10 @@ angular.module('ps.podcast.details.episodes', [
                 $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
                     return (elem.id === item.id);
                 });
-            });
+            }).then($scope.loadPage);
         };
+
+
         $scope.reset = function (item) {
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
