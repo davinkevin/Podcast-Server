@@ -268,7 +268,7 @@ public class Item implements Serializable {
         return new HashCodeBuilder(17, 37)
                 .append(title)
                 .append(FilenameUtils.getName(url))
-                .append(pubdate.toInstant())
+                .append((pubdate != null) ? pubdate.toInstant() : null)
                 .append(description)
                 .toHashCode();
     }

@@ -33,11 +33,12 @@ import java.util.stream.Collectors;
 @Scope("prototype")
 public class PluzzUpdater extends AbstractUpdater {
 
-    public static final String JSOUP_ITEM_SELECTOR = "#autreEmission";
+    public static final String JSOUP_ITEM_SELECTOR = "#player-memeProgramme";
     public static final String PLUZZ_INFORMATION_URL = "http://webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s&catalogue=Pluzz";
     public static final String PLUZZ_COVER_BASE_URL = "http://refonte.webservices.francetelevisions.fr%s";
     //PATTERN :
     public static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
+    public static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
 
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
@@ -76,13 +77,14 @@ public class PluzzUpdater extends AbstractUpdater {
 
 
             //get from current page, for the first of the panel
-            itemList.add(getPluzzItem(page.select("meta[property=og:url]").attr("content")));
+
+            itemList.add(getCurrentPlayedItem(page));
 
             // get from right panel
             Elements listOfEpisodes = page.select(JSOUP_ITEM_SELECTOR);
             itemList.addAll(listOfEpisodes.select("a.row")
                     .stream()
-                    .map(element -> getPluzzItem(element.attr("href")))
+                    .map(element -> getPluzzItemByUrl(element.attr("href")))
                     .collect(Collectors.toList()));
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -90,6 +92,15 @@ public class PluzzUpdater extends AbstractUpdater {
         }
         return itemList;
 
+    }
+
+    private Item getCurrentPlayedItem(Document page) {
+        String urlContainingId = page.select("meta[name=og:image]").attr("content");
+        Matcher m = ID_PLUZZ_MAIN_PAGE_PATTERN.matcher(urlContainingId);
+        if (!m.find()) {
+            return new Item();
+        }
+        return getPluzzItemById(m.group(1));
     }
 
 
@@ -121,12 +132,16 @@ public class PluzzUpdater extends AbstractUpdater {
         return "";
     }
 
-    private Item getPluzzItem(String url) {
+    private Item getPluzzItemByUrl(String url) {
         String pluzzId = getPluzzId(url);
 
         if (pluzzId.isEmpty())
             return new Item();
 
+        return getPluzzItemById(pluzzId);
+    }
+
+    private Item getPluzzItemById(String pluzzId) {
         JSONParser parser = new JSONParser();
         try {
             logger.debug(getPluzzJsonInformation(pluzzId));
@@ -143,11 +158,11 @@ public class PluzzUpdater extends AbstractUpdater {
             }
 
             Item itemToReturn = new Item()
-                                    .setTitle(responseObject.get("titre").toString().concat(seasonEpisode).concat(responseObject.get("sous_titre").toString()))
-                                    .setDescription(responseObject.get("synopsis").toString())
-                                    .setPubdate( DateUtils.fromPluzz((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")) )
-                                    .setCover(ImageUtils.getCoverFromURL(new URL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image")))))
-                                    .setUrl(getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
+                    .setTitle(responseObject.get("titre").toString().concat(seasonEpisode).concat(responseObject.get("sous_titre").toString()))
+                    .setDescription(responseObject.get("synopsis").toString())
+                    .setPubdate( DateUtils.fromPluzz((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")) )
+                    .setCover(ImageUtils.getCoverFromURL(new URL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image")))))
+                    .setUrl(getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
 
 
 
@@ -157,7 +172,6 @@ public class PluzzUpdater extends AbstractUpdater {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-
 
         return new Item();
     }
