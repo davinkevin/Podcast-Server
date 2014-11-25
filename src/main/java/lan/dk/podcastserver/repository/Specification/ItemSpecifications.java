@@ -1,13 +1,10 @@
 package lan.dk.podcastserver.repository.Specification;
 
-import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
+import com.mysema.query.types.expr.BooleanExpression;
+import lan.dk.podcastserver.entity.QItem;
 import lan.dk.podcastserver.entity.Tag;
-import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -15,24 +12,64 @@ import java.util.List;
  */
 public class ItemSpecifications {
 
-    public static Specification<Item> isInTags(List<Tag> tags) {
+    public static BooleanExpression isDownloaded(Boolean downloaded) {
+        QItem item = QItem.item;
+
+        if (downloaded)
+            return item.status.eq("Finish");
+
+        return item.status.isNull().or(item.status.eq("Not Downloaded"));
+    }
+
+    public static BooleanExpression isNewerThan(ZonedDateTime dateTime){
+        return QItem.item.pubdate.gt(dateTime);
+    }
+
+    public static BooleanExpression isOlderThan(ZonedDateTime dateTime){
+        return QItem.item.pubdate.lt(dateTime);
+    }
+
+    public static BooleanExpression hasToBeDeleted(Boolean deleted){
+        QItem item = QItem.item;
+
+        if (deleted)
+            return item.podcast.hasToBeDeleted.isTrue();
+
+        return item.podcast.hasToBeDeleted.isFalse();
+
+    }
+
+    public static BooleanExpression isInId(final List<Integer> ids){
+        return QItem.item.id.in(ids);
+    }
+
+    public static BooleanExpression isInTags(List<Tag> tags) {
         return isInTags(tags.toArray(new Tag[tags.size()]));
     }
 
-    public static Specification<Item> isInTags(final Tag... tags) {
-        return (root, query, cb) -> {
-            Collection<Predicate> predicates = new ArrayList<>();
+    public static BooleanExpression isInTags(final Tag... tags) {
+        if (tags.length == 0)
+            return null;
 
-            Join<Item, Podcast> itemPodcastJoin = root.join("podcast");
-            for(Tag tag : tags) {
-                predicates.add(cb.isMember(tag, itemPodcastJoin.<List<Tag>>get("tags")));
-            }
+        QItem item = QItem.item;
 
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-        };
+        BooleanExpression tagsPredicate = null;
+
+        for (Tag tag : tags) {
+            tagsPredicate =
+                    (tagsPredicate == null)
+                            ? item.podcast.tags.contains(tag)
+                            : tagsPredicate.and(item.podcast.tags.contains(tag));
+        }
+
+        return tagsPredicate;
     }
 
-    public static Specification<Item> hasId(final List<Integer> ids) {
-        return (root, query, cb) -> root.<Integer>get("id").in(ids);
+    public static BooleanExpression hasStatus(String status) {
+        return QItem.item.status.eq(status);
+    }
+
+    public static BooleanExpression isInPodcast(Integer podcastId) {
+        return QItem.item.podcast.id.eq(podcastId);
     }
 }

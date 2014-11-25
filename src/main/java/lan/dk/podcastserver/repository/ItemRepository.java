@@ -1,19 +1,11 @@
 package lan.dk.podcastserver.repository;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.Custom.ItemRepositoryCustom;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 
-public interface ItemRepository extends JpaRepository<Item, Integer>, ItemRepositoryCustom, JpaSpecificationExecutor {
+public interface ItemRepository extends JpaRepository<Item, Integer>, ItemRepositoryCustom, QueryDslPredicateExecutor {
 
-    List<Item> findByStatus(@Param(value="status") String status);
-    Page<Item> findByPodcast(@Param(value="podcast") Podcast podcast, Pageable page);
 }

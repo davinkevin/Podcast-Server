@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.repository.Impl;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.Custom.ItemRepositoryCustom;
 import lan.dk.podcastserver.utils.hibernate.transformer.HibernateIdExtractor;
 import org.apache.lucene.search.Query;
@@ -15,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
-import java.util.Date;
 import java.util.List;
 
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
@@ -25,62 +22,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @PersistenceContext
     EntityManager em;
-
-    @Override
-    public List<Item> findAllItemNotDownloadedNewerThan(Date date) {
-
-        // Récupération des élément inhérant à la recherche par Critères
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Item> criteriaQuery = builder.createQuery(Item.class);
-
-        Root<Item> itemRoot = criteriaQuery.from(Item.class);
-
-        Predicate wherePridcate =
-                   builder.and(
-                           // Ajout du prédicat de comparaison entre la date du jour et la dâte passé en argument
-                           builder.between(itemRoot.<Date>get("pubdate"), date, new Date()),
-                           //OR
-                           builder.or(
-                                   // Status est à Not Downloaded
-                                   builder.equal(itemRoot.<String>get("status"), "Not Downloaded"),
-                                   // Status est à Null
-                                   builder.isNull(itemRoot.<String>get("status"))
-                           )
-                   );
-
-        // Between two date :
-        criteriaQuery.where(wherePridcate);
-
-        // Affichage de la requête pour le Debug
-        //logger.debug(em.createQuery(criteriaQuery).unwrap(org.hibernate.Query.class).getQueryString());
-        return em.createQuery(criteriaQuery).getResultList();
-
-    }
-
-    @Override
-    public List<Item> findAllItemDownloadedOlderThan(Date date) {
-        // Récupération des élément inhérant à la recherche par Critères
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Item> criteriaQuery = builder.createQuery(Item.class);
-
-        Root<Item> itemRoot = criteriaQuery.from(Item.class);
-
-        Predicate wherePridcate =
-                builder.and(
-                        builder.lessThan(itemRoot.<Date>get("downloaddate"), date),
-                        builder.equal(itemRoot.<String>get("status"), "Finish")
-                );
-
-        Join<Item, Podcast> itemPodcastJoin = itemRoot.join("podcast");
-        wherePridcate = builder.and(wherePridcate, builder.equal(itemPodcastJoin.<Podcast>get("hasToBeDeleted"), Boolean.TRUE));
-
-        // Between two date :
-        criteriaQuery.where(wherePridcate);
-
-        // Affichage de la requête pour le Debug
-        logger.debug(em.createQuery(criteriaQuery).unwrap(org.hibernate.Query.class).getQueryString());
-        return em.createQuery(criteriaQuery).getResultList();
-    }
 
     @Override
     public void reindex() throws InterruptedException {
@@ -120,10 +61,4 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         logger.info(results.toString());
         return results;
     }
-
-    /*
-    private Boolean getLuceneOrder(Sort.Direction direction) {
-        return "DESC".equals(direction.name());
-    }
-    */
 }

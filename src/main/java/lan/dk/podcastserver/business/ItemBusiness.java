@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Tag;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,13 +31,9 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.hasId;
-import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.isInTags;
-import static org.springframework.data.jpa.domain.Specifications.where;
+import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.*;
 
 @Component
 @Transactional
@@ -49,7 +45,7 @@ public class ItemBusiness {
     @Resource ItemRepository itemRepository;
     @Resource PodcastBusiness podcastBusiness;
 
-    @Value("${numberofdaytodownload:30}") int numberOfDayToDownload;
+    @Value("${numberofdaytodownload:30}") Long numberOfDayToDownload;
 
     //** Delegation Repository **//
     public List<Item> findAll() {
@@ -70,12 +66,12 @@ public class ItemBusiness {
         return itemRepository.findAll(getSearchSpecifications(term, tags), new PageRequest(page.getPageNumber(), page.getPageSize()));
     }
 
-    private Specifications<Item> getSearchSpecifications(String term, List<Tag> tags) {
+    private Predicate getSearchSpecifications(String term, List<Tag> tags) {
         if (StringUtils.isEmpty(term)) {
-            return where(isInTags(tags));
+            return isInTags(tags);
         }
 
-        return where( hasId(itemRepository.fullTextSearch(term)) ).and( isInTags(tags) );
+        return isInId(itemRepository.fullTextSearch(term)).and( isInTags(tags) );
     }
 
     public List<Item> save(Iterable<Item> entities) {
@@ -106,42 +102,40 @@ public class ItemBusiness {
         itemRepository.delete(entity);
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public List<Item> findAllItemNotDownloadedNewerThan(Date date) {
-        return itemRepository.findAllItemNotDownloadedNewerThan(date);
+    public Iterable<Item> findAllItemNotDownloadedNewerThan(ZonedDateTime date) {
+        return itemRepository.findAll(isDownloaded(Boolean.FALSE).and(isNewerThan(date)));
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public List<Item> findAllItemDownloadedOlderThan(Date date) {
-        return itemRepository.findAllItemDownloadedOlderThan(date);
+    public Iterable<Item> findAllItemDownloadedOlderThan(ZonedDateTime date) {
+        return itemRepository.findAll(isDownloaded(Boolean.TRUE).and(isOlderThan(date)));
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public List<Item> findByStatus(String status) {
-        return itemRepository.findByStatus(status);
+    public Iterable<Item> findByStatus(String status) {
+        return itemRepository.findAll(hasStatus(status));
     }
 
     //****************************//
 
     @Transactional(readOnly = true)
-    public List<Item> findAllToDownload() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(c.getTime());
-        c.add(Calendar.DATE, numberOfDayToDownload*-1);  // number of days to add
-        return this.findAllItemNotDownloadedNewerThan(c.getTime());
+    public Iterable<Item> findAllToDownload() {
+        return findAllItemNotDownloadedNewerThan(ZonedDateTime.now().minusDays(numberOfDayToDownload));
     }
 
     @Transactional(readOnly = true)
-    public List<Item> findAllToDelete() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(c.getTime());
-        c.add(Calendar.DATE, numberOfDayToDownload*-1);  // number of days to add
-        return this.findAllItemDownloadedOlderThan(c.getTime());
+    public Iterable<Item> findAllToDelete() {
+        return findAllItemDownloadedOlderThan(ZonedDateTime.now().minusDays(numberOfDayToDownload));
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
-        return itemRepository.findByPodcast(podcastBusiness.findOne(idPodcast), pageRequest);
+        return itemRepository.findAll(isInPodcast(idPodcast), pageRequest);
     }
 
 
