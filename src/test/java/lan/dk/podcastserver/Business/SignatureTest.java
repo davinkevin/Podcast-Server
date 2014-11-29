@@ -6,7 +6,7 @@ import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.Mock.MockRepository;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
-import lan.dk.podcastserver.utils.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;

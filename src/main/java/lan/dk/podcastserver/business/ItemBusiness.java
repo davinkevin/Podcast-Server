@@ -7,7 +7,6 @@ import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -181,7 +180,7 @@ public class ItemBusiness {
         uploadedFile.transferTo(fileToSave);
 
         item.setTitle(FilenameUtils.removeExtension(uploadedFile.getOriginalFilename().split(" - ")[2]))
-                .setPubdate(DateUtils.fromFolder(uploadedFile.getOriginalFilename().split(" - ")[1]))
+                .setPubdate(podcastBusiness.fromFolder(uploadedFile.getOriginalFilename().split(" - ")[1]))
                 .setUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
                 .setLength(uploadedFile.getSize())
                 .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(uploadedFile.getOriginalFilename())))

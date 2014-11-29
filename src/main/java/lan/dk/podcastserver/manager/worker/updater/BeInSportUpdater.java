@@ -14,7 +14,12 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +34,7 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 public class BeInSportUpdater extends AbstractUpdater {
 
+    public static final String BEINSPORT_PATTERN = "MMM dd yyyy, HH:mm";
     public static String EPISODE_LISTING_URL = "http://www.beinsports.fr/replay/category/{idBeInSport}/page/1/size/8/ajax/true";
     public static String XML_PREFIX_DESCRIPTOR_URL = "http://www.beinsports.fr/fragment/beINSport/xml/vodConfig/videoId/";
     public static String BEINSPORTS_HOST_URL = "http://www.beinsports.fr/";
@@ -41,6 +47,8 @@ public class BeInSportUpdater extends AbstractUpdater {
     /* Patter to extract value from URL */
     public static Pattern IDBEINSPORT_PATTERN = Pattern.compile(".*/category/([^/]*)/.*");
     public static Pattern SUBSTRING_VIDEO_URL_PATTERN = Pattern.compile(".*/([0-9]*/.*)$");
+
+
 
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
@@ -118,7 +126,7 @@ public class BeInSportUpdater extends AbstractUpdater {
         org.jdom2.Element xml_clip = xmlEpisode.getRootElement().getChild("clip");
 
         try {
-            item.setPubdate(DateUtils.fromBeInSport(xml_clip.getAttributeValue("videoCreationDate")));
+            item.setPubdate(fromBeInSport(xml_clip.getAttributeValue("videoCreationDate")));
             item.setCover(ImageUtils.getCoverFromURL(new URL(BEINSPORTS_HOST_URL.concat(xml_clip.getAttributeValue("videoImageSrc")))));
 
             String externalUrl = null;
@@ -181,4 +189,8 @@ public class BeInSportUpdater extends AbstractUpdater {
         }
     }
 
+    public ZonedDateTime fromBeInSport(String beInSportDate) {
+        LocalDateTime localDateTime = LocalDateTime.parse(beInSportDate, DateTimeFormatter.ofPattern(BEINSPORT_PATTERN, Locale.ENGLISH)); // Format : Feb 17 2014, 10:26
+        return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
+    }
 }

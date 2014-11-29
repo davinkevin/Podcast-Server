@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
@@ -19,6 +18,7 @@ import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +31,10 @@ public class YoutubeUpdater extends AbstractUpdater {
     //private static final String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
 
     @Value("${numberofdaytodownload:30}") Integer numberOfDayToDownload;
+
+    public static ZonedDateTime fromYoutube(String pubDate) {
+        return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
+    }
 
     public Podcast updateAndAddItems(Podcast podcast) {
 
@@ -73,7 +77,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                     Item podcastItem = new Item()
                             .setTitle(item.getChildText("title", defaultNamespace))
                             .setDescription(item.getChildText("content", defaultNamespace))
-                            .setPubdate(DateUtils.fromYoutube(item.getChildText("published", defaultNamespace)))
+                            .setPubdate(fromYoutube(item.getChildText("published", defaultNamespace)))
                             .setPodcast(podcast);
 
                     if (podcastItem.getPubdate().isBefore(maxDate) && borne > YOUTUBE_MAX_RESULTS) {

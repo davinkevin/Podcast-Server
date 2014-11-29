@@ -3,7 +3,7 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
-import lan.dk.podcastserver.utils.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;

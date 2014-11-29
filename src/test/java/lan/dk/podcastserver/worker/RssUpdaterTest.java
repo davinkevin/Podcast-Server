@@ -4,12 +4,10 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.config.JPAConfig;
 import lan.dk.podcastserver.context.PropertyConfigTest;
-import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.RSSUpdater;
-import lan.dk.podcastserver.utils.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerUtils;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
 
 import static org.junit.Assert.assertThat;
 

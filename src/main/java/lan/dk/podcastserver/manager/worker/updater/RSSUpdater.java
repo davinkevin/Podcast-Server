@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
@@ -17,6 +16,8 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,7 +76,7 @@ public class RSSUpdater extends AbstractUpdater {
                 if (item.getChild("enclosure") != null || item.getChild("origEnclosureLink", feedburner) != null)   { // est un podcast utilisable
                     Item podcastItem = new Item()
                             .setTitle(item.getChildText("title"))
-                            .setPubdate(DateUtils.fromRFC822(item.getChildText("pubDate")))
+                            .setPubdate(ZonedDateTime.parse(item.getChildText("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME))
                             .setDescription(item.getChildText("description"))
                             .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
                             .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))

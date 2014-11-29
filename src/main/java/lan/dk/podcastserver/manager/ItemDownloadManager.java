@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.utils.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.utils;
+package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -20,7 +20,6 @@ public class WorkerUtils implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        logger.debug("Initialisation du Contexte");
         this.context = applicationContext;
     }
 

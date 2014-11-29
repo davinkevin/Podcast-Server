@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
@@ -18,6 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -30,9 +31,10 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 public class JeuxVideoFRUpdater extends AbstractUpdater {
 
-    public static String JEUXVIDEOFR_HOST_URL = "http://www.jeuxvideo.fr/";
-    public static String XML_PREFIX_DESCRIPTOR_URL = "http://www.jeuxvideo.fr/api/tv/xml.php?player_generique=player_generique&id=";
-    public static Pattern ID_JEUXVIDEOFR_PATTERN = Pattern.compile(".*-([0-9]*)\\..*");
+    public static final String JEUXVIDEOFR_PATTERN = "dd/MM/yyyy";
+    public static final String JEUXVIDEOFR_HOST_URL = "http://www.jeuxvideo.fr/";
+    public static final String XML_PREFIX_DESCRIPTOR_URL = "http://www.jeuxvideo.fr/api/tv/xml.php?player_generique=player_generique&id=";
+    public static final Pattern ID_JEUXVIDEOFR_PATTERN = Pattern.compile(".*-([0-9]*)\\..*");
 
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
@@ -74,7 +76,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
                         .setTitle(element.select(".video .bleu2").text())
                         .setDescription(element.select(".video .bleu2").text());
                 try {
-                    item.setPubdate(DateUtils.fromJeuxVideoFr(element.select("td:nth-of-type(3)").text()));
+                    item.setPubdate(fromJeuxVideoFr(element.select("td:nth-of-type(3)").text()));
                 } catch (Exception e) {
                     logger.error("Non Parseable date : {}", element.select("p:contains(Vidéo)").text());
                 }
@@ -149,5 +151,9 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
             }
         }
         return false;
+    }
+
+    public ZonedDateTime fromJeuxVideoFr(String pubDate) {
+        return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(JEUXVIDEOFR_PATTERN)), LocalTime.of(0, 0)), ZoneId.of("Europe/Paris"));
     }
 }

@@ -1,11 +1,13 @@
 package lan.dk.podcastserver.Utils;
 
-import lan.dk.podcastserver.utils.DateUtils;
+import lan.dk.podcastserver.business.PodcastBusiness;
+import lan.dk.podcastserver.manager.worker.updater.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -18,7 +20,7 @@ public class DateUtilsTest {
 
     @Test
     public void should_get_the_right_localdatetime_from_upload_format () {
-        ZonedDateTime zonedDateTime = DateUtils.fromFolder("2014-12-21");
+        ZonedDateTime zonedDateTime = PodcastBusiness.fromFolder("2014-12-21");
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -30,7 +32,7 @@ public class DateUtilsTest {
     
     @Test
     public void should_parse_a_RFC822_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromRFC822("Sun, 21 Dec 2014 11:05:30 GMT");
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse("Sun, 21 Dec 2014 11:05:30 GMT", DateTimeFormatter.RFC_1123_DATE_TIME);
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -43,7 +45,7 @@ public class DateUtilsTest {
 
     @Test
     public void should_parse_a_canalplus_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromCanalPlus("21/12/2014", "11:05:30");
+        ZonedDateTime zonedDateTime = CanalPlusUpdater.fromCanalPlus("21/12/2014", "11:05:30");
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -55,7 +57,7 @@ public class DateUtilsTest {
 
     @Test
     public void should_parse_youtube_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromYoutube("2014-12-21T11:05:30.000Z");
+        ZonedDateTime zonedDateTime = YoutubeUpdater.fromYoutube("2014-12-21T11:05:30.000Z");
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -68,13 +70,13 @@ public class DateUtilsTest {
     @Test
     public void should_output_RFC2822_date () {
         String date = "Sun, 21 Dec 2014 11:05:30 GMT";
-        ZonedDateTime zonedDateTime = DateUtils.fromRFC822(date);
-        assertThat(date).isEqualTo(DateUtils.toRFC2822(zonedDateTime));
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME);
+        assertThat(date).isEqualTo(zonedDateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME));
     }
 
     @Test
     public void should_parse_beinsport_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromBeInSport("Dec 21 2014, 11:05");
+        ZonedDateTime zonedDateTime = BeInSportUpdater.fromBeInSport("Dec 21 2014, 11:05");
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -85,7 +87,7 @@ public class DateUtilsTest {
 
     @Test
     public void should_parse_jeuxvideofr_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromJeuxVideoFr("21/12/2014");
+        ZonedDateTime zonedDateTime = JeuxVideoFRUpdater.fromJeuxVideoFr("21/12/2014");
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -94,7 +96,7 @@ public class DateUtilsTest {
 
     @Test
     public void should_parse_parleys_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromParleys("Sun Dec 21 11:05:30 UTC 2014");
+        ZonedDateTime zonedDateTime = ParleysUpdater.fromParleys("Sun Dec 21 11:05:30 UTC 2014");
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);
@@ -106,7 +108,7 @@ public class DateUtilsTest {
 
     @Test
     public void should_parse_pluzz_date () {
-        ZonedDateTime zonedDateTime = DateUtils.fromPluzz(1419156330L);
+        ZonedDateTime zonedDateTime = PluzzUpdater.fromPluzz(1419156330L);
 
         assertThat(zonedDateTime.getYear()).isEqualTo(2014);
         assertThat(zonedDateTime.getMonthValue()).isEqualTo(12);

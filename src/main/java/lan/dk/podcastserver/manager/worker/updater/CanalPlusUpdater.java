@@ -16,6 +16,10 @@ import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -24,6 +28,8 @@ import java.util.regex.Pattern;
 @Component("CanalPlusUpdater")
 @Scope("prototype")
 public class CanalPlusUpdater extends AbstractUpdater {
+
+    public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
 
     public Podcast updateAndAddItems(Podcast podcast) {
 
@@ -236,7 +242,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         try {
             currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"))
-                    .setPubdate(DateUtils.fromCanalPlus(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
+                    .setPubdate(fromCanalPlus(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
                     .setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
                     .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
@@ -277,5 +283,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
         return itemSet;
     }
 
-
+    public ZonedDateTime fromCanalPlus(String date, String heure) {
+        LocalDateTime localDateTime = LocalDateTime.parse(date.concat("-").concat(heure), DateTimeFormatter.ofPattern(CANALPLUS_PATTERN));
+        return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
+    }
 }

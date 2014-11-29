@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 
 
 public class jDomUtils {
@@ -69,7 +70,7 @@ public class jDomUtils {
         url.addContent(new Text("http://localhost:8080/api/podcast/" + podcast.getId() + "/rss"));
 
         Element lastUpdate = new Element("pubDate");
-        lastUpdate.addContent(new Text(DateUtils.toRFC2822(podcast.getLastUpdate())));
+        lastUpdate.addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
 
         Element description = new Element("description");
         description.addContent(new Text(podcast.getDescription()));
@@ -147,7 +148,7 @@ public class jDomUtils {
             xmlItem.addContent(item_enclosure);
 
             Element item_pubdate = new Element("pubDate");
-            item_pubdate.addContent(new Text(DateUtils.toRFC2822(item.getPubdate())));
+            item_pubdate.addContent(new Text(item.getPubdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
             xmlItem.addContent(item_pubdate);
 
             Element itunesExplicite = new Element("explicit", itunesNS);

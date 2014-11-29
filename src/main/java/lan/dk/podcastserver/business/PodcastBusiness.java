@@ -6,7 +6,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,15 +17,16 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
 @Component
 @Transactional
 public class PodcastBusiness {
+
+    public static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
     @Resource private PodcastRepository podcastRepository;
     @Resource private ItemRepository itemRepository;
@@ -131,7 +131,7 @@ public class PodcastBusiness {
         file.transferTo(fileToSave);
 
         item.setTitle(FilenameUtils.removeExtension(name.split(" - ")[2]))
-            .setPubdate(DateUtils.fromFolder(name.split(" - ")[1]))
+            .setPubdate(fromFolder(name.split(" - ")[1]))
             .setUrl(fileContainer + "/" + podcast.getTitle() + "/" + name)
             .setLength(file.getSize())
             .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
@@ -168,5 +168,9 @@ public class PodcastBusiness {
             .setUrl(coverToSave.getUrl());
 
         return save(podcast);
+    }
+
+    public ZonedDateTime fromFolder(String pubDate) {
+        return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
     }
 }

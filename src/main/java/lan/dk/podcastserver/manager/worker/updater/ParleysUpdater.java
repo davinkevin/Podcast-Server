@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DateUtils;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.URLUtils;
@@ -18,7 +17,10 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +32,7 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 public class ParleysUpdater extends AbstractUpdater {
 
+    public static final String PARLEYS_PATTERN = "EEE MMM dd HH:mm:ss z yyyy";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/%s?index=0&size=%s&text=&orderBy=date";
@@ -119,7 +122,7 @@ public class ParleysUpdater extends AbstractUpdater {
             return new Item()
                             .setTitle((String) responseObject.get("title"))
                             .setDescription((String) responseObject.get("description"))
-                            .setPubdate(DateUtils.fromParleys((String) responseObject.get("publishedOn")))
+                            .setPubdate(fromParleys((String) responseObject.get("publishedOn")))
                             .setCover(ImageUtils.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
                             .setUrl(String.format(PARLEYS_ITEM_URL, id));
 
@@ -155,5 +158,9 @@ public class ParleysUpdater extends AbstractUpdater {
     private Integer getNumberOfItem(String url) throws IOException, ParseException {
         JSONObject responseObject = getParseJsonObject(url, 1);
         return (responseObject.get("count") != null) ? ((Long) responseObject.get("count")).intValue() : 100 ;
+    }
+
+    public ZonedDateTime fromParleys(String pubDate) {
+        return ZonedDateTime.parse(pubDate, DateTimeFormatter.ofPattern(PARLEYS_PATTERN, Locale.ENGLISH)); // Format : Thu Jun 26 06:34:41 UTC 2014
     }
 }
