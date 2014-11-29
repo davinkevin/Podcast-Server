@@ -26,7 +26,7 @@ public class HTTPDownloader extends AbstractDownloader {
         //this.startDownload();
         //int borne = randomGenerator.nextInt(100);
         try {
-            URL url = new URL(item.getUrl());
+            URL url = new URL(getItemUrl());
             // initialize url information object
             info = new DownloadInfo(url);
             // extract infromation from the web
@@ -39,18 +39,18 @@ public class HTTPDownloader extends AbstractDownloader {
                     switch (info.getState()) {
                         case EXTRACTING:
                         case EXTRACTING_DONE:
-                            logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
+                            logger.debug(FilenameUtils.getName(String.valueOf(getItemUrl())) + " " + info.getState());
                             break;
                         case ERROR:
                             stopDownload();
                             break;
                         case DONE:
-                            logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - Téléchargement terminé");
+                            logger.debug(FilenameUtils.getName(String.valueOf(getItemUrl())) + " - Téléchargement terminé");
                             finishDownload();
                             itemDownloadManager.removeACurrentDownload(item);
                             break;
                         case RETRYING:
-                            logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState() + " " + info.getDelay());
+                            logger.debug(FilenameUtils.getName(String.valueOf(getItemUrl())) + " " + info.getState() + " " + info.getDelay());
                             break;
                         case DOWNLOADING:
                             long now = System.currentTimeMillis();

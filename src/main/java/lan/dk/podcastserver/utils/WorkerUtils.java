@@ -42,6 +42,8 @@ public class WorkerUtils implements ApplicationContextAware {
             nameDownloader = "RTMP";
         } else if (itemUrl.contains("www.youtube.com")) {
             nameDownloader = "Youtube";
+        } else if (itemUrl.contains("www.jeuxvideo.fr")) {
+            nameDownloader = "JeuxVideoFr";
         } else if (itemUrl.contains("m3u8")) {
             nameDownloader = "M3U8";
         } else if (itemUrl.contains("parleys")) {
@@ -50,7 +52,7 @@ public class WorkerUtils implements ApplicationContextAware {
             nameDownloader = "HTTP";
         }
 
-        Downloader downloader = null;
+        Downloader downloader;
         try {
             downloader = (Downloader) context.getBean(nameDownloader + "Downloader");
         } catch (BeansException e) {

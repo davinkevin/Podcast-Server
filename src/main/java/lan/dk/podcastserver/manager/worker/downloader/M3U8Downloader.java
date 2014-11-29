@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +25,10 @@ public class M3U8Downloader extends AbstractDownloader {
         logger.debug("Download");
         itemDownloadManager.addACurrentDownload();
 
-        if (item.getUrl().contains("m3u8")) {
+        if (getItemUrl().contains("m3u8")) {
             URL urlListFile = null;
             try {
-                urlListFile = new URL(item.getUrl());
+                urlListFile = new URL(getItemUrl());
                 urlList = new ArrayList<>();
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlListFile.openStream()));
@@ -100,13 +99,11 @@ public class M3U8Downloader extends AbstractDownloader {
                 };
 
                 runnableDownloader.run();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            logger.debug("Traiter avec le downloader adapté à {}", item.getUrl());
+            logger.debug("Traiter avec le downloader adapté à {}", getItemUrl());
             stopDownload();
         }
         return this.item;

@@ -8,6 +8,7 @@ public interface Downloader {
 
     public void setItem(Item item);
     public Item getItem();
+    public String getItemUrl();
 
     public void startDownload();
     public void pauseDownload();

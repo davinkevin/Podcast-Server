@@ -7,7 +7,6 @@ import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -80,8 +79,10 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
                     logger.error("Non Parseable date : {}", element.select("p:contains(Vidéo)").text());
                 }
 
-                Matcher m = ID_JEUXVIDEOFR_PATTERN.matcher(element.select("a").attr("href"));
+                String itemUrl = element.select("a").attr("href");
+                Matcher m = ID_JEUXVIDEOFR_PATTERN.matcher(itemUrl);
                 if (m.find() && !m.group(1).equals("0") ) {
+                    item.setUrl(itemUrl);
                     itemSet.add(
                             getDetailFromXML(item, Integer.valueOf(m.group(1)))
                     );
@@ -103,27 +104,15 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         org.jdom2.Document xmlEpisode = null;
         try {
             xmlEpisode = jDomUtils.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(String.valueOf(idJeuxVideoFr)));
-        } catch (JDOMException e) {
+        } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("JDOMException :", e);
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
+            return item;
         }
 
         org.jdom2.Element xml_item = xmlEpisode.getRootElement().getChild("channel").getChild("item");
 
         try {
             item.setCover(ImageUtils.getCoverFromURL(new URL(xml_item.getChildText("visuel_clip"))));
-
-            if (StringUtils.isNotEmpty(xml_item.getChildText("url_video_hq"))) {
-                item.setUrl(xml_item.getChildText("url_video_hq"));
-            } else if (StringUtils.isNotEmpty(xml_item.getChildText("url_video_sd"))) {
-                item.setUrl(xml_item.getChildText("url_video_sd"));
-            } else if (StringUtils.isNotEmpty(xml_item.getChildText("url_video_3g"))) {
-                item.setUrl(xml_item.getChildText("url_video_3g"));
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -151,8 +151,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
             try {
                 finalFile  = File.createTempFile(
-                        FilenameUtils.getBaseName(item.getUrl()).concat("-"),
-                        ".".concat(FilenameUtils.getExtension(item.getUrl())),
+                        FilenameUtils.getBaseName(getItemUrl()).concat("-"),
+                        ".".concat(FilenameUtils.getExtension(getItemUrl())),
                         finalFile.getParentFile());
                 finalFile.delete();
             } catch (IOException e) {
@@ -164,7 +164,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     private File getTempFile(Item item) {
-        String fileName = FilenameUtils.getName(String.valueOf(item.getUrl()));
+        String fileName = FilenameUtils.getName(String.valueOf(getItemUrl()));
 
         if ( fileName.lastIndexOf("?") != -1 )
             fileName = fileName.substring(0, fileName.lastIndexOf("?"));
@@ -191,5 +191,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected void convertAndSaveBroadcast() {
         this.template.convertAndSend(WS_TOPIC_DOWNLOAD, this.item );
         this.template.convertAndSend(WS_TOPIC_PODCAST.concat(String.valueOf(item.getPodcast().getId())), this.item );
+    }
+
+    public String getItemUrl() {
+        return item.getUrl();
     }
 }
