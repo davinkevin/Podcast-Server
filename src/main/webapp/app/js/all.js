@@ -127,6 +127,10 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -134,8 +138,15 @@ angular.module('ps.filters', [])
         };
     }
 );
-angular.module('ps.search', [
-    'ps.search.item'
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
 ]);
 
 /**
@@ -167,16 +178,6 @@ _.mixin({
         return localArray;
     }
 });
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
-]);
 angular.module('ps.download', [
     'ps.websocket',
     'ps.dataService.donwloadManager',
@@ -274,7 +275,6 @@ angular.module('ps.download', [
         });
 
     });
-
 angular.module('ps.item.details', [
     'restangular',
     'ps.websocket',
@@ -368,11 +368,6 @@ angular.module('ps.podcast.creation', [
                 $location.path('/podcast/' + podcast.id);
             });
         };
-    });
-angular.module('ps.podcast.list', [
-])
-    .controller('PodcastsListCtrl', function ($scope, podcasts) {
-        $scope.podcasts = podcasts;
     });
 (function(module) {
 try {
@@ -1028,6 +1023,11 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.podcast.list', [
+])
+    .controller('PodcastsListCtrl', function ($scope, podcasts) {
+        $scope.podcasts = podcasts;
+    });
 angular.module('ps.dataService.donwloadManager', [
     'restangular'
 ])
