@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -74,10 +73,6 @@ public class ItemBusiness {
         return isInId(itemRepository.fullTextSearch(term)).and( isInTags(tags) );
     }
 
-    public List<Item> save(Iterable<Item> entities) {
-        return itemRepository.save(entities);
-    }
-
     public Item save(Item entity) {
         return itemRepository.save(entity);
     }
@@ -95,41 +90,34 @@ public class ItemBusiness {
 
         itemToDelete.getPodcast().getItems().remove(itemToDelete);
 
-        this.delete(itemToDelete);
+        delete(itemToDelete);
     }
 
     public void delete(Item entity) {
         itemRepository.delete(entity);
     }
 
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
-    public Iterable<Item> findAllItemNotDownloadedNewerThan(ZonedDateTime date) {
-        return itemRepository.findAll(isDownloaded(Boolean.FALSE).and(isNewerThan(date)));
-    }
+    //****************************//
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public Iterable<Item> findAllItemDownloadedOlderThan(ZonedDateTime date) {
-        return itemRepository.findAll(isDownloaded(Boolean.TRUE).and(isOlderThan(date)));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
-    public Iterable<Item> findByStatus(String status) {
+    public Iterable<Item> findByStatus(String... status) {
         return itemRepository.findAll(hasStatus(status));
     }
 
-    //****************************//
-
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public Iterable<Item> findAllToDownload() {
-        return findAllItemNotDownloadedNewerThan(ZonedDateTime.now().minusDays(numberOfDayToDownload));
+        return itemRepository.findAll(isDownloaded(Boolean.FALSE)
+                .and(isNewerThan(ZonedDateTime.now().minusDays(numberOfDayToDownload))));
     }
 
     @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
     public Iterable<Item> findAllToDelete() {
-        return findAllItemDownloadedOlderThan(ZonedDateTime.now().minusDays(numberOfDayToDownload));
+        return itemRepository.findAll(isDownloaded(Boolean.TRUE)
+                .and(isOlderThan(ZonedDateTime.now().minusDays(numberOfDayToDownload)))
+                .and(hasToBeDeleted(Boolean.TRUE)));
     }
 
     @SuppressWarnings("unchecked")
@@ -141,13 +129,12 @@ public class ItemBusiness {
 
 
     public String getEpisodeFile(int id) {
-        Item item = this.findOne(id);
+        Item item = findOne(id);
         try {
             if (item.getLocalUrl() != null) {
                 logger.info("Interne - Item " + id + " : " + item.getLocalUrl());
                 URL redirectionURL = new URL(item.getLocalUrl());
-                URI redirectionURI = new URI(redirectionURL.getProtocol(), null, redirectionURL.getHost(), redirectionURL.getPort(), redirectionURL.getPath(), null, null);
-                return redirectionURI.toASCIIString();
+                return new URI(redirectionURL.getProtocol(), null, redirectionURL.getHost(), redirectionURL.getPort(), redirectionURL.getPath(), null, null).toASCIIString();
             }
             else {
                 logger.info("Externe - Item " + id + " : " + item.getUrl());
@@ -173,7 +160,7 @@ public class ItemBusiness {
         return save(itemToReset.reset());
     }
 
-    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws PodcastNotFoundException, IOException, ParseException {
+    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws PodcastNotFoundException, IOException {
         Podcast podcast = podcastBusiness.findOne(podcastId);
         if (podcast == null) {
             throw new PodcastNotFoundException();
@@ -188,6 +175,7 @@ public class ItemBusiness {
         if (fileToSave.exists()) {
             fileToSave.delete();
         }
+        //noinspection ResultOfMethodCallIgnored
         fileToSave.mkdirs();
 
         uploadedFile.transferTo(fileToSave);

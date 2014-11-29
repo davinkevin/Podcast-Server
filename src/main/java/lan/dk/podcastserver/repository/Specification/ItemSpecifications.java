@@ -65,8 +65,22 @@ public class ItemSpecifications {
         return tagsPredicate;
     }
 
-    public static BooleanExpression hasStatus(String status) {
-        return QItem.item.status.eq(status);
+    public static BooleanExpression hasStatus(final String... statuses) {
+        if (statuses.length == 0)
+            return null;
+
+        QItem item = QItem.item;
+
+        BooleanExpression statusPredicate = null;
+
+        for (String status : statuses) {
+            statusPredicate =
+                    (statusPredicate == null)
+                        ? item.status.eq(status)
+                        : statusPredicate.and(item.status.eq(status));
+        }
+
+        return statusPredicate;
     }
 
     public static BooleanExpression isInPodcast(Integer podcastId) {

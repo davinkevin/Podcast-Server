@@ -141,14 +141,12 @@ public class UpdatePodcastBusiness  {
         File fileToDelete;
         for (Item item : itemBusiness.findAllToDelete()) {
             fileToDelete = new File(rootFolder + item.getFileURI());
-            logger.info("Suppression du fichier associé à l'item " + fileToDelete.getAbsolutePath());
+            logger.info("Suppression du fichier associé à l'item {}", fileToDelete.getAbsolutePath());
             if (fileToDelete.exists() && fileToDelete.delete()) {
                 logger.debug("Suppression effectuée");
-                item.setStatus("Deleted")
-                        .setLocalUri(null)
-                        .setLocalUrl(null);
-                itemBusiness.save(item);
             }
+            item.setStatus("Deleted").setLocalUri(null).setLocalUrl(null);
+            itemBusiness.save(item);
         }
     }
 
@@ -176,15 +174,9 @@ public class UpdatePodcastBusiness  {
 
     @PostConstruct
     public void resetItemWithIncorrectState() {
+        logger.debug("Reset des Started et Paused");
 
-        logger.debug("Reset des Started");
-
-        for (Item item : itemBusiness.findByStatus("Started")) {
-            itemBusiness.save(item.setStatus("Not Downloaded"));
-        }
-
-        logger.debug("Reset des Paused");
-        for (Item item : itemBusiness.findByStatus("Paused")) {
+        for (Item item : itemBusiness.findByStatus("Started", "Paused")) {
             itemBusiness.save(item.setStatus("Not Downloaded"));
         }
     }
