@@ -127,10 +127,6 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -138,15 +134,8 @@ angular.module('ps.filters', [])
         };
     }
 );
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
+angular.module('ps.search', [
+    'ps.search.item'
 ]);
 
 /**
@@ -178,6 +167,17 @@ _.mixin({
         return localArray;
     }
 });
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
+
 angular.module('ps.download', [
     'ps.websocket',
     'ps.dataService.donwloadManager',
@@ -369,6 +369,46 @@ angular.module('ps.podcast.creation', [
             });
         };
     });
+angular.module('ps.podcast.list', [
+])
+    .controller('PodcastsListCtrl', function ($scope, podcasts) {
+        $scope.podcasts = podcasts;
+    });
+angular.module('ps.dataService.donwloadManager', [
+    'restangular'
+])
+    .factory('DonwloadManager', function(Restangular) {
+    'use strict';
+    return {
+        download: function (item) {
+            return Restangular.one("item").customGET(item.id + "/addtoqueue");
+        },
+        stopDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+        },
+        toggleDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+        },
+        stopAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
+        },
+        pauseAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
+        },
+        restartAllCurrentDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
+        },
+        removeFromQueue: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
+        },
+        updateNumberOfSimDl: function (number) {
+            return Restangular.one("task").customPOST(number, "downloadManager/limit");
+        },
+        dontDonwload: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+        }
+    };
+});
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -575,8 +615,8 @@ module.run(['$templateCache', function($templateCache) {
     '                    <div class="">\n' +
     '                        <img ng-class="{\'img-grayscale\' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />\n' +
     '                        <div class="overlay-button">\n' +
-    '                            <div class="btn-group" dropdown is-open="isopen">\n' +
-    '                                <button type="button" class="btn dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
+    '                            <div class="btn-group" dropdown>\n' +
+    '                                <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
     '                                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
     '                                    <li ng-show="item.status == \'Started\' || item.status == \'Paused\'">\n' +
     '                                        <a ng-show="item.status == \'Started\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Mettre en pause</a>\n' +
@@ -950,7 +990,7 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '\n' +
     '            <div class="btn-group" dropdown is-open="isopen">\n' +
-    '                <button type="button" class="btn btn-default dropdown-toggle"><i class="ionicons ion-android-more"></i></button>\n' +
+    '                <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
     '                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
     '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
     '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
@@ -1023,46 +1063,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-angular.module('ps.podcast.list', [
-])
-    .controller('PodcastsListCtrl', function ($scope, podcasts) {
-        $scope.podcasts = podcasts;
-    });
-angular.module('ps.dataService.donwloadManager', [
-    'restangular'
-])
-    .factory('DonwloadManager', function(Restangular) {
-    'use strict';
-    return {
-        download: function (item) {
-            return Restangular.one("item").customGET(item.id + "/addtoqueue");
-        },
-        stopDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
-        },
-        toggleDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
-        },
-        stopAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
-        },
-        pauseAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
-        },
-        restartAllCurrentDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
-        },
-        removeFromQueue: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
-        },
-        updateNumberOfSimDl: function (number) {
-            return Restangular.one("task").customPOST(number, "downloadManager/limit");
-        },
-        dontDonwload: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
-        }
-    };
-});
 /**
  * Created by kevin on 01/11/14.
  */
