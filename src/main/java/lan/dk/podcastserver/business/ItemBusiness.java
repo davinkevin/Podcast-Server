@@ -32,7 +32,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static lan.dk.podcastserver.repository.Specification.ItemSpecifications.*;
+import static lan.dk.podcastserver.repository.specification.ItemSpecifications.*;
 
 @Component
 @Transactional

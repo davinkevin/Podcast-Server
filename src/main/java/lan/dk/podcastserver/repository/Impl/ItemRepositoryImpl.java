@@ -1,7 +1,7 @@
-package lan.dk.podcastserver.repository.Impl;
+package lan.dk.podcastserver.repository.impl;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.repository.Custom.ItemRepositoryCustom;
+import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import lan.dk.podcastserver.utils.hibernate.transformer.HibernateIdExtractor;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;

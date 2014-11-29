@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.repository.Custom;
+package lan.dk.podcastserver.repository.custom;
 
 import java.util.List;
 

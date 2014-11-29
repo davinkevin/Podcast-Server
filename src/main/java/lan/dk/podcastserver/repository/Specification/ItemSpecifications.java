@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.repository.Specification;
+package lan.dk.podcastserver.repository.specification;
 
 import com.mysema.query.types.expr.BooleanExpression;
 import lan.dk.podcastserver.entity.QItem;
