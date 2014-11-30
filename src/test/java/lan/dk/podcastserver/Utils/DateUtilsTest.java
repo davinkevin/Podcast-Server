@@ -1,15 +1,7 @@
 package lan.dk.podcastserver.Utils;
 
-import lan.dk.podcastserver.business.PodcastBusiness;
-import lan.dk.podcastserver.manager.worker.updater.*;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 27/09/2014.
@@ -17,7 +9,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class DateUtilsTest {
 
     private final Logger logger = LoggerFactory.getLogger(DateUtilsTest.class);
-
+/*
     @Test
     public void should_get_the_right_localdatetime_from_upload_format () {
         ZonedDateTime zonedDateTime = PodcastBusiness.fromFolder("2014-12-21");
@@ -116,5 +108,5 @@ public class DateUtilsTest {
         assertThat(zonedDateTime.getHour()).isEqualTo(11);
         assertThat(zonedDateTime.getMinute()).isEqualTo(5);
         assertThat(zonedDateTime.getSecond()).isEqualTo(30);
-    }
+    }*/
 }

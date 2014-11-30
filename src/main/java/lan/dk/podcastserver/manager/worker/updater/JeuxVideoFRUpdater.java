@@ -1,11 +1,13 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -35,6 +37,8 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     public static final String JEUXVIDEOFR_HOST_URL = "http://www.jeuxvideo.fr/";
     public static final String XML_PREFIX_DESCRIPTOR_URL = "http://www.jeuxvideo.fr/api/tv/xml.php?player_generique=player_generique&id=";
     public static final Pattern ID_JEUXVIDEOFR_PATTERN = Pattern.compile(".*-([0-9]*)\\..*");
+    public static final String IMG_LOCALISATION_THUMB = "http://img.jeuxvideo.fr/03E80232%s";
+    public static final String IMG_DELIMITER = "006E0046";
 
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
@@ -73,21 +77,16 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
             for (Element element : page.select(".block-video-tableVideo tbody tr")) {
                 Item item = new Item()
-                        .setTitle(element.select(".video .bleu2").text())
-                        .setDescription(element.select(".video .bleu2").text());
-                try {
-                    item.setPubdate(fromJeuxVideoFr(element.select("td:nth-of-type(3)").text()));
-                } catch (Exception e) {
-                    logger.error("Non Parseable date : {}", element.select("p:contains(Vidéo)").text());
-                }
+                        .setTitle(element.select(".video a").attr("title"))
+                        .setDescription(element.select(".video .bleu2").text())
+                        .setCover(getCover(element.select(".tip img").attr("src")))
+                        .setPubdate(fromJeuxVideoFr(element.select("td:nth-of-type(3)").text()));
 
                 String itemUrl = element.select("a").attr("href");
                 Matcher m = ID_JEUXVIDEOFR_PATTERN.matcher(itemUrl);
                 if (m.find() && !m.group(1).equals("0") ) {
                     item.setUrl(itemUrl);
-                    itemSet.add(
-                            getDetailFromXML(item, Integer.valueOf(m.group(1)))
-                    );
+                    itemSet.add(item);
                 }
             }
 
@@ -155,5 +154,16 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
     public ZonedDateTime fromJeuxVideoFr(String pubDate) {
         return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(JEUXVIDEOFR_PATTERN)), LocalTime.of(0, 0)), ZoneId.of("Europe/Paris"));
+    }
+
+    private Cover getCover(String tinyUrl) throws IOException {
+        if (StringUtils.isEmpty(tinyUrl) || !tinyUrl.contains(IMG_DELIMITER)) {
+            return null;
+        }
+
+        String coverUrl = String.format(IMG_LOCALISATION_THUMB, tinyUrl.substring(tinyUrl.lastIndexOf(IMG_DELIMITER)+IMG_DELIMITER.length()));
+
+        return ImageUtils.getCoverFromURL(new URL(coverUrl));
+
     }
 }
