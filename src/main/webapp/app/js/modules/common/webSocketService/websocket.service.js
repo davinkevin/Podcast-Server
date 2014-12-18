@@ -10,7 +10,7 @@ angular.module('ps.websocket', [
         promiseResult = deferred.promise;
 
 
-    this.connect = function(){
+    self.connect = function(){
         wsClient.connect("user", "password", function () {
            self.isConnected = true;
            $log.info("Connection to the WebSockets");
@@ -19,20 +19,20 @@ angular.module('ps.websocket', [
         return promiseResult;
     };
 
-    this.subscribe = function(url, callback) {
+    self.subscribe = function(url, callback) {
         promiseResult.then(function() {
             wsClient.subscribe(url, callback);
         });
         return self;
     };
 
-    this.unsubscribe = function(queue, callback) {
+    self.unsubscribe = function(queue, callback) {
         promiseResult.then(function() {
             wsClient.unsubscribe(queue, callback);
         });
         return self;
     };
 
-    this.connect();
-    return this;
+    self.connect();
+    return self;
 });

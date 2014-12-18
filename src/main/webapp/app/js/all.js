@@ -6,6 +6,7 @@ angular.module('podcastApp', [
     'ps.partial',
     'ps.filters',
     'ps.dataservice',
+    'authorize-notification',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',
@@ -127,6 +128,39 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
+angular.module('authorize-notification', [
+    'notification'
+]).directive('authorizeNotification', function() {
+    return {
+        replace : true,
+        restrcit : 'E',
+        templateUrl : 'html/authorize-notification.html',
+        scope : true,
+        controllerAs : 'an',
+        controller : 'authorizeNotificationController'
+    };
+}).controller('authorizeNotificationController', function($window, Notification, $rootScope){
+    var vm = this;
+
+    //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
+    // Issue fixed in the M37 of Chrome :
+    vm.state = hasToBeShown();
+    vm.manuallyactivate = function() {
+        Notification.requestPermission(function() {
+            vm.state = hasToBeShown();
+            $rootScope.$digest();
+        });
+    };
+
+    function hasToBeShown() {
+        return (('Notification' in $window) && $window.Notification.permission != 'granted');
+    }
+});
+
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -134,10 +168,16 @@ angular.module('ps.filters', [])
         };
     }
 );
-angular.module('ps.search', [
-    'ps.search.item'
-]);
+/**
+ * Created by kevin on 02/11/14.
+ */
 
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -167,43 +207,17 @@ _.mixin({
         return localArray;
     }
 });
-/**
- * Created by kevin on 02/11/14.
- */
 
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
-]);
 angular.module('ps.download', [
     'ps.websocket',
     'ps.dataService.donwloadManager',
-    'restangular',
     'notification'
 ])
-    .controller('DownloadCtrl', function ($scope, Restangular, podcastWebSocket, DonwloadManager, Notification, $window) {
-        $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
+    .controller('DownloadCtrl', function ($scope, podcastWebSocket, DonwloadManager, Notification) {
+        $scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
 
-
-        //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
-        // Issue fixed in the M37 of Chrome :
-        $scope.activeNotification = {
-            state : (('Notification' in $window) && $window.Notification.permission != 'granted'),
-            manuallyactivate : Notification.requestPermission
-        };
-
-
-        $scope.refreshWaitingItems = function () {
-            var scopeWaitingItems = $scope.waitingitems || Restangular.all("task/downloadManager/queue");
-            scopeWaitingItems.getList().then(function (waitingitems) {
-                $scope.waitingitems = waitingitems;
-            });
-        };
-
-        Restangular.one("task/downloadManager/limit").get().then(function (data) {
+        DonwloadManager.getNumberOfSimDl().then(function (data) {
             $scope.numberOfSimDl = parseInt(data);
         });
 
@@ -274,7 +288,6 @@ angular.module('ps.download', [
         });
 
     });
-
 angular.module('ps.item.details', [
     'restangular',
     'ps.websocket',
@@ -383,6 +396,21 @@ try {
   module = angular.module('ps.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/authorize-notification.html',
+    '<div ng-show="an.state" class="alert alert-info text-center" role="alert">\n' +
+    '    <a ng-click="an.manuallyactivate()" class="btn btn-primary">Activer Notification</a>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('ps.partial');
+} catch (e) {
+  module = angular.module('ps.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/download.html',
     '<!--<div class="jumbotron">-->\n' +
     '    <!--<div class="container">-->\n' +
@@ -399,9 +427,6 @@ module.run(['$templateCache', function($templateCache) {
     '                <input ng-model="numberOfSimDl" ng-change="updateNumberOfSimDl(numberOfSimDl)" type="number" class="form-control" placeholder="Number of download">\n' +
     '            </div>\n' +
     '        </div>\n' +
-    '        <span>\n' +
-    '            <a ng-show="activeNotification.state" ng-click="activeNotification.manuallyactivate()" class="btn btn-primary">Activer Notification</a>\n' +
-    '        </span>\n' +
     '        <div class="btn-group pull-right">\n' +
     '            <button ng-click="restartAllDownload()" type="button" class="btn btn-default">Démarrer</button>\n' +
     '            <button ng-click="pauseAllDownload()" type="button" class="btn btn-default">Pause</button>\n' +
@@ -1064,6 +1089,12 @@ angular.module('ps.dataService.donwloadManager', [
         },
         dontDonwload: function (item) {
             return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+        },
+        getDownloading : function() {
+            return Restangular.one('task').all("downloadManager/downloading").getList();
+        },
+        getNumberOfSimDl : function() {
+            return Restangular.one("task/downloadManager/limit").get();
         }
     };
 });
@@ -1175,7 +1206,7 @@ angular.module('ps.websocket', [
         promiseResult = deferred.promise;
 
 
-    this.connect = function(){
+    self.connect = function(){
         wsClient.connect("user", "password", function () {
            self.isConnected = true;
            $log.info("Connection to the WebSockets");
@@ -1184,22 +1215,22 @@ angular.module('ps.websocket', [
         return promiseResult;
     };
 
-    this.subscribe = function(url, callback) {
+    self.subscribe = function(url, callback) {
         promiseResult.then(function() {
             wsClient.subscribe(url, callback);
         });
         return self;
     };
 
-    this.unsubscribe = function(queue, callback) {
+    self.unsubscribe = function(queue, callback) {
         promiseResult.then(function() {
             wsClient.unsubscribe(queue, callback);
         });
         return self;
     };
 
-    this.connect();
-    return this;
+    self.connect();
+    return self;
 });
 'use strict';
 

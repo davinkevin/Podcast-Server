@@ -30,6 +30,12 @@ angular.module('ps.dataService.donwloadManager', [
         },
         dontDonwload: function (item) {
             return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+        },
+        getDownloading : function() {
+            return Restangular.one('task').all("downloadManager/downloading").getList();
+        },
+        getNumberOfSimDl : function() {
+            return Restangular.one("task/downloadManager/limit").get();
         }
     };
 });
