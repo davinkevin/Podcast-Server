@@ -599,7 +599,7 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '    <div class="text-center row" >\n' +
     '        <pagination ng-show="totalPages > 1" items-per-page="12" max-size="10" boundary-links="true" total-items="totalItems" ng-model="currentPage" ng-change="changePage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>\n' +
-    '        <a ng-click="search = !search; reinitSearch();" ng-class="{\'btn-primary\' : search, \'btn-default\' : !search}" class="btn pull-right search-button"><i class="glyphicon glyphicon-search"></i></a>\n' +
+    '        <a ng-click="search = !search;" ng-class="{\'btn-primary\' : search, \'btn-default\' : !search}" class="btn pull-right search-button"><i class="glyphicon glyphicon-search"></i></a>\n' +
     '    </div>\n' +
     '        <div class="row">\n' +
     '            <div ng-repeat="item in items track by item.id" class="col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList">\n' +
@@ -1464,17 +1464,6 @@ angular.module('ps.search.item', [
         $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
         $scope.searchParameters.direction = cache.get("search:direction") || undefined;
         $scope.searchParameters.properties = cache.get("search:properties") || undefined;
-
-        $scope.reinitSearch = function() {
-            if (!$scope.search) {
-                $scope.currentPage = 1;
-                $scope.searchParameters.term = undefined;
-                $scope.searchParameters.searchTags = undefined;
-                $scope.searchParameters.direction = 'DESC';
-                $scope.searchParameters.properties = 'pubdate';
-                $scope.changePage();
-            }
-        };
 
         $scope.changePage();
 

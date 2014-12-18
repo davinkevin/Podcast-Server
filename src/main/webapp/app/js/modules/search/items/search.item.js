@@ -68,17 +68,6 @@ angular.module('ps.search.item', [
         $scope.searchParameters.direction = cache.get("search:direction") || undefined;
         $scope.searchParameters.properties = cache.get("search:properties") || undefined;
 
-        $scope.reinitSearch = function() {
-            if (!$scope.search) {
-                $scope.currentPage = 1;
-                $scope.searchParameters.term = undefined;
-                $scope.searchParameters.searchTags = undefined;
-                $scope.searchParameters.direction = 'DESC';
-                $scope.searchParameters.properties = 'pubdate';
-                $scope.changePage();
-            }
-        };
-
         $scope.changePage();
 
         //** DownloadManager **//
