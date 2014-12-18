@@ -11,6 +11,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  */
 @Configuration
 @ComponentScan(basePackages = { "lan.dk.podcastserver.utils",
+                                "lan.dk.podcastserver.service",
                                 "lan.dk.podcastserver.business"})
 @EnableAsync
 public class BeanConfigScan {

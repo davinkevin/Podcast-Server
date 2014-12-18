@@ -24,6 +24,8 @@ angular.module('ps.podcast.creation', [
                 $scope.podcast.type = "CanalPlus";
             } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "JeuxVideoFR";
+            } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "JeuxVideoCom";
             } else if (/parleys\.com/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "Parleys";
             } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {

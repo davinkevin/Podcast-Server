@@ -350,6 +350,8 @@ angular.module('ps.podcast.creation', [
                 $scope.podcast.type = "CanalPlus";
             } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "JeuxVideoFR";
+            } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "JeuxVideoCom";
             } else if (/parleys\.com/i.test($scope.podcast.url)) {
                 $scope.podcast.type = "Parleys";
             } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
@@ -697,6 +699,7 @@ module.run(['$templateCache', function($templateCache) {
     '                <select class="form-control" ng-model="podcast.type">\n' +
     '                    <option value="BeInSports">Be In Sports</option>\n' +
     '                    <option value="CanalPlus">Canal+</option>\n' +
+    '                    <option value="JeuxVideoCom">Jeux Video Com</option>\n' +
     '                    <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
     '                    <option value="Parleys">Parleys</option>\n' +
     '                    <option value="Pluzz">Pluzz</option>\n' +
@@ -871,6 +874,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <select class="form-control" ng-model="podcast.type">\n' +
     '                        <option value="BeInSports">Be In Sports</option>\n' +
     '                        <option value="CanalPlus">Canal+</option>\n' +
+    '                        <option value="JeuxVideoCom">Jeux Video Com</option>\n' +
     '                        <option value="JeuxVideoFR">Jeux Video Fr</option>\n' +
     '                        <option value="Parleys">Parleys</option>\n' +
     '                        <option value="Pluzz">Pluzz</option>\n' +
