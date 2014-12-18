@@ -59,22 +59,15 @@ angular.module('ps.download', [
                         }
                         break;
                 }
-        })
+        }, $scope)
             .subscribe("/app/waitingList", function (message) {
                 $scope.waitingitems = JSON.parse(message.body);
-            })
+            }, $scope)
             .subscribe("/topic/waitingList", function (message) {
                 var remoteWaitingItems = JSON.parse(message.body);
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
                 });
-            });
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket
-                .unsubscribe("/topic/download")
-                .unsubscribe("/app/waitingList")
-                .unsubscribe("/topic/waitingList");
-        });
+            }, $scope);
 
     });

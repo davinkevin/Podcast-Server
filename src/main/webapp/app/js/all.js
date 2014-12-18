@@ -269,23 +269,16 @@ angular.module('ps.download', [
                         }
                         break;
                 }
-        })
+        }, $scope)
             .subscribe("/app/waitingList", function (message) {
                 $scope.waitingitems = JSON.parse(message.body);
-            })
+            }, $scope)
             .subscribe("/topic/waitingList", function (message) {
                 var remoteWaitingItems = JSON.parse(message.body);
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
                 });
-            });
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket
-                .unsubscribe("/topic/download")
-                .unsubscribe("/app/waitingList")
-                .unsubscribe("/topic/waitingList");
-        });
+            }, $scope);
 
     });
 angular.module('ps.item.details', [
@@ -324,11 +317,7 @@ angular.module('ps.item.details', [
                 if (itemFromWS.id == $scope.item.id) {
                     _.assign($scope.item, itemFromWS);
                 }
-            });
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket.unsubscribe(webSockedUrl);
-        });
+            }, $scope);
     });
 /**
  * Created by kevin on 01/11/14.
@@ -1215,9 +1204,14 @@ angular.module('ps.websocket', [
         return promiseResult;
     };
 
-    self.subscribe = function(url, callback) {
+    self.subscribe = function(url, callback, scope) {
         promiseResult.then(function() {
             wsClient.subscribe(url, callback);
+            if (scope !== undefined) {
+                scope.$on('$destroy', function () {
+                    self.unsubscribe(url);
+                });
+            }
         });
         return self;
     };
@@ -1297,11 +1291,7 @@ angular.module('ps.podcast.details.episodes', [
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
                 _.assign(elemToUpdate, item);
-            });
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket.unsubscribe(webSocketUrl);
-        });
+            }, $scope);
 
         $scope.loadPage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
@@ -1474,11 +1464,7 @@ angular.module('ps.search.item', [
 
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
-        podcastWebSocket.subscribe(webSocketUrl, updateItemFromWS);
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket.unsubscribe(webSocketUrl);
-        });
+        podcastWebSocket.subscribe(webSocketUrl, updateItemFromWS, $scope);
 
         function updateItemFromWS(message) {
             var item = JSON.parse(message.body);

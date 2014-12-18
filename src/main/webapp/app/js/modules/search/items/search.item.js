@@ -77,11 +77,7 @@ angular.module('ps.search.item', [
 
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
-        podcastWebSocket.subscribe(webSocketUrl, updateItemFromWS);
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket.unsubscribe(webSocketUrl);
-        });
+        podcastWebSocket.subscribe(webSocketUrl, updateItemFromWS, $scope);
 
         function updateItemFromWS(message) {
             var item = JSON.parse(message.body);

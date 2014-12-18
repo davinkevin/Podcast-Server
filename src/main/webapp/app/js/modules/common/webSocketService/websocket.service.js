@@ -19,9 +19,14 @@ angular.module('ps.websocket', [
         return promiseResult;
     };
 
-    self.subscribe = function(url, callback) {
+    self.subscribe = function(url, callback, scope) {
         promiseResult.then(function() {
             wsClient.subscribe(url, callback);
+            if (scope !== undefined) {
+                scope.$on('$destroy', function () {
+                    self.unsubscribe(url);
+                });
+            }
         });
         return self;
     };

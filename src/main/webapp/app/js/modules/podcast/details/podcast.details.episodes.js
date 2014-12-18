@@ -25,11 +25,7 @@ angular.module('ps.podcast.details.episodes', [
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
                 _.assign(elemToUpdate, item);
-            });
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket.unsubscribe(webSocketUrl);
-        });
+            }, $scope);
 
         $scope.loadPage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;

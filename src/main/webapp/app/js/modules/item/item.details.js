@@ -34,9 +34,5 @@ angular.module('ps.item.details', [
                 if (itemFromWS.id == $scope.item.id) {
                     _.assign($scope.item, itemFromWS);
                 }
-            });
-
-        $scope.$on('$destroy', function () {
-            podcastWebSocket.unsubscribe(webSockedUrl);
-        });
+            }, $scope);
     });
