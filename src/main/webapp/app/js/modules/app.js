@@ -6,6 +6,7 @@ angular.module('podcastApp', [
     'ps.partial',
     'ps.filters',
     'ps.dataservice',
+    'authorize-notification',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',

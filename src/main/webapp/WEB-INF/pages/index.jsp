@@ -54,6 +54,8 @@
     </div>
 </nav>
 
+<authorize-notification></authorize-notification>
+
 <div ng-view autoscroll=""></div>
 
 <!-- inject:js -->

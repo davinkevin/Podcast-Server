@@ -13,9 +13,6 @@
                 <input ng-model="numberOfSimDl" ng-change="updateNumberOfSimDl(numberOfSimDl)" type="number" class="form-control" placeholder="Number of download">
             </div>
         </div>
-        <span>
-            <a ng-show="activeNotification.state" ng-click="activeNotification.manuallyactivate()" class="btn btn-primary">Activer Notification</a>
-        </span>
         <div class="btn-group pull-right">
             <button ng-click="restartAllDownload()" type="button" class="btn btn-default">Démarrer</button>
             <button ng-click="pauseAllDownload()" type="button" class="btn btn-default">Pause</button>

@@ -1,30 +1,13 @@
 angular.module('ps.download', [
     'ps.websocket',
     'ps.dataService.donwloadManager',
-    'restangular',
     'notification'
 ])
-    .controller('DownloadCtrl', function ($scope, Restangular, podcastWebSocket, DonwloadManager, Notification, $window) {
-        $scope.items = Restangular.all("task/downloadManager/downloading").getList().$object;
+    .controller('DownloadCtrl', function ($scope, podcastWebSocket, DonwloadManager, Notification) {
+        $scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
 
-
-        //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
-        // Issue fixed in the M37 of Chrome :
-        $scope.activeNotification = {
-            state : (('Notification' in $window) && $window.Notification.permission != 'granted'),
-            manuallyactivate : Notification.requestPermission
-        };
-
-
-        $scope.refreshWaitingItems = function () {
-            var scopeWaitingItems = $scope.waitingitems || Restangular.all("task/downloadManager/queue");
-            scopeWaitingItems.getList().then(function (waitingitems) {
-                $scope.waitingitems = waitingitems;
-            });
-        };
-
-        Restangular.one("task/downloadManager/limit").get().then(function (data) {
+        DonwloadManager.getNumberOfSimDl().then(function (data) {
             $scope.numberOfSimDl = parseInt(data);
         });
 
