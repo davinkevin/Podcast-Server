@@ -2,10 +2,9 @@ package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.ValidatorConfig;
-import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.ParleysUpdater;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -15,7 +14,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 12/07/2014.
@@ -29,22 +29,28 @@ public class ParleysUpdaterTest {
     @Resource
     ParleysUpdater parleysUpdater;
 
-   /* Podcast DEVOXX_FRANCE_2014 = new Podcast("Devoxx France 2014", "http://www.parleys.com/channel/5355419ce4b0524a2f28bca0/",
-            "", "Parleys", new Timestamp(System.currentTimeMillis()), null, new Cover("http://www.devoxx.com/download/attachments/5342010/logo_devoxx_france_big.jpg?version=2&modificationDate=1321095236000", 250, 166), null, true);
+    Podcast DEVOXX_2014;
 
+    @Before
+    public void beforeEach() {
+        DEVOXX_2014 = new Podcast();
+        DEVOXX_2014.setType("Parleys");
+        DEVOXX_2014.setTitle("Devoxx 2014");
+        DEVOXX_2014.setUrl("https://www.parleys.com/channel/5459089ce4b030b13206d2ea/");
+    }
 
     @Test
     public void signatureFeedParleys() {
-        String signature =  parleysUpdater.generateSignature(DEVOXX_FRANCE_2014);
-        String signature2 = parleysUpdater.generateSignature(DEVOXX_FRANCE_2014);
+        String signature =  parleysUpdater.generateSignature(DEVOXX_2014);
+        String signature2 = parleysUpdater.generateSignature(DEVOXX_2014);
 
-        Assert.assertEquals(signature, signature2);
+        assertThat(signature).isEqualTo(signature2);
     }
 
     @Test
     public void updateFeedParleys() {
-        Podcast podcast = parleysUpdater.updateAndAddItems(DEVOXX_FRANCE_2014);
-        Assert.assertEquals(111, podcast.getItems().size());
+        Podcast podcast = parleysUpdater.updateAndAddItems(DEVOXX_2014);
+        logger.info(podcast.toString());
     }
-*/
+
 }

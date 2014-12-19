@@ -77,7 +77,9 @@ public class ParleysUpdater extends AbstractUpdater {
                 JSONObject currentObject = (JSONObject) jsonObject;
 
                 String _id = (String) currentObject.get("_id");
-                itemSet.add(getParleysItem(_id));
+                if (isFree(currentObject)) {
+                    itemSet.add(getParleysItem(_id));
+                }
             }
 
         } catch (IOException | ParseException e) {
@@ -85,6 +87,7 @@ public class ParleysUpdater extends AbstractUpdater {
         }
         return itemSet;
     }
+
 
     @Override
     public Podcast findPodcast(String url) {
@@ -160,7 +163,12 @@ public class ParleysUpdater extends AbstractUpdater {
         return (responseObject.get("count") != null) ? ((Long) responseObject.get("count")).intValue() : 100 ;
     }
 
-    public ZonedDateTime fromParleys(String pubDate) {
+
+    private Boolean isFree(JSONObject currentObject) {
+        return (Boolean) ((JSONObject) currentObject.get("visibility")).get("free");
+    }
+
+    private ZonedDateTime fromParleys(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ofPattern(PARLEYS_PATTERN, Locale.ENGLISH)); // Format : Thu Jun 26 06:34:41 UTC 2014
     }
 }

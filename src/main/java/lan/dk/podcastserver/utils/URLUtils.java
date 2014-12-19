@@ -47,14 +47,9 @@ public class URLUtils {
         return false;
     }
 
-    public static Reader getReaderFromURL (String url) {
-        try {
-            URL urlObject = new URL(url);
-            return new BufferedReader(new InputStreamReader(urlObject.openStream(), "UTF-8"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static Reader getReaderFromURL (String url) throws IOException {
+        URL urlObject = new URL(url);
+        return new BufferedReader(new InputStreamReader(urlObject.openStream(), "UTF-8"));
     }
 
     public static String getM3U8UrlFormMultiStreamFile(String url) {
