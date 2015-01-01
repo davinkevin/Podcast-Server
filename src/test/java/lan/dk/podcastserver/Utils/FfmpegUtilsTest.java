@@ -2,7 +2,7 @@ package lan.dk.podcastserver.Utils;
 
 import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.UtilsConfig;
-import lan.dk.podcastserver.utils.FfmpegUtils;
+import lan.dk.podcastserver.service.FfmpegService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,7 +22,7 @@ import java.util.List;
 public class FfmpegUtilsTest {
 
     @Resource
-    FfmpegUtils ffmpegUtils;
+    FfmpegService ffmpegService;
 
     @Test
     public void testFfmpegConcatDemux() throws Exception {
@@ -33,6 +33,6 @@ public class FfmpegUtilsTest {
         fileList.add(new File(location.concat("2.mp4")));
         fileList.add(new File(location.concat("3.mp4")));
 
-        ffmpegUtils.concatDemux(new File(location + "concat.mp4"), fileList.toArray(new File[fileList.size()]));
+        ffmpegService.concatDemux(new File(location + "concat.mp4"), fileList.toArray(new File[fileList.size()]));
     }
 }

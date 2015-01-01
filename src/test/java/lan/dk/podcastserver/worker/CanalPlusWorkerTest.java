@@ -6,7 +6,7 @@ import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.updater.CanalPlusUpdater;
-import lan.dk.podcastserver.service.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerService;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class CanalPlusWorkerTest {
     CanalPlusUpdater canalPlusUpdater;
 
     @Autowired
-    WorkerUtils workerUtils;
+    WorkerService workerService;
 
     Podcast canalPlusPodcast;
 /*
@@ -109,7 +109,7 @@ public class CanalPlusWorkerTest {
         logger.debug("Download");
         //canalPlusPodcast = canalPlusUpdater.updateAndAddItems(canalPlusPodcast);
 
-        Downloader downloader = workerUtils.getDownloaderByType(canalPlusPodcast.getItems().iterator().next());
+        Downloader downloader = workerService.getDownloaderByType(canalPlusPodcast.getItems().iterator().next());
 
         logger.debug(downloader.getItem().toString());
 

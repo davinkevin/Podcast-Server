@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.utils;
+package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.utils.ThreadUtils.OutputLogger;
 import org.slf4j.Logger;
@@ -12,8 +12,8 @@ import java.lang.reflect.Field;
 /**
  * Created by kevin on 19/07/2014.
  */
-@Component("FfmpegUtils")
-public class FfmpegUtils {
+@Component("FfmpegService")
+public class FfmpegService {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 

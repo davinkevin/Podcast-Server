@@ -3,7 +3,7 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
-import lan.dk.podcastserver.service.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -41,7 +41,8 @@ public class UpdatePodcastBusiness  {
     @Resource(name="Validator") Validator validator;
 
     @Value("${rootfolder:${catalina.home}/webapp/podcast/}") protected String rootFolder;
-    @Resource WorkerUtils workerUtils;
+    @Resource
+    WorkerService workerService;
 
 
     @Transactional(noRollbackFor=Exception.class)
@@ -52,7 +53,7 @@ public class UpdatePodcastBusiness  {
         for (Podcast podcast : podcasts) {
             try {
                 logger.info("Traitement du Podcast : " + podcast.toString());
-                updater = workerUtils.getUpdaterByType(podcast);
+                updater = workerService.getUpdaterByType(podcast);
                 String signature = updater.generateSignature(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
                     updater.updateAndAddItems(podcast);
@@ -80,7 +81,7 @@ public class UpdatePodcastBusiness  {
             try {
                 logger.info("Traitement du Podcast : " + podcast.toString());
 
-                updater = workerUtils.getUpdaterByType(podcast);
+                updater = workerService.getUpdaterByType(podcast);
                 String signature = updater.generateSignature(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
                     podcast = updater.updateAndAddItems(podcast);
@@ -104,7 +105,7 @@ public class UpdatePodcastBusiness  {
         List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
         for (Podcast podcast : podcasts) {
             try {
-                final Updater updater = workerUtils.getUpdaterByType(podcast);
+                final Updater updater = workerService.getUpdaterByType(podcast);
                 podcastItemsToUpdate.put(podcast.getSignature(), asyncExecutor.submit(() -> updater.update(podcast)));
             } catch (Exception e) {
                 e.printStackTrace();

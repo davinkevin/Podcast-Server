@@ -6,7 +6,7 @@ import lan.dk.podcastserver.config.JPAConfig;
 import lan.dk.podcastserver.context.PropertyConfigTest;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.RSSUpdater;
-import lan.dk.podcastserver.service.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerService;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class RssUpdaterTest {
     PodcastBusiness podcastBusiness;
 
     @Autowired
-    WorkerUtils workerUtils;
+    WorkerService workerService;
 
     Podcast canalPlusPodcast;
 

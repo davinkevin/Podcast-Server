@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.service.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class ItemDownloadManager {
 
 
     @Autowired
-    private WorkerUtils workerUtils;
+    private WorkerService workerService;
 
     private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
     private boolean isRunning = false;
@@ -266,7 +266,7 @@ public class ItemDownloadManager {
             Downloader downloader = downloadingQueue.get(item);
             downloader.startDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
-            Downloader worker = workerUtils.getDownloaderByType(item);
+            Downloader worker = workerService.getDownloaderByType(item);
 
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
@@ -278,7 +278,7 @@ public class ItemDownloadManager {
     public void resetDownload(Item item) {
         if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
             item.addATry();
-            Downloader worker = workerUtils.getDownloaderByType(item);
+            Downloader worker = workerService.getDownloaderByType(item);
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
                 new Thread((Runnable) worker).start();

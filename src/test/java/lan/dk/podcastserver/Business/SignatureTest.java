@@ -6,7 +6,7 @@ import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.Mock.MockRepository;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
-import lan.dk.podcastserver.service.WorkerUtils;
+import lan.dk.podcastserver.service.WorkerService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -32,7 +32,8 @@ public class SignatureTest {
 
     @Resource
     UpdatePodcastBusiness updatePodcastBusiness;
-    @Resource WorkerUtils workerUtils;
+    @Resource
+    WorkerService workerService;
     List<Podcast> podcastList = new ArrayList<Podcast>();
 /*
     @Before
@@ -69,7 +70,7 @@ public class SignatureTest {
             logger.info(podcast.getTitle());
             Assert.isTrue(StringUtils.isEmpty(podcast.getSignature()));
 
-            updater = workerUtils.getUpdaterByType(podcast);
+            updater = workerService.getUpdaterByType(podcast);
 
             String signature = updater.generateSignature(podcast);
             if ( signature != null) {

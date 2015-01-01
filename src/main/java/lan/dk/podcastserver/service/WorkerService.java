@@ -12,8 +12,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 
-@Component("WorkerUtils")
-public class WorkerUtils implements ApplicationContextAware {
+@Component("WorkerService")
+public class WorkerService implements ApplicationContextAware {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected ApplicationContext context = null;
