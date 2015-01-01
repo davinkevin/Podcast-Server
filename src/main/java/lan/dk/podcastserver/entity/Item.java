@@ -269,7 +269,7 @@ public class Item implements Serializable {
                 //.append(title)
                 .append(url)
                 .append((pubdate != null) ? pubdate.toInstant() : null)
-                .append(description)
+                /*.append(description)*/
                 .toHashCode();
     }
 
