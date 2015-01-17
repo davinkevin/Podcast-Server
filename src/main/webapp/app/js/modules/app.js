@@ -11,7 +11,7 @@ angular.module('podcastApp', [
     'ngTouch',
     'cfp.hotkeys',
     'restangular',
-    'AngularStomp',
+    'AngularStompDK',
     'LocalStorageModule',
     'ngAnimate',
     'truncate',
@@ -118,4 +118,10 @@ angular.module('podcastApp', [
     .config(function($tooltipProvider) {
         //TODO : fix for problem in angular 1.3.0 : https://github.com/angular-ui/bootstrap/issues/2828
         $tooltipProvider.options({animation: false});
+    })
+    .config(function(ngstompProvider){
+        ngstompProvider
+            .url('/ws')
+            .credential('login', 'password')
+            .class(SockJS);
     });

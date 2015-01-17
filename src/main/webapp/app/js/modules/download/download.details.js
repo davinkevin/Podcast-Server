@@ -1,9 +1,10 @@
 angular.module('ps.download', [
-    'ps.websocket',
+    /*'ps.websocket',*/
     'ps.dataService.donwloadManager',
-    'notification'
+    'notification',
+    'AngularStompDK'
 ])
-    .controller('DownloadCtrl', function ($scope, podcastWebSocket, DonwloadManager, Notification) {
+    .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
         $scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
 
@@ -33,7 +34,7 @@ angular.module('ps.download', [
 
 
         /** Websocket Connection */
-        podcastWebSocket
+        ngstomp
             .subscribe("/topic/download", function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });

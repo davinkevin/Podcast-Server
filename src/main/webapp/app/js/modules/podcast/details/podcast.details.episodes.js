@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('ps.podcast.details.episodes', [
-    'ps.websocket'
+    /*'ps.websocket',*/
+    'AngularStompDK'
 ])
     .directive('podcastItemsList', function($log){
         return {
@@ -14,13 +15,13 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, podcastWebSocket, itemService ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
         var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
 
-        podcastWebSocket
+        ngstomp
             .subscribe(webSocketUrl, function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });

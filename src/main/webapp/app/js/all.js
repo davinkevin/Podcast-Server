@@ -11,7 +11,7 @@ angular.module('podcastApp', [
     'ngTouch',
     'cfp.hotkeys',
     'restangular',
-    'AngularStomp',
+    'AngularStompDK',
     'LocalStorageModule',
     'ngAnimate',
     'truncate',
@@ -118,6 +118,12 @@ angular.module('podcastApp', [
     .config(function($tooltipProvider) {
         //TODO : fix for problem in angular 1.3.0 : https://github.com/angular-ui/bootstrap/issues/2828
         $tooltipProvider.options({animation: false});
+    })
+    .config(function(ngstompProvider){
+        ngstompProvider
+            .url('/ws')
+            .credential('login', 'password')
+            .class(SockJS);
     });
 /**
  * Created by kevin on 01/11/14.
@@ -209,11 +215,12 @@ _.mixin({
 });
 
 angular.module('ps.download', [
-    'ps.websocket',
+    /*'ps.websocket',*/
     'ps.dataService.donwloadManager',
-    'notification'
+    'notification',
+    'AngularStompDK'
 ])
-    .controller('DownloadCtrl', function ($scope, podcastWebSocket, DonwloadManager, Notification) {
+    .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
         $scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
 
@@ -243,7 +250,7 @@ angular.module('ps.download', [
 
 
         /** Websocket Connection */
-        podcastWebSocket
+        ngstomp
             .subscribe("/topic/download", function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });
@@ -283,10 +290,11 @@ angular.module('ps.download', [
     });
 angular.module('ps.item.details', [
     'restangular',
-    'ps.websocket',
-    'ps.dataService.donwloadManager'
+    /*'ps.websocket',*/
+    'ps.dataService.donwloadManager',
+    'AngularStompDK'
 ])
-    .controller('ItemDetailCtrl', function ($scope, podcastWebSocket, DonwloadManager, $location, podcast, item) {
+    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, podcast, item) {
 
         $scope.item = item;
         $scope.item.podcast = podcast;
@@ -310,7 +318,7 @@ angular.module('ps.item.details', [
         //** WebSocket Inscription **//
         var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
-        podcastWebSocket
+        ngstomp
             .subscribe(webSockedUrl, function(message) {
                 var itemFromWS = JSON.parse(message.body);
 
@@ -1183,49 +1191,6 @@ angular.module('ps.dataService.tag', [
         return baseAll.post(null, {name : query});
     }
 });
-
-
-angular.module('ps.websocket', [
-    'AngularStomp'
-]).service('podcastWebSocket', function (ngstomp, $log, $q) {
-    'use strict';
-    var self = this,
-        wsClient = ngstomp("/ws", SockJS),
-        deferred = $q.defer(),
-        promiseResult = deferred.promise;
-
-
-    self.connect = function(){
-        wsClient.connect("user", "password", function () {
-           self.isConnected = true;
-           $log.info("Connection to the WebSockets");
-           deferred.resolve();
-        });
-        return promiseResult;
-    };
-
-    self.subscribe = function(url, callback, scope) {
-        promiseResult.then(function() {
-            wsClient.subscribe(url, callback);
-            if (scope !== undefined) {
-                scope.$on('$destroy', function () {
-                    self.unsubscribe(url);
-                });
-            }
-        });
-        return self;
-    };
-
-    self.unsubscribe = function(queue, callback) {
-        promiseResult.then(function() {
-            wsClient.unsubscribe(queue, callback);
-        });
-        return self;
-    };
-
-    self.connect();
-    return self;
-});
 'use strict';
 
 angular.module('ps.podcast.details.edition', [])
@@ -1267,7 +1232,8 @@ angular.module('ps.podcast.details.edition', [])
 'use strict';
 
 angular.module('ps.podcast.details.episodes', [
-    'ps.websocket'
+    /*'ps.websocket',*/
+    'AngularStompDK'
 ])
     .directive('podcastItemsList', function($log){
         return {
@@ -1280,13 +1246,13 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, podcastWebSocket, itemService ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
         var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
 
-        podcastWebSocket
+        ngstomp
             .subscribe(webSocketUrl, function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
@@ -1391,7 +1357,7 @@ angular.module('ps.search.item', [
     'ps.dataService.donwloadManager'
 ])
     .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, podcastWebSocket, DonwloadManager, ItemPerPage) {
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage) {
         'use strict';
 
         // Gestion du cache de la pagination :
@@ -1464,7 +1430,7 @@ angular.module('ps.search.item', [
 
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
-        podcastWebSocket.subscribe(webSocketUrl, updateItemFromWS, $scope);
+        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
 
         function updateItemFromWS(message) {
             var item = JSON.parse(message.body);

@@ -4,7 +4,7 @@ angular.module('ps.search.item', [
     'ps.dataService.donwloadManager'
 ])
     .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, podcastWebSocket, DonwloadManager, ItemPerPage) {
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage) {
         'use strict';
 
         // Gestion du cache de la pagination :
@@ -77,7 +77,7 @@ angular.module('ps.search.item', [
 
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
-        podcastWebSocket.subscribe(webSocketUrl, updateItemFromWS, $scope);
+        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
 
         function updateItemFromWS(message) {
             var item = JSON.parse(message.body);

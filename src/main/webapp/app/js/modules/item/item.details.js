@@ -1,9 +1,10 @@
 angular.module('ps.item.details', [
     'restangular',
-    'ps.websocket',
-    'ps.dataService.donwloadManager'
+    /*'ps.websocket',*/
+    'ps.dataService.donwloadManager',
+    'AngularStompDK'
 ])
-    .controller('ItemDetailCtrl', function ($scope, podcastWebSocket, DonwloadManager, $location, podcast, item) {
+    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, podcast, item) {
 
         $scope.item = item;
         $scope.item.podcast = podcast;
@@ -27,7 +28,7 @@ angular.module('ps.item.details', [
         //** WebSocket Inscription **//
         var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
-        podcastWebSocket
+        ngstomp
             .subscribe(webSockedUrl, function(message) {
                 var itemFromWS = JSON.parse(message.body);
 
