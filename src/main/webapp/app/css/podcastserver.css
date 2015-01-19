@@ -62,3 +62,4 @@
 .upload-item .drop-box .upload-text{height:100%;padding-top:5%}
 .upload-item .drop-box.dropping{background:#C7C7C7}
 .item-details .thumbnail img{min-height:200px;object-fit:cover}
+.item-player video{width:100%;height:auto}

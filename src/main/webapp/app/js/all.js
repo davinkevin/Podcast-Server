@@ -289,8 +289,6 @@ angular.module('ps.download', [
 
     });
 angular.module('ps.item.details', [
-    'restangular',
-    /*'ps.websocket',*/
     'ps.dataService.donwloadManager',
     'AngularStompDK'
 ])
@@ -332,8 +330,46 @@ angular.module('ps.item.details', [
  */
 
 angular.module('ps.item', [
-    'ps.item.details'
+    'ps.item.details',
+    'ps.item.player'
 ]);
+angular.module('ps.item.player', [
+    'ngSanitize',
+    'ngRoute',
+    'com.2fdevs.videogular'
+])
+    .config(function($routeProvider) {
+        $routeProvider.
+            when('/podcast/:podcastId/item/:itemId/play', {
+                templateUrl: 'html/item-player.html',
+                controller: 'ItemPlayerController',
+                controllerAs: 'ipc',
+                resolve : {
+                    item : function (itemService, $route) {
+                        return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                    },
+                    podcast : function (podcastService, $route) {
+                        return podcastService.findById($route.current.params.podcastId);
+                    }
+                }
+            });
+    })
+    .controller('ItemPlayerController', function (podcast, item) {
+        var vm = this;
+        
+        vm.item = item;
+        vm.item.podcast = podcast;
+
+        vm.config = {
+            preload: 'none',
+            sources: [
+                { src : item.localUrl, type : item.mimeType }
+            ],
+            theme: {
+                url: "http://www.videogular.com/styles/themes/default/videogular.css"
+            }
+        }
+    });
 angular.module('ps.podcast.creation', [
     'restangular'
 ])
@@ -511,17 +547,18 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '                    <div class="buttonList text-center">\n' +
     '                        <!-- Téléchargement en cours -->\n' +
-    '                                <span ng-show="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
-    '                                    <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
-    '                                    <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
-    '                                </span>\n' +
+    '                        <span ng-show="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
+    '                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
+    '                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
+    '                        </span>\n' +
     '\n' +
     '                        <!-- Lancer le téléchargement -->\n' +
     '                        <button ng-click="item.download()" ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '\n' +
     '                        <!-- Accéder au fichier -->\n' +
     '                        <a ng-href="{{ item.url }}" ng-show="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
-    '                        <a ng-href="{{ item.localUrl }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
+    '                        <!--<a ng-href="{{ item.localUrl }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>-->\n' +
+    '                        <a ng-href="/#/podcast/{{ item.podcast.id }}/item/{{ item.id }}/play" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>\n' +
     '\n' +
     '                        <!-- Supprimer l\'item -->\n' +
     '                        <button ng-click="remove(item)" ng-show="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
@@ -551,6 +588,32 @@ module.run(['$templateCache', function($templateCache) {
     '</div>\n' +
     '\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('ps.partial');
+} catch (e) {
+  module = angular.module('ps.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/item-player.html',
+    '<div class="container item-player">\n' +
+    '    <br/>\n' +
+    '    <ol class="breadcrumb">\n' +
+    '        <li><a href="/#/podcasts">Podcasts</a></li>\n' +
+    '        <li><a ng-href="/#/podcast/{{ ipc.item.podcast.id }}"> {{ ipc.item.podcast.title }}</a></li>\n' +
+    '        <li class="active"><a ng-href="/#/podcast/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>\n' +
+    '    </ol>\n' +
+    '\n' +
+    '    <div ng-show="ipc.item.localUrl !== null" class="videogular-container">\n' +
+    '        <videogular vg-theme="controller.config.theme.url">\n' +
+    '            <vg-video vg-src="ipc.config.sources" vg-native-controls="true" vg-preload="ipc.config.preload"></vg-video>\n' +
+    '        </videogular>\n' +
+    '    </div>\n' +
+    '    \n' +
+    '</div>');
 }]);
 })();
 
@@ -630,6 +693,9 @@ module.run(['$templateCache', function($templateCache) {
     '                                    <li>\n' +
     '                                        <a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>\n' +
     '                                    </li>\n' +
+    '                                    <li ng-show="item.localUrl != null">\n' +
+    '                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a>\n' +
+    '                                    </li>\n' +
     '                                </ul>\n' +
     '                            </div>\n' +
     '                        </div>\n' +
@@ -644,9 +710,9 @@ module.run(['$templateCache', function($templateCache) {
     '                    </div>\n' +
     '                    <div class="text-center row-button">\n' +
     '                        <span ng-show="item.status == \'Started\' || item.status == \'Paused\'" >\n' +
-    '                                        <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
-    '                                        <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
-    '                                    </span>\n' +
+    '                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
+    '                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>\n' +
+    '                        </span>\n' +
     '\n' +
     '                        <button ng-click="item.download()" ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '                        <a href="{{ item.proxyURL }}" ng-show="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
@@ -985,6 +1051,7 @@ module.run(['$templateCache', function($templateCache) {
     '                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
     '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
     '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
+    '                    <li ng-show="item.localUrl != null"><a ng-href="/#/podcast/{{ podcast.id }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a></li>\n' +
     '                </ul>\n' +
     '            </div>\n' +
     '        </div>\n' +

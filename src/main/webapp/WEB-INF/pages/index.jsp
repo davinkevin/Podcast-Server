@@ -75,6 +75,7 @@
 <script src="/app/js/lib/angular-hotkeys/build/hotkeys.min.js"></script>
 <script src="/app/js/lib/angular-notification/angular-notification.min.js"></script>
 <script src="/app/js/lib/ng-file-upload/angular-file-upload.min.js"></script>
+<script src="/app/js/lib/videogular/videogular.js"></script>
 <script src="/app/js/lib/restangular/dist/restangular.min.js"></script>
 <script src="/app/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>
 <!-- endinject -->

@@ -23,6 +23,7 @@
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
                     <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>
                     <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>
+                    <li ng-show="item.localUrl != null"><a ng-href="/#/podcast/{{ podcast.id }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a></li>
                 </ul>
             </div>
         </div>

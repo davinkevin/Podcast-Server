@@ -3,5 +3,6 @@
  */
 
 angular.module('ps.item', [
-    'ps.item.details'
+    'ps.item.details',
+    'ps.item.player'
 ]);

@@ -7,6 +7,7 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +110,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
             try {
                 this.item.setMimeType(Files.probeContentType(target.toPath()));
-                if (this.item.getMimeType() == null) {
+                if (this.item.getMimeType() == null || (!StringUtils.isEmpty(this.item.getMimeType()) && this.item.getMimeType().contains("unknown"))) {
                     this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
                 }
             } catch (IOException e) {

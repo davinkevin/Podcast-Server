@@ -1,6 +1,4 @@
 angular.module('ps.item.details', [
-    'restangular',
-    /*'ps.websocket',*/
     'ps.dataService.donwloadManager',
     'AngularStompDK'
 ])

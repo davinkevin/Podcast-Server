@@ -1,212 +1,214 @@
 {
-    "name": "Podcast Server",
-    "version": "1.0.0",
-    "dependencies": {
-        "angular": "1.3.9",
-        "angular-route": "1.3.9",
-        "angular-animate": "1.3.9",
-        "angular-sanitize": "1.3.9",
-        "angular-touch": "1.3.9",
-        "bootstrap": "~3.2.0",
-        "angular-bootstrap": "~0.12.0",
-        "restangular": "~1.4.0",
-        "AngularStompDK": "~0.0.9",
-        "stomp-websocket": "~2.3.0",
-        "sockjs": "~0.3.4",
-        "angular-local-storage": "~0.1.4",
-        "angular-truncate": "*",
-        "angular-loading-bar": "~0.6.0",
-        "animate.css": "~3.1.0",
-        "ng-tags-input": "~2.1.1",
-        "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
-        "angular-notification": "~0.2.3",
-        "ionicons": "~1.5.2",
-        "ng-file-upload": "~1.6.12"
+  "name": "Podcast Server",
+  "version": "1.0.0",
+  "dependencies": {
+    "angular": "1.3.9",
+    "angular-route": "1.3.9",
+    "angular-animate": "1.3.9",
+    "angular-sanitize": "1.3.9",
+    "angular-touch": "1.3.9",
+    "bootstrap": "~3.2.0",
+    "angular-bootstrap": "~0.12.0",
+    "restangular": "~1.4.0",
+    "AngularStompDK": "~0.0.9",
+    "stomp-websocket": "~2.3.0",
+    "sockjs": "~0.3.4",
+    "angular-local-storage": "~0.1.4",
+    "angular-truncate": "*",
+    "angular-loading-bar": "~0.6.0",
+    "animate.css": "~3.1.0",
+    "ng-tags-input": "~2.1.1",
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
+    "angular-notification": "~0.2.3",
+    "ionicons": "~1.5.2",
+    "ng-file-upload": "~1.6.12",
+    "videogular": "~0.7.2"
+  },
+  "resolutions": {
+    "angular": "1.3.9",
+    "angular-sanitize": "1.3.9"
+  },
+  "overrides": {
+    "jquery": {
+      "main": {
+        "dev": "",
+        "prod": ""
+      }
     },
-    "resolutions": {
-        "angular": "1.3.9"
+    "angular": {
+      "main": {
+        "dev": "angular.js",
+        "prod": [
+          "angular.min.js",
+          "angular.min.js.map"
+        ]
+      }
     },
-    "overrides": {
-        "jquery": {
-            "main": {
-                "dev": "",
-                "prod": ""
-            }
-        },
-        "angular": {
-            "main": {
-                "dev": "angular.js",
-                "prod": [
-                    "angular.min.js",
-                    "angular.min.js.map"
-                ]
-            }
-        },
-        "angular-animate": {
-            "main": {
-                "dev": "angular-animate.js",
-                "prod": [
-                    "angular-animate.min.js",
-                    "angular-animate.min.js.map"
-                ]
-            }
-        },
-        "angular-bootstrap": {
-            "main": {
-                "dev": "ui-bootstrap-tpls.js",
-                "prod": "ui-bootstrap-tpls.min.js"
-            }
-        },
-        "angular-loading-bar": {
-            "main": {
-                "dev": [
-                    "build/loading-bar.js",
-                    "build/loading-bar.css"
-                ],
-                "prod": [
-                    "build/loading-bar.min.js",
-                    "build/loading-bar.min.css"
-                ]
-            }
-        },
-        "angular-hotkeys": {
-            "main": {
-                "dev": [
-                    "build/hotkeys.js",
-                    "build/hotkeys.css"
-                ],
-                "prod": [
-                    "build/hotkeys.min.js",
-                    "build/hotkeys.min.css"
-                ]
-            }
-        },
-        "angular-local-storage": {
-            "main": {
-                "dev": "dist/angular-local-storage.js",
-                "prod": "dist/angular-local-storage.min.js"
-            }
-        },
-        "angular-route": {
-            "main": {
-                "dev": "angular-route.js",
-                "prod": [
-                    "angular-route.min.js",
-                    "angular-route.min.js.map"
-                ]
-            }
-        },
-        "angular-touch": {
-            "main": {
-                "dev": "angular-touch.js",
-                "prod": [
-                    "angular-touch.min.js",
-                    "angular-touch.min.js.map"
-                ]
-            }
-        },
-        "angular-sanitize": {
-            "main": {
-                "dev": "angular-sanitize.js",
-                "prod": [
-                    "angular-sanitize.min.js",
-                    "angular-sanitize.min.js.map"
-                ]
-            }
-        },
-        "angular-truncate": {
-            "main": {
-                "dev": "src/truncate.js",
-                "prod": "src/truncate.js"
-            }
-        },
-        "AngularStompDK": {
-            "main": {
-                "dev": "lib/angular-stomp.js",
-                "prod": "dist/angular-stomp.min.js"
-            }
-        },
-        "animate.css": {
-            "main": {
-                "dev": "animate.css",
-                "prod": "animate.min.css"
-            }
-        },
-        "bootstrap": {
-            "main": {
-                "dev": [
-                    "./dist/css/bootstrap.css",
-                    "./dist/fonts/glyphicons-halflings-regular.eot",
-                    "./dist/fonts/glyphicons-halflings-regular.svg",
-                    "./dist/fonts/glyphicons-halflings-regular.ttf",
-                    "./dist/fonts/glyphicons-halflings-regular.woff"
-                ],
-                "prod": [
-                    "./dist/css/bootstrap.min.css",
-                    "./dist/css/bootstrap.css.map",
-                    "./dist/fonts/glyphicons-halflings-regular.eot",
-                    "./dist/fonts/glyphicons-halflings-regular.svg",
-                    "./dist/fonts/glyphicons-halflings-regular.ttf",
-                    "./dist/fonts/glyphicons-halflings-regular.woff"
-                ]
-            }
-        },
-        "lodash": {
-            "main": {
-                "dev": "dist/lodash.compat.js",
-                "prod": "dist/lodash.compat.min.js"
-            }
-        },
-        "ng-tags-input": {
-            "main": {
-                "dev": [
-                    "ng-tags-input.js",
-                    "ng-tags-input.css"
-                ],
-                "prod": [
-                    "ng-tags-input.min.js",
-                    "ng-tags-input.min.css"
-                ]
-            }
-        },
-        "restangular": {
-            "main": {
-                "dev": "dist/restangular.js",
-                "prod": "dist/restangular.min.js"
-            }
-        },
-        "sockjs": {
-            "main": {
-                "dev": "sockjs.js",
-                "prod": "sockjs.min.js"
-            }
-        },
-        "angular-notification": {
-            "main": {
-                "dev": "angular-notification.js",
-                "prod": [
-                    "angular-notification.min.js",
-                    "angular-notification.min.map"
-                ]
-            }
-        },
-        "stomp-websocket": {
-            "main": {
-                "dev": "lib/stomp.js",
-                "prod": "lib/stomp.min.js"
-            }
-        },
-        "mousetrap": {
-            "main": {
-                "dev": "mousetrap.js",
-                "prod": "mousetrap.min.js"
-            }
-        },
-        "ng-file-upload": {
-            "main": {
-                "dev": "angular-file-upload.js",
-                "prod": "angular-file-upload.min.js"
-            }
-        }
+    "angular-animate": {
+      "main": {
+        "dev": "angular-animate.js",
+        "prod": [
+          "angular-animate.min.js",
+          "angular-animate.min.js.map"
+        ]
+      }
+    },
+    "angular-bootstrap": {
+      "main": {
+        "dev": "ui-bootstrap-tpls.js",
+        "prod": "ui-bootstrap-tpls.min.js"
+      }
+    },
+    "angular-loading-bar": {
+      "main": {
+        "dev": [
+          "build/loading-bar.js",
+          "build/loading-bar.css"
+        ],
+        "prod": [
+          "build/loading-bar.min.js",
+          "build/loading-bar.min.css"
+        ]
+      }
+    },
+    "angular-hotkeys": {
+      "main": {
+        "dev": [
+          "build/hotkeys.js",
+          "build/hotkeys.css"
+        ],
+        "prod": [
+          "build/hotkeys.min.js",
+          "build/hotkeys.min.css"
+        ]
+      }
+    },
+    "angular-local-storage": {
+      "main": {
+        "dev": "dist/angular-local-storage.js",
+        "prod": "dist/angular-local-storage.min.js"
+      }
+    },
+    "angular-route": {
+      "main": {
+        "dev": "angular-route.js",
+        "prod": [
+          "angular-route.min.js",
+          "angular-route.min.js.map"
+        ]
+      }
+    },
+    "angular-touch": {
+      "main": {
+        "dev": "angular-touch.js",
+        "prod": [
+          "angular-touch.min.js",
+          "angular-touch.min.js.map"
+        ]
+      }
+    },
+    "angular-sanitize": {
+      "main": {
+        "dev": "angular-sanitize.js",
+        "prod": [
+          "angular-sanitize.min.js",
+          "angular-sanitize.min.js.map"
+        ]
+      }
+    },
+    "angular-truncate": {
+      "main": {
+        "dev": "src/truncate.js",
+        "prod": "src/truncate.js"
+      }
+    },
+    "AngularStompDK": {
+      "main": {
+        "dev": "lib/angular-stomp.js",
+        "prod": "dist/angular-stomp.min.js"
+      }
+    },
+    "animate.css": {
+      "main": {
+        "dev": "animate.css",
+        "prod": "animate.min.css"
+      }
+    },
+    "bootstrap": {
+      "main": {
+        "dev": [
+          "./dist/css/bootstrap.css",
+          "./dist/fonts/glyphicons-halflings-regular.eot",
+          "./dist/fonts/glyphicons-halflings-regular.svg",
+          "./dist/fonts/glyphicons-halflings-regular.ttf",
+          "./dist/fonts/glyphicons-halflings-regular.woff"
+        ],
+        "prod": [
+          "./dist/css/bootstrap.min.css",
+          "./dist/css/bootstrap.css.map",
+          "./dist/fonts/glyphicons-halflings-regular.eot",
+          "./dist/fonts/glyphicons-halflings-regular.svg",
+          "./dist/fonts/glyphicons-halflings-regular.ttf",
+          "./dist/fonts/glyphicons-halflings-regular.woff"
+        ]
+      }
+    },
+    "lodash": {
+      "main": {
+        "dev": "dist/lodash.compat.js",
+        "prod": "dist/lodash.compat.min.js"
+      }
+    },
+    "ng-tags-input": {
+      "main": {
+        "dev": [
+          "ng-tags-input.js",
+          "ng-tags-input.css"
+        ],
+        "prod": [
+          "ng-tags-input.min.js",
+          "ng-tags-input.min.css"
+        ]
+      }
+    },
+    "restangular": {
+      "main": {
+        "dev": "dist/restangular.js",
+        "prod": "dist/restangular.min.js"
+      }
+    },
+    "sockjs": {
+      "main": {
+        "dev": "sockjs.js",
+        "prod": "sockjs.min.js"
+      }
+    },
+    "angular-notification": {
+      "main": {
+        "dev": "angular-notification.js",
+        "prod": [
+          "angular-notification.min.js",
+          "angular-notification.min.map"
+        ]
+      }
+    },
+    "stomp-websocket": {
+      "main": {
+        "dev": "lib/stomp.js",
+        "prod": "lib/stomp.min.js"
+      }
+    },
+    "mousetrap": {
+      "main": {
+        "dev": "mousetrap.js",
+        "prod": "mousetrap.min.js"
+      }
+    },
+    "ng-file-upload": {
+      "main": {
+        "dev": "angular-file-upload.js",
+        "prod": "angular-file-upload.min.js"
+      }
     }
+  }
 }
