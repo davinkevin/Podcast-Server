@@ -53,7 +53,26 @@
         </div>
     </div>
 </nav>--%>
-<navbar></navbar>
+<navbar>
+    <li>
+        <a href="#/podcasts">
+            <span class="ionicons ion-social-rss">  </span>
+            <span class="hidden-xs">Podcast</span>
+        </a>
+    </li>
+    <li>
+        <a href="#/podcast/add">
+            <span class="ionicons ion-android-add"></span>
+            <span class="hidden-xs"> Ajouter</span>
+        </a>
+    </li>
+    <li>
+        <a href="#/download">
+            <span class="ionicons ion-android-download"></span>
+            <span class="hidden-xs"> Téléchargement</span>
+        </a>
+    </li>
+</navbar>
 
 <authorize-notification></authorize-notification>
 

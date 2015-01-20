@@ -221,6 +221,7 @@ angular.module('navbar', [
 ])
     .directive('navbar', function() {
         return {
+            transclude : true,
             replace : true,
             restrict : 'E',
             templateUrl : 'html/navbar.html',
@@ -763,33 +764,8 @@ module.run(['$templateCache', function($templateCache) {
     '<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">\n' +
     '    <div class="container-fluid">\n' +
     '        <div class="navbar-header">\n' +
-    '            <!--<button type="button" class="navbar-toggle" ng-click="navbar.navCollapsed = !navbar.navCollapsed" >\n' +
-    '                <span class="sr-only">Toggle navigation</span>\n' +
-    '                <span class="icon-bar"></span>\n' +
-    '                <span class="icon-bar"></span>\n' +
-    '                <span class="icon-bar"></span>\n' +
-    '            </button>-->\n' +
     '            <a class="navbar-brand" href="#/items">Podcast Server</a>\n' +
-    '            <ul class="nav navbar-nav pull-right">\n' +
-    '                <li>\n' +
-    '                    <a href="#/podcasts">\n' +
-    '                        <span class="ionicons ion-social-rss">  </span>\n' +
-    '                        <span class="hidden-xs">Podcast</span>\n' +
-    '                    </a>\n' +
-    '                </li>\n' +
-    '                <li>\n' +
-    '                    <a href="#/podcast/add">\n' +
-    '                        <span class="ionicons ion-android-add"></span>\n' +
-    '                        <span class="hidden-xs"> Ajouter</span>\n' +
-    '                    </a>\n' +
-    '                </li>\n' +
-    '                <li>\n' +
-    '                    <a href="#/download">\n' +
-    '                        <span class="ionicons ion-android-download"></span>\n' +
-    '                        <span class="hidden-xs"> Téléchargement</span>\n' +
-    '                    </a>\n' +
-    '                </li>\n' +
-    '            </ul>\n' +
+    '            <ul class="nav navbar-nav pull-right" ng-transclude></ul>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '</nav>');

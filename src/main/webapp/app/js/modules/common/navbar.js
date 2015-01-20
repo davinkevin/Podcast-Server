@@ -2,6 +2,7 @@ angular.module('navbar', [
 ])
     .directive('navbar', function() {
         return {
+            transclude : true,
             replace : true,
             restrict : 'E',
             templateUrl : 'html/navbar.html',
