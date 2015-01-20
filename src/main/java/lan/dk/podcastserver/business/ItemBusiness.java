@@ -122,7 +122,7 @@ public class ItemBusiness {
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    @Transactional(readOnly = true)
     public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
         return itemRepository.findAll(isInPodcast(idPodcast), pageRequest);
     }

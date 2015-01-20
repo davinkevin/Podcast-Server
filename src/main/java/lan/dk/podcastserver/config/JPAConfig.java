@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lan.dk.podcastserver.utils.hibernate.CustomJPADialect;
 import org.h2.tools.Server;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.slf4j.Logger;
@@ -130,6 +131,7 @@ public class JPAConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
         entityManagerFactoryBean.setDataSource(dataSource());
+        entityManagerFactoryBean.setJpaDialect(new CustomJPADialect());
         entityManagerFactoryBean.setPackagesToScan(environment.getProperty(PROPERTY_ENTITYMANAGERPACKAGESTOSCAN_NAME, PROPERTY_ENTITYMANAGER_PACKAGES_TO_SCAN_DEFAULT));
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
 
