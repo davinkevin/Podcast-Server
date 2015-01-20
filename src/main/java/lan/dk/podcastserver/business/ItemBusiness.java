@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,12 +51,13 @@ public class ItemBusiness {
         return itemRepository.findAll();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findAll(Pageable pageable) {
         return itemRepository.findAll(pageable);
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, PageRequest page) {
         if (page.getSort().getOrderFor("pertinence") == null) {
             return itemRepository.findAll(getSearchSpecifications(term, tags), page);
@@ -76,7 +78,7 @@ public class ItemBusiness {
         return itemRepository.save(entity);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Item findOne(Integer integer) {
         return itemRepository.findOne(integer);
     }
@@ -99,20 +101,20 @@ public class ItemBusiness {
     //****************************//
 
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findByStatus(String... status) {
         return itemRepository.findAll(hasStatus(status));
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDownload() {
         return itemRepository.findAll(isDownloaded(Boolean.FALSE)
                 .and(isNewerThan(ZonedDateTime.now().minusDays(numberOfDayToDownload))));
     }
 
-    @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDelete() {
         return itemRepository.findAll(isDownloaded(Boolean.TRUE)
                 .and(isOlderThan(ZonedDateTime.now().minusDays(numberOfDayToDownload)))
@@ -120,7 +122,7 @@ public class ItemBusiness {
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
         return itemRepository.findAll(isInPodcast(idPodcast), pageRequest);
     }
