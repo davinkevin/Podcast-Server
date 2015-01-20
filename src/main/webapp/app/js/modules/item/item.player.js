@@ -1,7 +1,11 @@
 angular.module('ps.item.player', [
     'ngSanitize',
     'ngRoute',
-    'com.2fdevs.videogular'
+    'com.2fdevs.videogular',
+    'com.2fdevs.videogular.plugins.poster',
+    'com.2fdevs.videogular.plugins.controls',
+    'com.2fdevs.videogular.plugins.overlayplay',
+    'com.2fdevs.videogular.plugins.buffering'
 ])
     .config(function($routeProvider) {
         $routeProvider.
@@ -32,6 +36,9 @@ angular.module('ps.item.player', [
             ],
             theme: {
                 url: "http://www.videogular.com/styles/themes/default/videogular.css"
+            },
+            plugins: {
+                poster: item.cover.url
             }
         }
     });

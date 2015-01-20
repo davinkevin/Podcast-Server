@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/app/js/lib/ng-tags-input/ng-tags-input.min.css">
     <link rel="stylesheet" href="/app/js/lib/angular-hotkeys/build/hotkeys.min.css">
     <link rel="stylesheet" href="/app/js/lib/ionicons/css/ionicons.css">
+    <link rel="stylesheet" href="/app/js/lib/videogular-themes-default/videogular.min.css">
     <link rel="stylesheet" href="/app/js/lib/bootstrap/dist/css/bootstrap.min.css">
     <!-- endinject -->
 
@@ -20,39 +21,6 @@
 
 </head>
 <body>
-<%--<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" >
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#/items">Podcast Server</a>
-        </div>
-
-        <div class="collapse navbar-collapse navbar-ex1-collapse" collapse="navCollapsed">
-            <ul class="nav navbar-nav">
-                <li>
-                    <a href="#/podcasts">
-                        Podcast
-                    </a>
-                </li>
-                <li>
-                    <a href="#/podcast/add">
-                        Ajouter
-                    </a>
-                </li>
-                <li>
-                    <a href="#/download">
-                        Téléchargement
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>--%>
 <navbar>
     <li>
         <a href="#/podcasts">
@@ -96,6 +64,10 @@
 <script src="/app/js/lib/angular-notification/angular-notification.min.js"></script>
 <script src="/app/js/lib/ng-file-upload/angular-file-upload.min.js"></script>
 <script src="/app/js/lib/videogular/videogular.js"></script>
+<script src="/app/js/lib/videogular-poster/poster.js"></script>
+<script src="/app/js/lib/videogular-buffering/buffering.js"></script>
+<script src="/app/js/lib/videogular-overlay-play/overlay-play.js"></script>
+<script src="/app/js/lib/videogular-controls/controls.js"></script>
 <script src="/app/js/lib/restangular/dist/restangular.min.js"></script>
 <script src="/app/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>
 <!-- endinject -->

@@ -129,112 +129,6 @@ angular.module('ps.common', [
     'navbar',
     'authorize-notification'
 ]);
-angular.module('authorize-notification', [
-    'notification'
-]).directive('authorizeNotification', function() {
-    return {
-        replace : true,
-        restrict : 'E',
-        templateUrl : 'html/authorize-notification.html',
-        scope : true,
-        controllerAs : 'an',
-        controller : 'authorizeNotificationController'
-    };
-}).controller('authorizeNotificationController', function($window, Notification, $rootScope){
-    var vm = this;
-
-    //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
-    // Issue fixed in the M37 of Chrome :
-    vm.state = hasToBeShown();
-    vm.manuallyactivate = function() {
-        Notification.requestPermission(function() {
-            vm.state = hasToBeShown();
-            $rootScope.$digest();
-        });
-    };
-
-    function hasToBeShown() {
-        return (('Notification' in $window) && $window.Notification.permission != 'granted');
-    }
-});
-
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.podcast', [
-    'ps.podcast.details',
-    'ps.podcast.creation',
-    'ps.podcast.list'
-]);
-angular.module('ps.filters', [])
-    .filter('htmlToPlaintext', function () {
-        return function(text) {
-            return String(text || "").replace(/<[^>]+>/gm, '');
-        };
-    }
-);
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
-/**
- * Created by kevin on 14/08/2014.
- */
-
-_.mixin({
-    // Update in place, does not preserve order
-    updateinplace : function(localArray, remoteArray, comparisonFunction) {
-        // Default function working on the === operator by the indexOf function:
-        var comparFunc = comparisonFunction || function (inArray, elem) {
-            return inArray.indexOf(elem);
-        };
-
-        // Remove from localArray what is not in the remote array :
-        _.forEachRight(localArray.slice(), function (elem, key) {
-            if (comparFunc(remoteArray, elem) === -1) {
-                localArray.splice(key, 1);
-            }
-        });
-
-        // Add to localArray what is new in the remote array :
-        _.forEach(remoteArray, function (elem) {
-            if (comparFunc(localArray, elem) === -1) {
-                localArray.push(elem);
-            }
-        });
-
-        return localArray;
-    }
-});
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
-]);
-angular.module('navbar', [
-])
-    .directive('navbar', function() {
-        return {
-            transclude : true,
-            replace : true,
-            restrict : 'E',
-            templateUrl : 'html/navbar.html',
-            scope : true,
-            controllerAs : 'navbar',
-            controller : 'navbarController'
-        };
-    }).controller('navbarController', function(){
-        var vm = this;
-        vm.navCollapsed = true;
-    });
-
-
 angular.module('ps.download', [
     /*'ps.websocket',*/
     'ps.dataService.donwloadManager',
@@ -309,6 +203,15 @@ angular.module('ps.download', [
             }, $scope);
 
     });
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module('ps.podcast', [
+    'ps.podcast.details',
+    'ps.podcast.creation',
+    'ps.podcast.list'
+]);
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
     'AngularStompDK'
@@ -346,6 +249,10 @@ angular.module('ps.item.details', [
                 }
             }, $scope);
     });
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
 /**
  * Created by kevin on 01/11/14.
  */
@@ -354,10 +261,24 @@ angular.module('ps.item', [
     'ps.item.details',
     'ps.item.player'
 ]);
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
 angular.module('ps.item.player', [
     'ngSanitize',
     'ngRoute',
-    'com.2fdevs.videogular'
+    'com.2fdevs.videogular',
+    'com.2fdevs.videogular.plugins.poster',
+    'com.2fdevs.videogular.plugins.controls',
+    'com.2fdevs.videogular.plugins.overlayplay',
+    'com.2fdevs.videogular.plugins.buffering'
 ])
     .config(function($routeProvider) {
         $routeProvider.
@@ -388,9 +309,13 @@ angular.module('ps.item.player', [
             ],
             theme: {
                 url: "http://www.videogular.com/styles/themes/default/videogular.css"
+            },
+            plugins: {
+                poster: item.cover.url
             }
         }
     });
+
 angular.module('ps.podcast.creation', [
     'restangular'
 ])
@@ -443,6 +368,88 @@ angular.module('ps.podcast.list', [
     .controller('PodcastsListCtrl', function ($scope, podcasts) {
         $scope.podcasts = podcasts;
     });
+angular.module('authorize-notification', [
+    'notification'
+]).directive('authorizeNotification', function() {
+    return {
+        replace : true,
+        restrict : 'E',
+        templateUrl : 'html/authorize-notification.html',
+        scope : true,
+        controllerAs : 'an',
+        controller : 'authorizeNotificationController'
+    };
+}).controller('authorizeNotificationController', function($window, Notification, $rootScope){
+    var vm = this;
+
+    //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
+    // Issue fixed in the M37 of Chrome :
+    vm.state = hasToBeShown();
+    vm.manuallyactivate = function() {
+        Notification.requestPermission(function() {
+            vm.state = hasToBeShown();
+            $rootScope.$digest();
+        });
+    };
+
+    function hasToBeShown() {
+        return (('Notification' in $window) && $window.Notification.permission != 'granted');
+    }
+});
+
+angular.module('ps.filters', [])
+    .filter('htmlToPlaintext', function () {
+        return function(text) {
+            return String(text || "").replace(/<[^>]+>/gm, '');
+        };
+    }
+);
+/**
+ * Created by kevin on 14/08/2014.
+ */
+
+_.mixin({
+    // Update in place, does not preserve order
+    updateinplace : function(localArray, remoteArray, comparisonFunction) {
+        // Default function working on the === operator by the indexOf function:
+        var comparFunc = comparisonFunction || function (inArray, elem) {
+            return inArray.indexOf(elem);
+        };
+
+        // Remove from localArray what is not in the remote array :
+        _.forEachRight(localArray.slice(), function (elem, key) {
+            if (comparFunc(remoteArray, elem) === -1) {
+                localArray.splice(key, 1);
+            }
+        });
+
+        // Add to localArray what is new in the remote array :
+        _.forEach(remoteArray, function (elem) {
+            if (comparFunc(localArray, elem) === -1) {
+                localArray.push(elem);
+            }
+        });
+
+        return localArray;
+    }
+});
+angular.module('navbar', [
+])
+    .directive('navbar', function() {
+        return {
+            transclude : true,
+            replace : true,
+            restrict : 'E',
+            templateUrl : 'html/navbar.html',
+            scope : true,
+            controllerAs : 'navbar',
+            controller : 'navbarController'
+        };
+    }).controller('navbarController', function(){
+        var vm = this;
+        vm.navCollapsed = true;
+    });
+
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -630,7 +637,25 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '    <div ng-show="ipc.item.localUrl !== null" class="videogular-container">\n' +
     '        <videogular vg-theme="controller.config.theme.url">\n' +
-    '            <vg-video vg-src="ipc.config.sources" vg-native-controls="true" vg-preload="ipc.config.preload"></vg-video>\n' +
+    '            <vg-video vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-video>\n' +
+    '\n' +
+    '            <vg-controls>\n' +
+    '                <vg-play-pause-button></vg-play-pause-button>\n' +
+    '                <vg-timedisplay>{{ currentTime | date:\'mm:ss\' }}</vg-timedisplay>\n' +
+    '                <vg-scrubBar>\n' +
+    '                    <vg-scrubbarcurrenttime></vg-scrubbarcurrenttime>\n' +
+    '                </vg-scrubBar>\n' +
+    '                <vg-timedisplay>{{ timeLeft | date:\'mm:ss\' }}</vg-timedisplay>\n' +
+    '                <vg-volume>\n' +
+    '                    <vg-mutebutton></vg-mutebutton>\n' +
+    '                    <vg-volumebar></vg-volumebar>\n' +
+    '                </vg-volume>\n' +
+    '                <vg-fullscreenButton></vg-fullscreenButton>\n' +
+    '            </vg-controls>\n' +
+    '\n' +
+    '            <vg-overlay-play></vg-overlay-play>\n' +
+    '            \n' +
+    '            <vg-poster-image vg-url=\'ipc.config.plugins.poster\'></vg-poster-image>\n' +
     '        </videogular>\n' +
     '    </div>\n' +
     '    \n' +
