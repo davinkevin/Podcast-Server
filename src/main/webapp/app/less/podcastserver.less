@@ -381,3 +381,14 @@
     height:auto;
   }
 }
+
+.navbar-nav {
+  & >li {
+    float: left;
+  }
+
+  @media screen and (max-width: @screen-sm-min) {
+    margin: 7.5px -15px 0 -15px;
+    padding-right: 16px;
+  }
+}

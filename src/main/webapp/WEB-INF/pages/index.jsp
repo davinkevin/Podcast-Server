@@ -20,7 +20,7 @@
 
 </head>
 <body>
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<%--<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" >
@@ -52,7 +52,8 @@
             </ul>
         </div>
     </div>
-</nav>
+</nav>--%>
+<navbar></navbar>
 
 <authorize-notification></authorize-notification>
 

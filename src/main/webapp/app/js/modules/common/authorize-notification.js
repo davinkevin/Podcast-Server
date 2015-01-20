@@ -3,7 +3,7 @@ angular.module('authorize-notification', [
 ]).directive('authorizeNotification', function() {
     return {
         replace : true,
-        restrcit : 'E',
+        restrict : 'E',
         templateUrl : 'html/authorize-notification.html',
         scope : true,
         controllerAs : 'an',

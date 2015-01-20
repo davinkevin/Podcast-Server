@@ -4,9 +4,8 @@ angular.module('podcastApp', [
     'ps.item',
     'ps.download',
     'ps.partial',
-    'ps.filters',
     'ps.dataservice',
-    'authorize-notification',
+    'ps.common',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',
@@ -125,21 +124,17 @@ angular.module('podcastApp', [
             .credential('login', 'password')
             .class(SockJS);
     });
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.podcast', [
-    'ps.podcast.details',
-    'ps.podcast.creation',
-    'ps.podcast.list'
+angular.module('ps.common', [
+    'ps.filters',
+    'navbar',
+    'authorize-notification'
 ]);
 angular.module('authorize-notification', [
     'notification'
 ]).directive('authorizeNotification', function() {
     return {
         replace : true,
-        restrcit : 'E',
+        restrict : 'E',
         templateUrl : 'html/authorize-notification.html',
         scope : true,
         controllerAs : 'an',
@@ -163,10 +158,15 @@ angular.module('authorize-notification', [
     }
 });
 
-angular.module('ps.search', [
-    'ps.search.item'
-]);
+/**
+ * Created by kevin on 01/11/14.
+ */
 
+angular.module('ps.podcast', [
+    'ps.podcast.details',
+    'ps.podcast.creation',
+    'ps.podcast.list'
+]);
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -174,16 +174,10 @@ angular.module('ps.filters', [])
         };
     }
 );
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
+angular.module('ps.search', [
+    'ps.search.item'
 ]);
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -213,6 +207,32 @@ _.mixin({
         return localArray;
     }
 });
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
+angular.module('navbar', [
+])
+    .directive('navbar', function() {
+        return {
+            replace : true,
+            restrict : 'E',
+            templateUrl : 'html/navbar.html',
+            scope : true,
+            controllerAs : 'navbar',
+            controller : 'navbarController'
+        };
+    }).controller('navbarController', function(){
+        var vm = this;
+        vm.navCollapsed = true;
+    });
+
 
 angular.module('ps.download', [
     /*'ps.websocket',*/
@@ -729,6 +749,50 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('ps.partial');
+} catch (e) {
+  module = angular.module('ps.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/navbar.html',
+    '<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">\n' +
+    '    <div class="container-fluid">\n' +
+    '        <div class="navbar-header">\n' +
+    '            <!--<button type="button" class="navbar-toggle" ng-click="navbar.navCollapsed = !navbar.navCollapsed" >\n' +
+    '                <span class="sr-only">Toggle navigation</span>\n' +
+    '                <span class="icon-bar"></span>\n' +
+    '                <span class="icon-bar"></span>\n' +
+    '                <span class="icon-bar"></span>\n' +
+    '            </button>-->\n' +
+    '            <a class="navbar-brand" href="#/items">Podcast Server</a>\n' +
+    '            <ul class="nav navbar-nav pull-right">\n' +
+    '                <li>\n' +
+    '                    <a href="#/podcasts">\n' +
+    '                        <span class="ionicons ion-social-rss">  </span>\n' +
+    '                        <span class="hidden-xs">Podcast</span>\n' +
+    '                    </a>\n' +
+    '                </li>\n' +
+    '                <li>\n' +
+    '                    <a href="#/podcast/add">\n' +
+    '                        <span class="ionicons ion-android-add"></span>\n' +
+    '                        <span class="hidden-xs"> Ajouter</span>\n' +
+    '                    </a>\n' +
+    '                </li>\n' +
+    '                <li>\n' +
+    '                    <a href="#/download">\n' +
+    '                        <span class="ionicons ion-android-download"></span>\n' +
+    '                        <span class="hidden-xs"> Téléchargement</span>\n' +
+    '                    </a>\n' +
+    '                </li>\n' +
+    '            </ul>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</nav>');
 }]);
 })();
 

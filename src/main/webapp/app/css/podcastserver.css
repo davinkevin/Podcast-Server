@@ -63,3 +63,5 @@
 .upload-item .drop-box.dropping{background:#C7C7C7}
 .item-details .thumbnail img{min-height:200px;object-fit:cover}
 .item-player video{width:100%;height:auto}
+.navbar-nav>li{float:left}
+@media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
