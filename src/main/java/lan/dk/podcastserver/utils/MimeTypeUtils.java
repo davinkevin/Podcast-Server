@@ -1,8 +1,11 @@
 package lan.dk.podcastserver.utils;
 
 import lan.dk.podcastserver.entity.Item;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +17,9 @@ import java.util.Map;
 @Component
 public class MimeTypeUtils {
 
+    // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
+    private static final Tika tika = new Tika();
+    
     private static Map<String, String> MimeMap;
     static
     {
@@ -45,8 +51,10 @@ public class MimeTypeUtils {
         } else {
             return item.getUrl().substring(item.getUrl().lastIndexOf("."));
         }
-
-
+    }
+    
+    public static String probeContentType(Path path) throws IOException {
+        return tika.detect(path.toFile());
     }
 
 }
