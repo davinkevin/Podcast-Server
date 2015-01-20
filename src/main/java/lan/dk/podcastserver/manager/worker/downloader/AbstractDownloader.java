@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -107,10 +108,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setLength(FileUtils.sizeOf(target));
 
             try {
-                this.item.setMimeType(MimeTypeUtils.probeContentType(target.toPath()));
-                /*if (this.item.getMimeType() == null || (!StringUtils.isEmpty(this.item.getMimeType()) && this.item.getMimeType().contains("unknown"))) {
-                    this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
-                }*/
+                this.item.setMimeType(Files.probeContentType(target.toPath()));
+                if (this.item.getMimeType() == null) {
+                    this.item.setMimeType(MimeTypeUtils.probeContentType(target.toPath()));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
