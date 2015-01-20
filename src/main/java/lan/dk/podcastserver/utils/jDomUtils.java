@@ -60,6 +60,7 @@ public class jDomUtils {
 
     public static String podcastToXMLGeneric (Podcast podcast, String serveurURL) {
         Namespace itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+        Namespace mediaNS = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
         Element channel = new Element("channel");
 
@@ -140,7 +141,10 @@ public class jDomUtils {
             Element item_enclosure = new Element("enclosure");
 
             item_enclosure.setAttribute("url", serveurURL + item.getProxyURL() + MimeTypeUtils.getExtension(item) );
-            item_enclosure.setAttribute("length", String.valueOf(item.getLength()));
+            
+            if (item.getLength() != null) {
+                item_enclosure.setAttribute("length", String.valueOf(item.getLength()));
+            }
 
             if (StringUtils.isNotEmpty(item.getMimeType()))
                 item_enclosure.setAttribute("type", item.getMimeType());
@@ -166,6 +170,12 @@ public class jDomUtils {
             Element guid = new Element("guid");
             guid.addContent(new Text(serveurURL + item.getProxyURL()));
             xmlItem.addContent(guid);
+            
+            if (item.getCover() != null) {
+                Element thumbnail = new Element("thumbnail", mediaNS);
+                thumbnail.setAttribute("url", item.getCover().getUrl());
+                xmlItem.addContent(thumbnail);
+            }
 
             xmlItem.addContent(itunesAuthor.clone());
 
@@ -174,6 +184,7 @@ public class jDomUtils {
 
         Element rss = new Element("rss");
         rss.addNamespaceDeclaration(itunesNS);
+        rss.addNamespaceDeclaration(mediaNS);
         rss.addContent(channel);
 
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
