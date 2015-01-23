@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate4.HibernateExceptionTranslator;
@@ -149,8 +150,7 @@ public class JPAConfig {
         if ("filesystem".equals(environment.getProperty(PROPERTY_DIRECTORYPROVIDER_NAME, PROPERTY_DIRECTORYPROVIDER_DEFAULT))) {
             jpaProperties.put(PROPERTY_INDEXBASE_NAME, environment.getProperty(PROPERTY_INDEXBASE_NAME, PROPERTY_INDEXBASE_DEFAULT));
         }
-
-
+    
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
         return entityManagerFactoryBean;
@@ -162,6 +162,7 @@ public class JPAConfig {
     }
 
 
+    @Lazy
     @Bean(initMethod = "start", destroyMethod = "stop")
     public Server h2Server() throws SQLException {
         return Server.createTcpServer(PARAMETER_H2_SERVER);

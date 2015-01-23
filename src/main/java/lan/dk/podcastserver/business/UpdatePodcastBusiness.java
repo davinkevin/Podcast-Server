@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -108,6 +109,7 @@ public class UpdatePodcastBusiness  {
                 final Updater updater = workerService.getUpdaterByType(podcast);
                 podcastItemsToUpdate.put(podcast.getSignature(), asyncExecutor.submit(() -> updater.update(podcast)));
             } catch (Exception e) {
+                logger.error("Error during signature of podcast {}", podcast.getTitle(), e);
                 e.printStackTrace();
             }
         }
@@ -115,13 +117,14 @@ public class UpdatePodcastBusiness  {
         for (Map.Entry<String, Future<Pair<Podcast, Set<Item>>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
             try {
                 String currentPodcastSignature = podcastAndItems.getKey();
-                Pair<Podcast, Set<Item>> returnPaired = podcastAndItems.getValue().get();
+                Pair<Podcast, Set<Item>> returnPaired = podcastAndItems.getValue().get(5, TimeUnit.MINUTES);
                 if (!StringUtils.equals(currentPodcastSignature, returnPaired.getKey().getSignature())) {
                     podcastBusiness.update(
                             attachNewItemsToPodcast(returnPaired.getKey(), returnPaired.getValue())
                     );
                 }
             } catch (Exception e) {
+                logger.error("Error during update of podcast", e);
                 e.printStackTrace();
             }
         }

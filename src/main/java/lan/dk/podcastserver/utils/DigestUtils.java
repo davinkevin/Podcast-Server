@@ -15,17 +15,17 @@ public class DigestUtils {
 
     public static String generateMD5SignatureFromUrl(String url) {
         try {
+            
             MessageDigest md = MessageDigest.getInstance("MD5");
             InputStream is = new URL(url).openStream();
-
+            DigestInputStream dis = new DigestInputStream(is, md);
             try {
-                is = new DigestInputStream(is, md);
-
-                while (true) {
-                    if (is.read() == -1) break;
-                }
+                logger.debug("Beginning of digest on {}", url);
+                while (dis.read() != -1);
+                logger.debug("End of digest on {}", url);
             } finally {
                 is.close();
+                dis.close();
             }
             byte[] digest = md.digest();
             StringBuilder sb = new StringBuilder();
@@ -39,7 +39,6 @@ public class DigestUtils {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-
     }
 
     public static String generateMD5SignatureFromDOM(String html) {
@@ -57,9 +56,5 @@ public class DigestUtils {
             e.printStackTrace();
         }
         return "";
-    }
-
-    public static String generateMD5SignatureFromURL(String url) {
-        return generateMD5SignatureFromDOM(url);
     }
 }
