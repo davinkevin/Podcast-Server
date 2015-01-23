@@ -27,17 +27,25 @@
                         <!-- Lancer le téléchargement -->
                         <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
-                        <!-- Accéder au fichier -->
-                        <a ng-href="{{ item.url }}" ng-show="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
                         <!--<a ng-href="{{ item.localUrl }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>-->
                         <a ng-href="/#/podcast/{{ item.podcast.id }}/item/{{ item.id }}/play" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
 
-                        <!-- Supprimer l'item -->
-                        <button ng-click="remove(item)" ng-show="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                        <!-- Add to Playlist -->
+                        <a ng-show="item.localUrl != null" ng-click="toggleInPlaylist()" type="button" class="btn btn-primary">
+                            <span ng-hide="isInPlaylist()" class="glyphicon glyphicon-plus"></span>
+                            <span ng-show="isInPlaylist()" class="glyphicon glyphicon-minus"></span>
+                        </a>
 
-                        <!-- Reset de l'itam -->
-                        <button ng-click="reset(item)" ng-hide="item.status == 'Started' || item.status == 'Paused'" type="button" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span></button>
-
+                        <div class="btn-group" dropdown is-open="isopen">
+                            <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                <li ng-show="item.localUrl != null"><a ng-href="{{ item.localUrl }}"><span class="glyphicon glyphicon-play"></span> Lire</a></li>
+                                <li><a ng-click="remove(item)" ng-show="(item.status != 'Started' && item.status != 'Paused' )"><span class="glyphicon glyphicon-remove"></span> Retirer</a></li>
+                                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
+                                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>
+                            </ul>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

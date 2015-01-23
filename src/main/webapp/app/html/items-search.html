@@ -44,30 +44,33 @@
                                 <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                     <li ng-show="item.status == 'Started' || item.status == 'Paused'">
-                                        <a ng-show="item.status == 'Started'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Mettre en pause</a>
-                                        <a ng-show="item.status == 'Paused'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Reprendre</a>
+                                        <a ng-show="item.status == 'Started'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>
+                                        <a ng-show="item.status == 'Paused'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>
                                     </li>
                                     <li ng-show="item.status == 'Started' || item.status == 'Paused'">
-                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop"></span> Stopper</a>
+                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop text-danger"></span> Stopper</a>
                                     </li>
                                     <li ng-show="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null">
-                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save"></span> Télécharger</a>
+                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save text-primary"></span> Télécharger</a>
                                     </li>
-                                    <li ng-show="item.localUrl == null" >
-                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a>
-                                    </li>
-                                    <!--
-                                    <li ng-show="item.localUrl != null">
-                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>
-                                    </li> -->
                                     <li>
-                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>
+                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.localUrl != null">
+                                            <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player</a>
+                                    </li>
+                                    <li ng-show="item.localUrl != null">
+                                        <a ng-click="addOrRemove(item)">
+                                            <span ng-hide="isInPlaylist(item)"><span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist</span>
+                                            <span ng-show="isInPlaylist(item)"><span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist</span>
+                                        </a>
+                                    </li>
+                                    <!--<li ng-show="item.localUrl == null" >
+                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a>
+                                    </li>-->
+                                    <li>
+                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove text-danger"></span> Supprimer</a>
                                     </li>
                                     <li>
                                         <a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
-                                    </li>
-                                    <li ng-show="item.localUrl != null">
-                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a>
                                     </li>
                                 </ul>
                             </div>

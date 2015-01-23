@@ -1,10 +1,11 @@
 angular.module('ps.search.item', [
     'ps.dataService.item',
     'ps.dataService.tag',
+    'ps.player',
     'ps.dataService.donwloadManager'
 ])
     .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage) {
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
         'use strict';
 
         // Gestion du cache de la pagination :
@@ -44,6 +45,7 @@ angular.module('ps.search.item', [
         //** Item Operation **//
         $scope.remove = function (item) {
             return item.remove().then(function(){
+                playlistService.remove(item);
                 return $scope.changePage();
             });
         };
@@ -52,6 +54,7 @@ angular.module('ps.search.item', [
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
             });
         };
 
@@ -75,6 +78,14 @@ angular.module('ps.search.item', [
         $scope.toggleDownload = DonwloadManager.toggleDownload;
         $scope.loadTags = tagService.search;
 
+        //** Playlist Manager **//
+        $scope.addOrRemove = function(item) {
+            return playlistService.addOrRemove(item);
+        };
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
+        };
+        
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
         ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);

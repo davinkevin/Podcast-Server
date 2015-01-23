@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('ps.podcast.details.episodes', [
-    /*'ps.websocket',*/
+    'ps.player',
     'AngularStompDK'
 ])
-    .directive('podcastItemsList', function($log){
+    .directive('podcastItemsList', function(){
         return {
             restrcit : 'E',
             templateUrl : 'html/podcast-details-episodes.html',
@@ -15,7 +15,7 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService, playlistService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
@@ -48,6 +48,8 @@ angular.module('ps.podcast.details.episodes', [
                 $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
                     return (elem.id === item.id);
                 });
+            }).then(function() {
+                playlistService.remove(item);
             }).then($scope.loadPage);
         };
 
@@ -56,7 +58,16 @@ angular.module('ps.podcast.details.episodes', [
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
             });
+        };
+
+        $scope.addOrRemoveInPlaylist = function (item) {
+            playlistService.addOrRemove(item);
+        };
+
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
         };
 
         $scope.swipePage = function(val) {

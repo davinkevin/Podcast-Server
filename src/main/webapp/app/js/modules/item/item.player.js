@@ -23,14 +23,14 @@ angular.module('ps.item.player', [
                 }
             });
     })
-    .controller('ItemPlayerController', function (podcast, item) {
+    .controller('ItemPlayerController', function (podcast, item, $timeout) {
         var vm = this;
         
         vm.item = item;
         vm.item.podcast = podcast;
-
+        
         vm.config = {
-            preload: 'none',
+            preload: true,
             sources: [
                 { src : item.localUrl, type : item.mimeType }
             ],
@@ -38,7 +38,19 @@ angular.module('ps.item.player', [
                 url: "http://www.videogular.com/styles/themes/default/videogular.css"
             },
             plugins: {
+                controls: {
+                    autoHide: true,
+                    autoHideTime: 2000
+                },
                 poster: item.cover.url
             }
         }
+
+        vm.onPlayerReady = function(API) {
+            if (vm.config.preload) {
+                $timeout(function () {
+                    API.play();
+                })
+            }
+        };
     });

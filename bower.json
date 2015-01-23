@@ -13,7 +13,7 @@
     "AngularStompDK": "~0.0.9",
     "stomp-websocket": "~2.3.0",
     "sockjs": "~0.3.4",
-    "angular-local-storage": "~0.1.4",
+    "ngstorage": "~0.3.0",
     "angular-truncate": "*",
     "angular-loading-bar": "~0.6.0",
     "animate.css": "~3.1.0",
@@ -88,10 +88,10 @@
         ]
       }
     },
-    "angular-local-storage": {
+    "ngstorage": {
       "main": {
-        "dev": "dist/angular-local-storage.js",
-        "prod": "dist/angular-local-storage.min.js"
+        "dev": "ngStorage.js",
+        "prod": "ngStorage.min.js"
       }
     },
     "angular-route": {

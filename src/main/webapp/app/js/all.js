@@ -5,13 +5,13 @@ angular.module('podcastApp', [
     'ps.download',
     'ps.partial',
     'ps.dataservice',
+    'ps.player',
     'ps.common',
     'ngRoute',
     'ngTouch',
     'cfp.hotkeys',
     'restangular',
     'AngularStompDK',
-    'LocalStorageModule',
     'ngAnimate',
     'truncate',
     'ui.bootstrap',
@@ -129,6 +129,112 @@ angular.module('ps.common', [
     'navbar',
     'authorize-notification'
 ]);
+angular.module('authorize-notification', [
+    'notification'
+]).directive('authorizeNotification', function() {
+    return {
+        replace : true,
+        restrict : 'E',
+        templateUrl : 'html/authorize-notification.html',
+        scope : true,
+        controllerAs : 'an',
+        controller : 'authorizeNotificationController'
+    };
+}).controller('authorizeNotificationController', function($window, Notification, $rootScope){
+    var vm = this;
+
+    //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
+    // Issue fixed in the M37 of Chrome :
+    vm.state = hasToBeShown();
+    vm.manuallyactivate = function() {
+        Notification.requestPermission(function() {
+            vm.state = hasToBeShown();
+            $rootScope.$digest();
+        });
+    };
+
+    function hasToBeShown() {
+        return (('Notification' in $window) && $window.Notification.permission != 'granted');
+    }
+});
+
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module('ps.podcast', [
+    'ps.podcast.details',
+    'ps.podcast.creation',
+    'ps.podcast.list'
+]);
+angular.module('ps.filters', [])
+    .filter('htmlToPlaintext', function () {
+        return function(text) {
+            return String(text || "").replace(/<[^>]+>/gm, '');
+        };
+    }
+);
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
+/**
+ * Created by kevin on 14/08/2014.
+ */
+
+_.mixin({
+    // Update in place, does not preserve order
+    updateinplace : function(localArray, remoteArray, comparisonFunction) {
+        // Default function working on the === operator by the indexOf function:
+        var comparFunc = comparisonFunction || function (inArray, elem) {
+            return inArray.indexOf(elem);
+        };
+
+        // Remove from localArray what is not in the remote array :
+        _.forEachRight(localArray.slice(), function (elem, key) {
+            if (comparFunc(remoteArray, elem) === -1) {
+                localArray.splice(key, 1);
+            }
+        });
+
+        // Add to localArray what is new in the remote array :
+        _.forEach(remoteArray, function (elem) {
+            if (comparFunc(localArray, elem) === -1) {
+                localArray.push(elem);
+            }
+        });
+
+        return localArray;
+    }
+});
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
+angular.module('navbar', [
+])
+    .directive('navbar', function() {
+        return {
+            transclude : true,
+            replace : true,
+            restrict : 'E',
+            templateUrl : 'html/navbar.html',
+            scope : true,
+            controllerAs : 'navbar',
+            controller : 'navbarController'
+        };
+    }).controller('navbarController', function(){
+        var vm = this;
+        vm.navCollapsed = true;
+    });
+
+
 angular.module('ps.download', [
     /*'ps.websocket',*/
     'ps.dataService.donwloadManager',
@@ -203,20 +309,12 @@ angular.module('ps.download', [
             }, $scope);
 
     });
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.podcast', [
-    'ps.podcast.details',
-    'ps.podcast.creation',
-    'ps.podcast.list'
-]);
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
+    'ps.player',
     'AngularStompDK'
 ])
-    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, podcast, item) {
+    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
 
         $scope.item = item;
         $scope.item.podcast = podcast;
@@ -227,6 +325,7 @@ angular.module('ps.item.details', [
 
         $scope.remove = function(item) {
             return item.remove().then(function() {
+                playlistService.remove(item);
                 $location.path('/podcast/'.concat($scope.item.podcast.id));
             });
         };
@@ -234,7 +333,16 @@ angular.module('ps.item.details', [
         $scope.reset = function (item) {
             return item.reset().then(function (itemReseted) {
                 _.assign($scope.item, itemReseted);
+                playlistService.remove(item);
             });
+        };
+        
+        $scope.toggleInPlaylist = function () {
+            playlistService.addOrRemove(item);
+        };
+        
+        $scope.isInPlaylist = function() {
+            return playlistService.contains(item);
         };
 
         //** WebSocket Inscription **//
@@ -249,10 +357,6 @@ angular.module('ps.item.details', [
                 }
             }, $scope);
     });
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
 /**
  * Created by kevin on 01/11/14.
  */
@@ -260,16 +364,6 @@ angular.module('ps.search', [
 angular.module('ps.item', [
     'ps.item.details',
     'ps.item.player'
-]);
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
 ]);
 angular.module('ps.item.player', [
     'ngSanitize',
@@ -296,14 +390,14 @@ angular.module('ps.item.player', [
                 }
             });
     })
-    .controller('ItemPlayerController', function (podcast, item) {
+    .controller('ItemPlayerController', function (podcast, item, $timeout) {
         var vm = this;
         
         vm.item = item;
         vm.item.podcast = podcast;
-
+        
         vm.config = {
-            preload: 'none',
+            preload: true,
             sources: [
                 { src : item.localUrl, type : item.mimeType }
             ],
@@ -311,11 +405,122 @@ angular.module('ps.item.player', [
                 url: "http://www.videogular.com/styles/themes/default/videogular.css"
             },
             plugins: {
+                controls: {
+                    autoHide: true,
+                    autoHideTime: 2000
+                },
                 poster: item.cover.url
             }
         }
-    });
 
+        vm.onPlayerReady = function(API) {
+            if (vm.config.preload) {
+                $timeout(function () {
+                    API.play();
+                })
+            }
+        };
+    });
+angular.module('ps.player', [
+    'ngSanitize',
+    'ngRoute',
+    'ngStorage',
+    'com.2fdevs.videogular',
+    'com.2fdevs.videogular.plugins.poster',
+    'com.2fdevs.videogular.plugins.controls',
+    'com.2fdevs.videogular.plugins.overlayplay',
+    'com.2fdevs.videogular.plugins.buffering'
+])
+    .config(function($routeProvider) {
+        $routeProvider.
+            when('/player', {
+                templateUrl: 'html/player.html',
+                controller: 'PlayerController',
+                controllerAs: 'pc'
+            });
+    })
+    .controller('PlayerController', function (playlistService, $timeout) {
+        var vm = this; 
+        
+        vm.state = null;
+        vm.API = null;
+        vm.currentVideo = 0;
+
+        vm.onPlayerReady = function(API) {
+            vm.API = API;
+
+            if (vm.API.currentState == 'play' || vm.isCompleted) 
+                vm.API.play();
+
+            vm.isCompleted = false;
+            vm.setVideo(0)
+        };
+
+        vm.onCompleteVideo = function() {
+            vm.isCompleted = true;
+            vm.currentVideo++;
+
+            if (vm.currentVideo >= vm.playlist.length) {
+                vm.currentVideo = 0;
+                return;
+            }
+
+            vm.setVideo(vm.currentVideo);
+        };
+        
+
+        vm.config = {
+            preload : true,
+            sources: [],
+            theme: {
+                url: "http://www.videogular.com/styles/themes/default/videogular.css"
+            },
+            plugins: {
+                controls: {
+                    autoHide: true,
+                    autoHideTime: 2000
+                },
+                poster: ''
+            }
+        };
+        
+        vm.playlist = playlistService.playlist();
+
+        vm.setVideo = function(index) {
+            var item = vm.playlist[index];
+
+            if (item !== null && item !== undefined) {
+                vm.API.stop();
+                vm.currentVideo = index;
+                vm.config.sources = [{src : item.localUrl, type : item.mimeType }];
+                vm.config.plugins.poster = item.cover.url;
+                if (vm.config.preload) {
+                    $timeout(function() { vm.API.play(); }, 500);
+                }
+            }
+        };
+
+    })
+    .factory('playlistService', function($localStorage) {
+        $localStorage.playlist = $localStorage.playlist || [];
+        return {
+            playlist : function() {
+                return $localStorage.playlist
+            },
+            add : function(item) {
+                $localStorage.playlist.push(item);
+            },
+            remove : function (item) {
+                $localStorage.playlist = _.remove($localStorage.playlist, function(elem) { return elem.id !== item.id; });
+            },
+            contains : function(item) {
+                return angular.isObject(_.find($localStorage.playlist, {id : item.id}));
+            },
+            addOrRemove : function (item) {
+                (this.contains(item)) ? this.remove(item) : this.add(item);
+            }
+        };
+    });
 angular.module('ps.podcast.creation', [
     'restangular'
 ])
@@ -368,88 +573,6 @@ angular.module('ps.podcast.list', [
     .controller('PodcastsListCtrl', function ($scope, podcasts) {
         $scope.podcasts = podcasts;
     });
-angular.module('authorize-notification', [
-    'notification'
-]).directive('authorizeNotification', function() {
-    return {
-        replace : true,
-        restrict : 'E',
-        templateUrl : 'html/authorize-notification.html',
-        scope : true,
-        controllerAs : 'an',
-        controller : 'authorizeNotificationController'
-    };
-}).controller('authorizeNotificationController', function($window, Notification, $rootScope){
-    var vm = this;
-
-    //** https://code.google.com/p/chromium/issues/detail?id=274284 **/
-    // Issue fixed in the M37 of Chrome :
-    vm.state = hasToBeShown();
-    vm.manuallyactivate = function() {
-        Notification.requestPermission(function() {
-            vm.state = hasToBeShown();
-            $rootScope.$digest();
-        });
-    };
-
-    function hasToBeShown() {
-        return (('Notification' in $window) && $window.Notification.permission != 'granted');
-    }
-});
-
-angular.module('ps.filters', [])
-    .filter('htmlToPlaintext', function () {
-        return function(text) {
-            return String(text || "").replace(/<[^>]+>/gm, '');
-        };
-    }
-);
-/**
- * Created by kevin on 14/08/2014.
- */
-
-_.mixin({
-    // Update in place, does not preserve order
-    updateinplace : function(localArray, remoteArray, comparisonFunction) {
-        // Default function working on the === operator by the indexOf function:
-        var comparFunc = comparisonFunction || function (inArray, elem) {
-            return inArray.indexOf(elem);
-        };
-
-        // Remove from localArray what is not in the remote array :
-        _.forEachRight(localArray.slice(), function (elem, key) {
-            if (comparFunc(remoteArray, elem) === -1) {
-                localArray.splice(key, 1);
-            }
-        });
-
-        // Add to localArray what is new in the remote array :
-        _.forEach(remoteArray, function (elem) {
-            if (comparFunc(localArray, elem) === -1) {
-                localArray.push(elem);
-            }
-        });
-
-        return localArray;
-    }
-});
-angular.module('navbar', [
-])
-    .directive('navbar', function() {
-        return {
-            transclude : true,
-            replace : true,
-            restrict : 'E',
-            templateUrl : 'html/navbar.html',
-            scope : true,
-            controllerAs : 'navbar',
-            controller : 'navbarController'
-        };
-    }).controller('navbarController', function(){
-        var vm = this;
-        vm.navCollapsed = true;
-    });
-
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -583,17 +706,25 @@ module.run(['$templateCache', function($templateCache) {
     '                        <!-- Lancer le téléchargement -->\n' +
     '                        <button ng-click="item.download()" ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '\n' +
-    '                        <!-- Accéder au fichier -->\n' +
-    '                        <a ng-href="{{ item.url }}" ng-show="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>\n' +
     '                        <!--<a ng-href="{{ item.localUrl }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>-->\n' +
     '                        <a ng-href="/#/podcast/{{ item.podcast.id }}/item/{{ item.id }}/play" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>\n' +
     '\n' +
-    '                        <!-- Supprimer l\'item -->\n' +
-    '                        <button ng-click="remove(item)" ng-show="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
+    '                        <!-- Add to Playlist -->\n' +
+    '                        <a ng-show="item.localUrl != null" ng-click="toggleInPlaylist()" type="button" class="btn btn-primary">\n' +
+    '                            <span ng-hide="isInPlaylist()" class="glyphicon glyphicon-plus"></span>\n' +
+    '                            <span ng-show="isInPlaylist()" class="glyphicon glyphicon-minus"></span>\n' +
+    '                        </a>\n' +
     '\n' +
-    '                        <!-- Reset de l\'itam -->\n' +
-    '                        <button ng-click="reset(item)" ng-hide="item.status == \'Started\' || item.status == \'Paused\'" type="button" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span></button>\n' +
-    '\n' +
+    '                        <div class="btn-group" dropdown is-open="isopen">\n' +
+    '                            <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
+    '                            <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
+    '                                <li ng-show="item.localUrl != null"><a ng-href="{{ item.localUrl }}"><span class="glyphicon glyphicon-play"></span> Lire</a></li>\n' +
+    '                                <li><a ng-click="remove(item)" ng-show="(item.status != \'Started\' && item.status != \'Paused\' )"><span class="glyphicon glyphicon-remove"></span> Retirer</a></li>\n' +
+    '                                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
+    '                                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
+    '                            </ul>\n' +
+    '                        </div>\n' +
+    '                        \n' +
     '                    </div>\n' +
     '                </div>\n' +
     '            </div>\n' +
@@ -636,10 +767,10 @@ module.run(['$templateCache', function($templateCache) {
     '    </ol>\n' +
     '\n' +
     '    <div ng-show="ipc.item.localUrl !== null" class="videogular-container">\n' +
-    '        <videogular vg-theme="controller.config.theme.url">\n' +
+    '        <videogular vg-theme="ipc.config.theme.url" vg-player-ready="ipc.onPlayerReady">\n' +
     '            <vg-video vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-video>\n' +
     '\n' +
-    '            <vg-controls>\n' +
+    '            <vg-controls vg-autohide="ipc.config.plugins.controls.autoHide" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">\n' +
     '                <vg-play-pause-button></vg-play-pause-button>\n' +
     '                <vg-timedisplay>{{ currentTime | date:\'mm:ss\' }}</vg-timedisplay>\n' +
     '                <vg-scrubBar>\n' +
@@ -717,30 +848,33 @@ module.run(['$templateCache', function($templateCache) {
     '                                <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
     '                                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
     '                                    <li ng-show="item.status == \'Started\' || item.status == \'Paused\'">\n' +
-    '                                        <a ng-show="item.status == \'Started\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Mettre en pause</a>\n' +
-    '                                        <a ng-show="item.status == \'Paused\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i> Reprendre</a>\n' +
+    '                                        <a ng-show="item.status == \'Started\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>\n' +
+    '                                        <a ng-show="item.status == \'Paused\'" ng-click="toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>\n' +
     '                                    </li>\n' +
     '                                    <li ng-show="item.status == \'Started\' || item.status == \'Paused\'">\n' +
-    '                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop"></span> Stopper</a>\n' +
+    '                                        <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop text-danger"></span> Stopper</a>\n' +
     '                                    </li>\n' +
     '                                    <li ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null">\n' +
-    '                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save"></span> Télécharger</a>\n' +
+    '                                        <a ng-click="item.download()"><span class="glyphicon glyphicon-save text-primary"></span> Télécharger</a>\n' +
     '                                    </li>\n' +
-    '                                    <li ng-show="item.localUrl == null" >\n' +
-    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a>\n' +
-    '                                    </li>\n' +
-    '                                    <!--\n' +
-    '                                    <li ng-show="item.localUrl != null">\n' +
-    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span></a>\n' +
-    '                                    </li> -->\n' +
     '                                    <li>\n' +
-    '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove"></span> Supprimer</a>\n' +
+    '                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.localUrl != null">\n' +
+    '                                            <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player</a>\n' +
+    '                                    </li>\n' +
+    '                                    <li ng-show="item.localUrl != null">\n' +
+    '                                        <a ng-click="addOrRemove(item)">\n' +
+    '                                            <span ng-hide="isInPlaylist(item)"><span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist</span>\n' +
+    '                                            <span ng-show="isInPlaylist(item)"><span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist</span>\n' +
+    '                                        </a>\n' +
+    '                                    </li>\n' +
+    '                                    <!--<li ng-show="item.localUrl == null" >\n' +
+    '                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a>\n' +
+    '                                    </li>-->\n' +
+    '                                    <li>\n' +
+    '                                        <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove text-danger"></span> Supprimer</a>\n' +
     '                                    </li>\n' +
     '                                    <li>\n' +
     '                                        <a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>\n' +
-    '                                    </li>\n' +
-    '                                    <li ng-show="item.localUrl != null">\n' +
-    '                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a>\n' +
     '                                    </li>\n' +
     '                                </ul>\n' +
     '                            </div>\n' +
@@ -794,6 +928,56 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</nav>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('ps.partial');
+} catch (e) {
+  module = angular.module('ps.partial', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('html/player.html',
+    '<div class="container video-player">\n' +
+    '    <br/>\n' +
+    '    <div class="col-lg-8 player">\n' +
+    '        <videogular vg-theme="controller.config.theme.url" vg-player-ready="pc.onPlayerReady" vg-complete="pc.onCompleteVideo">\n' +
+    '            <vg-video vg-src="pc.config.sources" vg-native-controls="false" vg-preload="pc.config.preload"></vg-video>\n' +
+    '\n' +
+    '            <vg-controls vg-autohide="pc.config.plugins.controls.autoHide" vg-autohide-time="pc.config.plugins.controls.autoHideTime">\n' +
+    '                <vg-play-pause-button></vg-play-pause-button>\n' +
+    '                <vg-timedisplay>{{ currentTime | date:\'mm:ss\' }}</vg-timedisplay>\n' +
+    '                <vg-scrubBar>\n' +
+    '                    <vg-scrubbarcurrenttime></vg-scrubbarcurrenttime>\n' +
+    '                </vg-scrubBar>\n' +
+    '                <vg-timedisplay>{{ timeLeft | date:\'mm:ss\' }}</vg-timedisplay>\n' +
+    '                <vg-volume>\n' +
+    '                    <vg-mutebutton></vg-mutebutton>\n' +
+    '                    <vg-volumebar></vg-volumebar>\n' +
+    '                </vg-volume>\n' +
+    '                <vg-fullscreenButton></vg-fullscreenButton>\n' +
+    '            </vg-controls>\n' +
+    '\n' +
+    '            <vg-overlay-play></vg-overlay-play>\n' +
+    '\n' +
+    '            <vg-poster-image vg-url=\'pc.config.plugins.poster\'></vg-poster-image>\n' +
+    '        </videogular>\n' +
+    '    </div>\n' +
+    '    <div class="playlist col-lg-4">\n' +
+    '        <div class="media clearfix"  ng-repeat="item in pc.playlist track by item.id" ng-class="{\'isReading\' : pc.currentVideo === $index}">\n' +
+    '            <a class="pull-left cover" ng-click="pc.setVideo($index)">\n' +
+    '                <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
+    '            </a>\n' +
+    '\n' +
+    '            <div class="media-body">\n' +
+    '                <p ng-click="pc.setVideo($index)" class="">{{ item.title }}</p>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '        \n' +
+    '    </div>\n' +
+    '\n' +
+    '</div>');
 }]);
 })();
 
@@ -1104,19 +1288,27 @@ module.run(['$templateCache', function($templateCache) {
     '            <!-- Lancer le téléchargement -->\n' +
     '            <button ng-click="item.download()" ng-show="(item.status != \'Started\' && item.status != \'Paused\' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>\n' +
     '\n' +
-    '            <!-- Accéder au fichier -->\n' +
-    '            <a href="{{ item.localUrl }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>\n' +
-    '\n' +
+    '            <!-- Lire dans le player -->\n' +
+    '            <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>\n' +
+    '            \n' +
     '            <!-- Supprimer l\'item -->\n' +
     '            <button ng-click="remove(item)" ng-show="(item.status != \'Started\' && item.status != \'Paused\' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>\n' +
     '\n' +
-    '\n' +
+    '            <!-- Menu complémentaire -->\n' +
     '            <div class="btn-group" dropdown is-open="isopen">\n' +
     '                <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
     '                <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
-    '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
-    '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
-    '                    <li ng-show="item.localUrl != null"><a ng-href="/#/podcast/{{ podcast.id }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a></li>\n' +
+    '                    <li ng-show="item.localUrl != null"><a ng-href="{{ item.localUrl }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>\n' +
+    '                    <li ng-show="item.localUrl != null">\n' +
+    '                        <a ng-hide="isInPlaylist(item)" ng-click="addOrRemoveInPlaylist(item)">\n' +
+    '                            <span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist\n' +
+    '                        </a>\n' +
+    '                        <a ng-show="isInPlaylist(item)" ng-click="addOrRemoveInPlaylist(item)">\n' +
+    '                            <span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist\n' +
+    '                        </a>\n' +
+    '                    </li>\n' +
+    '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>\n' +
+    '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
     '                </ul>\n' +
     '            </div>\n' +
     '        </div>\n' +
@@ -1364,10 +1556,10 @@ angular.module('ps.podcast.details.edition', [])
 'use strict';
 
 angular.module('ps.podcast.details.episodes', [
-    /*'ps.websocket',*/
+    'ps.player',
     'AngularStompDK'
 ])
-    .directive('podcastItemsList', function($log){
+    .directive('podcastItemsList', function(){
         return {
             restrcit : 'E',
             templateUrl : 'html/podcast-details-episodes.html',
@@ -1378,7 +1570,7 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService, playlistService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
@@ -1411,6 +1603,8 @@ angular.module('ps.podcast.details.episodes', [
                 $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
                     return (elem.id === item.id);
                 });
+            }).then(function() {
+                playlistService.remove(item);
             }).then($scope.loadPage);
         };
 
@@ -1419,7 +1613,16 @@ angular.module('ps.podcast.details.episodes', [
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
             });
+        };
+
+        $scope.addOrRemoveInPlaylist = function (item) {
+            playlistService.addOrRemove(item);
+        };
+
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
         };
 
         $scope.swipePage = function(val) {
@@ -1486,10 +1689,11 @@ angular.module('ps.podcast.details.upload', [
 angular.module('ps.search.item', [
     'ps.dataService.item',
     'ps.dataService.tag',
+    'ps.player',
     'ps.dataService.donwloadManager'
 ])
     .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage) {
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
         'use strict';
 
         // Gestion du cache de la pagination :
@@ -1529,6 +1733,7 @@ angular.module('ps.search.item', [
         //** Item Operation **//
         $scope.remove = function (item) {
             return item.remove().then(function(){
+                playlistService.remove(item);
                 return $scope.changePage();
             });
         };
@@ -1537,6 +1742,7 @@ angular.module('ps.search.item', [
             return item.reset().then(function (itemReseted) {
                 var itemInList = _.find($scope.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
             });
         };
 
@@ -1560,6 +1766,14 @@ angular.module('ps.search.item', [
         $scope.toggleDownload = DonwloadManager.toggleDownload;
         $scope.loadTags = tagService.search;
 
+        //** Playlist Manager **//
+        $scope.addOrRemove = function(item) {
+            return playlistService.addOrRemove(item);
+        };
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
+        };
+        
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
         ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);

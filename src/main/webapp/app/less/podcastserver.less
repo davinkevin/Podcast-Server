@@ -246,29 +246,30 @@
   }
 }
 
+podcast-items-list {
+  .media {
+    margin-left: 5px;
+    margin-right: 5px;
+    overflow: visible;
+    .media-heading {
+      .text-overflow();
+    }
 
-.media {
-  margin-left: 5px;
-  margin-right: 5px;
-  overflow: visible;
-  .media-heading {
-    .text-overflow();
-  }
+    img {
+      object-fit : cover;
+    }
 
-  img {
-    object-fit : cover;
-  }
-
-  .btn {
-    border : none;
-  }
-  &.ng-leave {
-    -webkit-animation: fadeOutRight 0.5s;
-    animation: fadeOutRight 0.5s;
-  }
-  &.ng-enter {
-    -webkit-animation: fadeInLeft 0.5s;
-    animation: fadeInLeft 0.5s;
+    .btn {
+      border : none;
+    }
+    &.ng-leave {
+      -webkit-animation: fadeOutRight 0.5s;
+      animation: fadeOutRight 0.5s;
+    }
+    &.ng-enter {
+      -webkit-animation: fadeInLeft 0.5s;
+      animation: fadeInLeft 0.5s;
+    }
   }
 }
 
@@ -367,6 +368,9 @@
 
 
 .item-details {
+  * .btn-default.dropdown-toggle {
+    border : none;
+  }
   .thumbnail {
     img {
       min-height: 200px;
@@ -390,5 +394,48 @@
   @media screen and (max-width: @screen-sm-min) {
     margin: 7.5px -15px 0 -15px;
     padding-right: 16px;
+  }
+}
+
+.video-player {
+  
+  .player {
+    padding-top: 16px;
+  }
+  
+  .player, .playlist {
+    background: #000000;
+    @media screen and (min-width: @screen-lg-min) {
+      height: 500px;
+    }
+  }
+  video {
+    width:100%;
+    height:auto;
+  }
+  .playlist {
+    
+    
+    @media screen and (min-width: @screen-lg-min) {
+      padding-top: 16px;
+    }
+    @media screen and (max-width: @screen-lg-min) {
+      padding-bottom: 16px;
+    }
+    overflow-x: scroll;
+    .media {
+      margin-top : 0;
+      height: 115px;
+      padding-top: 7px;
+      padding-left: 7px;
+      color: white;
+      font-weight: bold;
+    }
+    .isReading {
+      background: #6F6F6F;
+      img {
+        border: 2px solid rgba(216, 41, 41, 0.81);
+      }
+    }
   }
 }

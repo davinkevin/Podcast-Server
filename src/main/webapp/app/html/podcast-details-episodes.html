@@ -11,19 +11,27 @@
             <!-- Lancer le téléchargement -->
             <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
-            <!-- Accéder au fichier -->
-            <a href="{{ item.localUrl }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
-
+            <!-- Lire dans le player -->
+            <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
+            
             <!-- Supprimer l'item -->
             <button ng-click="remove(item)" ng-show="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
 
-
+            <!-- Menu complémentaire -->
             <div class="btn-group" dropdown is-open="isopen">
                 <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon glyphicon-repeat"></span> Reset</a></li>
-                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>
-                    <li ng-show="item.localUrl != null"><a ng-href="/#/podcast/{{ podcast.id }}/item/{{ item.id }}/play"><span class="ionicons ion-social-youtube"> Lire dans le player</a></li>
+                    <li ng-show="item.localUrl != null"><a ng-href="{{ item.localUrl }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
+                    <li ng-show="item.localUrl != null">
+                        <a ng-hide="isInPlaylist(item)" ng-click="addOrRemoveInPlaylist(item)">
+                            <span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist
+                        </a>
+                        <a ng-show="isInPlaylist(item)" ng-click="addOrRemoveInPlaylist(item)">
+                            <span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist
+                        </a>
+                    </li>
+                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>
+                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
                 </ul>
             </div>
         </div>

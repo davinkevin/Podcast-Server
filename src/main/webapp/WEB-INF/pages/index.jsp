@@ -29,6 +29,12 @@
         </a>
     </li>
     <li>
+        <a href="#/player">
+            <span class="ionicons ion-social-youtube"></span>
+            <span class="hidden-xs"> Player</span>
+        </a>
+    </li>
+    <li>
         <a href="#/podcast/add">
             <span class="ionicons ion-android-add"></span>
             <span class="hidden-xs"> Ajouter</span>
@@ -56,7 +62,7 @@
 <script src="/app/js/lib/lodash/dist/lodash.compat.min.js"></script>
 <script src="/app/js/lib/stomp-websocket/lib/stomp.min.js"></script>
 <script src="/app/js/lib/sockjs/sockjs.min.js"></script>
-<script src="/app/js/lib/angular-local-storage/dist/angular-local-storage.min.js"></script>
+<script src="/app/js/lib/ngstorage/ngStorage.min.js"></script>
 <script src="/app/js/lib/angular-truncate/src/truncate.js"></script>
 <script src="/app/js/lib/angular-loading-bar/build/loading-bar.min.js"></script>
 <script src="/app/js/lib/ng-tags-input/ng-tags-input.min.js"></script>

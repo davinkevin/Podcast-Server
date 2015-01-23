@@ -39,12 +39,12 @@
 .downloadList .media * img{width:100px;height:90px;border-top-left-radius:5px;border-bottom-left-radius:5px;object-fit:cover}
 .downloadList .media .media-heading{padding-top:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .downloadList .media .buttonList{padding-top:24px}
-.media{margin-left:5px;margin-right:5px;overflow:visible}
-.media .media-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.media img{object-fit:cover}
-.media .btn{border:none}
-.media.ng-leave{-webkit-animation:fadeOutRight .5s;animation:fadeOutRight .5s}
-.media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fadeInLeft .5s}
+podcast-items-list .media{margin-left:5px;margin-right:5px;overflow:visible}
+podcast-items-list .media .media-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+podcast-items-list .media img{object-fit:cover}
+podcast-items-list .media .btn{border:none}
+podcast-items-list .media.ng-leave{-webkit-animation:fadeOutRight .5s;animation:fadeOutRight .5s}
+podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fadeInLeft .5s}
 .bootstrap .tags{background-color:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;-webkit-appearance:inherit}
 .bootstrap .tags.focused{border-color:#66afe9;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}
 .bootstrap .tags .tag-item{background:#428bca;border:1px solid #357ebd;border-radius:4px;color:#fff}
@@ -61,7 +61,18 @@
 .upload-item .drop-box{background:#F8F8F8;border:5px dashed #DDD;height:100px;text-align:center}
 .upload-item .drop-box .upload-text{height:100%;padding-top:5%}
 .upload-item .drop-box.dropping{background:#C7C7C7}
+.item-details * .btn-default.dropdown-toggle{border:none}
 .item-details .thumbnail img{min-height:200px;object-fit:cover}
 .item-player video{width:100%;height:auto}
 .navbar-nav>li{float:left}
 @media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
+.video-player .player{padding-top:16px}
+.video-player .player,.video-player .playlist{background:#000}
+@media screen and (min-width:1200px){.video-player .player,.video-player .playlist{height:500px}}
+.video-player video{width:100%;height:auto}
+.video-player .playlist{overflow-x:scroll}
+@media screen and (min-width:1200px){.video-player .playlist{padding-top:16px}}
+@media screen and (max-width:1200px){.video-player .playlist{padding-bottom:16px}}
+.video-player .playlist .media{margin-top:0;height:115px;padding-top:7px;padding-left:7px;color:#fff;font-weight:700}
+.video-player .playlist .isReading{background:#6F6F6F}
+.video-player .playlist .isReading img{border:2px solid rgba(216,41,41,.81)}
