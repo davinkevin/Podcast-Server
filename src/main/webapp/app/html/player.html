@@ -25,6 +25,9 @@
     </div>
     <div class="playlist col-lg-4">
         <div class="media clearfix"  ng-repeat="item in pc.playlist track by item.id" ng-class="{'isReading' : pc.currentVideo === $index}">
+
+            <button ng-click="pc.remove(item)" type="button" class="pull-right close"><span aria-hidden="true">&times;</span></button>
+
             <a class="pull-left cover" ng-click="pc.setVideo($index)">
                 <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
             </a>

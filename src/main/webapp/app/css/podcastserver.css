@@ -73,6 +73,6 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .video-player .playlist{overflow-x:scroll}
 @media screen and (min-width:1200px){.video-player .playlist{padding-top:16px}}
 @media screen and (max-width:1200px){.video-player .playlist{padding-bottom:16px}}
-.video-player .playlist .media{margin-top:0;height:115px;padding-top:7px;padding-left:7px;color:#fff;font-weight:700}
+.video-player .playlist .media{margin-top:0;height:115px;padding-top:8px;padding-left:8px;padding-right:8px;color:#fff;font-weight:700}
 .video-player .playlist .isReading{background:#6F6F6F}
 .video-player .playlist .isReading img{border:2px solid rgba(216,41,41,.81)}

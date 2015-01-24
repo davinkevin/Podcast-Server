@@ -484,8 +484,8 @@ angular.module('ps.player', [
             }
         };
         
-        vm.playlist = playlistService.playlist();
-
+        reloadPlaylist();
+        
         vm.setVideo = function(index) {
             var item = vm.playlist[index];
 
@@ -499,7 +499,15 @@ angular.module('ps.player', [
                 }
             }
         };
+        
+        vm.remove = function(item) {
+            playlistService.remove(item);
+            reloadPlaylist();
+        };
 
+        function reloadPlaylist() {
+            vm.playlist = playlistService.playlist();
+        }
     })
     .factory('playlistService', function($localStorage) {
         $localStorage.playlist = $localStorage.playlist || [];
@@ -966,6 +974,9 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '    <div class="playlist col-lg-4">\n' +
     '        <div class="media clearfix"  ng-repeat="item in pc.playlist track by item.id" ng-class="{\'isReading\' : pc.currentVideo === $index}">\n' +
+    '\n' +
+    '            <button ng-click="pc.remove(item)" type="button" class="pull-right close"><span aria-hidden="true">&times;</span></button>\n' +
+    '\n' +
     '            <a class="pull-left cover" ng-click="pc.setVideo($index)">\n' +
     '                <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
     '            </a>\n' +

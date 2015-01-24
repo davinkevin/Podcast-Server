@@ -61,8 +61,8 @@ angular.module('ps.player', [
             }
         };
         
-        vm.playlist = playlistService.playlist();
-
+        reloadPlaylist();
+        
         vm.setVideo = function(index) {
             var item = vm.playlist[index];
 
@@ -76,7 +76,15 @@ angular.module('ps.player', [
                 }
             }
         };
+        
+        vm.remove = function(item) {
+            playlistService.remove(item);
+            reloadPlaylist();
+        };
 
+        function reloadPlaylist() {
+            vm.playlist = playlistService.playlist();
+        }
     })
     .factory('playlistService', function($localStorage) {
         $localStorage.playlist = $localStorage.playlist || [];
