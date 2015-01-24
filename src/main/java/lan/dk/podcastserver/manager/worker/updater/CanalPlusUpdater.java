@@ -108,19 +108,19 @@ public class CanalPlusUpdater extends AbstractUpdater {
         // Si la page possède un planifier :
         if (page != null) {
             if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-                return DigestUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
+                return SignatureUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
             }
         }
 
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
         if (!podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return DigestUtils.generateMD5SignatureFromUrl(this.getPodcastURLFromFrontTools(podcast.getUrl()));
+            return SignatureUtils.generateSignatureFromURL(this.getPodcastURLFromFrontTools(podcast.getUrl()));
         }
 
         // Si l'url est une front-tools et que la liste est encore vide :
         if (podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return DigestUtils.generateMD5SignatureFromUrl(podcast.getUrl());
+            return SignatureUtils.generateSignatureFromURL(podcast.getUrl());
         }
         return "";
     }

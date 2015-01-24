@@ -171,7 +171,7 @@ public class BeInSportUpdater extends AbstractUpdater {
 
         if (!listingUrl.equals("")) {
             logger.debug("URL de signature : {}", listingUrl);
-            return DigestUtils.generateMD5SignatureFromUrl(podcast.getUrl());
+            return SignatureUtils.generateSignatureFromURL(podcast.getUrl());
         } else {
             return "";
         }

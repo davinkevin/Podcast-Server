@@ -256,7 +256,7 @@
         <dependency>
             <groupId>com.github.axet</groupId>
             <artifactId>vget</artifactId>
-            <version>1.1.5</version>
+            <version>1.1.22</version>
         </dependency>
 
         <dependency>

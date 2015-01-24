@@ -2,8 +2,8 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -130,7 +130,7 @@ public class PluzzUpdater extends AbstractUpdater {
 
             Elements listOfItem = page.select(JSOUP_ITEM_SELECTOR);
 
-            return DigestUtils.generateMD5SignatureFromDOM((listOfItem.size() == 0) ? page.html() : listOfItem.html());
+            return SignatureUtils.generateMD5SignatureFromDOM((listOfItem.size() == 0) ? page.html() : listOfItem.html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);

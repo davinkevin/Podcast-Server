@@ -3,8 +3,8 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -133,7 +133,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
         try {
             page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
-            return DigestUtils.generateMD5SignatureFromDOM(page.select(".block-video-tableVideo tbody tr").html());
+            return SignatureUtils.generateMD5SignatureFromDOM(page.select(".block-video-tableVideo tbody tr").html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);

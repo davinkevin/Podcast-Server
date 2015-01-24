@@ -3,8 +3,8 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.DigestUtils;
 import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -133,7 +133,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
         if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0) != null) {
-            return DigestUtils.generateMD5SignatureFromDOM (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));
+            return SignatureUtils.generateMD5SignatureFromDOM(podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));
         }
         return "";
     }

@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.Utils;
 
-import lan.dk.podcastserver.utils.DigestUtils;
+import lan.dk.podcastserver.utils.SignatureUtils;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
@@ -11,6 +11,6 @@ public class DigestTest {
 
     @Test
     public void DigestHTML() {
-        Assert.notNull(DigestUtils.generateMD5SignatureFromDOM("uneNouvellePhrase"));
+        Assert.notNull(SignatureUtils.generateMD5SignatureFromDOM("uneNouvellePhrase"));
     }
 }
