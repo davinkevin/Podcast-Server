@@ -21,7 +21,7 @@
                     <vg-mutebutton></vg-mutebutton>
                     <vg-volumebar></vg-volumebar>
                 </vg-volume>
-                <vg-fullscreenButton></vg-fullscreenButton>
+                <vg-fullscreenButton ng-show="ipc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreenButton>
                 <div class='btn-video-share'><a ng-href="{{ ipc.item.localUrl }}" class="ionicons ion-android-share"></a></div>
             </vg-controls>
 

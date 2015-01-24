@@ -124,11 +124,6 @@ angular.module('podcastApp', [
             .credential('login', 'password')
             .class(SockJS);
     });
-angular.module('ps.common', [
-    'ps.filters',
-    'navbar',
-    'authorize-notification'
-]);
 angular.module('authorize-notification', [
     'notification'
 ]).directive('authorizeNotification', function() {
@@ -158,14 +153,10 @@ angular.module('authorize-notification', [
     }
 });
 
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.podcast', [
-    'ps.podcast.details',
-    'ps.podcast.creation',
-    'ps.podcast.list'
+angular.module('ps.common', [
+    'ps.filters',
+    'navbar',
+    'authorize-notification'
 ]);
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
@@ -174,10 +165,6 @@ angular.module('ps.filters', [])
         };
     }
 );
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -208,14 +195,13 @@ _.mixin({
     }
 });
 /**
- * Created by kevin on 02/11/14.
+ * Created by kevin on 01/11/14.
  */
 
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
+angular.module('ps.podcast', [
+    'ps.podcast.details',
+    'ps.podcast.creation',
+    'ps.podcast.list'
 ]);
 angular.module('navbar', [
 ])
@@ -234,6 +220,9 @@ angular.module('navbar', [
         vm.navCollapsed = true;
     });
 
+angular.module('ps.search', [
+    'ps.search.item'
+]);
 
 angular.module('ps.download', [
     /*'ps.websocket',*/
@@ -309,6 +298,17 @@ angular.module('ps.download', [
             }, $scope);
 
     });
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
+
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
     'ps.player',
@@ -583,6 +583,415 @@ angular.module('ps.podcast.list', [
     .controller('PodcastsListCtrl', function ($scope, podcasts) {
         $scope.podcasts = podcasts;
     });
+angular.module('ps.dataService.donwloadManager', [
+    'restangular'
+])
+    .factory('DonwloadManager', function(Restangular) {
+    'use strict';
+    return {
+        download: function (item) {
+            return Restangular.one("item").customGET(item.id + "/addtoqueue");
+        },
+        stopDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+        },
+        toggleDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+        },
+        stopAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
+        },
+        pauseAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
+        },
+        restartAllCurrentDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
+        },
+        removeFromQueue: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
+        },
+        updateNumberOfSimDl: function (number) {
+            return Restangular.one("task").customPOST(number, "downloadManager/limit");
+        },
+        dontDonwload: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+        },
+        getDownloading : function() {
+            return Restangular.one('task').all("downloadManager/downloading").getList();
+        },
+        getNumberOfSimDl : function() {
+            return Restangular.one("task/downloadManager/limit").get();
+        }
+    };
+});
+/**
+ * Created by kevin on 01/11/14.
+ */
+angular.module('ps.dataService.item', [
+    'restangular'
+])
+    .factory('itemService', function (Restangular) {
+        'use strict';
+        return {
+            search: search,
+            findById : findById,
+            getItemForPodcastWithPagination : getItemForPodcastWithPagination,
+            restangularizePodcastItem : restangularizePodcastItem
+        };
+
+        function search(searchParameters) {
+            //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
+            return Restangular.one("item/search")
+                .post(null, searchParameters)
+                .then(function (responseFromServer) {
+                    responseFromServer.content = restangularizedItems(responseFromServer.content);
+                    return responseFromServer;
+                });
+        }
+
+        function findById(podcastId, itemId) {
+            return Restangular.one("podcast", podcastId).one("items", itemId).get();
+        }
+
+        function getItemForPodcastWithPagination(podcast, pageParemeters) {
+            return podcast.one("items").post(null, pageParemeters);
+        }
+
+        function restangularizePodcastItem (podcast, items) {
+            return Restangular.restangularizeCollection(podcast, items, 'items');
+        }
+
+        // Private Function :
+
+        // transformation
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        }
+    });
+
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataService.podcast', [
+    'restangular'
+]).factory('podcastService', function (Restangular) {
+    'use strict';
+
+    return {
+        findById    :   findById,
+        findAll     :   findAll
+    };
+
+    function findById(podcastId) {
+        return Restangular.one('podcast', podcastId).get();
+    }
+
+    function findAll() {
+        return Restangular.all('podcast').getList();
+    }
+});
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module('ps.dataService.tag', [
+    'restangular'
+]).factory('tagService', function (Restangular) {
+    'use strict';
+    var baseAll = Restangular.all('tag');
+
+    return {
+        getAll : getAll,
+        search : search
+    };
+
+
+
+    function getAll() {
+        return baseAll.get();
+    }
+
+    function search(query) {
+        return baseAll.post(null, {name : query});
+    }
+});
+'use strict';
+
+angular.module('ps.podcast.details.edition', [])
+    .directive('podcastEdition', function () {
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-edition.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastEditionCtrl'
+        };
+    })
+    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
+        var tags = Restangular.all("tag");
+
+        $scope.loadTags = function (query) {
+            return tags.post(null, {name : query});
+        };
+
+        $scope.save = function () {
+            var podcastToUpdate = _.cloneDeep($scope.podcast);
+            podcastToUpdate.items = null;
+            $scope.podcast.patch(podcastToUpdate)
+                .then(function (patchedPodcast){
+                    _.assign($scope.podcast, patchedPodcast);
+                })
+                .then(function () {
+                    $scope.$emit('podcastEdition:save');
+                });
+        };
+        $scope.deletePodcast = function () {
+            $scope.podcast.remove().then(function () {
+                $location.path('/podcasts');
+            });
+        };
+    });
+
+'use strict';
+
+angular.module('ps.podcast.details.episodes', [
+    'ps.player',
+    'AngularStompDK'
+])
+    .directive('podcastItemsList', function(){
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-episodes.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastItemsListCtrl'
+        };
+    })
+    .constant('PodcastItemPerPage', 10)
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService, playlistService ) {
+        $scope.currentPage = 1;
+        $scope.itemPerPage = PodcastItemPerPage;
+
+        var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
+
+        ngstomp
+            .subscribe(webSocketUrl, function (message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+                _.assign(elemToUpdate, item);
+            }, $scope);
+
+        $scope.loadPage = function() {
+            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
+            return itemService.getItemForPodcastWithPagination($scope.podcast, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
+                .then(function(itemsResponse) {
+                    $scope.podcast.items = itemService.restangularizePodcastItem($scope.podcast, itemsResponse.content);
+                    $scope.podcast.totalItems = itemsResponse.totalElements;
+                });
+        };
+
+        $scope.loadPage();
+        $scope.$on("podcastItems:refresh", function () {
+            $scope.currentPage = 1;
+            $scope.loadPage();
+        });
+
+        $scope.remove = function (item) {
+            item.remove().then(function() {
+                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
+                    return (elem.id === item.id);
+                });
+            }).then(function() {
+                playlistService.remove(item);
+            }).then($scope.loadPage);
+        };
+
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
+            });
+        };
+
+        $scope.addOrRemoveInPlaylist = function (item) {
+            playlistService.addOrRemove(item);
+        };
+
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
+        };
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.loadPage();
+        };
+
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+    });
+
+angular.module('ps.podcast.details', [
+    'ps.podcast.details',
+    'ps.podcast.details.episodes',
+    'ps.podcast.details.edition',
+    'ps.podcast.details.upload',
+    'restangular'
+]).controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
+
+        $scope.podcast = podcast;
+
+        function refreshItems () {
+            $scope.$broadcast('podcastItems:refresh');
+        }
+
+        $scope.refresh = function () {
+            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
+                .then(refreshItems);
+        };
+        $scope.$on("podcastEdition:save", refreshItems);
+
+    });
+'use strict';
+
+angular.module('ps.podcast.details.upload', [
+    'angularFileUpload'
+])
+    .directive('podcastUpload', function ($log) {
+        return {
+            restrcit : 'E',
+            templateUrl : 'html/podcast-details-upload.html',
+            scope : {
+                podcast : '='
+            },
+            controller : 'podcastUploadCtrl'
+        };
+    })
+    .controller('podcastUploadCtrl', function ($scope, $log) {
+        $scope.onFileSelect = function($files) {
+            var formData;
+            angular.forEach($files, function (file) {
+                formData = new FormData();
+                formData.append('file', file);
+                $scope.podcast.all('items')
+                    .withHttpConfig({transformRequest: angular.identity})
+                    .customPOST(formData, 'upload', undefined, {'Content-Type': undefined}).then(function (item) {
+                        $log.info("Upload de l'item suivant");
+                        $log.info(item);
+                    });
+            });
+        };
+    });
+
+angular.module('ps.search.item', [
+    'ps.dataService.item',
+    'ps.dataService.tag',
+    'ps.player',
+    'ps.dataService.donwloadManager'
+])
+    .constant('ItemPerPage', 12)
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
+        'use strict';
+
+        // Gestion du cache de la pagination :
+        var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+
+        $scope.changePage = function() {
+            $scope.searchParameters.page = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / ItemPerPage)) ? Math.ceil($scope.totalItems / ItemPerPage) : $scope.currentPage;
+            $scope.searchParameters.page -= 1;
+            itemService.search($scope.searchParameters).then(function(itemsResponse) {
+
+                $scope.items = itemsResponse.content;
+                $scope.totalPages = itemsResponse.totalPages;
+                $scope.totalItems = itemsResponse.totalElements;
+
+                cache.put('search:currentPage', $scope.currentPage);
+                cache.put('search:currentWord', $scope.term);
+                cache.put('search:currentTags', $scope.searchTags);
+                cache.put("search:direction", $scope.direction);
+                cache.put("search:properties", $scope.properties);
+
+                $location.search("page", $scope.currentPage);
+            });
+        };
+
+        $scope.$on('$routeUpdate', function(){
+            if ($scope.currentPage !== $location.search().page) {
+                $scope.currentPage = $location.search().page || 1;
+                $scope.changePage();
+            }
+        });
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.changePage();
+        };
+
+        //** Item Operation **//
+        $scope.remove = function (item) {
+            return item.remove().then(function(){
+                playlistService.remove(item);
+                return $scope.changePage();
+            });
+        };
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
+            });
+        };
+
+        // Longeur inconnu au chargement :
+        //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
+        $scope.totalItems = Number.MAX_VALUE;
+        $scope.maxSize = 10;
+
+        $scope.searchParameters = {};
+        $scope.searchParameters.size = ItemPerPage;
+        $scope.currentPage = cache.get("search:currentPage") || 1;
+        $scope.searchParameters.term = cache.get("search:currentWord") || undefined;
+        $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
+        $scope.searchParameters.direction = cache.get("search:direction") || undefined;
+        $scope.searchParameters.properties = cache.get("search:properties") || undefined;
+
+        $scope.changePage();
+
+        //** DownloadManager **//
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        $scope.loadTags = tagService.search;
+
+        //** Playlist Manager **//
+        $scope.addOrRemove = function(item) {
+            return playlistService.addOrRemove(item);
+        };
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
+        };
+        
+        //** WebSocket Subscription **//
+        var webSocketUrl = "/topic/download";
+        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
+
+        function updateItemFromWS(message) {
+            var item = JSON.parse(message.body);
+
+            var elemToUpdate = _.find($scope.items, { 'id': item.id });
+            if (elemToUpdate)
+                _.assign(elemToUpdate, item);
+        }
+
+    });
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -790,7 +1199,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <vg-mutebutton></vg-mutebutton>\n' +
     '                    <vg-volumebar></vg-volumebar>\n' +
     '                </vg-volume>\n' +
-    '                <vg-fullscreenButton></vg-fullscreenButton>\n' +
+    '                <vg-fullscreenButton ng-show="ipc.config.sources[0].type.indexOf(\'audio\') === -1"></vg-fullscreenButton>\n' +
     '                <div class=\'btn-video-share\'><a ng-href="{{ ipc.item.localUrl }}" class="ionicons ion-android-share"></a></div>\n' +
     '            </vg-controls>\n' +
     '\n' +
@@ -965,7 +1374,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <vg-mutebutton></vg-mutebutton>\n' +
     '                    <vg-volumebar></vg-volumebar>\n' +
     '                </vg-volume>\n' +
-    '                <vg-fullscreenButton></vg-fullscreenButton>\n' +
+    '                <vg-fullscreenButton ng-show="pc.config.sources[0].type.indexOf(\'audio\') === -1"></vg-fullscreenButton>\n' +
     '                <div class=\'btn-video-share\'><a ng-href="{{ pc.config.sources[0].src }}" class="ionicons ion-android-share"></a></div>\n' +
     '            </vg-controls>\n' +
     '\n' +
@@ -1390,413 +1799,3 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-angular.module('ps.dataService.donwloadManager', [
-    'restangular'
-])
-    .factory('DonwloadManager', function(Restangular) {
-    'use strict';
-    return {
-        download: function (item) {
-            return Restangular.one("item").customGET(item.id + "/addtoqueue");
-        },
-        stopDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
-        },
-        toggleDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
-        },
-        stopAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
-        },
-        pauseAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
-        },
-        restartAllCurrentDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
-        },
-        removeFromQueue: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
-        },
-        updateNumberOfSimDl: function (number) {
-            return Restangular.one("task").customPOST(number, "downloadManager/limit");
-        },
-        dontDonwload: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
-        },
-        getDownloading : function() {
-            return Restangular.one('task').all("downloadManager/downloading").getList();
-        },
-        getNumberOfSimDl : function() {
-            return Restangular.one("task/downloadManager/limit").get();
-        }
-    };
-});
-/**
- * Created by kevin on 01/11/14.
- */
-angular.module('ps.dataService.item', [
-    'restangular'
-])
-    .factory('itemService', function (Restangular) {
-        'use strict';
-        return {
-            search: search,
-            findById : findById,
-            getItemForPodcastWithPagination : getItemForPodcastWithPagination,
-            restangularizePodcastItem : restangularizePodcastItem
-        };
-
-        function search(searchParameters) {
-            //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-            return Restangular.one("item/search")
-                .post(null, searchParameters)
-                .then(function (responseFromServer) {
-                    responseFromServer.content = restangularizedItems(responseFromServer.content);
-                    return responseFromServer;
-                });
-        }
-
-        function findById(podcastId, itemId) {
-            return Restangular.one("podcast", podcastId).one("items", itemId).get();
-        }
-
-        function getItemForPodcastWithPagination(podcast, pageParemeters) {
-            return podcast.one("items").post(null, pageParemeters);
-        }
-
-        function restangularizePodcastItem (podcast, items) {
-            return Restangular.restangularizeCollection(podcast, items, 'items');
-        }
-
-        // Private Function :
-
-        // transformation
-        function restangularizedItems(itemList) {
-            var restangularList = [];
-            angular.forEach(itemList, function (value) {
-                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
-            });
-            return restangularList;
-        }
-    });
-
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataService.podcast', [
-    'restangular'
-]).factory('podcastService', function (Restangular) {
-    'use strict';
-
-    return {
-        findById    :   findById,
-        findAll     :   findAll
-    };
-
-    function findById(podcastId) {
-        return Restangular.one('podcast', podcastId).get();
-    }
-
-    function findAll() {
-        return Restangular.all('podcast').getList();
-    }
-});
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.dataService.tag', [
-    'restangular'
-]).factory('tagService', function (Restangular) {
-    'use strict';
-    var baseAll = Restangular.all('tag');
-
-    return {
-        getAll : getAll,
-        search : search
-    };
-
-
-
-    function getAll() {
-        return baseAll.get();
-    }
-
-    function search(query) {
-        return baseAll.post(null, {name : query});
-    }
-});
-'use strict';
-
-angular.module('ps.podcast.details.edition', [])
-    .directive('podcastEdition', function () {
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-edition.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastEditionCtrl'
-        };
-    })
-    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
-        var tags = Restangular.all("tag");
-
-        $scope.loadTags = function (query) {
-            return tags.post(null, {name : query});
-        };
-
-        $scope.save = function () {
-            var podcastToUpdate = _.cloneDeep($scope.podcast);
-            podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate)
-                .then(function (patchedPodcast){
-                    _.assign($scope.podcast, patchedPodcast);
-                })
-                .then(function () {
-                    $scope.$emit('podcastEdition:save');
-                });
-        };
-        $scope.deletePodcast = function () {
-            $scope.podcast.remove().then(function () {
-                $location.path('/podcasts');
-            });
-        };
-    });
-
-'use strict';
-
-angular.module('ps.podcast.details.episodes', [
-    'ps.player',
-    'AngularStompDK'
-])
-    .directive('podcastItemsList', function(){
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-episodes.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastItemsListCtrl'
-        };
-    })
-    .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService, playlistService ) {
-        $scope.currentPage = 1;
-        $scope.itemPerPage = PodcastItemPerPage;
-
-        var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
-
-        ngstomp
-            .subscribe(webSocketUrl, function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                _.assign(elemToUpdate, item);
-            }, $scope);
-
-        $scope.loadPage = function() {
-            $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
-            return itemService.getItemForPodcastWithPagination($scope.podcast, {size: PodcastItemPerPage, page : $scope.currentPage - 1, direction : 'DESC', properties : 'pubdate'})
-                .then(function(itemsResponse) {
-                    $scope.podcast.items = itemService.restangularizePodcastItem($scope.podcast, itemsResponse.content);
-                    $scope.podcast.totalItems = itemsResponse.totalElements;
-                });
-        };
-
-        $scope.loadPage();
-        $scope.$on("podcastItems:refresh", function () {
-            $scope.currentPage = 1;
-            $scope.loadPage();
-        });
-
-        $scope.remove = function (item) {
-            item.remove().then(function() {
-                $scope.podcast.items = _.reject($scope.podcast.items, function(elem) {
-                    return (elem.id === item.id);
-                });
-            }).then(function() {
-                playlistService.remove(item);
-            }).then($scope.loadPage);
-        };
-
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.podcast.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-                playlistService.remove(itemInList);
-            });
-        };
-
-        $scope.addOrRemoveInPlaylist = function (item) {
-            playlistService.addOrRemove(item);
-        };
-
-        $scope.isInPlaylist = function(item) {
-            return playlistService.contains(item);
-        };
-
-        $scope.swipePage = function(val) {
-            $scope.currentPage += val;
-            $scope.loadPage();
-        };
-
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-    });
-
-angular.module('ps.podcast.details', [
-    'ps.podcast.details',
-    'ps.podcast.details.episodes',
-    'ps.podcast.details.edition',
-    'ps.podcast.details.upload',
-    'restangular'
-]).controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
-
-        $scope.podcast = podcast;
-
-        function refreshItems () {
-            $scope.$broadcast('podcastItems:refresh');
-        }
-
-        $scope.refresh = function () {
-            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
-        };
-        $scope.$on("podcastEdition:save", refreshItems);
-
-    });
-'use strict';
-
-angular.module('ps.podcast.details.upload', [
-    'angularFileUpload'
-])
-    .directive('podcastUpload', function ($log) {
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-upload.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastUploadCtrl'
-        };
-    })
-    .controller('podcastUploadCtrl', function ($scope, $log) {
-        $scope.onFileSelect = function($files) {
-            var formData;
-            angular.forEach($files, function (file) {
-                formData = new FormData();
-                formData.append('file', file);
-                $scope.podcast.all('items')
-                    .withHttpConfig({transformRequest: angular.identity})
-                    .customPOST(formData, 'upload', undefined, {'Content-Type': undefined}).then(function (item) {
-                        $log.info("Upload de l'item suivant");
-                        $log.info(item);
-                    });
-            });
-        };
-    });
-
-angular.module('ps.search.item', [
-    'ps.dataService.item',
-    'ps.dataService.tag',
-    'ps.player',
-    'ps.dataService.donwloadManager'
-])
-    .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
-        'use strict';
-
-        // Gestion du cache de la pagination :
-        var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
-
-        $scope.changePage = function() {
-            $scope.searchParameters.page = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / ItemPerPage)) ? Math.ceil($scope.totalItems / ItemPerPage) : $scope.currentPage;
-            $scope.searchParameters.page -= 1;
-            itemService.search($scope.searchParameters).then(function(itemsResponse) {
-
-                $scope.items = itemsResponse.content;
-                $scope.totalPages = itemsResponse.totalPages;
-                $scope.totalItems = itemsResponse.totalElements;
-
-                cache.put('search:currentPage', $scope.currentPage);
-                cache.put('search:currentWord', $scope.term);
-                cache.put('search:currentTags', $scope.searchTags);
-                cache.put("search:direction", $scope.direction);
-                cache.put("search:properties", $scope.properties);
-
-                $location.search("page", $scope.currentPage);
-            });
-        };
-
-        $scope.$on('$routeUpdate', function(){
-            if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page || 1;
-                $scope.changePage();
-            }
-        });
-
-        $scope.swipePage = function(val) {
-            $scope.currentPage += val;
-            $scope.changePage();
-        };
-
-        //** Item Operation **//
-        $scope.remove = function (item) {
-            return item.remove().then(function(){
-                playlistService.remove(item);
-                return $scope.changePage();
-            });
-        };
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-                playlistService.remove(itemInList);
-            });
-        };
-
-        // Longeur inconnu au chargement :
-        //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-        $scope.totalItems = Number.MAX_VALUE;
-        $scope.maxSize = 10;
-
-        $scope.searchParameters = {};
-        $scope.searchParameters.size = ItemPerPage;
-        $scope.currentPage = cache.get("search:currentPage") || 1;
-        $scope.searchParameters.term = cache.get("search:currentWord") || undefined;
-        $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
-        $scope.searchParameters.direction = cache.get("search:direction") || undefined;
-        $scope.searchParameters.properties = cache.get("search:properties") || undefined;
-
-        $scope.changePage();
-
-        //** DownloadManager **//
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-        $scope.loadTags = tagService.search;
-
-        //** Playlist Manager **//
-        $scope.addOrRemove = function(item) {
-            return playlistService.addOrRemove(item);
-        };
-        $scope.isInPlaylist = function(item) {
-            return playlistService.contains(item);
-        };
-        
-        //** WebSocket Subscription **//
-        var webSocketUrl = "/topic/download";
-        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
-
-        function updateItemFromWS(message) {
-            var item = JSON.parse(message.body);
-
-            var elemToUpdate = _.find($scope.items, { 'id': item.id });
-            if (elemToUpdate)
-                _.assign(elemToUpdate, item);
-        }
-
-    });
