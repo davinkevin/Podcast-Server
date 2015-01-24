@@ -54,7 +54,6 @@ angular.module('ps.player', [
             },
             plugins: {
                 controls: {
-                    autoHide: true,
                     autoHideTime: 2000
                 },
                 poster: ''

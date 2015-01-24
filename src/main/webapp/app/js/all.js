@@ -179,17 +179,6 @@ angular.module('ps.search', [
 ]);
 
 /**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag',
-]);
-
-/**
  * Created by kevin on 14/08/2014.
  */
 
@@ -218,6 +207,17 @@ _.mixin({
         return localArray;
     }
 });
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+]);
+
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -477,7 +477,6 @@ angular.module('ps.player', [
             },
             plugins: {
                 controls: {
-                    autoHide: true,
                     autoHideTime: 2000
                 },
                 poster: ''
@@ -579,101 +578,6 @@ angular.module('ps.podcast.creation', [
             });
         };
     });
-angular.module('ps.podcast.list', [
-])
-    .controller('PodcastsListCtrl', function ($scope, podcasts) {
-        $scope.podcasts = podcasts;
-    });
-angular.module('ps.dataService.donwloadManager', [
-    'restangular'
-])
-    .factory('DonwloadManager', function(Restangular) {
-    'use strict';
-    return {
-        download: function (item) {
-            return Restangular.one("item").customGET(item.id + "/addtoqueue");
-        },
-        stopDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
-        },
-        toggleDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
-        },
-        stopAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
-        },
-        pauseAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
-        },
-        restartAllCurrentDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
-        },
-        removeFromQueue: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
-        },
-        updateNumberOfSimDl: function (number) {
-            return Restangular.one("task").customPOST(number, "downloadManager/limit");
-        },
-        dontDonwload: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
-        },
-        getDownloading : function() {
-            return Restangular.one('task').all("downloadManager/downloading").getList();
-        },
-        getNumberOfSimDl : function() {
-            return Restangular.one("task/downloadManager/limit").get();
-        }
-    };
-});
-/**
- * Created by kevin on 01/11/14.
- */
-angular.module('ps.dataService.item', [
-    'restangular'
-])
-    .factory('itemService', function (Restangular) {
-        'use strict';
-        return {
-            search: search,
-            findById : findById,
-            getItemForPodcastWithPagination : getItemForPodcastWithPagination,
-            restangularizePodcastItem : restangularizePodcastItem
-        };
-
-        function search(searchParameters) {
-            //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-            return Restangular.one("item/search")
-                .post(null, searchParameters)
-                .then(function (responseFromServer) {
-                    responseFromServer.content = restangularizedItems(responseFromServer.content);
-                    return responseFromServer;
-                });
-        }
-
-        function findById(podcastId, itemId) {
-            return Restangular.one("podcast", podcastId).one("items", itemId).get();
-        }
-
-        function getItemForPodcastWithPagination(podcast, pageParemeters) {
-            return podcast.one("items").post(null, pageParemeters);
-        }
-
-        function restangularizePodcastItem (podcast, items) {
-            return Restangular.restangularizeCollection(podcast, items, 'items');
-        }
-
-        // Private Function :
-
-        // transformation
-        function restangularizedItems(itemList) {
-            var restangularList = [];
-            angular.forEach(itemList, function (value) {
-                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
-            });
-            return restangularList;
-        }
-    });
-
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -871,7 +775,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <videogular vg-theme="ipc.config.theme.url" vg-player-ready="ipc.onPlayerReady">\n' +
     '            <vg-video vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-video>\n' +
     '\n' +
-    '            <vg-controls vg-autohide="ipc.config.plugins.controls.autoHide" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">\n' +
+    '            <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf(\'audio\') === -1" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">\n' +
     '                <vg-play-pause-button></vg-play-pause-button>\n' +
     '                <vg-timedisplay>{{ currentTime | date:\'mm:ss\' }}</vg-timedisplay>\n' +
     '                <vg-scrubBar>\n' +
@@ -1482,6 +1386,101 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+angular.module('ps.podcast.list', [
+])
+    .controller('PodcastsListCtrl', function ($scope, podcasts) {
+        $scope.podcasts = podcasts;
+    });
+angular.module('ps.dataService.donwloadManager', [
+    'restangular'
+])
+    .factory('DonwloadManager', function(Restangular) {
+    'use strict';
+    return {
+        download: function (item) {
+            return Restangular.one("item").customGET(item.id + "/addtoqueue");
+        },
+        stopDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+        },
+        toggleDownload: function (item) {
+            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+        },
+        stopAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
+        },
+        pauseAllDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
+        },
+        restartAllCurrentDownload: function () {
+            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
+        },
+        removeFromQueue: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
+        },
+        updateNumberOfSimDl: function (number) {
+            return Restangular.one("task").customPOST(number, "downloadManager/limit");
+        },
+        dontDonwload: function (item) {
+            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+        },
+        getDownloading : function() {
+            return Restangular.one('task').all("downloadManager/downloading").getList();
+        },
+        getNumberOfSimDl : function() {
+            return Restangular.one("task/downloadManager/limit").get();
+        }
+    };
+});
+/**
+ * Created by kevin on 01/11/14.
+ */
+angular.module('ps.dataService.item', [
+    'restangular'
+])
+    .factory('itemService', function (Restangular) {
+        'use strict';
+        return {
+            search: search,
+            findById : findById,
+            getItemForPodcastWithPagination : getItemForPodcastWithPagination,
+            restangularizePodcastItem : restangularizePodcastItem
+        };
+
+        function search(searchParameters) {
+            //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
+            return Restangular.one("item/search")
+                .post(null, searchParameters)
+                .then(function (responseFromServer) {
+                    responseFromServer.content = restangularizedItems(responseFromServer.content);
+                    return responseFromServer;
+                });
+        }
+
+        function findById(podcastId, itemId) {
+            return Restangular.one("podcast", podcastId).one("items", itemId).get();
+        }
+
+        function getItemForPodcastWithPagination(podcast, pageParemeters) {
+            return podcast.one("items").post(null, pageParemeters);
+        }
+
+        function restangularizePodcastItem (podcast, items) {
+            return Restangular.restangularizeCollection(podcast, items, 'items');
+        }
+
+        // Private Function :
+
+        // transformation
+        function restangularizedItems(itemList) {
+            var restangularList = [];
+            angular.forEach(itemList, function (value) {
+                restangularList.push(Restangular.restangularizeElement(Restangular.one('podcast', value.podcastId), value, 'items'));
+            });
+            return restangularList;
+        }
+    });
 
 /**
  * Created by kevin on 02/11/14.

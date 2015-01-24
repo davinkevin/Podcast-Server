@@ -83,3 +83,4 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .video-player .playlist .isReading img{border:2px solid rgba(216,41,41,.81)}
 .btn-share-video videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
 .btn-share-video videogular div.btn-video-share a,.btn-share-video videogular div.btn-video-share a:hover,.btn-share-video videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
+videogular{background-color:rgba(255,255,255,0)!important}
