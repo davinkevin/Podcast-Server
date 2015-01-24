@@ -63,7 +63,10 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .upload-item .drop-box.dropping{background:#C7C7C7}
 .item-details * .btn-default.dropdown-toggle{border:none}
 .item-details .thumbnail img{min-height:200px;object-fit:cover}
+.item-player{margin-bottom:16px}
 .item-player video{width:100%;height:auto}
+.item-player videogular div.my-button{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
+.item-player videogular div.my-button a,.item-player videogular div.my-button a:hover,.item-player videogular div.my-button a:visited{color:#fff;text-decoration:none}
 .navbar-nav>li{float:left}
 @media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
 .video-player .player{padding-top:16px}

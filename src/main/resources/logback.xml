@@ -21,12 +21,8 @@
     </appender>
   
   <logger name="lan.dk.podcastserver" level="DEBUG"/>
-  <logger name="lan.dk.podcastserver.utils" level="ERROR"/>
   <logger name="org.hibernate.search.impl" level="INFO" />
   <logger name="org.springframework.web.socket" level="OFF"/>
-
-  <logger name="org.hibernate" level="ERROR" />
-  <logger name="org.hibernate.validator" level="OFF" />
 
     <!-- Spring MVC -->
     <!-- ORM | Hibernate
@@ -37,7 +33,7 @@
 
 
   <root level="info">
-    <appender-ref ref="FILE" />
+    <!--<appender-ref ref="FILE" />-->
     <appender-ref ref="STDOUT" />
   </root>
 

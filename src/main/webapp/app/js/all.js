@@ -790,6 +790,7 @@ module.run(['$templateCache', function($templateCache) {
     '                    <vg-volumebar></vg-volumebar>\n' +
     '                </vg-volume>\n' +
     '                <vg-fullscreenButton></vg-fullscreenButton>\n' +
+    '                <div class=\'my-button\'><a ng-href="{{ ipc.item.localUrl }}" class="ionicons ion-android-share"></a></div>\n' +
     '            </vg-controls>\n' +
     '\n' +
     '            <vg-overlay-play></vg-overlay-play>\n' +
@@ -797,7 +798,6 @@ module.run(['$templateCache', function($templateCache) {
     '            <vg-poster-image vg-url=\'ipc.config.plugins.poster\'></vg-poster-image>\n' +
     '        </videogular>\n' +
     '    </div>\n' +
-    '    \n' +
     '</div>');
 }]);
 })();
