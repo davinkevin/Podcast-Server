@@ -1,6 +1,8 @@
 package lan.dk.podcastserver.utils;
 
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +16,9 @@ import java.net.URL;
  */
 public class URLUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(SignatureUtils.class);
+    public static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
+    
     public static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
         /* http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8 */
         String[] splitUrl = m3u8Url.split(",");
@@ -72,5 +77,33 @@ public class URLUtils {
             e.printStackTrace();
         }
         return urlToReturn;
+    }
+
+    public static String getRealURL(String url) {
+        return getRealURL(url, 0);
+    }
+
+    private static String getRealURL(String url, Integer numberOfRedirection) {
+        if (MAX_NUMBER_OF_REDIRECTION < numberOfRedirection) {
+            throw new RuntimeException("Too Many Redirections");
+        }
+
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+            if (isARedirection(conn.getResponseCode())) {
+                conn.disconnect();
+                return getRealURL(conn.getHeaderField("Location"), numberOfRedirection+1);
+            }
+        } catch (IOException e) {
+            logger.error("Error during retrieval of the real URL for {} at {} redirection", url, numberOfRedirection);
+        }
+
+        return url;
+    }
+    private static Boolean isARedirection(int status) {
+        return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP
+                || status == HttpURLConnection.HTTP_MOVED_PERM
+                || status == HttpURLConnection.HTTP_SEE_OTHER);
     }
 }

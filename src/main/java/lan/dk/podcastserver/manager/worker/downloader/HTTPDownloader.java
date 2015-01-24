@@ -5,6 +5,7 @@ import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -12,11 +13,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URL;
 
-//@Scope("prototype")
-@Component("HTTPDownloader")
 @Scope("prototype")
+@Component("HTTPDownloader")
 public class HTTPDownloader extends AbstractDownloader {
-
     protected DownloadInfo info = null;
 
     @Override
@@ -26,7 +25,7 @@ public class HTTPDownloader extends AbstractDownloader {
         //this.startDownload();
         //int borne = randomGenerator.nextInt(100);
         try {
-            URL url = new URL(getItemUrl());
+            URL url = new URL(URLUtils.getRealURL(getItemUrl()));
             // initialize url information object
             info = new DownloadInfo(url);
             // extract infromation from the web
@@ -75,16 +74,9 @@ public class HTTPDownloader extends AbstractDownloader {
                 }
             };
 
-
             info.extract(stopDownloading, itemSynchronisation);
-            // enable multipart donwload
-            //info.enableMultipart();
-            // Choise target file
-            //target = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(url)) + temporaryExtension );
-            //target = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + FilenameUtils.getName(String.valueOf(url)) + temporaryExtension );
-            //target.getParentFile().mkdirs();
-            //logger.debug(target.getAbsolutePath() + "exist : " + target.exists());
             target = getTagetFile(this.item);
+
             // create wget downloader
             WGet w = new WGet(info, target);
             // will blocks until download finishes
