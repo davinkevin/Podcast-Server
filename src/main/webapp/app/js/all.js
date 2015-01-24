@@ -217,7 +217,6 @@ angular.module('ps.dataservice', [
     'ps.dataService.podcast',
     'ps.dataService.tag',
 ]);
-
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -234,6 +233,7 @@ angular.module('navbar', [
         var vm = this;
         vm.navCollapsed = true;
     });
+
 
 angular.module('ps.download', [
     /*'ps.websocket',*/
@@ -578,6 +578,11 @@ angular.module('ps.podcast.creation', [
             });
         };
     });
+angular.module('ps.podcast.list', [
+])
+    .controller('PodcastsListCtrl', function ($scope, podcasts) {
+        $scope.podcasts = podcasts;
+    });
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -736,7 +741,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '\n' +
     '        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">\n' +
-    '            <br/>\n' +
     '            <div class="panel panel-default">\n' +
     '                <div class="panel-heading">\n' +
     '                    <h3 class="panel-title">{{ item.title }}</h3>\n' +
@@ -1387,11 +1391,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-angular.module('ps.podcast.list', [
-])
-    .controller('PodcastsListCtrl', function ($scope, podcasts) {
-        $scope.podcasts = podcasts;
-    });
 angular.module('ps.dataService.donwloadManager', [
     'restangular'
 ])
