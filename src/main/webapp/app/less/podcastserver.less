@@ -385,17 +385,7 @@ podcast-items-list {
     width:100%;
     height:auto;
   }
-  videogular div.my-button {
-    display: table-cell;
-    width: 50px;
-    vertical-align: middle;
-    text-align: center;
-    cursor: pointer;
-    a, a:hover, a:visited {
-      color: white;
-      text-decoration: none;
-    }
-  }
+  .btn-share-video();
 }
 
 .navbar-nav {
@@ -410,6 +400,8 @@ podcast-items-list {
 }
 
 .video-player {
+
+  .btn-share-video();
   
   .player {
     padding-top: 16px;
@@ -434,6 +426,7 @@ podcast-items-list {
       padding-bottom: 16px;
     }
     overflow-x: scroll;
+    height: 500px;
     .media {
       margin-top : 0;
       height: 115px;
@@ -450,4 +443,18 @@ podcast-items-list {
       }
     }
   }
+}
+
+.btn-share-video {
+  videogular div.btn-video-share {
+    display: table-cell;
+    width: 50px;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    a, a:hover, a:visited {
+      color: white;
+      text-decoration: none;
+    }
+  }  
 }

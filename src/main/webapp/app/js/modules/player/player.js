@@ -80,6 +80,9 @@ angular.module('ps.player', [
         vm.remove = function(item) {
             playlistService.remove(item);
             reloadPlaylist();
+            if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.localUrl) {
+                vm.setVideo(0);
+            }
         };
 
         function reloadPlaylist() {

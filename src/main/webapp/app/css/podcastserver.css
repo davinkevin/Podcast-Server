@@ -65,17 +65,21 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .item-details .thumbnail img{min-height:200px;object-fit:cover}
 .item-player{margin-bottom:16px}
 .item-player video{width:100%;height:auto}
-.item-player videogular div.my-button{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
-.item-player videogular div.my-button a,.item-player videogular div.my-button a:hover,.item-player videogular div.my-button a:visited{color:#fff;text-decoration:none}
+.item-player videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
+.item-player videogular div.btn-video-share a,.item-player videogular div.btn-video-share a:hover,.item-player videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
 .navbar-nav>li{float:left}
 @media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
+.video-player videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
+.video-player videogular div.btn-video-share a,.video-player videogular div.btn-video-share a:hover,.video-player videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
 .video-player .player{padding-top:16px}
 .video-player .player,.video-player .playlist{background:#000}
 @media screen and (min-width:1200px){.video-player .player,.video-player .playlist{height:500px}}
 .video-player video{width:100%;height:auto}
-.video-player .playlist{overflow-x:scroll}
+.video-player .playlist{overflow-x:scroll;height:500px}
 @media screen and (min-width:1200px){.video-player .playlist{padding-top:16px}}
 @media screen and (max-width:1200px){.video-player .playlist{padding-bottom:16px}}
 .video-player .playlist .media{margin-top:0;height:115px;padding-top:8px;padding-left:8px;padding-right:8px;color:#fff;font-weight:700}
 .video-player .playlist .isReading{background:#6F6F6F}
 .video-player .playlist .isReading img{border:2px solid rgba(216,41,41,.81)}
+.btn-share-video videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
+.btn-share-video videogular div.btn-video-share a,.btn-share-video videogular div.btn-video-share a:hover,.btn-share-video videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
