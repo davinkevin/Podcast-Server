@@ -5,7 +5,9 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.SignatureUtils;
+import lan.dk.podcastserver.utils.URLUtils;
 import lan.dk.podcastserver.utils.jDomUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -27,7 +29,7 @@ import java.util.Set;
 public class YoutubeUpdater extends AbstractUpdater {
 
     private static final Integer YOUTUBE_MAX_RESULTS = 50;
-    private static final String GDATA_USER_FEED = "http://gdata.youtube.com/feeds/api/users/";
+    private static final String GDATA_USER_FEED = "https://gdata.youtube.com/feeds/api/users/";
     //private static final String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
 
     @Value("${numberofdaytodownload:30}") Integer numberOfDayToDownload;
@@ -85,7 +87,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                     }
                     for (Element link : item.getChildren("link", defaultNamespace)) {
                         if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
-                            podcastItem.setUrl(link.getAttributeValue("href", null, ""));
+                            podcastItem.setUrl(URLUtils.changeProtocol(link.getAttributeValue("href", null, ""), "http", "https"));
                             break;
                         }
                     }
@@ -151,7 +153,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                 youtubeUrl.matches(".*.youtube.com/.*")) && !youtubeUrl.contains("gdata") ) { //www.youtube.com/[channel|user]*/nom
             return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
         } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
-            return youtubeUrl + queryParam;
+            return "https://" + StringUtils.substringAfter(youtubeUrl + queryParam, "://");
         }
         return null;
 

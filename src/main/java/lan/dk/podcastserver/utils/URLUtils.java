@@ -18,7 +18,8 @@ public class URLUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SignatureUtils.class);
     public static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
-    
+    public static final String PROTOCOL_SEPARATOR = "://";
+
     public static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
         /* http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8 */
         String[] splitUrl = m3u8Url.split(",");
@@ -105,5 +106,9 @@ public class URLUtils {
         return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP
                 || status == HttpURLConnection.HTTP_MOVED_PERM
                 || status == HttpURLConnection.HTTP_SEE_OTHER);
+    }
+    
+    public static String changeProtocol(String url, String originalProtocol, String destinationProtocol){
+        return url.replace(originalProtocol.concat(PROTOCOL_SEPARATOR), destinationProtocol.concat(PROTOCOL_SEPARATOR));
     }
 }
