@@ -59,8 +59,12 @@ angular.module('ps.player', [
                 poster: ''
             }
         };
+
+        vm.reloadPlaylist = function() {
+            vm.playlist = playlistService.playlist();
+        };
         
-        reloadPlaylist();
+        vm.reloadPlaylist();
         
         vm.setVideo = function(index) {
             var item = vm.playlist[index];
@@ -84,8 +88,9 @@ angular.module('ps.player', [
             }
         };
 
-        function reloadPlaylist() {
-            vm.playlist = playlistService.playlist();
+        vm.removeAll = function () {
+            playlistService.removeAll();
+            vm.reloadPlaylist();
         }
     })
     .factory('playlistService', function($localStorage) {
@@ -105,6 +110,9 @@ angular.module('ps.player', [
             },
             addOrRemove : function (item) {
                 (this.contains(item)) ? this.remove(item) : this.add(item);
+            },
+            removeAll : function () {
+                $localStorage.playlist = [];
             }
         };
     });
