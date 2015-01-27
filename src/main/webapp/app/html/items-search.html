@@ -80,7 +80,7 @@
                         </a>
                     </div>
                     <div class="text-center clearfix itemTitle center" >
-                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip-trigger tooltip="{{ item.title }}" tooltip-placement="bottom" >
+                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip-append-to-body="true" tooltip="{{ item.title }}" tooltip-placement="bottom" >
                             {{ item.title | characters:30 }}
                         </a>
                     </div>

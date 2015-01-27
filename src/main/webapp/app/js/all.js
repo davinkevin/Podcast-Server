@@ -3,127 +3,12 @@ angular.module('podcastApp', [
     'ps.podcast',
     'ps.item',
     'ps.download',
-    'ps.partial',
-    'ps.dataservice',
     'ps.player',
     'ps.common',
-    'ngRoute',
-    'ngTouch',
-    'cfp.hotkeys',
-    'restangular',
-    'AngularStompDK',
-    'ngAnimate',
-    'truncate',
-    'ui.bootstrap',
-    'angular-loading-bar',
-    'ngTagsInput',
-    'notification'
-])
-    .config(function($routeProvider) {
-
-        var commonKey = [
-            ['h', 'Goto Home', function (event) {
-                event.preventDefault();
-                window.location.href = '#/items';
-            }],
-            ['s', 'Goto Search', function (event) {
-                event.preventDefault();
-                window.location.href = '#/item/search';
-            }],
-            ['p', 'Goto Podcast List', function (event) {
-                event.preventDefault();
-                window.location.href = '#/podcasts';
-            }],
-            ['d', 'Goto Download List', function (event) {
-                event.preventDefault();
-                window.location.href = '#/download';
-            }]
-        ];
-
-            $routeProvider.
-                when('/podcasts', {
-                    templateUrl: 'html/podcasts-list.html',
-                    controller: 'PodcastsListCtrl',
-                    hotkeys: commonKey,
-                    resolve : {
-                        podcasts : function(podcastService) {
-                            return podcastService.findAll();
-                        }
-                    }
-                }).
-                when('/podcast/add', {
-                    templateUrl: 'html/podcast-add.html',
-                    controller: 'PodcastAddCtrl',
-                    hotkeys: commonKey
-                }).
-                when('/podcast/:podcastId', {
-                    templateUrl: 'html/podcast-detail.html',
-                    controller: 'PodcastDetailCtrl',
-                    hotkeys: [
-                        ['r', 'Refresh', 'refreshItems()'],
-                        ['f', 'Force Refresh', 'refresh()'],
-                        ['l', 'List of Items', 'tabs[0].active = true'],
-                        ['m', 'Modification of Podcast', 'tabs[1].active = true']
-                    ].concat(commonKey),
-                    resolve : {
-                        podcast : function (Restangular, $route) {
-                            return Restangular.one('podcast', $route.current.params.podcastId).get();
-                        }
-                    }
-                }).
-                when('/items', {
-                    templateUrl: 'html/items-search.html',
-                    controller: 'ItemsSearchCtrl',
-                    reloadOnSearch: false,
-                    hotkeys: [
-                        ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
-                        ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
-                    ].concat(commonKey)
-                }).
-                when('/podcast/:podcastId/item/:itemId', {
-                    templateUrl: 'html/item-detail.html',
-                    controller: 'ItemDetailCtrl',
-                    hotkeys: commonKey,
-                    resolve : {
-                        item : function (itemService, $route) {
-                            return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-                        },
-                        podcast : function (podcastService, $route) {
-                            return podcastService.findById($route.current.params.podcastId);
-                        }
-                    }
-                }).
-                when('/download', {
-                    templateUrl: 'html/download.html',
-                    controller: 'DownloadCtrl',
-                    hotkeys: commonKey
-                }).
-                otherwise({
-                    redirectTo: '/items'
-                });
-        })
-    .config(function (cfpLoadingBarProvider) {
-        cfpLoadingBarProvider.includeSpinner = false;
-    })
-    .config(function(RestangularProvider) {
-        RestangularProvider.setBaseUrl('/api/');
-
-        RestangularProvider.addElementTransformer('items', false, function(item) {
-            item.addRestangularMethod('reset', 'get', 'reset');
-            item.addRestangularMethod('download', 'get', 'addtoqueue');
-            return item;
-        });
-    })
-    .config(function($tooltipProvider) {
-        //TODO : fix for problem in angular 1.3.0 : https://github.com/angular-ui/bootstrap/issues/2828
-        $tooltipProvider.options({animation: false});
-    })
-    .config(function(ngstompProvider){
-        ngstompProvider
-            .url('/ws')
-            .credential('login', 'password')
-            .class(SockJS);
-    });
+    'ps.dataservice',
+    'ps.config',
+    'ps.partial'
+]);
 angular.module('ps.common', [
     'ps.filters',
     'navbar',
@@ -215,7 +100,7 @@ angular.module('ps.dataservice', [
     'ps.dataService.donwloadManager',
     'ps.dataService.item',
     'ps.dataService.podcast',
-    'ps.dataService.tag',
+    'ps.dataService.tag'
 ]);
 angular.module('navbar', [
 ])
@@ -235,12 +120,95 @@ angular.module('navbar', [
     });
 
 
+angular.module('ps.config', [
+    'ps.config.route',
+    'ps.config.loading',
+    'ps.config.restangular',
+    'ps.config.ngstomp',
+    'ps.config.module'
+]);
+angular.module('ps.config.loading', [
+    'angular-loading-bar'
+])
+    .config(function (cfpLoadingBarProvider) {
+        cfpLoadingBarProvider.includeSpinner = false;
+    });
+angular.module('ps.config.module', [
+    'ngTouch',
+    'ngAnimate',
+    'ui.bootstrap',
+    'truncate'
+]);
+angular.module('ps.config.ngstomp', [
+    'AngularStompDK'
+])
+    .config(function(ngstompProvider){
+        ngstompProvider
+            .url('/ws')
+            .credential('login', 'password')
+            .class(SockJS);
+    });
+angular.module('ps.config.restangular', [
+    'restangular'
+])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api/');
+
+        RestangularProvider.addElementTransformer('items', false, function(item) {
+            item.addRestangularMethod('reset', 'get', 'reset');
+            item.addRestangularMethod('download', 'get', 'addtoqueue');
+            return item;
+        });
+    });
+angular.module('ps.config.route', [
+    'ngRoute',
+    'cfp.hotkeys'
+])
+    .constant('commonKey', [
+        ['h', 'Goto Home', function (event) {
+            event.preventDefault();
+            window.location.href = '#/items';
+        }],
+        ['s', 'Goto Search', function (event) {
+            event.preventDefault();
+            window.location.href = '#/item/search';
+        }],
+        ['p', 'Goto Podcast List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/podcasts';
+        }],
+        ['d', 'Goto Download List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/download';
+        }]
+    ])
+    .config(function($routeProvider, commonKey) {
+        /*$routeProvider.
+            when('/podcast/add', {
+                templateUrl: 'html/podcast-add.html',
+                controller: 'PodcastAddCtrl',
+                hotkeys: commonKey
+            });*/
+        
+        $routeProvider.
+            otherwise({
+                redirectTo: '/items'
+            });
+    });
 angular.module('ps.download', [
-    /*'ps.websocket',*/
+    'ps.config.route',
     'ps.dataService.donwloadManager',
     'notification',
     'AngularStompDK'
 ])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/download', {
+                templateUrl: 'html/download.html',
+                controller: 'DownloadCtrl',
+                hotkeys: commonKey
+            })
+    })
     .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
         $scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
@@ -308,288 +276,6 @@ angular.module('ps.download', [
                 });
             }, $scope);
 
-    });
-angular.module('ps.item.details', [
-    'ps.dataService.donwloadManager',
-    'ps.player',
-    'AngularStompDK'
-])
-    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
-
-        $scope.item = item;
-        $scope.item.podcast = podcast;
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-
-
-        $scope.remove = function(item) {
-            return item.remove().then(function() {
-                playlistService.remove(item);
-                $location.path('/podcast/'.concat($scope.item.podcast.id));
-            });
-        };
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                _.assign($scope.item, itemReseted);
-                playlistService.remove(item);
-            });
-        };
-        
-        $scope.toggleInPlaylist = function () {
-            playlistService.addOrRemove(item);
-        };
-        
-        $scope.isInPlaylist = function() {
-            return playlistService.contains(item);
-        };
-
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
-
-        ngstomp
-            .subscribe(webSockedUrl, function(message) {
-                var itemFromWS = JSON.parse(message.body);
-
-                if (itemFromWS.id == $scope.item.id) {
-                    _.assign($scope.item, itemFromWS);
-                }
-            }, $scope);
-    });
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.item', [
-    'ps.item.details',
-    'ps.item.player'
-]);
-angular.module('ps.item.player', [
-    'ngSanitize',
-    'ngRoute',
-    'com.2fdevs.videogular',
-    'com.2fdevs.videogular.plugins.poster',
-    'com.2fdevs.videogular.plugins.controls',
-    'com.2fdevs.videogular.plugins.overlayplay',
-    'com.2fdevs.videogular.plugins.buffering'
-])
-    .config(function($routeProvider) {
-        $routeProvider.
-            when('/podcast/:podcastId/item/:itemId/play', {
-                templateUrl: 'html/item-player.html',
-                controller: 'ItemPlayerController',
-                controllerAs: 'ipc',
-                resolve : {
-                    item : function (itemService, $route) {
-                        return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-                    },
-                    podcast : function (podcastService, $route) {
-                        return podcastService.findById($route.current.params.podcastId);
-                    }
-                }
-            });
-    })
-    .controller('ItemPlayerController', function (podcast, item, $timeout) {
-        var vm = this;
-        
-        vm.item = item;
-        vm.item.podcast = podcast;
-        
-        vm.config = {
-            preload: true,
-            sources: [
-                { src : item.localUrl, type : item.mimeType }
-            ],
-            theme: {
-                url: "http://www.videogular.com/styles/themes/default/videogular.css"
-            },
-            plugins: {
-                controls: {
-                    autoHide: true,
-                    autoHideTime: 2000
-                },
-                poster: item.cover.url
-            }
-        }
-
-        vm.onPlayerReady = function(API) {
-            if (vm.config.preload) {
-                $timeout(function () {
-                    API.play();
-                })
-            }
-        };
-    });
-angular.module('ps.player', [
-    'ngSanitize',
-    'ngRoute',
-    'ngStorage',
-    'com.2fdevs.videogular',
-    'com.2fdevs.videogular.plugins.poster',
-    'com.2fdevs.videogular.plugins.controls',
-    'com.2fdevs.videogular.plugins.overlayplay',
-    'com.2fdevs.videogular.plugins.buffering'
-])
-    .config(function($routeProvider) {
-        $routeProvider.
-            when('/player', {
-                templateUrl: 'html/player.html',
-                controller: 'PlayerController',
-                controllerAs: 'pc'
-            });
-    })
-    .controller('PlayerController', function (playlistService, $timeout) {
-        var vm = this; 
-        
-        vm.state = null;
-        vm.API = null;
-        vm.currentVideo = 0;
-
-        vm.onPlayerReady = function(API) {
-            vm.API = API;
-
-            if (vm.API.currentState == 'play' || vm.isCompleted) 
-                vm.API.play();
-
-            vm.isCompleted = false;
-            vm.setVideo(0)
-        };
-
-        vm.onCompleteVideo = function() {
-            vm.isCompleted = true;
-            vm.currentVideo++;
-
-            if (vm.currentVideo >= vm.playlist.length) {
-                vm.currentVideo = 0;
-                return;
-            }
-
-            vm.setVideo(vm.currentVideo);
-        };
-        
-
-        vm.config = {
-            preload : true,
-            sources: [],
-            theme: {
-                url: "http://www.videogular.com/styles/themes/default/videogular.css"
-            },
-            plugins: {
-                controls: {
-                    autoHideTime: 2000
-                },
-                poster: ''
-            }
-        };
-
-        vm.reloadPlaylist = function() {
-            vm.playlist = playlistService.playlist();
-        };
-        
-        vm.reloadPlaylist();
-        
-        vm.setVideo = function(index) {
-            var item = vm.playlist[index];
-
-            if (item !== null && item !== undefined) {
-                vm.API.stop();
-                vm.currentVideo = index;
-                vm.config.sources = [{src : item.localUrl, type : item.mimeType }];
-                vm.config.plugins.poster = item.cover.url;
-                if (vm.config.preload) {
-                    $timeout(function() { vm.API.play(); }, 500);
-                }
-            }
-        };
-        
-        vm.remove = function(item) {
-            playlistService.remove(item);
-            reloadPlaylist();
-            if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.localUrl) {
-                vm.setVideo(0);
-            }
-        };
-
-        vm.removeAll = function () {
-            playlistService.removeAll();
-            vm.reloadPlaylist();
-        }
-    })
-    .factory('playlistService', function($localStorage) {
-        $localStorage.playlist = $localStorage.playlist || [];
-        return {
-            playlist : function() {
-                return $localStorage.playlist
-            },
-            add : function(item) {
-                $localStorage.playlist.push(item);
-            },
-            remove : function (item) {
-                $localStorage.playlist = _.remove($localStorage.playlist, function(elem) { return elem.id !== item.id; });
-            },
-            contains : function(item) {
-                return angular.isObject(_.find($localStorage.playlist, {id : item.id}));
-            },
-            addOrRemove : function (item) {
-                (this.contains(item)) ? this.remove(item) : this.add(item);
-            },
-            removeAll : function () {
-                $localStorage.playlist = [];
-            }
-        };
-    });
-angular.module('ps.podcast.creation', [
-    'restangular'
-])
-    .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
-        var podcasts = Restangular.all("podcast"),
-            tags = Restangular.all("tag");
-
-        $scope.podcast = {
-            hasToBeDeleted : true,
-            cover : {
-                height: 200,
-                width: 200
-            }
-        };
-
-        $scope.loadTags = function(query) {
-            return tags.post(null, {name : query});
-        };
-
-        $scope.changeType = function() {
-            if (/beinsports\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "BeInSports";
-            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "CanalPlus";
-            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "JeuxVideoFR";
-            } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "JeuxVideoCom";
-            } else if (/parleys\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Parleys";
-            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Pluzz";
-            } else if (/youtube\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Youtube";
-            } else if ($scope.podcast.url.length > 0) {
-                $scope.podcast.type = "RSS";
-            } else {
-                $scope.podcast.type = "Send";
-            }
-        };
-
-        $scope.save = function() {
-            podcasts.post($scope.podcast).then(function (podcast) {
-                $location.path('/podcast/' + podcast.id);
-            });
-        };
-    });
-angular.module('ps.podcast.list', [
-])
-    .controller('PodcastsListCtrl', function ($scope, podcasts) {
-        $scope.podcasts = podcasts;
     });
 (function(module) {
 try {
@@ -901,7 +587,7 @@ module.run(['$templateCache', function($templateCache) {
     '                        </a>\n' +
     '                    </div>\n' +
     '                    <div class="text-center clearfix itemTitle center" >\n' +
-    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip-trigger tooltip="{{ item.title }}" tooltip-placement="bottom" >\n' +
+    '                        <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip-append-to-body="true" tooltip="{{ item.title }}" tooltip-placement="bottom" >\n' +
     '                            {{ item.title | characters:30 }}\n' +
     '                        </a>\n' +
     '                    </div>\n' +
@@ -1013,7 +699,7 @@ try {
   module = angular.module('ps.partial', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('html/podcast-add.html',
+  $templateCache.put('html/podcast-creation.html',
     '<div class="jumbotron">\n' +
     '    <div class="container">\n' +
     '        <h1>Ajouter un Podcast</h1>\n' +
@@ -1047,7 +733,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <div class="form-group">\n' +
     '            <label for="url" class="col-sm-1 control-label">Tags</label>\n' +
     '            <div class="col-sm-10">\n' +
-    '                <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">\n' +
+    '                <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap" placeholder="Ajouter un tag">\n' +
     '                    <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
     '                </tags-input>\n' +
     '            </div>\n' +
@@ -1225,7 +911,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <div class="form-group">\n' +
     '                <label for="url" class="col-sm-2 control-label">Tags</label>\n' +
     '                <div class="col-sm-10">\n' +
-    '                    <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">\n' +
+    '                    <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap" placeholder="Ajouter un tag">\n' +
     '                        <auto-complete source="loadTags($query)" min-length="2"></auto-complete>\n' +
     '                    </tags-input>\n' +
     '                </div>\n' +
@@ -1340,8 +1026,8 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '        <a class="pull-left" ng-href="#/podcast/{{podcast.id}}/item/{{item.id}}">\n' +
     '            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">\n' +
-    '\n' +
     '        </a>\n' +
+    '        \n' +
     '        <div class="media-body">\n' +
     '            <h4 class="media-heading">{{ item.title }}</h4>\n' +
     '            <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n' +
@@ -1393,7 +1079,9 @@ module.run(['$templateCache', function($templateCache) {
     '    <div class="row">\n' +
     '        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in podcasts">\n' +
     '            <a ng-href="#/podcast/{{ podcast.id }}" >\n' +
-    '                <img class="img-responsive img-rounded" ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" />\n' +
+    '                <img    class="img-responsive img-rounded" ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}"\n' +
+    '                        tooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ podcast.title }}!"\n' +
+    '                        />\n' +
     '            </a>\n' +
     '        </div>\n' +
     '    </div>\n' +
@@ -1403,6 +1091,434 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.item.details', [
+    'ps.dataService.donwloadManager',
+    'ps.player',
+    'AngularStompDK'
+]).config(function($routeProvider, commonKey) {
+    $routeProvider.
+        when('/podcast/:podcastId/item/:itemId', {
+            templateUrl: 'html/item-detail.html',
+            controller: 'ItemDetailCtrl',
+            hotkeys: commonKey,
+            resolve : {
+                item : function (itemService, $route) {
+                    return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                },
+                podcast : function (podcastService, $route) {
+                    return podcastService.findById($route.current.params.podcastId);
+                }
+            }
+        });
+})
+    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
+
+        $scope.item = item;
+        $scope.item.podcast = podcast;
+        $scope.download = DonwloadManager.download;
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+
+
+        $scope.remove = function(item) {
+            return item.remove().then(function() {
+                playlistService.remove(item);
+                $location.path('/podcast/'.concat($scope.item.podcast.id));
+            });
+        };
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                _.assign($scope.item, itemReseted);
+                playlistService.remove(item);
+            });
+        };
+        
+        $scope.toggleInPlaylist = function () {
+            playlistService.addOrRemove(item);
+        };
+        
+        $scope.isInPlaylist = function() {
+            return playlistService.contains(item);
+        };
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
+
+        ngstomp
+            .subscribe(webSockedUrl, function(message) {
+                var itemFromWS = JSON.parse(message.body);
+
+                if (itemFromWS.id == $scope.item.id) {
+                    _.assign($scope.item, itemFromWS);
+                }
+            }, $scope);
+    });
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module('ps.item', [
+    'ps.item.details',
+    'ps.item.player'
+]);
+angular.module('ps.item.player', [
+    'ngSanitize',
+    'ngRoute',
+    'com.2fdevs.videogular',
+    'com.2fdevs.videogular.plugins.poster',
+    'com.2fdevs.videogular.plugins.controls',
+    'com.2fdevs.videogular.plugins.overlayplay',
+    'com.2fdevs.videogular.plugins.buffering'
+])
+    .config(function($routeProvider) {
+        $routeProvider.
+            when('/podcast/:podcastId/item/:itemId/play', {
+                templateUrl: 'html/item-player.html',
+                controller: 'ItemPlayerController',
+                controllerAs: 'ipc',
+                resolve : {
+                    item : function (itemService, $route) {
+                        return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                    },
+                    podcast : function (podcastService, $route) {
+                        return podcastService.findById($route.current.params.podcastId);
+                    }
+                }
+            });
+    })
+    .controller('ItemPlayerController', function (podcast, item, $timeout) {
+        var vm = this;
+        
+        vm.item = item;
+        vm.item.podcast = podcast;
+        
+        vm.config = {
+            preload: true,
+            sources: [
+                { src : item.localUrl, type : item.mimeType }
+            ],
+            theme: {
+                url: "http://www.videogular.com/styles/themes/default/videogular.css"
+            },
+            plugins: {
+                controls: {
+                    autoHide: true,
+                    autoHideTime: 2000
+                },
+                poster: item.cover.url
+            }
+        }
+
+        vm.onPlayerReady = function(API) {
+            if (vm.config.preload) {
+                $timeout(function () {
+                    API.play();
+                })
+            }
+        };
+    });
+angular.module('ps.player', [
+    'ngSanitize',
+    'ngRoute',
+    'ngStorage',
+    'com.2fdevs.videogular',
+    'com.2fdevs.videogular.plugins.poster',
+    'com.2fdevs.videogular.plugins.controls',
+    'com.2fdevs.videogular.plugins.overlayplay',
+    'com.2fdevs.videogular.plugins.buffering'
+])
+    .config(function($routeProvider) {
+        $routeProvider.
+            when('/player', {
+                templateUrl: 'html/player.html',
+                controller: 'PlayerController',
+                controllerAs: 'pc'
+            });
+    })
+    .controller('PlayerController', function (playlistService, $timeout) {
+        var vm = this; 
+        
+        vm.state = null;
+        vm.API = null;
+        vm.currentVideo = 0;
+
+        vm.onPlayerReady = function(API) {
+            vm.API = API;
+
+            if (vm.API.currentState == 'play' || vm.isCompleted) 
+                vm.API.play();
+
+            vm.isCompleted = false;
+            vm.setVideo(0)
+        };
+
+        vm.onCompleteVideo = function() {
+            vm.isCompleted = true;
+            vm.currentVideo++;
+
+            if (vm.currentVideo >= vm.playlist.length) {
+                vm.currentVideo = 0;
+                return;
+            }
+
+            vm.setVideo(vm.currentVideo);
+        };
+        
+
+        vm.config = {
+            preload : true,
+            sources: [],
+            theme: {
+                url: "http://www.videogular.com/styles/themes/default/videogular.css"
+            },
+            plugins: {
+                controls: {
+                    autoHideTime: 2000
+                },
+                poster: ''
+            }
+        };
+
+        vm.reloadPlaylist = function() {
+            vm.playlist = playlistService.playlist();
+        };
+        
+        vm.reloadPlaylist();
+        
+        vm.setVideo = function(index) {
+            var item = vm.playlist[index];
+
+            if (item !== null && item !== undefined) {
+                vm.API.stop();
+                vm.currentVideo = index;
+                vm.config.sources = [{src : item.localUrl, type : item.mimeType }];
+                vm.config.plugins.poster = item.cover.url;
+                if (vm.config.preload) {
+                    $timeout(function() { vm.API.play(); }, 500);
+                }
+            }
+        };
+        
+        vm.remove = function(item) {
+            playlistService.remove(item);
+            reloadPlaylist();
+            if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.localUrl) {
+                vm.setVideo(0);
+            }
+        };
+
+        vm.removeAll = function () {
+            playlistService.removeAll();
+            vm.reloadPlaylist();
+        }
+    })
+    .factory('playlistService', function($localStorage) {
+        $localStorage.playlist = $localStorage.playlist || [];
+        return {
+            playlist : function() {
+                return $localStorage.playlist
+            },
+            add : function(item) {
+                $localStorage.playlist.push(item);
+            },
+            remove : function (item) {
+                $localStorage.playlist = _.remove($localStorage.playlist, function(elem) { return elem.id !== item.id; });
+            },
+            contains : function(item) {
+                return angular.isObject(_.find($localStorage.playlist, {id : item.id}));
+            },
+            addOrRemove : function (item) {
+                (this.contains(item)) ? this.remove(item) : this.add(item);
+            },
+            removeAll : function () {
+                $localStorage.playlist = [];
+            }
+        };
+    });
+angular.module('ps.podcast.creation', [
+    'ps.config.route',
+    'ps.dataservice',
+    'ngTagsInput'
+])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/podcast-creation', {
+                templateUrl: 'html/podcast-creation.html',
+                controller: 'PodcastAddCtrl',
+                hotkeys: commonKey
+            });
+    })
+    .controller('PodcastAddCtrl', function ($scope, $location, tagService, podcastService) {
+        $scope.podcast = angular.extend(podcastService.getNewPodcast(), { hasToBeDeleted : true, cover : { height: 200, width: 200 } } );
+
+        $scope.loadTags = function(query) {
+            return tagService.search(query);
+        };
+
+        $scope.changeType = function() {
+            if (/beinsports\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "BeInSports";
+            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "CanalPlus";
+            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "JeuxVideoFR";
+            } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "JeuxVideoCom";
+            } else if (/parleys\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Parleys";
+            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Pluzz";
+            } else if (/youtube\.com/i.test($scope.podcast.url)) {
+                $scope.podcast.type = "Youtube";
+            } else if ($scope.podcast.url.length > 0) {
+                $scope.podcast.type = "RSS";
+            } else {
+                $scope.podcast.type = "Send";
+            }
+        };
+
+        $scope.save = function() {
+            podcastService.save($scope.podcast).then(function (podcast) {
+                $location.path('/podcast/' + podcast.id);
+            });
+        };
+        
+    });
+angular.module('ps.podcast.list', [
+    'ps.config.route'
+])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/podcasts', {
+                templateUrl: 'html/podcasts-list.html',
+                controller: 'PodcastsListCtrl',
+                hotkeys: commonKey,
+                resolve: {
+                    podcasts: function (podcastService) {
+                        return podcastService.findAll();
+                    }
+                }
+            });
+    })
+    .controller('PodcastsListCtrl', function ($scope, podcasts) {
+        $scope.podcasts = podcasts;
+    });
+angular.module('ps.search.item', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.tag',
+    'ps.player',
+    'ps.config.route',
+    'ngTagsInput'
+])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/items', {
+                templateUrl: 'html/items-search.html',
+                controller: 'ItemsSearchCtrl',
+                reloadOnSearch: false,
+                hotkeys: [
+                    ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
+                    ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
+                ].concat(commonKey)
+            });
+    })
+    .constant('ItemPerPage', 12)
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
+        'use strict';
+
+        // Gestion du cache de la pagination :
+        var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+
+        $scope.changePage = function() {
+            $scope.searchParameters.page = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / ItemPerPage)) ? Math.ceil($scope.totalItems / ItemPerPage) : $scope.currentPage;
+            $scope.searchParameters.page -= 1;
+            itemService.search($scope.searchParameters).then(function(itemsResponse) {
+
+                $scope.items = itemsResponse.content;
+                $scope.totalPages = itemsResponse.totalPages;
+                $scope.totalItems = itemsResponse.totalElements;
+
+                cache.put('search:currentPage', $scope.currentPage);
+                cache.put('search:currentWord', $scope.term);
+                cache.put('search:currentTags', $scope.searchTags);
+                cache.put("search:direction", $scope.direction);
+                cache.put("search:properties", $scope.properties);
+
+                $location.search("page", $scope.currentPage);
+            });
+        };
+
+        $scope.$on('$routeUpdate', function(){
+            if ($scope.currentPage !== $location.search().page) {
+                $scope.currentPage = $location.search().page || 1;
+                $scope.changePage();
+            }
+        });
+
+        $scope.swipePage = function(val) {
+            $scope.currentPage += val;
+            $scope.changePage();
+        };
+
+        //** Item Operation **//
+        $scope.remove = function (item) {
+            return item.remove().then(function(){
+                playlistService.remove(item);
+                return $scope.changePage();
+            });
+        };
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+                playlistService.remove(itemInList);
+            });
+        };
+
+        // Longeur inconnu au chargement :
+        //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
+        $scope.totalItems = Number.MAX_VALUE;
+        $scope.maxSize = 10;
+
+        $scope.searchParameters = {};
+        $scope.searchParameters.size = ItemPerPage;
+        $scope.currentPage = cache.get("search:currentPage") || 1;
+        $scope.searchParameters.term = cache.get("search:currentWord") || undefined;
+        $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
+        $scope.searchParameters.direction = cache.get("search:direction") || undefined;
+        $scope.searchParameters.properties = cache.get("search:properties") || undefined;
+
+        $scope.changePage();
+
+        //** DownloadManager **//
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        $scope.loadTags = tagService.search;
+
+        //** Playlist Manager **//
+        $scope.addOrRemove = function(item) {
+            return playlistService.addOrRemove(item);
+        };
+        $scope.isInPlaylist = function(item) {
+            return playlistService.contains(item);
+        };
+
+        //** WebSocket Subscription **//
+        var webSocketUrl = "/topic/download";
+        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
+
+        function updateItemFromWS(message) {
+            var item = JSON.parse(message.body);
+
+            var elemToUpdate = _.find($scope.items, { 'id': item.id });
+            if (elemToUpdate)
+                _.assign(elemToUpdate, item);
+        }
+
+    });
 angular.module('ps.dataService.donwloadManager', [
     'restangular'
 ])
@@ -1501,18 +1617,39 @@ angular.module('ps.dataService.podcast', [
     'restangular'
 ]).factory('podcastService', function (Restangular) {
     'use strict';
+    var route = 'podcast';
 
     return {
         findById    :   findById,
-        findAll     :   findAll
+        findAll     :   findAll,
+        save        :   save,
+        getNewPodcast : getNewPodcast,
+        patch       :   patch,
+        deletePodcast : deletePodcast
     };
 
     function findById(podcastId) {
-        return Restangular.one('podcast', podcastId).get();
+        return Restangular.one(route, podcastId).get();
     }
 
     function findAll() {
-        return Restangular.all('podcast').getList();
+        return Restangular.all(route).getList();
+    }
+    
+    function save(podcast) {
+        return podcast.save();
+    }
+    
+    function getNewPodcast() {
+        return Restangular.one(route);
+    }
+    
+    function patch(item) {
+        return item.patch();
+    }
+    
+    function deletePodcast(item) {
+        return item.remove();
     }
 });
 /**
@@ -1530,8 +1667,6 @@ angular.module('ps.dataService.tag', [
         search : search
     };
 
-
-
     function getAll() {
         return baseAll.get();
     }
@@ -1542,7 +1677,11 @@ angular.module('ps.dataService.tag', [
 });
 'use strict';
 
-angular.module('ps.podcast.details.edition', [])
+angular.module('ps.podcast.details.edition', [
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+    'ngTagsInput'
+])
     .directive('podcastEdition', function () {
         return {
             restrcit : 'E',
@@ -1553,26 +1692,24 @@ angular.module('ps.podcast.details.edition', [])
             controller : 'podcastEditionCtrl'
         };
     })
-    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
-        var tags = Restangular.all("tag");
-
+    .controller('podcastEditionCtrl', function ($scope, $location, tagService, podcastService) {
         $scope.loadTags = function (query) {
-            return tags.post(null, {name : query});
+            return tagService.search(query);
         };
 
         $scope.save = function () {
             var podcastToUpdate = _.cloneDeep($scope.podcast);
             podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate)
-                .then(function (patchedPodcast){
-                    _.assign($scope.podcast, patchedPodcast);
-                })
-                .then(function () {
-                    $scope.$emit('podcastEdition:save');
-                });
+
+            podcastService.patch(podcastToUpdate).then(function (patchedPodcast){
+                _.assign($scope.podcast, patchedPodcast);
+            }).then(function () {
+                $scope.$emit('podcastEdition:save');
+            });
         };
+
         $scope.deletePodcast = function () {
-            $scope.podcast.remove().then(function () {
+            podcastService.deletePodcast($scope.podcast).then(function () {
                 $location.path('/podcasts');
             });
         };
@@ -1660,12 +1797,31 @@ angular.module('ps.podcast.details.episodes', [
     });
 
 angular.module('ps.podcast.details', [
+    'ps.config.route',
     'ps.podcast.details',
     'ps.podcast.details.episodes',
     'ps.podcast.details.edition',
     'ps.podcast.details.upload',
     'restangular'
-]).controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
+]).config(function($routeProvider, commonKey) {
+    $routeProvider.
+        when('/podcast/:podcastId', {
+            templateUrl: 'html/podcast-detail.html',
+            controller: 'PodcastDetailCtrl',
+            hotkeys: [
+                ['r', 'Refresh', 'refreshItems()'],
+                ['f', 'Force Refresh', 'refresh()'],
+                ['l', 'List of Items', 'tabs[0].active = true'],
+                ['m', 'Modification of Podcast', 'tabs[1].active = true']
+            ].concat(commonKey),
+            resolve : {
+                podcast : function (Restangular, $route) {
+                    return Restangular.one('podcast', $route.current.params.podcastId).get();
+                }
+            }
+        })    
+})
+    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
 
         $scope.podcast = podcast;
 
@@ -1685,7 +1841,7 @@ angular.module('ps.podcast.details', [
 angular.module('ps.podcast.details.upload', [
     'angularFileUpload'
 ])
-    .directive('podcastUpload', function ($log) {
+    .directive('podcastUpload', function () {
         return {
             restrcit : 'E',
             templateUrl : 'html/podcast-details-upload.html',
@@ -1709,106 +1865,4 @@ angular.module('ps.podcast.details.upload', [
                     });
             });
         };
-    });
-
-angular.module('ps.search.item', [
-    'ps.dataService.item',
-    'ps.dataService.tag',
-    'ps.player',
-    'ps.dataService.donwloadManager'
-])
-    .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
-        'use strict';
-
-        // Gestion du cache de la pagination :
-        var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
-
-        $scope.changePage = function() {
-            $scope.searchParameters.page = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / ItemPerPage)) ? Math.ceil($scope.totalItems / ItemPerPage) : $scope.currentPage;
-            $scope.searchParameters.page -= 1;
-            itemService.search($scope.searchParameters).then(function(itemsResponse) {
-
-                $scope.items = itemsResponse.content;
-                $scope.totalPages = itemsResponse.totalPages;
-                $scope.totalItems = itemsResponse.totalElements;
-
-                cache.put('search:currentPage', $scope.currentPage);
-                cache.put('search:currentWord', $scope.term);
-                cache.put('search:currentTags', $scope.searchTags);
-                cache.put("search:direction", $scope.direction);
-                cache.put("search:properties", $scope.properties);
-
-                $location.search("page", $scope.currentPage);
-            });
-        };
-
-        $scope.$on('$routeUpdate', function(){
-            if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page || 1;
-                $scope.changePage();
-            }
-        });
-
-        $scope.swipePage = function(val) {
-            $scope.currentPage += val;
-            $scope.changePage();
-        };
-
-        //** Item Operation **//
-        $scope.remove = function (item) {
-            return item.remove().then(function(){
-                playlistService.remove(item);
-                return $scope.changePage();
-            });
-        };
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-                playlistService.remove(itemInList);
-            });
-        };
-
-        // Longeur inconnu au chargement :
-        //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-        $scope.totalItems = Number.MAX_VALUE;
-        $scope.maxSize = 10;
-
-        $scope.searchParameters = {};
-        $scope.searchParameters.size = ItemPerPage;
-        $scope.currentPage = cache.get("search:currentPage") || 1;
-        $scope.searchParameters.term = cache.get("search:currentWord") || undefined;
-        $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
-        $scope.searchParameters.direction = cache.get("search:direction") || undefined;
-        $scope.searchParameters.properties = cache.get("search:properties") || undefined;
-
-        $scope.changePage();
-
-        //** DownloadManager **//
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-        $scope.loadTags = tagService.search;
-
-        //** Playlist Manager **//
-        $scope.addOrRemove = function(item) {
-            return playlistService.addOrRemove(item);
-        };
-        $scope.isInPlaylist = function(item) {
-            return playlistService.contains(item);
-        };
-        
-        //** WebSocket Subscription **//
-        var webSocketUrl = "/topic/download";
-        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
-
-        function updateItemFromWS(message) {
-            var item = JSON.parse(message.body);
-
-            var elemToUpdate = _.find($scope.items, { 'id': item.id });
-            if (elemToUpdate)
-                _.assign(elemToUpdate, item);
-        }
-
     });

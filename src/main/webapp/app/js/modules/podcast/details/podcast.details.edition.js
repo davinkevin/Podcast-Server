@@ -1,6 +1,10 @@
 'use strict';
 
-angular.module('ps.podcast.details.edition', [])
+angular.module('ps.podcast.details.edition', [
+    'ps.dataService.podcast',
+    'ps.dataService.tag',
+    'ngTagsInput'
+])
     .directive('podcastEdition', function () {
         return {
             restrcit : 'E',
@@ -11,26 +15,24 @@ angular.module('ps.podcast.details.edition', [])
             controller : 'podcastEditionCtrl'
         };
     })
-    .controller('podcastEditionCtrl', function ($scope, Restangular, $location) {
-        var tags = Restangular.all("tag");
-
+    .controller('podcastEditionCtrl', function ($scope, $location, tagService, podcastService) {
         $scope.loadTags = function (query) {
-            return tags.post(null, {name : query});
+            return tagService.search(query);
         };
 
         $scope.save = function () {
             var podcastToUpdate = _.cloneDeep($scope.podcast);
             podcastToUpdate.items = null;
-            $scope.podcast.patch(podcastToUpdate)
-                .then(function (patchedPodcast){
-                    _.assign($scope.podcast, patchedPodcast);
-                })
-                .then(function () {
-                    $scope.$emit('podcastEdition:save');
-                });
+
+            podcastService.patch(podcastToUpdate).then(function (patchedPodcast){
+                _.assign($scope.podcast, patchedPodcast);
+            }).then(function () {
+                $scope.$emit('podcastEdition:save');
+            });
         };
+
         $scope.deletePodcast = function () {
-            $scope.podcast.remove().then(function () {
+            podcastService.deletePodcast($scope.podcast).then(function () {
                 $location.path('/podcasts');
             });
         };

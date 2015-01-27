@@ -24,7 +24,7 @@
             <div class="form-group">
                 <label for="url" class="col-sm-2 control-label">Tags</label>
                 <div class="col-sm-10">
-                    <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap">
+                    <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap" placeholder="Ajouter un tag">
                         <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
                     </tags-input>
                 </div>

@@ -2,7 +2,22 @@ angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
     'ps.player',
     'AngularStompDK'
-])
+]).config(function($routeProvider, commonKey) {
+    $routeProvider.
+        when('/podcast/:podcastId/item/:itemId', {
+            templateUrl: 'html/item-detail.html',
+            controller: 'ItemDetailCtrl',
+            hotkeys: commonKey,
+            resolve : {
+                item : function (itemService, $route) {
+                    return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                },
+                podcast : function (podcastService, $route) {
+                    return podcastService.findById($route.current.params.podcastId);
+                }
+            }
+        });
+})
     .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
 
         $scope.item = item;

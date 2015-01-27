@@ -1,9 +1,17 @@
 angular.module('ps.download', [
-    /*'ps.websocket',*/
+    'ps.config.route',
     'ps.dataService.donwloadManager',
     'notification',
     'AngularStompDK'
 ])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/download', {
+                templateUrl: 'html/download.html',
+                controller: 'DownloadCtrl',
+                hotkeys: commonKey
+            })
+    })
     .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
         $scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];

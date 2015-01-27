@@ -35,7 +35,7 @@
         </a>
     </li>
     <li>
-        <a href="#/podcast/add">
+        <a href="#/podcast-creation">
             <span class="ionicons ion-android-add"></span>
             <span class="hidden-xs"> Ajouter</span>
         </a>

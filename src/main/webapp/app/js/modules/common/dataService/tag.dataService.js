@@ -13,8 +13,6 @@ angular.module('ps.dataService.tag', [
         search : search
     };
 
-
-
     function getAll() {
         return baseAll.get();
     }

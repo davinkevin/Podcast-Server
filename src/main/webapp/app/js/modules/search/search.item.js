@@ -1,9 +1,23 @@
 angular.module('ps.search.item', [
+    'ps.dataService.donwloadManager',
     'ps.dataService.item',
     'ps.dataService.tag',
     'ps.player',
-    'ps.dataService.donwloadManager'
+    'ps.config.route',
+    'ngTagsInput'
 ])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/items', {
+                templateUrl: 'html/items-search.html',
+                controller: 'ItemsSearchCtrl',
+                reloadOnSearch: false,
+                hotkeys: [
+                    ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
+                    ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
+                ].concat(commonKey)
+            });
+    })
     .constant('ItemPerPage', 12)
     .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
         'use strict';
@@ -85,7 +99,7 @@ angular.module('ps.search.item', [
         $scope.isInPlaylist = function(item) {
             return playlistService.contains(item);
         };
-        
+
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
         ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);

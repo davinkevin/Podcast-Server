@@ -1,20 +1,21 @@
 angular.module('ps.podcast.creation', [
-    'restangular'
+    'ps.config.route',
+    'ps.dataservice',
+    'ngTagsInput'
 ])
-    .controller('PodcastAddCtrl', function ($scope, Restangular, $location) {
-        var podcasts = Restangular.all("podcast"),
-            tags = Restangular.all("tag");
-
-        $scope.podcast = {
-            hasToBeDeleted : true,
-            cover : {
-                height: 200,
-                width: 200
-            }
-        };
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/podcast-creation', {
+                templateUrl: 'html/podcast-creation.html',
+                controller: 'PodcastAddCtrl',
+                hotkeys: commonKey
+            });
+    })
+    .controller('PodcastAddCtrl', function ($scope, $location, tagService, podcastService) {
+        $scope.podcast = angular.extend(podcastService.getNewPodcast(), { hasToBeDeleted : true, cover : { height: 200, width: 200 } } );
 
         $scope.loadTags = function(query) {
-            return tags.post(null, {name : query});
+            return tagService.search(query);
         };
 
         $scope.changeType = function() {
@@ -40,8 +41,9 @@ angular.module('ps.podcast.creation', [
         };
 
         $scope.save = function() {
-            podcasts.post($scope.podcast).then(function (podcast) {
+            podcastService.save($scope.podcast).then(function (podcast) {
                 $location.path('/podcast/' + podcast.id);
             });
         };
+        
     });

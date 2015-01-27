@@ -3,7 +3,7 @@
 angular.module('ps.podcast.details.upload', [
     'angularFileUpload'
 ])
-    .directive('podcastUpload', function ($log) {
+    .directive('podcastUpload', function () {
         return {
             restrcit : 'E',
             templateUrl : 'html/podcast-details-upload.html',
