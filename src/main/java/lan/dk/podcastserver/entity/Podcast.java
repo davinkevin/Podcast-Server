@@ -19,7 +19,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Podcast implements Serializable {
 
-    private int id;
+    private Integer id;
     private String title;
     private String url;
     private String signature;
@@ -42,7 +42,7 @@ public class Podcast implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

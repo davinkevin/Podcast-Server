@@ -29,7 +29,7 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
-    public Podcast findById(@PathVariable int id) {
+    public Podcast findById(@PathVariable Integer id) {
         return podcastBusiness.findOne(id);
     }
 
@@ -42,13 +42,13 @@ public class PodcastController {
     */
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
-    public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) {
+    public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") Integer id) {
         podcast.setId(id);
         return podcastBusiness.reatachAndSave(podcast);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH, produces = "application/json")
-    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") int id) throws PodcastNotFoundException {
+    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") Integer id) throws PodcastNotFoundException {
         podcast.setId(id);
         Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
         patchedPodcast.setItems(null);
@@ -57,29 +57,24 @@ public class PodcastController {
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void delete (@PathVariable int id) {
+    public void delete (@PathVariable Integer id) {
         podcastBusiness.delete(id);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public List<Podcast> findAll() {
-
         //TODO : Using JSONVIEW or Waiting https://jira.spring.io/browse/SPR-7156 to be solved in 1/JUL/2014
-        List<Podcast> podcastList = podcastBusiness.findAll();
-        for(Podcast podcast : podcastList) {
-            podcast.setItems(null);
-        }
-
-        return podcastList;
+        return podcastBusiness.findAll();
+                
     }
 
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
-    public String getRss(@PathVariable int id) {
+    public String getRss(@PathVariable Integer id) {
         return podcastBusiness.getRss(id);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/upload", method=RequestMethod.POST)
     @Deprecated
+    @RequestMapping(value="{id:[\\d]+}/upload", method=RequestMethod.POST)
     public String handleFileUpload(@PathVariable Integer id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name) throws PodcastNotFoundException {
         logger.info("Envoie du fichier : {}", name);
         if (!file.isEmpty()) {
