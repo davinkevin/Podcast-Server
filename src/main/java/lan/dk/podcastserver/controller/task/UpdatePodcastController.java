@@ -3,19 +3,14 @@ package lan.dk.podcastserver.controller.task;
 import lan.dk.podcastserver.business.UpdatePodcastBusiness;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 
-@Controller
+@RestController
 @RequestMapping("/api/task/updateManager")
-public class UpdatePodcastService {
+public class UpdatePodcastController {
 
     @Resource
     UpdatePodcastBusiness updatePodcastBusiness;
@@ -37,7 +32,6 @@ public class UpdatePodcastService {
 
     @RequestMapping(value = "/updatePodcast/force", method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Transactional
     private void updatePodcastForced (@RequestBody int id) {
         updatePodcastBusiness.forceUpdatePodcast(id);
     }

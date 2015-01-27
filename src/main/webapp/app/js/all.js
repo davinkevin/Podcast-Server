@@ -1,3 +1,8 @@
+angular.module('ps.common', [
+    'ps.filters',
+    'navbar',
+    'authorize-notification'
+]);
 angular.module('podcastApp', [
     'ps.search',
     'ps.podcast',
@@ -9,10 +14,14 @@ angular.module('podcastApp', [
     'ps.config',
     'ps.partial'
 ]);
-angular.module('ps.common', [
-    'ps.filters',
-    'navbar',
-    'authorize-notification'
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module('ps.podcast', [
+    'ps.podcast.details',
+    'ps.podcast.creation',
+    'ps.podcast.list'
 ]);
 angular.module('authorize-notification', [
     'notification'
@@ -55,14 +64,16 @@ angular.module('ps.filters', [])
     }
 );
 /**
- * Created by kevin on 01/11/14.
+ * Created by kevin on 02/11/14.
  */
 
-angular.module('ps.podcast', [
-    'ps.podcast.details',
-    'ps.podcast.creation',
-    'ps.podcast.list'
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag'
 ]);
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -92,17 +103,6 @@ _.mixin({
         return localArray;
     }
 });
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag'
-]);
-
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -276,6 +276,69 @@ angular.module('ps.download', [
                 });
             }, $scope);
 
+    });
+angular.module('ps.item.details', [
+    'ps.dataService.donwloadManager',
+    'ps.player',
+    'AngularStompDK'
+]).config(function($routeProvider, commonKey) {
+    $routeProvider.
+        when('/podcast/:podcastId/item/:itemId', {
+            templateUrl: 'html/item-detail.html',
+            controller: 'ItemDetailCtrl',
+            hotkeys: commonKey,
+            resolve : {
+                item : function (itemService, $route) {
+                    return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                },
+                podcast : function (podcastService, $route) {
+                    return podcastService.findById($route.current.params.podcastId);
+                }
+            }
+        });
+})
+    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
+
+        $scope.item = item;
+        $scope.item.podcast = podcast;
+        $scope.download = DonwloadManager.download;
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+
+
+        $scope.remove = function(item) {
+            return item.remove().then(function() {
+                playlistService.remove(item);
+                $location.path('/podcast/'.concat($scope.item.podcast.id));
+            });
+        };
+
+        $scope.reset = function (item) {
+            return item.reset().then(function (itemReseted) {
+                _.assign($scope.item, itemReseted);
+                playlistService.remove(item);
+            });
+        };
+        
+        $scope.toggleInPlaylist = function () {
+            playlistService.addOrRemove(item);
+        };
+        
+        $scope.isInPlaylist = function() {
+            return playlistService.contains(item);
+        };
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
+
+        ngstomp
+            .subscribe(webSockedUrl, function(message) {
+                var itemFromWS = JSON.parse(message.body);
+
+                if (itemFromWS.id == $scope.item.id) {
+                    _.assign($scope.item, itemFromWS);
+                }
+            }, $scope);
     });
 (function(module) {
 try {
@@ -1080,7 +1143,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in podcasts | orderBy:\'-lastUpdate\'">\n' +
     '            <a ng-href="#/podcast/{{ podcast.id }}" >\n' +
     '                <img    class="img-responsive img-rounded" ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}"\n' +
-    '                        tooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ podcast.title }}!"\n' +
+    '                        tooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ podcast.title }}"\n' +
     '                        />\n' +
     '            </a>\n' +
     '        </div>\n' +
@@ -1091,69 +1154,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-angular.module('ps.item.details', [
-    'ps.dataService.donwloadManager',
-    'ps.player',
-    'AngularStompDK'
-]).config(function($routeProvider, commonKey) {
-    $routeProvider.
-        when('/podcast/:podcastId/item/:itemId', {
-            templateUrl: 'html/item-detail.html',
-            controller: 'ItemDetailCtrl',
-            hotkeys: commonKey,
-            resolve : {
-                item : function (itemService, $route) {
-                    return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-                },
-                podcast : function (podcastService, $route) {
-                    return podcastService.findById($route.current.params.podcastId);
-                }
-            }
-        });
-})
-    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
-
-        $scope.item = item;
-        $scope.item.podcast = podcast;
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-
-
-        $scope.remove = function(item) {
-            return item.remove().then(function() {
-                playlistService.remove(item);
-                $location.path('/podcast/'.concat($scope.item.podcast.id));
-            });
-        };
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                _.assign($scope.item, itemReseted);
-                playlistService.remove(item);
-            });
-        };
-        
-        $scope.toggleInPlaylist = function () {
-            playlistService.addOrRemove(item);
-        };
-        
-        $scope.isInPlaylist = function() {
-            return playlistService.contains(item);
-        };
-
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
-
-        ngstomp
-            .subscribe(webSockedUrl, function(message) {
-                var itemFromWS = JSON.parse(message.body);
-
-                if (itemFromWS.id == $scope.item.id) {
-                    _.assign($scope.item, itemFromWS);
-                }
-            }, $scope);
-    });
 /**
  * Created by kevin on 01/11/14.
  */
