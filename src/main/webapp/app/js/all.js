@@ -43,6 +43,17 @@ angular.module('authorize-notification', [
     }
 });
 
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
+angular.module('ps.filters', [])
+    .filter('htmlToPlaintext', function () {
+        return function(text) {
+            return String(text || "").replace(/<[^>]+>/gm, '');
+        };
+    }
+);
 /**
  * Created by kevin on 01/11/14.
  */
@@ -52,17 +63,6 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
-angular.module('ps.filters', [])
-    .filter('htmlToPlaintext', function () {
-        return function(text) {
-            return String(text || "").replace(/<[^>]+>/gm, '');
-        };
-    }
-);
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -102,6 +102,7 @@ angular.module('ps.dataservice', [
     'ps.dataService.podcast',
     'ps.dataService.tag'
 ]);
+
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -118,7 +119,6 @@ angular.module('navbar', [
         var vm = this;
         vm.navCollapsed = true;
     });
-
 
 angular.module('ps.config', [
     'ps.config.route',
@@ -1077,7 +1077,7 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('html/podcasts-list.html',
     '<div class="container podcastlist" style="margin-top: 15px;">\n' +
     '    <div class="row">\n' +
-    '        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in podcasts">\n' +
+    '        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in podcasts | orderBy:\'-lastUpdate\'">\n' +
     '            <a ng-href="#/podcast/{{ podcast.id }}" >\n' +
     '                <img    class="img-responsive img-rounded" ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}"\n' +
     '                        tooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ podcast.title }}!"\n' +
