@@ -16,7 +16,6 @@ import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
@@ -51,20 +50,11 @@ public class PluzzUpdater extends AbstractUpdater {
 
 
         // Si le bean est valide :
-        getItems(podcast)
-                .stream()
-                .filter(item -> !podcast.getItems().contains(item))
-                .forEach(item -> {
-
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                });
+        getItems(podcast).stream()
+                .filter(item -> !podcast.contains(item))
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
+                .forEach(podcast::add);
 
         return podcast;
     }

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -40,17 +39,12 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     public Podcast updateAndAddItems(Podcast podcast) {
 
-        getItems(podcast)
-                .stream()
-                .filter(item -> !podcast.getItems().contains(item))
-                .forEach(item -> {
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                });
+        getItems(podcast).stream()
+                .filter(item -> !podcast.contains(item))
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
+                .forEach(podcast::add);
+        
         return podcast;
     }
 

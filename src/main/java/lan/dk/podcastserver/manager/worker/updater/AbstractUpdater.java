@@ -31,8 +31,6 @@ public abstract class AbstractUpdater implements Updater {
             String signature = generateSignature(podcast);
             if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
                 podcast.setSignature(signature);
-
-
                 return new ImmutablePair<>(podcast, getItems(podcast));
             } else {
                 logger.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());

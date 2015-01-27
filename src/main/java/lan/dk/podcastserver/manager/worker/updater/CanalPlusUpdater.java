@@ -2,7 +2,10 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.*;
+import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.SignatureUtils;
+import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.utils.jDomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Jsoup;
@@ -12,7 +15,6 @@ import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,8 +27,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component("CanalPlusUpdater")
 @Scope("prototype")
+@Component("CanalPlusUpdater")
 public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
@@ -35,19 +37,10 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         // Si le bean est valide :
         getItems(podcast).stream()
-                .filter(item -> !podcast.getItems().contains(item))
-                .forEach(item -> {
-
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                });
-
-        logger.debug("Nombre d'episode : " + podcast.getItems().size());
+                .filter(item -> !podcast.contains(item))
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
+                .forEach(podcast::add);
 
         return podcast;
     }

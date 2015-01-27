@@ -2,7 +2,10 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.*;
+import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.SignatureUtils;
+import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.utils.jDomUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -11,7 +14,6 @@ import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -53,17 +55,10 @@ public class BeInSportUpdater extends AbstractUpdater {
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
         getItems(podcast).stream()
-                .filter(item -> !podcast.getItems().contains(item))
-                .forEach(item -> {
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                });
+                .filter(item -> !podcast.contains(item))
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
+                .forEach(podcast::add);
 
         return podcast;
     }

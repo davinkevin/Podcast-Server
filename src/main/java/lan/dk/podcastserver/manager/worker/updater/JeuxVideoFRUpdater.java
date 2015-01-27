@@ -16,7 +16,6 @@ import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URL;
 import java.time.*;
@@ -48,16 +47,9 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         // Si le bean est valide :
         itemSet.stream()
                 .filter(item -> !podcastContains(podcast, item))
-                .forEach(item -> {
-                    // Si le bean est valide :
-                    item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
-                    if (constraintViolations.isEmpty()) {
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
-                });
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
+                .forEach(podcast::add);
 
         return podcast;
     }

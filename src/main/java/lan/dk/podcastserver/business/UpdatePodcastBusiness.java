@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.io.File;
 import java.time.ZonedDateTime;
@@ -104,6 +103,7 @@ public class UpdatePodcastBusiness  {
         Map<String, Future< Pair<Podcast, Set<Item>> > > podcastItemsToUpdate = new HashMap<>();
 
         List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
+        logger.info("Traitement de {} podcasts", podcasts.size());
         for (Podcast podcast : podcasts) {
             try {
                 final Updater updater = workerService.getUpdaterByType(podcast);
@@ -114,6 +114,7 @@ public class UpdatePodcastBusiness  {
             }
         }
 
+        logger.info("Traitement des ajouts sur {} podcasts", podcastItemsToUpdate.size());
         for (Map.Entry<String, Future<Pair<Podcast, Set<Item>>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
             try {
                 String currentPodcastSignature = podcastAndItems.getKey();
@@ -155,24 +156,18 @@ public class UpdatePodcastBusiness  {
     }
 
     public Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items) {
-
-        if (podcast.getItems() != null && !podcast.getItems().containsAll(items)) {
-            podcast.setLastUpdate(ZonedDateTime.now());
-        }
-
+        
         items.stream()
                 .filter(item -> !podcast.getItems().contains(item))
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
                 .forEach(item -> {
-                    // Si le bean est valide :
+                    logger.debug("Add an item to {}", podcast.getTitle());
                     item.setPodcast(podcast);
-                    Set<ConstraintViolation<Item>> constraintViolations = validator.validate(item);
-                    if (constraintViolations.isEmpty()) {
-                        logger.debug("Add an item to {}", podcast.getTitle());
-                        podcast.getItems().add(item);
-                    } else {
-                        logger.error(constraintViolations.toString());
-                    }
+                    podcast.getItems().add(item);
+                    podcast.setLastUpdate(ZonedDateTime.now());
                 });
+        
         return podcast;
     }
 

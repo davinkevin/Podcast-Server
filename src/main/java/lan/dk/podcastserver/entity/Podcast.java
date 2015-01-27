@@ -192,13 +192,19 @@ public class Podcast implements Serializable {
     }
 
     @Transient @JsonIgnore
-    public Podcast addTag(Tag tag) {
+    public Podcast add(Tag tag) {
         this.tags.add(tag);
         return this;
     }
 
     @Transient @JsonIgnore
-    public boolean containsItem(Item item) {
+    public Boolean contains(Item item) {
         return items.contains(item);
+    }
+    
+    @Transient @JsonIgnore
+    public Podcast add(Item item) {
+        items.add(item.setPodcast(this));
+        return this;
     }
 }
