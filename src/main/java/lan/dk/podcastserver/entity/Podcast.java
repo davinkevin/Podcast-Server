@@ -38,7 +38,7 @@ public class Podcast implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
