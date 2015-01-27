@@ -77,7 +77,7 @@ public class ItemSpecifications {
             statusPredicate =
                     (statusPredicate == null)
                         ? item.status.eq(status)
-                        : statusPredicate.and(item.status.eq(status));
+                        : statusPredicate.or(item.status.eq(status));
         }
 
         return statusPredicate;
