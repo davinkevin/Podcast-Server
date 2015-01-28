@@ -11,6 +11,7 @@ import org.springframework.context.annotation.FilterType;
 @ComponentScan(value = "lan.dk.podcastserver.config",
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RootConfig.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebMvcConfig.class)
         })
 public class RootConfig {
 

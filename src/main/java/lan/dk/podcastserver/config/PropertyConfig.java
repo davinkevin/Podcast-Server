@@ -10,7 +10,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @Configuration
 //@PropertySource(value = {"classpath:application.properties"}, ignoreResourceNotFound = true)
-@PropertySource(value = {"classpath:application.properties", "file:${catalina.home}/conf/podcastserver.properties"}, ignoreResourceNotFound = true)
+@PropertySource(value = {"classpath:application.properties","file:#{systemEnvironment['PODCAST_SERVER']/conf/podcastserver.properties}", "file:${catalina.home}/conf/podcastserver.properties"}, ignoreResourceNotFound = true)
 public class PropertyConfig {
 
     @Bean
