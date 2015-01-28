@@ -17,9 +17,13 @@ public class DownloadControllerWS {
     @Resource
     ItemDownloadManager itemDownloadManager;
 
-    @SubscribeMapping("/waitingList")
-//    @SendTo("/app/waitingList")
-    private Collection<Item> getWaitingList() {
+    @SubscribeMapping("/waiting")
+    private Collection<Item> waitingList() {
         return itemDownloadManager.getWaitingQueue();
+    }
+    
+    @SubscribeMapping("/download")
+    private Collection<Item> downloadList() {
+        return itemDownloadManager.getItemInDownloadingQueue();
     }
 }

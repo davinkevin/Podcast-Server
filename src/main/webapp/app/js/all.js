@@ -210,7 +210,7 @@ angular.module('ps.download', [
             })
     })
     .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
-        $scope.items = DonwloadManager.getDownloading().$object;
+        //$scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
 
         DonwloadManager.getNumberOfSimDl().then(function (data) {
@@ -240,6 +240,12 @@ angular.module('ps.download', [
 
         /** Websocket Connection */
         ngstomp
+            .subscribe("/app/download", function(message) {
+                $scope.items = JSON.parse(message.body);
+            }, $scope)
+            .subscribe("/app/waiting", function (message) {
+                $scope.waitingitems = JSON.parse(message.body);
+            }, $scope)
             .subscribe("/topic/download", function (message) {
                 var item = JSON.parse(message.body);
                 var elemToUpdate = _.find($scope.items, { 'id': item.id });
@@ -266,10 +272,7 @@ angular.module('ps.download', [
                         break;
                 }
         }, $scope)
-            .subscribe("/app/waitingList", function (message) {
-                $scope.waitingitems = JSON.parse(message.body);
-            }, $scope)
-            .subscribe("/topic/waitingList", function (message) {
+            .subscribe("/topic/waiting", function (message) {
                 var remoteWaitingItems = JSON.parse(message.body);
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
