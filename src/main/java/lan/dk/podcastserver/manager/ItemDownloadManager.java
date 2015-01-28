@@ -14,17 +14,20 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
 public class ItemDownloadManager {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String WS_TOPIC_WAITINGLIST = "/topic/waitingList";
+    private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
     //Représnetation de la fils d'attente
     private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<Item>();
@@ -152,11 +155,9 @@ public class ItemDownloadManager {
     }
 
     private void initDownload() {
-        for(Item item : itemBusiness.findAllToDownload()) {
-            if (!waitingQueue.contains(item)) {
-                waitingQueue.add(item);
-            }
-        }
+        StreamSupport.stream(itemBusiness.findAllToDownload().spliterator(), false)
+                .filter(item -> !waitingQueue.contains(item))
+                .forEach(waitingQueue::add);
     }
 
     public void launchDownload() {
@@ -179,11 +180,10 @@ public class ItemDownloadManager {
     }
 
     public void restartAllDownload() {
-        for (Downloader downloader : downloadingQueue.values()) {
-            if (downloader.getItem().getStatus().equals("Paused")) {
-                getDownloaderByTypeAndRun(downloader.getItem());
-            }
-        }
+        downloadingQueue.values()
+                .stream()
+                .filter(downloader -> downloader.getItem().getStatus().equals("Paused"))
+                .forEach(downloader -> getDownloaderByTypeAndRun(downloader.getItem()));
     }
 
     // Change State of id identified download
@@ -253,12 +253,11 @@ public class ItemDownloadManager {
     }
 
     public Item getItemInDownloadingQueue(int id) {
-        for (Item item : downloadingQueue.keySet()) {
-            if (item.getId()== id) {
-                return item;
-            }
-        }
-        return null;
+        return downloadingQueue.keySet()
+                .stream()
+                .filter(item -> Objects.equals(item.getId(), id))
+                .findFirst()
+                .get();
     }
 
     private void getDownloaderByTypeAndRun(Item item) {
@@ -309,4 +308,7 @@ public class ItemDownloadManager {
         return downloadingQueue.containsKey(item);
     }
 
+    public Set<Item> getItemInDownloadingQueue() {
+        return downloadingQueue.keySet();
+    }
 }
