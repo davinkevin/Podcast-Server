@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -316,20 +315,16 @@ public class ItemDownloadManager {
 
         copyOfWaitingList.stream().forEach(aItemList::add);
         
-        Item movingItem = aItemList.stream()
-                .filter(item -> item.getId().equals(itemId)).findFirst().orElse(null);
-        
-        Integer currentPositionOfItem = IntStream.range(0, aItemList.size())
-                                        .filter(i -> aItemList.get(i).getId().equals(itemId))
-                                        .findFirst().orElseGet(() -> -1);
+        Optional<Item> movingItem = aItemList.stream()
+                .filter(item -> item.getId().equals(itemId)).findFirst();
 
-        if (currentPositionOfItem.equals(-1)) {
+        if (!movingItem.isPresent()) {
             logger.error("Moving element in waiting list not authorized : Element wasn't in the list");
             return;
         }
 
         aItemList.removeIf(item -> item.getId().equals(itemId));
-        aItemList.add(position, movingItem);
+        aItemList.add(position, movingItem.get());
         
         waitingQueue.clear();
         waitingQueue.addAll(aItemList);
