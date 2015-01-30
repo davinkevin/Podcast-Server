@@ -2,11 +2,11 @@ package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.utils.form.MovingItemInQueueForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Queue;
@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Created by kevin on 26/12/2013.
  */
-@Controller
+@RestController
 @RequestMapping("/api/task/downloadManager")
 public class IDMController {
 
@@ -25,37 +25,31 @@ public class IDMController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value="/queue", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
     public Queue<Item> getDownloadList () {
         return IDM.getWaitingQueue();
     }
 
     @RequestMapping(value="/downloading", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
     public Set<Item> getDownloadingList () {
         return IDM.getDownloadingQueue().keySet();
     }
 
     @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
     public Item getDownloadingList (@PathVariable int id) {
         return IDM.getItemInDownloadingQueue(id);
     }
 
     @RequestMapping(value="/current", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
     public int getNumberOfCurrentDownload () {
         return IDM.getNumberOfCurrentDownload();
     }
 
     @RequestMapping(value="/limit", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
     public int setLimitParallelDownload () {
         return IDM.getLimitParallelDownload();
     }
 
     @RequestMapping(value="/limit", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
     public void setLimitParallelDownload (@RequestBody int setLimitParallelDownload) {
         IDM.setLimitParallelDownload(setLimitParallelDownload);
     }
@@ -68,7 +62,6 @@ public class IDMController {
     }
 
     @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
     public void changeStatusDownload (@RequestBody String status, @PathVariable(value = "id") int id) {
         logger.debug("id : " + id + "; status : " + status);
     }
@@ -133,9 +126,7 @@ public class IDMController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeItemFromQueueAndStopped(@PathVariable int id) {
         IDM.removeItemFromQueue(id, true);
-
     }
-
 
     @RequestMapping(value="/queue", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
@@ -143,4 +134,9 @@ public class IDMController {
         IDM.getWaitingQueue().clear();
     }
 
+    @RequestMapping(value="/move", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void moveItemInQueue(@RequestBody MovingItemInQueueForm movingItemInQueueForm) {
+        IDM.moveItemInQueue(movingItemInQueueForm.getId(), movingItemInQueueForm.getPosition());
+    }
 }

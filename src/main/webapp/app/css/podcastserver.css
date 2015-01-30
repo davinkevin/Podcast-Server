@@ -39,6 +39,8 @@
 .downloadList .media * img{width:100px;height:90px;border-top-left-radius:5px;border-bottom-left-radius:5px;object-fit:cover}
 .downloadList .media .media-heading{padding-top:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .downloadList .media .buttonList{padding-top:24px}
+.downloadList .item-in-waiting-list{overflow:visible}
+.downloadList .item-in-waiting-list .btn{border:none}
 podcast-items-list .media{margin-left:5px;margin-right:5px;overflow:visible}
 podcast-items-list .media .media-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 podcast-items-list .media img{object-fit:cover}

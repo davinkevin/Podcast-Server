@@ -3,39 +3,46 @@ angular.module('ps.dataService.donwloadManager', [
 ])
     .factory('DonwloadManager', function(Restangular) {
     'use strict';
+        
+        var baseTask = Restangular.one("task"),
+            baseDownloadManager = baseTask.one('downloadManager');
+        
     return {
         download: function (item) {
             return Restangular.one("item").customGET(item.id + "/addtoqueue");
         },
         stopDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+            return baseDownloadManager.customPOST(item.id, "stopDownload");
         },
         toggleDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+            return baseDownloadManager.customPOST(item.id, "toogleDownload");
         },
         stopAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
+            return baseDownloadManager.customGET("stopAllDownload");
         },
         pauseAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
+            return baseDownloadManager.customGET("pauseAllDownload");
         },
         restartAllCurrentDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
+            return baseDownloadManager.customGET("restartAllCurrentDownload");
         },
         removeFromQueue: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
+            return baseDownloadManager.customDELETE("queue/" + item.id);
         },
         updateNumberOfSimDl: function (number) {
-            return Restangular.one("task").customPOST(number, "downloadManager/limit");
+            return baseDownloadManager.customPOST(number, "limit");
         },
         dontDonwload: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+            return baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
         },
         getDownloading : function() {
-            return Restangular.one('task').all("downloadManager/downloading").getList();
+            return baseTask.all("downloadManager/downloading").getList();
         },
         getNumberOfSimDl : function() {
-            return Restangular.one("task/downloadManager/limit").get();
+            return baseDownloadManager.one("limit").get();
+        },
+        moveInWaitingList : function (item, position) {
+            baseDownloadManager.customPOST({id : item.id, position : position } , 'move');
         }
     };
 });

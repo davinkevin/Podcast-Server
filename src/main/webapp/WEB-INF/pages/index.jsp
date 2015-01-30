@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/app/js/lib/angular-hotkeys/build/hotkeys.min.css">
     <link rel="stylesheet" href="/app/js/lib/ionicons/css/ionicons.css">
     <link rel="stylesheet" href="/app/js/lib/videogular-themes-default/videogular.min.css">
+    <link rel="stylesheet" href="/app/js/lib/components-font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/app/js/lib/bootstrap/dist/css/bootstrap.min.css">
     <!-- endinject -->
 

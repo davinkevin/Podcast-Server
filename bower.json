@@ -27,7 +27,8 @@
     "videogular-themes-default": "~0.7.2",
     "videogular-buffering": "~0.7.2",
     "videogular-overlay-play": "~0.7.2",
-    "videogular-controls": "~0.7.2"
+    "videogular-controls": "~0.7.2",
+    "components-font-awesome": "~4.3.0"
   },
   "resolutions": {
     "angular": "1.3.9",
@@ -217,9 +218,27 @@
     },
     "videogular-themes-default": {
       "main": {
-        "dev": ["videogular.css", "fonts/videogular.eot", "fonts/videogular.svg", "fonts/videogular.ttf", "fonts/videogular.woff"],
-        "prod": ["videogular.min.css", "fonts/videogular.eot", "fonts/videogular.svg", "fonts/videogular.ttf", "fonts/videogular.woff"]
+        "dev": [
+          "videogular.css",
+          "fonts/videogular.eot",
+          "fonts/videogular.svg",
+          "fonts/videogular.ttf",
+          "fonts/videogular.woff"
+        ],
+        "prod": [
+          "videogular.min.css",
+          "fonts/videogular.eot",
+          "fonts/videogular.svg",
+          "fonts/videogular.ttf",
+          "fonts/videogular.woff"
+        ]
       }
+    },
+    "components-font-awesome" : {
+      "main" : {
+        "dev" : ["css/font-awesome.css", "fonts/FontAwesome.otf", "fonts/fontawesome-webfont.eot", "fonts/fontawesome-webfont.svg", "fonts/fontawesome-webfont.ttf", "fonts/fontawesome-webfont.woff", "fonts/fontawesome-webfont.woff2"],
+        "prod" : ["css/font-awesome.min.css", "fonts/FontAwesome.otf", "fonts/fontawesome-webfont.eot", "fonts/fontawesome-webfont.svg", "fonts/fontawesome-webfont.ttf", "fonts/fontawesome-webfont.woff", "fonts/fontawesome-webfont.woff2"]
+      }      
     }
   }
 }

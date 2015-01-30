@@ -69,7 +69,7 @@ angular.module('ps.search', [
 
 _.mixin({
     // Update in place, does not preserve order
-    updateinplace : function(localArray, remoteArray, comparisonFunction) {
+    updateinplace : function(localArray, remoteArray, comparisonFunction, withOrder) {
         // Default function working on the === operator by the indexOf function:
         var comparFunc = comparisonFunction || function (inArray, elem) {
             return inArray.indexOf(elem);
@@ -89,6 +89,13 @@ _.mixin({
             }
         });
 
+        if (withOrder) {
+            _.forEach(remoteArray, function (elem, key) {
+                var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
+                localArray.splice(key, 0, elementToMove);
+            })
+        }
+        
         return localArray;
     }
 });
@@ -236,6 +243,7 @@ angular.module('ps.download', [
         $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
         $scope.removeFromQueue = DonwloadManager.removeFromQueue;
         $scope.dontDonwload = DonwloadManager.dontDonwload;
+        $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
 
 
         /** Websocket Connection */
@@ -276,7 +284,7 @@ angular.module('ps.download', [
                 var remoteWaitingItems = JSON.parse(message.body);
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
-                });
+                }, true);
             }, $scope);
 
     });
@@ -349,14 +357,23 @@ module.run(['$templateCache', function($templateCache) {
     '    <accordion close-others="true">\n' +
     '        <accordion-group is-open="waitingitems.length > 0">\n' +
     '            <accordion-heading>\n' +
-    '                Liste d\'attente <span class="pull-right badge">{{ waitingitems.length }}</span></a>\n' +
+    '                Liste d\'attente <span class="pull-right badge">{{ waitingitems.length }}</span>\n' +
     '            </accordion-heading>\n' +
-    '            <div class="media clearfix"  ng-repeat="item in waitingitems"  >\n' +
+    '            <div class="media item-in-waiting-list clearfix"  ng-repeat="item in waitingitems"  >\n' +
     '\n' +
     '                <div class="pull-right">\n' +
     '                    <br/>\n' +
     '                    <button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>\n' +
     '                    <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>\n' +
+    '                    <div class="btn-group" dropdown is-open="isopen">\n' +
+    '                        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
+    '                        <ul class="dropdown-menu" role="menu">\n' +
+    '                            <li ng-hide="$first"><a ng-click="moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> First</a></li>\n' +
+    '                            <li><a ng-hide="$first || $index === 1" ng-click="moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Up</a></li>\n' +
+    '                            <li><a ng-hide="$last ||    $index === waitingitems.length-2" ng-click="moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Down</a></li>\n' +
+    '                            <li><a ng-hide="$last" ng-click="moveInWaitingList(item, waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Last</a></li>\n' +
+    '                        </ul>\n' +
+    '                    </div>\n' +
     '                </div>\n' +
     '\n' +
     '                <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">\n' +
@@ -1527,39 +1544,46 @@ angular.module('ps.dataService.donwloadManager', [
 ])
     .factory('DonwloadManager', function(Restangular) {
     'use strict';
+        
+        var baseTask = Restangular.one("task"),
+            baseDownloadManager = baseTask.one('downloadManager');
+        
     return {
         download: function (item) {
             return Restangular.one("item").customGET(item.id + "/addtoqueue");
         },
         stopDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/stopDownload");
+            return baseDownloadManager.customPOST(item.id, "stopDownload");
         },
         toggleDownload: function (item) {
-            return Restangular.one("task").customPOST(item.id, "downloadManager/toogleDownload");
+            return baseDownloadManager.customPOST(item.id, "toogleDownload");
         },
         stopAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/stopAllDownload");
+            return baseDownloadManager.customGET("stopAllDownload");
         },
         pauseAllDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/pauseAllDownload");
+            return baseDownloadManager.customGET("pauseAllDownload");
         },
         restartAllCurrentDownload: function () {
-            return Restangular.one("task").customGET("downloadManager/restartAllCurrentDownload");
+            return baseDownloadManager.customGET("restartAllCurrentDownload");
         },
         removeFromQueue: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id);
+            return baseDownloadManager.customDELETE("queue/" + item.id);
         },
         updateNumberOfSimDl: function (number) {
-            return Restangular.one("task").customPOST(number, "downloadManager/limit");
+            return baseDownloadManager.customPOST(number, "limit");
         },
         dontDonwload: function (item) {
-            return Restangular.one("task").customDELETE("downloadManager/queue/" + item.id + "/andstop");
+            return baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
         },
         getDownloading : function() {
-            return Restangular.one('task').all("downloadManager/downloading").getList();
+            return baseTask.all("downloadManager/downloading").getList();
         },
         getNumberOfSimDl : function() {
-            return Restangular.one("task/downloadManager/limit").get();
+            return baseDownloadManager.one("limit").get();
+        },
+        moveInWaitingList : function (item, position) {
+            baseDownloadManager.customPOST({id : item.id, position : position } , 'move');
         }
     };
 });

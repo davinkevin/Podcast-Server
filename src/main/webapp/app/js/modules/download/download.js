@@ -39,6 +39,7 @@ angular.module('ps.download', [
         $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
         $scope.removeFromQueue = DonwloadManager.removeFromQueue;
         $scope.dontDonwload = DonwloadManager.dontDonwload;
+        $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
 
 
         /** Websocket Connection */
@@ -79,7 +80,7 @@ angular.module('ps.download', [
                 var remoteWaitingItems = JSON.parse(message.body);
                 _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
                     return _.findIndex(inArray, { 'id': elem.id });
-                });
+                }, true);
             }, $scope);
 
     });

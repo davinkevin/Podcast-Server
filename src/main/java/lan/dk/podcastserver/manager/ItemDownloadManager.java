@@ -13,13 +13,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -310,5 +308,32 @@ public class ItemDownloadManager {
 
     public Set<Item> getItemInDownloadingQueue() {
         return downloadingQueue.keySet();
+    }
+
+    public void moveItemInQueue(Integer itemId, Integer position) {
+        List<Item> copyOfWaitingList = Arrays.asList(waitingQueue.toArray(new Item[waitingQueue.size()]));
+        List<Item> aItemList = new ArrayList<>();
+
+        copyOfWaitingList.stream().forEach(aItemList::add);
+        
+        Item movingItem = aItemList.stream()
+                .filter(item -> item.getId().equals(itemId)).findFirst().orElse(null);
+        
+        Integer currentPositionOfItem = IntStream.range(0, aItemList.size())
+                                        .filter(i -> aItemList.get(i).getId().equals(itemId))
+                                        .findFirst().orElseGet(() -> -1);
+
+        if (currentPositionOfItem.equals(-1)) {
+            logger.error("Moving element in waiting list not authorized : Element wasn't in the list");
+            return;
+        }
+
+        aItemList.removeIf(item -> item.getId().equals(itemId));
+        aItemList.add(position, movingItem);
+        
+        waitingQueue.clear();
+        waitingQueue.addAll(aItemList);
+
+        convertAndSendWaitingQueue();
     }
 }

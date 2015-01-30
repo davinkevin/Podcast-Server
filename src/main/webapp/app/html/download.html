@@ -44,14 +44,23 @@
     <accordion close-others="true">
         <accordion-group is-open="waitingitems.length > 0">
             <accordion-heading>
-                Liste d'attente <span class="pull-right badge">{{ waitingitems.length }}</span></a>
+                Liste d'attente <span class="pull-right badge">{{ waitingitems.length }}</span>
             </accordion-heading>
-            <div class="media clearfix"  ng-repeat="item in waitingitems"  >
+            <div class="media item-in-waiting-list clearfix"  ng-repeat="item in waitingitems"  >
 
                 <div class="pull-right">
                     <br/>
                     <button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>
                     <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>
+                    <div class="btn-group" dropdown is-open="isopen">
+                        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-hide="$first"><a ng-click="moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> First</a></li>
+                            <li><a ng-hide="$first || $index === 1" ng-click="moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Up</a></li>
+                            <li><a ng-hide="$last ||    $index === waitingitems.length-2" ng-click="moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Down</a></li>
+                            <li><a ng-hide="$last" ng-click="moveInWaitingList(item, waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Last</a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
