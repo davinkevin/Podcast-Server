@@ -1,6 +1,7 @@
 angular.module('ps.item.player', [
     'ngSanitize',
     'ngRoute',
+    'device-detection',
     'com.2fdevs.videogular',
     'com.2fdevs.videogular.plugins.poster',
     'com.2fdevs.videogular.plugins.controls',
@@ -23,7 +24,7 @@ angular.module('ps.item.player', [
                 }
             });
     })
-    .controller('ItemPlayerController', function (podcast, item, $timeout) {
+    .controller('ItemPlayerController', function (podcast, item, $timeout, deviceDetectorService) {
         var vm = this;
         
         vm.item = item;
@@ -39,7 +40,7 @@ angular.module('ps.item.player', [
             },
             plugins: {
                 controls: {
-                    autoHide: true,
+                    autoHide: !deviceDetectorService.isTouchedDevice(),
                     autoHideTime: 2000
                 },
                 poster: item.cover.url

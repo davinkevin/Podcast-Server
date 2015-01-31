@@ -10,7 +10,7 @@
         <videogular vg-theme="ipc.config.theme.url" vg-player-ready="ipc.onPlayerReady">
             <vg-video vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-video>
 
-            <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf('audio') === -1" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">
+            <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf('audio') === -1 && ipc.config.plugins.controls.autoHide" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">
                 <vg-play-pause-button></vg-play-pause-button>
                 <vg-timedisplay>{{ currentTime | date:'mm:ss' }}</vg-timedisplay>
                 <vg-scrubBar>

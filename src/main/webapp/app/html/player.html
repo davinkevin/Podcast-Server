@@ -4,7 +4,7 @@
         <videogular vg-theme="controller.config.theme.url" vg-player-ready="pc.onPlayerReady" vg-complete="pc.onCompleteVideo">
             <vg-video vg-src="pc.config.sources" vg-native-controls="false" vg-preload="pc.config.preload"></vg-video>
 
-            <vg-controls vg-autohide="pc.config.sources[0].type.indexOf('audio') === -1" vg-autohide-time="pc.config.plugins.controls.autoHideTime">
+            <vg-controls vg-autohide="pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide" vg-autohide-time="pc.config.plugins.controls.autoHideTime">
                 <vg-play-pause-button></vg-play-pause-button>
                 <vg-timedisplay>{{ currentTime | date:'mm:ss' }}</vg-timedisplay>
                 <vg-scrubBar>

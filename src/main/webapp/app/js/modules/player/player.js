@@ -2,6 +2,7 @@ angular.module('ps.player', [
     'ngSanitize',
     'ngRoute',
     'ngStorage',
+    'device-detection',
     'com.2fdevs.videogular',
     'com.2fdevs.videogular.plugins.poster',
     'com.2fdevs.videogular.plugins.controls',
@@ -16,9 +17,10 @@ angular.module('ps.player', [
                 controllerAs: 'pc'
             });
     })
-    .controller('PlayerController', function (playlistService, $timeout) {
-        var vm = this; 
+    .controller('PlayerController', function (playlistService, $timeout, deviceDetectorService) {
+        var vm = this;
         
+        vm.playlist = [];
         vm.state = null;
         vm.API = null;
         vm.currentVideo = 0;
@@ -54,6 +56,7 @@ angular.module('ps.player', [
             },
             plugins: {
                 controls: {
+                    autoHide : !deviceDetectorService.isTouchedDevice(),
                     autoHideTime: 2000
                 },
                 poster: ''
@@ -61,7 +64,7 @@ angular.module('ps.player', [
         };
 
         vm.reloadPlaylist = function() {
-            vm.playlist = playlistService.playlist();
+            _.updateinplace(vm.playlist, playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
         };
         
         vm.reloadPlaylist();
@@ -82,7 +85,7 @@ angular.module('ps.player', [
         
         vm.remove = function(item) {
             playlistService.remove(item);
-            reloadPlaylist();
+            vm.reloadPlaylist();
             if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.localUrl) {
                 vm.setVideo(0);
             }

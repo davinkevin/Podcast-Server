@@ -12,7 +12,8 @@ angular.module('podcastApp', [
 angular.module('ps.common', [
     'ps.filters',
     'navbar',
-    'authorize-notification'
+    'authorize-notification',
+    'device-detection'
 ]);
 angular.module('authorize-notification', [
     'notification'
@@ -52,6 +53,20 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
+angular.module('device-detection', [])
+    .factory('deviceDetectorService', function deviceDetectorService($window) {
+        return {
+            isTouchedDevice : isTouchedDevice            
+        };
+        
+        function isTouchedDevice() {
+            return 'ontouchstart' in $window;
+        }
+    });
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -59,10 +74,16 @@ angular.module('ps.filters', [])
         };
     }
 );
-angular.module('ps.search', [
-    'ps.search.item'
-]);
+/**
+ * Created by kevin on 02/11/14.
+ */
 
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag'
+]);
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -99,16 +120,7 @@ _.mixin({
         return localArray;
     }
 });
-/**
- * Created by kevin on 02/11/14.
- */
 
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag'
-]);
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -125,7 +137,6 @@ angular.module('navbar', [
         var vm = this;
         vm.navCollapsed = true;
     });
-
 
 angular.module('ps.config', [
     'ps.config.route',
@@ -201,92 +212,6 @@ angular.module('ps.config.route', [
             otherwise({
                 redirectTo: '/items'
             });
-    });
-angular.module('ps.download', [
-    'ps.config.route',
-    'ps.dataService.donwloadManager',
-    'notification',
-    'AngularStompDK'
-])
-    .config(function($routeProvider, commonKey) {
-        $routeProvider.
-            when('/download', {
-                templateUrl: 'html/download.html',
-                controller: 'DownloadCtrl',
-                hotkeys: commonKey
-            })
-    })
-    .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
-        //$scope.items = DonwloadManager.getDownloading().$object;
-        $scope.waitingitems = [];
-
-        DonwloadManager.getNumberOfSimDl().then(function (data) {
-            $scope.numberOfSimDl = parseInt(data);
-        });
-
-        $scope.getTypeFromStatus = function (item) {
-            if (item.status === "Paused")
-                return "warning";
-            return "info";
-        };
-
-        $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
-
-        /** Spécifique aux éléments de la liste : **/
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
-
-        /** Global **/
-        $scope.stopAllDownload = DonwloadManager.stopAllDownload;
-        $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
-        $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
-        $scope.removeFromQueue = DonwloadManager.removeFromQueue;
-        $scope.dontDonwload = DonwloadManager.dontDonwload;
-        $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
-
-
-        /** Websocket Connection */
-        ngstomp
-            .subscribe("/app/download", function(message) {
-                $scope.items = JSON.parse(message.body);
-            }, $scope)
-            .subscribe("/app/waiting", function (message) {
-                $scope.waitingitems = JSON.parse(message.body);
-            }, $scope)
-            .subscribe("/topic/download", function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.items, { 'id': item.id });
-                switch (item.status) {
-                    case 'Started' :
-                    case 'Paused' :
-                        if (elemToUpdate)
-                            _.assign(elemToUpdate, item);
-                        else
-                            $scope.items.push(item);
-                        break;
-                    case 'Finish' :
-                        new Notification('Téléchargement terminé', {
-                            body: item.title,
-                            icon: item.cover.url,
-                            delay: 5000
-                        });
-                    case 'Stopped' :
-                        if (elemToUpdate){
-                            _.remove($scope.items, function (item) {
-                                return item.id === elemToUpdate.id;
-                            });
-                        }
-                        break;
-                }
-        }, $scope)
-            .subscribe("/topic/waiting", function (message) {
-                var remoteWaitingItems = JSON.parse(message.body);
-                _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
-                    return _.findIndex(inArray, { 'id': elem.id });
-                }, true);
-            }, $scope);
-
     });
 (function(module) {
 try {
@@ -493,7 +418,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <videogular vg-theme="ipc.config.theme.url" vg-player-ready="ipc.onPlayerReady">\n' +
     '            <vg-video vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-video>\n' +
     '\n' +
-    '            <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf(\'audio\') === -1" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">\n' +
+    '            <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf(\'audio\') === -1 && ipc.config.plugins.controls.autoHide" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">\n' +
     '                <vg-play-pause-button></vg-play-pause-button>\n' +
     '                <vg-timedisplay>{{ currentTime | date:\'mm:ss\' }}</vg-timedisplay>\n' +
     '                <vg-scrubBar>\n' +
@@ -668,7 +593,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <videogular vg-theme="controller.config.theme.url" vg-player-ready="pc.onPlayerReady" vg-complete="pc.onCompleteVideo">\n' +
     '            <vg-video vg-src="pc.config.sources" vg-native-controls="false" vg-preload="pc.config.preload"></vg-video>\n' +
     '\n' +
-    '            <vg-controls vg-autohide="pc.config.sources[0].type.indexOf(\'audio\') === -1" vg-autohide-time="pc.config.plugins.controls.autoHideTime">\n' +
+    '            <vg-controls vg-autohide="pc.config.sources[0].type.indexOf(\'audio\') === -1 && pc.config.plugins.controls.autoHide" vg-autohide-time="pc.config.plugins.controls.autoHideTime">\n' +
     '                <vg-play-pause-button></vg-play-pause-button>\n' +
     '                <vg-timedisplay>{{ currentTime | date:\'mm:ss\' }}</vg-timedisplay>\n' +
     '                <vg-scrubBar>\n' +
@@ -1111,6 +1036,92 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.download', [
+    'ps.config.route',
+    'ps.dataService.donwloadManager',
+    'notification',
+    'AngularStompDK'
+])
+    .config(function($routeProvider, commonKey) {
+        $routeProvider.
+            when('/download', {
+                templateUrl: 'html/download.html',
+                controller: 'DownloadCtrl',
+                hotkeys: commonKey
+            })
+    })
+    .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
+        //$scope.items = DonwloadManager.getDownloading().$object;
+        $scope.waitingitems = [];
+
+        DonwloadManager.getNumberOfSimDl().then(function (data) {
+            $scope.numberOfSimDl = parseInt(data);
+        });
+
+        $scope.getTypeFromStatus = function (item) {
+            if (item.status === "Paused")
+                return "warning";
+            return "info";
+        };
+
+        $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
+
+        /** Spécifique aux éléments de la liste : **/
+        $scope.download = DonwloadManager.download;
+        $scope.stopDownload = DonwloadManager.stopDownload;
+        $scope.toggleDownload = DonwloadManager.toggleDownload;
+
+        /** Global **/
+        $scope.stopAllDownload = DonwloadManager.stopAllDownload;
+        $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
+        $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
+        $scope.removeFromQueue = DonwloadManager.removeFromQueue;
+        $scope.dontDonwload = DonwloadManager.dontDonwload;
+        $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
+
+
+        /** Websocket Connection */
+        ngstomp
+            .subscribe("/app/download", function(message) {
+                $scope.items = JSON.parse(message.body);
+            }, $scope)
+            .subscribe("/app/waiting", function (message) {
+                $scope.waitingitems = JSON.parse(message.body);
+            }, $scope)
+            .subscribe("/topic/download", function (message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find($scope.items, { 'id': item.id });
+                switch (item.status) {
+                    case 'Started' :
+                    case 'Paused' :
+                        if (elemToUpdate)
+                            _.assign(elemToUpdate, item);
+                        else
+                            $scope.items.push(item);
+                        break;
+                    case 'Finish' :
+                        new Notification('Téléchargement terminé', {
+                            body: item.title,
+                            icon: item.cover.url,
+                            delay: 5000
+                        });
+                    case 'Stopped' :
+                        if (elemToUpdate){
+                            _.remove($scope.items, function (item) {
+                                return item.id === elemToUpdate.id;
+                            });
+                        }
+                        break;
+                }
+        }, $scope)
+            .subscribe("/topic/waiting", function (message) {
+                var remoteWaitingItems = JSON.parse(message.body);
+                _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
+                    return _.findIndex(inArray, { 'id': elem.id });
+                }, true);
+            }, $scope);
+
+    });
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
     'ps.player',
@@ -1185,6 +1196,7 @@ angular.module('ps.item', [
 angular.module('ps.item.player', [
     'ngSanitize',
     'ngRoute',
+    'device-detection',
     'com.2fdevs.videogular',
     'com.2fdevs.videogular.plugins.poster',
     'com.2fdevs.videogular.plugins.controls',
@@ -1207,7 +1219,7 @@ angular.module('ps.item.player', [
                 }
             });
     })
-    .controller('ItemPlayerController', function (podcast, item, $timeout) {
+    .controller('ItemPlayerController', function (podcast, item, $timeout, deviceDetectorService) {
         var vm = this;
         
         vm.item = item;
@@ -1223,7 +1235,7 @@ angular.module('ps.item.player', [
             },
             plugins: {
                 controls: {
-                    autoHide: true,
+                    autoHide: !deviceDetectorService.isTouchedDevice(),
                     autoHideTime: 2000
                 },
                 poster: item.cover.url
@@ -1242,6 +1254,7 @@ angular.module('ps.player', [
     'ngSanitize',
     'ngRoute',
     'ngStorage',
+    'device-detection',
     'com.2fdevs.videogular',
     'com.2fdevs.videogular.plugins.poster',
     'com.2fdevs.videogular.plugins.controls',
@@ -1256,9 +1269,10 @@ angular.module('ps.player', [
                 controllerAs: 'pc'
             });
     })
-    .controller('PlayerController', function (playlistService, $timeout) {
-        var vm = this; 
+    .controller('PlayerController', function (playlistService, $timeout, deviceDetectorService) {
+        var vm = this;
         
+        vm.playlist = [];
         vm.state = null;
         vm.API = null;
         vm.currentVideo = 0;
@@ -1294,6 +1308,7 @@ angular.module('ps.player', [
             },
             plugins: {
                 controls: {
+                    autoHide : !deviceDetectorService.isTouchedDevice(),
                     autoHideTime: 2000
                 },
                 poster: ''
@@ -1301,7 +1316,7 @@ angular.module('ps.player', [
         };
 
         vm.reloadPlaylist = function() {
-            vm.playlist = playlistService.playlist();
+            _.updateinplace(vm.playlist, playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
         };
         
         vm.reloadPlaylist();
@@ -1322,7 +1337,7 @@ angular.module('ps.player', [
         
         vm.remove = function(item) {
             playlistService.remove(item);
-            reloadPlaylist();
+            vm.reloadPlaylist();
             if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.localUrl) {
                 vm.setVideo(0);
             }
