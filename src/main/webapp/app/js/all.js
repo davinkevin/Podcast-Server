@@ -354,8 +354,8 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '    <br/>\n' +
     '\n' +
-    '    <accordion close-others="true">\n' +
-    '        <accordion-group is-open="waitingitems.length > 0">\n' +
+    '    <accordion close-others="true" ng-show="waitingitems.length > 0">\n' +
+    '        <accordion-group is-open="true">\n' +
     '            <accordion-heading>\n' +
     '                Liste d\'attente <span class="pull-right badge">{{ waitingitems.length }}</span>\n' +
     '            </accordion-heading>\n' +
@@ -365,13 +365,13 @@ module.run(['$templateCache', function($templateCache) {
     '                    <br/>\n' +
     '                    <button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>\n' +
     '                    <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>\n' +
-    '                    <div class="btn-group" dropdown is-open="isopen">\n' +
+    '                    <div class="btn-group" dropdown is-open="isopen" ng-show="waitingitems.length > 1">\n' +
     '                        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
     '                        <ul class="dropdown-menu" role="menu">\n' +
-    '                            <li ng-hide="$first"><a ng-click="moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> First</a></li>\n' +
-    '                            <li><a ng-hide="$first || $index === 1" ng-click="moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Up</a></li>\n' +
-    '                            <li><a ng-hide="$last ||    $index === waitingitems.length-2" ng-click="moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Down</a></li>\n' +
-    '                            <li><a ng-hide="$last" ng-click="moveInWaitingList(item, waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Last</a></li>\n' +
+    '                            <li ng-hide="$first"><a ng-click="moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> Premier</a></li>\n' +
+    '                            <li><a ng-hide="$first || $index === 1" ng-click="moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Monter</a></li>\n' +
+    '                            <li><a ng-hide="$last ||    $index === waitingitems.length-2" ng-click="moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Descendre</a></li>\n' +
+    '                            <li><a ng-hide="$last" ng-click="moveInWaitingList(item, waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Dernier</a></li>\n' +
     '                        </ul>\n' +
     '                    </div>\n' +
     '                </div>\n' +
