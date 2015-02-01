@@ -23,7 +23,7 @@ angular.module('ps.player', [
         vm.playlist = [];
         vm.state = null;
         vm.API = null;
-        vm.currentVideo = 0;
+        vm.currentVideo = {};
 
         vm.onPlayerReady = function(API) {
             vm.API = API;
@@ -36,15 +36,15 @@ angular.module('ps.player', [
         };
 
         vm.onCompleteVideo = function() {
+            var indexOfVideo = getIndexOfVideoInPlaylist(vm.currentVideo);
             vm.isCompleted = true;
-            vm.currentVideo++;
 
-            if (vm.currentVideo >= vm.playlist.length) {
-                vm.currentVideo = 0;
+            if (indexOfVideo+1 === vm.playlist.length) {
+                vm.currentVideo = vm.playlist[0];
                 return;
             }
 
-            vm.setVideo(vm.currentVideo);
+            vm.setVideo(indexOfVideo+1);
         };
         
 
@@ -70,13 +70,12 @@ angular.module('ps.player', [
         vm.reloadPlaylist();
         
         vm.setVideo = function(index) {
-            var item = vm.playlist[index];
+            vm.currentVideo = vm.playlist[index];
 
-            if (item !== null && item !== undefined) {
+            if (vm.currentVideo !== null && vm.currentVideo !== undefined) {
                 vm.API.stop();
-                vm.currentVideo = index;
-                vm.config.sources = [{src : item.localUrl, type : item.mimeType }];
-                vm.config.plugins.poster = item.cover.url;
+                vm.config.sources = [{src : vm.currentVideo.localUrl, type : vm.currentVideo.mimeType }];
+                vm.config.plugins.poster = vm.currentVideo.cover.url;
                 if (vm.config.preload) {
                     $timeout(function() { vm.API.play(); }, 500);
                 }
@@ -94,6 +93,10 @@ angular.module('ps.player', [
         vm.removeAll = function () {
             playlistService.removeAll();
             vm.reloadPlaylist();
+        };
+        
+        function getIndexOfVideoInPlaylist(item) {
+            return vm.playlist.indexOf(item);
         }
     })
     .factory('playlistService', function($localStorage) {
