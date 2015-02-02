@@ -1,8 +1,7 @@
 'use strict';
 
 angular.module('ps.podcast.details.episodes', [
-    'ps.player',
-    'AngularStompDK'
+    'ps.player'
 ])
     .directive('podcastItemsList', function(){
         return {
@@ -15,18 +14,19 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService, playlistService ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
         var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
 
-        ngstomp
-            .subscribe(webSocketUrl, function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                _.assign(elemToUpdate, item);
-            }, $scope);
+        DonwloadManager
+            .ws
+                .subscribe(webSocketUrl, function (message) {
+                    var item = JSON.parse(message.body);
+                    var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+                    _.assign(elemToUpdate, item);
+                }, $scope);
 
         $scope.loadPage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
@@ -75,6 +75,6 @@ angular.module('ps.podcast.details.episodes', [
             $scope.loadPage();
         };
 
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        $scope.stopDownload = DonwloadManager.ws.stop;
+        $scope.toggleDownload = DonwloadManager.ws.toggle;
     });

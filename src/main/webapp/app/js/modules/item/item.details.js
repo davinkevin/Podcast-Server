@@ -1,7 +1,6 @@
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
-    'ps.player',
-    'AngularStompDK'
+    'ps.player'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
         when('/podcast/:podcastId/item/:itemId', {
@@ -18,13 +17,13 @@ angular.module('ps.item.details', [
             }
         });
 })
-    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
+    .controller('ItemDetailCtrl', function ($scope, DonwloadManager, $location, playlistService, podcast, item) {
 
         $scope.item = item;
         $scope.item.podcast = podcast;
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        
+        $scope.stopDownload = DonwloadManager.ws.stop;
+        $scope.toggleDownload = DonwloadManager.ws.toggle;
 
 
         $scope.remove = function(item) {
@@ -52,12 +51,13 @@ angular.module('ps.item.details', [
         //** WebSocket Inscription **//
         var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
-        ngstomp
-            .subscribe(webSockedUrl, function(message) {
-                var itemFromWS = JSON.parse(message.body);
-
-                if (itemFromWS.id == $scope.item.id) {
-                    _.assign($scope.item, itemFromWS);
-                }
-            }, $scope);
+        DonwloadManager
+            .ws
+                .subscribe(webSockedUrl, function(message) {
+                    var itemFromWS = JSON.parse(message.body);
+    
+                    if (itemFromWS.id == $scope.item.id) {
+                        _.assign($scope.item, itemFromWS);
+                    }
+                }, $scope);
     });

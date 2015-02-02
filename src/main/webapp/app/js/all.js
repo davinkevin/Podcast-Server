@@ -261,7 +261,8 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '        <div class="buttonList pull-right">\n' +
     '            <br/>\n' +
-    '            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
+    '            <button ng-click="toggleDownload(item)" type="button" class="btn btn-sm" \n' +
+    '                    ng-class="{\'btn-primary\' : item.status === \'Started\', \'btn-warning\' : item.status === \'Paused\'}"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>\n' +
     '            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>\n' +
     '        </div>\n' +
     '\n' +
@@ -1039,8 +1040,7 @@ module.run(['$templateCache', function($templateCache) {
 angular.module('ps.download', [
     'ps.config.route',
     'ps.dataService.donwloadManager',
-    'notification',
-    'AngularStompDK'
+    'notification'
 ])
     .config(function($routeProvider, commonKey) {
         $routeProvider.
@@ -1050,7 +1050,7 @@ angular.module('ps.download', [
                 hotkeys: commonKey
             })
     })
-    .controller('DownloadCtrl', function ($scope, ngstomp, DonwloadManager, Notification) {
+    .controller('DownloadCtrl', function ($scope, DonwloadManager, Notification) {
         //$scope.items = DonwloadManager.getDownloading().$object;
         $scope.waitingitems = [];
 
@@ -1066,10 +1066,52 @@ angular.module('ps.download', [
 
         $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
 
+        /** Websocket Connection */
+        DonwloadManager
+            .ws
+                .subscribe("/app/download", function(message) {
+                    $scope.items = JSON.parse(message.body);
+                }, $scope)
+                .subscribe("/app/waiting", function (message) {
+                    $scope.waitingitems = JSON.parse(message.body);
+                }, $scope)
+                .subscribe("/topic/download", function (message) {
+                    var item = JSON.parse(message.body);
+                    var elemToUpdate = _.find($scope.items, { 'id': item.id });
+                    switch (item.status) {
+                        case 'Started' :
+                        case 'Paused' :
+                            if (elemToUpdate)
+                                _.assign(elemToUpdate, item);
+                            else
+                                $scope.items.push(item);
+                            break;
+                        case 'Finish' :
+                            new Notification('Téléchargement terminé', {
+                                body: item.title,
+                                icon: item.cover.url,
+                                delay: 5000
+                            });
+                        case 'Stopped' :
+                            if (elemToUpdate){
+                                _.remove($scope.items, function (item) {
+                                    return item.id === elemToUpdate.id;
+                                });
+                            }
+                            break;
+                    }
+            }, $scope)
+                .subscribe("/topic/waiting", function (message) {
+                    var remoteWaitingItems = JSON.parse(message.body);
+                    _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
+                        return _.findIndex(inArray, { 'id': elem.id });
+                    }, true);
+                }, $scope);
+
         /** Spécifique aux éléments de la liste : **/
         $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        $scope.stopDownload = DonwloadManager.ws.stop;
+        $scope.toggleDownload = DonwloadManager.ws.toggle;
 
         /** Global **/
         $scope.stopAllDownload = DonwloadManager.stopAllDownload;
@@ -1079,53 +1121,10 @@ angular.module('ps.download', [
         $scope.dontDonwload = DonwloadManager.dontDonwload;
         $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
 
-
-        /** Websocket Connection */
-        ngstomp
-            .subscribe("/app/download", function(message) {
-                $scope.items = JSON.parse(message.body);
-            }, $scope)
-            .subscribe("/app/waiting", function (message) {
-                $scope.waitingitems = JSON.parse(message.body);
-            }, $scope)
-            .subscribe("/topic/download", function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.items, { 'id': item.id });
-                switch (item.status) {
-                    case 'Started' :
-                    case 'Paused' :
-                        if (elemToUpdate)
-                            _.assign(elemToUpdate, item);
-                        else
-                            $scope.items.push(item);
-                        break;
-                    case 'Finish' :
-                        new Notification('Téléchargement terminé', {
-                            body: item.title,
-                            icon: item.cover.url,
-                            delay: 5000
-                        });
-                    case 'Stopped' :
-                        if (elemToUpdate){
-                            _.remove($scope.items, function (item) {
-                                return item.id === elemToUpdate.id;
-                            });
-                        }
-                        break;
-                }
-        }, $scope)
-            .subscribe("/topic/waiting", function (message) {
-                var remoteWaitingItems = JSON.parse(message.body);
-                _.updateinplace($scope.waitingitems, remoteWaitingItems, function(inArray, elem) {
-                    return _.findIndex(inArray, { 'id': elem.id });
-                }, true);
-            }, $scope);
-
     });
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
-    'ps.player',
-    'AngularStompDK'
+    'ps.player'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
         when('/podcast/:podcastId/item/:itemId', {
@@ -1142,13 +1141,13 @@ angular.module('ps.item.details', [
             }
         });
 })
-    .controller('ItemDetailCtrl', function ($scope, ngstomp, DonwloadManager, $location, playlistService, podcast, item) {
+    .controller('ItemDetailCtrl', function ($scope, DonwloadManager, $location, playlistService, podcast, item) {
 
         $scope.item = item;
         $scope.item.podcast = podcast;
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        
+        $scope.stopDownload = DonwloadManager.ws.stop;
+        $scope.toggleDownload = DonwloadManager.ws.toggle;
 
 
         $scope.remove = function(item) {
@@ -1176,14 +1175,15 @@ angular.module('ps.item.details', [
         //** WebSocket Inscription **//
         var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
 
-        ngstomp
-            .subscribe(webSockedUrl, function(message) {
-                var itemFromWS = JSON.parse(message.body);
-
-                if (itemFromWS.id == $scope.item.id) {
-                    _.assign($scope.item, itemFromWS);
-                }
-            }, $scope);
+        DonwloadManager
+            .ws
+                .subscribe(webSockedUrl, function(message) {
+                    var itemFromWS = JSON.parse(message.body);
+    
+                    if (itemFromWS.id == $scope.item.id) {
+                        _.assign($scope.item, itemFromWS);
+                    }
+                }, $scope);
     });
 /**
  * Created by kevin on 01/11/14.
@@ -1463,7 +1463,7 @@ angular.module('ps.search.item', [
             });
     })
     .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, ngstomp, DonwloadManager, ItemPerPage, playlistService) {
+    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
         'use strict';
 
         // Gestion du cache de la pagination :
@@ -1532,8 +1532,8 @@ angular.module('ps.search.item', [
         $scope.changePage();
 
         //** DownloadManager **//
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        $scope.stopDownload = DonwloadManager.ws.stop;
+        $scope.toggleDownload = DonwloadManager.ws.toggle;
         $scope.loadTags = tagService.search;
 
         //** Playlist Manager **//
@@ -1546,65 +1546,80 @@ angular.module('ps.search.item', [
 
         //** WebSocket Subscription **//
         var webSocketUrl = "/topic/download";
-        ngstomp.subscribe(webSocketUrl, updateItemFromWS, $scope);
+        DonwloadManager
+            .ws
+            .subscribe(webSocketUrl, function updateItemFromWS(message) {
+                var item = JSON.parse(message.body);
 
-        function updateItemFromWS(message) {
-            var item = JSON.parse(message.body);
-
-            var elemToUpdate = _.find($scope.items, { 'id': item.id });
-            if (elemToUpdate)
-                _.assign(elemToUpdate, item);
-        }
-
+                var elemToUpdate = _.find($scope.items, { 'id': item.id });
+                if (elemToUpdate)
+                    _.assign(elemToUpdate, item);
+            }, $scope);
     });
 angular.module('ps.dataService.donwloadManager', [
-    'restangular'
+    'restangular',
+    'AngularStompDK'
 ])
-    .factory('DonwloadManager', function(Restangular) {
-    'use strict';
-        
+    .factory('DonwloadManager', function(Restangular, ngstomp) {
+        'use strict';
+
         var baseTask = Restangular.one("task"),
             baseDownloadManager = baseTask.one('downloadManager');
+
+        //** Part dedicated to web-socket :
         
-    return {
-        download: function (item) {
-            return Restangular.one("item").customGET(item.id + "/addtoqueue");
-        },
-        stopDownload: function (item) {
-            return baseDownloadManager.customPOST(item.id, "stopDownload");
-        },
-        toggleDownload: function (item) {
-            return baseDownloadManager.customPOST(item.id, "toogleDownload");
-        },
-        stopAllDownload: function () {
-            return baseDownloadManager.customGET("stopAllDownload");
-        },
-        pauseAllDownload: function () {
-            return baseDownloadManager.customGET("pauseAllDownload");
-        },
-        restartAllCurrentDownload: function () {
-            return baseDownloadManager.customGET("restartAllCurrentDownload");
-        },
-        removeFromQueue: function (item) {
-            return baseDownloadManager.customDELETE("queue/" + item.id);
-        },
-        updateNumberOfSimDl: function (number) {
-            return baseDownloadManager.customPOST(number, "limit");
-        },
-        dontDonwload: function (item) {
-            return baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
-        },
-        getDownloading : function() {
-            return baseTask.all("downloadManager/downloading").getList();
-        },
-        getNumberOfSimDl : function() {
-            return baseDownloadManager.one("limit").get();
-        },
-        moveInWaitingList : function (item, position) {
-            baseDownloadManager.customPOST({id : item.id, position : position } , 'move');
-        }
-    };
-});
+        var WS_DOWNLOAD_BASE = '/app/download';
+        
+        var ws = {
+            connect : ngstomp.connect,
+            subscribe : ngstomp.subscribe,
+            unsubscribe : ngstomp.unsubscribe,
+            toggle : function (item) { ngstomp.send(WS_DOWNLOAD_BASE + '/toogle', item); },
+            start : function (item) { ngstomp.send(WS_DOWNLOAD_BASE + '/start', item); },
+            pause : function (item) { ngstomp.send(WS_DOWNLOAD_BASE + '/pause', item); },
+            stop : function (item) { ngstomp.send(WS_DOWNLOAD_BASE + '/stop', item); }
+        };
+        
+        return {
+            download: function (item) {
+                return Restangular.one("item").customGET(item.id + "/addtoqueue");
+            },
+            stopDownload: function (item) {
+                return baseDownloadManager.customPOST(item.id, "stopDownload");
+            },
+            toggleDownload: function (item) {
+                return baseDownloadManager.customPOST(item.id, "toogleDownload");
+            },
+            stopAllDownload: function () {
+                return baseDownloadManager.customGET("stopAllDownload");
+            },
+            pauseAllDownload: function () {
+                return baseDownloadManager.customGET("pauseAllDownload");
+            },
+            restartAllCurrentDownload: function () {
+                return baseDownloadManager.customGET("restartAllCurrentDownload");
+            },
+            removeFromQueue: function (item) {
+                return baseDownloadManager.customDELETE("queue/" + item.id);
+            },
+            updateNumberOfSimDl: function (number) {
+                return baseDownloadManager.customPOST(number, "limit");
+            },
+            dontDonwload: function (item) {
+                return baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
+            },
+            getDownloading : function() {
+                return baseTask.all("downloadManager/downloading").getList();
+            },
+            getNumberOfSimDl : function() {
+                return baseDownloadManager.one("limit").get();
+            },
+            moveInWaitingList : function (item, position) {
+                baseDownloadManager.customPOST({id : item.id, position : position } , 'move');
+            },
+            ws : ws
+        };
+    });
 /**
  * Created by kevin on 01/11/14.
  */
@@ -1763,8 +1778,7 @@ angular.module('ps.podcast.details.edition', [
 'use strict';
 
 angular.module('ps.podcast.details.episodes', [
-    'ps.player',
-    'AngularStompDK'
+    'ps.player'
 ])
     .directive('podcastItemsList', function(){
         return {
@@ -1777,18 +1791,19 @@ angular.module('ps.podcast.details.episodes', [
         };
     })
     .constant('PodcastItemPerPage', 10)
-    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, ngstomp, itemService, playlistService ) {
+    .controller('podcastItemsListCtrl', function ($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService ) {
         $scope.currentPage = 1;
         $scope.itemPerPage = PodcastItemPerPage;
 
         var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
 
-        ngstomp
-            .subscribe(webSocketUrl, function (message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
-                _.assign(elemToUpdate, item);
-            }, $scope);
+        DonwloadManager
+            .ws
+                .subscribe(webSocketUrl, function (message) {
+                    var item = JSON.parse(message.body);
+                    var elemToUpdate = _.find($scope.podcast.items, { 'id': item.id });
+                    _.assign(elemToUpdate, item);
+                }, $scope);
 
         $scope.loadPage = function() {
             $scope.currentPage = ($scope.currentPage < 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage)) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
@@ -1837,8 +1852,8 @@ angular.module('ps.podcast.details.episodes', [
             $scope.loadPage();
         };
 
-        $scope.stopDownload = DonwloadManager.stopDownload;
-        $scope.toggleDownload = DonwloadManager.toggleDownload;
+        $scope.stopDownload = DonwloadManager.ws.stop;
+        $scope.toggleDownload = DonwloadManager.ws.toggle;
     });
 
 angular.module('ps.podcast.details', [

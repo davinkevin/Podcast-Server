@@ -10,7 +10,7 @@
     "bootstrap": "~3.2.0",
     "angular-bootstrap": "~0.12.0",
     "restangular": "~1.4.0",
-    "AngularStompDK": "~0.0.9",
+    "AngularStompDK": "~0.1.0",
     "stomp-websocket": "~2.3.0",
     "sockjs": "~0.3.4",
     "ngstorage": "~0.3.0",
