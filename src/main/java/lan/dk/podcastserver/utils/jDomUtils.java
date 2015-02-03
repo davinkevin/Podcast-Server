@@ -177,8 +177,6 @@ public class jDomUtils {
                 xmlItem.addContent(thumbnail);
             }
 
-            xmlItem.addContent(itunesAuthor.clone());
-
             channel.addContent(xmlItem);
         }
 
