@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Created by kevin on 01/02/2014.
@@ -110,5 +111,13 @@ public class URLUtils {
     
     public static String changeProtocol(String url, String originalProtocol, String destinationProtocol){
         return url.replace(originalProtocol.concat(PROTOCOL_SEPARATOR), destinationProtocol.concat(PROTOCOL_SEPARATOR));
+    }
+    
+    public static URLConnection getStreamWithTimeOut(String stringUrl, Integer timeOut) throws IOException {
+        URL url = new URL(stringUrl);
+        URLConnection urlConnection = url.openConnection();
+        urlConnection.setReadTimeout(timeOut);
+        urlConnection.setConnectTimeout(timeOut);
+        return urlConnection;
     }
 }

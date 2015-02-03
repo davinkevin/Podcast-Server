@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.business;
 
-import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -8,6 +7,7 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Component
@@ -65,10 +66,12 @@ public class PodcastBusiness {
 
     public void delete(Integer integer) {
         podcastRepository.delete(integer);
+        //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
     public void delete(Podcast entity) {
         podcastRepository.delete(entity);
+        //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
     public List<Podcast> findByUrlIsNotNull() {
@@ -82,11 +85,24 @@ public class PodcastBusiness {
         if (podcastToUpdate == null)
             throw new PodcastNotFoundException();
 
+        // Move folder if name has change : 
+        if (StringUtils.equals(podcastToUpdate.getTitle(), patchPodcast.getTitle())) {
+            /* 
+                TODO : Move Folder to new Location using java.nio.FILES and java.nio.PATH
+                It must add modification on each item of the podcast (localUrl)
+             */
+            
+        }
+        
         podcastToUpdate.setTitle(patchPodcast.getTitle());
         podcastToUpdate.setUrl(patchPodcast.getUrl());
         podcastToUpdate.setSignature(patchPodcast.getSignature());
         podcastToUpdate.setType(patchPodcast.getType());
 
+        if (!coverBusiness.hasSameCoverURL(patchPodcast, podcastToUpdate)) {
+            patchPodcast.getCover().setUrl(coverBusiness.download(patchPodcast));
+        }
+        
         podcastToUpdate.setCover(
                 coverBusiness.findOne(patchPodcast.getCover().getId())
                     .setHeight(patchPodcast.getCover().getHeight())
@@ -136,8 +152,7 @@ public class PodcastBusiness {
             .setLength(file.getSize())
             .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
             .setDescription(podcast.getDescription())
-            .setLocalUrl(fileContainer + "/" + podcast.getTitle() + "/" + name)
-            .setLocalUri(fileToSave.getAbsolutePath())
+            .setFileName(name)
             .setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
             .setPodcast(podcast)
             .setStatus("Finish");
@@ -157,17 +172,16 @@ public class PodcastBusiness {
     }
 
     public Podcast reatachAndSave(Podcast podcast) {
-
-        Cover coverToSave = podcast.getCover();
-        //podcast.setCover(coverBusiness.reatachCover(podcast.getCover()));
         podcast.setTags(tagBusiness.getTagListByName(podcast.getTags()));
-
-        podcast.getCover()
-            .setHeight(coverToSave.getHeight())
-            .setWidth(coverToSave.getWidth())
-            .setUrl(coverToSave.getUrl());
-
         return save(podcast);
+    }
+    
+    public Podcast create(Podcast podcast) {
+        if (!Objects.isNull(podcast.getCover())) {
+            podcast.getCover().setUrl(coverBusiness.download(podcast));
+        }
+        
+        return reatachAndSave(podcast);
     }
 
     public ZonedDateTime fromFolder(String pubDate) {

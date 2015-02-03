@@ -23,9 +23,9 @@ public class PodcastController {
 
     @Resource private PodcastBusiness podcastBusiness;
 
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, produces = "application/json")
+    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {
-        return podcastBusiness.reatachAndSave(podcast);
+        return podcastBusiness.create(podcast);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
@@ -33,21 +33,13 @@ public class PodcastController {
         return podcastBusiness.findOne(id);
     }
 
-    /*
-    @RequestMapping(value="{id:[\\d]+}/items", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<Item> findItemsByPodcastId(@PathVariable int id) {
-        return podcastBusiness.getItems(id);
-    }
-    */
-
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT, produces = "application/json")
+    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT)
     public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") Integer id) {
         podcast.setId(id);
         return podcastBusiness.reatachAndSave(podcast);
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH, produces = "application/json")
+    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH)
     public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") Integer id) throws PodcastNotFoundException {
         podcast.setId(id);
         Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
@@ -55,7 +47,7 @@ public class PodcastController {
         return patchedPodcast;
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
+    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete (@PathVariable Integer id) {
         podcastBusiness.delete(id);
