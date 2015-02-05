@@ -38,7 +38,7 @@
             <div ng-repeat="item in items track by item.id" class="col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList">
                 <div class="box">
                     <div class="">
-                        <img ng-class="{'img-grayscale' : (item.localUrl == null) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />
+                        <img ng-class="{'img-grayscale' : (!item.isDownloaded) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />
                         <div class="overlay-button">
                             <div class="btn-group" dropdown>
                                 <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
@@ -50,22 +50,19 @@
                                     <li ng-show="item.status == 'Started' || item.status == 'Paused'">
                                         <a ng-click="stopDownload(item)"><span class="glyphicon glyphicon-stop text-danger"></span> Stopper</a>
                                     </li>
-                                    <li ng-show="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null">
+                                    <li ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded">
                                         <a ng-click="item.download()"><span class="glyphicon glyphicon-save text-primary"></span> Télécharger</a>
                                     </li>
                                     <li>
-                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.localUrl != null">
+                                        <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded">
                                             <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player</a>
                                     </li>
-                                    <li ng-show="item.localUrl != null">
+                                    <li ng-show="item.isDownloaded">
                                         <a ng-click="addOrRemove(item)">
                                             <span ng-hide="isInPlaylist(item)"><span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist</span>
                                             <span ng-show="isInPlaylist(item)"><span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist</span>
                                         </a>
                                     </li>
-                                    <!--<li ng-show="item.localUrl == null" >
-                                        <a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a>
-                                    </li>-->
                                     <li>
                                         <a ng-click="remove(item)"><span class="glyphicon glyphicon-remove text-danger"></span> Supprimer</a>
                                     </li>
@@ -76,7 +73,7 @@
                             </div>
                         </div>
                         <a class="overlay-main-button" ng-href="{{ item.proxyURL  }}" >
-                            <span ng-class="{'glyphicon-globe' : (item.localUrl == null), 'glyphicon-play' : (item.localUrl != null)}" class="glyphicon "></span>
+                            <span ng-class="{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}" class="glyphicon "></span>
                         </a>
                     </div>
                     <div class="text-center clearfix itemTitle center" >
@@ -90,11 +87,11 @@
                             <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
                         </span>
 
-                        <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
-                        <a href="{{ item.proxyURL }}" ng-show="item.localUrl == null" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
+                        <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <a href="{{ item.proxyURL }}" ng-show="!item.isDownloaded" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
 
-                        <a href="{{ item.proxyURL }}" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
-                        <button ng-click="remove(item)" ng-show="item.localUrl != null" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                        <a href="{{ item.proxyURL }}" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                        <button ng-click="remove(item)" ng-show="item.isDownloaded" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
                 </div>
             </div>

@@ -6,7 +6,7 @@
         <li class="active"><a ng-href="/#/podcast/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>
     </ol>
 
-    <div ng-show="ipc.item.localUrl !== null" class="videogular-container">
+    <div ng-show="ipc.item.isDownloaded" class="videogular-container">
         <videogular vg-theme="ipc.config.theme.url" vg-player-ready="ipc.onPlayerReady">
             <vg-video vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-video>
 
@@ -22,7 +22,7 @@
                     <vg-volumebar></vg-volumebar>
                 </vg-volume>
                 <vg-fullscreenButton ng-show="ipc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreenButton>
-                <div class='btn-video-share'><a ng-href="{{ ipc.item.localUrl }}" class="ionicons ion-android-share"></a></div>
+                <div class='btn-video-share'><a ng-href="{{ ipc.item.proxyURL }}" class="ionicons ion-android-share"></a></div>
             </vg-controls>
 
             <vg-overlay-play></vg-overlay-play>

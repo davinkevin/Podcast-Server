@@ -9,10 +9,10 @@
         </span>
 
             <!-- Lancer le téléchargement -->
-            <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && item.localUrl == null " type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+            <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
             <!-- Lire dans le player -->
-            <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.localUrl != null" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
+            <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
             
             <!-- Supprimer l'item -->
             <button ng-click="remove(item)" ng-show="(item.status != 'Started' && item.status != 'Paused' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
@@ -21,8 +21,8 @@
             <div class="btn-group" dropdown is-open="isopen">
                 <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    <li ng-show="item.localUrl != null"><a ng-href="{{ item.localUrl }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
-                    <li ng-show="item.localUrl != null">
+                    <li ng-show="item.isDownloaded"><a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
+                    <li ng-show="item.isDownloaded">
                         <a ng-hide="isInPlaylist(item)" ng-click="addOrRemoveInPlaylist(item)">
                             <span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist
                         </a>

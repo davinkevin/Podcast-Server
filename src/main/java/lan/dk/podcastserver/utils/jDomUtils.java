@@ -2,6 +2,7 @@ package lan.dk.podcastserver.utils;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
@@ -140,7 +141,9 @@ public class jDomUtils {
 
             Element item_enclosure = new Element("enclosure");
 
-            item_enclosure.setAttribute("url", serveurURL + item.getProxyURL() + MimeTypeUtils.getExtension(item) );
+            item_enclosure.setAttribute("url", serveurURL
+                    .concat(item.getProxyURL())
+                    .concat((item.isDownloaded()) ? "."+FilenameUtils.getExtension(item.getFileName()) : MimeTypeUtils.getExtension(item)));
             
             if (item.getLength() != null) {
                 item_enclosure.setAttribute("length", String.valueOf(item.getLength()));

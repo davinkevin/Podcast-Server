@@ -11,11 +11,15 @@ import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 
 
@@ -25,67 +29,31 @@ import java.time.ZonedDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Item implements Serializable {
 
+    public static Path rootFolder;
+    public static String fileContainer;
+    
     private static final String STATUS_NOT_DOWNLOADED = "Not Downloaded";
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download";
-
+    
     private Integer id;
     private String title;
     private String url;
 
+    private Podcast podcast;
     private ZonedDateTime pubdate;
     private String description;
     private String mimeType;
     private Long length;
     private Cover cover;
+    private String fileName;
 
     /* Value for the Download */
-    private String localUrl;
-    private String localUri;
     private String status = STATUS_NOT_DOWNLOADED;
     private Integer progression = 0;
-    private ZonedDateTime downloaddate;
-    private Podcast podcast;
+    private ZonedDateTime downloadDate;
     private Integer numberOfTry = 0;
 
     public Item() {
-    }
-/*
-
-    public Item(String title, String url, Timestamp pubdate, Podcast podcast) {
-        this.title = title;
-        this.url = url;
-        this.pubdate = pubdate;
-        this.podcast = podcast;
-    }
-
-    public Item(String title, String url, Timestamp pubdate) {
-
-        this.title = title;
-        this.url = url;
-        this.pubdate = pubdate;
-    }
-*/
-
-    @Column(name = "mimetype")
-    @Basic
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public Item setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-        return this;
-    }
-
-    @Column(name = "length")
-    @Basic
-    public Long getLength() {
-        return length;
-    }
-
-    public Item setLength(Long length) {
-        this.length = length;
-        return this;
     }
 
     @Id
@@ -100,9 +68,29 @@ public class Item implements Serializable {
         this.id = id;
         return this;
     }
+    
+    @Basic @Column(name = "mimetype")
+    public String getMimeType() {
+        return mimeType;
+    }
 
-    @Column(name = "title")
-    @Basic @Field
+    public Item setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+        return this;
+    }
+
+    @Basic @Column(name = "length")
+    public Long getLength() {
+        return length;
+    }
+
+    public Item setLength(Long length) {
+        this.length = length;
+        return this;
+    }
+   
+
+    @Basic @Field @Column(name = "title")
     public String getTitle() {
         return title;
     }
@@ -112,8 +100,7 @@ public class Item implements Serializable {
         return this;
     }
 
-    @Column(name = "url", length = 65535, unique = true)
-    @Basic
+    @Basic @Column(name = "url", length = 65535, unique = true)
     public String getUrl() {
         return url;
     }
@@ -146,25 +133,24 @@ public class Item implements Serializable {
         return this;
     }
 
-    @Column(name = "local_url")
     @Basic
-    public String getLocalUrl() {
-        return localUrl;
-    }
-
-    public Item setLocalUrl(String localUrl) {
-        this.localUrl = localUrl;
-        return this;
-    }
-
     @Column(name = "status")
-    @Basic
     public String getStatus() {
         return status;
     }
 
     public Item setStatus(String status) {
         this.status = status;
+        return this;
+    }
+
+    @Basic
+    public String getFileName() {
+        return fileName;
+    }
+
+    public Item setFileName(String fileName) {
+        this.fileName = fileName;
         return this;
     }
 
@@ -191,15 +177,13 @@ public class Item implements Serializable {
 
     @Column(name = "downloadddate")
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
-    public ZonedDateTime getDownloaddate() {
-        return downloaddate;
+    public ZonedDateTime getDownloadDate() {
+        return downloadDate;
     }
 
 
-    //public Timestamp getDownloaddate() {return new Timestamp(new Date().getTime());}
-
-    public Item setDownloaddate(ZonedDateTime downloaddate) {
-        this.downloaddate = downloaddate;
+    public Item setDownloadDate(ZonedDateTime downloaddate) {
+        this.downloadDate = downloaddate;
         return this;
     }
 
@@ -214,14 +198,13 @@ public class Item implements Serializable {
         return this;
     }
 
-    @Column(name = "local_uri")
-    @Basic
+    @Transient @JsonIgnore
     public String getLocalUri() {
-        return localUri;
+        return (fileName == null) ? null : getLocalPath().toString();
     }
 
     public Item setLocalUri(String localUri) {
-        this.localUri = localUri;
+        fileName = FilenameUtils.getName(localUri);
         return this;
     }
 
@@ -259,17 +242,15 @@ public class Item implements Serializable {
             return url.equals(item.url) || FilenameUtils.getName(item.url).equals(FilenameUtils.getName(url));
         }
 
-        return localUrl != null && item.localUrl != null && localUrl.equals(item.localUrl);
+        return StringUtils.equals(getLocalUrl(), item.getLocalUrl());
 
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                //.append(title)
                 .append(url)
                 .append((pubdate != null) ? pubdate.toInstant() : null)
-                /*.append(description)*/
                 .toHashCode();
     }
 
@@ -284,11 +265,9 @@ public class Item implements Serializable {
                 ", mimeType='" + mimeType + '\'' +
                 ", length=" + length +
                 ", cover=" + cover +
-                ", localUrl='" + localUrl + '\'' +
-                ", localUri='" + localUri + '\'' +
                 ", status='" + status + '\'' +
                 ", progression=" + progression +
-                ", downloaddate=" + downloaddate +
+                ", downloaddate=" + downloadDate +
                 ", podcast=" + podcast +
                 ", numberOfTry=" + numberOfTry +
                 '}';
@@ -296,41 +275,55 @@ public class Item implements Serializable {
 
     /* Helpers */
     @Transient
-    @JsonProperty("proxyURL")
+    public String getLocalUrl() {
+        return (fileName == null) ? null : UriComponentsBuilder.fromHttpUrl(fileContainer)
+                .pathSegment(podcast.getTitle())
+                .pathSegment(fileName)
+                .build()
+                .toString();
+    }
+    
+    @Transient @JsonProperty("proxyURL")
     public String getProxyURL() {
         return String.format(PROXY_URL, podcast.getId(), id);
     }
 
-    @Transient
-    @JsonIgnore
+    @Transient @JsonIgnore
     public String getFileURI() {
-        return File.separator + this.podcast.getTitle() + File.separator + FilenameUtils.getName(this.localUrl);
+        return File.separator + this.podcast.getTitle() + File.separator + fileName;
     }
 
+    @Transient @JsonProperty("isDownloaded")
+    public Boolean isDownloaded() {
+        return StringUtils.isNotEmpty(fileName);
+    }
+    
     //* CallBack Method JPA *//
     @PreRemove
     public void preRemove() {
-        if (this.podcast.getHasToBeDeleted() && !StringUtils.isEmpty(this.getLocalUri())) {
-            File fileToDelete = new File(this.getLocalUri());
-            if (fileToDelete.exists()) {
-                fileToDelete.delete();
+        if (podcast.getHasToBeDeleted() && isDownloaded()) {
+            try {
+                Files.deleteIfExists(getLocalPath());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
     @Transient
-    @JsonProperty("cover")
+    private Path getLocalPath() {
+        return rootFolder.resolve(podcast.getTitle()).resolve(fileName);
+    }
+
+    @Transient @JsonProperty("cover")
     public Cover getCoverOfItemOrPodcast() {
         return (this.cover == null) ? podcast.getCover() : this.cover;
     }
 
-    @JsonProperty("podcastId")
-    @Transient
+    @Transient @JsonProperty("podcastId")
     public Integer getPodcastId() { return (podcast == null) ? null : podcast.getId();}
 
-    @Transient
-    @JsonIgnore
-    @AssertTrue
+    @Transient @JsonIgnore @AssertTrue
     public boolean hasValidURL() {
         return (!StringUtils.isEmpty(this.url)) || "send".equals(this.podcast.getType());
     }
@@ -339,10 +332,7 @@ public class Item implements Serializable {
     public Item reset() {
         preRemove();
         setStatus(STATUS_NOT_DOWNLOADED);
-        setLocalUrl(null);
-        setLocalUri(null);
-        //setDownloaddate(null);
-        downloaddate = null;
+        downloadDate = null;
         return this;
     }
 }

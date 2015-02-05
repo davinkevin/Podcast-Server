@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -87,16 +89,7 @@ public class ItemDownloadManager {
         return downloadingQueue;
     }
 
-    public void setWaitingQueue(Queue<Item> waitingQueue) {
-        this.waitingQueue = waitingQueue;
-    }
-
-    public void setDownloadingQueue(Map<Item, Downloader> downloadingQueue) {
-        this.downloadingQueue = downloadingQueue;
-    }
-
     public ItemDownloadManager(Queue<Item> waitingQueue) {
-
         this.waitingQueue = waitingQueue;
     }
 
@@ -107,7 +100,6 @@ public class ItemDownloadManager {
     public void setNumberOfCurrentDownload(int numberOfCurrentDownload) {
         this.numberOfCurrentDownload.set(numberOfCurrentDownload);
     }
-
 
     public String getRootfolder() {
         return rootfolder;
@@ -330,5 +322,11 @@ public class ItemDownloadManager {
         waitingQueue.addAll(aItemList);
 
         convertAndSendWaitingQueue();
+    }
+    
+    @PostConstruct
+    public void postConstruct() {
+        Item.fileContainer = fileContainer;
+        Item.rootFolder = Paths.get(rootfolder);
     }
 }

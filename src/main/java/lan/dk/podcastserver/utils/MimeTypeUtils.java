@@ -46,10 +46,11 @@ public class MimeTypeUtils {
         if (item.getMimeType() != null) {
             return item.getMimeType().replace("audio/", ".").replace("video/", ".");
         }
-        if (item.getPodcast().getType() == "Youtube" || item.getUrl().lastIndexOf(".") == -1 ) {
+        
+        if ("Youtube".equals(item.getPodcast().getType()) || item.getUrl().lastIndexOf(".") == -1 ) {
             return ".mp4";
         } else {
-            return item.getUrl().substring(item.getUrl().lastIndexOf("."));
+            return "."+FilenameUtils.getExtension(item.getUrl());
         }
     }
     

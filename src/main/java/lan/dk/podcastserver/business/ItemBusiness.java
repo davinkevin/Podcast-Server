@@ -132,7 +132,7 @@ public class ItemBusiness {
     public String getEpisodeFile(int id) {
         Item item = findOne(id);
         try {
-            if (item.getLocalUrl() != null) {
+            if (item.isDownloaded()) {
                 logger.info("Interne - Item " + id + " : " + item.getLocalUrl());
                 URL redirectionURL = new URL(item.getLocalUrl());
                 return new URI(redirectionURL.getProtocol(), null, redirectionURL.getHost(), redirectionURL.getPort(), redirectionURL.getPath(), null, null).toASCIIString();
@@ -187,9 +187,8 @@ public class ItemBusiness {
                 .setLength(uploadedFile.getSize())
                 .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(uploadedFile.getOriginalFilename())))
                 .setDescription(podcast.getDescription())
-                .setLocalUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
-                .setLocalUri(fileToSave.getAbsolutePath())
-                .setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
+                .setFileName(uploadedFile.getOriginalFilename())
+                .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
                 .setPodcast(podcast)
                 .setStatus("Finish");
 

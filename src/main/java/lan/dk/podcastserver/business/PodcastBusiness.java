@@ -153,7 +153,7 @@ public class PodcastBusiness {
             .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
             .setDescription(podcast.getDescription())
             .setFileName(name)
-            .setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
+            .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
             .setPodcast(podcast)
             .setStatus("Finish");
 

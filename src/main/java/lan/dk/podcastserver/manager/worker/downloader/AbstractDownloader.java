@@ -102,9 +102,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
                 logger.error("IOException :", e);
             }
 
-            this.item.setLocalUrl(itemDownloadManager.getFileContainer() + "/" + item.getPodcast().getTitle() + "/" + FilenameUtils.getName(String.valueOf(target)));
-            this.item.setLocalUri(target.getAbsolutePath());
-            this.item.setDownloaddate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
+            this.item.setFileName(FilenameUtils.getName(target.getAbsolutePath()));
+            this.item.setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
             this.item.setLength(FileUtils.sizeOf(target));
 
             try {

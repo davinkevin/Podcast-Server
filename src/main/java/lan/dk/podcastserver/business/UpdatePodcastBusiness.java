@@ -150,7 +150,7 @@ public class UpdatePodcastBusiness  {
             if (fileToDelete.exists() && fileToDelete.delete()) {
                 logger.debug("Suppression effectuée");
             }
-            item.setStatus("Deleted").setLocalUri(null).setLocalUrl(null);
+            item.setStatus("Deleted").setFileName(null);
             itemBusiness.save(item);
         }
     }
