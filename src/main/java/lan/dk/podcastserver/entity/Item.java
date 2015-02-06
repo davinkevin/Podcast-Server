@@ -327,6 +327,7 @@ public class Item implements Serializable {
         preRemove();
         setStatus(STATUS_NOT_DOWNLOADED);
         downloadDate = null;
+        fileName = null;
         return this;
     }
 }
