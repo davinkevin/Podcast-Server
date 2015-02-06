@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -143,15 +145,19 @@ public class UpdatePodcastBusiness  {
 
     public void deleteOldEpisode() {
         logger.info("Suppression des anciens items");
-        File fileToDelete;
+        Path fileToDelete;
         for (Item item : itemBusiness.findAllToDelete()) {
-            fileToDelete = new File(rootFolder + item.getFileURI());
-            logger.info("Suppression du fichier associé à l'item {}", fileToDelete.getAbsolutePath());
-            if (fileToDelete.exists() && fileToDelete.delete()) {
-                logger.debug("Suppression effectuée");
+            fileToDelete = item.getLocalPath();
+            logger.info("Suppression du fichier associé à l'item {} : {}", item.getId(), fileToDelete.toAbsolutePath().toString());
+            try {
+                Files.deleteIfExists(fileToDelete);
+                itemBusiness.save(
+                        item.setStatus("Deleted")
+                            .setFileName(null)
+                );
+            } catch (IOException e) {
+                logger.error("Error during suppression : ", e);
             }
-            item.setStatus("Deleted").setFileName(null);
-            itemBusiness.save(item);
         }
     }
 

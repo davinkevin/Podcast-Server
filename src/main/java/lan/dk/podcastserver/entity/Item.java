@@ -15,7 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -288,11 +287,6 @@ public class Item implements Serializable {
         return String.format(PROXY_URL, podcast.getId(), id);
     }
 
-    @Transient @JsonIgnore
-    public String getFileURI() {
-        return File.separator + this.podcast.getTitle() + File.separator + fileName;
-    }
-
     @Transient @JsonProperty("isDownloaded")
     public Boolean isDownloaded() {
         return StringUtils.isNotEmpty(fileName);
@@ -310,8 +304,8 @@ public class Item implements Serializable {
         }
     }
 
-    @Transient
-    private Path getLocalPath() {
+    @Transient @JsonIgnore
+    public Path getLocalPath() {
         return rootFolder.resolve(podcast.getTitle()).resolve(fileName);
     }
 
