@@ -10,6 +10,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -65,6 +66,8 @@ public class jDomUtils {
 
         Element channel = new Element("channel");
 
+        String coverUrl = getAsciiURL(podcast.getCover().getUrl());
+        
         Element title = new Element("title");
         title.addContent(new Text(podcast.getTitle()));
 
@@ -114,9 +117,9 @@ public class jDomUtils {
             Element image_width = new Element("width");
             Element image_height = new Element("height");
 
-            itunesImage.addContent(new Text(podcast.getCover().getUrl()));
+            itunesImage.addContent(new Text(coverUrl));
 
-            image_url.addContent(podcast.getCover().getUrl());
+            image_url.addContent(coverUrl);
             image_width.addContent(String.valueOf(podcast.getCover().getWidth()));
             image_height.addContent(String.valueOf(podcast.getCover().getHeight()));
             image.addContent(image_height);
@@ -174,11 +177,10 @@ public class jDomUtils {
             guid.addContent(new Text(serveurURL + item.getProxyURL()));
             xmlItem.addContent(guid);
             
-            if (item.getCover() != null) {
-                Element thumbnail = new Element("thumbnail", mediaNS);
-                thumbnail.setAttribute("url", item.getCover().getUrl());
-                xmlItem.addContent(thumbnail);
-            }
+
+            Element thumbnail = new Element("thumbnail", mediaNS);
+            thumbnail.setAttribute("url", getAsciiURL(item.getCoverOfItemOrPodcast().getUrl()));
+            xmlItem.addContent(thumbnail);
 
             channel.addContent(xmlItem);
         }
@@ -199,5 +201,9 @@ public class jDomUtils {
 
         return null;
 
+    }
+
+    private static String getAsciiURL(String url) {
+        return UriComponentsBuilder.fromHttpUrl(url).build().toUri().toASCIIString();
     }
 }
