@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.repository.specification;
 
+import com.mysema.query.types.Predicate;
 import com.mysema.query.types.expr.BooleanExpression;
 import lan.dk.podcastserver.entity.QItem;
 import lan.dk.podcastserver.entity.Tag;
@@ -85,5 +86,12 @@ public class ItemSpecifications {
 
     public static BooleanExpression isInPodcast(Integer podcastId) {
         return QItem.item.podcast.id.eq(podcastId);
+    }
+
+    public static Predicate getSearchSpecifications(List<Integer> ids, List<Tag> tags) {
+        if (ids != null) {
+            return isInId(ids).and(isInTags(tags) );
+        }
+        return isInTags(tags);
     }
 }

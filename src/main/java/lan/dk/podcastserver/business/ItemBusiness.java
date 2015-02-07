@@ -7,13 +7,14 @@ import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.specification.ItemSpecifications;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static lan.dk.podcastserver.repository.specification.ItemSpecifications.*;
 
@@ -62,16 +65,36 @@ public class ItemBusiness {
         if (page.getSort().getOrderFor("pertinence") == null) {
             return itemRepository.findAll(getSearchSpecifications(term, tags), page);
         }
-
-        return itemRepository.findAll(getSearchSpecifications(term, tags), new PageRequest(page.getPageNumber(), page.getPageSize()));
+        
+        return findByTagsAndFullTextTermOrderByPertinence(term, tags, page);
     }
 
-    private Predicate getSearchSpecifications(String term, List<Tag> tags) {
-        if (StringUtils.isEmpty(term)) {
-            return isInTags(tags);
-        }
+    @SuppressWarnings("unchecked")
+    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, PageRequest page) {
+        PageRequest pageRequest = new PageRequest(page.getPageNumber(), page.getPageSize());
 
-        return isInId(itemRepository.fullTextSearch(term)).and( isInTags(tags) );
+        // List with the order of pertinence of search result :
+        List<Integer> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
+
+        // List of all the item matching the search result :
+        List<Item> allResult = (List<Item>) itemRepository.findAll(ItemSpecifications.getSearchSpecifications(fullTextIdsWithOrder, tags));
+
+        //Number of result
+        Long numberOfResult = (long) allResult.size();
+        
+        //Re-order the result list : 
+        List<Item> orderedList = fullTextIdsWithOrder
+                .stream()
+                .map(id -> allResult.stream().filter(item -> id.equals(item.getId())).findFirst())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                // Keep only the needed element for the page
+                .skip(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                // Collect them all !
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(orderedList, pageRequest, numberOfResult);
     }
 
     public Item save(Item entity) {
@@ -199,5 +222,9 @@ public class ItemBusiness {
         podcastBusiness.save(podcast);
 
         return item;
+    }
+
+    private Predicate getSearchSpecifications(String term, List<Tag> tags) {
+        return ItemSpecifications.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
     }
 }

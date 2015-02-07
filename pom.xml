@@ -129,15 +129,17 @@
 
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search</artifactId>
-            <version>4.5.1.Final</version>
+            <artifactId>hibernate-search-orm</artifactId>
+            <version>5.0.1.Final</version>
         </dependency>
 
+<!--        
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-analyzers</artifactId>
-            <version>4.5.1.Final</version>
+            <version>4.5.3.Final</version>
         </dependency>
+-->
 
         <!--User Type Mapping-->
         <dependency>

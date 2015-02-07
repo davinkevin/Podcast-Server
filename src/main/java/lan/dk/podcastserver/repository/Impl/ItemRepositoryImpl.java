@@ -5,9 +5,8 @@ import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import lan.dk.podcastserver.utils.hibernate.transformer.HibernateIdExtractor;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;
-import org.hibernate.search.impl.SimpleIndexingProgressMonitor;
+import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+
+import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
@@ -25,7 +26,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     public void reindex() throws InterruptedException {
-        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
+        FullTextEntityManager fullTextEntityManager = getFullTextEntityManager(em);
         fullTextEntityManager
                             .createIndexer(Item.class)
                             .batchSizeToLoadObjects(25)
@@ -39,16 +40,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Override
     @SuppressWarnings("unchecked")
     public List<Integer> fullTextSearch(String term) {
-        FullTextEntityManager fullTextEntityManager =
-                org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
+        FullTextEntityManager fullTextEntityManager = getFullTextEntityManager(em);
 
         QueryBuilder qbDsl = fullTextEntityManager.getSearchFactory()
                 .buildQueryBuilder().forEntity( Item.class ).get();
 
         Query luceneQuery = qbDsl.keyword()
-                                .fuzzy()
-                                    .withThreshold(0.7f)
-                                    .withPrefixLength(3)
                             .onFields("description", "title")
                             .matching(term).createQuery();
 
@@ -58,7 +55,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .setResultTransformer(new HibernateIdExtractor())
                 .getResultList();
 
-        logger.info(results.toString());
+        logger.debug(results.toString());
         return results;
     }
 }
