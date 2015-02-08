@@ -10,6 +10,7 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.specification.ItemSpecifications;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,6 +78,11 @@ public class ItemBusiness {
         // List with the order of pertinence of search result :
         List<Integer> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 
+        // Reverse if order is ASC
+        if ("ASC".equals(page.getSort().getOrderFor("pertinence").getDirection().toString())) {
+            Collections.reverse(fullTextIdsWithOrder);
+        }
+        
         // List of all the item matching the search result :
         List<Item> allResult = (List<Item>) itemRepository.findAll(ItemSpecifications.getSearchSpecifications(fullTextIdsWithOrder, tags));
 
@@ -225,6 +232,8 @@ public class ItemBusiness {
     }
 
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {
-        return ItemSpecifications.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
+        return (StringUtils.isEmpty(term))
+                ? isInTags(tags)
+                : ItemSpecifications.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
     }
 }
