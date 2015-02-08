@@ -22,7 +22,8 @@
         </div>
 
         <div class="form-group col-sm-2">
-            <select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()" ng-disabled="searchParameters.properties === 'pertinence'">
+            <!--<select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()" ng-disabled="searchParameters.properties === 'pertinence'">-->
+            <select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()">
                 <option value>Ordre</option>
                 <option value="DESC">Descendant</option>
                 <option value="ASC">Ascendant</option>

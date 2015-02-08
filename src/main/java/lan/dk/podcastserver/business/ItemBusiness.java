@@ -64,17 +64,13 @@ public class ItemBusiness {
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, PageRequest page) {
-        if (page.getSort().getOrderFor("pertinence") == null) {
-            return itemRepository.findAll(getSearchSpecifications(term, tags), page);
-        }
-        
-        return findByTagsAndFullTextTermOrderByPertinence(term, tags, page);
+        return page.getSort().getOrderFor("pertinence") == null 
+                ? itemRepository.findAll(getSearchSpecifications(term, tags), page) 
+                : findByTagsAndFullTextTermOrderByPertinence(term, tags, page);
     }
 
     @SuppressWarnings("unchecked")
     private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, PageRequest page) {
-        PageRequest pageRequest = new PageRequest(page.getPageNumber(), page.getPageSize());
-
         // List with the order of pertinence of search result :
         List<Integer> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 
@@ -96,12 +92,12 @@ public class ItemBusiness {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 // Keep only the needed element for the page
-                .skip(pageRequest.getOffset())
-                .limit(pageRequest.getPageSize())
+                .skip(page.getOffset())
+                .limit(page.getPageSize())
                 // Collect them all !
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(orderedList, pageRequest, numberOfResult);
+        return new PageImpl<>(orderedList, page, numberOfResult);
     }
 
     public Item save(Item entity) {

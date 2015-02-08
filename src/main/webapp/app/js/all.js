@@ -84,6 +84,7 @@ angular.module('ps.dataservice', [
     'ps.dataService.podcast',
     'ps.dataService.tag'
 ]);
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -120,7 +121,6 @@ _.mixin({
         return localArray;
     }
 });
-
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -474,7 +474,8 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '\n' +
     '        <div class="form-group col-sm-2">\n' +
-    '            <select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()" ng-disabled="searchParameters.properties === \'pertinence\'">\n' +
+    '            <!--<select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()" ng-disabled="searchParameters.properties === \'pertinence\'">-->\n' +
+    '            <select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()">\n' +
     '                <option value>Ordre</option>\n' +
     '                <option value="DESC">Descendant</option>\n' +
     '                <option value="ASC">Ascendant</option>\n' +
