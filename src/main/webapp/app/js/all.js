@@ -84,7 +84,6 @@ angular.module('ps.dataservice', [
     'ps.dataService.podcast',
     'ps.dataService.tag'
 ]);
-
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -121,6 +120,7 @@ _.mixin({
         return localArray;
     }
 });
+
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -367,10 +367,10 @@ module.run(['$templateCache', function($templateCache) {
     '                        <div class="btn-group" dropdown is-open="isopen">\n' +
     '                            <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>\n' +
     '                            <ul class="dropdown-menu dropdown-menu-right" role="menu">\n' +
-    '                                <li ng-show="item.isDownloaded"><a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play"></span> Lire</a></li>\n' +
-    '                                <li><a ng-click="remove(item)" ng-show="(item.status != \'Started\' && item.status != \'Paused\' )"><span class="glyphicon glyphicon-remove"></span> Retirer</a></li>\n' +
+    '                                <li ng-show="item.isDownloaded"><a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>\n' +
+    '                                <li><a ng-click="remove(item)" ng-show="(item.status != \'Started\' && item.status != \'Paused\' )"><span class="glyphicon glyphicon-remove text-danger"></span> Retirer</a></li>\n' +
+    '                                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>\n' +
     '                                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
-    '                                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe"></span> Lire en ligne</a></li>\n' +
     '                            </ul>\n' +
     '                        </div>\n' +
     '                        \n' +
