@@ -16,7 +16,7 @@ public class PodcastServerConfig {
     @Resource Environment environment;
 
     private static final String PROPERTY_ROOTFOLDER_NAME = "rootfolder";
-    private static final String PROPERTY_ROOTFOLDER_DEFAULT = "${catalina.home}/webapp/podcast/";
+    private static final String PROPERTY_ROOTFOLDER_DEFAULT = "#environment.getProperty('catalina.home').concat('/webapps/podcast/')";
 
     private static final String PROPERTY_SERVEURURL_NAME = "serverURL";
     private static final String PROPERTY_SERVEURURL_DEFAULT = "http://localhost:8080";
@@ -44,7 +44,7 @@ public class PodcastServerConfig {
 
     @Bean
     PodcastServerParameters podcastServerParameters() {
-        return PodcastServerParameters.builder()
+        return PodcastServerParameters.builder(environment)
                     .rootfolder(environment.getProperty(PROPERTY_ROOTFOLDER_NAME, PROPERTY_ROOTFOLDER_DEFAULT))
                     .serveurURL(environment.getProperty(PROPERTY_SERVEURURL_NAME, PROPERTY_SERVEURURL_DEFAULT))
                     .fileContainer(environment.getProperty(PROPERTY_FILECONTAINER_NAME, PROPERTY_FILECONTAINER_DEFAULT))

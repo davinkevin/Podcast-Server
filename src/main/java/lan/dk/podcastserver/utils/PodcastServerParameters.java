@@ -1,5 +1,11 @@
 package lan.dk.podcastserver.utils;
 
+import org.springframework.core.env.Environment;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -53,26 +59,25 @@ public class PodcastServerParameters {
     public Integer numberOfTry() {return numberOfTry;}
     public String coverDefaultName() { return coverDefaultName;}
 
-    public static PodcastServerParametersBuilder builder() {
-        return new PodcastServerParametersBuilder();
+    public static PodcastServerParametersBuilder builder(Environment env) {
+        return new PodcastServerParametersBuilder(env);
     }
     
     public static class PodcastServerParametersBuilder {
-        String rootfolder;
-        String serveurURL;
-        String fileContainer;
-        String coverDefaultName;
-        String downloadExtention;
+        String rootfolder, serveurURL, fileContainer, coverDefaultName, downloadExtention;
+        Integer maxUpdateParallels, concurrentDownload, numberOfTry;
         Long numberOfDayToDownload;
-        Integer maxUpdateParallels;
-        Integer concurrentDownload;
-        Integer numberOfTry;
 
-        public PodcastServerParametersBuilder() {
+        ExpressionParser parser = new SpelExpressionParser();
+        EvaluationContext context = new StandardEvaluationContext();
+
+
+        public PodcastServerParametersBuilder(Environment environment) {
+            context.setVariable("environment", environment);
         }
 
         public PodcastServerParametersBuilder rootfolder(String rootfolder) {
-            this.rootfolder = rootfolder;
+            this.rootfolder = parser.parseExpression(rootfolder).getValue(context, String.class);
             return this;
         }
 
