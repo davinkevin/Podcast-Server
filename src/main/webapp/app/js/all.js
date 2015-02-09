@@ -84,6 +84,7 @@ angular.module('ps.dataservice', [
     'ps.dataService.podcast',
     'ps.dataService.tag'
 ]);
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -120,7 +121,6 @@ _.mixin({
         return localArray;
     }
 });
-
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -177,41 +177,6 @@ angular.module('ps.config.restangular', [
             item.addRestangularMethod('download', 'get', 'addtoqueue');
             return item;
         });
-    });
-angular.module('ps.config.route', [
-    'ngRoute',
-    'cfp.hotkeys'
-])
-    .constant('commonKey', [
-        ['h', 'Goto Home', function (event) {
-            event.preventDefault();
-            window.location.href = '#/items';
-        }],
-        ['s', 'Goto Search', function (event) {
-            event.preventDefault();
-            window.location.href = '#/item/search';
-        }],
-        ['p', 'Goto Podcast List', function (event) {
-            event.preventDefault();
-            window.location.href = '#/podcasts';
-        }],
-        ['d', 'Goto Download List', function (event) {
-            event.preventDefault();
-            window.location.href = '#/download';
-        }]
-    ])
-    .config(function($routeProvider, commonKey) {
-        /*$routeProvider.
-            when('/podcast/add', {
-                templateUrl: 'html/podcast-add.html',
-                controller: 'PodcastAddCtrl',
-                hotkeys: commonKey
-            });*/
-        
-        $routeProvider.
-            otherwise({
-                redirectTo: '/items'
-            });
     });
 (function(module) {
 try {
@@ -961,7 +926,7 @@ module.run(['$templateCache', function($templateCache) {
     '                            <span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist\n' +
     '                        </a>\n' +
     '                    </li>\n' +
-    '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>\n' +
+    '                    <li><a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>\n' +
     '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
     '                </ul>\n' +
     '            </div>\n' +
@@ -1034,6 +999,41 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.config.route', [
+    'ngRoute',
+    'cfp.hotkeys'
+])
+    .constant('commonKey', [
+        ['h', 'Goto Home', function (event) {
+            event.preventDefault();
+            window.location.href = '#/items';
+        }],
+        ['s', 'Goto Search', function (event) {
+            event.preventDefault();
+            window.location.href = '#/item/search';
+        }],
+        ['p', 'Goto Podcast List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/podcasts';
+        }],
+        ['d', 'Goto Download List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/download';
+        }]
+    ])
+    .config(function($routeProvider, commonKey) {
+        /*$routeProvider.
+            when('/podcast/add', {
+                templateUrl: 'html/podcast-add.html',
+                controller: 'PodcastAddCtrl',
+                hotkeys: commonKey
+            });*/
+        
+        $routeProvider.
+            otherwise({
+                redirectTo: '/items'
+            });
+    });
 angular.module('ps.download', [
     'ps.config.route',
     'ps.dataService.donwloadManager',
