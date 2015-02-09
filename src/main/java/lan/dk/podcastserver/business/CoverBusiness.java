@@ -3,7 +3,7 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
-import lan.dk.podcastserver.utils.PodcastServerParameters;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;

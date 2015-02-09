@@ -9,7 +9,7 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.specification.ItemSpecifications;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
-import lan.dk.podcastserver.utils.PodcastServerParameters;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

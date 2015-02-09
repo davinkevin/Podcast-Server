@@ -166,18 +166,6 @@ angular.module('ps.config.ngstomp', [
             .credential('login', 'password')
             .class(SockJS);
     });
-angular.module('ps.config.restangular', [
-    'restangular'
-])
-    .config(function(RestangularProvider) {
-        RestangularProvider.setBaseUrl('/api/');
-
-        RestangularProvider.addElementTransformer('items', false, function(item) {
-            item.addRestangularMethod('reset', 'get', 'reset');
-            item.addRestangularMethod('download', 'get', 'addtoqueue');
-            return item;
-        });
-    });
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -926,7 +914,7 @@ module.run(['$templateCache', function($templateCache) {
     '                            <span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist\n' +
     '                        </a>\n' +
     '                    </li>\n' +
-    '                    <li><a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>\n' +
+    '                    <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>\n' +
     '                    <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>\n' +
     '                </ul>\n' +
     '            </div>\n' +
@@ -999,6 +987,18 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.config.restangular', [
+    'restangular'
+])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api/');
+
+        RestangularProvider.addElementTransformer('items', false, function(item) {
+            item.addRestangularMethod('reset', 'get', 'reset');
+            item.addRestangularMethod('download', 'get', 'addtoqueue');
+            return item;
+        });
+    });
 angular.module('ps.config.route', [
     'ngRoute',
     'cfp.hotkeys'

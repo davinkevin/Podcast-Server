@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.service;
 
-import lan.dk.podcastserver.utils.PodcastServerParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

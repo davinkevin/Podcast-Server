@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
-import lan.dk.podcastserver.utils.PodcastServerParameters;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

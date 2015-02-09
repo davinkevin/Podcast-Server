@@ -4,7 +4,7 @@ import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.service.WorkerService;
-import lan.dk.podcastserver.utils.PodcastServerParameters;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

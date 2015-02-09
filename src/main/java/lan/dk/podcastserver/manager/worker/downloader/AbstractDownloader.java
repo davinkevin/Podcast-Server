@@ -5,7 +5,7 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
-import lan.dk.podcastserver.utils.PodcastServerParameters;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
