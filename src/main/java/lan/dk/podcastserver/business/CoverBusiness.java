@@ -3,22 +3,22 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
+import lan.dk.podcastserver.utils.PodcastServerParameters;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
@@ -35,12 +35,7 @@ public class CoverBusiness {
     public static final String QUOTE_HTML_REPLACEMENT = "%27";
 
     @Resource CoverRepository coverRepository;
-
-    @Value("${cover.defaultname:cover}") String coverDefaultName;
-    @Value("${fileContainer:http://localhost:8080/podcast}") String webFileContainer;
-
-    @Value("${rootfolder:${catalina.home}/webapp/podcast/}") String rootfolder;
-    Path rootFolderPath;
+    @Resource PodcastServerParameters podcastServerParameters;
 
     public Cover findOne(Integer integer) {
         return coverRepository.findOne(integer);
@@ -50,13 +45,7 @@ public class CoverBusiness {
         return coverRepository.exists(integer);
     }
 
-    public Cover save(Cover cover) {
-        return coverRepository.save(cover);
-    }
-
-    public Cover findByUrl(String url) {
-        return coverRepository.findByUrl(url);
-    }
+    public Cover save(Cover cover) { return coverRepository.save(cover); }
 
     public String download(Podcast podcast) {
 
@@ -65,9 +54,9 @@ public class CoverBusiness {
         }
 
         String coverUrl = podcast.getCover().getUrl();
-        String fileName = coverDefaultName + "." + FilenameUtils.getExtension(coverUrl);
+        String fileName = podcastServerParameters.coverDefaultName() + "." + FilenameUtils.getExtension(coverUrl);
 
-        Path fileLocation = rootFolderPath.resolve(podcast.getTitle()).resolve(fileName);
+        Path fileLocation = podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(fileName);
 
         // Download file to correct location :
         try {
@@ -83,21 +72,18 @@ public class CoverBusiness {
                     fileLocation,
                     StandardCopyOption.REPLACE_EXISTING
             );
-        } catch (IOException e) {
+            return UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer())
+                    .pathSegment(podcast.getTitle())
+                    .pathSegment(fileName)
+                    .toUriString()
+                    .replace(QUOTE_CHARACTER, QUOTE_HTML_REPLACEMENT);
+        } catch (URISyntaxException | IOException e) {
             logger.error("Error during downloading of the cover", e);
             return "";
         }
-
-        // return URL to this file
-        return webFileContainer.concat("/").concat(podcast.getTitle()).concat("/").concat(fileName).replace(QUOTE_CHARACTER, QUOTE_HTML_REPLACEMENT);
     }
 
     public Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
         return !Objects.isNull(patchPodcast.getCover()) && !Objects.isNull(podcastToUpdate.getCover()) && StringUtils.equalsIgnoreCase(patchPodcast.getCover().getUrl(), podcastToUpdate.getCover().getUrl());
-    }
-
-    @PostConstruct
-    public void init() {
-        rootFolderPath = Paths.get(rootfolder);
     }
 }

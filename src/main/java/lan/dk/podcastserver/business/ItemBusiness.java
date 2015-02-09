@@ -9,11 +9,11 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.specification.ItemSpecifications;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
+import lan.dk.podcastserver.utils.PodcastServerParameters;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -45,11 +46,9 @@ public class ItemBusiness {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource ItemDownloadManager itemDownloadManager;
-
+    @Resource PodcastServerParameters podcastServerParameters;
     @Resource ItemRepository itemRepository;
     @Resource PodcastBusiness podcastBusiness;
-
-    @Value("${numberofdaytodownload:30}") Long numberOfDayToDownload;
 
     //** Delegation Repository **//
     public List<Item> findAll() {
@@ -136,14 +135,14 @@ public class ItemBusiness {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDownload() {
         return itemRepository.findAll(isDownloaded(Boolean.FALSE)
-                .and(isNewerThan(ZonedDateTime.now().minusDays(numberOfDayToDownload))));
+                .and(isNewerThan(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload()))));
     }
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDelete() {
         return itemRepository.findAll(isDownloaded(Boolean.TRUE)
-                .and(isOlderThan(ZonedDateTime.now().minusDays(numberOfDayToDownload)))
+                .and(isOlderThan(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload())))
                 .and(hasToBeDeleted(Boolean.TRUE)));
     }
 
@@ -187,7 +186,7 @@ public class ItemBusiness {
         return save(itemToReset.reset());
     }
 
-    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws PodcastNotFoundException, IOException {
+    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws PodcastNotFoundException, IOException, URISyntaxException {
         Podcast podcast = podcastBusiness.findOne(podcastId);
         if (podcast == null) {
             throw new PodcastNotFoundException();
@@ -198,7 +197,7 @@ public class ItemBusiness {
 
         Item item = new Item();
         //String name = name;
-        File fileToSave = new File(podcastBusiness.getRootfolder() + File.separator + podcast.getTitle() + File.separator + uploadedFile.getOriginalFilename());
+        File fileToSave = new File(podcastServerParameters.getRootfolder() + File.separator + podcast.getTitle() + File.separator + uploadedFile.getOriginalFilename());
         if (fileToSave.exists()) {
             fileToSave.delete();
         }
@@ -209,7 +208,7 @@ public class ItemBusiness {
 
         item.setTitle(FilenameUtils.removeExtension(uploadedFile.getOriginalFilename().split(" - ")[2]))
                 .setPubdate(podcastBusiness.fromFolder(uploadedFile.getOriginalFilename().split(" - ")[1]))
-                .setUrl(podcastBusiness.getFileContainer() + "/" + podcast.getTitle() + "/" + uploadedFile.getOriginalFilename())
+                .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(uploadedFile.getOriginalFilename()).build().toUriString())
                 .setLength(uploadedFile.getSize())
                 .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(uploadedFile.getOriginalFilename())))
                 .setDescription(podcast.getDescription())

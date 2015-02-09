@@ -9,7 +9,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,13 +37,9 @@ public class UpdatePodcastBusiness  {
     @Resource PodcastBusiness podcastBusiness;
     @Resource ItemBusiness itemBusiness;
 
-    @Resource
-    @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
+    @Resource @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
     @Resource(name="Validator") Validator validator;
-
-    @Value("${rootfolder:${catalina.home}/webapp/podcast/}") protected String rootFolder;
-    @Resource
-    WorkerService workerService;
+    @Resource WorkerService workerService;
 
 
     @Transactional(noRollbackFor=Exception.class)

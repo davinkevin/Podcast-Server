@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 
 /**
@@ -70,7 +71,7 @@ public class ItemController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public Item uploadFile(@PathVariable Integer idPodcast, @RequestPart("file") MultipartFile file) throws PodcastNotFoundException, IOException, ParseException {
+    public Item uploadFile(@PathVariable Integer idPodcast, @RequestPart("file") MultipartFile file) throws PodcastNotFoundException, IOException, ParseException, URISyntaxException {
         return itemBusiness.addItemByUpload(idPodcast, file);
     }
 }

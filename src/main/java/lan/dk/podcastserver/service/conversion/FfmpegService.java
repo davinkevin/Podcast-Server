@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.service;
+package lan.dk.podcastserver.service.conversion;
 
 import lan.dk.podcastserver.utils.ThreadUtils.OutputLogger;
 import org.slf4j.Logger;

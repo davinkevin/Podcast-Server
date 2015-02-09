@@ -51,7 +51,7 @@ public class IDMController {
 
     @RequestMapping(value="/limit", method = RequestMethod.POST, produces = "application/json")
     public void setLimitParallelDownload (@RequestBody int setLimitParallelDownload) {
-        IDM.setLimitParallelDownload(setLimitParallelDownload);
+        IDM.changeLimitParallelsDownload(setLimitParallelDownload);
     }
 
     @RequestMapping(value="/launch", method = RequestMethod.GET, produces = "application/json")

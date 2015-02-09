@@ -31,7 +31,6 @@ public class TagBusiness {
     }
 
     public Set<Tag> getTagListByName(Set<Tag> tagList) {
-        Collection<String> tagsName = new ArrayList<>();
         Set<Tag> tagResult = new HashSet<>();
 
         for(Tag tag : tagList) {
@@ -42,7 +41,7 @@ public class TagBusiness {
                 tagResult.add(tag);
             }
         }
-        //tagResult.addAll(tagRepository.findByNameIn(tagsName));
+
         return tagResult;
     }
 }

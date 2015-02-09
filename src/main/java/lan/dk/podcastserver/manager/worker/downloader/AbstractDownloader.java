@@ -5,14 +5,15 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
+import lan.dk.podcastserver.utils.PodcastServerParameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +31,13 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public static final String WS_TOPIC_PODCAST = "/topic/podcast/";
 
     protected Item item;
-    protected String temporaryExtension = ".psdownload";
+    protected String temporaryExtension;
     protected File target = null;
 
-    @Autowired protected ItemDownloadManager itemDownloadManager;
-    @Autowired protected ItemBusiness itemService;
+    @Resource protected ItemDownloadManager itemDownloadManager;
     @Resource protected PodcastBusiness podcastBusiness;
+    @Resource protected ItemBusiness itemService;
+    @Resource protected PodcastServerParameters podcastServerParameters;
     @Resource protected SimpMessagingTemplate template;
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
@@ -43,7 +45,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public Item getItem() {
         return item;
     }
-
     public void setItem(Item item) {
         this.item = item;
     }
@@ -175,11 +176,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected Item saveSyncWithPodcast() {
         try {
             this.item.setPodcast(podcastBusiness.findOne(this.item.getPodcast().getId()));
-            //this.item.getPodcast().getItems().remove(this.item);
-            //this.item.getPodcast().getItems().add(this.item);
-
             return itemService.save(this.item);
-
         } catch (Exception e) {
             logger.error("Error during save and Sync of the item {}", this.item, e);
             return new Item();
@@ -194,5 +191,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     public String getItemUrl() {
         return item.getUrl();
+    }
+    
+    @PostConstruct
+    public void postConstruct() {
+        this.temporaryExtension = podcastServerParameters.getDownloadExtention();
     }
 }

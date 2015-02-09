@@ -12,7 +12,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +29,6 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final Integer YOUTUBE_MAX_RESULTS = 50;
     private static final String GDATA_USER_FEED = "https://gdata.youtube.com/feeds/api/users/";
     //private static final String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
-
-    @Value("${numberofdaytodownload:30}") Integer numberOfDayToDownload;
 
     public static ZonedDateTime fromYoutube(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
@@ -53,7 +50,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         Integer borne = 1;
         String realPodcastURl;
-        ZonedDateTime maxDate = ZonedDateTime.now().plusDays(numberOfDayToDownload);
+        ZonedDateTime maxDate = ZonedDateTime.now().plusDays(podcastServerParameters.numberOfDayToDownload());
         Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
         while (true) {

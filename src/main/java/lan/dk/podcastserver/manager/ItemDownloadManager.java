@@ -4,20 +4,21 @@ import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.service.WorkerService;
+import lan.dk.podcastserver.utils.PodcastServerParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
-import java.nio.file.Paths;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.StreamSupport;
 
@@ -28,53 +29,29 @@ public class ItemDownloadManager {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
-    //Représnetation de la fils d'attente
-    private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<Item>();
-    //Représentation de la fils en cours de téléchargement
-    private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<Item, Downloader>();
     @Resource SimpMessagingTemplate template;
+    @Resource ItemBusiness itemBusiness;
+    @Resource PodcastServerParameters podcastServerParameters;
+    @Resource WorkerService workerService;
 
-    @Autowired
-    ItemBusiness itemBusiness;
-
-    @Value("${concurrentDownload:3}")
-    private int limitParallelDownload;
-
-    @Value("${numberOfTry:10}")
-    private int numberOfTry;
-
-
-    @Value("${rootfolder:${catalina.home}/webapps/podcast/}")
-    private String rootfolder;
-
-    @Value("${serverURL:http://localhost:8080}")
-    private String serverURL;
-
-    @Value("${fileContainer:http://localhost:8080/podcast}")
-    protected String fileContainer;
-
-
-
-    @Autowired
-    private WorkerService workerService;
-
+    private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<>();
+    private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<>();
     private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
-    private boolean isRunning = false;
-
-
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
+    private Integer limitParallelDownload;
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
-        return limitParallelDownload;
+        return podcastServerParameters.concurrentDownload();
     }
 
-    public void setLimitParallelDownload(int limitParallelDownload) {
+    public void changeLimitParallelsDownload(Integer limitParallelDownload) {
 
-        boolean addToDownloadList = limitParallelDownload < this.limitParallelDownload;
+        boolean addToDownloadList = limitParallelDownload < getLimitParallelDownload();
 
         this.limitParallelDownload = limitParallelDownload;
 
-        if (addToDownloadList && !isRunning)
+        if (addToDownloadList && !isRunning.get())
             manageDownload();
     }
 
@@ -97,39 +74,21 @@ public class ItemDownloadManager {
         return numberOfCurrentDownload.get();
     }
 
+/*
     public void setNumberOfCurrentDownload(int numberOfCurrentDownload) {
         this.numberOfCurrentDownload.set(numberOfCurrentDownload);
     }
+*/
 
     public String getRootfolder() {
-        return rootfolder;
+        return podcastServerParameters.getRootfolder();
     }
-
-    public void setRootfolder(String rootfolder) {
-        this.rootfolder = rootfolder;
-    }
-
-    public String getServerURL() {
-        return serverURL;
-    }
-
-    public void setServerURL(String serverURL) {
-        this.serverURL = serverURL;
-    }
-
-    public String getFileContainer() {
-        return fileContainer;
-    }
-
-    public void setFileContainer(String fileContainer) {
-        this.fileContainer = fileContainer;
-    }
-
+    
     /* METHODS */
     private void manageDownload() {
 
-        if (!isRunning) {
-            isRunning = true;
+        if (!isRunning.get()) {
+            isRunning.set(true);
             Item currentItem = null;
 
             while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
@@ -138,7 +97,7 @@ public class ItemDownloadManager {
                      getDownloaderByTypeAndRun(currentItem);
                 }
             }
-            isRunning = false;
+            isRunning.set(false);
         }
         this.convertAndSendWaitingQueue();
     }
@@ -157,15 +116,11 @@ public class ItemDownloadManager {
 
     // Change status of all downloads :
     public void stopAllDownload() {
-        for (Downloader downloader : downloadingQueue.values()) {
-            downloader.stopDownload();
-        }
+        downloadingQueue.values().forEach(Downloader::stopDownload);
     }
 
     public void pauseAllDownload() {
-        for (Downloader downloader : downloadingQueue.values()) {
-            downloader.pauseDownload();
-        }
+        downloadingQueue.values().forEach(Downloader::pauseDownload);
     }
 
     public void restartAllDownload() {
@@ -237,7 +192,7 @@ public class ItemDownloadManager {
     public void removeACurrentDownload(Item item) {
         this.numberOfCurrentDownload.decrementAndGet();
         this.downloadingQueue.remove(item);
-        if (!isRunning)
+        if (!isRunning.get())
             manageDownload();
     }
 
@@ -290,7 +245,7 @@ public class ItemDownloadManager {
 
 
     public boolean canBeReseted(Item item) {
-        return item.getNumberOfTry()+1 <= numberOfTry;
+        return item.getNumberOfTry()+1 <= podcastServerParameters.numberOfTry();
     }
 
     public Boolean isInDownloadingQueue(Item item) {
@@ -325,8 +280,9 @@ public class ItemDownloadManager {
     }
     
     @PostConstruct
-    public void postConstruct() {
-        Item.fileContainer = fileContainer;
-        Item.rootFolder = Paths.get(rootfolder);
+    public void postConstruct() throws URISyntaxException {
+        Item.fileContainer = UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).build().toUriString();
+        Item.rootFolder = podcastServerParameters.rootFolder();
+        limitParallelDownload = podcastServerParameters.concurrentDownload();
     }
 }

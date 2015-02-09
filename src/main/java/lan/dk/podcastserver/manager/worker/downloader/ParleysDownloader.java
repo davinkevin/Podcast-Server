@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.service.FfmpegService;
+import lan.dk.podcastserver.service.conversion.FfmpegService;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
@@ -40,8 +40,7 @@ public class ParleysDownloader extends AbstractDownloader{
     private Long totalSize;
     private int avancementIntermediaire = 0;
 
-    @Resource
-    FfmpegService ffmpegService;
+    @Resource FfmpegService ffmpegService;
 
 
     @Override

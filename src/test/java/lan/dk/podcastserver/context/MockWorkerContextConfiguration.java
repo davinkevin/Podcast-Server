@@ -7,11 +7,6 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
-
-import static org.mockito.Mockito.when;
 
 @Configuration
 @ComponentScan(basePackages = {"lan.dk.podcastserver.manager.worker"})
@@ -21,8 +16,8 @@ public class MockWorkerContextConfiguration {
     @Bean
     public static ItemDownloadManager getItemDownloadManager() {
         ItemDownloadManager itemDownloadManager = Mockito.mock(ItemDownloadManager.class);
-        when(itemDownloadManager.getServerURL()).thenReturn("http://192.168.1.210:8080");
-        when(itemDownloadManager.getRootfolder()).thenReturn("/Users/kevin/");
+        /*when(itemDownloadManager.getServerURL()).thenReturn("http://192.168.1.210:8080");*/
+        /*when(itemDownloadManager.getRootfolder()).thenReturn("/Users/kevin/");*/
         return itemDownloadManager;
     }
 
