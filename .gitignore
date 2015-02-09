@@ -10,3 +10,4 @@ node/
 node_tmp/
 bower_components/
 target/
+src/generated
