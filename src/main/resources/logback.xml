@@ -10,6 +10,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/PodcastServer.log</file>
+        <!--<file>${catalina.home}/logs/PodcastServer.log</file>-->
         <encoder>
             <charset>UTF-8</charset>
             <Pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
@@ -28,11 +29,11 @@
     <!-- ORM | Hibernate
     <logger name="org.springframework.web" level="TRACE"/>
     <logger name="org.springframework.transaction" level="TRACE"/>
-          <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
     -->
 
 
-  <root level="info">
+  <root level="INFO">
     <!--<appender-ref ref="FILE" />-->
     <appender-ref ref="STDOUT" />
   </root>
