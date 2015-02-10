@@ -72,6 +72,7 @@ public class MultipartFileSender {
         }
 
         if (!Files.exists(filepath)) {
+            logger.error("File doesn't exist at URI : {}", filepath.toAbsolutePath().toString());
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

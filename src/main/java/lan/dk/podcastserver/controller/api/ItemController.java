@@ -6,6 +6,8 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import lan.dk.podcastserver.utils.multipart.MultipartFileSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ import java.text.ParseException;
 @RequestMapping("/api/podcast/{idPodcast}/items")
 public class ItemController {
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
     @Resource private ItemBusiness itemBusiness;
 
     @Autowired
@@ -60,8 +64,10 @@ public class ItemController {
 
     @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
     public void getEpisodeFile(@PathVariable Integer id, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        logger.debug("Download du fichier d'item {}", id);
         Item item = itemBusiness.findOne(id);
         if (item.isDownloaded()) {
+            logger.debug("Récupération en local de l'item {} au chemin {}", id, item.getLocalUri());
             MultipartFileSender.fromPath(item.getLocalPath())
                     .with(request)
                     .with(response)
