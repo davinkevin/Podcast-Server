@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.config;
 
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.jackson.CustomObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -10,6 +11,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import javax.annotation.Resource;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -23,7 +25,7 @@ import java.util.List;
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     public static final int CACHE_PERIOD = 31556926;
-    private List<HttpMessageConverter<?>> messageConverters; // Cached: this is not a bean.
+    @Resource PodcastServerParameters podcastServerParameters;
 
     /**
      * Enregistrement standards des Controllers
@@ -43,6 +45,12 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //super.addResourceHandlers(registry);
+        
+        registry
+                .addResourceHandler("/podcast/**")
+                .addResourceLocations(podcastServerParameters.rootFolderWithProtocol())
+                .setCachePeriod(CACHE_PERIOD);
+        
         /*
         registry.addResourceHandler("/css/**").addResourceLocations("/app/css/").setCachePeriod(CACHE_PERIOD);
         registry.addResourceHandler("/img/**").addResourceLocations("/app/img/").setCachePeriod(CACHE_PERIOD);

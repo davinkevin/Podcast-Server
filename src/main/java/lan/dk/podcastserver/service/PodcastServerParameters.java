@@ -44,6 +44,7 @@ public class PodcastServerParameters {
     public Integer getMaxUpdateParallels() { return maxUpdateParallels; }
 
     public Path rootFolder() { return Paths.get(rootfolder); }
+    public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
     public URI serveurURL() throws URISyntaxException { return new URI(serveurURL); }
     public URI fileContainer() throws URISyntaxException { return new URI(fileContainer); }
     public Long numberOfDayToDownload() { return numberOfDayToDownload; }

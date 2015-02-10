@@ -74,7 +74,7 @@ angular.module('ps.player', [
 
             if (vm.currentVideo !== null && vm.currentVideo !== undefined) {
                 vm.API.stop();
-                vm.config.sources = [{src : vm.currentVideo.localUrl, type : vm.currentVideo.mimeType }];
+                vm.config.sources = [{src : vm.currentVideo.proxyURL, type : vm.currentVideo.mimeType }];
                 vm.config.plugins.poster = vm.currentVideo.cover.url;
                 if (vm.config.preload) {
                     $timeout(function() { vm.API.play(); }, 500);
@@ -85,7 +85,7 @@ angular.module('ps.player', [
         vm.remove = function(item) {
             playlistService.remove(item);
             vm.reloadPlaylist();
-            if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.localUrl) {
+            if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.proxyURL) {
                 vm.setVideo(0);
             }
         };

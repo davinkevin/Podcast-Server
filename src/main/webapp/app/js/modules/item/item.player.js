@@ -33,7 +33,7 @@ angular.module('ps.item.player', [
         vm.config = {
             preload: true,
             sources: [
-                { src : item.localUrl, type : item.mimeType }
+                { src : item.proxyURL, type : item.mimeType }
             ],
             theme: {
                 url: "http://www.videogular.com/styles/themes/default/videogular.css"

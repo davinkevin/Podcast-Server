@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
+import lan.dk.podcastserver.utils.multipart.MultipartFileSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -57,11 +59,15 @@ public class ItemController {
     }
 
     @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
-    public void getEpisodeFile(@PathVariable int id, HttpServletResponse response) {
-        try {
-            response.sendRedirect(itemBusiness.getEpisodeFile(id));
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void getEpisodeFile(@PathVariable Integer id, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Item item = itemBusiness.findOne(id);
+        if (item.isDownloaded()) {
+            MultipartFileSender.fromPath(item.getLocalPath())
+                    .with(request)
+                    .with(response)
+                .serveResource();
+        } else {
+            response.sendRedirect(item.getUrl());
         }
     }
 
