@@ -6,6 +6,7 @@ import org.apache.tika.Tika;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class MimeTypeUtils {
 
     public static String getMimeType(String extension) {
         if (extension.isEmpty())
-            return "unknown/unknown";
+            return "application/octet-stream";
 
         if (MimeMap.containsKey(extension)) {
             return MimeMap.get(extension);
@@ -56,11 +57,15 @@ public class MimeTypeUtils {
     
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public static String probeContentType(Path file) throws IOException {
-        String mimetype = tika.detect(file.toFile());
+        String mimetype = Files.probeContentType(file);
         if (mimetype != null) 
             return mimetype;
-        else
-            return getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
+
+        mimetype = tika.detect(file.toFile());
+        if (mimetype != null)
+            return mimetype;
+        
+        return getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
     }
 
 }

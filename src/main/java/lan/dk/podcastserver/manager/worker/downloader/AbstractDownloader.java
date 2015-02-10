@@ -4,8 +4,8 @@ import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
 import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -17,7 +17,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -108,10 +107,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setLength(FileUtils.sizeOf(target));
 
             try {
-                this.item.setMimeType(Files.probeContentType(target.toPath()));
-                if (this.item.getMimeType() == null) {
-                    this.item.setMimeType(MimeTypeUtils.probeContentType(target.toPath()));
-                }
+                this.item.setMimeType(MimeTypeUtils.probeContentType(target.toPath()));
             } catch (IOException e) {
                 e.printStackTrace();
                 this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
