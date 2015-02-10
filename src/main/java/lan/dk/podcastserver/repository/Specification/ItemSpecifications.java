@@ -30,6 +30,10 @@ public class ItemSpecifications {
         return QItem.item.pubdate.lt(dateTime);
     }
 
+    public static BooleanExpression hasBeenDownloadedBefore(ZonedDateTime dateTime) {
+        return QItem.item.downloadDate.lt(dateTime);
+    }
+
     public static BooleanExpression hasToBeDeleted(Boolean deleted){
         QItem item = QItem.item;
 

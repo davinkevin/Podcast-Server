@@ -142,7 +142,7 @@ public class ItemBusiness {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDelete() {
         return itemRepository.findAll(isDownloaded(Boolean.TRUE)
-                .and(isOlderThan(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload())))
+                .and(hasBeenDownloadedBefore(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload())))
                 .and(hasToBeDeleted(Boolean.TRUE)));
     }
 
