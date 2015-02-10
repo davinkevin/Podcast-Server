@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 @Service
 public class PodcastServerParameters {
 
-    @Value("${rootfolder:${catalina.home}/webapp/podcast/}") String rootfolder;
+    @Value("${rootfolder:${catalina.home}/webapps/podcast/}") String rootfolder;
     @Value("${serverURL:http://localhost:8080}") String serveurURL;
     @Value("${fileContainer:http://localhost:8080/podcast}") String fileContainer;
     @Value("${cover.defaultname:cover}") String coverDefaultName;
