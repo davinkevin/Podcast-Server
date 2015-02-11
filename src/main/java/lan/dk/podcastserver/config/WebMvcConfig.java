@@ -2,6 +2,8 @@ package lan.dk.podcastserver.config;
 
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.jackson.CustomObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +27,8 @@ import java.util.List;
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     public static final int CACHE_PERIOD = 31556926;
+    public static final String PODCAST_LOCATION_RESOURCE_HANDLER = "/podcast/**";
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Resource PodcastServerParameters podcastServerParameters;
 
     /**
@@ -46,10 +50,12 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //super.addResourceHandlers(registry);
         
+        logger.info("Mapping du dossier {} à {}", PODCAST_LOCATION_RESOURCE_HANDLER, podcastServerParameters.rootFolderWithProtocol());
+        
         registry
-                .addResourceHandler("/podcast/**")
+                .addResourceHandler(PODCAST_LOCATION_RESOURCE_HANDLER)
                 .addResourceLocations(podcastServerParameters.rootFolderWithProtocol())
-                .setCachePeriod(CACHE_PERIOD);
+                .setCachePeriod(0);
         
         /*
         registry.addResourceHandler("/css/**").addResourceLocations("/app/css/").setCachePeriod(CACHE_PERIOD);
