@@ -21,6 +21,8 @@ import java.time.format.DateTimeFormatter;
 
 public class jDomUtils {
 
+    public static String SERVEUR_URL;
+    public static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
     private static Logger logger = LoggerFactory.getLogger(jDomUtils.class);
 
     @Deprecated
@@ -72,7 +74,7 @@ public class jDomUtils {
         title.addContent(new Text(podcast.getTitle()));
 
         Element url = new Element("link");
-        url.addContent(new Text("http://localhost:8080/api/podcast/" + podcast.getId() + "/rss"));
+        url.addContent(new Text(String.format(LINK_FORMAT, SERVEUR_URL, podcast.getId())));
 
         Element lastUpdate = new Element("pubDate");
         lastUpdate.addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
@@ -145,7 +147,7 @@ public class jDomUtils {
             Element item_enclosure = new Element("enclosure");
 
             item_enclosure.setAttribute("url", serveurURL
-                    .concat(item.getProxyURL())
+                    .concat(item.getProxyURLWithoutExtention())
                     .concat((item.isDownloaded()) ? "."+FilenameUtils.getExtension(item.getFileName()) : MimeTypeUtils.getExtension(item)));
             
             if (item.getLength() != null) {

@@ -32,7 +32,7 @@ public class Item implements Serializable {
     public static String fileContainer;
     
     private static final String STATUS_NOT_DOWNLOADED = "Not Downloaded";
-    private static final String PROXY_URL = "/api/podcast/%s/items/%s/download";
+    private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
     
     private Integer id;
     private String title;
@@ -284,7 +284,7 @@ public class Item implements Serializable {
     
     @Transient @JsonProperty("proxyURL")
     public String getProxyURL() {
-        return String.format(PROXY_URL, podcast.getId(), id);
+        return String.format(PROXY_URL, podcast.getId(), id, getExtention());
     }
 
     @Transient @JsonProperty("isDownloaded")
@@ -309,6 +309,17 @@ public class Item implements Serializable {
         return rootFolder.resolve(podcast.getTitle()).resolve(fileName);
     }
 
+    @Transient @JsonIgnore
+    public String getProxyURLWithoutExtention() {
+        return String.format(PROXY_URL, podcast.getId(), id, "");
+    }
+    
+    @Transient @JsonIgnore
+    private String getExtention() {
+        String ext = FilenameUtils.getExtension(fileName);
+        return (ext == null) ? "" : "."+ext;
+    }
+    
     @Transient @JsonProperty("cover")
     public Cover getCoverOfItemOrPodcast() {
         return (this.cover == null) ? podcast.getCover() : this.cover;
@@ -316,7 +327,7 @@ public class Item implements Serializable {
 
     @Transient @JsonProperty("podcastId")
     public Integer getPodcastId() { return (podcast == null) ? null : podcast.getId();}
-
+        
     @Transient @JsonIgnore @AssertTrue
     public boolean hasValidURL() {
         return (!StringUtils.isEmpty(this.url)) || "send".equals(this.podcast.getType());

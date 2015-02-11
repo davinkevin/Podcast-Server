@@ -3,8 +3,9 @@ package lan.dk.podcastserver.manager;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.WorkerService;
+import lan.dk.podcastserver.utils.jDomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -283,6 +284,7 @@ public class ItemDownloadManager {
     public void postConstruct() throws URISyntaxException {
         Item.fileContainer = UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).build().toUriString();
         Item.rootFolder = podcastServerParameters.rootFolder();
+        jDomUtils.SERVEUR_URL = podcastServerParameters.getServeurURL();
         limitParallelDownload = podcastServerParameters.concurrentDownload();
     }
 }
