@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
-import lan.dk.podcastserver.utils.multipart.MultipartFileSender;
+import lan.dk.podcastserver.utils.multipart.MultiPartFileSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class ItemController {
         Item item = itemBusiness.findOne(id);
         if (item.isDownloaded()) {
             logger.debug("Récupération en local de l'item {} au chemin {}", id, item.getLocalUri());
-            MultipartFileSender.fromPath(item.getLocalPath())
+            MultiPartFileSender.fromPath(item.getLocalPath())
                     .with(request)
                     .with(response)
                 .serveResource();

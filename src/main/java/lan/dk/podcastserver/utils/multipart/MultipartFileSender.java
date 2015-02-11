@@ -23,48 +23,54 @@ import java.util.List;
 /**
  * Created by kevin on 10/02/15.
  */
-public class MultipartFileSender {
+public class MultiPartFileSender {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
     private static final int DEFAULT_BUFFER_SIZE = 20480; // ..bytes = 20KB.
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
-    
+    private static final String CONTENT_DISPOSITION_INLINE = "inline";
+    private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
+
     Path filepath;
     HttpServletRequest request;
     HttpServletResponse response;
+    String disposition = CONTENT_DISPOSITION_INLINE;
     
-    public MultipartFileSender() {
+    private MultiPartFileSender() {
     }
-
-    public static MultipartFileSender fromPath(Path path) {
-        return new MultipartFileSender().setFilepath(path);
+    public static MultiPartFileSender fromPath(Path path) {
+        return new MultiPartFileSender().setFilepath(path);
     }
-    
-    public static MultipartFileSender fromFile(File file) {
-        return new MultipartFileSender().setFilepath(file.toPath());
+    public static MultiPartFileSender fromFile(File file) {
+        return new MultiPartFileSender().setFilepath(file.toPath());
     }
-
-    public static MultipartFileSender fromURIString(String uri) {
-        return new MultipartFileSender().setFilepath(Paths.get(uri));
-    }
-
-    //** internal setter **//
-    private MultipartFileSender setFilepath(Path filepath) {
-        this.filepath = filepath;
-        return this;
+    public static MultiPartFileSender fromURIString(String uri) {
+        return new MultiPartFileSender().setFilepath(Paths.get(uri));
     }
     
-    public MultipartFileSender with(HttpServletRequest httpRequest) {
+    public MultiPartFileSender with(HttpServletRequest httpRequest) {
         request = httpRequest;
         return this;
     }
-    
-    public MultipartFileSender with(HttpServletResponse httpResponse) {
+    public MultiPartFileSender with(HttpServletResponse httpResponse) {
         response = httpResponse;
         return this;
     }
+    public MultiPartFileSender withDispositionInline() {
+        forceDisposition(CONTENT_DISPOSITION_INLINE);
+        return this;
+    }
+    public MultiPartFileSender withDispositionAttachment() {
+        forceDisposition(CONTENT_DISPOSITION_ATTACHMENT);
+        return this;
+    }
+    public MultiPartFileSender withNoDisposition() {
+        forceDisposition(null);
+        return this;
+    }
+    
     
     public void serveResource() throws Exception {
         if (response == null || request == null) {
@@ -180,33 +186,28 @@ public class MultipartFileSender {
             }
         }
 
-        // Prepare and initialize response --------------------------------------------------------
-
-        // Get content type by file name and set content disposition.
-        String disposition = "inline";
-
-        // If content type is unknown, then set the default value.
-        // For all content types, see: http://www.w3schools.com/media/media_mimeref.asp
-        // To add new content types, add new mime-mapping entry in web.xml.
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        } else if (!contentType.startsWith("image")) {
-            // Else, expect for images, determine content disposition. If content type is supported by
-            // the browser, then set to inline, else attachment which will pop a 'save as' dialogue.
-            String accept = request.getHeader("Accept");
-            disposition = accept != null && HttpUtils.accepts(accept, contentType) ? "inline" : "attachment";
-        }
         logger.debug("Content-Type : {}", contentType);
         // Initialize response.
         response.reset();
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
         response.setHeader("Content-Type", contentType);
-        response.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
-        logger.debug("Content-Disposition : {}", disposition);
         response.setHeader("Accept-Ranges", "bytes");
         response.setHeader("ETag", fileName);
         response.setDateHeader("Last-Modified", lastModified);
         response.setDateHeader("Expires", System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
+
+
+        if (!StringUtils.isEmpty(disposition)) {
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            } else if (!contentType.startsWith("image")) {
+                String accept = request.getHeader("Accept");
+                disposition = accept != null && HttpUtils.accepts(accept, contentType) ? CONTENT_DISPOSITION_INLINE : CONTENT_DISPOSITION_ATTACHMENT;
+            }
+
+            response.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
+            logger.debug("Content-Disposition : {}", disposition);
+        }
 
         // Send requested file (part(s)) to client ------------------------------------------------
 
@@ -346,5 +347,15 @@ public class MultipartFileSender {
             return Arrays.binarySearch(matchValues, toMatch) > -1
                     || Arrays.binarySearch(matchValues, "*") > -1;
         }
+    }
+
+    //** internal setter **//
+    private MultiPartFileSender setFilepath(Path filepath) {
+        this.filepath = filepath;
+        return this;
+    }
+
+    private void forceDisposition(String disposition) {
+        this.disposition = disposition;
     }
 }
