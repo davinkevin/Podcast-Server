@@ -113,11 +113,11 @@ public class URLUtils {
         return url.replace(originalProtocol.concat(PROTOCOL_SEPARATOR), destinationProtocol.concat(PROTOCOL_SEPARATOR));
     }
     
-    public static URLConnection getStreamWithTimeOut(String stringUrl, Integer timeOut) throws IOException {
+    public static URLConnection getStreamWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
         URL url = new URL(stringUrl);
         URLConnection urlConnection = url.openConnection();
-        urlConnection.setReadTimeout(timeOut);
-        urlConnection.setConnectTimeout(timeOut);
+        urlConnection.setReadTimeout(timeOutInMilli);
+        urlConnection.setConnectTimeout(timeOutInMilli);
         return urlConnection;
     }
 }

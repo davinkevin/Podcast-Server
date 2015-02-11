@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -19,21 +20,20 @@ public class ImageUtils {
     public static Cover getCoverFromURL (URL url) throws IOException {
 
         Cover cover = new Cover(url.toString());
-        ImageInputStream in = null;
-        try {
-            in = ImageIO.createImageInputStream(url.openStream());
+        ImageInputStream imageInputStream;
+        try (InputStream urlInputStream = URLUtils.getStreamWithTimeOut(cover.getUrl(), 5000).getInputStream() ){
+            imageInputStream = ImageIO.createImageInputStream(urlInputStream);
         } catch (IOException e) {
             //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.debug("Erreur HTTP : " + e.getMessage());
+            logger.debug("Error during creation of ImageInputStream", e);
             return null;
-            //throw e;
         }
         try {
-            final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+            final Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
             if (readers.hasNext()) {
                 ImageReader reader = readers.next();
                 try {
-                    reader.setInput(in);
+                    reader.setInput(imageInputStream);
                     cover.setHeight(reader.getHeight(0));
                     cover.setWidth(reader.getWidth(0));
                 } catch (IOException e) {
@@ -45,8 +45,8 @@ public class ImageUtils {
                 }
             }
         } finally {
-            if (in != null) try {
-                in.close();
+            if (imageInputStream != null) try {
+                imageInputStream.close();
             } catch (IOException e) {
                 //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 logger.debug("Erreur HTTP : " + e.getMessage());
