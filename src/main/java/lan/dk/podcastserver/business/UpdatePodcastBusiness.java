@@ -116,7 +116,7 @@ public class UpdatePodcastBusiness  {
             try {
                 String currentPodcastSignature = podcastAndItems.getKey();
                 Pair<Podcast, Set<Item>> returnPaired = podcastAndItems.getValue().get(5, TimeUnit.MINUTES);
-                if (!StringUtils.equals(currentPodcastSignature, returnPaired.getKey().getSignature())) {
+                if (!StringUtils.isEmpty(returnPaired.getKey().getSignature()) && !StringUtils.equals(currentPodcastSignature, returnPaired.getKey().getSignature())) {
                     podcastBusiness.update(
                             attachNewItemsToPodcast(returnPaired.getKey(), returnPaired.getValue())
                     );
