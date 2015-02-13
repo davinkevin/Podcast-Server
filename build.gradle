@@ -1,0 +1,115 @@
+
+apply plugin: 'idea'
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply plugin: 'war'
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+
+group = 'lan.dk'
+version = '1.0-SNAPSHOT'
+
+description = """Podcast Server"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+sourceSets {
+    generated {
+        java {
+            srcDirs = ['src/generated/']
+        }
+    }
+}
+
+configurations {
+    querydslapt
+}
+
+
+repositories {
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+ext {
+    spring = "4.1.4.RELEASE"
+    springData = "1.7.1.RELEASE"
+    hibernate = "4.3.8.Final"
+    hibernateSearch = '5.0.1.Final'
+    jackson = "2.4.2"
+    slf4j = "1.7.1"
+    javaxServlet = "3.0.1"
+    mockito = "1.9.5"
+    queryDsl = "3.5.1"
+}
+dependencies {
+    compile group: 'org.springframework', name: 'spring-core', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-beans', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-tx', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-orm', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-web', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-webmvc', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-websocket', version:"$spring"
+    compile group: 'org.springframework', name: 'spring-messaging', version:"$spring"
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version:"$springData"
+    compile group: 'com.mysema.querydsl', name: 'querydsl-core', version:"$queryDsl"
+    compile group: 'com.mysema.querydsl', name: 'querydsl-jpa', version:"$queryDsl"
+    compile group: 'org.hibernate', name: 'hibernate-core', version:"$hibernate"
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version:"$hibernate"
+    compile group: 'org.hibernate', name: 'hibernate-ehcache', version:"$hibernate"
+    compile group: 'org.hibernate', name: 'hibernate-search-orm', version:"$hibernateSearch"
+    compile group: 'org.jadira.usertype', name: 'usertype.extended', version:'3.2.0.GA'
+    compile group: 'javax.validation', name: 'validation-api', version:'1.1.0.Final'
+    compile group: 'org.hibernate', name: 'hibernate-validator', version:'5.0.3.Final'
+    compile group: 'com.zaxxer', name: 'HikariCP', version:'2.3.2'
+    compile group: 'com.h2database', name: 'h2', version:'1.3.176'
+    compile group: 'javax.servlet', name: 'jstl', version:'1.2'
+    compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:"$slf4j"
+    compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.1.1'
+    compile group: 'org.jdom', name: 'jdom2', version:'2.0.5'
+    compile group: 'org.apache.tika', name: 'tika-core', version:'1.7'
+    compile group: 'jaxen', name: 'jaxen', version:'1.1.4'
+    compile group: 'org.jsoup', name: 'jsoup', version:'1.7.3'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.1.2'
+    compile group: 'com.github.axet', name: 'vget', version:'1.1.5'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:"$jackson"
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version:"$jackson"
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version:"$jackson"
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-hibernate4', version:"$jackson"
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version:"$jackson"
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version:'1.1.1'
+    compile group: 'commons-io', name: 'commons-io', version:'2.4'
+    compile group: 'commons-fileupload', name: 'commons-fileupload', version:'1.3'
+    testCompile group: 'org.mockito', name: 'mockito-core', version:"$mockito"
+    testCompile group: 'org.springframework', name: 'spring-test', version:"$spring"
+    testCompile group: 'junit', name: 'junit', version:'4.11'
+    testCompile group: 'org.assertj', name: 'assertj-core', version:'1.7.1'
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:"$javaxServlet"
+    providedCompile group: 'javax.servlet.jsp', name: 'jsp-api', version:'2.1'
+    querydslapt group: 'com.mysema.querydsl', name: 'querydsl-apt', version:"$queryDsl"
+}
+
+task generateQueryDSL(type: JavaCompile, group: 'build', description: 'Generates the QueryDSL query types') {
+    source = sourceSets.main.java
+    classpath = configurations.compile + configurations.querydslapt
+    options.compilerArgs = ["-proc:only", "-processor", "com.mysema.query.apt.jpa.JPAAnnotationProcessor"]
+    destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
+}
+
+compileJava {
+    dependsOn generateQueryDSL
+    source generateQueryDSL.destinationDir
+}
+
+/* 
+    Gretty Configuration :
+    - http://akhikhl.github.io/gretty-doc/Gretty-configuration.html 
+    - http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html
+*/
+gretty {
+    // supported values:
+    // 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8'
+    servletContainer = 'tomcat8'
+    contextPath = '/'
+}
+
