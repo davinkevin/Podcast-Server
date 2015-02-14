@@ -3,6 +3,7 @@ package lan.dk.podcastserver.utils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,10 +17,11 @@ import java.net.URLConnection;
  * Created by kevin on 01/02/2014.
  */
 public class URLUtils {
-
+    
     private static final Logger logger = LoggerFactory.getLogger(SignatureUtils.class);
-    public static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
-    public static final String PROTOCOL_SEPARATOR = "://";
+    private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 5000;
+    private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
+    private static final String PROTOCOL_SEPARATOR = "://";
 
     public static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
         /* http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8 */
@@ -119,5 +121,13 @@ public class URLUtils {
         urlConnection.setReadTimeout(timeOutInMilli);
         urlConnection.setConnectTimeout(timeOutInMilli);
         return urlConnection;
+    }
+    
+    public static URLConnection getStreamWithTimeOut(String stringUrl) throws IOException {
+        return getStreamWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
+    }
+
+    public static String getAsciiURL(String url) {
+        return UriComponentsBuilder.fromHttpUrl(url).build().toUri().toASCIIString();
     }
 }

@@ -10,7 +10,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -21,9 +20,10 @@ import java.time.format.DateTimeFormatter;
 
 public class jDomUtils {
 
-    public static String SERVEUR_URL;
-    public static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
     private static Logger logger = LoggerFactory.getLogger(jDomUtils.class);
+
+    public static String SERVEUR_URL;
+    private static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
 
     @Deprecated
     public static Podcast getPodcastFromURL(URL url) {
@@ -46,13 +46,11 @@ public class jDomUtils {
 
     public static Document jdom2Parse(String urlasString) throws JDOMException, IOException {
         SAXBuilder sax = new SAXBuilder();
-        URL url;
         Document doc = null;
-        logger.debug("Debut Parsing");
+        logger.debug("Begin Parsing of {}", urlasString);
         try {
-            url = new URL(urlasString);
-            doc = sax.build(url);
-            logger.debug("Fin Parsing");
+            doc = sax.build(URLUtils.getStreamWithTimeOut(urlasString).getInputStream(), urlasString);
+            logger.debug("End Parsing of {}", urlasString);
         } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             throw e;
@@ -68,7 +66,7 @@ public class jDomUtils {
 
         Element channel = new Element("channel");
 
-        String coverUrl = getAsciiURL(podcast.getCover().getUrl());
+        String coverUrl = URLUtils.getAsciiURL(podcast.getCover().getUrl());
         
         Element title = new Element("title");
         title.addContent(new Text(podcast.getTitle()));
@@ -181,7 +179,7 @@ public class jDomUtils {
             
 
             Element thumbnail = new Element("thumbnail", mediaNS);
-            thumbnail.setAttribute("url", getAsciiURL(item.getCoverOfItemOrPodcast().getUrl()));
+            thumbnail.setAttribute("url", URLUtils.getAsciiURL(item.getCoverOfItemOrPodcast().getUrl()));
             xmlItem.addContent(thumbnail);
 
             channel.addContent(xmlItem);
@@ -203,9 +201,5 @@ public class jDomUtils {
 
         return null;
 
-    }
-
-    private static String getAsciiURL(String url) {
-        return UriComponentsBuilder.fromHttpUrl(url).build().toUri().toASCIIString();
     }
 }
