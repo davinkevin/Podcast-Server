@@ -24,6 +24,8 @@ public class jDomUtils {
 
     public static String SERVEUR_URL;
     private static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
+    public static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+    public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
     @Deprecated
     public static Podcast getPodcastFromURL(URL url) {
@@ -61,8 +63,6 @@ public class jDomUtils {
     }
 
     public static String podcastToXMLGeneric (Podcast podcast, String serveurURL) {
-        Namespace itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
-        Namespace mediaNS = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
         Element channel = new Element("channel");
 
@@ -80,10 +80,10 @@ public class jDomUtils {
         Element description = new Element("description");
         description.addContent(new Text(podcast.getDescription()));
 
-        Element itunesSub = new Element("subtitle", itunesNS);
+        Element itunesSub = new Element("subtitle", ITUNES_NAMESPACE);
         itunesSub.addContent(new Text(podcast.getDescription()));
 
-        Element itunesSummary = new Element("summary", itunesNS);
+        Element itunesSummary = new Element("summary", ITUNES_NAMESPACE);
         itunesSummary.addContent(new Text(podcast.getDescription()));
 
         Element language = new Element("language");
@@ -92,10 +92,10 @@ public class jDomUtils {
         //Element copyright = new Element("copyright");
         //copyright.addContent(new Text(podcast.getTitle()));
 
-        Element itunesAuthor = new Element("author", itunesNS);
+        Element itunesAuthor = new Element("author", ITUNES_NAMESPACE);
         itunesAuthor.addContent(new Text(podcast.getType()));
 
-        Element itunesCategory = new Element("category", itunesNS);
+        Element itunesCategory = new Element("category", ITUNES_NAMESPACE);
 
 
         channel.addContent(url);
@@ -110,7 +110,7 @@ public class jDomUtils {
         channel.addContent(itunesCategory);
 
 
-        Element itunesImage = new Element("image", itunesNS);
+        Element itunesImage = new Element("image", ITUNES_NAMESPACE);
         if (podcast.getCover() != null) {
             Element image = new Element("image");
             Element image_url = new Element("url");
@@ -161,15 +161,15 @@ public class jDomUtils {
             item_pubdate.addContent(new Text(item.getPubdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
             xmlItem.addContent(item_pubdate);
 
-            Element itunesExplicite = new Element("explicit", itunesNS);
+            Element itunesExplicite = new Element("explicit", ITUNES_NAMESPACE);
             itunesExplicite.addContent(new Text("No"));
             xmlItem.addContent(itunesExplicite);
 
-            Element itunesItemSub = new Element("subtitle", itunesNS);
+            Element itunesItemSub = new Element("subtitle", ITUNES_NAMESPACE);
             itunesItemSub.addContent(new Text(item.getTitle()));
             xmlItem.addContent(itunesItemSub);
 
-            Element itunesItemSummary = new Element("summary", itunesNS);
+            Element itunesItemSummary = new Element("summary", ITUNES_NAMESPACE);
             itunesItemSummary.addContent(new Text(item.getDescription()));
             xmlItem.addContent(itunesItemSummary);
 
@@ -178,7 +178,7 @@ public class jDomUtils {
             xmlItem.addContent(guid);
             
 
-            Element thumbnail = new Element("thumbnail", mediaNS);
+            Element thumbnail = new Element("thumbnail", MEDIA_NAMESPACE);
             thumbnail.setAttribute("url", URLUtils.getAsciiURL(item.getCoverOfItemOrPodcast().getUrl()));
             xmlItem.addContent(thumbnail);
 
@@ -186,8 +186,8 @@ public class jDomUtils {
         }
 
         Element rss = new Element("rss");
-        rss.addNamespaceDeclaration(itunesNS);
-        rss.addNamespaceDeclaration(mediaNS);
+        rss.addNamespaceDeclaration(ITUNES_NAMESPACE);
+        rss.addNamespaceDeclaration(MEDIA_NAMESPACE);
         rss.addContent(channel);
 
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
