@@ -469,7 +469,7 @@ module.run(['$templateCache', function($templateCache) {
     '                <option value>Tri</option>\n' +
     '                <option value="pertinence">Pertinence</option>\n' +
     '                <option value="pubdate">Date publication</option>\n' +
-    '                <option value="downloaddate">Date de download</option>\n' +
+    '                <option value="downloadDate">Date de download</option>\n' +
     '            </select>\n' +
     '        </div>\n' +
     '\n' +
