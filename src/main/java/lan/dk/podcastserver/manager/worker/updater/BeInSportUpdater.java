@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.URLUtils;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.jdom2.JDOMException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -14,6 +14,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ public class BeInSportUpdater extends AbstractUpdater {
     public static Pattern IDBEINSPORT_PATTERN = Pattern.compile(".*/category/([^/]*)/.*");
     public static Pattern SUBSTRING_VIDEO_URL_PATTERN = Pattern.compile(".*/([0-9]*/.*)$");
 
-
+    @Resource JdomService jdomService;
 
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
@@ -107,7 +108,7 @@ public class BeInSportUpdater extends AbstractUpdater {
 
         org.jdom2.Document xmlEpisode = null;
         try {
-            xmlEpisode = jDomUtils.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(idItemBeInSport));
+            xmlEpisode = jdomService.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(idItemBeInSport));
         } catch (JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("JDOMException :", e);

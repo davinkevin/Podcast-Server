@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.SignatureUtils;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.time.*;
@@ -39,6 +40,8 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     public static final String IMG_LOCALISATION_THUMB = "http://img.jeuxvideo.fr/03E80232%s";
     public static final String IMG_DELIMITER = "006E0046";
 
+    @Resource JdomService jdomService;
+    
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
 
@@ -96,7 +99,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
         org.jdom2.Document xmlEpisode = null;
         try {
-            xmlEpisode = jDomUtils.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(String.valueOf(idJeuxVideoFr)));
+            xmlEpisode = jdomService.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(String.valueOf(idJeuxVideoFr)));
         } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return item;

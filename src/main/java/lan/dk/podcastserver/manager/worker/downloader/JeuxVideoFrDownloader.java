@@ -1,13 +1,14 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,8 @@ public class JeuxVideoFrDownloader extends HTTPDownloader {
     public static String XML_PREFIX_DESCRIPTOR_URL = "http://www.jeuxvideo.fr/api/tv/xml.php?player_generique=player_generique&id=%s";
     public static Pattern ID_JEUXVIDEOFR_PATTERN = Pattern.compile(".*-([0-9]*)\\..*");
 
+    @Resource JdomService jdomService;
+    
     public String jeuxVideoFrItemTempUrl = null;
 
     @Override
@@ -44,7 +47,7 @@ public class JeuxVideoFrDownloader extends HTTPDownloader {
 
         org.jdom2.Document xmlEpisode = null;
         try {
-            xmlEpisode = jDomUtils.jdom2Parse(String.format(XML_PREFIX_DESCRIPTOR_URL, idJeuxVideoFr));
+            xmlEpisode = jdomService.jdom2Parse(String.format(XML_PREFIX_DESCRIPTOR_URL, idJeuxVideoFr));
         } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return item;

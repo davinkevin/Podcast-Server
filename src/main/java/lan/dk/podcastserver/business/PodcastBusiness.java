@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.xml.JdomService;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FilenameUtils;
@@ -31,10 +32,14 @@ public class PodcastBusiness {
     public static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
     @Resource private PodcastServerParameters podcastServerParameters;
+    @Resource private JdomService jdomService;
+    
     @Resource private PodcastRepository podcastRepository;
+    
     @Resource private ItemBusiness itemBusiness;
     @Resource private TagBusiness tagBusiness;
     @Resource private CoverBusiness coverBusiness;
+
 
     //** Delegate du Repository **//
     public List<Podcast> findAll() {
@@ -107,7 +112,7 @@ public class PodcastBusiness {
 
     @Transactional(readOnly = true)
     public String getRss(int id) {
-        return this.findOne(id).toXML(podcastServerParameters.getServeurURL());
+        return jdomService.podcastToXMLGeneric(findOne(id));
     }
 
     @Transactional

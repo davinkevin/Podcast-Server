@@ -6,7 +6,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.URLUtils;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -15,6 +15,7 @@ import org.jdom2.Namespace;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -30,6 +31,8 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final String GDATA_USER_FEED = "https://gdata.youtube.com/feeds/api/users/";
     //private static final String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
 
+    @Resource JdomService jdomService;
+    
     public static ZonedDateTime fromYoutube(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
     }
@@ -59,7 +62,7 @@ public class YoutubeUpdater extends AbstractUpdater {
             logger.debug("URL = {}", realPodcastURl);
             Document podcastXMLSource;
             try {
-                podcastXMLSource = jDomUtils.jdom2Parse(realPodcastURl);
+                podcastXMLSource = jdomService.jdom2Parse(realPodcastURl);
                 Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
                 if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).size() == 0) {
@@ -114,7 +117,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         // Si l'image de présentation a changé :
         Document podcastXMLSource;
         try {
-            podcastXMLSource = jDomUtils.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl(), null));
+            podcastXMLSource = jdomService.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl(), null));
         } catch (JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return "";

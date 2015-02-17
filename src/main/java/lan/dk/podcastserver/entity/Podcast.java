@@ -3,7 +3,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
@@ -183,12 +183,6 @@ public class Podcast implements Serializable {
         result = 31 * result + (signature != null ? signature.hashCode() : 0);
         result = 31 * result + (lastUpdate != null ? lastUpdate.hashCode() : 0);
         return result;
-    }
-
-    /* XML Methods */
-    @Transient @JsonIgnore
-    public String toXML(String serveurURL) {
-        return jDomUtils.podcastToXMLGeneric(this, serveurURL);
     }
 
     @Transient @JsonIgnore

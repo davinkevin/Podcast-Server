@@ -75,6 +75,7 @@ public class CoverBusiness {
             return UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer())
                     .pathSegment(podcast.getTitle())
                     .pathSegment(fileName)
+                    .build()
                     .toUriString()
                     .replace(QUOTE_CHARACTER, QUOTE_HTML_REPLACEMENT);
         } catch (URISyntaxException | IOException e) {

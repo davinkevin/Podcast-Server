@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.URLUtils;
-import lan.dk.podcastserver.utils.jDomUtils;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Jsoup;
@@ -15,6 +15,7 @@ import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,7 +33,8 @@ import java.util.regex.Pattern;
 public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
-
+    @Resource JdomService jdomService;
+    
     public Podcast updateAndAddItems(Podcast podcast) {
 
         // Si le bean est valide :
@@ -225,7 +227,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         //currentEpisode.setTitle(episode.select("h4 a").first().text());
         org.jdom2.Document xmlAboutCurrentEpisode = null;
         try {
-            xmlAboutCurrentEpisode = jDomUtils.jdom2Parse("http://service.canal-plus.com/video/rest/getVideos/cplus/" + idCanalPlusVideo);
+            xmlAboutCurrentEpisode = jdomService.jdom2Parse("http://service.canal-plus.com/video/rest/getVideos/cplus/" + idCanalPlusVideo);
         } catch (IOException | JDOMException e) {
             logger.error("IOException | JDOMException :", e);
             return new Item();

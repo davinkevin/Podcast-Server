@@ -126,8 +126,4 @@ public class URLUtils {
     public static URLConnection getStreamWithTimeOut(String stringUrl) throws IOException {
         return getStreamWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
     }
-
-    public static String getAsciiURL(String url) {
-        return UriComponentsBuilder.fromHttpUrl(url).build().toUri().toASCIIString();
-    }
 }
