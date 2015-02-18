@@ -2,10 +2,9 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.SignatureUtils;
-import lan.dk.podcastserver.utils.URLUtils;
 import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.URLUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -167,7 +166,7 @@ public class BeInSportUpdater extends AbstractUpdater {
 
         if (!listingUrl.equals("")) {
             logger.debug("URL de signature : {}", listingUrl);
-            return SignatureUtils.generateSignatureFromURL(podcast.getUrl());
+            return signatureService.generateSignatureFromURL(podcast.getUrl());
         } else {
             return "";
         }

@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -91,7 +90,7 @@ public class ParleysUpdater extends AbstractUpdater {
             JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
             podcastRepresentation.remove("completedIn");
             podcastRepresentation.remove("results");
-            return SignatureUtils.generateMD5SignatureFromDOM(podcastRepresentation.toJSONString());
+            return signatureService.generateMD5SignatureFromDOM(podcastRepresentation.toJSONString());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }

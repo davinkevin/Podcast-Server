@@ -2,9 +2,8 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.SignatureUtils;
 import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.utils.ImageUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -122,7 +121,7 @@ public class RSSUpdater extends AbstractUpdater {
 
     @Override
     public String generateSignature(Podcast podcast) {
-        return SignatureUtils.generateSignatureFromURL(podcast.getUrl());
+        return signatureService.generateSignatureFromURL(podcast.getUrl());
     }
 
 

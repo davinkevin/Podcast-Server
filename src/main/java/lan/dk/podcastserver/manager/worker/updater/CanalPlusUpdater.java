@@ -2,10 +2,9 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.SignatureUtils;
-import lan.dk.podcastserver.utils.URLUtils;
 import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Jsoup;
@@ -103,19 +102,19 @@ public class CanalPlusUpdater extends AbstractUpdater {
         // Si la page possède un planifier :
         if (page != null) {
             if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-                return SignatureUtils.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
+                return signatureService.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
             }
         }
 
 
         // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
         if (!podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return SignatureUtils.generateSignatureFromURL(this.getPodcastURLFromFrontTools(podcast.getUrl()));
+            return signatureService.generateSignatureFromURL(this.getPodcastURLFromFrontTools(podcast.getUrl()));
         }
 
         // Si l'url est une front-tools et que la liste est encore vide :
         if (podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return SignatureUtils.generateSignatureFromURL(podcast.getUrl());
+            return signatureService.generateSignatureFromURL(podcast.getUrl());
         }
         return "";
     }

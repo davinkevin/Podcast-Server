@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.SignatureUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -93,7 +92,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
     public String generateSignature(Podcast podcast) {
         try {
             Document page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
-            return SignatureUtils.generateMD5SignatureFromDOM(page.select("article").html());
+            return signatureService.generateMD5SignatureFromDOM(page.select("article").html());
         } catch (IOException e) {
             logger.error("IOException :", e);
         }

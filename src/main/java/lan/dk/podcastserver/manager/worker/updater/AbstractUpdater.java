@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.signature.SignatureService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,6 +24,7 @@ public abstract class AbstractUpdater implements Updater {
     protected final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0";
 
     @Resource PodcastServerParameters podcastServerParameters;
+    @Resource SignatureService signatureService;
     @Resource(name="Validator") Validator validator;
 
     public Pair<Podcast, Set<Item>> update(Podcast podcast) {

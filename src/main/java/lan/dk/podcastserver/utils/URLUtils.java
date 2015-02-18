@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.utils;
 
+import lan.dk.podcastserver.service.signature.SignatureService;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.net.URLConnection;
  */
 public class URLUtils {
     
-    private static final Logger logger = LoggerFactory.getLogger(SignatureUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SignatureService.class);
     private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 5000;
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
