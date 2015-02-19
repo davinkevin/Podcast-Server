@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.service.WorkerService;
 import org.apache.commons.lang3.StringUtils;
@@ -147,7 +148,7 @@ public class UpdatePodcastBusiness  {
             try {
                 Files.deleteIfExists(fileToDelete);
                 itemBusiness.save(
-                        item.setStatus("Deleted")
+                        item.setStatus(Status.DELETED)
                             .setFileName(null)
                 );
             } catch (IOException e) {
@@ -176,8 +177,8 @@ public class UpdatePodcastBusiness  {
     public void resetItemWithIncorrectState() {
         logger.debug("Reset des Started et Paused");
 
-        for (Item item : itemBusiness.findByStatus("Started", "Paused")) {
-            itemBusiness.save(item.setStatus("Not Downloaded"));
+        for (Item item : itemBusiness.findByStatus(Status.STARTED, Status.PAUSED)) {
+            itemBusiness.save(item.setStatus(Status.NOT_DOWNLOADED));
         }
     }
 

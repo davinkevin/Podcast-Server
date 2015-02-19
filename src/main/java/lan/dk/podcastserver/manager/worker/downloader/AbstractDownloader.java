@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
@@ -56,7 +57,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void startDownload() {
-        this.item.setStatus("Started");
+        this.item.setStatus(Status.STARTED);
         stopDownloading.set(false);
         this.saveSyncWithPodcast();
         this.convertAndSaveBroadcast();
@@ -65,7 +66,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void pauseDownload() {
-        this.item.setStatus("Paused");
+        this.item.setStatus(Status.PAUSED);
         stopDownloading.set(true);
         this.saveSyncWithPodcast();
         this.convertAndSaveBroadcast();
@@ -73,7 +74,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void stopDownload() {
-        this.item.setStatus("Stopped");
+        this.item.setStatus(Status.STOPPED);
         stopDownloading.set(true);
         this.saveSyncWithPodcast();
         itemDownloadManager.removeACurrentDownload(item);
@@ -87,7 +88,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void finishDownload() {
         itemDownloadManager.removeACurrentDownload(item);
         if (target != null) {
-            this.item.setStatus("Finish");
+            this.item.setStatus(Status.FINISH);
             try {
 
                 if (target.getAbsolutePath().contains(temporaryExtension)) { // Si contient l'extention temporaire.
@@ -124,9 +125,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     public void resetDownload() {
         this.stopDownload();
-        //item.setStatus("Not Downloaded").setProgression(0);
-        //itemService.save(item);
-        //itemDownloadManager.addItemToQueue(item);
     }
 
     @Transactional

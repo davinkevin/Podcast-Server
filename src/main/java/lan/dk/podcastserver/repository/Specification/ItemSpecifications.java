@@ -3,6 +3,7 @@ package lan.dk.podcastserver.repository.specification;
 import com.mysema.query.types.Predicate;
 import com.mysema.query.types.expr.BooleanExpression;
 import lan.dk.podcastserver.entity.QItem;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 
 import java.time.ZonedDateTime;
@@ -17,9 +18,9 @@ public class ItemSpecifications {
         QItem item = QItem.item;
 
         if (downloaded)
-            return item.status.eq("Finish");
+            return item.status.eq(Status.FINISH.value());
 
-        return item.status.isNull().or(item.status.eq("Not Downloaded"));
+        return item.status.isNull().or(item.status.eq(Status.NOT_DOWNLOADED.value()));
     }
 
     public static BooleanExpression isNewerThan(ZonedDateTime dateTime){
@@ -70,7 +71,7 @@ public class ItemSpecifications {
         return tagsPredicate;
     }
 
-    public static BooleanExpression hasStatus(final String... statuses) {
+    public static BooleanExpression hasStatus(final Status... statuses) {
         if (statuses.length == 0)
             return null;
 
@@ -78,11 +79,11 @@ public class ItemSpecifications {
 
         BooleanExpression statusPredicate = null;
 
-        for (String status : statuses) {
+        for (Status status : statuses) {
             statusPredicate =
                     (statusPredicate == null)
-                        ? item.status.eq(status)
-                        : statusPredicate.or(item.status.eq(status));
+                        ? item.status.eq(status.value())
+                        : statusPredicate.or(item.status.eq(status.value()));
         }
 
         return statusPredicate;

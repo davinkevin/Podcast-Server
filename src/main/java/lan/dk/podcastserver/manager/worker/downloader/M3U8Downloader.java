@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
@@ -71,9 +72,9 @@ public class M3U8Downloader extends AbstractDownloader {
 
 
                                 if (stopDownloading.get()) {
-                                    if (item.getStatus().equals("Stopped")) {
+                                    if (Status.STOPPED.is(item.getStatus())) {
                                         break;
-                                    } else if (item.getStatus().equals("Paused")) {
+                                    } else if (Status.PAUSED.is(item.getStatus())) {
 
                                         synchronized(this)
                                         {
@@ -83,7 +84,7 @@ public class M3U8Downloader extends AbstractDownloader {
                                 }
                             }
 
-                            if (item.getStatus().equals("Started")) {
+                            if (Status.STARTED.is(item.getStatus())) {
                                 finishDownload();
                             }
                         } catch (IOException | InterruptedException e) {
@@ -142,7 +143,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public void startDownload() {
-        this.item.setStatus("Started");
+        this.item.setStatus(Status.STARTED);
         stopDownloading.set(false);
         this.saveSyncWithPodcast();
         convertAndSaveBroadcast();

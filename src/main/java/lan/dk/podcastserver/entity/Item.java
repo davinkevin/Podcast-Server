@@ -30,10 +30,9 @@ public class Item implements Serializable {
 
     public static Path rootFolder;
     public static String fileContainer;
-    
-    private static final String STATUS_NOT_DOWNLOADED = "Not Downloaded";
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
-    
+
+
     private Integer id;
     private String title;
     private String url;
@@ -47,7 +46,7 @@ public class Item implements Serializable {
     private String fileName;
 
     /* Value for the Download */
-    private String status = STATUS_NOT_DOWNLOADED;
+    private Status status = Status.NOT_DOWNLOADED;
     private Integer progression = 0;
     private ZonedDateTime downloadDate;
     private Integer numberOfTry = 0;
@@ -135,14 +134,21 @@ public class Item implements Serializable {
     @Basic
     @Column(name = "status")
     public String getStatus() {
-        return status;
+        return status.value();
     }
 
+    @JsonProperty("status")
     public Item setStatus(String status) {
+        setStatus(Status.byValue(status));
+        return this;
+    }
+    
+    @JsonIgnore
+    public Item setStatus(Status status) {
         this.status = status;
         return this;
     }
-
+    
     @Basic
     public String getFileName() {
         return fileName;
@@ -336,7 +342,7 @@ public class Item implements Serializable {
     @Transient @JsonIgnore
     public Item reset() {
         preRemove();
-        setStatus(STATUS_NOT_DOWNLOADED);
+        setStatus(Status.NOT_DOWNLOADED);
         downloadDate = null;
         fileName = null;
         return this;

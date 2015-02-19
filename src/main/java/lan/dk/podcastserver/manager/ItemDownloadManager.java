@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager;
 
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
@@ -93,7 +94,7 @@ public class ItemDownloadManager {
 
             while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
                 currentItem = this.getWaitingQueue().poll();
-                if ( !"Started".equals(currentItem.getStatus()) && !"Finish".equals(currentItem.getStatus()) ) {
+                if ( !Status.STARTED.is(currentItem.getStatus()) && !Status.FINISH.is(currentItem.getStatus()) ) {
                      getDownloaderByTypeAndRun(currentItem);
                 }
             }
@@ -126,7 +127,7 @@ public class ItemDownloadManager {
     public void restartAllDownload() {
         downloadingQueue.values()
                 .stream()
-                .filter(downloader -> downloader.getItem().getStatus().equals("Paused"))
+                .filter(downloader -> Status.PAUSED.is(downloader.getItem().getStatus()))
                 .forEach(downloader -> getDownloaderByTypeAndRun(downloader.getItem()));
     }
 
@@ -146,10 +147,10 @@ public class ItemDownloadManager {
 
     public void toogleDownload(int id) {
         Item item = getItemInDownloadingQueue(id);
-        if (item.getStatus().equals("Paused")) {
+        if (Status.PAUSED.is(item.getStatus())) {
             logger.debug("restart du download");
             restartDownload(id);
-        } else if (item.getStatus().equals("Started")) {
+        } else if (Status.STARTED.is(item.getStatus())) {
             logger.debug("pause du download");
             pauseDownload(id);
         }
@@ -157,7 +158,6 @@ public class ItemDownloadManager {
 
     public void addItemToQueue(int id) {
         this.addItemToQueue(itemBusiness.findOne(id));
-        //this.convertAndSendWaitingQueue();
     }
 
     public void addItemToQueue(Item item) {
@@ -174,7 +174,7 @@ public class ItemDownloadManager {
         this.removeItemFromQueue(item);
 
         if (stopItem)
-            itemBusiness.save(item.setStatus("Stopped"));
+            itemBusiness.save(item.setStatus(Status.STOPPED));
 
         this.convertAndSendWaitingQueue();
     }

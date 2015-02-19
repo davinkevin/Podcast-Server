@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Status;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -81,7 +82,7 @@ public class RTMPDownloader extends AbstractDownloader {
                             e.printStackTrace();
                             logger.error("IOException :", e);
                         }
-                        if (!item.getStatus().equals("Finish") && !stopDownloading.get()) {
+                        if (!Status.FINISH.is(item.getStatus()) && !stopDownloading.get()) {
                             logger.debug("Terminaison innatendu, reset du downloader");
                             resetDownload();
                         }
@@ -117,7 +118,7 @@ public class RTMPDownloader extends AbstractDownloader {
     @Override
     public void startDownload() {
         stopDownloading.set(false);
-        this.item.setStatus("Started");
+        this.item.setStatus(Status.STARTED);
         this.saveSyncWithPodcast();
         if (pid != 0 && p != null) { //Relancement du process UNIX
             //ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
@@ -139,14 +140,10 @@ public class RTMPDownloader extends AbstractDownloader {
             logger.error("IOException :", e);
             this.stopDownload();
         }
-
-        //stopDownloading.set(true);
-        //this.item.setStatus("Paused");
     }
 
     @Override
     public void stopDownload() {
-        //ProcessBuilder pb = new ProcessBuilder("kill", "-2", "" + pid);
         try {
             p.destroy();
         } finally {

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.xml.JdomService;
@@ -146,7 +147,7 @@ public class PodcastBusiness {
             .setFileName(name)
             .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
             .setPodcast(podcast)
-            .setStatus("Finish");
+            .setStatus(Status.FINISH);
 
         podcast.getItems().add(item);
         podcast.setLastUpdate(ZonedDateTime.now());

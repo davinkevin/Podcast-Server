@@ -3,13 +3,14 @@ package lan.dk.podcastserver.business;
 import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.specification.ItemSpecifications;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
 import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -127,7 +128,7 @@ public class ItemBusiness {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Iterable<Item> findByStatus(String... status) {
+    public Iterable<Item> findByStatus(Status... status) {
         return itemRepository.findAll(hasStatus(status));
     }
 
@@ -215,7 +216,7 @@ public class ItemBusiness {
                 .setFileName(uploadedFile.getOriginalFilename())
                 .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
                 .setPodcast(podcast)
-                .setStatus("Finish");
+                .setStatus(Status.FINISH);
 
         podcast.getItems().add(item);
         podcast.setLastUpdate(ZonedDateTime.now());
