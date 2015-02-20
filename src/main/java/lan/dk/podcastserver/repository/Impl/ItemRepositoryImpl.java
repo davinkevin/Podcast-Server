@@ -35,7 +35,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .cacheMode(CacheMode.NORMAL)
                 .idFetchSize(150)
                 .threadsToLoadObjects(1)
-                .progressMonitor(new SimpleIndexingProgressMonitor(100))
+                .progressMonitor(new SimpleIndexingProgressMonitor(1000))
                 .startAndWait();
     }
 
