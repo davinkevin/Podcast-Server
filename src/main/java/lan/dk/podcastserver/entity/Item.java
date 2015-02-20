@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
+import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -88,7 +89,8 @@ public class Item implements Serializable {
     }
    
 
-    @Basic @Field @Column(name = "title")
+    @Basic @Column(name = "title")
+    @Field @Boost(2.0F)
     public String getTitle() {
         return title;
     }
