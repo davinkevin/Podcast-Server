@@ -1,6 +1,5 @@
 
 apply plugin: 'idea'
-
 apply plugin: 'java'
 apply plugin: 'maven'
 
@@ -30,16 +29,18 @@ configurations {
 
 repositories {
      maven { url "http://repo.maven.apache.org/maven2" }
+     maven { url 'http://repo.spring.io/snapshot' }
 }
+
 ext {
     spring = "4.1.4.RELEASE"
-    springData = "1.7.1.RELEASE"
+    springData = "1.7.2.RELEASE"
     hibernate = "4.3.8.Final"
     hibernateSearch = '5.0.1.Final'
-    jackson = "2.4.2"
-    slf4j = "1.7.1"
+    jackson = "2.5.1"
+    slf4j = "1.7.10"
+    mockito = "1.10.19"
     javaxServlet = "3.0.1"
-    mockito = "1.9.5"
     queryDsl = "3.5.1"
 }
 dependencies {
