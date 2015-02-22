@@ -1,9 +1,3 @@
-angular.module('ps.common', [
-    'ps.filters',
-    'navbar',
-    'authorize-notification',
-    'device-detection'
-]);
 angular.module('podcastApp', [
     'ps.search',
     'ps.podcast',
@@ -15,18 +9,11 @@ angular.module('podcastApp', [
     'ps.config',
     'ps.partial'
 ]);
-angular.module('ps.search', [
-    'ps.search.item'
-]);
-
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module('ps.podcast', [
-    'ps.podcast.details',
-    'ps.podcast.creation',
-    'ps.podcast.list'
+angular.module('ps.common', [
+    'ps.filters',
+    'navbar',
+    'authorize-notification',
+    'device-detection'
 ]);
 angular.module('authorize-notification', [
     'notification'
@@ -58,16 +45,14 @@ angular.module('authorize-notification', [
 });
 
 /**
- * Created by kevin on 02/11/14.
+ * Created by kevin on 01/11/14.
  */
 
-angular.module('ps.dataservice', [
-    'ps.dataService.donwloadManager',
-    'ps.dataService.item',
-    'ps.dataService.podcast',
-    'ps.dataService.tag'
+angular.module('ps.podcast', [
+    'ps.podcast.details',
+    'ps.podcast.creation',
+    'ps.podcast.list'
 ]);
-
 angular.module('device-detection', [])
     .factory('deviceDetectorService', function deviceDetectorService($window) {
         return {
@@ -78,6 +63,10 @@ angular.module('device-detection', [])
             return 'ontouchstart' in $window;
         }
     });
+angular.module('ps.search', [
+    'ps.search.item'
+]);
+
 angular.module('ps.filters', [])
     .filter('htmlToPlaintext', function () {
         return function(text) {
@@ -85,6 +74,16 @@ angular.module('ps.filters', [])
         };
     }
 );
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module('ps.dataservice', [
+    'ps.dataService.donwloadManager',
+    'ps.dataService.item',
+    'ps.dataService.podcast',
+    'ps.dataService.tag'
+]);
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -121,6 +120,7 @@ _.mixin({
         return localArray;
     }
 });
+
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -138,6 +138,81 @@ angular.module('navbar', [
         vm.navCollapsed = true;
     });
 
+angular.module('ps.config', [
+    'ps.config.route',
+    'ps.config.loading',
+    'ps.config.restangular',
+    'ps.config.ngstomp',
+    'ps.config.module'
+]);
+angular.module('ps.config.loading', [
+    'angular-loading-bar'
+])
+    .config(function (cfpLoadingBarProvider) {
+        cfpLoadingBarProvider.includeSpinner = false;
+    });
+angular.module('ps.config.module', [
+    'ngTouch',
+    'ngAnimate',
+    'ui.bootstrap',
+    'truncate'
+]);
+angular.module('ps.config.ngstomp', [
+    'AngularStompDK'
+])
+    .config(function(ngstompProvider){
+        ngstompProvider
+            .url('/ws')
+            .credential('login', 'password')
+            .class(SockJS);
+    });
+angular.module('ps.config.restangular', [
+    'restangular'
+])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api/');
+
+        RestangularProvider.addElementTransformer('items', false, function(item) {
+            item.addRestangularMethod('reset', 'get', 'reset');
+            item.addRestangularMethod('download', 'get', 'addtoqueue');
+            return item;
+        });
+    });
+angular.module('ps.config.route', [
+    'ngRoute',
+    'cfp.hotkeys'
+])
+    .constant('commonKey', [
+        ['h', 'Goto Home', function (event) {
+            event.preventDefault();
+            window.location.href = '#/items';
+        }],
+        ['s', 'Goto Search', function (event) {
+            event.preventDefault();
+            window.location.href = '#/item/search';
+        }],
+        ['p', 'Goto Podcast List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/podcasts';
+        }],
+        ['d', 'Goto Download List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/download';
+        }]
+    ])
+    .config(function($routeProvider, commonKey) {
+        /*$routeProvider.
+            when('/podcast/add', {
+                templateUrl: 'html/podcast-add.html',
+                controller: 'PodcastAddCtrl',
+                hotkeys: commonKey
+            });*/
+        
+        $routeProvider.
+            otherwise({
+                redirectTo: '/items'
+            });
+    });
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -959,81 +1034,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-angular.module('ps.config', [
-    'ps.config.route',
-    'ps.config.loading',
-    'ps.config.restangular',
-    'ps.config.ngstomp',
-    'ps.config.module'
-]);
-angular.module('ps.config.loading', [
-    'angular-loading-bar'
-])
-    .config(function (cfpLoadingBarProvider) {
-        cfpLoadingBarProvider.includeSpinner = false;
-    });
-angular.module('ps.config.module', [
-    'ngTouch',
-    'ngAnimate',
-    'ui.bootstrap',
-    'truncate'
-]);
-angular.module('ps.config.ngstomp', [
-    'AngularStompDK'
-])
-    .config(function(ngstompProvider){
-        ngstompProvider
-            .url('/ws')
-            .credential('login', 'password')
-            .class(SockJS);
-    });
-angular.module('ps.config.restangular', [
-    'restangular'
-])
-    .config(function(RestangularProvider) {
-        RestangularProvider.setBaseUrl('/api/');
-
-        RestangularProvider.addElementTransformer('items', false, function(item) {
-            item.addRestangularMethod('reset', 'get', 'reset');
-            item.addRestangularMethod('download', 'get', 'addtoqueue');
-            return item;
-        });
-    });
-angular.module('ps.config.route', [
-    'ngRoute',
-    'cfp.hotkeys'
-])
-    .constant('commonKey', [
-        ['h', 'Goto Home', function (event) {
-            event.preventDefault();
-            window.location.href = '#/items';
-        }],
-        ['s', 'Goto Search', function (event) {
-            event.preventDefault();
-            window.location.href = '#/item/search';
-        }],
-        ['p', 'Goto Podcast List', function (event) {
-            event.preventDefault();
-            window.location.href = '#/podcasts';
-        }],
-        ['d', 'Goto Download List', function (event) {
-            event.preventDefault();
-            window.location.href = '#/download';
-        }]
-    ])
-    .config(function($routeProvider, commonKey) {
-        /*$routeProvider.
-            when('/podcast/add', {
-                templateUrl: 'html/podcast-add.html',
-                controller: 'PodcastAddCtrl',
-                hotkeys: commonKey
-            });*/
-        
-        $routeProvider.
-            otherwise({
-                redirectTo: '/items'
-            });
-    });
 angular.module('ps.download', [
     'ps.config.route',
     'ps.dataService.donwloadManager',
