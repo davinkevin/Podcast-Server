@@ -13,6 +13,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 
 @Component("WorkerService")
 public class WorkerService implements ApplicationContextAware {
@@ -75,7 +77,17 @@ public class WorkerService implements ApplicationContextAware {
             return null;
         }
         
-        // No other implementation yet : 
-        return context.getBean("RSSFinder", Finder.class);
+        String finderName = "RSS";
+        
+        if (isYoutubeUrl(url, "youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")) {
+            finderName = "Youtube";
+        }
+            
+        return context.getBean(finderName + "Finder", Finder.class);
+    }
+
+    private Boolean isYoutubeUrl(String url, String ... strings) {
+        return Arrays.stream(strings)
+                .anyMatch(url::contains);
     }
 }

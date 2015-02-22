@@ -53,8 +53,9 @@ public class Podcast implements Serializable {
         return type;
     }
 
-    public void setType(String type) {
+    public Podcast setType(String type) {
         this.type = type;
+        return this;
     }
 
     @Column(name = "title")
@@ -63,8 +64,9 @@ public class Podcast implements Serializable {
         return title;
     }
 
-    public void setTitle(String title) {
+    public Podcast setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     @Column(name = "url", length = 65535)
@@ -73,8 +75,9 @@ public class Podcast implements Serializable {
         return url;
     }
 
-    public void setUrl(String url) {
+    public Podcast setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     @Column(name = "signature")
@@ -124,8 +127,9 @@ public class Podcast implements Serializable {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Podcast setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     @Column(name = "hasToBeDeleted")
