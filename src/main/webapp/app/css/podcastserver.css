@@ -1,3 +1,5 @@
+.media-body,.media-left,.media-right{display:block}
+.media-body{width:auto}
 @media screen and (min-width:768px){.navbar-fixed-top{position:relative}}
 @media screen and (max-width:768px){body{padding-top:55px}}
 .img-grayscale{-webkit-filter:grayscale(100%);-moz-filter:grayscale(100%);-o-filter:grayscale(100%);-ms-filter:grayscale(100%);filter:grayscale(100%)}
