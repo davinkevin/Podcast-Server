@@ -58,6 +58,7 @@ gulp.task('js', function() {
 gulp.task('less', function () {
     gulp.src(lessLocation)
         .pipe(less())
+        .pipe(concat('podcastserver.css'))
         .pipe(minifyCSS({keepBreaks: true}))
         .pipe(gulp.dest(cssDestionation));
 });
