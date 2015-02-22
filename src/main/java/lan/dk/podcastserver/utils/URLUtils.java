@@ -19,7 +19,7 @@ import java.net.URLConnection;
 public class URLUtils {
     
     private static final Logger logger = LoggerFactory.getLogger(SignatureService.class);
-    private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 5000;
+    private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 10000;
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
 
