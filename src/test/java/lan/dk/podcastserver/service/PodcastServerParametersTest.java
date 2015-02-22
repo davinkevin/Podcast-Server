@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.podcastserver.context.ServiceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -14,13 +14,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PodcastServerParametersTest.PropertyConfig.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {PodcastServerParametersTest.PropertyConfig.class, ServiceConfig.class}, loader=AnnotationConfigContextLoader.class)
 public class PodcastServerParametersTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -46,10 +47,14 @@ public class PodcastServerParametersTest {
     
 
     @Configuration
-    @ComponentScan("lan.dk.podcastserver.service")
     @PropertySource(value = {"classpath:properties/podcastServerParameterService.properties"})
     public static class PropertyConfig {
 
+        @PostConstruct
+        public void setEnv() {
+            System.setProperty("catalina.home", "/tmp");
+        }
+        
         @Bean
         public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
             return new PropertySourcesPlaceholderConfigurer();

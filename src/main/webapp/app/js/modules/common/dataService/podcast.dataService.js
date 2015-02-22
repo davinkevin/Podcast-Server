@@ -4,7 +4,12 @@
 
 angular.module('ps.dataService.podcast', [
     'restangular'
-]).factory('podcastService', function (Restangular) {
+]).config(function(RestangularProvider) {
+    RestangularProvider.addElementTransformer('podcast', false, function(podcast) {
+        podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
+        return podcast;
+    });
+}).factory('podcastService', function (Restangular) {
     'use strict';
     var route = 'podcast';
 
@@ -14,7 +19,8 @@ angular.module('ps.dataService.podcast', [
         save        :   save,
         getNewPodcast : getNewPodcast,
         patch       :   patch,
-        deletePodcast : deletePodcast
+        deletePodcast : deletePodcast,
+        findInfo    :   findInfo
     };
 
     function findById(podcastId) {
@@ -39,5 +45,9 @@ angular.module('ps.dataService.podcast', [
     
     function deletePodcast(item) {
         return item.remove();
+    }
+    
+    function findInfo(url) {
+        return Restangular.one(route).findInfo(url);
     }
 });

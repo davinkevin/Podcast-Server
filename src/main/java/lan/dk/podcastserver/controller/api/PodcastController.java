@@ -1,7 +1,9 @@
 package lan.dk.podcastserver.controller.api;
 
+import lan.dk.podcastserver.business.FindPodcastBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ public class PodcastController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource private PodcastBusiness podcastBusiness;
+    @Resource private FindPodcastBusiness findPodcastBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {
@@ -82,5 +85,10 @@ public class PodcastController {
             logger.debug("You failed to upload {} because the file was empty.", name);
             return "You failed to upload " + name + " because the file was empty.";
         }
+    }
+
+    @RequestMapping(value="fetch", method = RequestMethod.POST)
+    public Podcast fetchPodcastInfoByUrl(@RequestBody String url) throws FindPodcastNotFoundException {
+        return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 }

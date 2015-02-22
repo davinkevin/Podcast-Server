@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.utils;
 
 import lan.dk.podcastserver.entity.Cover;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +18,14 @@ public class ImageUtils {
 
     private static Logger logger = LoggerFactory.getLogger(ImageUtils.class);
 
+    public static Cover getCoverFromURL(String url) throws IOException {
+        if (StringUtils.isEmpty(url))
+            return null;
+        
+        return getCoverFromURL(new URL(url));
+    }
+    
     public static Cover getCoverFromURL (URL url) throws IOException {
-
         Cover cover = new Cover(url.toString());
         ImageInputStream imageInputStream;
         try (InputStream urlInputStream = URLUtils.getStreamWithTimeOut(cover.getUrl(), 5000).getInputStream() ){

@@ -14,6 +14,15 @@ angular.module('ps.podcast.creation', [
     .controller('PodcastAddCtrl', function ($scope, $location, tagService, podcastService) {
         $scope.podcast = angular.extend(podcastService.getNewPodcast(), { hasToBeDeleted : true, cover : { height: 200, width: 200 } } );
 
+        $scope.findInfo = function() {
+            podcastService.findInfo($scope.podcast.url).then(function(podcastFetched) {
+                $scope.podcast.title = podcastFetched.title;
+                $scope.podcast.description = podcastFetched.description;
+                $scope.podcast.type = podcastFetched.type;
+                $scope.podcast.cover.url = podcastFetched.cover.url;
+            })
+        };
+        
         $scope.loadTags = function(query) {
             return tagService.search(query);
         };

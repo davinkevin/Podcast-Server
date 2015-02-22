@@ -3,7 +3,9 @@ package lan.dk.podcastserver.service;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.manager.worker.finder.Finder;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -67,7 +69,13 @@ public class WorkerService implements ApplicationContextAware {
         return null;
     }
 
-
-
-
+    public Finder getFinderByUrl(String url) {
+        
+        if (StringUtils.isEmpty(url)) {
+            return null;
+        }
+        
+        // No other implementation yet : 
+        return context.getBean("RSSFinder", Finder.class);
+    }
 }
