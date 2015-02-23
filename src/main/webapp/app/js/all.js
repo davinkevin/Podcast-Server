@@ -131,7 +131,10 @@ angular.module('navbar', [
             templateUrl : 'html/navbar.html',
             scope : true,
             controllerAs : 'navbar',
-            controller : 'navbarController'
+            controller : 'navbarController',
+            link : function(scope, element) {
+                element.removeClass('hidden');
+            }
         };
     }).controller('navbarController', function(){
         var vm = this;

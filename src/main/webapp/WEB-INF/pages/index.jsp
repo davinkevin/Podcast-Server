@@ -22,7 +22,7 @@
 
 </head>
 <body>
-<navbar>
+<navbar class="hidden">
     <li>
         <a href="#/podcasts">
             <span class="ionicons ion-social-rss">  </span>
