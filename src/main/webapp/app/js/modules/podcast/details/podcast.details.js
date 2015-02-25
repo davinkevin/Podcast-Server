@@ -17,8 +17,8 @@ angular.module('ps.podcast.details', [
                 ['m', 'Modification of Podcast', 'tabs[1].active = true']
             ].concat(commonKey),
             resolve : {
-                podcast : function (Restangular, $route) {
-                    return Restangular.one('podcast', $route.current.params.podcastId).get();
+                podcast : function (podcastService, $route) {
+                    return podcastService.findById($route.current.params.podcastId);
                 }
             }
         })    
