@@ -11,8 +11,9 @@ angular.module('ps.podcast.creation', [
                 hotkeys: commonKey
             });
     })
-    .controller('PodcastAddCtrl', function ($scope, $location, tagService, podcastService) {
-        $scope.podcast = angular.extend(podcastService.getNewPodcast(), { hasToBeDeleted : true, cover : { height: 200, width: 200 } } );
+    .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })
+    .controller('PodcastAddCtrl', function ($scope, $location, defaultPodcast, tagService, podcastService) {
+        $scope.podcast = angular.extend(podcastService.getNewPodcast(), defaultPodcast );
 
         $scope.findInfo = function() {
             podcastService.findInfo($scope.podcast.url).then(function(podcastFetched) {
