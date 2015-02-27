@@ -2,13 +2,13 @@
   "name": "Podcast Server",
   "version": "1.0.0",
   "dependencies": {
-    "angular": "1.3.13",
-    "angular-route": "1.3.13",
-    "angular-animate": "1.3.13",
-    "angular-sanitize": "1.3.13",
-    "angular-touch": "1.3.13",
+    "angular": "1.3.14",
+    "angular-route": "1.3.14",
+    "angular-animate": "1.3.14",
+    "angular-sanitize": "1.3.14",
+    "angular-touch": "1.3.14",
     "bootstrap": "~3.3.2",
-    "angular-bootstrap": "~0.12.0",
+    "angular-bootstrap": "~0.12.1",
     "restangular": "~1.4.0",
     "AngularStompDK": "~0.1.0",
     "stomp-websocket": "~2.3.0",
@@ -31,8 +31,8 @@
     "components-font-awesome": "~4.3.0"
   },
   "resolutions": {
-    "angular": "1.3.13",
-    "angular-sanitize": "1.3.13"
+    "angular": "1.3.14",
+    "angular-sanitize": "1.3.14"
   },
   "overrides": {
     "jquery": {
