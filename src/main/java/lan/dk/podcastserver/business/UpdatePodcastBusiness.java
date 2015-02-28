@@ -159,6 +159,9 @@ public class UpdatePodcastBusiness  {
 
     public Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items) {
         
+        if (items == null || items.isEmpty() )
+            return podcast;
+        
         items.stream()
                 .filter(item -> !podcast.getItems().contains(item))
                 .map(item -> item.setPodcast(podcast))
