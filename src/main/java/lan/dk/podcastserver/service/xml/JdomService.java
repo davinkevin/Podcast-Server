@@ -55,8 +55,8 @@ public class JdomService {
     private static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
     private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     
-    // Sax Parser : 
-    private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
+    // Sax Parser not used in final stage, because it is not thread-safe...:
+    /*private static final SAXBuilder SAX_BUILDER = new SAXBuilder();*/
     
     // URL Format
     private static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
@@ -67,10 +67,10 @@ public class JdomService {
         Document doc;
         try {
             logger.debug("Begin Parsing of {}", urlasString);
-            doc = SAX_BUILDER.build(URLUtils.getStreamWithTimeOut(urlasString).getInputStream(), urlasString);
+            doc = new SAXBuilder().build(URLUtils.getStreamWithTimeOut(urlasString).getInputStream(), urlasString);
             logger.debug("End Parsing of {}", urlasString);
         } catch (JDOMException | IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("Error during parsin of {}", urlasString, e);
             throw e;
         }
 
