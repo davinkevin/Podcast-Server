@@ -10,11 +10,12 @@ angular.module('ps.podcast.details', [
         when('/podcast/:podcastId', {
             templateUrl: 'html/podcast-detail.html',
             controller: 'PodcastDetailCtrl',
+            controllerAs: 'pdc',
             hotkeys: [
-                ['r', 'Refresh', 'refreshItems()'],
-                ['f', 'Force Refresh', 'refresh()'],
-                ['l', 'List of Items', 'tabs[0].active = true'],
-                ['m', 'Modification of Podcast', 'tabs[1].active = true']
+                ['r', 'Refresh', 'pdc.refreshItems()'],
+                ['f', 'Force Refresh', 'pdc.refresh()'],
+                ['l', 'List of Items', 'pdc.podcastTabs[0].active = true'],
+                ['m', 'Modification of Podcast', 'pdc.podcastTabs[1].active = true']
             ].concat(commonKey),
             resolve : {
                 podcast : function (podcastService, $route) {
@@ -23,18 +24,24 @@ angular.module('ps.podcast.details', [
             }
         })    
 })
-    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
+    .controller('PodcastDetailCtrl', function ($scope, podcast, Restangular) {
+        var vm = this;
+        
+        vm.podcast = podcast;
+        vm.podcastTabs= [
+            { heading : 'Episodes', active : true},
+            { heading : 'Edition', active : false},
+            { heading : 'Upload', disabled : podcast.type !== 'send'}
+        ];
 
-        $scope.podcast = podcast;
-
-        function refreshItems () {
+        vm.refreshItems = function() {
             $scope.$broadcast('podcastItems:refresh');
-        }
-
-        $scope.refresh = function () {
-            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
         };
-        $scope.$on("podcastEdition:save", refreshItems);
+        
+        vm.refresh = function () {
+            Restangular.one("task").customPOST(vm.podcast.id, "updateManager/updatePodcast/force")
+                .then(vm.refreshItems);
+        };
 
+        $scope.$on("podcastEdition:save", vm.refreshItems);
     });

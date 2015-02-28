@@ -203,14 +203,7 @@ angular.module('ps.config.route', [
             window.location.href = '#/download';
         }]
     ])
-    .config(function($routeProvider, commonKey) {
-        /*$routeProvider.
-            when('/podcast/add', {
-                templateUrl: 'html/podcast-add.html',
-                controller: 'PodcastAddCtrl',
-                hotkeys: commonKey
-            });*/
-        
+    .config(function($routeProvider) {
         $routeProvider.
             otherwise({
                 redirectTo: '/items'
@@ -761,55 +754,36 @@ module.run(['$templateCache', function($templateCache) {
     '    <br/>\n' +
     '    <ol class="breadcrumb">\n' +
     '        <li><a href="/#/podcasts">Podcasts</a></li>\n' +
-    '        <li><a class="active"> {{ podcast.title }}</a></li>\n' +
+    '        <li><a class="active"> {{ pdc.podcast.title }}</a></li>\n' +
     '    </ol>\n' +
     '\n' +
     '    <div>\n' +
-    '        <div class="jumbotron podcast-details-header" ng-style="{ \'background-image\' : \'url(\\\'\'+ podcast.cover.url + \'\\\')\'}">\n' +
+    '        <div class="jumbotron podcast-details-header" ng-style="{ \'background-image\' : \'url(\\\'\'+ pdc.podcast.cover.url + \'\\\')\'}">\n' +
     '            <div class="information-area">\n' +
     '                <div class="information-text">\n' +
-    '                    <h3><strong>{{ podcast.title }}</strong></h3>\n' +
-    '                    <p>{{ podcast.totalItems }} Episodes</p>\n' +
+    '                    <h3><strong>{{ pdc.podcast.title }}</strong></h3>\n' +
+    '                    <p>{{ pdc.podcast.totalItems }} Episodes</p>\n' +
     '                </div>\n' +
     '                <div class="action-button pull-right">\n' +
-    '                    <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>\n' +
-    '                    <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank"><span class="ionicons ion-social-rss"></a>\n' +
+    '                    <button ng-click="pdc.refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>\n' +
+    '                    <a type="button" class="btn btn-default" ng-href="/api/podcast/{{ pdc.podcast.id }}/rss" target="_blank"><span class="ionicons ion-social-rss"></span></a>\n' +
     '                </div>\n' +
     '            </div>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '<br/>\n' +
     '\n' +
-    '\n' +
-    '<!--<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">\n' +
-    '    <div class="thumbnail">\n' +
-    '        <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">\n' +
-    '        <div class="caption">\n' +
-    '            <h5 class="text-center "><strong>{{ podcast.title }}</strong></h5>\n' +
-    '            <p class="text-center">Nombre d\'épisode : {{ podcast.totalItems }}</p>\n' +
-    '            <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12 text-center">\n' +
-    '                <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>\n' +
-    '                <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank">RSS</a>\n' +
-    '            </div>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>-->\n' +
     '<div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">\n' +
     '\n' +
     '    <tabset>\n' +
-    '        <!--\n' +
-    '        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">\n' +
-    '            <ng-include src="tab.templateUrl" ></ng-include>\n' +
+    '        <tab heading="{{ pdc.podcastTabs[0].heading }}" active="pdc.podcastTabs[0].active" >\n' +
+    '            <podcast-items-list podcast="pdc.podcast"></podcast-items-list>\n' +
     '        </tab>\n' +
-    '        -->\n' +
-    '        <tab heading="Episodes" active="tab.active" disabled="tab.disabled">\n' +
-    '            <podcast-items-list podcast="podcast"></podcast-items-list>\n' +
+    '        <tab heading="{{ pdc.podcastTabs[1].heading }}" active="pdc.podcastTabs[1].active" >\n' +
+    '            <podcast-edition podcast="pdc.podcast"></podcast-edition>\n' +
     '        </tab>\n' +
-    '        <tab heading="Edition">\n' +
-    '            <podcast-edition podcast="podcast"></podcast-edition>\n' +
-    '        </tab>\n' +
-    '        <tab heading="Upload" ng-show="podcast.type == \'send\'">\n' +
-    '            <podcast-upload podcast="podcast"></podcast-upload>\n' +
+    '        <tab heading="{{ pdc.podcastTabs[2].heading }}" ng-show="pdc.podcast.type === \'send\'" active="pdc.podcastTabs[2].active" disabled="pdc.podcastTabs[2].disabled">\n' +
+    '            <podcast-upload podcast="pdc.podcast"></podcast-upload>\n' +
     '        </tab>\n' +
     '    </tabset>\n' +
     '\n' +
@@ -1387,8 +1361,9 @@ angular.module('ps.podcast.creation', [
                 hotkeys: commonKey
             });
     })
-    .controller('PodcastAddCtrl', function ($scope, $location, tagService, podcastService) {
-        $scope.podcast = angular.extend(podcastService.getNewPodcast(), { hasToBeDeleted : true, cover : { height: 200, width: 200 } } );
+    .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })
+    .controller('PodcastAddCtrl', function ($scope, $location, defaultPodcast, tagService, podcastService) {
+        $scope.podcast = angular.extend(podcastService.getNewPodcast(), defaultPodcast );
 
         $scope.findInfo = function() {
             podcastService.findInfo($scope.podcast.url).then(function(podcastFetched) {
@@ -1887,33 +1862,40 @@ angular.module('ps.podcast.details', [
         when('/podcast/:podcastId', {
             templateUrl: 'html/podcast-detail.html',
             controller: 'PodcastDetailCtrl',
+            controllerAs: 'pdc',
             hotkeys: [
-                ['r', 'Refresh', 'refreshItems()'],
-                ['f', 'Force Refresh', 'refresh()'],
-                ['l', 'List of Items', 'tabs[0].active = true'],
-                ['m', 'Modification of Podcast', 'tabs[1].active = true']
+                ['r', 'Refresh', 'pdc.refreshItems()'],
+                ['f', 'Force Refresh', 'pdc.refresh()'],
+                ['l', 'List of Items', 'pdc.podcastTabs[0].active = true'],
+                ['m', 'Modification of Podcast', 'pdc.podcastTabs[1].active = true']
             ].concat(commonKey),
             resolve : {
-                podcast : function (Restangular, $route) {
-                    return Restangular.one('podcast', $route.current.params.podcastId).get();
+                podcast : function (podcastService, $route) {
+                    return podcastService.findById($route.current.params.podcastId);
                 }
             }
         })    
 })
-    .controller('PodcastDetailCtrl', function ($scope, podcast, $routeParams, Restangular) {
+    .controller('PodcastDetailCtrl', function ($scope, podcast, Restangular) {
+        var vm = this;
+        
+        vm.podcast = podcast;
+        vm.podcastTabs= [
+            { heading : 'Episodes', active : true},
+            { heading : 'Edition', active : false},
+            { heading : 'Upload', disabled : podcast.type !== 'send'}
+        ];
 
-        $scope.podcast = podcast;
-
-        function refreshItems () {
+        vm.refreshItems = function() {
             $scope.$broadcast('podcastItems:refresh');
-        }
-
-        $scope.refresh = function () {
-            Restangular.one("task").customPOST($scope.podcast.id, "updateManager/updatePodcast/force")
-                .then(refreshItems);
         };
-        $scope.$on("podcastEdition:save", refreshItems);
+        
+        vm.refresh = function () {
+            Restangular.one("task").customPOST(vm.podcast.id, "updateManager/updatePodcast/force")
+                .then(vm.refreshItems);
+        };
 
+        $scope.$on("podcastEdition:save", vm.refreshItems);
     });
 'use strict';
 

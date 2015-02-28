@@ -20,14 +20,7 @@ angular.module('ps.config.route', [
             window.location.href = '#/download';
         }]
     ])
-    .config(function($routeProvider, commonKey) {
-        /*$routeProvider.
-            when('/podcast/add', {
-                templateUrl: 'html/podcast-add.html',
-                controller: 'PodcastAddCtrl',
-                hotkeys: commonKey
-            });*/
-        
+    .config(function($routeProvider) {
         $routeProvider.
             otherwise({
                 redirectTo: '/items'

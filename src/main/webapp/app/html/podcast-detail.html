@@ -4,55 +4,36 @@
     <br/>
     <ol class="breadcrumb">
         <li><a href="/#/podcasts">Podcasts</a></li>
-        <li><a class="active"> {{ podcast.title }}</a></li>
+        <li><a class="active"> {{ pdc.podcast.title }}</a></li>
     </ol>
 
     <div>
-        <div class="jumbotron podcast-details-header" ng-style="{ 'background-image' : 'url(\''+ podcast.cover.url + '\')'}">
+        <div class="jumbotron podcast-details-header" ng-style="{ 'background-image' : 'url(\''+ pdc.podcast.cover.url + '\')'}">
             <div class="information-area">
                 <div class="information-text">
-                    <h3><strong>{{ podcast.title }}</strong></h3>
-                    <p>{{ podcast.totalItems }} Episodes</p>
+                    <h3><strong>{{ pdc.podcast.title }}</strong></h3>
+                    <p>{{ pdc.podcast.totalItems }} Episodes</p>
                 </div>
                 <div class="action-button pull-right">
-                    <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-                    <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank"><span class="ionicons ion-social-rss"></a>
+                    <button ng-click="pdc.refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+                    <a type="button" class="btn btn-default" ng-href="/api/podcast/{{ pdc.podcast.id }}/rss" target="_blank"><span class="ionicons ion-social-rss"></span></a>
                 </div>
             </div>
         </div>
     </div>
 <br/>
 
-
-<!--<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-    <div class="thumbnail">
-        <img ng-src="{{podcast.cover.url}}" width="{{podcast.cover.width}}" height="{{podcast.cover.height}}" alt="">
-        <div class="caption">
-            <h5 class="text-center "><strong>{{ podcast.title }}</strong></h5>
-            <p class="text-center">Nombre d'épisode : {{ podcast.totalItems }}</p>
-            <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12 text-center">
-                <button ng-click="refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-                <a type="button" class="btn btn-default" href="/api/podcast/{{ podcast.id }}/rss" target="_blank">RSS</a>
-            </div>
-        </div>
-    </div>
-</div>-->
 <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
 
     <tabset>
-        <!--
-        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
-            <ng-include src="tab.templateUrl" ></ng-include>
+        <tab heading="{{ pdc.podcastTabs[0].heading }}" active="pdc.podcastTabs[0].active" >
+            <podcast-items-list podcast="pdc.podcast"></podcast-items-list>
         </tab>
-        -->
-        <tab heading="Episodes" active="tab.active" disabled="tab.disabled">
-            <podcast-items-list podcast="podcast"></podcast-items-list>
+        <tab heading="{{ pdc.podcastTabs[1].heading }}" active="pdc.podcastTabs[1].active" >
+            <podcast-edition podcast="pdc.podcast"></podcast-edition>
         </tab>
-        <tab heading="Edition">
-            <podcast-edition podcast="podcast"></podcast-edition>
-        </tab>
-        <tab heading="Upload" ng-show="podcast.type == 'send'">
-            <podcast-upload podcast="podcast"></podcast-upload>
+        <tab heading="{{ pdc.podcastTabs[2].heading }}" ng-show="pdc.podcast.type === 'send'" active="pdc.podcastTabs[2].active" disabled="pdc.podcastTabs[2].disabled">
+            <podcast-upload podcast="pdc.podcast"></podcast-upload>
         </tab>
     </tabset>
 
