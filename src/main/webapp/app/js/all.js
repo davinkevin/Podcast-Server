@@ -53,27 +53,10 @@ angular.module('ps.podcast', [
     'ps.podcast.creation',
     'ps.podcast.list'
 ]);
-angular.module('device-detection', [])
-    .factory('deviceDetectorService', function deviceDetectorService($window) {
-        return {
-            isTouchedDevice : isTouchedDevice            
-        };
-        
-        function isTouchedDevice() {
-            return 'ontouchstart' in $window;
-        }
-    });
 angular.module('ps.search', [
     'ps.search.item'
 ]);
 
-angular.module('ps.filters', [])
-    .filter('htmlToPlaintext', function () {
-        return function(text) {
-            return String(text || "").replace(/<[^>]+>/gm, '');
-        };
-    }
-);
 /**
  * Created by kevin on 02/11/14.
  */
@@ -84,6 +67,24 @@ angular.module('ps.dataservice', [
     'ps.dataService.podcast',
     'ps.dataService.tag'
 ]);
+
+angular.module('device-detection', [])
+    .factory('deviceDetectorService', function deviceDetectorService($window) {
+        return {
+            isTouchedDevice : isTouchedDevice            
+        };
+        
+        function isTouchedDevice() {
+            return 'ontouchstart' in $window;
+        }
+    });
+angular.module('ps.filters', [])
+    .filter('htmlToPlaintext', function () {
+        return function(text) {
+            return String(text || "").replace(/<[^>]+>/gm, '');
+        };
+    }
+);
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -120,7 +121,6 @@ _.mixin({
         return localArray;
     }
 });
-
 angular.module('navbar', [
 ])
     .directive('navbar', function() {
@@ -160,55 +160,6 @@ angular.module('ps.config.module', [
     'ui.bootstrap',
     'truncate'
 ]);
-angular.module('ps.config.ngstomp', [
-    'AngularStompDK'
-])
-    .config(function(ngstompProvider){
-        ngstompProvider
-            .url('/ws')
-            .credential('login', 'password')
-            .class(SockJS);
-    });
-angular.module('ps.config.restangular', [
-    'restangular'
-])
-    .config(function(RestangularProvider) {
-        RestangularProvider.setBaseUrl('/api/');
-
-        RestangularProvider.addElementTransformer('items', false, function(item) {
-            item.addRestangularMethod('reset', 'get', 'reset');
-            item.addRestangularMethod('download', 'get', 'addtoqueue');
-            return item;
-        });
-    });
-angular.module('ps.config.route', [
-    'ngRoute',
-    'cfp.hotkeys'
-])
-    .constant('commonKey', [
-        ['h', 'Goto Home', function (event) {
-            event.preventDefault();
-            window.location.href = '#/items';
-        }],
-        ['s', 'Goto Search', function (event) {
-            event.preventDefault();
-            window.location.href = '#/item/search';
-        }],
-        ['p', 'Goto Podcast List', function (event) {
-            event.preventDefault();
-            window.location.href = '#/podcasts';
-        }],
-        ['d', 'Goto Download List', function (event) {
-            event.preventDefault();
-            window.location.href = '#/download';
-        }]
-    ])
-    .config(function($routeProvider) {
-        $routeProvider.
-            otherwise({
-                redirectTo: '/items'
-            });
-    });
 (function(module) {
 try {
   module = angular.module('ps.partial');
@@ -782,7 +733,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <tab heading="{{ pdc.podcastTabs[1].heading }}" active="pdc.podcastTabs[1].active" >\n' +
     '            <podcast-edition podcast="pdc.podcast"></podcast-edition>\n' +
     '        </tab>\n' +
-    '        <tab heading="{{ pdc.podcastTabs[2].heading }}" ng-show="pdc.podcast.type === \'send\'" active="pdc.podcastTabs[2].active" disabled="pdc.podcastTabs[2].disabled">\n' +
+    '        <tab heading="{{ pdc.podcastTabs[2].heading }}" ng-hide="pdc.podcastTabs[2].disabled" active="pdc.podcastTabs[2].active" disabled="pdc.podcastTabs[2].disabled">\n' +
     '            <podcast-upload podcast="pdc.podcast"></podcast-upload>\n' +
     '        </tab>\n' +
     '    </tabset>\n' +
@@ -1011,6 +962,55 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+angular.module('ps.config.ngstomp', [
+    'AngularStompDK'
+])
+    .config(function(ngstompProvider){
+        ngstompProvider
+            .url('/ws')
+            .credential('login', 'password')
+            .class(SockJS);
+    });
+angular.module('ps.config.restangular', [
+    'restangular'
+])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api/');
+
+        RestangularProvider.addElementTransformer('items', false, function(item) {
+            item.addRestangularMethod('reset', 'get', 'reset');
+            item.addRestangularMethod('download', 'get', 'addtoqueue');
+            return item;
+        });
+    });
+angular.module('ps.config.route', [
+    'ngRoute',
+    'cfp.hotkeys'
+])
+    .constant('commonKey', [
+        ['h', 'Goto Home', function (event) {
+            event.preventDefault();
+            window.location.href = '#/items';
+        }],
+        ['s', 'Goto Search', function (event) {
+            event.preventDefault();
+            window.location.href = '#/item/search';
+        }],
+        ['p', 'Goto Podcast List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/podcasts';
+        }],
+        ['d', 'Goto Download List', function (event) {
+            event.preventDefault();
+            window.location.href = '#/download';
+        }]
+    ])
+    .config(function($routeProvider) {
+        $routeProvider.
+            otherwise({
+                redirectTo: '/items'
+            });
+    });
 angular.module('ps.download', [
     'ps.config.route',
     'ps.dataService.donwloadManager',
@@ -1729,6 +1729,20 @@ angular.module('ps.dataService.tag', [
         return baseAll.post(null, {name : query});
     }
 });
+angular.module('ps.dataService.updateService', [
+    'restangular'
+])
+    .factory('UpdateService', function(Restangular) {
+        'use strict';
+        
+        return {
+            forceUpdatePodcast : forceUpdatePodcast
+        };
+
+        function forceUpdatePodcast(idPodcast) {
+            return Restangular.one("task").customPOST(idPodcast, "updateManager/updatePodcast/force");
+        }
+    });
 'use strict';
 
 angular.module('ps.podcast.details.edition', [
@@ -1856,7 +1870,7 @@ angular.module('ps.podcast.details', [
     'ps.podcast.details.episodes',
     'ps.podcast.details.edition',
     'ps.podcast.details.upload',
-    'restangular'
+    'ps.dataService.updateService'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
         when('/podcast/:podcastId', {
@@ -1874,9 +1888,9 @@ angular.module('ps.podcast.details', [
                     return podcastService.findById($route.current.params.podcastId);
                 }
             }
-        })    
+        });
 })
-    .controller('PodcastDetailCtrl', function ($scope, podcast, Restangular) {
+    .controller('PodcastDetailCtrl', function ($scope, podcast, UpdateService) {
         var vm = this;
         
         vm.podcast = podcast;
@@ -1891,7 +1905,7 @@ angular.module('ps.podcast.details', [
         };
         
         vm.refresh = function () {
-            Restangular.one("task").customPOST(vm.podcast.id, "updateManager/updatePodcast/force")
+            UpdateService.forceUpdatePodcast(vm.podcast.id)
                 .then(vm.refreshItems);
         };
 

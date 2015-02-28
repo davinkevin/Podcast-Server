@@ -4,7 +4,7 @@ angular.module('ps.podcast.details', [
     'ps.podcast.details.episodes',
     'ps.podcast.details.edition',
     'ps.podcast.details.upload',
-    'restangular'
+    'ps.dataService.updateService'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
         when('/podcast/:podcastId', {
@@ -22,9 +22,9 @@ angular.module('ps.podcast.details', [
                     return podcastService.findById($route.current.params.podcastId);
                 }
             }
-        })    
+        });
 })
-    .controller('PodcastDetailCtrl', function ($scope, podcast, Restangular) {
+    .controller('PodcastDetailCtrl', function ($scope, podcast, UpdateService) {
         var vm = this;
         
         vm.podcast = podcast;
@@ -39,7 +39,7 @@ angular.module('ps.podcast.details', [
         };
         
         vm.refresh = function () {
-            Restangular.one("task").customPOST(vm.podcast.id, "updateManager/updatePodcast/force")
+            UpdateService.forceUpdatePodcast(vm.podcast.id)
                 .then(vm.refreshItems);
         };
 
