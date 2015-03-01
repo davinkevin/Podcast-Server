@@ -62,7 +62,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
         try {
             Connection.Response response = Jsoup.connect(podcast.getUrl())
-                    .timeout(5000)
+                    .timeout(10000)
                     .userAgent(USER_AGENT)
                     .referrer("http://www.google.fr")
                     .execute();
@@ -126,7 +126,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         Document page = null;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
+            page = Jsoup.connect(podcast.getUrl()).timeout(10000).get();
             return signatureService.generateMD5SignatureFromDOM(page.select(".block-video-tableVideo tbody tr").html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -138,12 +138,12 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
     private boolean podcastContains(Podcast podcast, Item item) {
         String nameOfItem = FilenameUtils.getName(item.getUrl());
-        for (Item itemInPodcast : podcast.getItems()) {
-            if (nameOfItem.equals(FilenameUtils.getName(itemInPodcast.getUrl()))) {
-                return true;
-            }
-        }
-        return false;
+        
+        return podcast.getItems()
+                .stream()
+                .map(Item::getUrl)
+                .map(FilenameUtils::getName)
+                .anyMatch(nameOfItem::equals);
     }
 
     public ZonedDateTime fromJeuxVideoFr(String pubDate) {
@@ -151,13 +151,19 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     }
 
     private Cover getCover(String tinyUrl) throws IOException {
-        if (StringUtils.isEmpty(tinyUrl) || !tinyUrl.contains(IMG_DELIMITER)) {
+        if (StringUtils.isEmpty(tinyUrl)) {
             return null;
         }
 
-        String coverUrl = String.format(IMG_LOCALISATION_THUMB, tinyUrl.substring(tinyUrl.lastIndexOf(IMG_DELIMITER)+IMG_DELIMITER.length()));
+        if (tinyUrl.contains(IMG_DELIMITER)) {
+            return ImageUtils.getCoverFromURL(String.format(IMG_LOCALISATION_THUMB, tinyUrl.substring(tinyUrl.lastIndexOf(IMG_DELIMITER)+IMG_DELIMITER.length())));
+        }
 
-        return ImageUtils.getCoverFromURL(new URL(coverUrl));
-
+        /* http://2.im6.fr/-99663-photo-crop-pd41f08d993a0ab2c15f76ef444ac1e04-youtube.jpg?options=eNoryywqKU3N0bW0NDMzBgAi7gRK&width=400&height=300 */
+        if (tinyUrl.contains("width") && tinyUrl.contains("height")) {
+            return ImageUtils.getCoverFromURL(StringUtils.substringBeforeLast(tinyUrl, "&") + String.format("&width=400&height=300"));
+        }
+        
+        return ImageUtils.getCoverFromURL(tinyUrl);
     }
 }
