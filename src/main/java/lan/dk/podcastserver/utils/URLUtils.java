@@ -2,6 +2,7 @@ package lan.dk.podcastserver.utils;
 
 import lan.dk.podcastserver.service.signature.SignatureService;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,6 +96,7 @@ public class URLUtils {
         try {
             URL obj = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+            conn.setInstanceFollowRedirects(false);
             if (isARedirection(conn.getResponseCode())) {
                 conn.disconnect();
                 return getRealURL(conn.getHeaderField("Location"), numberOfRedirection+1);
@@ -125,5 +127,20 @@ public class URLUtils {
     
     public static URLConnection getStreamWithTimeOut(String stringUrl) throws IOException {
         return getStreamWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
+    }
+
+    public static String getFileNameM3U8Url(String url) {
+        if (StringUtils.contains(url, "canal-plus") || StringUtils.contains(url, "cplus"))
+            return getFileNameFromCanalPlusM3U8Url(url);
+        
+        /* In other case, remove the url parameter and extract the filename */
+        return FilenameUtils.getBaseName(StringUtils.substringBeforeLast(url, "?")).concat(".mp4");
+    }
+
+    public static String urlWithDomain(String urlWithDomain, String domaineLessUrl) {
+        if (domaineLessUrl.contains("://"))
+            return domaineLessUrl;
+
+        return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + domaineLessUrl;
     }
 }

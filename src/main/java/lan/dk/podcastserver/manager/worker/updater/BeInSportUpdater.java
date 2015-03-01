@@ -4,8 +4,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.xml.JdomService;
 import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.URLUtils;
-import org.jdom2.JDOMException;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,13 +14,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,26 +30,22 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 public class BeInSportUpdater extends AbstractUpdater {
 
-    public static final String BEINSPORT_PATTERN = "MMM dd yyyy, HH:mm";
-    public static String EPISODE_LISTING_URL = "http://www.beinsports.fr/replay/category/{idBeInSport}/page/1/size/8/ajax/true";
-    public static String XML_PREFIX_DESCRIPTOR_URL = "http://www.beinsports.fr/fragment/beINSport/xml/vodConfig/videoId/";
-    public static String BEINSPORTS_HOST_URL = "http://www.beinsports.fr/";
-    /* Prefixe for HTTP content over RTMP */
-    public static String[] HTTP_VOD_PREFIX_URL = {
-                                        "http://vod.beinsports1.aka.oss1.performgroup.com/",
-                                        "http://vod.cms.download.performgroup.com/beinsport/"
-    };
-
     /* Patter to extract value from URL */
-    public static Pattern IDBEINSPORT_PATTERN = Pattern.compile(".*/category/([^/]*)/.*");
-    public static Pattern SUBSTRING_VIDEO_URL_PATTERN = Pattern.compile(".*/([0-9]*/.*)$");
+    private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\": \"([^\"]*)\".*";
+    private static final String PARAMETER_SEPARATOR = "?";
+    private static final String EPISODE_LISTING_URL = "http://www.beinsports.fr/replay/category/{idBeInSport}/page/1/size/8/ajax/true";
+    private static final String VIDEO_ARTICLE_URL_FORMAT = "http://www.beinsports.fr/ajax/swap-video/article/%s";
+    private static final Pattern IDBEINSPORT_PATTERN = Pattern.compile(".*/category/([^/]*)/.*");
+    private static final Pattern DATE_PATTERN = Pattern.compile(".*[(]([^)]*)[)].*");
+    private static final Pattern STREAM_HLS_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "stream_hls_url"));
+    private static final Pattern THUMB_NAIL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "thumbnail_large_url"));
 
     @Resource JdomService jdomService;
 
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
         getItems(podcast).stream()
-                .filter(item -> !podcast.contains(item))
+                .filter(item -> !podcastContains(podcast, item))
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(podcast::add);
@@ -76,80 +66,80 @@ public class BeInSportUpdater extends AbstractUpdater {
                     .referrer("http://www.google.fr")
                     .execute();
             page = response.parse();
-
-            //logger.debug(page.html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
             return itemSet;
         }
 
+        String idShow = StringUtils.substringAfterLast(podcast.getUrl(), "/");
 
-        for(Element article : page.select("article")) {
+        for(Element article : page.select("#" + idShow + " article")) {
             Item item = new Item()
-                    .setTitle(article.select(".info h4 a").first().text())
-                    .setDescription(article.select(".info span").first().text());
-
-            item = getDetailOfItemByXML(item, article.select("a").first().className());
-
-            logger.debug(item.toString());
-
+                    .setTitle(article.select("h4").first().text())
+                    .setDescription(article.select("h4").first().text())
+                    .setPubdate(getPubDateFromDescription(article.select("h4").first().text()));
+            
+            item = getDetailOfItemByXML(item, StringUtils.substringAfterLast(article.select("a").first().attr("href"), "/"));
             itemSet.add(item);
-
         }
 
         return itemSet;
     }
 
+    private ZonedDateTime getPubDateFromDescription(String title) {
+        /* L'Expresso (26/02) - 1\u00e8re partie */
+        Matcher m = DATE_PATTERN.matcher(title);
+        
+        if (!m.find()) {
+            return null;
+        }
+        
+        String dayMonth = m.group(1);
+        return ZonedDateTime
+                .now()
+                .withMonth(Integer.valueOf(StringUtils.substringAfter(dayMonth, "/")))
+                .withDayOfMonth(Integer.valueOf(StringUtils.substringBefore(dayMonth, "/")))
+                .withHour(8)
+                .withMinute(0);
+    }
 
-    private Item getDetailOfItemByXML(Item item, String idItemBeInSport) {
-        logger.debug("Id BeInSport : {}", idItemBeInSport);
 
-        org.jdom2.Document xmlEpisode = null;
+    private Item getDetailOfItemByXML(Item item, String urlItemBeInSport) {
+        String javascriptCode;
         try {
-            xmlEpisode = jdomService.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(idItemBeInSport));
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("JDOMException :", e);
-            return new Item();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
+            Connection.Response response = Jsoup.connect(String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport))
+                    .timeout(10000)
+                    .userAgent(USER_AGENT)
+                    .referrer("http://www.google.fr")
+                    .execute();
+            Document articlePage = response.parse();
+            String apiItemUrl = articlePage.select("iframe").attr("src");
+
+            response = Jsoup.connect(apiItemUrl)
+                    .timeout(10000)
+                    .userAgent(USER_AGENT)
+                    .referrer("http://www.google.fr")
+                    .execute();
+            javascriptCode = response.parse().select("script").last().data();
+        } catch (IOException | IllegalArgumentException e) {
+            logger.error("Error during fetch of {}", String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport), e);
             return new Item();
         }
 
-        org.jdom2.Element xml_clip = xmlEpisode.getRootElement().getChild("clip");
 
-        try {
-            item.setPubdate(fromBeInSport(xml_clip.getAttributeValue("videoCreationDate")));
-            item.setCover(ImageUtils.getCoverFromURL(new URL(BEINSPORTS_HOST_URL.concat(xml_clip.getAttributeValue("videoImageSrc")))));
+        Matcher matcher = STREAM_HLS_URL_EXTRACTOR_PATTERN1.matcher(javascriptCode);
+        if (matcher.find()) {
+            item.setUrl(matcher.group(1));
+        }
 
-            String externalUrl = null;
-            Integer bitrate = 0;
-            for (org.jdom2.Element urlFileToDownload : xml_clip.getChild("videofiles").getChildren()) {
-                if (Integer.valueOf(urlFileToDownload.getAttributeValue("bitrate")) > bitrate) {
-                    bitrate = Integer.valueOf(urlFileToDownload.getAttributeValue("bitrate"));
-                    externalUrl = urlFileToDownload.getAttributeValue("externalPath");
-                }
+        Matcher thumNailematcher = THUMB_NAIL_EXTRACTOR_PATTERN.matcher(javascriptCode);
+        if (thumNailematcher.find()) {
+            try {
+                item.setCover(ImageUtils.getCoverFromURL(thumNailematcher.group(1)));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            Matcher m = SUBSTRING_VIDEO_URL_PATTERN.matcher(externalUrl);
-            String vodUrl = null;
-            if (m.find()) {
-                for (String prefix : HTTP_VOD_PREFIX_URL) {
-                    vodUrl = prefix.concat(m.group(1));
-                    if (URLUtils.isAValidURL(vodUrl)) {
-                        break;
-                    } else {
-                        vodUrl = null;
-                    }
-                }
-            }
-
-            item.setUrl((vodUrl != null) ? vodUrl : externalUrl);
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return item;
@@ -165,7 +155,6 @@ public class BeInSportUpdater extends AbstractUpdater {
         String listingUrl = getListingUrl(podcast);
 
         if (!listingUrl.equals("")) {
-            logger.debug("URL de signature : {}", listingUrl);
             return signatureService.generateSignatureFromURL(podcast.getUrl());
         } else {
             return "";
@@ -183,9 +172,13 @@ public class BeInSportUpdater extends AbstractUpdater {
             return "";
         }
     }
+    
+    public Boolean podcastContains(Podcast podcast, Item item) {
+        String itemToFindSimplifiedUrl = StringUtils.substringBefore(item.getUrl(), PARAMETER_SEPARATOR);
 
-    public ZonedDateTime fromBeInSport(String beInSportDate) {
-        LocalDateTime localDateTime = LocalDateTime.parse(beInSportDate, DateTimeFormatter.ofPattern(BEINSPORT_PATTERN, Locale.ENGLISH)); // Format : Feb 17 2014, 10:26
-        return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
+        return podcast.getItems().stream()
+                .map(Item::getUrl)
+                .map(url -> StringUtils.substringBefore(url, PARAMETER_SEPARATOR))
+                .anyMatch(itemToFindSimplifiedUrl::equals);
     }
 }

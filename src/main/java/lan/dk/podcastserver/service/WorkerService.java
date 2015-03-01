@@ -43,6 +43,8 @@ public class WorkerService implements ApplicationContextAware {
         String itemUrl = item.getUrl().toLowerCase();
         if (itemUrl.contains("rtmp")) {
             nameDownloader = "RTMP";
+        } else if (itemUrl.contains("cdn.dmcloud")) {
+            nameDownloader = "DailyMotionCloud";
         } else if (itemUrl.contains("www.youtube.com")) {
             nameDownloader = "Youtube";
         } else if (itemUrl.contains("www.jeuxvideo.fr")) {

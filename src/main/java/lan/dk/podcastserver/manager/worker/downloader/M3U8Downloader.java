@@ -12,8 +12,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component("M3U8Downloader")
 @Scope("prototype")
+@Component("M3U8Downloader")
 public class M3U8Downloader extends AbstractDownloader {
 
     List<String> urlList;
@@ -36,7 +36,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     if (!inputLine.startsWith("#")) {
-                        urlList.add(inputLine);
+                        urlList.add(URLUtils.urlWithDomain(getItemUrl(), inputLine));
                     }
                 }
                 in.close();
@@ -116,7 +116,7 @@ public class M3U8Downloader extends AbstractDownloader {
         if (target != null)
             return target;
 
-        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + URLUtils.getFileNameFromCanalPlusM3U8Url(item.getUrl()) );
+        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + URLUtils.getFileNameM3U8Url(item.getUrl()) );
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
         //logger.debug(file.getAbsolutePath());
 
@@ -154,5 +154,9 @@ public class M3U8Downloader extends AbstractDownloader {
                 runnableDownloader.notify();
             }
         }
+    }
+    
+    public Boolean hasDomain(String url) {
+        return url.contains("://");
     }
 }
