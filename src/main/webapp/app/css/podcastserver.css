@@ -12,6 +12,7 @@
 .button-row{z-index:1000}
 .podcastlist * .thumb{margin-bottom:15px}
 .podcastlist img{position:relative;border-radius:5px;background-color:#fff;box-shadow:0 2px 6px 2px rgba(66,66,66,.75)}
+.podcastlist img:hover{box-shadow:0 2px 6px 2px rgba(51,122,183,.5)}
 .listItems{list-style:none}
 .listItems li{clear:both;max-height:100px;height:100px;line-height:25px}
 .listItems li img{float:left}
@@ -19,6 +20,7 @@
 .downloadingItems{list-style:none}
 .downloadingItems .progress{margin-top:5px}
 .box{position:relative;border-radius:5px;background-color:#fff;box-shadow:0 0 15px 0 rgba(0,0,0,.1);border:1px solid #ddd}
+.box:hover{box-shadow:0 0 15px 0 rgba(51,122,183,.5)}
 .item-listing .pagination{margin-bottom:0}
 .item-listing .search-button{margin-top:20px}
 .item-listing .itemInList{padding-top:15px;padding-bottom:15px}
