@@ -22,6 +22,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,11 +45,9 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
 
-        Set<Item> itemSet = getItems(podcast);
-
         // Si le bean est valide :
-        itemSet.stream()
-                .filter(item -> !podcastContains(podcast, item))
+        getItems(podcast).stream()
+                .filter(notIn(podcast))
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(podcast::add);
@@ -136,14 +135,16 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         return "";
     }
 
-    private boolean podcastContains(Podcast podcast, Item item) {
-        String nameOfItem = FilenameUtils.getName(item.getUrl());
-        
-        return podcast.getItems()
-                .stream()
-                .map(Item::getUrl)
-                .map(FilenameUtils::getName)
-                .anyMatch(nameOfItem::equals);
+    public Predicate<Item> notIn(Podcast podcast) {
+        return item -> {
+            String nameOfItem = FilenameUtils.getName(item.getUrl());
+
+            return podcast.getItems()
+                    .stream()
+                    .map(Item::getUrl)
+                    .map(FilenameUtils::getName)
+                    .anyMatch(nameOfItem::equals);
+        };
     }
 
     public ZonedDateTime fromJeuxVideoFr(String pubDate) {

@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 
 public interface Updater {
@@ -18,4 +19,8 @@ public interface Updater {
     public Podcast findPodcast(String url);
 
     public String generateSignature(Podcast podcast);
+
+    public default Predicate<Item> notIn(Podcast podcast) {
+        return item -> !podcast.contains(item);
+    }
 }

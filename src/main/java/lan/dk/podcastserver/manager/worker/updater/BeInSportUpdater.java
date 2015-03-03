@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,7 @@ public class BeInSportUpdater extends AbstractUpdater {
     @Override
     public Podcast updateAndAddItems(Podcast podcast) {
         getItems(podcast).stream()
-                .filter(item -> !podcastContains(podcast, item))
+                .filter(notIn(podcast))
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(podcast::add);
@@ -180,5 +181,10 @@ public class BeInSportUpdater extends AbstractUpdater {
                 .map(Item::getUrl)
                 .map(url -> StringUtils.substringBefore(url, PARAMETER_SEPARATOR))
                 .anyMatch(itemToFindSimplifiedUrl::equals);
+    }
+
+
+    public Predicate<Item> notIn(Podcast podcast) {
+        return item -> !podcastContains(podcast, item);
     }
 }

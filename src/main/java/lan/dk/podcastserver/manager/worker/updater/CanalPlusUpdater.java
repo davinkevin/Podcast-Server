@@ -38,7 +38,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         // Si le bean est valide :
         getItems(podcast).stream()
-                .filter(item -> !podcast.contains(item))
+                .filter(notIn(podcast))
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(podcast::add);

@@ -15,6 +15,8 @@ import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
+
 //@Component
 //@Scope("prototype")
 @Transactional(noRollbackFor=Exception.class)
@@ -33,7 +35,13 @@ public abstract class AbstractUpdater implements Updater {
             String signature = generateSignature(podcast);
             if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
                 podcast.setSignature(signature);
-                return new ImmutablePair<>(podcast, getItems(podcast));
+                
+                Set<Item> itemNotPresentInPodcast = getItems(podcast)
+                        .stream()
+                        .filter(notIn(podcast))
+                        .collect(toSet());
+                
+                return new ImmutablePair<>(podcast, itemNotPresentInPodcast);
             } else {
                 logger.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());
             }

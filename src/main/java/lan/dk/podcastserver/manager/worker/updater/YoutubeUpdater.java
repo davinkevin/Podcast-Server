@@ -39,7 +39,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     public Podcast updateAndAddItems(Podcast podcast) {
 
         getItems(podcast).stream()
-                .filter(item -> !podcast.contains(item))
+                .filter(notIn(podcast))
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(podcast::add);
