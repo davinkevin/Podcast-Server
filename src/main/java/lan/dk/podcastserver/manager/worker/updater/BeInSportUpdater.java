@@ -9,7 +9,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.context.annotation.Scope;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
  *
  */
 @Component("BeInSportsUpdater")
-@Scope("prototype")
 public class BeInSportUpdater extends AbstractUpdater {
 
     /* Patter to extract value from URL */
@@ -122,7 +121,7 @@ public class BeInSportUpdater extends AbstractUpdater {
                     .userAgent(USER_AGENT)
                     .referrer("http://www.google.fr")
                     .execute();
-            javascriptCode = response.parse().select("script").last().data();
+            javascriptCode = getJavascriptPart(response.parse().select("script"));
         } catch (IOException | IllegalArgumentException e) {
             logger.error("Error during fetch of {}", String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport), e);
             return new Item();
@@ -144,6 +143,14 @@ public class BeInSportUpdater extends AbstractUpdater {
         }
 
         return item;
+    }
+
+    private String getJavascriptPart(Elements tagScripts) {
+        return tagScripts.stream()
+                .map(Element::data)
+                .filter(data -> data.contains("stream_hls_url"))
+                .findFirst()
+                .orElse("");
     }
 
     @Override
@@ -175,6 +182,9 @@ public class BeInSportUpdater extends AbstractUpdater {
     }
     
     public Boolean podcastContains(Podcast podcast, Item item) {
+        if (item.getUrl() == null)
+            return false;
+        
         String itemToFindSimplifiedUrl = StringUtils.substringBefore(item.getUrl(), PARAMETER_SEPARATOR);
 
         return podcast.getItems().stream()
