@@ -6,7 +6,6 @@ import lan.dk.podcastserver.utils.ImageUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 /**
  * Created by kevin on 18/12/14.
  */
-@Scope("prototype")
 @Component("JeuxVideoComUpdater")
 public class JeuxVideoComUpdater extends AbstractUpdater {
 

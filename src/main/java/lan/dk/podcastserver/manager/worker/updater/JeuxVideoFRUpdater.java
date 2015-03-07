@@ -12,7 +12,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,7 +28,6 @@ import java.util.regex.Pattern;
 /**
  * Created by kevin on 22/02/2014.
  */
-@Scope("prototype")
 @Component("JeuxVideoFRUpdater")
 public class JeuxVideoFRUpdater extends AbstractUpdater {
 

@@ -10,7 +10,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,9 +27,8 @@ import java.util.regex.Pattern;
  * Utilisation de referrer et User-Agent : http://stackoverflow.com/questions/6581655/jsoup-useragent-how-to-set-it-right
  *
  */
-@Scope("prototype")
 @Component("BeInSportsUpdater")
-public class BeInSportUpdater extends AbstractUpdater {
+public class BeInSportsUpdater extends AbstractUpdater {
 
     /* Patter to extract value from URL */
     private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\": \"([^\"]*)\".*";

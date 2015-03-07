@@ -12,7 +12,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 /**
  * Created by kevin on 09/08/2014.
  */
-@Scope("prototype")
 @Component("PluzzUpdater")
 public class PluzzUpdater extends AbstractUpdater {
 
