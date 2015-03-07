@@ -20,8 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component("RSSUpdater")
 @Scope("prototype")
+@Component("RSSUpdater")
 public class RSSUpdater extends AbstractUpdater {
 
     @Resource JdomService jdomService;

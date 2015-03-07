@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 /**
  * Created by kevin on 12/07/2014.
  */
-@Component("ParleysUpdater")
 @Scope("prototype")
+@Component("ParleysUpdater")
 public class ParleysUpdater extends AbstractUpdater {
 
     public static final String PARLEYS_PATTERN = "EEE MMM dd HH:mm:ss z yyyy";

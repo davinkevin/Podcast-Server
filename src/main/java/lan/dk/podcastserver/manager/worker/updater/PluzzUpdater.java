@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 /**
  * Created by kevin on 09/08/2014.
  */
-@Component("PluzzUpdater")
 @Scope("prototype")
+@Component("PluzzUpdater")
 public class PluzzUpdater extends AbstractUpdater {
 
     public static final String JSOUP_ITEM_SELECTOR = "#player-memeProgramme";

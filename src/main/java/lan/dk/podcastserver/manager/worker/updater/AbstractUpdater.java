@@ -17,8 +17,6 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
-//@Component
-//@Scope("prototype")
 @Transactional(noRollbackFor=Exception.class)
 public abstract class AbstractUpdater implements Updater {
 

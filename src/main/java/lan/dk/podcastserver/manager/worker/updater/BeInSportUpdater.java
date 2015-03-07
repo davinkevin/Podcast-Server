@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,15 +28,15 @@ import java.util.regex.Pattern;
  * Utilisation de referrer et User-Agent : http://stackoverflow.com/questions/6581655/jsoup-useragent-how-to-set-it-right
  *
  */
+@Scope("prototype")
 @Component("BeInSportsUpdater")
 public class BeInSportUpdater extends AbstractUpdater {
 
     /* Patter to extract value from URL */
     private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\": \"([^\"]*)\".*";
     private static final String PARAMETER_SEPARATOR = "?";
-    private static final String EPISODE_LISTING_URL = "http://www.beinsports.fr/replay/category/{idBeInSport}/page/1/size/8/ajax/true";
+    private static final String EPISODE_LISTING_URL = "http://www.beinsports.fr/ajax/filter-videos/siteSection/replay/filterBySelect/%s/ajaxSection/integrales";
     private static final String VIDEO_ARTICLE_URL_FORMAT = "http://www.beinsports.fr/ajax/swap-video/article/%s";
-    private static final Pattern IDBEINSPORT_PATTERN = Pattern.compile(".*/category/([^/]*)/.*");
     private static final Pattern DATE_PATTERN = Pattern.compile(".*[(]([^)]*)[)].*");
     private static final Pattern STREAM_HLS_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "stream_hls_url"));
     private static final Pattern THUMB_NAIL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "thumbnail_large_url"));
@@ -72,9 +73,7 @@ public class BeInSportUpdater extends AbstractUpdater {
             return itemSet;
         }
 
-        String idShow = StringUtils.substringAfterLast(podcast.getUrl(), "/");
-
-        for(Element article : page.select("#" + idShow + " article")) {
+        for(Element article : page.select("article")) {
             Item item = new Item()
                     .setTitle(article.select("h4").first().text())
                     .setDescription(article.select("h4").first().text())
@@ -170,15 +169,8 @@ public class BeInSportUpdater extends AbstractUpdater {
     }
 
     private String getListingUrl(Podcast podcast) {
-        String listingUrl = EPISODE_LISTING_URL;
-
-        // Extraction de l'id de l'emission :
-        Matcher m = IDBEINSPORT_PATTERN.matcher(podcast.getUrl());
-        if (m.find()) {
-            return listingUrl.replace("{idBeInSport}", m.group(1));
-        } else {
-            return "";
-        }
+        String idShow = StringUtils.substringAfterLast(podcast.getUrl(), "/");
+        return String.format(EPISODE_LISTING_URL, idShow);
     }
     
     public Boolean podcastContains(Podcast podcast, Item item) {

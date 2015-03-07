@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 /**
  * Created by kevin on 22/02/2014.
  */
-@Component("JeuxVideoFRUpdater")
 @Scope("prototype")
+@Component("JeuxVideoFRUpdater")
 public class JeuxVideoFRUpdater extends AbstractUpdater {
 
     public static final String JEUXVIDEOFR_PATTERN = "dd/MM/yyyy";

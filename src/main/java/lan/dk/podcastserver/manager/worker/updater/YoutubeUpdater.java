@@ -22,8 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component("YoutubeUpdater")
 @Scope("prototype")
+@Component("YoutubeUpdater")
 public class YoutubeUpdater extends AbstractUpdater {
 
     private static final Integer YOUTUBE_MAX_RESULTS = 50;
