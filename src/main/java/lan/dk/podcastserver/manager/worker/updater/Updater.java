@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import org.apache.commons.lang3.tuple.Pair;
+import lan.dk.podcastserver.utils.facade.UpdateTuple;
 
 import java.util.Set;
 import java.util.function.Predicate;
@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 
 public interface Updater {
 
-    public Pair<Podcast, Set<Item>> update(Podcast podcast);
+    public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast);
 
     public Set<Item> getItems(Podcast podcast);
 

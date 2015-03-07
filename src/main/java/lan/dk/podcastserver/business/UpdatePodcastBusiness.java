@@ -3,10 +3,10 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.service.WorkerService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 
 @Component
@@ -98,7 +99,7 @@ public class UpdatePodcastBusiness  {
 
     public void updateAsyncPodcast() {
         logger.info("Lancement de l'update");
-        Map<String, Future< Pair<Podcast, Set<Item>> > > podcastItemsToUpdate = new HashMap<>();
+        Map<String, Future< UpdateTuple<Podcast, Set<Item>, Predicate<Item>> > > podcastItemsToUpdate = new HashMap<>();
 
         List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
         logger.info("Traitement de {} podcasts", podcasts.size());
@@ -113,13 +114,13 @@ public class UpdatePodcastBusiness  {
         }
 
         logger.info("Traitement des ajouts sur {} podcasts", podcastItemsToUpdate.size());
-        for (Map.Entry<String, Future<Pair<Podcast, Set<Item>>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
+        for (Map.Entry<String, Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
             try {
                 String currentPodcastSignature = podcastAndItems.getKey();
-                Pair<Podcast, Set<Item>> returnPaired = podcastAndItems.getValue().get(5, TimeUnit.MINUTES);
-                if (!StringUtils.isEmpty(returnPaired.getKey().getSignature()) && !StringUtils.equals(currentPodcastSignature, returnPaired.getKey().getSignature())) {
+                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> returnValue = podcastAndItems.getValue().get(5, TimeUnit.MINUTES);
+                if (!StringUtils.isEmpty(returnValue.first().getSignature()) && !StringUtils.equals(currentPodcastSignature, returnValue.first().getSignature())) {
                     podcastBusiness.update(
-                            attachNewItemsToPodcast(returnPaired.getKey(), returnPaired.getValue())
+                            attachNewItemsToPodcast(returnValue.first(), returnValue.middle(), returnValue.last())
                     );
                 }
             } catch (Exception e) {
@@ -157,13 +158,13 @@ public class UpdatePodcastBusiness  {
         }
     }
 
-    public Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items) {
+    public Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {
         
         if (items == null || items.isEmpty() )
             return podcast;
         
         items.stream()
-                .filter(item -> !podcast.getItems().contains(item))
+                .filter(filter)
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(item -> {

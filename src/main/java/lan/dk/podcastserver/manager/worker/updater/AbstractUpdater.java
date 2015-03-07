@@ -2,11 +2,10 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.signature.SignatureService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
+import java.util.function.Predicate;
 
 @Transactional(noRollbackFor=Exception.class)
 public abstract class AbstractUpdater implements Updater {
@@ -27,19 +25,13 @@ public abstract class AbstractUpdater implements Updater {
     @Resource SignatureService signatureService;
     @Resource(name="Validator") Validator validator;
 
-    public Pair<Podcast, Set<Item>> update(Podcast podcast) {
+    public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
         try {
             logger.info("Ajout du podcast \"{}\" à l'executor", podcast.getTitle());
             String signature = generateSignature(podcast);
             if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
                 podcast.setSignature(signature);
-                
-                Set<Item> itemNotPresentInPodcast = getItems(podcast)
-                        .stream()
-                        .filter(notIn(podcast))
-                        .collect(toSet());
-                
-                return new ImmutablePair<>(podcast, itemNotPresentInPodcast);
+                return UpdateTuple.of(podcast, getItems(podcast), notIn(podcast));
             } else {
                 logger.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());
             }
@@ -48,7 +40,7 @@ public abstract class AbstractUpdater implements Updater {
             e.printStackTrace();
         }
 
-        return new ImmutablePair<>(podcast, podcast.getItems());
+        return UpdateTuple.of(podcast, podcast.getItems(), item -> true);
     }
     
 }
