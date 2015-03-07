@@ -70,7 +70,7 @@ public class SignatureTest {
             logger.info(podcast.getTitle());
             Assert.isTrue(StringUtils.isEmpty(podcast.getSignature()));
 
-            updater = workerService.getUpdaterByType(podcast);
+            updater = workerService.updaterOf(podcast);
 
             String signature = updater.generateSignature(podcast);
             if ( signature != null) {

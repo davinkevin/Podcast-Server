@@ -52,7 +52,7 @@ public class UpdatePodcastBusiness  {
         for (Podcast podcast : podcasts) {
             try {
                 logger.info("Traitement du Podcast : " + podcast.toString());
-                updater = workerService.getUpdaterByType(podcast);
+                updater = workerService.updaterOf(podcast);
                 String signature = updater.generateSignature(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
                     updater.updateAndAddItems(podcast);
@@ -80,7 +80,7 @@ public class UpdatePodcastBusiness  {
             try {
                 logger.info("Traitement du Podcast : " + podcast.toString());
 
-                updater = workerService.getUpdaterByType(podcast);
+                updater = workerService.updaterOf(podcast);
                 String signature = updater.generateSignature(podcast);
                 if ( signature != null && !signature.equals(podcast.getSignature()) ) {
                     podcast = updater.updateAndAddItems(podcast);
@@ -105,11 +105,10 @@ public class UpdatePodcastBusiness  {
         logger.info("Traitement de {} podcasts", podcasts.size());
         for (Podcast podcast : podcasts) {
             try {
-                final Updater updater = workerService.getUpdaterByType(podcast);
+                final Updater updater = workerService.updaterOf(podcast);
                 podcastItemsToUpdate.put(podcast.getSignature(), asyncExecutor.submit(() -> updater.update(podcast)));
             } catch (Exception e) {
                 logger.error("Error during signature of podcast {}", podcast.getTitle(), e);
-                e.printStackTrace();
             }
         }
 
@@ -125,7 +124,6 @@ public class UpdatePodcastBusiness  {
                 }
             } catch (Exception e) {
                 logger.error("Error during update of podcast", e);
-                e.printStackTrace();
             }
         }
 

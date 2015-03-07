@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 
 
@@ -21,20 +23,11 @@ public class WorkerService implements ApplicationContextAware {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected ApplicationContext context = null;
+    
+    @Resource UpdaterSelector updaterSelector;
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
-    }
-
-    public Updater getUpdaterByType(Podcast podcast) throws Exception {
-        Updater updater = (Updater) context.getBean(podcast.getType() + "Updater");
-
-        if (updater == null) {
-            logger.warn("No updater for the type {}", podcast.getType());
-            throw new Exception("No Updater for the type " + podcast.getType());
-        } else
-            return updater;
+    public Updater updaterOf(Podcast podcast) throws Exception {
+        return (Updater) context.getBean(updaterSelector.of(podcast.getUrl()).getSimpleName());
     }
 
     public Downloader getDownloaderByType(Item item) {
@@ -91,5 +84,11 @@ public class WorkerService implements ApplicationContextAware {
     private Boolean isYoutubeUrl(String url, String ... strings) {
         return Arrays.stream(strings)
                 .anyMatch(url::contains);
+    }
+
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
     }
 }

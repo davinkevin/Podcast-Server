@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.worker;
 
 import lan.dk.podcastserver.config.PropertyConfig;
-import lan.dk.podcastserver.manager.worker.updater.BeInSportUpdater;
+import lan.dk.podcastserver.manager.worker.updater.BeInSportsUpdater;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class BeInSportWorker {
 
     private final Logger logger = LoggerFactory.getLogger(BeInSportWorker.class);
 
-    BeInSportUpdater beInSportUpdater = new BeInSportUpdater();
+    BeInSportsUpdater beInSportsUpdater = new BeInSportsUpdater();
 
 /*
     @Test
