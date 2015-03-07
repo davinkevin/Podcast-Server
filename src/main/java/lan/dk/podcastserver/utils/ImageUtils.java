@@ -32,7 +32,7 @@ public class ImageUtils {
             imageInputStream = ImageIO.createImageInputStream(urlInputStream);
         } catch (IOException e) {
             //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.debug("Error during creation of ImageInputStream", e);
+            logger.debug("Error during creation of ImageInputStream for {}", cover.getUrl());
             return null;
         }
         try {
