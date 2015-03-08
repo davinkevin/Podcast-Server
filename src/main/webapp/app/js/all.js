@@ -900,53 +900,62 @@ angular.module("ps.dataService.item", ["restangular"]).service("itemService", it
  * Created by kevin on 02/11/14.
  */
 
+var podcastService = (function () {
+    function podcastService(Restangular) {
+        _classCallCheck(this, podcastService);
+
+        this.Restangular = Restangular;
+        this.route = "podcast";
+    }
+    podcastService.$inject = ["Restangular"];
+
+    _createClass(podcastService, {
+        findById: {
+            value: function findById(podcastId) {
+                return this.Restangular.one(this.route, podcastId).get();
+            }
+        },
+        findAll: {
+            value: function findAll() {
+                return this.Restangular.all(this.route).getList();
+            }
+        },
+        save: {
+            value: function save(podcast) {
+                return podcast.save();
+            }
+        },
+        getNewPodcast: {
+            value: function getNewPodcast() {
+                return this.Restangular.one(this.route);
+            }
+        },
+        patch: {
+            value: function patch(item) {
+                return item.patch();
+            }
+        },
+        deletePodcast: {
+            value: function deletePodcast(item) {
+                return item.remove();
+            }
+        },
+        findInfo: {
+            value: function findInfo(url) {
+                return this.Restangular.one(this.route).findInfo(url);
+            }
+        }
+    });
+
+    return podcastService;
+})();
+
 angular.module("ps.dataService.podcast", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
     RestangularProvider.addElementTransformer("podcast", false, function (podcast) {
         podcast.addRestangularMethod("findInfo", "post", "fetch", undefined, { "Content-Type": "text/plain" });
         return podcast;
     });
-}]).factory("podcastService", ["Restangular", function (Restangular) {
-    "use strict";
-    var route = "podcast";
-
-    return {
-        findById: findById,
-        findAll: findAll,
-        save: save,
-        getNewPodcast: getNewPodcast,
-        patch: patch,
-        deletePodcast: deletePodcast,
-        findInfo: findInfo
-    };
-
-    function findById(podcastId) {
-        return Restangular.one(route, podcastId).get();
-    }
-
-    function findAll() {
-        return Restangular.all(route).getList();
-    }
-
-    function save(podcast) {
-        return podcast.save();
-    }
-
-    function getNewPodcast() {
-        return Restangular.one(route);
-    }
-
-    function patch(item) {
-        return item.patch();
-    }
-
-    function deletePodcast(item) {
-        return item.remove();
-    }
-
-    function findInfo(url) {
-        return Restangular.one(route).findInfo(url);
-    }
-}]);
+}]).service("podcastService", podcastService);
 /**
  * Created by kevin on 01/11/14.
  */

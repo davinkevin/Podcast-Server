@@ -2,52 +2,48 @@
  * Created by kevin on 02/11/14.
  */
 
-angular.module('ps.dataService.podcast', [
-    'restangular'
-]).config(function(RestangularProvider) {
-    RestangularProvider.addElementTransformer('podcast', false, function(podcast) {
-        podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
-        return podcast;
-    });
-}).factory('podcastService', function (Restangular) {
-    'use strict';
-    var route = 'podcast';
-
-    return {
-        findById    :   findById,
-        findAll     :   findAll,
-        save        :   save,
-        getNewPodcast : getNewPodcast,
-        patch       :   patch,
-        deletePodcast : deletePodcast,
-        findInfo    :   findInfo
-    };
-
-    function findById(podcastId) {
-        return Restangular.one(route, podcastId).get();
-    }
-
-    function findAll() {
-        return Restangular.all(route).getList();
-    }
+class podcastService  {
     
-    function save(podcast) {
+    constructor(Restangular) {
+        this.Restangular = Restangular;
+        this.route = 'podcast';
+    }
+
+    findById(podcastId) {
+        return this.Restangular.one(this.route, podcastId).get();
+    }
+
+    findAll() {
+        return this.Restangular.all(this.route).getList();
+    }
+
+    save(podcast) {
         return podcast.save();
     }
-    
-    function getNewPodcast() {
-        return Restangular.one(route);
+
+    getNewPodcast() {
+        return this.Restangular.one(this.route);
     }
-    
-    function patch(item) {
+
+    patch(item) {
         return item.patch();
     }
-    
-    function deletePodcast(item) {
+
+    deletePodcast(item) {
         return item.remove();
     }
-    
-    function findInfo(url) {
-        return Restangular.one(route).findInfo(url);
+
+    findInfo(url) {
+        return this.Restangular.one(this.route).findInfo(url);
     }
-});
+    
+}
+
+angular.module('ps.dataService.podcast', ['restangular'])
+    .config((RestangularProvider) => {
+            RestangularProvider.addElementTransformer('podcast', false, (podcast) => {
+                podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
+                return podcast;
+            });
+        })
+    .service('podcastService', podcastService);
