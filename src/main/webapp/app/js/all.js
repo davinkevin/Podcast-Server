@@ -842,46 +842,59 @@ angular.module("ps.dataService.donwloadManager", ["restangular", "AngularStompDK
 /**
  * Created by kevin on 01/11/14.
  */
-angular.module("ps.dataService.item", ["restangular"]).factory("itemService", ["Restangular", function (Restangular) {
-    "use strict";
-    return {
-        search: search,
-        findById: findById,
-        getItemForPodcastWithPagination: getItemForPodcastWithPagination,
-        restangularizePodcastItem: restangularizePodcastItem
-    };
 
-    function search(searchParameters) {
-        //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-        return Restangular.one("item/search").post(null, searchParameters).then(function (responseFromServer) {
-            responseFromServer.content = restangularizedItems(responseFromServer.content);
-            return responseFromServer;
-        });
+var itemService = (function () {
+    function itemService(Restangular) {
+        _classCallCheck(this, itemService);
+
+        this.Restangular = Restangular;
     }
+    itemService.$inject = ["Restangular"];
 
-    function findById(podcastId, itemId) {
-        return Restangular.one("podcast", podcastId).one("items", itemId).get();
-    }
+    _createClass(itemService, {
+        search: {
+            value: function search(searchParameters) {
+                var _this = this;
 
-    function getItemForPodcastWithPagination(podcast, pageParemeters) {
-        return podcast.one("items").post(null, pageParemeters);
-    }
+                return this.Restangular.one("item/search").post(null, searchParameters).then(function (responseFromServer) {
+                    responseFromServer.content = _this.restangularizedItems(responseFromServer.content);
+                    return responseFromServer;
+                });
+            }
+        },
+        findById: {
+            value: function findById(podcastId, itemId) {
+                return this.Restangular.one("podcast", podcastId).one("items", itemId).get();
+            }
+        },
+        getItemForPodcastWithPagination: {
+            value: function getItemForPodcastWithPagination(podcast, pageParemeters) {
+                return podcast.one("items").post(null, pageParemeters);
+            }
+        },
+        restangularizePodcastItem: {
+            value: function restangularizePodcastItem(podcast, items) {
+                return this.Restangular.restangularizeCollection(podcast, items, "items");
+            }
+        },
+        restangularizedItems: {
+            value: function restangularizedItems(itemList) {
+                var _this = this;
 
-    function restangularizePodcastItem(podcast, items) {
-        return Restangular.restangularizeCollection(podcast, items, "items");
-    }
+                var restangularList = [];
 
-    // Private Function :
+                angular.forEach(itemList, function (value) {
+                    restangularList.push(_this.Restangular.restangularizeElement(_this.Restangular.one("podcast", value.podcastId), value, "items"));
+                });
+                return restangularList;
+            }
+        }
+    });
 
-    // transformation
-    function restangularizedItems(itemList) {
-        var restangularList = [];
-        angular.forEach(itemList, function (value) {
-            restangularList.push(Restangular.restangularizeElement(Restangular.one("podcast", value.podcastId), value, "items"));
-        });
-        return restangularList;
-    }
-}]);
+    return itemService;
+})();
+
+angular.module("ps.dataService.item", ["restangular"]).service("itemService", itemService);
 
 /**
  * Created by kevin on 02/11/14.
