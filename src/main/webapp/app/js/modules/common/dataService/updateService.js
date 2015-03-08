@@ -1,14 +1,12 @@
-angular.module('ps.dataService.updateService', [
-    'restangular'
-])
-    .factory('UpdateService', function(Restangular) {
-        'use strict';
-        
-        return {
-            forceUpdatePodcast : forceUpdatePodcast
-        };
 
-        function forceUpdatePodcast(idPodcast) {
-            return Restangular.one("task").customPOST(idPodcast, "updateManager/updatePodcast/force");
-        }
-    });
+class UpdateService {
+    constructor(Restangular) {
+        this.Restangular = Restangular;
+    }
+
+    forceUpdatePodcast(idPodcast) {
+        return this.Restangular.one("task").customPOST(idPodcast, "updateManager/updatePodcast/force");
+    }
+} 
+
+angular.module('ps.dataService.updateService', ['restangular']).service('UpdateService', UpdateService);
