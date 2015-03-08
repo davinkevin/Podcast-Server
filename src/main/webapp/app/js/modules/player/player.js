@@ -1,15 +1,15 @@
 angular.module('ps.player', [
     'ngSanitize',
     'ngRoute',
-    'ngStorage',
     'device-detection',
     'com.2fdevs.videogular',
     'com.2fdevs.videogular.plugins.poster',
     'com.2fdevs.videogular.plugins.controls',
     'com.2fdevs.videogular.plugins.overlayplay',
-    'com.2fdevs.videogular.plugins.buffering'
+    'com.2fdevs.videogular.plugins.buffering',
+    'ps.player.playlist'
 ])
-    .config(function($routeProvider) {
+    .config(($routeProvider) => {
         $routeProvider.
             when('/player', {
                 templateUrl: 'html/player.html',
@@ -17,9 +17,9 @@ angular.module('ps.player', [
                 controllerAs: 'pc'
             });
     })
-    .controller('PlayerController', function (playlistService, $timeout, deviceDetectorService) {
+    .controller('PlayerController', function PlayerController(playlistService, $timeout, deviceDetectorService) {
         var vm = this;
-        
+
         vm.playlist = [];
         vm.state = null;
         vm.API = null;
@@ -28,7 +28,7 @@ angular.module('ps.player', [
         vm.onPlayerReady = function(API) {
             vm.API = API;
 
-            if (vm.API.currentState == 'play' || vm.isCompleted) 
+            if (vm.API.currentState == 'play' || vm.isCompleted)
                 vm.API.play();
 
             vm.isCompleted = false;
@@ -46,7 +46,7 @@ angular.module('ps.player', [
 
             vm.setVideo(indexOfVideo+1);
         };
-        
+
 
         vm.config = {
             preload : true,
@@ -66,9 +66,9 @@ angular.module('ps.player', [
         vm.reloadPlaylist = function() {
             _.updateinplace(vm.playlist, playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
         };
-        
+
         vm.reloadPlaylist();
-        
+
         vm.setVideo = function(index) {
             vm.currentVideo = vm.playlist[index];
 
@@ -81,7 +81,7 @@ angular.module('ps.player', [
                 }
             }
         };
-        
+
         vm.remove = function(item) {
             playlistService.remove(item);
             vm.reloadPlaylist();
@@ -94,31 +94,8 @@ angular.module('ps.player', [
             playlistService.removeAll();
             vm.reloadPlaylist();
         };
-        
+
         function getIndexOfVideoInPlaylist(item) {
             return vm.playlist.indexOf(item);
         }
-    })
-    .factory('playlistService', function($localStorage) {
-        $localStorage.playlist = $localStorage.playlist || [];
-        return {
-            playlist : function() {
-                return $localStorage.playlist
-            },
-            add : function(item) {
-                $localStorage.playlist.push(item);
-            },
-            remove : function (item) {
-                $localStorage.playlist = _.remove($localStorage.playlist, function(elem) { return elem.id !== item.id; });
-            },
-            contains : function(item) {
-                return angular.isObject(_.find($localStorage.playlist, {id : item.id}));
-            },
-            addOrRemove : function (item) {
-                (this.contains(item)) ? this.remove(item) : this.add(item);
-            },
-            removeAll : function () {
-                $localStorage.playlist = [];
-            }
-        };
     });
