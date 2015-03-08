@@ -7,53 +7,6 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
-angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
-angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
-    cfpLoadingBarProvider.includeSpinner = false;
-}]);
-angular.module("ps.search", ["ps.search.item"]);
-
-angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module("ps.dataservice", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.podcast", "ps.dataService.tag"]);
-angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.otherwise({
-        redirectTo: "/items"
-    });
-}]);
 angular.module("authorize-notification", ["notification"]).directive("authorizeNotification", function () {
     return {
         replace: true,
@@ -81,6 +34,11 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     }
 }]);
 
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
 angular.module("device-detection", []).factory("deviceDetectorService", ["$window", function deviceDetectorService($window) {
     return {
         isTouchedDevice: isTouchedDevice
@@ -90,11 +48,14 @@ angular.module("device-detection", []).factory("deviceDetectorService", ["$windo
         return "ontouchstart" in $window;
     }
 }]);
+angular.module("ps.search", ["ps.search.item"]);
+
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -149,6 +110,40 @@ angular.module("navbar", []).directive("navbar", function () {
     vm.navCollapsed = true;
 });
 
+angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
+angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
+    cfpLoadingBarProvider.includeSpinner = false;
+}]);
+angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
+angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
+    ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+}]);
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.otherwise({
+        redirectTo: "/items"
+    });
+}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -773,74 +768,110 @@ angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataServ
         if (elemToUpdate) _.assign(elemToUpdate, item);
     }, $scope);
 }]);
-angular.module("ps.dataService.donwloadManager", ["restangular", "AngularStompDK"]).factory("DonwloadManager", ["Restangular", "ngstomp", function (Restangular, ngstomp) {
-    "use strict";
+/**
+ * Created by kevin on 02/11/14.
+ */
 
-    var baseTask = Restangular.one("task"),
-        baseDownloadManager = baseTask.one("downloadManager");
+angular.module("ps.dataservice", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.podcast", "ps.dataService.tag", "ps.dataService.updateService"]);
 
-    //** Part dedicated to web-socket :
+var DownloadManager = (function () {
+    function DownloadManager(Restangular, ngstomp) {
+        var _this = this;
 
-    var WS_DOWNLOAD_BASE = "/app/download";
+        _classCallCheck(this, DownloadManager);
 
-    var ws = {
-        connect: ngstomp.connect,
-        subscribe: ngstomp.subscribe,
-        unsubscribe: ngstomp.unsubscribe,
-        toggle: function toggle(item) {
-            ngstomp.send(WS_DOWNLOAD_BASE + "/toogle", item);
+        this.Restangular = Restangular;
+        this.baseTask = this.Restangular.one("task");
+        this.baseDownloadManager = this.baseTask.one("downloadManager");
+        this.WS_DOWNLOAD_BASE = "/app/download";
+
+        this.ws = {
+            connect: ngstomp.connect,
+            subscribe: ngstomp.subscribe,
+            unsubscribe: ngstomp.unsubscribe,
+            toggle: function (item) {
+                ngstomp.send(_this.WS_DOWNLOAD_BASE + "/toogle", item);
+            },
+            start: function (item) {
+                ngstomp.send(_this.WS_DOWNLOAD_BASE + "/start", item);
+            },
+            pause: function (item) {
+                ngstomp.send(_this.WS_DOWNLOAD_BASE + "/pause", item);
+            },
+            stop: function (item) {
+                ngstomp.send(_this.WS_DOWNLOAD_BASE + "/stop", item);
+            }
+        };
+    }
+    DownloadManager.$inject = ["Restangular", "ngstomp"];
+
+    _createClass(DownloadManager, {
+        download: {
+            value: function download(item) {
+                return this.Restangular.one("item").customGET(item.id + "/addtoqueue");
+            }
         },
-        start: function start(item) {
-            ngstomp.send(WS_DOWNLOAD_BASE + "/start", item);
+        stopDownload: {
+            value: function stopDownload(item) {
+                return this.baseDownloadManager.customPOST(item.id, "stopDownload");
+            }
         },
-        pause: function pause(item) {
-            ngstomp.send(WS_DOWNLOAD_BASE + "/pause", item);
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                return this.baseDownloadManager.customPOST(item.id, "toogleDownload");
+            }
         },
-        stop: function stop(item) {
-            ngstomp.send(WS_DOWNLOAD_BASE + "/stop", item);
+        stopAllDownload: {
+            value: function stopAllDownload() {
+                return this.baseDownloadManager.customGET("stopAllDownload");
+            }
+        },
+        pauseAllDownload: {
+            value: function pauseAllDownload() {
+                return this.baseDownloadManager.customGET("pauseAllDownload");
+            }
+        },
+        restartAllCurrentDownload: {
+            value: function restartAllCurrentDownload() {
+                return this.baseDownloadManager.customGET("restartAllCurrentDownload");
+            }
+        },
+        removeFromQueue: {
+            value: function removeFromQueue(item) {
+                return this.baseDownloadManager.customDELETE("queue/" + item.id);
+            }
+        },
+        updateNumberOfSimDl: {
+            value: function updateNumberOfSimDl(number) {
+                return this.baseDownloadManager.customPOST(number, "limit");
+            }
+        },
+        dontDonwload: {
+            value: function dontDonwload(item) {
+                return this.baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
+            }
+        },
+        getDownloading: {
+            value: function getDownloading() {
+                return this.baseTask.all("downloadManager/downloading").getList();
+            }
+        },
+        getNumberOfSimDl: {
+            value: function getNumberOfSimDl() {
+                return this.baseDownloadManager.one("limit").get();
+            }
+        },
+        moveInWaitingList: {
+            value: function moveInWaitingList(item, position) {
+                this.baseDownloadManager.customPOST({ id: item.id, position: position }, "move");
+            }
         }
-    };
+    });
 
-    return {
-        download: function download(item) {
-            return Restangular.one("item").customGET(item.id + "/addtoqueue");
-        },
-        stopDownload: function stopDownload(item) {
-            return baseDownloadManager.customPOST(item.id, "stopDownload");
-        },
-        toggleDownload: function toggleDownload(item) {
-            return baseDownloadManager.customPOST(item.id, "toogleDownload");
-        },
-        stopAllDownload: function stopAllDownload() {
-            return baseDownloadManager.customGET("stopAllDownload");
-        },
-        pauseAllDownload: function pauseAllDownload() {
-            return baseDownloadManager.customGET("pauseAllDownload");
-        },
-        restartAllCurrentDownload: function restartAllCurrentDownload() {
-            return baseDownloadManager.customGET("restartAllCurrentDownload");
-        },
-        removeFromQueue: function removeFromQueue(item) {
-            return baseDownloadManager.customDELETE("queue/" + item.id);
-        },
-        updateNumberOfSimDl: function updateNumberOfSimDl(number) {
-            return baseDownloadManager.customPOST(number, "limit");
-        },
-        dontDonwload: function dontDonwload(item) {
-            return baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
-        },
-        getDownloading: function getDownloading() {
-            return baseTask.all("downloadManager/downloading").getList();
-        },
-        getNumberOfSimDl: function getNumberOfSimDl() {
-            return baseDownloadManager.one("limit").get();
-        },
-        moveInWaitingList: function moveInWaitingList(item, position) {
-            baseDownloadManager.customPOST({ id: item.id, position: position }, "move");
-        },
-        ws: ws
-    };
-}]);
+    return DownloadManager;
+})();
+
+angular.module("ps.dataService.donwloadManager", ["restangular", "AngularStompDK"]).service("DonwloadManager", DownloadManager);
 /**
  * Created by kevin on 01/11/14.
  */
