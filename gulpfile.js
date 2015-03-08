@@ -14,7 +14,9 @@ var gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps'),
     args = require('yargs').argv,
     plumber = require('gulp-plumber'),
-    es = require('event-stream');
+    es = require('event-stream'),
+    babel = require('gulp-babel'), 
+    wrap = require('gulp-wrap');
 
 var fileAppLocation = 'src/main/webapp/app/';
 
@@ -47,8 +49,10 @@ gulp.task('js', function() {
     )
     .pipe(sourcemaps.init())
     .pipe(concat('all.js'))
-    .pipe(gulp.dest(jsDestination))
+    .pipe(wrap('(function(){\n"use strict";\n<%= contents %>\n})();'))
+    .pipe(babel())
     .pipe(ngAnnotate())
+    .pipe(gulp.dest(jsDestination))
     .pipe(uglify())
     .pipe(rename('all.min.js'))
     .pipe(sourcemaps.write('.'))
