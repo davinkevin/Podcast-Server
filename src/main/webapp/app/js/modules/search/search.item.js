@@ -90,7 +90,7 @@ angular.module('ps.search.item', [
         //** DownloadManager **//
         $scope.stopDownload = DonwloadManager.ws.stop;
         $scope.toggleDownload = DonwloadManager.ws.toggle;
-        $scope.loadTags = tagService.search;
+        $scope.loadTags = (query) => tagService.search(query);
 
         //** Playlist Manager **//
         $scope.addOrRemove = function(item) {

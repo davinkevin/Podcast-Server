@@ -7,6 +7,8 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
+angular.module("ps.search", ["ps.search.item"]);
+
 angular.module("authorize-notification", ["notification"]).directive("authorizeNotification", function () {
     return {
         replace: true,
@@ -48,18 +50,17 @@ angular.module("device-detection", []).factory("deviceDetectorService", ["$windo
         return "ontouchstart" in $window;
     }
 }]);
-angular.module("ps.search", ["ps.search.item"]);
+/**
+ * Created by kevin on 02/11/14.
+ */
+
+angular.module("ps.dataservice", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.podcast", "ps.dataService.tag"]);
 
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
-/**
- * Created by kevin on 02/11/14.
- */
-
-angular.module("ps.dataservice", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.podcast", "ps.dataService.tag"]);
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -96,7 +97,6 @@ _.mixin({
         return localArray;
     }
 });
-
 angular.module("navbar", []).directive("navbar", function () {
     return {
         transclude: true,
@@ -292,177 +292,6 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
     }]);
 })();
 
-angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManager", "notification"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/download", {
-        templateUrl: "html/download.html",
-        controller: "DownloadCtrl",
-        hotkeys: commonKey
-    });
-}]).controller("DownloadCtrl", ["$scope", "DonwloadManager", "Notification", function ($scope, DonwloadManager, Notification) {
-    //$scope.items = DonwloadManager.getDownloading().$object;
-    $scope.waitingitems = [];
-
-    DonwloadManager.getNumberOfSimDl().then(function (data) {
-        $scope.numberOfSimDl = parseInt(data);
-    });
-
-    $scope.getTypeFromStatus = function (item) {
-        if (item.status === "Paused") return "warning";
-        return "info";
-    };
-
-    $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
-
-    /** Websocket Connection */
-    DonwloadManager.ws.subscribe("/app/download", function (message) {
-        $scope.items = JSON.parse(message.body);
-    }, $scope).subscribe("/app/waiting", function (message) {
-        $scope.waitingitems = JSON.parse(message.body);
-    }, $scope).subscribe("/topic/download", function (message) {
-        var item = JSON.parse(message.body);
-        var elemToUpdate = _.find($scope.items, { id: item.id });
-        switch (item.status) {
-            case "Started":
-            case "Paused":
-                if (elemToUpdate) _.assign(elemToUpdate, item);else $scope.items.push(item);
-                break;
-            case "Finish":
-                new Notification("Téléchargement terminé", {
-                    body: item.title,
-                    icon: item.cover.url,
-                    delay: 5000
-                });
-            case "Stopped":
-                if (elemToUpdate) {
-                    _.remove($scope.items, function (item) {
-                        return item.id === elemToUpdate.id;
-                    });
-                }
-                break;
-        }
-    }, $scope).subscribe("/topic/waiting", function (message) {
-        var remoteWaitingItems = JSON.parse(message.body);
-        _.updateinplace($scope.waitingitems, remoteWaitingItems, function (inArray, elem) {
-            return _.findIndex(inArray, { id: elem.id });
-        }, true);
-    }, $scope);
-
-    /** Spécifique aux éléments de la liste : **/
-    $scope.download = DonwloadManager.download;
-    $scope.stopDownload = DonwloadManager.ws.stop;
-    $scope.toggleDownload = DonwloadManager.ws.toggle;
-
-    /** Global **/
-    $scope.stopAllDownload = DonwloadManager.stopAllDownload;
-    $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
-    $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
-    $scope.removeFromQueue = DonwloadManager.removeFromQueue;
-    $scope.dontDonwload = DonwloadManager.dontDonwload;
-    $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
-}]);
-angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
-        templateUrl: "html/item-detail.html",
-        controller: "ItemDetailCtrl",
-        hotkeys: commonKey,
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemDetailCtrl", ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item", function ($scope, DonwloadManager, $location, playlistService, podcast, item) {
-
-    $scope.item = item;
-    $scope.item.podcast = podcast;
-
-    $scope.stopDownload = DonwloadManager.ws.stop;
-    $scope.toggleDownload = DonwloadManager.ws.toggle;
-
-    $scope.remove = function (item) {
-        return item.remove().then(function () {
-            playlistService.remove(item);
-            $location.path("/podcast/".concat($scope.item.podcast.id));
-        });
-    };
-
-    $scope.reset = function (item) {
-        return item.reset().then(function (itemReseted) {
-            _.assign($scope.item, itemReseted);
-            playlistService.remove(item);
-        });
-    };
-
-    $scope.toggleInPlaylist = function () {
-        playlistService.addOrRemove(item);
-    };
-
-    $scope.isInPlaylist = function () {
-        return playlistService.contains(item);
-    };
-
-    //** WebSocket Inscription **//
-    var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
-
-    DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-        var itemFromWS = JSON.parse(message.body);
-
-        if (itemFromWS.id == $scope.item.id) {
-            _.assign($scope.item, itemFromWS);
-        }
-    }, $scope);
-}]);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
-angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
-        templateUrl: "html/item-player.html",
-        controller: "ItemPlayerController",
-        controllerAs: "ipc",
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemPlayerController", ["podcast", "item", "$timeout", "deviceDetectorService", function (podcast, item, $timeout, deviceDetectorService) {
-    var vm = this;
-
-    vm.item = item;
-    vm.item.podcast = podcast;
-
-    vm.config = {
-        preload: true,
-        sources: [{ src: item.proxyURL, type: item.mimeType }],
-        theme: {
-            url: "http://www.videogular.com/styles/themes/default/videogular.css"
-        },
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: item.cover.url
-        }
-    };
-
-    vm.onPlayerReady = function (API) {
-        if (vm.config.preload) {
-            $timeout(function () {
-                API.play();
-            });
-        }
-    };
-}]);
 angular.module("ps.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering", "ps.player.playlist"]).config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/player", {
         templateUrl: "html/player.html",
@@ -603,77 +432,6 @@ var PlaylistService = (function () {
 
 angular.module("ps.player.playlist", ["ngStorage"]).service("playlistService", PlaylistService);
 
-angular.module("ps.podcast.creation", ["ps.config.route", "ps.dataservice", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast-creation", {
-        templateUrl: "html/podcast-creation.html",
-        controller: "PodcastAddCtrl",
-        hotkeys: commonKey
-    });
-}]).constant("defaultPodcast", { hasToBeDeleted: true, cover: { height: 200, width: 200 } }).controller("PodcastAddCtrl", ["$scope", "$location", "defaultPodcast", "tagService", "podcastService", function ($scope, $location, defaultPodcast, tagService, podcastService) {
-    $scope.podcast = angular.extend(podcastService.getNewPodcast(), defaultPodcast);
-
-    $scope.findInfo = function () {
-        podcastService.findInfo($scope.podcast.url).then(function (podcastFetched) {
-            $scope.podcast.title = podcastFetched.title;
-            $scope.podcast.description = podcastFetched.description;
-            $scope.podcast.type = podcastFetched.type;
-            $scope.podcast.cover.url = podcastFetched.cover.url;
-        });
-    };
-
-    $scope.loadTags = function (query) {
-        return tagService.search(query);
-    };
-
-    $scope.changeType = function () {
-        if (/beinsports\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "BeInSports";
-        } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "CanalPlus";
-        } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "JeuxVideoFR";
-        } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "JeuxVideoCom";
-        } else if (/parleys\.com/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "Parleys";
-        } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "Pluzz";
-        } else if (/youtube\.com/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "Youtube";
-        } else if ($scope.podcast.url.length > 0) {
-            $scope.podcast.type = "RSS";
-        } else {
-            $scope.podcast.type = "Send";
-        }
-    };
-
-    $scope.save = function () {
-        podcastService.save($scope.podcast).then(function (podcast) {
-            $location.path("/podcast/" + podcast.id);
-        });
-    };
-}]);
-
-var PodcastsListCtrl = function PodcastsListCtrl(podcasts) {
-    _classCallCheck(this, PodcastsListCtrl);
-
-    this.podcasts = podcasts;
-};
-PodcastsListCtrl.$inject = ["podcasts"];
-
-angular.module("ps.podcast.list", ["ps.config.route", "ps.dataService.podcast"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcasts", {
-        templateUrl: "html/podcasts-list.html",
-        controller: "PodcastsListCtrl",
-        controllerAs: "plc",
-        hotkeys: commonKey,
-        resolve: {
-            podcasts: ["podcastService", function podcasts(podcastService) {
-                return podcastService.findAll();
-            }]
-        }
-    });
-}]).controller("PodcastsListCtrl", PodcastsListCtrl);
 angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/items", {
         templateUrl: "html/items-search.html",
@@ -752,7 +510,9 @@ angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataServ
     //** DownloadManager **//
     $scope.stopDownload = DonwloadManager.ws.stop;
     $scope.toggleDownload = DonwloadManager.ws.toggle;
-    $scope.loadTags = tagService.search;
+    $scope.loadTags = function (query) {
+        return tagService.search(query);
+    };
 
     //** Playlist Manager **//
     $scope.addOrRemove = function (item) {
@@ -770,6 +530,248 @@ angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataServ
         var elemToUpdate = _.find($scope.items, { id: item.id });
         if (elemToUpdate) _.assign(elemToUpdate, item);
     }, $scope);
+}]);
+angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
+        templateUrl: "html/item-detail.html",
+        controller: "ItemDetailCtrl",
+        hotkeys: commonKey,
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemDetailCtrl", ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item", function ($scope, DonwloadManager, $location, playlistService, podcast, item) {
+
+    $scope.item = item;
+    $scope.item.podcast = podcast;
+
+    $scope.stopDownload = DonwloadManager.ws.stop;
+    $scope.toggleDownload = DonwloadManager.ws.toggle;
+
+    $scope.remove = function (item) {
+        return item.remove().then(function () {
+            playlistService.remove(item);
+            $location.path("/podcast/".concat($scope.item.podcast.id));
+        });
+    };
+
+    $scope.reset = function (item) {
+        return item.reset().then(function (itemReseted) {
+            _.assign($scope.item, itemReseted);
+            playlistService.remove(item);
+        });
+    };
+
+    $scope.toggleInPlaylist = function () {
+        playlistService.addOrRemove(item);
+    };
+
+    $scope.isInPlaylist = function () {
+        return playlistService.contains(item);
+    };
+
+    //** WebSocket Inscription **//
+    var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
+
+    DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+        var itemFromWS = JSON.parse(message.body);
+
+        if (itemFromWS.id == $scope.item.id) {
+            _.assign($scope.item, itemFromWS);
+        }
+    }, $scope);
+}]);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
+        templateUrl: "html/item-player.html",
+        controller: "ItemPlayerController",
+        controllerAs: "ipc",
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemPlayerController", ["podcast", "item", "$timeout", "deviceDetectorService", function (podcast, item, $timeout, deviceDetectorService) {
+    var vm = this;
+
+    vm.item = item;
+    vm.item.podcast = podcast;
+
+    vm.config = {
+        preload: true,
+        sources: [{ src: item.proxyURL, type: item.mimeType }],
+        theme: {
+            url: "http://www.videogular.com/styles/themes/default/videogular.css"
+        },
+        plugins: {
+            controls: {
+                autoHide: !deviceDetectorService.isTouchedDevice(),
+                autoHideTime: 2000
+            },
+            poster: item.cover.url
+        }
+    };
+
+    vm.onPlayerReady = function (API) {
+        if (vm.config.preload) {
+            $timeout(function () {
+                API.play();
+            });
+        }
+    };
+}]);
+angular.module("ps.podcast.creation", ["ps.config.route", "ps.dataservice", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast-creation", {
+        templateUrl: "html/podcast-creation.html",
+        controller: "PodcastAddCtrl",
+        hotkeys: commonKey
+    });
+}]).constant("defaultPodcast", { hasToBeDeleted: true, cover: { height: 200, width: 200 } }).controller("PodcastAddCtrl", ["$scope", "$location", "defaultPodcast", "tagService", "podcastService", function ($scope, $location, defaultPodcast, tagService, podcastService) {
+    $scope.podcast = angular.extend(podcastService.getNewPodcast(), defaultPodcast);
+
+    $scope.findInfo = function () {
+        podcastService.findInfo($scope.podcast.url).then(function (podcastFetched) {
+            $scope.podcast.title = podcastFetched.title;
+            $scope.podcast.description = podcastFetched.description;
+            $scope.podcast.type = podcastFetched.type;
+            $scope.podcast.cover.url = podcastFetched.cover.url;
+        });
+    };
+
+    $scope.loadTags = function (query) {
+        return tagService.search(query);
+    };
+
+    $scope.changeType = function () {
+        if (/beinsports\.fr/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "BeInSports";
+        } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "CanalPlus";
+        } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "JeuxVideoFR";
+        } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "JeuxVideoCom";
+        } else if (/parleys\.com/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "Parleys";
+        } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "Pluzz";
+        } else if (/youtube\.com/i.test($scope.podcast.url)) {
+            $scope.podcast.type = "Youtube";
+        } else if ($scope.podcast.url.length > 0) {
+            $scope.podcast.type = "RSS";
+        } else {
+            $scope.podcast.type = "Send";
+        }
+    };
+
+    $scope.save = function () {
+        podcastService.save($scope.podcast).then(function (podcast) {
+            $location.path("/podcast/" + podcast.id);
+        });
+    };
+}]);
+
+var PodcastsListCtrl = function PodcastsListCtrl(podcasts) {
+    _classCallCheck(this, PodcastsListCtrl);
+
+    this.podcasts = podcasts;
+};
+PodcastsListCtrl.$inject = ["podcasts"];
+
+angular.module("ps.podcast.list", ["ps.config.route", "ps.dataService.podcast"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcasts", {
+        templateUrl: "html/podcasts-list.html",
+        controller: "PodcastsListCtrl",
+        controllerAs: "plc",
+        hotkeys: commonKey,
+        resolve: {
+            podcasts: ["podcastService", function podcasts(podcastService) {
+                return podcastService.findAll();
+            }]
+        }
+    });
+}]).controller("PodcastsListCtrl", PodcastsListCtrl);
+angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManager", "notification"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/download", {
+        templateUrl: "html/download.html",
+        controller: "DownloadCtrl",
+        hotkeys: commonKey
+    });
+}]).controller("DownloadCtrl", ["$scope", "DonwloadManager", "Notification", function ($scope, DonwloadManager, Notification) {
+    //$scope.items = DonwloadManager.getDownloading().$object;
+    $scope.waitingitems = [];
+
+    DonwloadManager.getNumberOfSimDl().then(function (data) {
+        $scope.numberOfSimDl = parseInt(data);
+    });
+
+    $scope.getTypeFromStatus = function (item) {
+        if (item.status === "Paused") return "warning";
+        return "info";
+    };
+
+    $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
+
+    /** Websocket Connection */
+    DonwloadManager.ws.subscribe("/app/download", function (message) {
+        $scope.items = JSON.parse(message.body);
+    }, $scope).subscribe("/app/waiting", function (message) {
+        $scope.waitingitems = JSON.parse(message.body);
+    }, $scope).subscribe("/topic/download", function (message) {
+        var item = JSON.parse(message.body);
+        var elemToUpdate = _.find($scope.items, { id: item.id });
+        switch (item.status) {
+            case "Started":
+            case "Paused":
+                if (elemToUpdate) _.assign(elemToUpdate, item);else $scope.items.push(item);
+                break;
+            case "Finish":
+                new Notification("Téléchargement terminé", {
+                    body: item.title,
+                    icon: item.cover.url,
+                    delay: 5000
+                });
+            case "Stopped":
+                if (elemToUpdate) {
+                    _.remove($scope.items, function (item) {
+                        return item.id === elemToUpdate.id;
+                    });
+                }
+                break;
+        }
+    }, $scope).subscribe("/topic/waiting", function (message) {
+        var remoteWaitingItems = JSON.parse(message.body);
+        _.updateinplace($scope.waitingitems, remoteWaitingItems, function (inArray, elem) {
+            return _.findIndex(inArray, { id: elem.id });
+        }, true);
+    }, $scope);
+
+    /** Spécifique aux éléments de la liste : **/
+    $scope.download = DonwloadManager.download;
+    $scope.stopDownload = DonwloadManager.ws.stop;
+    $scope.toggleDownload = DonwloadManager.ws.toggle;
+
+    /** Global **/
+    $scope.stopAllDownload = DonwloadManager.stopAllDownload;
+    $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
+    $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
+    $scope.removeFromQueue = DonwloadManager.removeFromQueue;
+    $scope.dontDonwload = DonwloadManager.dontDonwload;
+    $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
 }]);
 angular.module("ps.dataService.donwloadManager", ["restangular", "AngularStompDK"]).factory("DonwloadManager", ["Restangular", "ngstomp", function (Restangular, ngstomp) {
     "use strict";
@@ -960,23 +962,31 @@ angular.module("ps.dataService.podcast", ["restangular"]).config(["RestangularPr
  * Created by kevin on 01/11/14.
  */
 
-angular.module("ps.dataService.tag", ["restangular"]).factory("tagService", ["Restangular", function (Restangular) {
-    "use strict";
-    var baseAll = Restangular.all("tag");
+var tagService = (function () {
+    function tagService(Restangular) {
+        _classCallCheck(this, tagService);
 
-    return {
-        getAll: getAll,
-        search: search
-    };
-
-    function getAll() {
-        return baseAll.get();
+        this.baseAll = Restangular.all("tag");
     }
+    tagService.$inject = ["Restangular"];
 
-    function search(query) {
-        return baseAll.post(null, { name: query });
-    }
-}]);
+    _createClass(tagService, {
+        getAll: {
+            value: function getAll() {
+                return this.baseAll.get();
+            }
+        },
+        search: {
+            value: function search(query) {
+                return this.baseAll.post(null, { name: query });
+            }
+        }
+    });
+
+    return tagService;
+})();
+
+angular.module("ps.dataService.tag", ["restangular"]).service("tagService", tagService);
 angular.module("ps.dataService.updateService", ["restangular"]).factory("UpdateService", ["Restangular", function (Restangular) {
     "use strict";
 
