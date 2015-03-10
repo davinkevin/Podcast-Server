@@ -25,7 +25,7 @@ angular.module('ps.download', [
             return "info";
         };
 
-        $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
+        $scope.updateNumberOfSimDl = (number) => {DonwloadManager.updateNumberOfSimDl(number)};
 
         /** Websocket Connection */
         DonwloadManager
@@ -70,16 +70,16 @@ angular.module('ps.download', [
                 }, $scope);
 
         /** Spécifique aux éléments de la liste : **/
-        $scope.download = DonwloadManager.download;
-        $scope.stopDownload = DonwloadManager.ws.stop;
-        $scope.toggleDownload = DonwloadManager.ws.toggle;
+        $scope.download = (item) => {DonwloadManager.download(item)};
+        $scope.stopDownload = (item) => {DonwloadManager.ws.stop(item)};
+        $scope.toggleDownload = (item) => {DonwloadManager.ws.toggle(item)};
 
         /** Global **/
-        $scope.stopAllDownload = DonwloadManager.stopAllDownload;
-        $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
-        $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
-        $scope.removeFromQueue = DonwloadManager.removeFromQueue;
-        $scope.dontDonwload = DonwloadManager.dontDonwload;
-        $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
+        $scope.stopAllDownload = () => {DonwloadManager.stopAllDownload()};
+        $scope.pauseAllDownload = () => {DonwloadManager.pauseAllDownload()};
+        $scope.restartAllCurrentDownload = () => {DonwloadManager.restartAllCurrentDownload()};
+        $scope.removeFromQueue = (item) => {DonwloadManager.removeFromQueue(item)};
+        $scope.dontDonwload = (item) => {DonwloadManager.dontDonwload(item)};
+        $scope.moveInWaitingList = (item, position) => {DonwloadManager.moveInWaitingList(item, position)};
 
     });

@@ -306,7 +306,9 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
         return "info";
     };
 
-    $scope.updateNumberOfSimDl = DonwloadManager.updateNumberOfSimDl;
+    $scope.updateNumberOfSimDl = function (number) {
+        DonwloadManager.updateNumberOfSimDl(number);
+    };
 
     /** Websocket Connection */
     DonwloadManager.ws.subscribe("/app/download", function (message) {
@@ -343,17 +345,35 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
     }, $scope);
 
     /** Spécifique aux éléments de la liste : **/
-    $scope.download = DonwloadManager.download;
-    $scope.stopDownload = DonwloadManager.ws.stop;
-    $scope.toggleDownload = DonwloadManager.ws.toggle;
+    $scope.download = function (item) {
+        DonwloadManager.download(item);
+    };
+    $scope.stopDownload = function (item) {
+        DonwloadManager.ws.stop(item);
+    };
+    $scope.toggleDownload = function (item) {
+        DonwloadManager.ws.toggle(item);
+    };
 
     /** Global **/
-    $scope.stopAllDownload = DonwloadManager.stopAllDownload;
-    $scope.pauseAllDownload = DonwloadManager.pauseAllDownload;
-    $scope.restartAllCurrentDownload = DonwloadManager.restartAllCurrentDownload;
-    $scope.removeFromQueue = DonwloadManager.removeFromQueue;
-    $scope.dontDonwload = DonwloadManager.dontDonwload;
-    $scope.moveInWaitingList = DonwloadManager.moveInWaitingList;
+    $scope.stopAllDownload = function () {
+        DonwloadManager.stopAllDownload();
+    };
+    $scope.pauseAllDownload = function () {
+        DonwloadManager.pauseAllDownload();
+    };
+    $scope.restartAllCurrentDownload = function () {
+        DonwloadManager.restartAllCurrentDownload();
+    };
+    $scope.removeFromQueue = function (item) {
+        DonwloadManager.removeFromQueue(item);
+    };
+    $scope.dontDonwload = function (item) {
+        DonwloadManager.dontDonwload(item);
+    };
+    $scope.moveInWaitingList = function (item, position) {
+        DonwloadManager.moveInWaitingList(item, position);
+    };
 }]);
 angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/podcast/:podcastId/item/:itemId", {
