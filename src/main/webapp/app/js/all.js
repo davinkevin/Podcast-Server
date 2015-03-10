@@ -6,6 +6,7 @@ var _createClass = (function () { function defineProperties(target, props) { for
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
+angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -19,13 +20,12 @@ var authorizeNotificationDirective = function authorizeNotificationDirective() {
 };
 
 var authorizeNotificationController = (function () {
-    function authorizeNotificationController($window, Notification, /*, $rootScope*/$q) {
+    function authorizeNotificationController($window, Notification, $q) {
         _classCallCheck(this, authorizeNotificationController);
 
         this.$window = $window;
         this.$q = $q;
         this.Notification = Notification;
-        /*this.$rootScope = $rootScope;*/
         this.state = this.hasToBeShown();
     }
     authorizeNotificationController.$inject = ["$window", "Notification", "$q"];
@@ -63,28 +63,40 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
-angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
 /**
  * Created by kevin on 01/11/14.
  */
 
 angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
+
+var deviceDetectorService = (function () {
+    function deviceDetectorService($window) {
+        _classCallCheck(this, deviceDetectorService);
+
+        this.$window = $window;
+    }
+    deviceDetectorService.$inject = ["$window"];
+
+    _createClass(deviceDetectorService, {
+        isTouchedDevice: {
+            value: function isTouchedDevice() {
+                return "ontouchstart" in this.$window;
+            }
+        }
+    });
+
+    return deviceDetectorService;
+})();
+
+angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
 angular.module("ps.search", ["ps.search.item"]);
 
-angular.module("device-detection", []).factory("deviceDetectorService", ["$window", function deviceDetectorService($window) {
-    return {
-        isTouchedDevice: isTouchedDevice
-    };
-
-    function isTouchedDevice() {
-        return "ontouchstart" in $window;
-    }
-}]);
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -121,23 +133,40 @@ _.mixin({
         return localArray;
     }
 });
-angular.module("navbar", []).directive("navbar", function () {
-    return {
-        transclude: true,
-        replace: true,
-        restrict: "E",
-        templateUrl: "html/navbar.html",
-        scope: true,
-        controllerAs: "navbar",
-        controller: "navbarController",
-        link: function link(scope, element) {
-            element.removeClass("hidden");
+
+var navbarController = function navbarController() {
+    _classCallCheck(this, navbarController);
+
+    this.navCollapsed = true;
+};
+
+var navbarDirective = (function () {
+    function navbarDirective() {
+        _classCallCheck(this, navbarDirective);
+
+        this.transclude = true;
+        this.replace = true;
+        this.restrict = "E";
+        this.scope = true;
+        this.templateUrl = "html/navbar.html";
+        this.controller = "navbarController";
+        this.controllerAs = "navbar";
+    }
+
+    _createClass(navbarDirective, {
+        link: {
+            value: function link(scope, element) {
+                element.removeClass("hidden");
+            }
         }
-    };
-}).controller("navbarController", function () {
-    var vm = this;
-    vm.navCollapsed = true;
-});
+    });
+
+    return navbarDirective;
+})();
+
+angular.module("navbar", []).directive("navbar", function () {
+    return new navbarDirective();
+}).controller("navbarController", navbarController);
 
 angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
 angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
@@ -154,6 +183,23 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         item.addRestangularMethod("reset", "get", "reset");
         item.addRestangularMethod("download", "get", "addtoqueue");
         return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.otherwise({
+        redirectTo: "/items"
     });
 }]);
 (function (module) {
@@ -299,23 +345,6 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
     }]);
 })();
 
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.otherwise({
-        redirectTo: "/items"
-    });
-}]);
 angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManager", "notification"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/download", {
         templateUrl: "html/download.html",
