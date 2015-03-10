@@ -174,11 +174,10 @@ angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoading
 }]);
 angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
 angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
 }]);
 angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
     RestangularProvider.setBaseUrl("/api/");
-
     RestangularProvider.addElementTransformer("items", false, function (item) {
         item.addRestangularMethod("reset", "get", "reset");
         item.addRestangularMethod("download", "get", "addtoqueue");
@@ -198,9 +197,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
     event.preventDefault();
     window.location.href = "#/download";
 }]]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.otherwise({
-        redirectTo: "/items"
-    });
+    return $routeProvider.otherwise({ redirectTo: "/items" });
 }]);
 (function (module) {
     try {

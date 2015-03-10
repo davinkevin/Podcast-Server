@@ -1,28 +1,21 @@
-angular.module('ps.config.route', [
-    'ngRoute',
-    'cfp.hotkeys'
-])
+angular
+    .module('ps.config.route', ['ngRoute','cfp.hotkeys'])
     .constant('commonKey', [
-        ['h', 'Goto Home', function (event) {
+        ['h', 'Goto Home', (event) => {
             event.preventDefault();
             window.location.href = '#/items';
         }],
-        ['s', 'Goto Search', function (event) {
+        ['s', 'Goto Search', (event) =>  {
             event.preventDefault();
             window.location.href = '#/item/search';
         }],
-        ['p', 'Goto Podcast List', function (event) {
+        ['p', 'Goto Podcast List', (event) =>  {
             event.preventDefault();
             window.location.href = '#/podcasts';
         }],
-        ['d', 'Goto Download List', function (event) {
+        ['d', 'Goto Download List', (event) =>  {
             event.preventDefault();
             window.location.href = '#/download';
         }]
     ])
-    .config(function($routeProvider) {
-        $routeProvider.
-            otherwise({
-                redirectTo: '/items'
-            });
-    });
+    .config(($routeProvider) => $routeProvider.otherwise({redirectTo: '/items'}));
