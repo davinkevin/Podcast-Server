@@ -1,3 +1,32 @@
+class ItemPlayerController {
+
+    constructor(podcast, item, $timeout, deviceDetectorService) {
+        this.item = item;
+        this.item.podcast = podcast;
+        this.$timeout = $timeout;
+
+        this.config = {
+            autoPlay: true,
+            sources: [
+                { src : this.item.proxyURL, type : this.item.mimeType }
+            ],
+            plugins: {
+                controls: {
+                    autoHide: !deviceDetectorService.isTouchedDevice(),
+                    autoHideTime: 2000
+                },
+                poster: this.item.cover.url
+            }
+        }
+    }
+
+    onPlayerReady(API) {
+        if (this.config.preload) {
+            this.$timeout(() => { API.play(); })
+        }
+    };
+}
+
 angular.module('ps.item.player', [
     'ngSanitize',
     'ngRoute',
@@ -8,7 +37,7 @@ angular.module('ps.item.player', [
     'com.2fdevs.videogular.plugins.overlayplay',
     'com.2fdevs.videogular.plugins.buffering'
 ])
-    .config(function($routeProvider) {
+    .config(($routeProvider) => {
         $routeProvider.
             when('/podcast/:podcastId/item/:itemId/play', {
                 templateUrl: 'html/item-player.html',
@@ -24,34 +53,4 @@ angular.module('ps.item.player', [
                 }
             });
     })
-    .controller('ItemPlayerController', function (podcast, item, $timeout, deviceDetectorService) {
-        var vm = this;
-        
-        vm.item = item;
-        vm.item.podcast = podcast;
-        
-        vm.config = {
-            preload: true,
-            sources: [
-                { src : item.proxyURL, type : item.mimeType }
-            ],
-            theme: {
-                url: "http://www.videogular.com/styles/themes/default/videogular.css"
-            },
-            plugins: {
-                controls: {
-                    autoHide: !deviceDetectorService.isTouchedDevice(),
-                    autoHideTime: 2000
-                },
-                poster: item.cover.url
-            }
-        }
-
-        vm.onPlayerReady = function(API) {
-            if (vm.config.preload) {
-                $timeout(function () {
-                    API.play();
-                })
-            }
-        };
-    });
+    .controller('ItemPlayerController', ItemPlayerController);

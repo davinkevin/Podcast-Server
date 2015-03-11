@@ -239,7 +239,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/item-player.html", "<div class=\"container item-player\">\n" + "    <br/>\n" + "    <ol class=\"breadcrumb\">\n" + "        <li><a href=\"/#/podcasts\">Podcasts</a></li>\n" + "        <li><a ng-href=\"/#/podcast/{{ ipc.item.podcast.id }}\"> {{ ipc.item.podcast.title }}</a></li>\n" + "        <li class=\"active\"><a ng-href=\"/#/podcast/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}\">{{ ipc.item.title }}</a></li>\n" + "    </ol>\n" + "\n" + "    <div ng-show=\"ipc.item.isDownloaded\" class=\"videogular-container\">\n" + "        <videogular vg-theme=\"ipc.config.theme.url\" vg-player-ready=\"ipc.onPlayerReady($API)\">\n" + "            <vg-media vg-src=\"ipc.config.sources\" vg-native-controls=\"false\" vg-preload=\"ipc.config.preload\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"ipc.config.sources[0].type.indexOf('audio') === -1 && ipc.config.plugins.controls.autoHide\" vg-autohide-time=\"ipc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"ipc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ ipc.item.proxyURL }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "            \n" + "            <vg-poster vg-url='ipc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "    </div>\n" + "</div>");
+        $templateCache.put("html/item-player.html", "<div class=\"container item-player\">\n" + "    <br/>\n" + "    <ol class=\"breadcrumb\">\n" + "        <li><a href=\"/#/podcasts\">Podcasts</a></li>\n" + "        <li><a ng-href=\"/#/podcast/{{ ipc.item.podcast.id }}\"> {{ ipc.item.podcast.title }}</a></li>\n" + "        <li class=\"active\"><a ng-href=\"/#/podcast/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}\">{{ ipc.item.title }}</a></li>\n" + "    </ol>\n" + "\n" + "    <div ng-show=\"ipc.item.isDownloaded\" class=\"videogular-container\">\n" + "        <videogular vg-theme=\"ipc.config.theme.url\" vg-auto-play=\"ipc.config.autoPlay\" >\n" + "            <vg-media vg-src=\"ipc.config.sources\" vg-native-controls=\"false\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"ipc.config.sources[0].type.indexOf('audio') === -1 && ipc.config.plugins.controls.autoHide\" vg-autohide-time=\"ipc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"ipc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ ipc.item.proxyURL }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "            \n" + "            <vg-poster vg-url='ipc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "    </div>\n" + "</div>");
     }]);
 })();
 
@@ -272,7 +272,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/player.html", "<div class=\"container video-player\">\n" + "    <br/>\n" + "    <div class=\"col-lg-8 player\">\n" + "        <videogular vg-theme=\"pc.config.theme.url\" vg-player-ready=\"pc.onPlayerReady($API)\" vg-complete=\"pc.onCompleteVideo()\">\n" + "            <vg-media vg-src=\"pc.config.sources\" vg-native-controls=\"false\" vg-preload=\"pc.config.preload\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide\" vg-autohide-time=\"pc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"pc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ pc.config.sources[0].src }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "\n" + "            <vg-poster vg-url='pc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "        <!--\n" + "        <videogular vg-theme=\"ipc.config.theme.url\" vg-player-ready=\"ipc.onPlayerReady($API)\">\n" + "            <vg-media vg-src=\"ipc.config.sources\" vg-native-controls=\"false\" vg-preload=\"ipc.config.preload\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"ipc.config.sources[0].type.indexOf('audio') === -1 && ipc.config.plugins.controls.autoHide\" vg-autohide-time=\"ipc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"ipc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ ipc.item.proxyURL }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "\n" + "            <vg-poster vg-url='ipc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "        -->\n" + "    </div>\n" + "    <div class=\"playlist col-lg-4\">\n" + "        <div class=\"row button-list\">\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.reloadPlaylist()\"><span class=\"ionicons ion-refresh\"></span> Rafraichir</div>\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.removeAll ()\"><span class=\"ionicons ion-trash-b\"></span> Vider</div>\n" + "        </div>\n" + "        <div class=\"media clearfix\"  ng-repeat=\"item in pc.playlist track by item.id\" ng-class=\"{'isReading' : pc.currentVideo.id === item.id}\">\n" + "\n" + "            <button ng-click=\"pc.remove(item)\" type=\"button\" class=\"pull-right close\"><span aria-hidden=\"true\">&times;</span></button>\n" + "\n" + "            <a class=\"pull-left cover\" ng-click=\"pc.setVideo($index)\">\n" + "                <img ng-src=\"{{item.cover.url}}\" width=\"100\" height=\"100\" style=\"\">\n" + "            </a>\n" + "\n" + "            <div class=\"media-body\">\n" + "                <p ng-click=\"pc.setVideo($index)\" class=\"\">{{ item.title }}</p>\n" + "            </div>\n" + "        </div>\n" + "        \n" + "    </div>\n" + "\n" + "</div>");
+        $templateCache.put("html/player.html", "<div class=\"container video-player\">\n" + "    <br/>\n" + "    <div class=\"col-lg-8 player\">\n" + "        <videogular vg-theme=\"pc.config.theme.url\" vg-player-ready=\"pc.onPlayerReady($API)\" vg-complete=\"pc.onCompleteVideo()\">\n" + "            <vg-media vg-src=\"pc.config.sources\" vg-native-controls=\"false\" vg-preload=\"pc.config.preload\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide\" vg-autohide-time=\"pc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"pc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ pc.config.sources[0].src }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "\n" + "            <vg-poster vg-url='pc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "    </div>\n" + "    <div class=\"playlist col-lg-4\">\n" + "        <div class=\"row button-list\">\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.reloadPlaylist()\"><span class=\"ionicons ion-refresh\"></span> Rafraichir</div>\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.removeAll ()\"><span class=\"ionicons ion-trash-b\"></span> Vider</div>\n" + "        </div>\n" + "        <div class=\"media clearfix\"  ng-repeat=\"item in pc.playlist track by item.id\" ng-class=\"{'isReading' : pc.currentVideo.id === item.id}\">\n" + "\n" + "            <button ng-click=\"pc.remove(item)\" type=\"button\" class=\"pull-right close\"><span aria-hidden=\"true\">&times;</span></button>\n" + "\n" + "            <a class=\"pull-left cover\" ng-click=\"pc.setVideo($index)\">\n" + "                <img ng-src=\"{{item.cover.url}}\" width=\"100\" height=\"100\" style=\"\">\n" + "            </a>\n" + "\n" + "            <div class=\"media-body\">\n" + "                <p ng-click=\"pc.setVideo($index)\" class=\"\">{{ item.title }}</p>\n" + "            </div>\n" + "        </div>\n" + "        \n" + "    </div>\n" + "\n" + "</div>");
     }]);
 })();
 
@@ -490,6 +490,44 @@ angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"
  */
 
 angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+
+var ItemPlayerController = (function () {
+    function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
+        _classCallCheck(this, ItemPlayerController);
+
+        this.item = item;
+        this.item.podcast = podcast;
+        this.$timeout = $timeout;
+
+        this.config = {
+            autoPlay: true,
+            sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
+            plugins: {
+                controls: {
+                    autoHide: !deviceDetectorService.isTouchedDevice(),
+                    autoHideTime: 2000
+                },
+                poster: this.item.cover.url
+            }
+        };
+    }
+    ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
+
+    _createClass(ItemPlayerController, {
+        onPlayerReady: {
+            value: function onPlayerReady(API) {
+                if (this.config.preload) {
+                    this.$timeout(function () {
+                        API.play();
+                    });
+                }
+            }
+        }
+    });
+
+    return ItemPlayerController;
+})();
+
 angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
         templateUrl: "html/item-player.html",
@@ -504,35 +542,7 @@ angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "
             }]
         }
     });
-}]).controller("ItemPlayerController", ["podcast", "item", "$timeout", "deviceDetectorService", function (podcast, item, $timeout, deviceDetectorService) {
-    var vm = this;
-
-    vm.item = item;
-    vm.item.podcast = podcast;
-
-    vm.config = {
-        preload: true,
-        sources: [{ src: item.proxyURL, type: item.mimeType }],
-        theme: {
-            url: "http://www.videogular.com/styles/themes/default/videogular.css"
-        },
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: item.cover.url
-        }
-    };
-
-    vm.onPlayerReady = function (API) {
-        if (vm.config.preload) {
-            $timeout(function () {
-                API.play();
-            });
-        }
-    };
-}]);
+}]).controller("ItemPlayerController", ItemPlayerController);
 angular.module("ps.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering", "ps.player.playlist"]).config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/player", {
         templateUrl: "html/player.html",
