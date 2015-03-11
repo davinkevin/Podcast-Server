@@ -38,13 +38,9 @@ angular.module('ps.item.player', [
                 controller: 'ItemPlayerController',
                 controllerAs: 'ipc',
                 resolve : {
-                    item : function (itemService, $route) {
-                        return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-                    },
-                    podcast : function (podcastService, $route) {
-                        return podcastService.findById($route.current.params.podcastId);
+                        item : (itemService, $route) => itemService.findById($route.current.params.podcastId, $route.current.params.itemId),
+                        podcast : (podcastService, $route) => podcastService.findById($route.current.params.podcastId)
                     }
-                }
-            });
-    })
+                });
+        })
     .controller('ItemPlayerController', ItemPlayerController);
