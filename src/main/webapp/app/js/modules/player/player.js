@@ -1,3 +1,83 @@
+
+class PlayerController {
+    constructor(playlistService, $timeout, deviceDetectorService) {
+        this.playlistService = playlistService;
+        this.$timeout = $timeout;
+
+        this.playlist = [];
+        this.state = null;
+        this.API = null;
+        this.currentVideo = {};
+        this.config = {
+            autoPlay : true,
+            sources: [],
+            plugins: {
+                controls: {
+                    autoHide : !deviceDetectorService.isTouchedDevice(),
+                    autoHideTime: 2000
+                },
+                poster: ''
+            }
+        };
+        this.reloadPlaylist();
+    }
+
+    onPlayerReady(API) {
+        this.API = API;
+
+        if (this.API.currentState == 'play' || this.isCompleted)
+            this.API.play();
+
+        this.isCompleted = false;
+        this.setVideo(0)
+    };
+
+    onCompleteVideo() {
+        var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
+        this.isCompleted = true;
+
+        if (indexOfVideo+1 === this.playlist.length) {
+            this.currentVideo = this.playlist[0];
+            return;
+        }
+
+        this.setVideo(indexOfVideo+1);
+    };
+
+    reloadPlaylist() {
+        _.updateinplace(this.playlist, this.playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
+    };
+
+
+
+    setVideo(index) {
+        this.currentVideo = this.playlist[index];
+
+        if (this.currentVideo !== null && this.currentVideo !== undefined) {
+            this.API.stop();
+            this.config.sources = [{src : this.currentVideo.proxyURL, type : this.currentVideo.mimeType }];
+            this.config.plugins.poster = this.currentVideo.cover.url;
+        }
+    };
+
+    remove(item) {
+        this.playlistService.remove(item);
+        this.reloadPlaylist();
+        if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
+            this.setVideo(0);
+        }
+    };
+
+    removeAll() {
+        this.playlistService.removeAll();
+        this.reloadPlaylist();
+    };
+
+    getIndexOfVideoInPlaylist(item) {
+        return this.playlist.indexOf(item);
+    }
+}
+
 angular.module('ps.player', [
     'ngSanitize',
     'ngRoute',
@@ -17,85 +97,4 @@ angular.module('ps.player', [
                 controllerAs: 'pc'
             });
     })
-    .controller('PlayerController', function PlayerController(playlistService, $timeout, deviceDetectorService) {
-        var vm = this;
-
-        vm.playlist = [];
-        vm.state = null;
-        vm.API = null;
-        vm.currentVideo = {};
-
-        vm.onPlayerReady = function(API) {
-            vm.API = API;
-
-            if (vm.API.currentState == 'play' || vm.isCompleted)
-                vm.API.play();
-
-            vm.isCompleted = false;
-            vm.setVideo(0)
-        };
-
-        vm.onCompleteVideo = function() {
-            var indexOfVideo = getIndexOfVideoInPlaylist(vm.currentVideo);
-            vm.isCompleted = true;
-
-            if (indexOfVideo+1 === vm.playlist.length) {
-                vm.currentVideo = vm.playlist[0];
-                return;
-            }
-
-            vm.setVideo(indexOfVideo+1);
-        };
-
-
-        vm.config = {
-            preload : true,
-            sources: [],
-            theme: {
-                url: "http://www.videogular.com/styles/themes/default/videogular.css"
-            },
-            plugins: {
-                controls: {
-                    autoHide : !deviceDetectorService.isTouchedDevice(),
-                    autoHideTime: 2000
-                },
-                poster: ''
-            }
-        };
-
-        vm.reloadPlaylist = function() {
-            _.updateinplace(vm.playlist, playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
-        };
-
-        vm.reloadPlaylist();
-
-        vm.setVideo = function(index) {
-            vm.currentVideo = vm.playlist[index];
-
-            if (vm.currentVideo !== null && vm.currentVideo !== undefined) {
-                vm.API.stop();
-                vm.config.sources = [{src : vm.currentVideo.proxyURL, type : vm.currentVideo.mimeType }];
-                vm.config.plugins.poster = vm.currentVideo.cover.url;
-                if (vm.config.preload) {
-                    $timeout(function() { vm.API.play(); }, 500);
-                }
-            }
-        };
-
-        vm.remove = function(item) {
-            playlistService.remove(item);
-            vm.reloadPlaylist();
-            if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.proxyURL) {
-                vm.setVideo(0);
-            }
-        };
-
-        vm.removeAll = function () {
-            playlistService.removeAll();
-            vm.reloadPlaylist();
-        };
-
-        function getIndexOfVideoInPlaylist(item) {
-            return vm.playlist.indexOf(item);
-        }
-    });
+    .controller('PlayerController', PlayerController);

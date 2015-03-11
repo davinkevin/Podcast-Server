@@ -1,7 +1,7 @@
 <div class="container video-player">
     <br/>
     <div class="col-lg-8 player">
-        <videogular vg-theme="pc.config.theme.url" vg-player-ready="pc.onPlayerReady($API)" vg-complete="pc.onCompleteVideo()">
+        <videogular vg-auto-play="pc.config.autoPlay" vg-player-ready="pc.onPlayerReady($API)" vg-complete="pc.onCompleteVideo()">
             <vg-media vg-src="pc.config.sources" vg-native-controls="false" vg-preload="pc.config.preload"></vg-media>
 
             <vg-controls vg-autohide="pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide" vg-autohide-time="pc.config.plugins.controls.autoHideTime">

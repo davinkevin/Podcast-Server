@@ -7,6 +7,12 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
+angular.module("ps.search", ["ps.search.item"]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -63,12 +69,6 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
-
 var deviceDetectorService = (function () {
     function deviceDetectorService($window) {
         _classCallCheck(this, deviceDetectorService);
@@ -89,14 +89,11 @@ var deviceDetectorService = (function () {
 })();
 
 angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
-angular.module("ps.search", ["ps.search.item"]);
-
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
-
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -172,33 +169,6 @@ angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.
 angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
 }]);
-angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
-angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -272,7 +242,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/player.html", "<div class=\"container video-player\">\n" + "    <br/>\n" + "    <div class=\"col-lg-8 player\">\n" + "        <videogular vg-theme=\"pc.config.theme.url\" vg-player-ready=\"pc.onPlayerReady($API)\" vg-complete=\"pc.onCompleteVideo()\">\n" + "            <vg-media vg-src=\"pc.config.sources\" vg-native-controls=\"false\" vg-preload=\"pc.config.preload\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide\" vg-autohide-time=\"pc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"pc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ pc.config.sources[0].src }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "\n" + "            <vg-poster vg-url='pc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "    </div>\n" + "    <div class=\"playlist col-lg-4\">\n" + "        <div class=\"row button-list\">\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.reloadPlaylist()\"><span class=\"ionicons ion-refresh\"></span> Rafraichir</div>\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.removeAll ()\"><span class=\"ionicons ion-trash-b\"></span> Vider</div>\n" + "        </div>\n" + "        <div class=\"media clearfix\"  ng-repeat=\"item in pc.playlist track by item.id\" ng-class=\"{'isReading' : pc.currentVideo.id === item.id}\">\n" + "\n" + "            <button ng-click=\"pc.remove(item)\" type=\"button\" class=\"pull-right close\"><span aria-hidden=\"true\">&times;</span></button>\n" + "\n" + "            <a class=\"pull-left cover\" ng-click=\"pc.setVideo($index)\">\n" + "                <img ng-src=\"{{item.cover.url}}\" width=\"100\" height=\"100\" style=\"\">\n" + "            </a>\n" + "\n" + "            <div class=\"media-body\">\n" + "                <p ng-click=\"pc.setVideo($index)\" class=\"\">{{ item.title }}</p>\n" + "            </div>\n" + "        </div>\n" + "        \n" + "    </div>\n" + "\n" + "</div>");
+        $templateCache.put("html/player.html", "<div class=\"container video-player\">\n" + "    <br/>\n" + "    <div class=\"col-lg-8 player\">\n" + "        <videogular vg-auto-play=\"pc.config.autoPlay\" vg-player-ready=\"pc.onPlayerReady($API)\" vg-complete=\"pc.onCompleteVideo()\">\n" + "            <vg-media vg-src=\"pc.config.sources\" vg-native-controls=\"false\" vg-preload=\"pc.config.preload\"></vg-media>\n" + "\n" + "            <vg-controls vg-autohide=\"pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide\" vg-autohide-time=\"pc.config.plugins.controls.autoHideTime\">\n" + "                <vg-play-pause-button></vg-play-pause-button>\n" + "                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-scrub-bar>\n" + "                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>\n" + "                </vg-scrub-bar>\n" + "                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>\n" + "                <vg-volume>\n" + "                    <vg-mute-button></vg-mute-button>\n" + "                    <vg-volume-bar></vg-volume-bar>\n" + "                </vg-volume>\n" + "                <vg-fullscreen-button ng-show=\"pc.config.sources[0].type.indexOf('audio') === -1\"></vg-fullscreen-button>\n" + "                <div class='btn-video-share'><a ng-href=\"{{ pc.config.sources[0].src }}\" class=\"ionicons ion-android-share\"></a></div>\n" + "            </vg-controls>\n" + "\n" + "            <vg-overlay-play></vg-overlay-play>\n" + "\n" + "            <vg-poster vg-url='pc.config.plugins.poster'></vg-poster>\n" + "        </videogular>\n" + "    </div>\n" + "    <div class=\"playlist col-lg-4\">\n" + "        <div class=\"row button-list\">\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.reloadPlaylist()\"><span class=\"ionicons ion-refresh\"></span> Rafraichir</div>\n" + "            <div class=\"col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center\" ng-click=\"pc.removeAll ()\"><span class=\"ionicons ion-trash-b\"></span> Vider</div>\n" + "        </div>\n" + "        <div class=\"media clearfix\"  ng-repeat=\"item in pc.playlist track by item.id\" ng-class=\"{'isReading' : pc.currentVideo.id === item.id}\">\n" + "\n" + "            <button ng-click=\"pc.remove(item)\" type=\"button\" class=\"pull-right close\"><span aria-hidden=\"true\">&times;</span></button>\n" + "\n" + "            <a class=\"pull-left cover\" ng-click=\"pc.setVideo($index)\">\n" + "                <img ng-src=\"{{item.cover.url}}\" width=\"100\" height=\"100\" style=\"\">\n" + "            </a>\n" + "\n" + "            <div class=\"media-body\">\n" + "                <p ng-click=\"pc.setVideo($index)\" class=\"\">{{ item.title }}</p>\n" + "            </div>\n" + "        </div>\n" + "        \n" + "    </div>\n" + "\n" + "</div>");
     }]);
 })();
 
@@ -342,6 +312,33 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
     }]);
 })();
 
+angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
+angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
+    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+}]);
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
 angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManager", "notification"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/download", {
         templateUrl: "html/download.html",
@@ -518,105 +515,116 @@ angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "
         controller: "ItemPlayerController",
         controllerAs: "ipc",
         resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
+            item: ["itemService", "$route", function (itemService, $route) {
                 return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
             }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+            podcast: ["podcastService", "$route", function (podcastService, $route) {
                 return podcastService.findById($route.current.params.podcastId);
             }]
         }
     });
 }]).controller("ItemPlayerController", ItemPlayerController);
+
+var PlayerController = (function () {
+    function PlayerController(playlistService, $timeout, deviceDetectorService) {
+        _classCallCheck(this, PlayerController);
+
+        this.playlistService = playlistService;
+        this.$timeout = $timeout;
+
+        this.playlist = [];
+        this.state = null;
+        this.API = null;
+        this.currentVideo = {};
+        this.config = {
+            autoPlay: true,
+            sources: [],
+            plugins: {
+                controls: {
+                    autoHide: !deviceDetectorService.isTouchedDevice(),
+                    autoHideTime: 2000
+                },
+                poster: ""
+            }
+        };
+        this.reloadPlaylist();
+    }
+    PlayerController.$inject = ["playlistService", "$timeout", "deviceDetectorService"];
+
+    _createClass(PlayerController, {
+        onPlayerReady: {
+            value: function onPlayerReady(API) {
+                this.API = API;
+
+                if (this.API.currentState == "play" || this.isCompleted) this.API.play();
+
+                this.isCompleted = false;
+                this.setVideo(0);
+            }
+        },
+        onCompleteVideo: {
+            value: function onCompleteVideo() {
+                var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
+                this.isCompleted = true;
+
+                if (indexOfVideo + 1 === this.playlist.length) {
+                    this.currentVideo = this.playlist[0];
+                    return;
+                }
+
+                this.setVideo(indexOfVideo + 1);
+            }
+        },
+        reloadPlaylist: {
+            value: function reloadPlaylist() {
+                _.updateinplace(this.playlist, this.playlistService.playlist(), function (inArray, elem) {
+                    return _.findIndex(inArray, { id: elem.id });
+                });
+            }
+        },
+        setVideo: {
+            value: function setVideo(index) {
+                this.currentVideo = this.playlist[index];
+
+                if (this.currentVideo !== null && this.currentVideo !== undefined) {
+                    this.API.stop();
+                    this.config.sources = [{ src: this.currentVideo.proxyURL, type: this.currentVideo.mimeType }];
+                    this.config.plugins.poster = this.currentVideo.cover.url;
+                }
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                this.playlistService.remove(item);
+                this.reloadPlaylist();
+                if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
+                    this.setVideo(0);
+                }
+            }
+        },
+        removeAll: {
+            value: function removeAll() {
+                this.playlistService.removeAll();
+                this.reloadPlaylist();
+            }
+        },
+        getIndexOfVideoInPlaylist: {
+            value: function getIndexOfVideoInPlaylist(item) {
+                return this.playlist.indexOf(item);
+            }
+        }
+    });
+
+    return PlayerController;
+})();
+
 angular.module("ps.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering", "ps.player.playlist"]).config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/player", {
         templateUrl: "html/player.html",
         controller: "PlayerController",
         controllerAs: "pc"
     });
-}]).controller("PlayerController", ["playlistService", "$timeout", "deviceDetectorService", function PlayerController(playlistService, $timeout, deviceDetectorService) {
-    var vm = this;
-
-    vm.playlist = [];
-    vm.state = null;
-    vm.API = null;
-    vm.currentVideo = {};
-
-    vm.onPlayerReady = function (API) {
-        vm.API = API;
-
-        if (vm.API.currentState == "play" || vm.isCompleted) vm.API.play();
-
-        vm.isCompleted = false;
-        vm.setVideo(0);
-    };
-
-    vm.onCompleteVideo = function () {
-        var indexOfVideo = getIndexOfVideoInPlaylist(vm.currentVideo);
-        vm.isCompleted = true;
-
-        if (indexOfVideo + 1 === vm.playlist.length) {
-            vm.currentVideo = vm.playlist[0];
-            return;
-        }
-
-        vm.setVideo(indexOfVideo + 1);
-    };
-
-    vm.config = {
-        preload: true,
-        sources: [],
-        theme: {
-            url: "http://www.videogular.com/styles/themes/default/videogular.css"
-        },
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: ""
-        }
-    };
-
-    vm.reloadPlaylist = function () {
-        _.updateinplace(vm.playlist, playlistService.playlist(), function (inArray, elem) {
-            return _.findIndex(inArray, { id: elem.id });
-        });
-    };
-
-    vm.reloadPlaylist();
-
-    vm.setVideo = function (index) {
-        vm.currentVideo = vm.playlist[index];
-
-        if (vm.currentVideo !== null && vm.currentVideo !== undefined) {
-            vm.API.stop();
-            vm.config.sources = [{ src: vm.currentVideo.proxyURL, type: vm.currentVideo.mimeType }];
-            vm.config.plugins.poster = vm.currentVideo.cover.url;
-            if (vm.config.preload) {
-                $timeout(function () {
-                    vm.API.play();
-                }, 500);
-            }
-        }
-    };
-
-    vm.remove = function (item) {
-        playlistService.remove(item);
-        vm.reloadPlaylist();
-        if (vm.config.sources.length > 0 && vm.config.sources[0].src === item.proxyURL) {
-            vm.setVideo(0);
-        }
-    };
-
-    vm.removeAll = function () {
-        playlistService.removeAll();
-        vm.reloadPlaylist();
-    };
-
-    function getIndexOfVideoInPlaylist(item) {
-        return vm.playlist.indexOf(item);
-    }
-}]);
+}]).controller("PlayerController", PlayerController);
 
 var PlaylistService = (function () {
     function PlaylistService($localStorage) {
