@@ -7,8 +7,8 @@
     </ol>
 
     <div ng-show="ipc.item.isDownloaded" class="videogular-container">
-        <videogular vg-theme="ipc.config.theme.url" vg-player-ready="ipc.onPlayerReady($API)">
-            <vg-media vg-src="ipc.config.sources" vg-native-controls="false" vg-preload="ipc.config.preload"></vg-media>
+        <videogular vg-theme="ipc.config.theme.url" vg-auto-play="ipc.config.autoPlay" >
+            <vg-media vg-src="ipc.config.sources" vg-native-controls="false"></vg-media>
 
             <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf('audio') === -1 && ipc.config.plugins.controls.autoHide" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">
                 <vg-play-pause-button></vg-play-pause-button>
