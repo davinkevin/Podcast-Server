@@ -491,42 +491,26 @@ angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"
 
 angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
 
-var ItemPlayerController = (function () {
-    function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
-        _classCallCheck(this, ItemPlayerController);
+var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
+    _classCallCheck(this, ItemPlayerController);
 
-        this.item = item;
-        this.item.podcast = podcast;
-        this.$timeout = $timeout;
+    this.item = item;
+    this.item.podcast = podcast;
+    this.$timeout = $timeout;
 
-        this.config = {
-            autoPlay: true,
-            sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
-            plugins: {
-                controls: {
-                    autoHide: !deviceDetectorService.isTouchedDevice(),
-                    autoHideTime: 2000
-                },
-                poster: this.item.cover.url
-            }
-        };
-    }
-    ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
-
-    _createClass(ItemPlayerController, {
-        onPlayerReady: {
-            value: function onPlayerReady(API) {
-                if (this.config.preload) {
-                    this.$timeout(function () {
-                        API.play();
-                    });
-                }
-            }
+    this.config = {
+        autoPlay: true,
+        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
+        plugins: {
+            controls: {
+                autoHide: !deviceDetectorService.isTouchedDevice(),
+                autoHideTime: 2000
+            },
+            poster: this.item.cover.url
         }
-    });
-
-    return ItemPlayerController;
-})();
+    };
+};
+ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
 
 angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {

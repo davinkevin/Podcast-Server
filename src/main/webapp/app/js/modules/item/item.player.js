@@ -19,12 +19,6 @@ class ItemPlayerController {
             }
         }
     }
-
-    onPlayerReady(API) {
-        if (this.config.preload) {
-            this.$timeout(() => { API.play(); })
-        }
-    };
 }
 
 angular.module('ps.item.player', [
