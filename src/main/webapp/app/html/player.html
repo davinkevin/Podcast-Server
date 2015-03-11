@@ -1,27 +1,27 @@
 <div class="container video-player">
     <br/>
     <div class="col-lg-8 player">
-        <videogular vg-theme="controller.config.theme.url" vg-player-ready="pc.onPlayerReady" vg-complete="pc.onCompleteVideo">
-            <vg-video vg-src="pc.config.sources" vg-native-controls="false" vg-preload="pc.config.preload"></vg-video>
+        <videogular vg-theme="pc.config.theme.url" vg-player-ready="pc.onPlayerReady($API)" vg-complete="pc.onCompleteVideo()">
+            <vg-media vg-src="pc.config.sources" vg-native-controls="false" vg-preload="pc.config.preload"></vg-media>
 
             <vg-controls vg-autohide="pc.config.sources[0].type.indexOf('audio') === -1 && pc.config.plugins.controls.autoHide" vg-autohide-time="pc.config.plugins.controls.autoHideTime">
                 <vg-play-pause-button></vg-play-pause-button>
-                <vg-timedisplay>{{ currentTime | date:'mm:ss' }}</vg-timedisplay>
-                <vg-scrubBar>
-                    <vg-scrubbarcurrenttime></vg-scrubbarcurrenttime>
-                </vg-scrubBar>
-                <vg-timedisplay>{{ timeLeft | date:'mm:ss' }}</vg-timedisplay>
+                <vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display>
+                <vg-scrub-bar>
+                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+                </vg-scrub-bar>
+                <vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display>
                 <vg-volume>
-                    <vg-mutebutton></vg-mutebutton>
-                    <vg-volumebar></vg-volumebar>
+                    <vg-mute-button></vg-mute-button>
+                    <vg-volume-bar></vg-volume-bar>
                 </vg-volume>
-                <vg-fullscreenButton ng-show="pc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreenButton>
+                <vg-fullscreen-button ng-show="pc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreen-button>
                 <div class='btn-video-share'><a ng-href="{{ pc.config.sources[0].src }}" class="ionicons ion-android-share"></a></div>
             </vg-controls>
 
             <vg-overlay-play></vg-overlay-play>
 
-            <vg-poster-image vg-url='pc.config.plugins.poster'></vg-poster-image>
+            <vg-poster vg-url='pc.config.plugins.poster'></vg-poster>
         </videogular>
     </div>
     <div class="playlist col-lg-4">

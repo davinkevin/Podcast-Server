@@ -22,12 +22,12 @@
     "angular-notification": "~0.2.3",
     "ionicons": "~1.5.2",
     "ng-file-upload": "~1.6.12",
-    "videogular": "~0.7.2",
-    "videogular-poster": "~0.7.2",
-    "videogular-themes-default": "~0.7.2",
-    "videogular-buffering": "~0.7.2",
-    "videogular-overlay-play": "~0.7.2",
-    "videogular-controls": "~0.7.2",
+    "videogular": "~1.1.0",
+    "videogular-poster": "~1.1.0",
+    "videogular-themes-default": "~1.1.0",
+    "videogular-buffering": "~1.1.0",
+    "videogular-overlay-play": "~1.1.0",
+    "videogular-controls": "~1.1.0",
     "components-font-awesome": "~4.3.0"
   },
   "resolutions": {

@@ -71,10 +71,10 @@
 <script src="/app/js/lib/angular-notification/angular-notification.min.js"></script>
 <script src="/app/js/lib/ng-file-upload/angular-file-upload.min.js"></script>
 <script src="/app/js/lib/videogular/videogular.js"></script>
-<script src="/app/js/lib/videogular-poster/poster.js"></script>
-<script src="/app/js/lib/videogular-buffering/buffering.js"></script>
-<script src="/app/js/lib/videogular-overlay-play/overlay-play.js"></script>
-<script src="/app/js/lib/videogular-controls/controls.js"></script>
+<script src="/app/js/lib/videogular-poster/vg-poster.js"></script>
+<script src="/app/js/lib/videogular-buffering/vg-buffering.js"></script>
+<script src="/app/js/lib/videogular-overlay-play/vg-overlay-play.js"></script>
+<script src="/app/js/lib/videogular-controls/vg-controls.js"></script>
 <script src="/app/js/lib/restangular/dist/restangular.min.js"></script>
 <script src="/app/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>
 <!-- endinject -->
