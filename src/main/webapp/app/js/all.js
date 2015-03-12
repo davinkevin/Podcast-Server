@@ -7,12 +7,6 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
-angular.module("ps.search", ["ps.search.item"]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -69,6 +63,12 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
+
 var deviceDetectorService = (function () {
     function deviceDetectorService($window) {
         _classCallCheck(this, deviceDetectorService);
@@ -89,11 +89,14 @@ var deviceDetectorService = (function () {
 })();
 
 angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
+angular.module("ps.search", ["ps.search.item"]);
+
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
+
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -169,6 +172,18 @@ angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.
 angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
 }]);
+angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
+angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
+    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+}]);
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -198,7 +213,7 @@ angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoading
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/item-detail.html", "\n" + "<div class=\"container item-details\">\n" + "\n" + "    <br/>\n" + "    <ol class=\"breadcrumb\">\n" + "        <li><a href=\"/#/podcasts\">Podcasts</a></li>\n" + "        <li><a ng-href=\"/#/podcast/{{ item.podcast.id }}\"> {{ item.podcast.title }}</a></li>\n" + "        <li class=\"active\">{{ item.title }}</li>\n" + "    </ol>\n" + "\n" + "    <div>\n" + "        <div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">\n" + "            <div class=\"thumbnail\">\n" + "                <a ng-href=\"{{ item.proxyURL || item.url }}\">\n" + "                    <img class=\"center-block\" ng-src=\"{{item.cover.url}}\" width=\"200\" height=\"200\">\n" + "                </a>\n" + "\n" + "                <div class=\"caption\">\n" + "\n" + "                    <div class=\"buttonList text-center\">\n" + "                        <!-- Téléchargement en cours -->\n" + "                        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "                            <button ng-click=\"toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "                            <button ng-click=\"stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "                        </span>\n" + "\n" + "                        <!-- Lancer le téléchargement -->\n" + "                        <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "\n" + "                        <a ng-href=\"/#/podcast/{{ item.podcast.id }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"ionicons ion-social-youtube\"></span></a>\n" + "\n" + "                        <!-- Add to Playlist -->\n" + "                        <a ng-show=\"item.isDownloaded\" ng-click=\"toggleInPlaylist()\" type=\"button\" class=\"btn btn-primary\">\n" + "                            <span ng-hide=\"isInPlaylist()\" class=\"glyphicon glyphicon-plus\"></span>\n" + "                            <span ng-show=\"isInPlaylist()\" class=\"glyphicon glyphicon-minus\"></span>\n" + "                        </a>\n" + "\n" + "                        <div class=\"btn-group\" dropdown is-open=\"isopen\">\n" + "                            <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                            <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                                <li ng-show=\"item.isDownloaded\"><a ng-href=\"{{ item.proxyURL }}\"><span class=\"glyphicon glyphicon-play text-success\"></span> Lire</a></li>\n" + "                                <li><a ng-click=\"remove(item)\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' )\"><span class=\"glyphicon glyphicon-remove text-danger\"></span> Retirer</a></li>\n" + "                                <li><a ng-href=\"{{ item.url }}\"><span class=\"glyphicon glyphicon-globe text-info\"></span> Lire en ligne</a></li>\n" + "                                <li><a ng-click=\"reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a></li>\n" + "                            </ul>\n" + "                        </div>\n" + "                        \n" + "                    </div>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <div class=\"col-xs-12 col-sm-12 col-md-9 col-lg-9\">\n" + "            <div class=\"panel panel-default\">\n" + "                <div class=\"panel-heading\">\n" + "                    <h3 class=\"panel-title\">{{ item.title }}</h3>\n" + "                </div>\n" + "                <div class=\"panel-body\">\n" + "                    {{ item.description | htmlToPlaintext }}\n" + "                </div>\n" + "                <div class=\"panel-footer\">Date de publication : <strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "    </div>\n" + "</div>\n" + "\n" + "");
+        $templateCache.put("html/item-detail.html", "\n" + "<div class=\"container item-details\">\n" + "\n" + "    <br/>\n" + "    <ol class=\"breadcrumb\">\n" + "        <li><a href=\"/#/podcasts\">Podcasts</a></li>\n" + "        <li><a ng-href=\"/#/podcast/{{ idc.item.podcast.id }}\"> {{ idc.item.podcast.title }}</a></li>\n" + "        <li class=\"active\">{{ idc.item.title }}</li>\n" + "    </ol>\n" + "\n" + "    <div>\n" + "        <div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">\n" + "            <div class=\"thumbnail\">\n" + "                <a ng-href=\"{{ idc.item.proxyURL || idc.item.url }}\">\n" + "                    <img class=\"center-block\" ng-src=\"{{idc.item.cover.url}}\" width=\"200\" height=\"200\">\n" + "                </a>\n" + "\n" + "                <div class=\"caption\">\n" + "\n" + "                    <div class=\"buttonList text-center\">\n" + "                        <!-- Téléchargement en cours -->\n" + "                        <span ng-show=\"idc.item.status == 'Started' || idc.item.status == 'Paused'\" >\n" + "                            <button ng-click=\"idc.toggleDownload(idc.item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "                            <button ng-click=\"idc.stopDownload(idc.item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "                        </span>\n" + "\n" + "                        <!-- Lancer le téléchargement -->\n" + "                        <button ng-click=\"idc.item.download()\" ng-show=\"(idc.item.status != 'Started' && idc.item.status != 'Paused' ) && !idc.item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "\n" + "                        <a ng-href=\"/#/podcast/{{ idc.item.podcast.id }}/item/{{ idc.item.id }}/play\" ng-show=\"idc.item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"ionicons ion-social-youtube\"></span></a>\n" + "\n" + "                        <!-- Add to Playlist -->\n" + "                        <a ng-show=\"idc.item.isDownloaded\" ng-click=\"idc.toggleInPlaylist()\" type=\"button\" class=\"btn btn-primary\">\n" + "                            <span ng-hide=\"idc.isInPlaylist()\" class=\"glyphicon glyphicon-plus\"></span>\n" + "                            <span ng-show=\"idc.isInPlaylist()\" class=\"glyphicon glyphicon-minus\"></span>\n" + "                        </a>\n" + "\n" + "                        <div class=\"btn-group\" dropdown is-open=\"isopen\">\n" + "                            <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                            <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                                <li ng-show=\"idc.item.isDownloaded\"><a ng-href=\"{{ idc.item.proxyURL }}\"><span class=\"glyphicon glyphicon-play text-success\"></span> Lire</a></li>\n" + "                                <li><a ng-click=\"idc.remove(idc.item)\" ng-show=\"(idc.item.status != 'Started' && idc.item.status != 'Paused' )\"><span class=\"glyphicon glyphicon-remove text-danger\"></span> Retirer</a></li>\n" + "                                <li><a ng-href=\"{{ idc.item.url }}\"><span class=\"glyphicon glyphicon-globe text-info\"></span> Lire en ligne</a></li>\n" + "                                <li><a ng-click=\"idc.reset(idc.item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a></li>\n" + "                            </ul>\n" + "                        </div>\n" + "                        \n" + "                    </div>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <div class=\"col-xs-12 col-sm-12 col-md-9 col-lg-9\">\n" + "            <div class=\"panel panel-default\">\n" + "                <div class=\"panel-heading\">\n" + "                    <h3 class=\"panel-title\">{{ idc.item.title }}</h3>\n" + "                </div>\n" + "                <div class=\"panel-body\">\n" + "                    {{ idc.item.description | htmlToPlaintext }}\n" + "                </div>\n" + "                <div class=\"panel-footer\">Date de publication : <strong>{{idc.item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
 
@@ -312,18 +327,6 @@ angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoading
     }]);
 })();
 
-angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
-angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
 angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
     event.preventDefault();
     window.location.href = "#/items";
@@ -427,10 +430,82 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
         DonwloadManager.moveInWaitingList(item, position);
     };
 }]);
+
+var ItemDetailCtrl = (function () {
+    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
+        var _this = this;
+
+        _classCallCheck(this, ItemDetailCtrl);
+
+        this.item = item;
+        this.$location = $location;
+        this.item.podcast = podcast;
+        this.playlistService = playlistService;
+        this.DonwloadManager = DonwloadManager;
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
+
+        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+            var itemFromWS = JSON.parse(message.body);
+            if (itemFromWS.id == _this.item.id) {
+                _.assign(_this.item, itemFromWS);
+            }
+        }, $scope);
+    }
+    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
+
+    _createClass(ItemDetailCtrl, {
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                var _this = this;
+
+                return item.remove().then(function () {
+                    _this.playlistService.remove(item);
+                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    _.assign(_this.item, itemReseted);
+                    _this.playlistService.remove(item);
+                });
+            }
+        },
+        toggleInPlaylist: {
+            value: function toggleInPlaylist() {
+                this.playlistService.addOrRemove(this.item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist() {
+                return this.playlistService.contains(this.item);
+            }
+        }
+    });
+
+    return ItemDetailCtrl;
+})();
+
 angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/podcast/:podcastId/item/:itemId", {
         templateUrl: "html/item-detail.html",
         controller: "ItemDetailCtrl",
+        controllerAs: "idc",
         hotkeys: commonKey,
         resolve: {
             item: ["itemService", "$route", function item(itemService, $route) {
@@ -441,47 +516,7 @@ angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"
             }]
         }
     });
-}]).controller("ItemDetailCtrl", ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item", function ($scope, DonwloadManager, $location, playlistService, podcast, item) {
-
-    $scope.item = item;
-    $scope.item.podcast = podcast;
-
-    $scope.stopDownload = DonwloadManager.ws.stop;
-    $scope.toggleDownload = DonwloadManager.ws.toggle;
-
-    $scope.remove = function (item) {
-        return item.remove().then(function () {
-            playlistService.remove(item);
-            $location.path("/podcast/".concat($scope.item.podcast.id));
-        });
-    };
-
-    $scope.reset = function (item) {
-        return item.reset().then(function (itemReseted) {
-            _.assign($scope.item, itemReseted);
-            playlistService.remove(item);
-        });
-    };
-
-    $scope.toggleInPlaylist = function () {
-        playlistService.addOrRemove(item);
-    };
-
-    $scope.isInPlaylist = function () {
-        return playlistService.contains(item);
-    };
-
-    //** WebSocket Inscription **//
-    var webSockedUrl = "/topic/podcast/".concat($scope.item.podcast.id);
-
-    DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-        var itemFromWS = JSON.parse(message.body);
-
-        if (itemFromWS.id == $scope.item.id) {
-            _.assign($scope.item, itemFromWS);
-        }
-    }, $scope);
-}]);
+}]).controller("ItemDetailCtrl", ItemDetailCtrl);
 /**
  * Created by kevin on 01/11/14.
  */

@@ -4,44 +4,44 @@
     <br/>
     <ol class="breadcrumb">
         <li><a href="/#/podcasts">Podcasts</a></li>
-        <li><a ng-href="/#/podcast/{{ item.podcast.id }}"> {{ item.podcast.title }}</a></li>
-        <li class="active">{{ item.title }}</li>
+        <li><a ng-href="/#/podcast/{{ idc.item.podcast.id }}"> {{ idc.item.podcast.title }}</a></li>
+        <li class="active">{{ idc.item.title }}</li>
     </ol>
 
     <div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <div class="thumbnail">
-                <a ng-href="{{ item.proxyURL || item.url }}">
-                    <img class="center-block" ng-src="{{item.cover.url}}" width="200" height="200">
+                <a ng-href="{{ idc.item.proxyURL || idc.item.url }}">
+                    <img class="center-block" ng-src="{{idc.item.cover.url}}" width="200" height="200">
                 </a>
 
                 <div class="caption">
 
                     <div class="buttonList text-center">
                         <!-- Téléchargement en cours -->
-                        <span ng-show="item.status == 'Started' || item.status == 'Paused'" >
-                            <button ng-click="toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
-                            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
+                        <span ng-show="idc.item.status == 'Started' || idc.item.status == 'Paused'" >
+                            <button ng-click="idc.toggleDownload(idc.item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+                            <button ng-click="idc.stopDownload(idc.item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
                         </span>
 
                         <!-- Lancer le téléchargement -->
-                        <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <button ng-click="idc.item.download()" ng-show="(idc.item.status != 'Started' && idc.item.status != 'Paused' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
-                        <a ng-href="/#/podcast/{{ item.podcast.id }}/item/{{ item.id }}/play" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
+                        <a ng-href="/#/podcast/{{ idc.item.podcast.id }}/item/{{ idc.item.id }}/play" ng-show="idc.item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
 
                         <!-- Add to Playlist -->
-                        <a ng-show="item.isDownloaded" ng-click="toggleInPlaylist()" type="button" class="btn btn-primary">
-                            <span ng-hide="isInPlaylist()" class="glyphicon glyphicon-plus"></span>
-                            <span ng-show="isInPlaylist()" class="glyphicon glyphicon-minus"></span>
+                        <a ng-show="idc.item.isDownloaded" ng-click="idc.toggleInPlaylist()" type="button" class="btn btn-primary">
+                            <span ng-hide="idc.isInPlaylist()" class="glyphicon glyphicon-plus"></span>
+                            <span ng-show="idc.isInPlaylist()" class="glyphicon glyphicon-minus"></span>
                         </a>
 
                         <div class="btn-group" dropdown is-open="isopen">
                             <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                <li ng-show="item.isDownloaded"><a ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
-                                <li><a ng-click="remove(item)" ng-show="(item.status != 'Started' && item.status != 'Paused' )"><span class="glyphicon glyphicon-remove text-danger"></span> Retirer</a></li>
-                                <li><a ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>
-                                <li><a ng-click="reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
+                                <li ng-show="idc.item.isDownloaded"><a ng-href="{{ idc.item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
+                                <li><a ng-click="idc.remove(idc.item)" ng-show="(idc.item.status != 'Started' && idc.item.status != 'Paused' )"><span class="glyphicon glyphicon-remove text-danger"></span> Retirer</a></li>
+                                <li><a ng-href="{{ idc.item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>
+                                <li><a ng-click="idc.reset(idc.item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
                             </ul>
                         </div>
                         
@@ -53,12 +53,12 @@
         <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{{ item.title }}</h3>
+                    <h3 class="panel-title">{{ idc.item.title }}</h3>
                 </div>
                 <div class="panel-body">
-                    {{ item.description | htmlToPlaintext }}
+                    {{ idc.item.description | htmlToPlaintext }}
                 </div>
-                <div class="panel-footer">Date de publication : <strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></div>
+                <div class="panel-footer">Date de publication : <strong>{{idc.item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></div>
             </div>
         </div>
 
