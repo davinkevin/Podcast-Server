@@ -10,7 +10,7 @@
     "bootstrap": "~3.3.2",
     "angular-bootstrap": "~0.12.1",
     "restangular": "~1.4.0",
-    "AngularStompDK": "~0.1.0",
+    "AngularStompDK": "~0.2.3",
     "stomp-websocket": "~2.3.0",
     "sockjs": "~0.3.4",
     "ngstorage": "~0.3.0",
@@ -130,8 +130,8 @@
     },
     "AngularStompDK": {
       "main": {
-        "dev": "lib/angular-stomp.js",
-        "prod": "dist/angular-stomp.min.js"
+        "dev": "dist/angular-stomp.es5.js",
+        "prod": ["dist/angular-stomp.min.js","dist/angular-stomp.min.js.map"]
       }
     },
     "animate.css": {

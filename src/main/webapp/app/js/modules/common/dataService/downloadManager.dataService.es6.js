@@ -8,8 +8,8 @@ class DownloadManager {
 
         this.ws = {
             connect : ngstomp.connect,
-            subscribe : ngstomp.subscribe,
-            unsubscribe : ngstomp.unsubscribe,
+            subscribe : (url, callback, scope) => ngstomp.subscribe(url, callback, scope),
+            unsubscribe : (url) => ngstomp.unsubscribe(url),
             toggle : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/toogle', item); },
             start : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/start', item); },
             pause : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/pause', item); },
