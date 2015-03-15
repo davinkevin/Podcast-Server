@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,7 +115,7 @@ public class ParleysUpdater extends AbstractUpdater {
                             .setTitle((String) responseObject.get("title"))
                             .setDescription((String) responseObject.get("description"))
                             .setPubdate(fromParleys((String) responseObject.get("publishedOn")))
-                            .setCover(ImageUtils.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
+                            .setCover(Objects.isNull(responseObject.get("thumbnail")) ? null : ImageUtils.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
                             .setUrl(String.format(PARLEYS_ITEM_URL, id));
 
 
