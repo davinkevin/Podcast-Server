@@ -1,31 +1,25 @@
-<!--<div class="jumbotron">-->
-    <!--<div class="container">-->
-        <!--<h1>Téléchargement</h1>-->
-    <!--</div>-->
-<!--</div>-->
-
 <div class="container downloadList">
 
     <div class="row form-horizontal" style="margin-top: 15px;">
         <div class="col-xs-offset-1 col-md-offset-1 col-sm-offset-1 col-lg-offset-1 form-group col-md-6 col-lg-6 col-xs-6 col-sm-6 ">
             <label class="pull-left control-label">Téléchargements simultanés</label>
             <div class="col-md-3 col-lg-3 col-xs-3 col-sm-3">
-                <input ng-model="numberOfSimDl" ng-change="updateNumberOfSimDl(numberOfSimDl)" type="number" class="form-control" placeholder="Number of download">
+                <input ng-model="dc.numberOfSimDl" ng-change="dc.updateNumberOfSimDl(numberOfSimDl)" type="number" class="form-control" placeholder="Number of download">
             </div>
         </div>
         <div class="btn-group pull-right">
-            <button ng-click="restartAllDownload()" type="button" class="btn btn-default">Démarrer</button>
-            <button ng-click="pauseAllDownload()" type="button" class="btn btn-default">Pause</button>
-            <button ng-click="stopAllDownload()" type="button" class="btn btn-default">Stop</button>
+            <button ng-click="dc.restartAllDownload()" type="button" class="btn btn-default">Démarrer</button>
+            <button ng-click="dc.pauseAllDownload()" type="button" class="btn btn-default">Pause</button>
+            <button ng-click="dc.stopAllDownload()" type="button" class="btn btn-default">Stop</button>
         </div>
     </div>
-    <div class="media"  ng-repeat="item in items | orderBy:'-progression' track by item.id" >
+    <div class="media"  ng-repeat="item in dc.items | orderBy:'-progression' track by item.id" >
 
         <div class="buttonList pull-right">
             <br/>
-            <button ng-click="toggleDownload(item)" type="button" class="btn btn-sm" 
+            <button ng-click="dc.toggleDownload(item)" type="button" class="btn btn-sm"
                     ng-class="{'btn-primary' : item.status === 'Started', 'btn-warning' : item.status === 'Paused'}"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
-            <button ng-click="stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
+            <button ng-click="dc.stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
         </div>
 
         <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
@@ -35,31 +29,31 @@
         <div class="media-body">
             <h5 class="media-heading">{{item.title | characters:100}}</h5>
             <br/>
-            <progressbar class="progress-striped active" animate="false" value="item.progression" type="{{ getTypeFromStatus(item) }}">{{item.progression}}%</progressbar>
+            <progressbar class="progress-striped active" animate="false" value="item.progression" type="{{ dc.getTypeFromStatus(item) }}">{{item.progression}}%</progressbar>
         </div>
     </div>
 
 
     <br/>
 
-    <accordion close-others="true" ng-show="waitingitems.length > 0">
+    <accordion close-others="true" ng-show="dc.waitingitems.length > 0">
         <accordion-group is-open="true">
             <accordion-heading>
-                Liste d'attente <span class="pull-right badge">{{ waitingitems.length }}</span>
+                Liste d'attente <span class="pull-right badge">{{ dc.waitingitems.length }}</span>
             </accordion-heading>
-            <div class="media item-in-waiting-list clearfix"  ng-repeat="item in waitingitems"  >
+            <div class="media item-in-waiting-list clearfix"  ng-repeat="item in dc.waitingitems track by item.id"  >
 
                 <div class="pull-right">
                     <br/>
-                    <button ng-click="removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>
-                    <button ng-click="dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>
-                    <div class="btn-group" dropdown is-open="isopen" ng-show="waitingitems.length > 1">
+                    <button ng-click="dc.removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>
+                    <button ng-click="dc.dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>
+                    <div class="btn-group" dropdown is-open="isopen" ng-show="dc.waitingitems.length > 1">
                         <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-hide="$first"><a ng-click="moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> Premier</a></li>
-                            <li><a ng-hide="$first || $index === 1" ng-click="moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Monter</a></li>
-                            <li><a ng-hide="$last ||    $index === waitingitems.length-2" ng-click="moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Descendre</a></li>
-                            <li><a ng-hide="$last" ng-click="moveInWaitingList(item, waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Dernier</a></li>
+                            <li ng-hide="$first"><a ng-click="dc.moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> Premier</a></li>
+                            <li><a ng-hide="$first || $index === 1" ng-click="dc.moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Monter</a></li>
+                            <li><a ng-hide="$last || $index === dc.waitingitems.length-2" ng-click="dc.moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Descendre</a></li>
+                            <li><a ng-hide="$last" ng-click="dc.moveInWaitingList(item, dc.waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Dernier</a></li>
                         </ul>
                     </div>
                 </div>
