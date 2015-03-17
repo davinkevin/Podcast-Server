@@ -1,3 +1,21 @@
+
+class wsDownloadManager {
+
+    /*@ngNoInject*/
+    constructor(urlBase, ngstomp) {
+        this.WS_DOWNLOAD_BASE = urlBase;
+        this.ngstomp = ngstomp;
+    }
+
+    connect() { return this.ngstomp.connect();}
+    subscribe(url, callback, scope) {return this.ngstomp.subscribe(url, callback, scope)}
+    unsubscribe(url) { return this.ngstomp.unsubscribe(url) }
+    toggle(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/toogle', item); }
+    start(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/start', item); }
+    pause(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/pause', item); }
+    stop(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/stop', item); }
+}
+
 class DownloadManager {
 
     constructor(Restangular, ngstomp) {
@@ -6,15 +24,7 @@ class DownloadManager {
         this.baseDownloadManager = this.baseTask.one('downloadManager');
         this.WS_DOWNLOAD_BASE = '/app/download';
 
-        this.ws = {
-            connect : ngstomp.connect,
-            subscribe : (url, callback, scope) => ngstomp.subscribe(url, callback, scope),
-            unsubscribe : (url) => ngstomp.unsubscribe(url),
-            toggle : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/toogle', item); },
-            start : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/start', item); },
-            pause : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/pause', item); },
-            stop : (item) => { ngstomp.send(this.WS_DOWNLOAD_BASE + '/stop', item); }
-        };
+        this.ws = new wsDownloadManager(this.WS_DOWNLOAD_BASE, ngstomp);
     }
 
     download(item) {
