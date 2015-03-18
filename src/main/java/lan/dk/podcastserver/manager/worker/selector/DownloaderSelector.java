@@ -23,7 +23,7 @@ public class DownloaderSelector {
 
         return downloaderCompatibilities
                 .stream()
-                .min(Comparator.comparing(updater -> updater.compatibility(url)))
+                .min(Comparator.comparing(downloader -> downloader.compatibility(url)))
                 .get()
                 .downloader();
     }
