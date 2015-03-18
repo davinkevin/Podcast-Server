@@ -45,8 +45,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public Item getItem() {
         return item;
     }
-    public void setItem(Item item) {
+    public Downloader setItem(Item item) {
         this.item = item;
+        return this;
     }
 
     @Override

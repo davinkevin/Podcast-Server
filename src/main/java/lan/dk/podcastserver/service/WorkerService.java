@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
+import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import org.apache.commons.lang3.StringUtils;
@@ -25,45 +26,15 @@ public class WorkerService implements ApplicationContextAware {
     protected ApplicationContext context = null;
     
     @Resource UpdaterSelector updaterSelector;
+    @Resource DownloaderSelector downloaderSelector;
 
     public Updater updaterOf(Podcast podcast) throws Exception {
         return (Updater) context.getBean(updaterSelector.of(podcast.getUrl()).getSimpleName());
     }
 
     public Downloader getDownloaderByType(Item item) {
-
-        String nameDownloader = null;
-        String itemUrl = item.getUrl().toLowerCase();
-        if (itemUrl.contains("rtmp")) {
-            nameDownloader = "RTMP";
-        } else if (itemUrl.contains("cdn.dmcloud")) {
-            nameDownloader = "DailyMotionCloud";
-        } else if (itemUrl.contains("www.youtube.com")) {
-            nameDownloader = "Youtube";
-        } else if (itemUrl.contains("www.jeuxvideo.fr")) {
-            nameDownloader = "JeuxVideoFr";
-        } else if (itemUrl.contains("m3u8")) {
-            nameDownloader = "M3U8";
-        } else if (itemUrl.contains("parleys")) {
-            nameDownloader = "Parleys";
-        } else if (itemUrl.contains("http")) {
-            nameDownloader = "HTTP";
-        }
-
-        Downloader downloader;
-        try {
-            downloader = (Downloader) context.getBean(nameDownloader + "Downloader");
-        } catch (BeansException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        if (downloader != null) {
-            downloader.setItem(item);
-            return downloader;
-        }
-
-        return null;
+        return ((Downloader) context.getBean(downloaderSelector.of(item.getUrl().toLowerCase()).getSimpleName()))
+                .setItem(item);
     }
 
     public Finder getFinderByUrl(String url) {

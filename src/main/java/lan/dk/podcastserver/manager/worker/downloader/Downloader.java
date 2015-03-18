@@ -6,7 +6,7 @@ public interface Downloader {
 
     public Item download();
 
-    public void setItem(Item item);
+    public Downloader setItem(Item item);
     public Item getItem();
     public String getItemUrl();
 
