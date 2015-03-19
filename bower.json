@@ -15,7 +15,7 @@
     "sockjs": "~0.3.4",
     "ngstorage": "~0.3.0",
     "angular-truncate": "*",
-    "angular-loading-bar": "~0.6.0",
+    "angular-loading-bar": "~0.7.1",
     "animate.css": "~3.1.0",
     "ng-tags-input": "~2.1.1",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
