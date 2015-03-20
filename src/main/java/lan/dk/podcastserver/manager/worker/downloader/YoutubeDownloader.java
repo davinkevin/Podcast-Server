@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.github.axet.vget.VGet;
+import com.github.axet.vget.info.VGetParser;
 import com.github.axet.vget.info.VideoInfo;
-import com.github.axet.vget.info.VideoInfoUser;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
@@ -98,17 +98,8 @@ public class YoutubeDownloader extends AbstractDownloader {
                 }
             };
 
-
-//            info.extract(itemSynchronisation, stopDownloading);
-//            target = getTagetFile(this.item);
-//            // create wget downloader
-//            VGet vGet = new VGet(info, target);
-//            // will blocks until download finishes
-//            vGet.download(stopDownloading, itemSynchronisation);
-
-            VideoInfoUser user = new VideoInfoUser();
-            //user.setUserQuality(VideoQuality.p480);
-            //File targetFolder = getFolderDestination(item);
+            VGetParser user = VGet.parser(url);
+            info = user.info(url);
 
             //target.createNewFile();
             v = new VGet(info, null);
@@ -155,11 +146,11 @@ public class YoutubeDownloader extends AbstractDownloader {
             return target;
 
         File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        target = file;
-        return target;
+       if (!file.getParentFile().exists()) {
+           file.getParentFile().mkdirs();
+       }
+       target = file;
+       return target;
     }
 
     @Override
