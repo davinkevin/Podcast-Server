@@ -1,9 +1,9 @@
 
 class DownloadCtrl {
 
-    constructor($scope, DonwloadManager, Notification) {
+    constructor($scope, DonwloadManager, $notification) {
         this.DonwloadManager = DonwloadManager;
-        this.Notification = Notification;
+        this.$notification = $notification;
         this.items =[];
         this.waitingitems = [];
         this.numberOfSimDl = 0;
@@ -38,7 +38,7 @@ class DownloadCtrl {
                     this.items.push(item);
                 break;
             case 'Finish' :
-                new this.Notification('Téléchargement terminé', {
+                this.$notification('Téléchargement terminé', {
                     body: item.title,
                     icon: item.cover.url,
                     delay: 5000

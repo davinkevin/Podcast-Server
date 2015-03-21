@@ -20,22 +20,22 @@ var authorizeNotificationDirective = function authorizeNotificationDirective() {
 };
 
 var authorizeNotificationController = (function () {
-    function authorizeNotificationController($window, Notification, $q) {
+    function authorizeNotificationController($window, $notification, $q) {
         _classCallCheck(this, authorizeNotificationController);
 
         this.$window = $window;
         this.$q = $q;
-        this.Notification = Notification;
+        this.$notification = $notification;
         this.state = this.hasToBeShown();
     }
-    authorizeNotificationController.$inject = ["$window", "Notification", "$q"];
+    authorizeNotificationController.$inject = ["$window", "$notification", "$q"];
 
     _createClass(authorizeNotificationController, {
         manuallyactivate: {
             value: function manuallyactivate() {
                 var _this = this;
 
-                this.notificationPromise().then(function () {
+                this.$notification.requestPermission().then(function () {
                     _this.state = _this.hasToBeShown();
                 });
             }
@@ -43,15 +43,6 @@ var authorizeNotificationController = (function () {
         hasToBeShown: {
             value: function hasToBeShown() {
                 return "Notification" in this.$window && this.$window.Notification.permission != "granted";
-            }
-        },
-        notificationPromise: {
-            value: function notificationPromise() {
-                var deferred = this.$q.defer();
-                this.Notification.requestPermission(function () {
-                    deferred.resolve();
-                });
-                return deferred.promise;
             }
         }
     });
@@ -199,156 +190,6 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
 }]]).config(["$routeProvider", function ($routeProvider) {
     return $routeProvider.otherwise({ redirectTo: "/items" });
 }]);
-
-var DownloadCtrl = (function () {
-    function DownloadCtrl($scope, DonwloadManager, Notification) {
-        var _this = this;
-
-        _classCallCheck(this, DownloadCtrl);
-
-        this.DonwloadManager = DonwloadManager;
-        this.Notification = Notification;
-        this.items = [];
-        this.waitingitems = [];
-        this.numberOfSimDl = 0;
-
-        this.DonwloadManager.getNumberOfSimDl().then(function (value) {
-            _this.numberOfSimDl = parseInt(value);
-        });
-
-        /** Websocket Connection */
-        this.DonwloadManager.ws.subscribe("/app/download", function (message) {
-            return _this.onSubscribeDownload(message);
-        }, $scope).subscribe("/app/waiting", function (message) {
-            return _this.onSubscribeWaiting(message);
-        }, $scope).subscribe("/topic/download", function (message) {
-            return _this.onDownloadUpdate(message);
-        }, $scope).subscribe("/topic/waiting", function (message) {
-            return _this.onWaitingUpdate(message);
-        }, $scope);
-    }
-    DownloadCtrl.$inject = ["$scope", "DonwloadManager", "Notification"];
-
-    _createClass(DownloadCtrl, {
-        onSubscribeDownload: {
-            value: function onSubscribeDownload(message) {
-                this.items = JSON.parse(message.body);
-            }
-        },
-        onSubscribeWaiting: {
-            value: function onSubscribeWaiting(message) {
-                this.waitingitems = JSON.parse(message.body);
-            }
-        },
-        onDownloadUpdate: {
-            value: function onDownloadUpdate(message) {
-                var item = JSON.parse(message.body);
-                var elemToUpdate = _.find(this.items, { id: item.id });
-                switch (item.status) {
-                    case "Started":
-                    case "Paused":
-                        if (elemToUpdate) _.assign(elemToUpdate, item);else this.items.push(item);
-                        break;
-                    case "Finish":
-                        new this.Notification("Téléchargement terminé", {
-                            body: item.title,
-                            icon: item.cover.url,
-                            delay: 5000
-                        });
-                    case "Stopped":
-                        if (elemToUpdate) {
-                            _.remove(this.items, function (item) {
-                                return item.id === elemToUpdate.id;
-                            });
-                        }
-                        break;
-                }
-            }
-        },
-        onWaitingUpdate: {
-            value: function onWaitingUpdate(message) {
-                var remoteWaitingItems = JSON.parse(message.body);
-                _.updateinplace(this.waitingitems, remoteWaitingItems, function (inArray, elem) {
-                    return _.findIndex(inArray, { id: elem.id });
-                }, true);
-            }
-        },
-        getTypeFromStatus: {
-            value: function getTypeFromStatus(item) {
-                if (item.status === "Paused") {
-                    return "warning";
-                }return "info";
-            }
-        },
-        updateNumberOfSimDl: {
-            value: function updateNumberOfSimDl(number) {
-                this.DonwloadManager.updateNumberOfSimDl(number);
-            }
-        },
-        download: {
-
-            /** Spécifique aux éléments de la liste : **/
-
-            value: function download(item) {
-                this.DonwloadManager.download(item);
-            }
-        },
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DonwloadManager.ws.stop(item);
-            }
-        },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                this.DonwloadManager.ws.toggle(item);
-            }
-        },
-        stopAllDownload: {
-
-            /** Global **/
-
-            value: function stopAllDownload() {
-                this.DonwloadManager.stopAllDownload();
-            }
-        },
-        pauseAllDownload: {
-            value: function pauseAllDownload() {
-                this.DonwloadManager.pauseAllDownload();
-            }
-        },
-        restartAllCurrentDownload: {
-            value: function restartAllCurrentDownload() {
-                this.DonwloadManager.restartAllCurrentDownload();
-            }
-        },
-        removeFromQueue: {
-            value: function removeFromQueue(item) {
-                this.DonwloadManager.removeFromQueue(item);
-            }
-        },
-        dontDonwload: {
-            value: function dontDonwload(item) {
-                this.DonwloadManager.dontDonwload(item);
-            }
-        },
-        moveInWaitingList: {
-            value: function moveInWaitingList(item, position) {
-                this.DonwloadManager.moveInWaitingList(item, position);
-            }
-        }
-    });
-
-    return DownloadCtrl;
-})();
-
-angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManager", "notification"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    return $routeProvider.when("/download", {
-        templateUrl: "html/download.html",
-        controller: "DownloadCtrl",
-        controllerAs: "dc",
-        hotkeys: commonKey
-    });
-}]).controller("DownloadCtrl", DownloadCtrl);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -491,6 +332,156 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
+
+var DownloadCtrl = (function () {
+    function DownloadCtrl($scope, DonwloadManager, $notification) {
+        var _this = this;
+
+        _classCallCheck(this, DownloadCtrl);
+
+        this.DonwloadManager = DonwloadManager;
+        this.$notification = $notification;
+        this.items = [];
+        this.waitingitems = [];
+        this.numberOfSimDl = 0;
+
+        this.DonwloadManager.getNumberOfSimDl().then(function (value) {
+            _this.numberOfSimDl = parseInt(value);
+        });
+
+        /** Websocket Connection */
+        this.DonwloadManager.ws.subscribe("/app/download", function (message) {
+            return _this.onSubscribeDownload(message);
+        }, $scope).subscribe("/app/waiting", function (message) {
+            return _this.onSubscribeWaiting(message);
+        }, $scope).subscribe("/topic/download", function (message) {
+            return _this.onDownloadUpdate(message);
+        }, $scope).subscribe("/topic/waiting", function (message) {
+            return _this.onWaitingUpdate(message);
+        }, $scope);
+    }
+    DownloadCtrl.$inject = ["$scope", "DonwloadManager", "$notification"];
+
+    _createClass(DownloadCtrl, {
+        onSubscribeDownload: {
+            value: function onSubscribeDownload(message) {
+                this.items = JSON.parse(message.body);
+            }
+        },
+        onSubscribeWaiting: {
+            value: function onSubscribeWaiting(message) {
+                this.waitingitems = JSON.parse(message.body);
+            }
+        },
+        onDownloadUpdate: {
+            value: function onDownloadUpdate(message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find(this.items, { id: item.id });
+                switch (item.status) {
+                    case "Started":
+                    case "Paused":
+                        if (elemToUpdate) _.assign(elemToUpdate, item);else this.items.push(item);
+                        break;
+                    case "Finish":
+                        this.$notification("Téléchargement terminé", {
+                            body: item.title,
+                            icon: item.cover.url,
+                            delay: 5000
+                        });
+                    case "Stopped":
+                        if (elemToUpdate) {
+                            _.remove(this.items, function (item) {
+                                return item.id === elemToUpdate.id;
+                            });
+                        }
+                        break;
+                }
+            }
+        },
+        onWaitingUpdate: {
+            value: function onWaitingUpdate(message) {
+                var remoteWaitingItems = JSON.parse(message.body);
+                _.updateinplace(this.waitingitems, remoteWaitingItems, function (inArray, elem) {
+                    return _.findIndex(inArray, { id: elem.id });
+                }, true);
+            }
+        },
+        getTypeFromStatus: {
+            value: function getTypeFromStatus(item) {
+                if (item.status === "Paused") {
+                    return "warning";
+                }return "info";
+            }
+        },
+        updateNumberOfSimDl: {
+            value: function updateNumberOfSimDl(number) {
+                this.DonwloadManager.updateNumberOfSimDl(number);
+            }
+        },
+        download: {
+
+            /** Spécifique aux éléments de la liste : **/
+
+            value: function download(item) {
+                this.DonwloadManager.download(item);
+            }
+        },
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
+            }
+        },
+        stopAllDownload: {
+
+            /** Global **/
+
+            value: function stopAllDownload() {
+                this.DonwloadManager.stopAllDownload();
+            }
+        },
+        pauseAllDownload: {
+            value: function pauseAllDownload() {
+                this.DonwloadManager.pauseAllDownload();
+            }
+        },
+        restartAllCurrentDownload: {
+            value: function restartAllCurrentDownload() {
+                this.DonwloadManager.restartAllCurrentDownload();
+            }
+        },
+        removeFromQueue: {
+            value: function removeFromQueue(item) {
+                this.DonwloadManager.removeFromQueue(item);
+            }
+        },
+        dontDonwload: {
+            value: function dontDonwload(item) {
+                this.DonwloadManager.dontDonwload(item);
+            }
+        },
+        moveInWaitingList: {
+            value: function moveInWaitingList(item, position) {
+                this.DonwloadManager.moveInWaitingList(item, position);
+            }
+        }
+    });
+
+    return DownloadCtrl;
+})();
+
+angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManager", "notification"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    return $routeProvider.when("/download", {
+        templateUrl: "html/download.html",
+        controller: "DownloadCtrl",
+        controllerAs: "dc",
+        hotkeys: commonKey
+    });
+}]).controller("DownloadCtrl", DownloadCtrl);
 
 var ItemDetailCtrl = (function () {
     function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {

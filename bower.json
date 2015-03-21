@@ -19,7 +19,7 @@
     "animate.css": "~3.1.0",
     "ng-tags-input": "~2.1.1",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
-    "angular-notification": "~0.2.3",
+    "angular-notification": "~1.0.0",
     "ionicons": "~1.5.2",
     "ng-file-upload": "~1.6.12",
     "videogular": "~1.1.0",
@@ -196,7 +196,7 @@
         "dev": "angular-notification.js",
         "prod": [
           "angular-notification.min.js",
-          "angular-notification.min.map"
+          "angular-notification.min.js.map"
         ]
       }
     },

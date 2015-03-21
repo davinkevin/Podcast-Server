@@ -11,31 +11,24 @@ class authorizeNotificationDirective {
 }
 
 class authorizeNotificationController {
-    constructor($window, Notification, $q) {
+    constructor($window, $notification, $q) {
         this.$window = $window;
         this.$q = $q;
-        this.Notification = Notification;
+        this.$notification = $notification;
         this.state = this.hasToBeShown();
     }
 
     manuallyactivate() {
-        this.notificationPromise()
+        this.$notification
+            .requestPermission()
             .then(() => { this.state = this.hasToBeShown();});
     }
 
     hasToBeShown() {
         return (('Notification' in this.$window) && this.$window.Notification.permission != 'granted');
     }
-
-    notificationPromise() {
-        let deferred = this.$q.defer();
-        this.Notification.requestPermission(() => {
-            deferred.resolve();
-        });
-        return deferred.promise;
-    }
 }
 
-angular.module('authorize-notification', [ 'notification'])
+angular.module('authorize-notification', ['notification'])
     .directive('authorizeNotification', () => new authorizeNotificationDirective())
     .controller('authorizeNotificationController', authorizeNotificationController);
