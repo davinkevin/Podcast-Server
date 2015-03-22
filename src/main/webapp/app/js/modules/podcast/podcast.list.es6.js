@@ -16,9 +16,7 @@ angular.module('ps.podcast.list', [
                 controllerAs: 'plc',
                 hotkeys: commonKey,
                 resolve: {
-                    podcasts: function (podcastService) {
-                        return podcastService.findAll();
-                    }
+                    podcasts: (podcastService) => podcastService.findAll()
                 }
             });
     })
