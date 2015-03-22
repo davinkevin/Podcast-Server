@@ -1,3 +1,124 @@
+class ItemSearchCtrl {
+
+    constructor($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
+        /* DI */
+        this.$location = $location;
+        this.itemService = itemService;
+        this.tagService = tagService;
+        this.DownloadManager = DonwloadManager;
+        this.playlistService = playlistService;
+
+        /* Constructor Init */
+        this.cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
+
+        this.totalItems = Number.MAX_VALUE;
+        this.maxSize = 10;
+        this.currentPage = this.cache.get("search:currentPage") || 1;
+
+        this.searchParameters = {
+            page : this.currentPage,
+            size : ItemPerPage,
+            term : this.cache.get("search:currentWord") || undefined,
+            searchTags : this.cache.get("search:currentTags") || undefined,
+            direction : this.cache.get("search:direction") || undefined,
+            properties : this.cache.get("search:properties") || undefined
+        };
+
+        //** WebSocket Subscription **//
+        this.DownloadManager
+            .ws
+            .subscribe("/topic/download", (message) => this.updateItemFromWS(message), $scope);
+
+        $scope.$on('$routeUpdate', () => {
+            if (this.currentPage !== this.$location.search().page) {
+                this.currentPage = this.$location.search().page || 1;
+                this.changePage();
+            }
+        });
+
+        this.changePage();
+    }
+
+    updateItemFromWS(wsMessage) {
+        let item = JSON.parse(wsMessage.body);
+
+        var elemToUpdate = _.find(this.items, { 'id': item.id });
+        if (elemToUpdate)
+            _.assign(elemToUpdate, item);
+    }
+
+    changePage() {
+        this.searchParameters.page = this.calculatePage();
+        return this.itemService.search(this.searchParameters)
+            .then((itemsResponse) => {
+
+                this.items = itemsResponse.content;
+                this.totalPages = itemsResponse.totalPages;
+                this.totalItems = itemsResponse.totalElements;
+
+                this.cache.put('search:currentPage', this.currentPage);
+                this.cache.put('search:currentWord', this.term);
+                this.cache.put('search:currentTags', this.searchTags);
+                this.cache.put("search:direction", this.direction);
+                this.cache.put("search:properties", this.properties);
+
+                this.$location.search("page", this.currentPage);
+            });
+    }
+
+    swipePage(val) {
+        this.currentPage += val;
+        return this.changePage();
+    };
+
+    //** Item Operation **//
+    remove(item) {
+        return item.remove()
+            .then(() => playlistService.remove(item))
+            .then(() => this.changePage());
+    }
+
+    reset(item) {
+        return item.reset()
+            .then((itemReseted) => {
+                var itemInList = _.find(this.items, { 'id': itemReseted.id });
+                _.assign(itemInList, itemReseted);
+                return itemInList
+            })
+            .then((itemInList) => this.playlistService.remove(itemInList));
+    };
+
+    stopDownload(item) {
+        this.DownloadManager.ws.stop(item);
+    }
+
+    toggleDownload(item){
+        return this.DownloadManager.ws.toggle(item);
+    }
+
+    loadTags(query){
+        return this.tagService.search(query);
+    }
+
+    //** Playlist Manager **//
+    addOrRemove(item) {
+        return this.playlistService.addOrRemove(item);
+    };
+
+    isInPlaylist(item) {
+        return this.playlistService.contains(item);
+    };
+
+    calculatePage() {
+        return ((this.currentPage <= 1)
+                ? 1
+                : (this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size))
+                    ? Math.ceil(this.totalItems / this.searchParameters.size)
+                    : this.currentPage
+            ) - 1;
+    }
+}
+
 angular.module('ps.search.item', [
     'ps.dataService.donwloadManager',
     'ps.dataService.item',
@@ -6,109 +127,18 @@ angular.module('ps.search.item', [
     'ps.config.route',
     'ngTagsInput'
 ])
-    .config(function($routeProvider, commonKey) {
+    .config(($routeProvider, commonKey) => {
         $routeProvider.
             when('/items', {
                 templateUrl: 'html/items-search.html',
                 controller: 'ItemsSearchCtrl',
+                controllerAs: 'isc',
                 reloadOnSearch: false,
                 hotkeys: [
-                    ['right', 'Next page', 'currentPage = currentPage+1; changePage();'],
-                    ['left', 'Previous page', 'currentPage = currentPage-1; changePage();']
+                    ['right', 'Next page', 'isc.currentPage = isc.currentPage+1; isc.changePage();'],
+                    ['left', 'Previous page', 'isc.currentPage = isc.currentPage-1; isc.changePage();']
                 ].concat(commonKey)
             });
     })
     .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', function ($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
-        'use strict';
-
-        // Gestion du cache de la pagination :
-        var cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
-
-        $scope.changePage = function() {
-            $scope.searchParameters.page = ($scope.currentPage <= 1) ? 1 : ($scope.currentPage > Math.ceil($scope.totalItems / ItemPerPage)) ? Math.ceil($scope.totalItems / ItemPerPage) : $scope.currentPage;
-            $scope.searchParameters.page -= 1;
-            itemService.search($scope.searchParameters).then(function(itemsResponse) {
-
-                $scope.items = itemsResponse.content;
-                $scope.totalPages = itemsResponse.totalPages;
-                $scope.totalItems = itemsResponse.totalElements;
-
-                cache.put('search:currentPage', $scope.currentPage);
-                cache.put('search:currentWord', $scope.term);
-                cache.put('search:currentTags', $scope.searchTags);
-                cache.put("search:direction", $scope.direction);
-                cache.put("search:properties", $scope.properties);
-
-                $location.search("page", $scope.currentPage);
-            });
-        };
-
-        $scope.$on('$routeUpdate', function(){
-            if ($scope.currentPage !== $location.search().page) {
-                $scope.currentPage = $location.search().page || 1;
-                $scope.changePage();
-            }
-        });
-
-        $scope.swipePage = function(val) {
-            $scope.currentPage += val;
-            $scope.changePage();
-        };
-
-        //** Item Operation **//
-        $scope.remove = function (item) {
-            return item.remove().then(function(){
-                playlistService.remove(item);
-                return $scope.changePage();
-            });
-        };
-
-        $scope.reset = function (item) {
-            return item.reset().then(function (itemReseted) {
-                var itemInList = _.find($scope.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-                playlistService.remove(itemInList);
-            });
-        };
-
-        // Longeur inconnu au chargement :
-        //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-        $scope.totalItems = Number.MAX_VALUE;
-        $scope.maxSize = 10;
-
-        $scope.searchParameters = {};
-        $scope.searchParameters.size = ItemPerPage;
-        $scope.currentPage = cache.get("search:currentPage") || 1;
-        $scope.searchParameters.term = cache.get("search:currentWord") || undefined;
-        $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
-        $scope.searchParameters.direction = cache.get("search:direction") || undefined;
-        $scope.searchParameters.properties = cache.get("search:properties") || undefined;
-
-        $scope.changePage();
-
-        //** DownloadManager **//
-        $scope.stopDownload = DonwloadManager.ws.stop;
-        $scope.toggleDownload = DonwloadManager.ws.toggle;
-        $scope.loadTags = (query) => tagService.search(query);
-
-        //** Playlist Manager **//
-        $scope.addOrRemove = function(item) {
-            return playlistService.addOrRemove(item);
-        };
-        $scope.isInPlaylist = function(item) {
-            return playlistService.contains(item);
-        };
-
-        //** WebSocket Subscription **//
-        var webSocketUrl = "/topic/download";
-        DonwloadManager
-            .ws
-            .subscribe(webSocketUrl, function updateItemFromWS(message) {
-                var item = JSON.parse(message.body);
-
-                var elemToUpdate = _.find($scope.items, { 'id': item.id });
-                if (elemToUpdate)
-                    _.assign(elemToUpdate, item);
-            }, $scope);
-    });
+    .controller('ItemsSearchCtrl', ItemSearchCtrl);

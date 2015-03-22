@@ -5,8 +5,15 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
+angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
+angular.module("ps.search", ["ps.search.item"]);
+
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -54,12 +61,6 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
-
 var deviceDetectorService = (function () {
     function deviceDetectorService($window) {
         _classCallCheck(this, deviceDetectorService);
@@ -80,14 +81,11 @@ var deviceDetectorService = (function () {
 })();
 
 angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
-angular.module("ps.search", ["ps.search.item"]);
-
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
-
 /**
  * Created by kevin on 14/08/2014.
  */
@@ -164,32 +162,6 @@ angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoading
     cfpLoadingBarProvider.includeSpinner = false;
 }]);
 angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
-angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -241,7 +213,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/items-search.html", "<div class=\"container item-listing\" ng-swipe-right=\"swipePage(-1)\" ng-swipe-left=\"swipePage(1)\">\n" + "    <!--<div class=\"col-xs-11 col-sm-11 col-lg-11 col-md-11\">-->\n" + "\n" + "    <div class=\"form-inline search-bar row\" ng-show=\"search\">\n" + "        <div class=\"form-group col-sm-3\">\n" + "            <input type=\"text\" class=\"form-control\" ng-model=\"searchParameters.term\" placeholder=\"Recherche globale\" ng-change=\"currentSearchPage=1; changePage()\" ng-model-options=\"{ debounce: 500 }\">\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-5\">\n" + "            <tags-input placeholder=\"Search by Tags\" add-from-autocomplete-only=\"true\" ng-model=\"searchParameters.tags\" display-property=\"name\" class=\"bootstrap\" on-tag-added=\"currentPage=1; changePage()\" on-tag-removed=\"currentPage=1; changePage()\">\n" + "                <auto-complete source=\"loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "            </tags-input>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <select class=\"form-control\" ng-model=\"searchParameters.properties\" ng-change=\"changePage()\">\n" + "                <option value>Tri</option>\n" + "                <option value=\"pertinence\">Pertinence</option>\n" + "                <option value=\"pubdate\">Date publication</option>\n" + "                <option value=\"downloadDate\">Date de download</option>\n" + "            </select>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <!--<select class=\"form-control\" ng-model=\"searchParameters.direction\" ng-change=\"changePage()\" ng-disabled=\"searchParameters.properties === 'pertinence'\">-->\n" + "            <select class=\"form-control\" ng-model=\"searchParameters.direction\" ng-change=\"changePage()\">\n" + "                <option value>Ordre</option>\n" + "                <option value=\"DESC\">Descendant</option>\n" + "                <option value=\"ASC\">Ascendant</option>\n" + "            </select>\n" + "        </div>\n" + "    </div>\n" + "\n" + "    <div class=\"text-center row\" >\n" + "        <pagination ng-show=\"totalPages > 1\" items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"totalItems\" ng-model=\"currentPage\" ng-change=\"changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "        <a ng-click=\"search = !search;\" ng-class=\"{'btn-primary' : search, 'btn-default' : !search}\" class=\"btn pull-right search-button\"><i class=\"glyphicon glyphicon-search\"></i></a>\n" + "    </div>\n" + "        <div class=\"row\">\n" + "            <div ng-repeat=\"item in items track by item.id\" class=\"col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList\">\n" + "                <div class=\"box\">\n" + "                    <div class=\"\">\n" + "                        <img ng-class=\"{'img-grayscale' : (!item.isDownloaded) }\" ng-src=\"{{ item.cover.url }}\" alt=\"\" class=\"img-responsive\" />\n" + "                        <div class=\"overlay-button\">\n" + "                            <div class=\"btn-group\" dropdown>\n" + "                                <button type=\"button\" class=\"btn dropdown dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                                <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-show=\"item.status == 'Started'\" ng-click=\"toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Mettre en pause</a>\n" + "                                        <a ng-show=\"item.status == 'Paused'\" ng-click=\"toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Reprendre</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-click=\"stopDownload(item)\"><span class=\"glyphicon glyphicon-stop text-danger\"></span> Stopper</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\">\n" + "                                        <a ng-click=\"item.download()\"><span class=\"glyphicon glyphicon-save text-primary\"></span> Télécharger</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-href=\"/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\">\n" + "                                            <span class=\"ionicons ion-social-youtube text-success\"></span> Lire dans le player</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.isDownloaded\">\n" + "                                        <a ng-click=\"addOrRemove(item)\">\n" + "                                            <span ng-hide=\"isInPlaylist(item)\"><span class=\"glyphicon glyphicon-plus text-primary\"></span> Ajouter à la Playlist</span>\n" + "                                            <span ng-show=\"isInPlaylist(item)\"><span class=\"glyphicon glyphicon-minus text-primary\"></span> Retirer de la Playlist</span>\n" + "                                        </a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"remove(item)\"><span class=\"glyphicon glyphicon-remove text-danger\"></span> Supprimer</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a>\n" + "                                    </li>\n" + "                                </ul>\n" + "                            </div>\n" + "                        </div>\n" + "                        <a class=\"overlay-main-button\" ng-href=\"{{ item.proxyURL  }}\" >\n" + "                            <span ng-class=\"{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}\" class=\"glyphicon \"></span>\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center clearfix itemTitle center\" >\n" + "                        <a ng-href=\"#/podcast/{{item.podcastId}}/item/{{item.id}}\" tooltip-append-to-body=\"true\" tooltip=\"{{ item.title }}\" tooltip-placement=\"bottom\" >\n" + "                            {{ item.title | characters:30 }}\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center row-button\">\n" + "                        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "                            <button ng-click=\"toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "                            <button ng-click=\"stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "                        </span>\n" + "\n" + "                        <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"!item.isDownloaded\" type=\"button\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-globe\"></span></a>\n" + "\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-play\"></span></a>\n" + "                        <button ng-click=\"remove(item)\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n" + "                    </div>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "    <!--</div>-->\n" + "    <div class=\"text-center row\" ng-show=\"totalPages > 1\">\n" + "        <pagination items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"totalItems\" ng-model=\"currentPage\" ng-change=\"changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "    </div>\n" + "</div>\n" + "");
+        $templateCache.put("html/items-search.html", "<div class=\"container item-listing\" ng-swipe-right=\"isc.swipePage(-1)\" ng-swipe-left=\"isc.swipePage(1)\">\n" + "    <!--<div class=\"col-xs-11 col-sm-11 col-lg-11 col-md-11\">-->\n" + "\n" + "    <div class=\"form-inline search-bar row\" ng-show=\"isc.search\">\n" + "        <div class=\"form-group col-sm-3\">\n" + "            <input type=\"text\" class=\"form-control\" ng-model=\"isc.searchParameters.term\" placeholder=\"Recherche globale\" ng-change=\"isc.currentSearchPage=1; isc.changePage()\" ng-model-options=\"{ debounce: 500 }\">\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-5\">\n" + "            <tags-input placeholder=\"Search by Tags\" add-from-autocomplete-only=\"true\" ng-model=\"isc.searchParameters.tags\" display-property=\"name\" class=\"bootstrap\" on-tag-added=\"isc.currentPage=1; isc.changePage()\" on-tag-removed=\"isc.currentPage=1; isc.changePage()\">\n" + "                <auto-complete source=\"isc.loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "            </tags-input>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <select class=\"form-control\" ng-model=\"isc.searchParameters.properties\" ng-change=\"isc.changePage()\">\n" + "                <option value>Tri</option>\n" + "                <option value=\"pertinence\">Pertinence</option>\n" + "                <option value=\"pubdate\">Date publication</option>\n" + "                <option value=\"downloadDate\">Date de download</option>\n" + "            </select>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <!--<select class=\"form-control\" ng-model=\"searchParameters.direction\" ng-change=\"changePage()\" ng-disabled=\"searchParameters.properties === 'pertinence'\">-->\n" + "            <select class=\"form-control\" ng-model=\"isc.searchParameters.direction\" ng-change=\"isc.changePage()\">\n" + "                <option value>Ordre</option>\n" + "                <option value=\"DESC\">Descendant</option>\n" + "                <option value=\"ASC\">Ascendant</option>\n" + "            </select>\n" + "        </div>\n" + "    </div>\n" + "\n" + "    <div class=\"text-center row\" >\n" + "        <pagination ng-show=\"isc.totalPages > 1\" items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"isc.totalItems\" ng-model=\"isc.currentPage\" ng-change=\"isc.changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "        <a ng-click=\"isc.search = !isc.search;\" ng-class=\"{'btn-primary' : isc.search, 'btn-default' : !isc.search}\" class=\"btn pull-right search-button\"><i class=\"glyphicon glyphicon-search\"></i></a>\n" + "    </div>\n" + "        <div class=\"row\">\n" + "            <div ng-repeat=\"item in isc.items track by item.id\" class=\"col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList\">\n" + "                <div class=\"box\">\n" + "                    <div class=\"\">\n" + "                        <img ng-class=\"{'img-grayscale' : (!item.isDownloaded) }\" ng-src=\"{{ item.cover.url }}\" alt=\"\" class=\"img-responsive\" />\n" + "                        <div class=\"overlay-button\">\n" + "                            <div class=\"btn-group\" dropdown>\n" + "                                <button type=\"button\" class=\"btn dropdown dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                                <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-show=\"item.status == 'Started'\" ng-click=\"isc.toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Mettre en pause</a>\n" + "                                        <a ng-show=\"item.status == 'Paused'\" ng-click=\"isc.toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Reprendre</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-click=\"isc.stopDownload(item)\"><span class=\"glyphicon glyphicon-stop text-danger\"></span> Stopper</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\">\n" + "                                        <a ng-click=\"item.download()\"><span class=\"glyphicon glyphicon-save text-primary\"></span> Télécharger</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-href=\"/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\">\n" + "                                            <span class=\"ionicons ion-social-youtube text-success\"></span> Lire dans le player</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.isDownloaded\">\n" + "                                        <a ng-click=\"isc.addOrRemove(item)\">\n" + "                                            <span ng-hide=\"isc.isInPlaylist(item)\"><span class=\"glyphicon glyphicon-plus text-primary\"></span> Ajouter à la Playlist</span>\n" + "                                            <span ng-show=\"isc.isInPlaylist(item)\"><span class=\"glyphicon glyphicon-minus text-primary\"></span> Retirer de la Playlist</span>\n" + "                                        </a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"isc.remove(item)\"><span class=\"glyphicon glyphicon-remove text-danger\"></span> Supprimer</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"isc.reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a>\n" + "                                    </li>\n" + "                                </ul>\n" + "                            </div>\n" + "                        </div>\n" + "                        <a class=\"overlay-main-button\" ng-href=\"{{ item.proxyURL  }}\" >\n" + "                            <span ng-class=\"{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}\" class=\"glyphicon \"></span>\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center clearfix itemTitle center\" >\n" + "                        <a ng-href=\"#/podcast/{{item.podcastId}}/item/{{item.id}}\" tooltip-append-to-body=\"true\" tooltip=\"{{ item.title }}\" tooltip-placement=\"bottom\" >\n" + "                            {{ item.title | characters:30 }}\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center row-button\">\n" + "                        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "                            <button ng-click=\"isc.toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "                            <button ng-click=\"isc.stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "                        </span>\n" + "\n" + "                        <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"!item.isDownloaded\" type=\"button\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-globe\"></span></a>\n" + "\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-play\"></span></a>\n" + "                        <button ng-click=\"isc.remove(item)\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n" + "                    </div>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "    <!--</div>-->\n" + "    <div class=\"text-center row\" ng-show=\"isc.totalPages > 1\">\n" + "        <pagination items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"isc.totalItems\" ng-model=\"isc.currentPage\" ng-change=\"isc.changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "    </div>\n" + "</div>\n" + "");
     }]);
 })();
 
@@ -332,6 +304,162 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
+
+angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
+    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+}]);
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
+
+var ItemDetailCtrl = (function () {
+    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
+        var _this = this;
+
+        _classCallCheck(this, ItemDetailCtrl);
+
+        this.item = item;
+        this.$location = $location;
+        this.item.podcast = podcast;
+        this.playlistService = playlistService;
+        this.DonwloadManager = DonwloadManager;
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
+
+        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+            var itemFromWS = JSON.parse(message.body);
+            if (itemFromWS.id == _this.item.id) {
+                _.assign(_this.item, itemFromWS);
+            }
+        }, $scope);
+    }
+    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
+
+    _createClass(ItemDetailCtrl, {
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                var _this = this;
+
+                return item.remove().then(function () {
+                    _this.playlistService.remove(item);
+                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    _.assign(_this.item, itemReseted);
+                    _this.playlistService.remove(item);
+                });
+            }
+        },
+        toggleInPlaylist: {
+            value: function toggleInPlaylist() {
+                this.playlistService.addOrRemove(this.item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist() {
+                return this.playlistService.contains(this.item);
+            }
+        }
+    });
+
+    return ItemDetailCtrl;
+})();
+
+angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
+        templateUrl: "html/item-detail.html",
+        controller: "ItemDetailCtrl",
+        controllerAs: "idc",
+        hotkeys: commonKey,
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemDetailCtrl", ItemDetailCtrl);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+
+var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
+    _classCallCheck(this, ItemPlayerController);
+
+    this.item = item;
+    this.item.podcast = podcast;
+    this.$timeout = $timeout;
+
+    this.config = {
+        autoPlay: true,
+        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
+        plugins: {
+            controls: {
+                autoHide: !deviceDetectorService.isTouchedDevice(),
+                autoHideTime: 2000
+            },
+            poster: this.item.cover.url
+        }
+    };
+};
+ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
+
+angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
+        templateUrl: "html/item-player.html",
+        controller: "ItemPlayerController",
+        controllerAs: "ipc",
+        resolve: {
+            item: ["itemService", "$route", function (itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function (podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemPlayerController", ItemPlayerController);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
@@ -483,48 +611,98 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
     });
 }]).controller("DownloadCtrl", DownloadCtrl);
 
-var ItemDetailCtrl = (function () {
-    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
+var ItemSearchCtrl = (function () {
+    function ItemSearchCtrl($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
         var _this = this;
 
-        _classCallCheck(this, ItemDetailCtrl);
+        _classCallCheck(this, ItemSearchCtrl);
 
-        this.item = item;
+        /* DI */
         this.$location = $location;
-        this.item.podcast = podcast;
+        this.itemService = itemService;
+        this.tagService = tagService;
+        this.DownloadManager = DonwloadManager;
         this.playlistService = playlistService;
-        this.DonwloadManager = DonwloadManager;
 
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
+        /* Constructor Init */
+        this.cache = $cacheFactory.get("paginationCache") || $cacheFactory("paginationCache");
 
-        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-            var itemFromWS = JSON.parse(message.body);
-            if (itemFromWS.id == _this.item.id) {
-                _.assign(_this.item, itemFromWS);
-            }
+        this.totalItems = Number.MAX_VALUE;
+        this.maxSize = 10;
+        this.currentPage = this.cache.get("search:currentPage") || 1;
+
+        this.searchParameters = {
+            page: this.currentPage,
+            size: ItemPerPage,
+            term: this.cache.get("search:currentWord") || undefined,
+            searchTags: this.cache.get("search:currentTags") || undefined,
+            direction: this.cache.get("search:direction") || undefined,
+            properties: this.cache.get("search:properties") || undefined
+        };
+
+        //** WebSocket Subscription **//
+        this.DownloadManager.ws.subscribe("/topic/download", function (message) {
+            return _this.updateItemFromWS(message);
         }, $scope);
-    }
-    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
 
-    _createClass(ItemDetailCtrl, {
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DonwloadManager.ws.stop(item);
+        $scope.$on("$routeUpdate", function () {
+            if (_this.currentPage !== _this.$location.search().page) {
+                _this.currentPage = _this.$location.search().page || 1;
+                _this.changePage();
+            }
+        });
+
+        this.changePage();
+    }
+    ItemSearchCtrl.$inject = ["$scope", "$cacheFactory", "$location", "itemService", "tagService", "DonwloadManager", "ItemPerPage", "playlistService"];
+
+    _createClass(ItemSearchCtrl, {
+        updateItemFromWS: {
+            value: function updateItemFromWS(wsMessage) {
+                var item = JSON.parse(wsMessage.body);
+
+                var elemToUpdate = _.find(this.items, { id: item.id });
+                if (elemToUpdate) _.assign(elemToUpdate, item);
             }
         },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                this.DonwloadManager.ws.toggle(item);
+        changePage: {
+            value: function changePage() {
+                var _this = this;
+
+                this.searchParameters.page = this.calculatePage();
+                return this.itemService.search(this.searchParameters).then(function (itemsResponse) {
+
+                    _this.items = itemsResponse.content;
+                    _this.totalPages = itemsResponse.totalPages;
+                    _this.totalItems = itemsResponse.totalElements;
+
+                    _this.cache.put("search:currentPage", _this.currentPage);
+                    _this.cache.put("search:currentWord", _this.term);
+                    _this.cache.put("search:currentTags", _this.searchTags);
+                    _this.cache.put("search:direction", _this.direction);
+                    _this.cache.put("search:properties", _this.properties);
+
+                    _this.$location.search("page", _this.currentPage);
+                });
+            }
+        },
+        swipePage: {
+            value: function swipePage(val) {
+                this.currentPage += val;
+                return this.changePage();
             }
         },
         remove: {
+
+            //** Item Operation **//
+
             value: function remove(item) {
                 var _this = this;
 
                 return item.remove().then(function () {
-                    _this.playlistService.remove(item);
-                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                    return playlistService.remove(item);
+                }).then(function () {
+                    return _this.changePage();
                 });
             }
         },
@@ -533,84 +711,61 @@ var ItemDetailCtrl = (function () {
                 var _this = this;
 
                 return item.reset().then(function (itemReseted) {
-                    _.assign(_this.item, itemReseted);
-                    _this.playlistService.remove(item);
+                    var itemInList = _.find(_this.items, { id: itemReseted.id });
+                    _.assign(itemInList, itemReseted);
+                    return itemInList;
+                }).then(function (itemInList) {
+                    return _this.playlistService.remove(itemInList);
                 });
             }
         },
-        toggleInPlaylist: {
-            value: function toggleInPlaylist() {
-                this.playlistService.addOrRemove(this.item);
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DownloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                return this.DownloadManager.ws.toggle(item);
+            }
+        },
+        loadTags: {
+            value: function loadTags(query) {
+                return this.tagService.search(query);
+            }
+        },
+        addOrRemove: {
+
+            //** Playlist Manager **//
+
+            value: function addOrRemove(item) {
+                return this.playlistService.addOrRemove(item);
             }
         },
         isInPlaylist: {
-            value: function isInPlaylist() {
-                return this.playlistService.contains(this.item);
+            value: function isInPlaylist(item) {
+                return this.playlistService.contains(item);
+            }
+        },
+        calculatePage: {
+            value: function calculatePage() {
+                return (this.currentPage <= 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size) ? Math.ceil(this.totalItems / this.searchParameters.size) : this.currentPage) - 1;
             }
         }
     });
 
-    return ItemDetailCtrl;
+    return ItemSearchCtrl;
 })();
 
-angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
-        templateUrl: "html/item-detail.html",
-        controller: "ItemDetailCtrl",
-        controllerAs: "idc",
-        hotkeys: commonKey,
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
+angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/items", {
+        templateUrl: "html/items-search.html",
+        controller: "ItemsSearchCtrl",
+        controllerAs: "isc",
+        reloadOnSearch: false,
+        hotkeys: [["right", "Next page", "isc.currentPage = isc.currentPage+1; isc.changePage();"], ["left", "Previous page", "isc.currentPage = isc.currentPage-1; isc.changePage();"]].concat(commonKey)
     });
-}]).controller("ItemDetailCtrl", ItemDetailCtrl);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
-
-var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
-    _classCallCheck(this, ItemPlayerController);
-
-    this.item = item;
-    this.item.podcast = podcast;
-    this.$timeout = $timeout;
-
-    this.config = {
-        autoPlay: true,
-        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: this.item.cover.url
-        }
-    };
-};
-ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
-
-angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
-        templateUrl: "html/item-player.html",
-        controller: "ItemPlayerController",
-        controllerAs: "ipc",
-        resolve: {
-            item: ["itemService", "$route", function (itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function (podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemPlayerController", ItemPlayerController);
+}]).constant("ItemPerPage", 12).controller("ItemsSearchCtrl", ItemSearchCtrl);
 
 var PlayerController = (function () {
     function PlayerController(playlistService, $timeout, deviceDetectorService) {
@@ -827,111 +982,12 @@ angular.module("ps.podcast.list", ["ps.config.route", "ps.dataService.podcast"])
         controllerAs: "plc",
         hotkeys: commonKey,
         resolve: {
-            podcasts: ["podcastService", function podcasts(podcastService) {
+            podcasts: ["podcastService", function (podcastService) {
                 return podcastService.findAll();
             }]
         }
     });
 }]).controller("PodcastsListCtrl", PodcastsListCtrl);
-angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/items", {
-        templateUrl: "html/items-search.html",
-        controller: "ItemsSearchCtrl",
-        reloadOnSearch: false,
-        hotkeys: [["right", "Next page", "currentPage = currentPage+1; changePage();"], ["left", "Previous page", "currentPage = currentPage-1; changePage();"]].concat(commonKey)
-    });
-}]).constant("ItemPerPage", 12).controller("ItemsSearchCtrl", ["$scope", "$cacheFactory", "$location", "itemService", "tagService", "DonwloadManager", "ItemPerPage", "playlistService", function ($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
-    "use strict";
-
-    // Gestion du cache de la pagination :
-    var cache = $cacheFactory.get("paginationCache") || $cacheFactory("paginationCache");
-
-    $scope.changePage = function () {
-        $scope.searchParameters.page = $scope.currentPage <= 1 ? 1 : $scope.currentPage > Math.ceil($scope.totalItems / ItemPerPage) ? Math.ceil($scope.totalItems / ItemPerPage) : $scope.currentPage;
-        $scope.searchParameters.page -= 1;
-        itemService.search($scope.searchParameters).then(function (itemsResponse) {
-
-            $scope.items = itemsResponse.content;
-            $scope.totalPages = itemsResponse.totalPages;
-            $scope.totalItems = itemsResponse.totalElements;
-
-            cache.put("search:currentPage", $scope.currentPage);
-            cache.put("search:currentWord", $scope.term);
-            cache.put("search:currentTags", $scope.searchTags);
-            cache.put("search:direction", $scope.direction);
-            cache.put("search:properties", $scope.properties);
-
-            $location.search("page", $scope.currentPage);
-        });
-    };
-
-    $scope.$on("$routeUpdate", function () {
-        if ($scope.currentPage !== $location.search().page) {
-            $scope.currentPage = $location.search().page || 1;
-            $scope.changePage();
-        }
-    });
-
-    $scope.swipePage = function (val) {
-        $scope.currentPage += val;
-        $scope.changePage();
-    };
-
-    //** Item Operation **//
-    $scope.remove = function (item) {
-        return item.remove().then(function () {
-            playlistService.remove(item);
-            return $scope.changePage();
-        });
-    };
-
-    $scope.reset = function (item) {
-        return item.reset().then(function (itemReseted) {
-            var itemInList = _.find($scope.items, { id: itemReseted.id });
-            _.assign(itemInList, itemReseted);
-            playlistService.remove(itemInList);
-        });
-    };
-
-    // Longeur inconnu au chargement :
-    //{term : 'term', tags : $scope.searchTags, size: numberByPage, page : $scope.currentPage - 1, direction : $scope.direction, properties : $scope.properties}
-    $scope.totalItems = Number.MAX_VALUE;
-    $scope.maxSize = 10;
-
-    $scope.searchParameters = {};
-    $scope.searchParameters.size = ItemPerPage;
-    $scope.currentPage = cache.get("search:currentPage") || 1;
-    $scope.searchParameters.term = cache.get("search:currentWord") || undefined;
-    $scope.searchParameters.searchTags = cache.get("search:currentTags") || undefined;
-    $scope.searchParameters.direction = cache.get("search:direction") || undefined;
-    $scope.searchParameters.properties = cache.get("search:properties") || undefined;
-
-    $scope.changePage();
-
-    //** DownloadManager **//
-    $scope.stopDownload = DonwloadManager.ws.stop;
-    $scope.toggleDownload = DonwloadManager.ws.toggle;
-    $scope.loadTags = function (query) {
-        return tagService.search(query);
-    };
-
-    //** Playlist Manager **//
-    $scope.addOrRemove = function (item) {
-        return playlistService.addOrRemove(item);
-    };
-    $scope.isInPlaylist = function (item) {
-        return playlistService.contains(item);
-    };
-
-    //** WebSocket Subscription **//
-    var webSocketUrl = "/topic/download";
-    DonwloadManager.ws.subscribe(webSocketUrl, function updateItemFromWS(message) {
-        var item = JSON.parse(message.body);
-
-        var elemToUpdate = _.find($scope.items, { id: item.id });
-        if (elemToUpdate) _.assign(elemToUpdate, item);
-    }, $scope);
-}]);
 /**
  * Created by kevin on 02/11/14.
  */
