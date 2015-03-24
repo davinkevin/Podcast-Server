@@ -5,15 +5,46 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
-angular.module("ps.search", ["ps.search.item"]);
-
+angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
+angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
+angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
+    cfpLoadingBarProvider.includeSpinner = false;
+}]);
 /**
  * Created by kevin on 01/11/14.
  */
 
 angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
+angular.module("ps.search", ["ps.search.item"]);
+
+angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
+angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
+    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+}]);
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -86,82 +117,6 @@ angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
-/**
- * Created by kevin on 14/08/2014.
- */
-
-_.mixin({
-    // Update in place, does not preserve order
-    updateinplace: function updateinplace(localArray, remoteArray, comparisonFunction, withOrder) {
-        // Default function working on the === operator by the indexOf function:
-        var comparFunc = comparisonFunction || function (inArray, elem) {
-            return inArray.indexOf(elem);
-        };
-
-        // Remove from localArray what is not in the remote array :
-        _.forEachRight(localArray.slice(), function (elem, key) {
-            if (comparFunc(remoteArray, elem) === -1) {
-                localArray.splice(key, 1);
-            }
-        });
-
-        // Add to localArray what is new in the remote array :
-        _.forEach(remoteArray, function (elem) {
-            if (comparFunc(localArray, elem) === -1) {
-                localArray.push(elem);
-            }
-        });
-
-        if (withOrder) {
-            _.forEach(remoteArray, function (elem, key) {
-                var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
-                localArray.splice(key, 0, elementToMove);
-            });
-        }
-
-        return localArray;
-    }
-});
-
-var navbarController = function navbarController() {
-    _classCallCheck(this, navbarController);
-
-    this.navCollapsed = true;
-};
-
-var navbarDirective = (function () {
-    function navbarDirective() {
-        _classCallCheck(this, navbarDirective);
-
-        this.transclude = true;
-        this.replace = true;
-        this.restrict = "E";
-        this.scope = true;
-        this.templateUrl = "html/navbar.html";
-        this.controller = "navbarController";
-        this.controllerAs = "navbar";
-    }
-
-    _createClass(navbarDirective, {
-        link: {
-            value: function link(scope, element) {
-                element.removeClass("hidden");
-            }
-        }
-    });
-
-    return navbarDirective;
-})();
-
-angular.module("navbar", []).directive("navbar", function () {
-    return new navbarDirective();
-}).controller("navbarController", navbarController);
-
-angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
-angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
-    cfpLoadingBarProvider.includeSpinner = false;
-}]);
-angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -305,161 +260,76 @@ angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "tru
     }]);
 })();
 
-angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
-
-var ItemDetailCtrl = (function () {
-    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
-        var _this = this;
-
-        _classCallCheck(this, ItemDetailCtrl);
-
-        this.item = item;
-        this.$location = $location;
-        this.item.podcast = podcast;
-        this.playlistService = playlistService;
-        this.DonwloadManager = DonwloadManager;
-
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
-
-        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-            var itemFromWS = JSON.parse(message.body);
-            if (itemFromWS.id == _this.item.id) {
-                _.assign(_this.item, itemFromWS);
-            }
-        }, $scope);
-    }
-    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
-
-    _createClass(ItemDetailCtrl, {
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DonwloadManager.ws.stop(item);
-            }
-        },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                this.DonwloadManager.ws.toggle(item);
-            }
-        },
-        remove: {
-            value: function remove(item) {
-                var _this = this;
-
-                return item.remove().then(function () {
-                    _this.playlistService.remove(item);
-                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
-                });
-            }
-        },
-        reset: {
-            value: function reset(item) {
-                var _this = this;
-
-                return item.reset().then(function (itemReseted) {
-                    _.assign(_this.item, itemReseted);
-                    _this.playlistService.remove(item);
-                });
-            }
-        },
-        toggleInPlaylist: {
-            value: function toggleInPlaylist() {
-                this.playlistService.addOrRemove(this.item);
-            }
-        },
-        isInPlaylist: {
-            value: function isInPlaylist() {
-                return this.playlistService.contains(this.item);
-            }
-        }
-    });
-
-    return ItemDetailCtrl;
-})();
-
-angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
-        templateUrl: "html/item-detail.html",
-        controller: "ItemDetailCtrl",
-        controllerAs: "idc",
-        hotkeys: commonKey,
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemDetailCtrl", ItemDetailCtrl);
 /**
- * Created by kevin on 01/11/14.
+ * Created by kevin on 14/08/2014.
  */
 
-angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+_.mixin({
+    // Update in place, does not preserve order
+    updateinplace: function updateinplace(localArray, remoteArray, comparisonFunction, withOrder) {
+        // Default function working on the === operator by the indexOf function:
+        var comparFunc = comparisonFunction || function (inArray, elem) {
+            return inArray.indexOf(elem);
+        };
 
-var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
-    _classCallCheck(this, ItemPlayerController);
+        // Remove from localArray what is not in the remote array :
+        _.forEachRight(localArray.slice(), function (elem, key) {
+            if (comparFunc(remoteArray, elem) === -1) {
+                localArray.splice(key, 1);
+            }
+        });
 
-    this.item = item;
-    this.item.podcast = podcast;
-    this.$timeout = $timeout;
+        // Add to localArray what is new in the remote array :
+        _.forEach(remoteArray, function (elem) {
+            if (comparFunc(localArray, elem) === -1) {
+                localArray.push(elem);
+            }
+        });
 
-    this.config = {
-        autoPlay: true,
-        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: this.item.cover.url
+        if (withOrder) {
+            _.forEach(remoteArray, function (elem, key) {
+                var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
+                localArray.splice(key, 0, elementToMove);
+            });
         }
-    };
-};
-ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
 
-angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
-        templateUrl: "html/item-player.html",
-        controller: "ItemPlayerController",
-        controllerAs: "ipc",
-        resolve: {
-            item: ["itemService", "$route", function (itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function (podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
+        return localArray;
+    }
+});
+
+var navbarController = function navbarController() {
+    _classCallCheck(this, navbarController);
+
+    this.navCollapsed = true;
+};
+
+var navbarDirective = (function () {
+    function navbarDirective() {
+        _classCallCheck(this, navbarDirective);
+
+        this.transclude = true;
+        this.replace = true;
+        this.restrict = "E";
+        this.scope = true;
+        this.templateUrl = "html/navbar.html";
+        this.controller = "navbarController";
+        this.controllerAs = "navbar";
+    }
+
+    _createClass(navbarDirective, {
+        link: {
+            value: function link(scope, element) {
+                element.removeClass("hidden");
+            }
         }
     });
-}]).controller("ItemPlayerController", ItemPlayerController);
+
+    return navbarDirective;
+})();
+
+angular.module("navbar", []).directive("navbar", function () {
+    return new navbarDirective();
+}).controller("navbarController", navbarController);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
@@ -611,98 +481,48 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
     });
 }]).controller("DownloadCtrl", DownloadCtrl);
 
-var ItemSearchCtrl = (function () {
-    function ItemSearchCtrl($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
+var ItemDetailCtrl = (function () {
+    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
         var _this = this;
 
-        _classCallCheck(this, ItemSearchCtrl);
+        _classCallCheck(this, ItemDetailCtrl);
 
-        /* DI */
+        this.item = item;
         this.$location = $location;
-        this.itemService = itemService;
-        this.tagService = tagService;
-        this.DownloadManager = DonwloadManager;
+        this.item.podcast = podcast;
         this.playlistService = playlistService;
+        this.DonwloadManager = DonwloadManager;
 
-        /* Constructor Init */
-        this.cache = $cacheFactory.get("paginationCache") || $cacheFactory("paginationCache");
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
 
-        this.totalItems = Number.MAX_VALUE;
-        this.maxSize = 10;
-        this.currentPage = this.cache.get("search:currentPage") || 1;
-
-        this.searchParameters = {
-            page: this.currentPage,
-            size: ItemPerPage,
-            term: this.cache.get("search:currentWord") || undefined,
-            searchTags: this.cache.get("search:currentTags") || undefined,
-            direction: this.cache.get("search:direction") || undefined,
-            properties: this.cache.get("search:properties") || undefined
-        };
-
-        //** WebSocket Subscription **//
-        this.DownloadManager.ws.subscribe("/topic/download", function (message) {
-            return _this.updateItemFromWS(message);
+        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+            var itemFromWS = JSON.parse(message.body);
+            if (itemFromWS.id == _this.item.id) {
+                _.assign(_this.item, itemFromWS);
+            }
         }, $scope);
-
-        $scope.$on("$routeUpdate", function () {
-            if (_this.currentPage !== _this.$location.search().page) {
-                _this.currentPage = _this.$location.search().page || 1;
-                _this.changePage();
-            }
-        });
-
-        this.changePage();
     }
-    ItemSearchCtrl.$inject = ["$scope", "$cacheFactory", "$location", "itemService", "tagService", "DonwloadManager", "ItemPerPage", "playlistService"];
+    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
 
-    _createClass(ItemSearchCtrl, {
-        updateItemFromWS: {
-            value: function updateItemFromWS(wsMessage) {
-                var item = JSON.parse(wsMessage.body);
-
-                var elemToUpdate = _.find(this.items, { id: item.id });
-                if (elemToUpdate) _.assign(elemToUpdate, item);
+    _createClass(ItemDetailCtrl, {
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
             }
         },
-        changePage: {
-            value: function changePage() {
-                var _this = this;
-
-                this.searchParameters.page = this.calculatePage();
-                return this.itemService.search(this.searchParameters).then(function (itemsResponse) {
-
-                    _this.items = itemsResponse.content;
-                    _this.totalPages = itemsResponse.totalPages;
-                    _this.totalItems = itemsResponse.totalElements;
-
-                    _this.cache.put("search:currentPage", _this.currentPage);
-                    _this.cache.put("search:currentWord", _this.term);
-                    _this.cache.put("search:currentTags", _this.searchTags);
-                    _this.cache.put("search:direction", _this.direction);
-                    _this.cache.put("search:properties", _this.properties);
-
-                    _this.$location.search("page", _this.currentPage);
-                });
-            }
-        },
-        swipePage: {
-            value: function swipePage(val) {
-                this.currentPage += val;
-                return this.changePage();
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
             }
         },
         remove: {
-
-            //** Item Operation **//
-
             value: function remove(item) {
                 var _this = this;
 
                 return item.remove().then(function () {
-                    return playlistService.remove(item);
-                }).then(function () {
-                    return _this.changePage();
+                    _this.playlistService.remove(item);
+                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
                 });
             }
         },
@@ -711,61 +531,84 @@ var ItemSearchCtrl = (function () {
                 var _this = this;
 
                 return item.reset().then(function (itemReseted) {
-                    var itemInList = _.find(_this.items, { id: itemReseted.id });
-                    _.assign(itemInList, itemReseted);
-                    return itemInList;
-                }).then(function (itemInList) {
-                    return _this.playlistService.remove(itemInList);
+                    _.assign(_this.item, itemReseted);
+                    _this.playlistService.remove(item);
                 });
             }
         },
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DownloadManager.ws.stop(item);
-            }
-        },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                return this.DownloadManager.ws.toggle(item);
-            }
-        },
-        loadTags: {
-            value: function loadTags(query) {
-                return this.tagService.search(query);
-            }
-        },
-        addOrRemove: {
-
-            //** Playlist Manager **//
-
-            value: function addOrRemove(item) {
-                return this.playlistService.addOrRemove(item);
+        toggleInPlaylist: {
+            value: function toggleInPlaylist() {
+                this.playlistService.addOrRemove(this.item);
             }
         },
         isInPlaylist: {
-            value: function isInPlaylist(item) {
-                return this.playlistService.contains(item);
-            }
-        },
-        calculatePage: {
-            value: function calculatePage() {
-                return (this.currentPage <= 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size) ? Math.ceil(this.totalItems / this.searchParameters.size) : this.currentPage) - 1;
+            value: function isInPlaylist() {
+                return this.playlistService.contains(this.item);
             }
         }
     });
 
-    return ItemSearchCtrl;
+    return ItemDetailCtrl;
 })();
 
-angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/items", {
-        templateUrl: "html/items-search.html",
-        controller: "ItemsSearchCtrl",
-        controllerAs: "isc",
-        reloadOnSearch: false,
-        hotkeys: [["right", "Next page", "isc.currentPage = isc.currentPage+1; isc.changePage();"], ["left", "Previous page", "isc.currentPage = isc.currentPage-1; isc.changePage();"]].concat(commonKey)
+angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
+        templateUrl: "html/item-detail.html",
+        controller: "ItemDetailCtrl",
+        controllerAs: "idc",
+        hotkeys: commonKey,
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
     });
-}]).constant("ItemPerPage", 12).controller("ItemsSearchCtrl", ItemSearchCtrl);
+}]).controller("ItemDetailCtrl", ItemDetailCtrl);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+
+var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
+    _classCallCheck(this, ItemPlayerController);
+
+    this.item = item;
+    this.item.podcast = podcast;
+    this.$timeout = $timeout;
+
+    this.config = {
+        autoPlay: true,
+        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
+        plugins: {
+            controls: {
+                autoHide: !deviceDetectorService.isTouchedDevice(),
+                autoHideTime: 2000
+            },
+            poster: this.item.cover.url
+        }
+    };
+};
+ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
+
+angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
+        templateUrl: "html/item-player.html",
+        controller: "ItemPlayerController",
+        controllerAs: "ipc",
+        resolve: {
+            item: ["itemService", "$route", function (itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function (podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemPlayerController", ItemPlayerController);
 
 var PlayerController = (function () {
     function PlayerController(playlistService, $timeout, deviceDetectorService) {
@@ -988,6 +831,174 @@ angular.module("ps.podcast.list", ["ps.config.route", "ps.dataService.podcast"])
         }
     });
 }]).controller("PodcastsListCtrl", PodcastsListCtrl);
+
+var ItemSearchCtrl = (function () {
+    function ItemSearchCtrl($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService, items) {
+        var _this = this;
+
+        _classCallCheck(this, ItemSearchCtrl);
+
+        /* DI */
+        this.$location = $location;
+        this.itemService = itemService;
+        this.tagService = tagService;
+        this.DownloadManager = DonwloadManager;
+        this.playlistService = playlistService;
+
+        /* Constructor Init */
+        this.cache = $cacheFactory.get("paginationCache") || $cacheFactory("paginationCache");
+
+        this.totalItems = Number.MAX_VALUE;
+        this.maxSize = 10;
+        this.currentPage = this.cache.get("search:currentPage") || 1;
+
+        this.searchParameters = {
+            page: this.currentPage,
+            size: ItemPerPage,
+            term: this.cache.get("search:currentWord") || undefined,
+            searchTags: this.cache.get("search:currentTags") || undefined,
+            direction: this.cache.get("search:direction") || undefined,
+            properties: this.cache.get("search:properties") || undefined
+        };
+
+        //** WebSocket Subscription **//
+        this.DownloadManager.ws.subscribe("/topic/download", function (message) {
+            return _this.updateItemFromWS(message);
+        }, $scope);
+
+        $scope.$on("$routeUpdate", function () {
+            if (_this.currentPage !== _this.$location.search().page) {
+                _this.currentPage = _this.$location.search().page || 1;
+                _this.changePage();
+            }
+        });
+
+        /*this.changePage();*/
+        this.attachResponse(items);
+    }
+    ItemSearchCtrl.$inject = ["$scope", "$cacheFactory", "$location", "itemService", "tagService", "DonwloadManager", "ItemPerPage", "playlistService", "items"];
+
+    _createClass(ItemSearchCtrl, {
+        updateItemFromWS: {
+            value: function updateItemFromWS(wsMessage) {
+                var item = JSON.parse(wsMessage.body);
+
+                var elemToUpdate = _.find(this.items, { id: item.id });
+                if (elemToUpdate) _.assign(elemToUpdate, item);
+            }
+        },
+        changePage: {
+            value: function changePage() {
+                var _this = this;
+
+                this.searchParameters.page = this.calculatePage();
+                return this.itemService.search(this.searchParameters).then(function (itemsResponse) {
+                    return _this.attachResponse(itemsResponse);
+                });
+            }
+        },
+        attachResponse: {
+            value: function attachResponse(itemsResponse) {
+                this.items = itemsResponse.content;
+                this.totalPages = itemsResponse.totalPages;
+                this.totalItems = itemsResponse.totalElements;
+
+                this.cache.put("search:currentPage", this.currentPage);
+                this.cache.put("search:currentWord", this.term);
+                this.cache.put("search:currentTags", this.searchTags);
+                this.cache.put("search:direction", this.direction);
+                this.cache.put("search:properties", this.properties);
+
+                this.$location.search("page", this.currentPage);
+            }
+        },
+        swipePage: {
+            value: function swipePage(val) {
+                this.currentPage += val;
+                return this.changePage();
+            }
+        },
+        remove: {
+
+            //** Item Operation **//
+
+            value: function remove(item) {
+                var _this = this;
+
+                return item.remove().then(function () {
+                    return playlistService.remove(item);
+                }).then(function () {
+                    return _this.changePage();
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    var itemInList = _.find(_this.items, { id: itemReseted.id });
+                    _.assign(itemInList, itemReseted);
+                    return itemInList;
+                }).then(function (itemInList) {
+                    return _this.playlistService.remove(itemInList);
+                });
+            }
+        },
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DownloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                return this.DownloadManager.ws.toggle(item);
+            }
+        },
+        loadTags: {
+            value: function loadTags(query) {
+                return this.tagService.search(query);
+            }
+        },
+        addOrRemove: {
+
+            //** Playlist Manager **//
+
+            value: function addOrRemove(item) {
+                return this.playlistService.addOrRemove(item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist(item) {
+                return this.playlistService.contains(item);
+            }
+        },
+        calculatePage: {
+            value: function calculatePage() {
+                return (this.currentPage <= 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size) ? Math.ceil(this.totalItems / this.searchParameters.size) : this.currentPage) - 1;
+            }
+        }
+    });
+
+    return ItemSearchCtrl;
+})();
+
+angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/items", {
+        templateUrl: "html/items-search.html",
+        controller: "ItemsSearchCtrl",
+        controllerAs: "isc",
+        reloadOnSearch: false,
+        hotkeys: [["right", "Next page", "isc.currentPage = isc.currentPage+1; isc.changePage();"], ["left", "Previous page", "isc.currentPage = isc.currentPage-1; isc.changePage();"]].concat(commonKey),
+        resolve: {
+            items: ["itemService", "ItemPerPage", "$location", "$cacheFactory", function (itemService, ItemPerPage, $location, $cacheFactory) {
+                var parameters = { size: ItemPerPage };
+                parameters.page = $cacheFactory.get("paginationCache") == undefined ? 0 : $cacheFactory.get("paginationCache").get("search:currentPage") - 1 || 0;
+                return itemService.search(parameters);
+            }]
+        }
+    });
+}]).constant("ItemPerPage", 12).controller("ItemsSearchCtrl", ItemSearchCtrl);
 /**
  * Created by kevin on 02/11/14.
  */
@@ -1140,8 +1151,10 @@ var itemService = (function () {
 
     _createClass(itemService, {
         search: {
-            value: function search(searchParameters) {
+            value: function search() {
                 var _this = this;
+
+                var searchParameters = arguments[0] === undefined ? { page: 0, size: 12 } : arguments[0];
 
                 return this.Restangular.one("item/search").post(null, searchParameters).then(function (responseFromServer) {
                     responseFromServer.content = _this.restangularizedItems(responseFromServer.content);

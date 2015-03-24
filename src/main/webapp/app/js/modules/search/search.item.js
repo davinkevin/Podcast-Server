@@ -1,6 +1,6 @@
 class ItemSearchCtrl {
 
-    constructor($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService) {
+    constructor($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService, items) {
         /* DI */
         this.$location = $location;
         this.itemService = itemService;
@@ -36,7 +36,8 @@ class ItemSearchCtrl {
             }
         });
 
-        this.changePage();
+        /*this.changePage();*/
+        this.attachResponse(items);
     }
 
     updateItemFromWS(wsMessage) {
@@ -50,20 +51,21 @@ class ItemSearchCtrl {
     changePage() {
         this.searchParameters.page = this.calculatePage();
         return this.itemService.search(this.searchParameters)
-            .then((itemsResponse) => {
+            .then((itemsResponse) => this.attachResponse(itemsResponse));
+    }
 
-                this.items = itemsResponse.content;
-                this.totalPages = itemsResponse.totalPages;
-                this.totalItems = itemsResponse.totalElements;
+    attachResponse(itemsResponse) {
+        this.items = itemsResponse.content;
+        this.totalPages = itemsResponse.totalPages;
+        this.totalItems = itemsResponse.totalElements;
 
-                this.cache.put('search:currentPage', this.currentPage);
-                this.cache.put('search:currentWord', this.term);
-                this.cache.put('search:currentTags', this.searchTags);
-                this.cache.put("search:direction", this.direction);
-                this.cache.put("search:properties", this.properties);
+        this.cache.put('search:currentPage', this.currentPage);
+        this.cache.put('search:currentWord', this.term);
+        this.cache.put('search:currentTags', this.searchTags);
+        this.cache.put("search:direction", this.direction);
+        this.cache.put("search:properties", this.properties);
 
-                this.$location.search("page", this.currentPage);
-            });
+        this.$location.search("page", this.currentPage);
     }
 
     swipePage(val) {
@@ -137,7 +139,16 @@ angular.module('ps.search.item', [
                 hotkeys: [
                     ['right', 'Next page', 'isc.currentPage = isc.currentPage+1; isc.changePage();'],
                     ['left', 'Previous page', 'isc.currentPage = isc.currentPage-1; isc.changePage();']
-                ].concat(commonKey)
+                ].concat(commonKey),
+                resolve : {
+                    items : (itemService, ItemPerPage, $location, $cacheFactory) => {
+                        let parameters = { size : ItemPerPage };
+                        parameters.page = ($cacheFactory.get('paginationCache') == undefined)
+                                ? 0
+                                : $cacheFactory.get('paginationCache').get("search:currentPage")-1 || 0;
+                        return itemService.search(parameters);
+                    }
+                }
             });
     })
     .constant('ItemPerPage', 12)

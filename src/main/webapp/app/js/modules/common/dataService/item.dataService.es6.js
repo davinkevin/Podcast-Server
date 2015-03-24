@@ -7,7 +7,7 @@ class itemService {
         this.Restangular = Restangular;
     }
 
-    search(searchParameters) {
+    search(searchParameters = { page : 0, size : 12} ) {
         return this.Restangular.one("item/search")
             .post(null, searchParameters)
             .then((responseFromServer) => {
