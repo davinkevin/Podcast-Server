@@ -4,28 +4,16 @@
 
 _.mixin({
     // Update in place, does not preserve order
-    updateinplace : function(localArray, remoteArray, comparisonFunction, withOrder) {
-        // Default function working on the === operator by the indexOf function:
-        var comparFunc = comparisonFunction || function (inArray, elem) {
-            return inArray.indexOf(elem);
-        };
+    updateinplace : function(localArray, remoteArray, comparisonFunction = (inArray, elem) => inArray.indexOf(elem), withOrder = false) {
 
         // Remove from localArray what is not in the remote array :
-        _.forEachRight(localArray.slice(), function (elem, key) {
-            if (comparFunc(remoteArray, elem) === -1) {
-                localArray.splice(key, 1);
-            }
-        });
+        _.forEachRight(localArray.slice(), (elem, key) => (comparisonFunction(remoteArray, elem) === -1) && localArray.splice(key, 1));
 
         // Add to localArray what is new in the remote array :
-        _.forEach(remoteArray, function (elem) {
-            if (comparFunc(localArray, elem) === -1) {
-                localArray.push(elem);
-            }
-        });
+        _.forEach(remoteArray, (elem) => (comparisonFunction(localArray, elem) === -1) && localArray.push(elem));
 
         if (withOrder) {
-            _.forEach(remoteArray, function (elem, key) {
+            _.forEach(remoteArray, (elem, key) => {
                 var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
                 localArray.splice(key, 0, elementToMove);
             })

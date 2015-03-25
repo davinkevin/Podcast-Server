@@ -6,45 +6,7 @@ var _createClass = (function () { function defineProperties(target, props) { for
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
-angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
-angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
-    cfpLoadingBarProvider.includeSpinner = false;
-}]);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
-angular.module("ps.search", ["ps.search.item"]);
-
-angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
-angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
-    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -92,6 +54,12 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
+
 var deviceDetectorService = (function () {
     function deviceDetectorService($window) {
         _classCallCheck(this, deviceDetectorService);
@@ -112,11 +80,112 @@ var deviceDetectorService = (function () {
 })();
 
 angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
+angular.module("ps.search", ["ps.search.item"]);
+
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
     };
 });
+
+/**
+ * Created by kevin on 14/08/2014.
+ */
+
+_.mixin({
+    // Update in place, does not preserve order
+    updateinplace: function updateinplace(localArray, remoteArray) {
+        var comparisonFunction = arguments[2] === undefined ? function (inArray, elem) {
+            return inArray.indexOf(elem);
+        } : arguments[2];
+        var withOrder = arguments[3] === undefined ? false : arguments[3];
+
+        // Remove from localArray what is not in the remote array :
+        _.forEachRight(localArray.slice(), function (elem, key) {
+            return comparisonFunction(remoteArray, elem) === -1 && localArray.splice(key, 1);
+        });
+
+        // Add to localArray what is new in the remote array :
+        _.forEach(remoteArray, function (elem) {
+            return comparisonFunction(localArray, elem) === -1 && localArray.push(elem);
+        });
+
+        if (withOrder) {
+            _.forEach(remoteArray, function (elem, key) {
+                var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
+                localArray.splice(key, 0, elementToMove);
+            });
+        }
+
+        return localArray;
+    }
+});
+
+var navbarController = function navbarController() {
+    _classCallCheck(this, navbarController);
+
+    this.navCollapsed = true;
+};
+
+var navbarDirective = (function () {
+    function navbarDirective() {
+        _classCallCheck(this, navbarDirective);
+
+        this.transclude = true;
+        this.replace = true;
+        this.restrict = "E";
+        this.scope = true;
+        this.templateUrl = "html/navbar.html";
+        this.controller = "navbarController";
+        this.controllerAs = "navbar";
+    }
+
+    _createClass(navbarDirective, {
+        link: {
+            value: function link(scope, element) {
+                element.removeClass("hidden");
+            }
+        }
+    });
+
+    return navbarDirective;
+})();
+
+angular.module("navbar", []).directive("navbar", function () {
+    return new navbarDirective();
+}).controller("navbarController", navbarController);
+
+angular.module("ps.config", ["ps.config.route", "ps.config.loading", "ps.config.restangular", "ps.config.ngstomp", "ps.config.module"]);
+angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
+    cfpLoadingBarProvider.includeSpinner = false;
+}]);
+angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
+angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
+    return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
+}]);
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -259,77 +328,6 @@ angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
-
-/**
- * Created by kevin on 14/08/2014.
- */
-
-_.mixin({
-    // Update in place, does not preserve order
-    updateinplace: function updateinplace(localArray, remoteArray, comparisonFunction, withOrder) {
-        // Default function working on the === operator by the indexOf function:
-        var comparFunc = comparisonFunction || function (inArray, elem) {
-            return inArray.indexOf(elem);
-        };
-
-        // Remove from localArray what is not in the remote array :
-        _.forEachRight(localArray.slice(), function (elem, key) {
-            if (comparFunc(remoteArray, elem) === -1) {
-                localArray.splice(key, 1);
-            }
-        });
-
-        // Add to localArray what is new in the remote array :
-        _.forEach(remoteArray, function (elem) {
-            if (comparFunc(localArray, elem) === -1) {
-                localArray.push(elem);
-            }
-        });
-
-        if (withOrder) {
-            _.forEach(remoteArray, function (elem, key) {
-                var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
-                localArray.splice(key, 0, elementToMove);
-            });
-        }
-
-        return localArray;
-    }
-});
-
-var navbarController = function navbarController() {
-    _classCallCheck(this, navbarController);
-
-    this.navCollapsed = true;
-};
-
-var navbarDirective = (function () {
-    function navbarDirective() {
-        _classCallCheck(this, navbarDirective);
-
-        this.transclude = true;
-        this.replace = true;
-        this.restrict = "E";
-        this.scope = true;
-        this.templateUrl = "html/navbar.html";
-        this.controller = "navbarController";
-        this.controllerAs = "navbar";
-    }
-
-    _createClass(navbarDirective, {
-        link: {
-            value: function link(scope, element) {
-                element.removeClass("hidden");
-            }
-        }
-    });
-
-    return navbarDirective;
-})();
-
-angular.module("navbar", []).directive("navbar", function () {
-    return new navbarDirective();
-}).controller("navbarController", navbarController);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
@@ -481,135 +479,6 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
     });
 }]).controller("DownloadCtrl", DownloadCtrl);
 
-var ItemDetailCtrl = (function () {
-    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
-        var _this = this;
-
-        _classCallCheck(this, ItemDetailCtrl);
-
-        this.item = item;
-        this.$location = $location;
-        this.item.podcast = podcast;
-        this.playlistService = playlistService;
-        this.DonwloadManager = DonwloadManager;
-
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
-
-        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-            var itemFromWS = JSON.parse(message.body);
-            if (itemFromWS.id == _this.item.id) {
-                _.assign(_this.item, itemFromWS);
-            }
-        }, $scope);
-    }
-    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
-
-    _createClass(ItemDetailCtrl, {
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DonwloadManager.ws.stop(item);
-            }
-        },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                this.DonwloadManager.ws.toggle(item);
-            }
-        },
-        remove: {
-            value: function remove(item) {
-                var _this = this;
-
-                return item.remove().then(function () {
-                    _this.playlistService.remove(item);
-                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
-                });
-            }
-        },
-        reset: {
-            value: function reset(item) {
-                var _this = this;
-
-                return item.reset().then(function (itemReseted) {
-                    _.assign(_this.item, itemReseted);
-                    _this.playlistService.remove(item);
-                });
-            }
-        },
-        toggleInPlaylist: {
-            value: function toggleInPlaylist() {
-                this.playlistService.addOrRemove(this.item);
-            }
-        },
-        isInPlaylist: {
-            value: function isInPlaylist() {
-                return this.playlistService.contains(this.item);
-            }
-        }
-    });
-
-    return ItemDetailCtrl;
-})();
-
-angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
-        templateUrl: "html/item-detail.html",
-        controller: "ItemDetailCtrl",
-        controllerAs: "idc",
-        hotkeys: commonKey,
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemDetailCtrl", ItemDetailCtrl);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
-
-var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
-    _classCallCheck(this, ItemPlayerController);
-
-    this.item = item;
-    this.item.podcast = podcast;
-    this.$timeout = $timeout;
-
-    this.config = {
-        autoPlay: true,
-        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: this.item.cover.url
-        }
-    };
-};
-ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
-
-angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
-        templateUrl: "html/item-player.html",
-        controller: "ItemPlayerController",
-        controllerAs: "ipc",
-        resolve: {
-            item: ["itemService", "$route", function (itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function (podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemPlayerController", ItemPlayerController);
-
 var PlayerController = (function () {
     function PlayerController(playlistService, $timeout, deviceDetectorService) {
         _classCallCheck(this, PlayerController);
@@ -760,6 +629,134 @@ var PlaylistService = (function () {
 
 angular.module("ps.player.playlist", ["ngStorage"]).service("playlistService", PlaylistService);
 
+var ItemDetailCtrl = (function () {
+    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
+        var _this = this;
+
+        _classCallCheck(this, ItemDetailCtrl);
+
+        this.item = item;
+        this.$location = $location;
+        this.item.podcast = podcast;
+        this.playlistService = playlistService;
+        this.DonwloadManager = DonwloadManager;
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
+
+        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+            var itemFromWS = JSON.parse(message.body);
+            if (itemFromWS.id == _this.item.id) {
+                _.assign(_this.item, itemFromWS);
+            }
+        }, $scope);
+    }
+    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
+
+    _createClass(ItemDetailCtrl, {
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                var _this = this;
+
+                return item.remove().then(function () {
+                    _this.playlistService.remove(item);
+                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    _.assign(_this.item, itemReseted);
+                    _this.playlistService.remove(item);
+                });
+            }
+        },
+        toggleInPlaylist: {
+            value: function toggleInPlaylist() {
+                this.playlistService.addOrRemove(this.item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist() {
+                return this.playlistService.contains(this.item);
+            }
+        }
+    });
+
+    return ItemDetailCtrl;
+})();
+
+angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
+        templateUrl: "html/item-detail.html",
+        controller: "ItemDetailCtrl",
+        controllerAs: "idc",
+        hotkeys: commonKey,
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemDetailCtrl", ItemDetailCtrl);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+
+var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
+    _classCallCheck(this, ItemPlayerController);
+
+    this.item = item;
+    this.item.podcast = podcast;
+    this.$timeout = $timeout;
+
+    this.config = {
+        autoPlay: true,
+        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
+        plugins: {
+            controls: {
+                autoHide: !deviceDetectorService.isTouchedDevice(),
+                autoHideTime: 2000
+            },
+            poster: this.item.cover.url
+        }
+    };
+};
+ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
+
+angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
+        templateUrl: "html/item-player.html",
+        controller: "ItemPlayerController",
+        controllerAs: "ipc",
+        resolve: {
+            item: ["itemService", "$route", function (itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function (podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemPlayerController", ItemPlayerController);
 angular.module("ps.podcast.creation", ["ps.config.route", "ps.dataservice", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/podcast-creation", {
         templateUrl: "html/podcast-creation.html",
