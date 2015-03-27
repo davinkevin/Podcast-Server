@@ -10,20 +10,20 @@
             <label for="title" class="col-sm-1 control-label">Titre</label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="title" ng-model="podcast.title" required placeholder="Titre">
+                <input type="text" class="form-control" id="title" ng-model="pac.podcast.title" required placeholder="Titre">
             </div>
         </div>
         <div class="form-group">
             <label for="url" class="col-sm-1 control-label">URL</label>
 
             <div class="col-sm-10">
-                <input type="url" class="form-control" id="url" ng-model="podcast.url" required placeholder="url" ng-change="changeType();findInfo();">
+                <input type="url" class="form-control" id="url" ng-model="pac.podcast.url" required placeholder="url" ng-change="pac.changeType();pac.findInfo();">
             </div>
         </div>
         <div class="form-group">
             <div class="checkbox col-sm-offset-2">
                 <label>
-                    <input type="checkbox" ng-model="podcast.hasToBeDeleted"> Suppression Automatique
+                    <input type="checkbox" ng-model="pac.podcast.hasToBeDeleted"> Suppression Automatique
                 </label>
             </div>
         </div>
@@ -31,8 +31,8 @@
         <div class="form-group">
             <label for="url" class="col-sm-1 control-label">Tags</label>
             <div class="col-sm-10">
-                <tags-input ng-model="podcast.tags" display-property="name" min-length="1" class="bootstrap" placeholder="Ajouter un tag">
-                    <auto-complete source="loadTags($query)" min-length="2"></auto-complete>
+                <tags-input ng-model="pac.podcast.tags" display-property="name" min-length="1" class="bootstrap" placeholder="Ajouter un tag">
+                    <auto-complete source="pac.loadTags($query)" min-length="2"></auto-complete>
                 </tags-input>
             </div>
         </div>
@@ -42,7 +42,7 @@
             <label for="height" class="col-sm-1 control-label">Type</label>
 
             <div class="col-sm-10">
-                <select class="form-control" ng-model="podcast.type">
+                <select class="form-control" ng-model="pac.podcast.type">
                     <option value="BeInSports">Be In Sports</option>
                     <option value="CanalPlus">Canal+</option>
                     <option value="JeuxVideoCom">Jeux Video Com</option>
@@ -56,21 +56,21 @@
             </div>
         </div>
         <div class="col-md-2 col-md-offset-1">
-            <img ng-src="{{ podcast.cover.url || 'http://placehold.it/200x200' }}" class="img-thumbnail">
+            <img ng-src="{{ pac.podcast.cover.url || 'http://placehold.it/200x200' }}" class="img-thumbnail">
         </div>
         <div class="col-md-9">
             <div class="form-group">
                 <label for="url" class="col-sm-2 control-label">URL</label>
 
                 <div class="col-sm-9">
-                    <input class="form-control" id="url" ng-model="podcast.cover.url" required placeholder="url">
+                    <input class="form-control" ng-model="pac.podcast.cover.url" required placeholder="url">
                 </div>
             </div>
             <div class="form-group">
                 <label for="width" class="col-sm-2 control-label">Lageur</label>
 
                 <div class="col-sm-3">
-                    <input type="number" class="form-control" id="width" ng-model="podcast.cover.width" required
+                    <input type="number" class="form-control" id="width" ng-model="pac.podcast.cover.width" required
                            placeholder="url">
                 </div>
             </div>
@@ -78,7 +78,7 @@
                 <label for="height" class="col-sm-2 control-label">Hauteur</label>
 
                 <div class="col-sm-3">
-                    <input type="number" class="form-control" id="height" ng-model="podcast.cover.height" required
+                    <input type="number" class="form-control" id="height" ng-model="pac.podcast.cover.height" required
                            placeholder="url">
                 </div>
             </div>
@@ -87,7 +87,7 @@
 
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button ng-click="save()" class="btn btn-default">Sauvegarder</button>
+                <button ng-click="pac.save()" class="btn btn-default">Sauvegarder</button>
             </div>
         </div>
     </form>

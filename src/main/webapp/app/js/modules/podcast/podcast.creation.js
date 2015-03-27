@@ -1,3 +1,55 @@
+class PodcastCreationController {
+
+    constructor($location, defaultPodcast, tagService, podcastService) {
+        this.podcastService = podcastService;
+        this.$location = $location;
+        this.tagService = tagService;
+        this.podcast = angular.extend(this.podcastService.getNewPodcast(), defaultPodcast );
+    }
+
+    findInfo() {
+        return this.podcastService.findInfo(this.podcast.url)
+            .then((podcastFetched) => {
+                this.podcast.title = podcastFetched.title;
+                this.podcast.description = podcastFetched.description;
+                this.podcast.type = podcastFetched.type;
+                this.podcast.cover.url = podcastFetched.cover.url;
+            });
+    }
+
+    loadTags(query) {
+        return this.tagService.search(query);
+    }
+
+    changeType() {
+        if (/beinsports\.fr/i.test(this.podcast.url)) {
+            this.podcast.type = "BeInSports";
+        } else if (/canalplus\.fr/i.test(this.podcast.url)) {
+            this.podcast.type = "CanalPlus";
+        } else if (/jeuxvideo\.fr/i.test(this.podcast.url)) {
+            this.podcast.type = "JeuxVideoFR";
+        } else if (/jeuxvideo\.com/i.test(this.podcast.url)) {
+            this.podcast.type = "JeuxVideoCom";
+        } else if (/parleys\.com/i.test(this.podcast.url)) {
+            this.podcast.type = "Parleys";
+        } else if (/pluzz\.francetv\.fr/i.test(this.podcast.url)) {
+            this.podcast.type = "Pluzz";
+        } else if (/youtube\.com/i.test(this.podcast.url)) {
+            this.podcast.type = "Youtube";
+        } else if (this.podcast.url.length > 0) {
+            this.podcast.type = "RSS";
+        } else {
+            this.podcast.type = "Send";
+        }
+    }
+
+    save() {
+        this.podcastService.save(this.podcast)
+            .then((podcast) => this.$location.path('/podcast/' + podcast.id));
+    }
+
+}
+
 angular.module('ps.podcast.creation', [
     'ps.config.route',
     'ps.dataservice',
@@ -8,52 +60,9 @@ angular.module('ps.podcast.creation', [
             when('/podcast-creation', {
                 templateUrl: 'html/podcast-creation.html',
                 controller: 'PodcastAddCtrl',
+                controllerAs: 'pac',
                 hotkeys: commonKey
             });
     })
     .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })
-    .controller('PodcastAddCtrl', function ($scope, $location, defaultPodcast, tagService, podcastService) {
-        $scope.podcast = angular.extend(podcastService.getNewPodcast(), defaultPodcast );
-
-        $scope.findInfo = function() {
-            podcastService.findInfo($scope.podcast.url).then(function(podcastFetched) {
-                $scope.podcast.title = podcastFetched.title;
-                $scope.podcast.description = podcastFetched.description;
-                $scope.podcast.type = podcastFetched.type;
-                $scope.podcast.cover.url = podcastFetched.cover.url;
-            })
-        };
-        
-        $scope.loadTags = function(query) {
-            return tagService.search(query);
-        };
-
-        $scope.changeType = function() {
-            if (/beinsports\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "BeInSports";
-            } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "CanalPlus";
-            } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "JeuxVideoFR";
-            } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "JeuxVideoCom";
-            } else if (/parleys\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Parleys";
-            } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Pluzz";
-            } else if (/youtube\.com/i.test($scope.podcast.url)) {
-                $scope.podcast.type = "Youtube";
-            } else if ($scope.podcast.url.length > 0) {
-                $scope.podcast.type = "RSS";
-            } else {
-                $scope.podcast.type = "Send";
-            }
-        };
-
-        $scope.save = function() {
-            podcastService.save($scope.podcast).then(function (podcast) {
-                $location.path('/podcast/' + podcast.id);
-            });
-        };
-        
-    });
+    .controller('PodcastAddCtrl', PodcastCreationController);

@@ -270,7 +270,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/podcast-creation.html", "<div class=\"jumbotron\">\n" + "    <div class=\"container\">\n" + "        <h1>Ajouter un Podcast</h1>\n" + "    </div>\n" + "</div>\n" + "\n" + "<div class=\"container\">\n" + "    <form class=\"form-horizontal\" role=\"form\" novalidate>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"title\" class=\"col-sm-1 control-label\">Titre</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"text\" class=\"form-control\" id=\"title\" ng-model=\"podcast.title\" required placeholder=\"Titre\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">URL</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"url\" class=\"form-control\" id=\"url\" ng-model=\"podcast.url\" required placeholder=\"url\" ng-change=\"changeType();findInfo();\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <div class=\"checkbox col-sm-offset-2\">\n" + "                <label>\n" + "                    <input type=\"checkbox\" ng-model=\"podcast.hasToBeDeleted\"> Suppression Automatique\n" + "                </label>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">Tags</label>\n" + "            <div class=\"col-sm-10\">\n" + "                <tags-input ng-model=\"podcast.tags\" display-property=\"name\" min-length=\"1\" class=\"bootstrap\" placeholder=\"Ajouter un tag\">\n" + "                    <auto-complete source=\"loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "                </tags-input>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <label for=\"height\" class=\"col-sm-1 control-label\">Type</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <select class=\"form-control\" ng-model=\"podcast.type\">\n" + "                    <option value=\"BeInSports\">Be In Sports</option>\n" + "                    <option value=\"CanalPlus\">Canal+</option>\n" + "                    <option value=\"JeuxVideoCom\">Jeux Video Com</option>\n" + "                    <option value=\"JeuxVideoFR\">Jeux Video Fr</option>\n" + "                    <option value=\"Parleys\">Parleys</option>\n" + "                    <option value=\"Pluzz\">Pluzz</option>\n" + "                    <option value=\"RSS\">RSS</option>\n" + "                    <option value=\"send\">Send</option>\n" + "                    <option value=\"Youtube\">Youtube</option>\n" + "                </select>\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"col-md-2 col-md-offset-1\">\n" + "            <img ng-src=\"{{ podcast.cover.url || 'http://placehold.it/200x200' }}\" class=\"img-thumbnail\">\n" + "        </div>\n" + "        <div class=\"col-md-9\">\n" + "            <div class=\"form-group\">\n" + "                <label for=\"url\" class=\"col-sm-2 control-label\">URL</label>\n" + "\n" + "                <div class=\"col-sm-9\">\n" + "                    <input class=\"form-control\" id=\"url\" ng-model=\"podcast.cover.url\" required placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"width\" class=\"col-sm-2 control-label\">Lageur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"width\" ng-model=\"podcast.cover.width\" required\n" + "                           placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"height\" class=\"col-sm-2 control-label\">Hauteur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"height\" ng-model=\"podcast.cover.height\" required\n" + "                           placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <div class=\"col-sm-offset-2 col-sm-10\">\n" + "                <button ng-click=\"save()\" class=\"btn btn-default\">Sauvegarder</button>\n" + "            </div>\n" + "        </div>\n" + "    </form>\n" + "</div>\n" + "\n" + "\n" + "\n" + "");
+        $templateCache.put("html/podcast-creation.html", "<div class=\"jumbotron\">\n" + "    <div class=\"container\">\n" + "        <h1>Ajouter un Podcast</h1>\n" + "    </div>\n" + "</div>\n" + "\n" + "<div class=\"container\">\n" + "    <form class=\"form-horizontal\" role=\"form\" novalidate>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"title\" class=\"col-sm-1 control-label\">Titre</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"text\" class=\"form-control\" id=\"title\" ng-model=\"pac.podcast.title\" required placeholder=\"Titre\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">URL</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"url\" class=\"form-control\" id=\"url\" ng-model=\"pac.podcast.url\" required placeholder=\"url\" ng-change=\"pac.changeType();pac.findInfo();\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <div class=\"checkbox col-sm-offset-2\">\n" + "                <label>\n" + "                    <input type=\"checkbox\" ng-model=\"pac.podcast.hasToBeDeleted\"> Suppression Automatique\n" + "                </label>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">Tags</label>\n" + "            <div class=\"col-sm-10\">\n" + "                <tags-input ng-model=\"pac.podcast.tags\" display-property=\"name\" min-length=\"1\" class=\"bootstrap\" placeholder=\"Ajouter un tag\">\n" + "                    <auto-complete source=\"pac.loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "                </tags-input>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <label for=\"height\" class=\"col-sm-1 control-label\">Type</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <select class=\"form-control\" ng-model=\"pac.podcast.type\">\n" + "                    <option value=\"BeInSports\">Be In Sports</option>\n" + "                    <option value=\"CanalPlus\">Canal+</option>\n" + "                    <option value=\"JeuxVideoCom\">Jeux Video Com</option>\n" + "                    <option value=\"JeuxVideoFR\">Jeux Video Fr</option>\n" + "                    <option value=\"Parleys\">Parleys</option>\n" + "                    <option value=\"Pluzz\">Pluzz</option>\n" + "                    <option value=\"RSS\">RSS</option>\n" + "                    <option value=\"send\">Send</option>\n" + "                    <option value=\"Youtube\">Youtube</option>\n" + "                </select>\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"col-md-2 col-md-offset-1\">\n" + "            <img ng-src=\"{{ pac.podcast.cover.url || 'http://placehold.it/200x200' }}\" class=\"img-thumbnail\">\n" + "        </div>\n" + "        <div class=\"col-md-9\">\n" + "            <div class=\"form-group\">\n" + "                <label for=\"url\" class=\"col-sm-2 control-label\">URL</label>\n" + "\n" + "                <div class=\"col-sm-9\">\n" + "                    <input class=\"form-control\" ng-model=\"pac.podcast.cover.url\" required placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"width\" class=\"col-sm-2 control-label\">Lageur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"width\" ng-model=\"pac.podcast.cover.width\" required\n" + "                           placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"height\" class=\"col-sm-2 control-label\">Hauteur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"height\" ng-model=\"pac.podcast.cover.height\" required\n" + "                           placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <div class=\"col-sm-offset-2 col-sm-10\">\n" + "                <button ng-click=\"pac.save()\" class=\"btn btn-default\">Sauvegarder</button>\n" + "            </div>\n" + "        </div>\n" + "    </form>\n" + "</div>\n" + "\n" + "\n" + "\n" + "");
     }]);
 })();
 
@@ -479,6 +479,135 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
     });
 }]).controller("DownloadCtrl", DownloadCtrl);
 
+var ItemDetailCtrl = (function () {
+    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
+        var _this = this;
+
+        _classCallCheck(this, ItemDetailCtrl);
+
+        this.item = item;
+        this.$location = $location;
+        this.item.podcast = podcast;
+        this.playlistService = playlistService;
+        this.DonwloadManager = DonwloadManager;
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
+
+        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+            var itemFromWS = JSON.parse(message.body);
+            if (itemFromWS.id == _this.item.id) {
+                _.assign(_this.item, itemFromWS);
+            }
+        }, $scope);
+    }
+    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
+
+    _createClass(ItemDetailCtrl, {
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                var _this = this;
+
+                return item.remove().then(function () {
+                    _this.playlistService.remove(item);
+                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    _.assign(_this.item, itemReseted);
+                    _this.playlistService.remove(item);
+                });
+            }
+        },
+        toggleInPlaylist: {
+            value: function toggleInPlaylist() {
+                this.playlistService.addOrRemove(this.item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist() {
+                return this.playlistService.contains(this.item);
+            }
+        }
+    });
+
+    return ItemDetailCtrl;
+})();
+
+angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
+        templateUrl: "html/item-detail.html",
+        controller: "ItemDetailCtrl",
+        controllerAs: "idc",
+        hotkeys: commonKey,
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemDetailCtrl", ItemDetailCtrl);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
+
+var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
+    _classCallCheck(this, ItemPlayerController);
+
+    this.item = item;
+    this.item.podcast = podcast;
+    this.$timeout = $timeout;
+
+    this.config = {
+        autoPlay: true,
+        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
+        plugins: {
+            controls: {
+                autoHide: !deviceDetectorService.isTouchedDevice(),
+                autoHideTime: 2000
+            },
+            poster: this.item.cover.url
+        }
+    };
+};
+ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
+
+angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
+        templateUrl: "html/item-player.html",
+        controller: "ItemPlayerController",
+        controllerAs: "ipc",
+        resolve: {
+            item: ["itemService", "$route", function (itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function (podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemPlayerController", ItemPlayerController);
+
 var PlayerController = (function () {
     function PlayerController(playlistService, $timeout, deviceDetectorService) {
         _classCallCheck(this, PlayerController);
@@ -629,184 +758,80 @@ var PlaylistService = (function () {
 
 angular.module("ps.player.playlist", ["ngStorage"]).service("playlistService", PlaylistService);
 
-var ItemDetailCtrl = (function () {
-    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
-        var _this = this;
+var PodcastCreationController = (function () {
+    function PodcastCreationController($location, defaultPodcast, tagService, podcastService) {
+        _classCallCheck(this, PodcastCreationController);
 
-        _classCallCheck(this, ItemDetailCtrl);
-
-        this.item = item;
+        this.podcastService = podcastService;
         this.$location = $location;
-        this.item.podcast = podcast;
-        this.playlistService = playlistService;
-        this.DonwloadManager = DonwloadManager;
-
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
-
-        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-            var itemFromWS = JSON.parse(message.body);
-            if (itemFromWS.id == _this.item.id) {
-                _.assign(_this.item, itemFromWS);
-            }
-        }, $scope);
+        this.tagService = tagService;
+        this.podcast = angular.extend(this.podcastService.getNewPodcast(), defaultPodcast);
     }
-    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
+    PodcastCreationController.$inject = ["$location", "defaultPodcast", "tagService", "podcastService"];
 
-    _createClass(ItemDetailCtrl, {
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DonwloadManager.ws.stop(item);
-            }
-        },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                this.DonwloadManager.ws.toggle(item);
-            }
-        },
-        remove: {
-            value: function remove(item) {
+    _createClass(PodcastCreationController, {
+        findInfo: {
+            value: function findInfo() {
                 var _this = this;
 
-                return item.remove().then(function () {
-                    _this.playlistService.remove(item);
-                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                return this.podcastService.findInfo(this.podcast.url).then(function (podcastFetched) {
+                    _this.podcast.title = podcastFetched.title;
+                    _this.podcast.description = podcastFetched.description;
+                    _this.podcast.type = podcastFetched.type;
+                    _this.podcast.cover.url = podcastFetched.cover.url;
                 });
             }
         },
-        reset: {
-            value: function reset(item) {
+        loadTags: {
+            value: function loadTags(query) {
+                return this.tagService.search(query);
+            }
+        },
+        changeType: {
+            value: function changeType() {
+                if (/beinsports\.fr/i.test(this.podcast.url)) {
+                    this.podcast.type = "BeInSports";
+                } else if (/canalplus\.fr/i.test(this.podcast.url)) {
+                    this.podcast.type = "CanalPlus";
+                } else if (/jeuxvideo\.fr/i.test(this.podcast.url)) {
+                    this.podcast.type = "JeuxVideoFR";
+                } else if (/jeuxvideo\.com/i.test(this.podcast.url)) {
+                    this.podcast.type = "JeuxVideoCom";
+                } else if (/parleys\.com/i.test(this.podcast.url)) {
+                    this.podcast.type = "Parleys";
+                } else if (/pluzz\.francetv\.fr/i.test(this.podcast.url)) {
+                    this.podcast.type = "Pluzz";
+                } else if (/youtube\.com/i.test(this.podcast.url)) {
+                    this.podcast.type = "Youtube";
+                } else if (this.podcast.url.length > 0) {
+                    this.podcast.type = "RSS";
+                } else {
+                    this.podcast.type = "Send";
+                }
+            }
+        },
+        save: {
+            value: function save() {
                 var _this = this;
 
-                return item.reset().then(function (itemReseted) {
-                    _.assign(_this.item, itemReseted);
-                    _this.playlistService.remove(item);
+                this.podcastService.save(this.podcast).then(function (podcast) {
+                    return _this.$location.path("/podcast/" + podcast.id);
                 });
-            }
-        },
-        toggleInPlaylist: {
-            value: function toggleInPlaylist() {
-                this.playlistService.addOrRemove(this.item);
-            }
-        },
-        isInPlaylist: {
-            value: function isInPlaylist() {
-                return this.playlistService.contains(this.item);
             }
         }
     });
 
-    return ItemDetailCtrl;
+    return PodcastCreationController;
 })();
 
-angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
-        templateUrl: "html/item-detail.html",
-        controller: "ItemDetailCtrl",
-        controllerAs: "idc",
-        hotkeys: commonKey,
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemDetailCtrl", ItemDetailCtrl);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
-
-var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
-    _classCallCheck(this, ItemPlayerController);
-
-    this.item = item;
-    this.item.podcast = podcast;
-    this.$timeout = $timeout;
-
-    this.config = {
-        autoPlay: true,
-        sources: [{ src: this.item.proxyURL, type: this.item.mimeType }],
-        plugins: {
-            controls: {
-                autoHide: !deviceDetectorService.isTouchedDevice(),
-                autoHideTime: 2000
-            },
-            poster: this.item.cover.url
-        }
-    };
-};
-ItemPlayerController.$inject = ["podcast", "item", "$timeout", "deviceDetectorService"];
-
-angular.module("ps.item.player", ["ngSanitize", "ngRoute", "device-detection", "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.poster", "com.2fdevs.videogular.plugins.controls", "com.2fdevs.videogular.plugins.overlayplay", "com.2fdevs.videogular.plugins.buffering"]).config(["$routeProvider", function ($routeProvider) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId/play", {
-        templateUrl: "html/item-player.html",
-        controller: "ItemPlayerController",
-        controllerAs: "ipc",
-        resolve: {
-            item: ["itemService", "$route", function (itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function (podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemPlayerController", ItemPlayerController);
 angular.module("ps.podcast.creation", ["ps.config.route", "ps.dataservice", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/podcast-creation", {
         templateUrl: "html/podcast-creation.html",
         controller: "PodcastAddCtrl",
+        controllerAs: "pac",
         hotkeys: commonKey
     });
-}]).constant("defaultPodcast", { hasToBeDeleted: true, cover: { height: 200, width: 200 } }).controller("PodcastAddCtrl", ["$scope", "$location", "defaultPodcast", "tagService", "podcastService", function ($scope, $location, defaultPodcast, tagService, podcastService) {
-    $scope.podcast = angular.extend(podcastService.getNewPodcast(), defaultPodcast);
-
-    $scope.findInfo = function () {
-        podcastService.findInfo($scope.podcast.url).then(function (podcastFetched) {
-            $scope.podcast.title = podcastFetched.title;
-            $scope.podcast.description = podcastFetched.description;
-            $scope.podcast.type = podcastFetched.type;
-            $scope.podcast.cover.url = podcastFetched.cover.url;
-        });
-    };
-
-    $scope.loadTags = function (query) {
-        return tagService.search(query);
-    };
-
-    $scope.changeType = function () {
-        if (/beinsports\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "BeInSports";
-        } else if (/canalplus\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "CanalPlus";
-        } else if (/jeuxvideo\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "JeuxVideoFR";
-        } else if (/jeuxvideo\.com/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "JeuxVideoCom";
-        } else if (/parleys\.com/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "Parleys";
-        } else if (/pluzz\.francetv\.fr/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "Pluzz";
-        } else if (/youtube\.com/i.test($scope.podcast.url)) {
-            $scope.podcast.type = "Youtube";
-        } else if ($scope.podcast.url.length > 0) {
-            $scope.podcast.type = "RSS";
-        } else {
-            $scope.podcast.type = "Send";
-        }
-    };
-
-    $scope.save = function () {
-        podcastService.save($scope.podcast).then(function (podcast) {
-            $location.path("/podcast/" + podcast.id);
-        });
-    };
-}]);
+}]).constant("defaultPodcast", { hasToBeDeleted: true, cover: { height: 200, width: 200 } }).controller("PodcastAddCtrl", PodcastCreationController);
 
 var PodcastsListCtrl = function PodcastsListCtrl(podcasts) {
     _classCallCheck(this, PodcastsListCtrl);
