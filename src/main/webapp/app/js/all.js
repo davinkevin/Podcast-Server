@@ -171,21 +171,6 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         return item;
     });
 }]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -237,7 +222,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/items-search.html", "<div class=\"container item-listing\" ng-swipe-right=\"isc.swipePage(-1)\" ng-swipe-left=\"isc.swipePage(1)\">\n" + "    <!--<div class=\"col-xs-11 col-sm-11 col-lg-11 col-md-11\">-->\n" + "\n" + "    <div class=\"form-inline search-bar row\" ng-show=\"isc.search\">\n" + "        <div class=\"form-group col-sm-3\">\n" + "            <input type=\"text\" class=\"form-control\" ng-model=\"isc.searchParameters.term\" placeholder=\"Recherche globale\" ng-change=\"isc.currentSearchPage=1; isc.changePage()\" ng-model-options=\"{ debounce: 500 }\">\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-5\">\n" + "            <tags-input placeholder=\"Search by Tags\" add-from-autocomplete-only=\"true\" ng-model=\"isc.searchParameters.tags\" display-property=\"name\" class=\"bootstrap\" on-tag-added=\"isc.currentPage=1; isc.changePage()\" on-tag-removed=\"isc.currentPage=1; isc.changePage()\">\n" + "                <auto-complete source=\"isc.loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "            </tags-input>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <select class=\"form-control\" ng-model=\"isc.searchParameters.properties\" ng-change=\"isc.changePage()\">\n" + "                <option value>Tri</option>\n" + "                <option value=\"pertinence\">Pertinence</option>\n" + "                <option value=\"pubdate\">Date publication</option>\n" + "                <option value=\"downloadDate\">Date de download</option>\n" + "            </select>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <!--<select class=\"form-control\" ng-model=\"searchParameters.direction\" ng-change=\"changePage()\" ng-disabled=\"searchParameters.properties === 'pertinence'\">-->\n" + "            <select class=\"form-control\" ng-model=\"isc.searchParameters.direction\" ng-change=\"isc.changePage()\">\n" + "                <option value>Ordre</option>\n" + "                <option value=\"DESC\">Descendant</option>\n" + "                <option value=\"ASC\">Ascendant</option>\n" + "            </select>\n" + "        </div>\n" + "    </div>\n" + "\n" + "    <div class=\"text-center row\" >\n" + "        <pagination ng-show=\"isc.totalPages > 1\" items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"isc.totalItems\" ng-model=\"isc.currentPage\" ng-change=\"isc.changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "        <a ng-click=\"isc.search = !isc.search;\" ng-class=\"{'btn-primary' : isc.search, 'btn-default' : !isc.search}\" class=\"btn pull-right search-button\"><i class=\"glyphicon glyphicon-search\"></i></a>\n" + "    </div>\n" + "        <div class=\"row\">\n" + "            <div ng-repeat=\"item in isc.items track by item.id\" class=\"col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList\">\n" + "                <div class=\"box\">\n" + "                    <div class=\"\">\n" + "                        <img ng-class=\"{'img-grayscale' : (!item.isDownloaded) }\" ng-src=\"{{ item.cover.url }}\" alt=\"\" class=\"img-responsive\" />\n" + "                        <div class=\"overlay-button\">\n" + "                            <div class=\"btn-group\" dropdown>\n" + "                                <button type=\"button\" class=\"btn dropdown dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                                <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-show=\"item.status == 'Started'\" ng-click=\"isc.toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Mettre en pause</a>\n" + "                                        <a ng-show=\"item.status == 'Paused'\" ng-click=\"isc.toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Reprendre</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-click=\"isc.stopDownload(item)\"><span class=\"glyphicon glyphicon-stop text-danger\"></span> Stopper</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\">\n" + "                                        <a ng-click=\"item.download()\"><span class=\"glyphicon glyphicon-save text-primary\"></span> Télécharger</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-href=\"/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\">\n" + "                                            <span class=\"ionicons ion-social-youtube text-success\"></span> Lire dans le player</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.isDownloaded\">\n" + "                                        <a ng-click=\"isc.addOrRemove(item)\">\n" + "                                            <span ng-hide=\"isc.isInPlaylist(item)\"><span class=\"glyphicon glyphicon-plus text-primary\"></span> Ajouter à la Playlist</span>\n" + "                                            <span ng-show=\"isc.isInPlaylist(item)\"><span class=\"glyphicon glyphicon-minus text-primary\"></span> Retirer de la Playlist</span>\n" + "                                        </a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"isc.remove(item)\"><span class=\"glyphicon glyphicon-remove text-danger\"></span> Supprimer</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"isc.reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a>\n" + "                                    </li>\n" + "                                </ul>\n" + "                            </div>\n" + "                        </div>\n" + "                        <a class=\"overlay-main-button\" ng-href=\"{{ item.proxyURL  }}\" >\n" + "                            <span ng-class=\"{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}\" class=\"glyphicon \"></span>\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center clearfix itemTitle center\" >\n" + "                        <a ng-href=\"#/podcast/{{item.podcastId}}/item/{{item.id}}\" tooltip-append-to-body=\"true\" tooltip=\"{{ item.title }}\" tooltip-placement=\"bottom\" >\n" + "                            {{ item.title | characters:30 }}\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center row-button\">\n" + "                        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "                            <button ng-click=\"isc.toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "                            <button ng-click=\"isc.stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "                        </span>\n" + "\n" + "                        <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"!item.isDownloaded\" type=\"button\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-globe\"></span></a>\n" + "\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-play\"></span></a>\n" + "                        <button ng-click=\"isc.remove(item)\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n" + "                    </div>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "    <!--</div>-->\n" + "    <div class=\"text-center row\" ng-show=\"isc.totalPages > 1\">\n" + "        <pagination items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"isc.totalItems\" ng-model=\"isc.currentPage\" ng-change=\"isc.changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "    </div>\n" + "</div>\n" + "");
+        $templateCache.put("html/items-search.html", "<div class=\"container item-listing\" ng-swipe-right=\"isc.swipePage(-1)\" ng-swipe-left=\"isc.swipePage(1)\">\n" + "    <!--<div class=\"col-xs-11 col-sm-11 col-lg-11 col-md-11\">-->\n" + "\n" + "    <div class=\"form-inline search-bar row\" ng-show=\"isc.search\">\n" + "        <div class=\"form-group col-sm-3\">\n" + "            <input type=\"text\" class=\"form-control\" ng-model=\"isc.searchParameters.term\" placeholder=\"Recherche globale\" ng-change=\"isc.resetSearch()\" ng-model-options=\"{ debounce: 500 }\">\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-5\">\n" + "            <tags-input placeholder=\"Search by Tags\" add-from-autocomplete-only=\"true\" ng-model=\"isc.searchParameters.tags\" display-property=\"name\" class=\"bootstrap\" on-tag-added=\"isc.resetSearch()\" on-tag-removed=\"isc.resetSearch()\">\n" + "                <auto-complete source=\"isc.loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "            </tags-input>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <select class=\"form-control\" ng-model=\"isc.searchParameters.properties\" ng-change=\"isc.resetSearch()\">\n" + "                <option value>Tri</option>\n" + "                <option value=\"pertinence\">Pertinence</option>\n" + "                <option value=\"pubdate\">Date publication</option>\n" + "                <option value=\"downloadDate\">Date de download</option>\n" + "            </select>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group col-sm-2\">\n" + "            <!--<select class=\"form-control\" ng-model=\"searchParameters.direction\" ng-change=\"changePage()\" ng-disabled=\"searchParameters.properties === 'pertinence'\">-->\n" + "            <select class=\"form-control\" ng-model=\"isc.searchParameters.direction\" ng-change=\"isc.resetSearch()\">\n" + "                <option value>Ordre</option>\n" + "                <option value=\"DESC\">Descendant</option>\n" + "                <option value=\"ASC\">Ascendant</option>\n" + "            </select>\n" + "        </div>\n" + "    </div>\n" + "\n" + "    <div class=\"text-center row\" >\n" + "        <pagination ng-show=\"isc.totalPages > 1\" items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"isc.totalItems\" ng-model=\"isc.currentPage\" ng-change=\"isc.changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "        <a ng-click=\"isc.search = !isc.search;\" ng-class=\"{'btn-primary' : isc.search, 'btn-default' : !isc.search}\" class=\"btn pull-right search-button\"><i class=\"glyphicon glyphicon-search\"></i></a>\n" + "    </div>\n" + "        <div class=\"row\">\n" + "            <div ng-repeat=\"item in isc.items track by item.id\" class=\"col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList\">\n" + "                <div class=\"box\">\n" + "                    <div class=\"\">\n" + "                        <img ng-class=\"{'img-grayscale' : (!item.isDownloaded) }\" ng-src=\"{{ item.cover.url }}\" alt=\"\" class=\"img-responsive\" />\n" + "                        <div class=\"overlay-button\">\n" + "                            <div class=\"btn-group\" dropdown>\n" + "                                <button type=\"button\" class=\"btn dropdown dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                                <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-show=\"item.status == 'Started'\" ng-click=\"isc.toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Mettre en pause</a>\n" + "                                        <a ng-show=\"item.status == 'Paused'\" ng-click=\"isc.toggleDownload(item)\"><i class=\"glyphicon glyphicon-play text-primary\"></i><i class=\"glyphicon glyphicon-pause text-primary\"></i> Reprendre</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.status == 'Started' || item.status == 'Paused'\">\n" + "                                        <a ng-click=\"isc.stopDownload(item)\"><span class=\"glyphicon glyphicon-stop text-danger\"></span> Stopper</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\">\n" + "                                        <a ng-click=\"item.download()\"><span class=\"glyphicon glyphicon-save text-primary\"></span> Télécharger</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-href=\"/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\">\n" + "                                            <span class=\"ionicons ion-social-youtube text-success\"></span> Lire dans le player</a>\n" + "                                    </li>\n" + "                                    <li ng-show=\"item.isDownloaded\">\n" + "                                        <a ng-click=\"isc.addOrRemove(item)\">\n" + "                                            <span ng-hide=\"isc.isInPlaylist(item)\"><span class=\"glyphicon glyphicon-plus text-primary\"></span> Ajouter à la Playlist</span>\n" + "                                            <span ng-show=\"isc.isInPlaylist(item)\"><span class=\"glyphicon glyphicon-minus text-primary\"></span> Retirer de la Playlist</span>\n" + "                                        </a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"isc.remove(item)\"><span class=\"glyphicon glyphicon-remove text-danger\"></span> Supprimer</a>\n" + "                                    </li>\n" + "                                    <li>\n" + "                                        <a ng-click=\"isc.reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a>\n" + "                                    </li>\n" + "                                </ul>\n" + "                            </div>\n" + "                        </div>\n" + "                        <a class=\"overlay-main-button\" ng-href=\"{{ item.proxyURL  }}\" >\n" + "                            <span ng-class=\"{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}\" class=\"glyphicon \"></span>\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center clearfix itemTitle center\" >\n" + "                        <a ng-href=\"#/podcast/{{item.podcastId}}/item/{{item.id}}\" tooltip-append-to-body=\"true\" tooltip=\"{{ item.title }}\" tooltip-placement=\"bottom\" >\n" + "                            {{ item.title | characters:30 }}\n" + "                        </a>\n" + "                    </div>\n" + "                    <div class=\"text-center row-button\">\n" + "                        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "                            <button ng-click=\"isc.toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "                            <button ng-click=\"isc.stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "                        </span>\n" + "\n" + "                        <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"!item.isDownloaded\" type=\"button\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-globe\"></span></a>\n" + "\n" + "                        <a href=\"{{ item.proxyURL }}\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-play\"></span></a>\n" + "                        <button ng-click=\"isc.remove(item)\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n" + "                    </div>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "    <!--</div>-->\n" + "    <div class=\"text-center row\" ng-show=\"isc.totalPages > 1\">\n" + "        <pagination items-per-page=\"12\" max-size=\"10\" boundary-links=\"true\" total-items=\"isc.totalItems\" ng-model=\"isc.currentPage\" ng-change=\"isc.changePage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "    </div>\n" + "</div>\n" + "");
     }]);
 })();
 
@@ -328,6 +313,22 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
+
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
@@ -854,8 +855,54 @@ angular.module("ps.podcast.list", ["ps.config.route", "ps.dataService.podcast"])
     });
 }]).controller("PodcastsListCtrl", PodcastsListCtrl);
 
+var SearchItemCache = (function () {
+    function SearchItemCache(DefaultItemSearchParameters, $sessionStorage) {
+        _classCallCheck(this, SearchItemCache);
+
+        this.$sessionStorage = $sessionStorage;
+        this.$sessionStorage.searchParameters = DefaultItemSearchParameters;
+    }
+    SearchItemCache.$inject = ["DefaultItemSearchParameters", "$sessionStorage"];
+
+    _createClass(SearchItemCache, {
+        getParameters: {
+            value: function getParameters() {
+                return this.$sessionStorage.searchParameters;
+            }
+        },
+        page: {
+            value: function page(pageNumber) {
+                if (angular.isNumber(pageNumber)) {
+                    this.$sessionStorage.searchParameters.page = pageNumber;
+                }
+
+                return this.$sessionStorage.searchParameters.page;
+            }
+        },
+        size: {
+            value: function size(sizeNumber) {
+                if (angular.isNumber(sizeNumber)) {
+                    this.$sessionStorage.searchParameters.size = sizeNumber;
+                }
+
+                return this.$sessionStorage.searchParameters.size;
+            }
+        },
+        updateSearchParam: {
+            value: function updateSearchParam(searchParam) {
+                this.$sessionStorage.searchParameters.term = searchParam.term;
+                this.$sessionStorage.searchParameters.tags = searchParam.tags;
+                this.$sessionStorage.searchParameters.direction = searchParam.direction;
+                this.$sessionStorage.searchParameters.properties = searchParam.properties;
+            }
+        }
+    });
+
+    return SearchItemCache;
+})();
+
 var ItemSearchCtrl = (function () {
-    function ItemSearchCtrl($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService, items) {
+    function ItemSearchCtrl($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, items) {
         var _this = this;
 
         _classCallCheck(this, ItemSearchCtrl);
@@ -866,22 +913,13 @@ var ItemSearchCtrl = (function () {
         this.tagService = tagService;
         this.DownloadManager = DonwloadManager;
         this.playlistService = playlistService;
+        this.SearchItemCache = SearchItemCache;
 
         /* Constructor Init */
-        this.cache = $cacheFactory.get("paginationCache") || $cacheFactory("paginationCache");
-
         this.totalItems = Number.MAX_VALUE;
         this.maxSize = 10;
-        this.currentPage = this.cache.get("search:currentPage") || 1;
-
-        this.searchParameters = {
-            page: this.currentPage,
-            size: ItemPerPage,
-            term: this.cache.get("search:currentWord") || undefined,
-            searchTags: this.cache.get("search:currentTags") || undefined,
-            direction: this.cache.get("search:direction") || undefined,
-            properties: this.cache.get("search:properties") || undefined
-        };
+        this.currentPage = this.SearchItemCache.page() + 1;
+        this.searchParameters = this.SearchItemCache.getParameters();
 
         //** WebSocket Subscription **//
         this.DownloadManager.ws.subscribe("/topic/download", function (message) {
@@ -898,7 +936,7 @@ var ItemSearchCtrl = (function () {
         /*this.changePage();*/
         this.attachResponse(items);
     }
-    ItemSearchCtrl.$inject = ["$scope", "$cacheFactory", "$location", "itemService", "tagService", "DonwloadManager", "ItemPerPage", "playlistService", "items"];
+    ItemSearchCtrl.$inject = ["$scope", "SearchItemCache", "$location", "itemService", "tagService", "DonwloadManager", "playlistService", "items"];
 
     _createClass(ItemSearchCtrl, {
         updateItemFromWS: {
@@ -913,8 +951,8 @@ var ItemSearchCtrl = (function () {
             value: function changePage() {
                 var _this = this;
 
-                this.searchParameters.page = this.calculatePage();
-                return this.itemService.search(this.searchParameters).then(function (itemsResponse) {
+                this.SearchItemCache.page(this.calculatePage());
+                return this.itemService.search(this.SearchItemCache.getParameters()).then(function (itemsResponse) {
                     return _this.attachResponse(itemsResponse);
                 });
             }
@@ -924,13 +962,7 @@ var ItemSearchCtrl = (function () {
                 this.items = itemsResponse.content;
                 this.totalPages = itemsResponse.totalPages;
                 this.totalItems = itemsResponse.totalElements;
-
-                this.cache.put("search:currentPage", this.currentPage);
-                this.cache.put("search:currentWord", this.term);
-                this.cache.put("search:currentTags", this.searchTags);
-                this.cache.put("search:direction", this.direction);
-                this.cache.put("search:properties", this.properties);
-
+                this.currentPage = this.SearchItemCache.page(itemsResponse.number) + 1;
                 this.$location.search("page", this.currentPage);
             }
         },
@@ -997,7 +1029,14 @@ var ItemSearchCtrl = (function () {
         },
         calculatePage: {
             value: function calculatePage() {
-                return (this.currentPage <= 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size) ? Math.ceil(this.totalItems / this.searchParameters.size) : this.currentPage) - 1;
+                return (this.currentPage <= 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size()) ? Math.ceil(this.totalItems / this.SearchItemCache.size()) : this.currentPage) - 1;
+            }
+        },
+        resetSearch: {
+            value: function resetSearch() {
+                this.currentPage = 1;
+                this.SearchItemCache.updateSearchParam(this.searchParameters);
+                return this.changePage();
             }
         }
     });
@@ -1005,22 +1044,27 @@ var ItemSearchCtrl = (function () {
     return ItemSearchCtrl;
 })();
 
-angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+angular.module("ps.search.item", ["ps.dataService.donwloadManager", "ps.dataService.item", "ps.dataService.tag", "ps.player", "ps.config.route", "ngTagsInput", "ngStorage"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
     $routeProvider.when("/items", {
         templateUrl: "html/items-search.html",
         controller: "ItemsSearchCtrl",
         controllerAs: "isc",
         reloadOnSearch: false,
-        hotkeys: [["right", "Next page", "isc.currentPage = isc.currentPage+1; isc.changePage();"], ["left", "Previous page", "isc.currentPage = isc.currentPage-1; isc.changePage();"]].concat(commonKey),
+        hotkeys: [["right", "Next page", "isc.swipePage(1)"], ["left", "Previous page", "isc.swipePage(-1)"]].concat(commonKey),
         resolve: {
-            items: ["itemService", "ItemPerPage", "$location", "$cacheFactory", function (itemService, ItemPerPage, $location, $cacheFactory) {
-                var parameters = { size: ItemPerPage };
-                parameters.page = $cacheFactory.get("paginationCache") == undefined ? 0 : $cacheFactory.get("paginationCache").get("search:currentPage") - 1 || 0;
-                return itemService.search(parameters);
+            items: ["itemService", "SearchItemCache", function (itemService, SearchItemCache) {
+                return itemService.search(SearchItemCache.getParameters());
             }]
         }
     });
-}]).constant("ItemPerPage", 12).controller("ItemsSearchCtrl", ItemSearchCtrl);
+}]).constant("DefaultItemSearchParameters", {
+    page: 0,
+    size: 12,
+    term: undefined,
+    tags: undefined,
+    direction: "DESC",
+    properties: "pubdate"
+}).controller("ItemsSearchCtrl", ItemSearchCtrl).service("SearchItemCache", SearchItemCache);
 /**
  * Created by kevin on 02/11/14.
  */

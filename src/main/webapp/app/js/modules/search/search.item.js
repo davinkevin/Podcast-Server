@@ -1,28 +1,53 @@
+class SearchItemCache {
+    constructor(DefaultItemSearchParameters, $sessionStorage) {
+        this.$sessionStorage = $sessionStorage;
+        this.$sessionStorage.searchParameters = DefaultItemSearchParameters
+    }
+
+    getParameters() {
+        return this.$sessionStorage.searchParameters;
+    }
+
+    page(pageNumber) {
+        if (angular.isNumber(pageNumber)) {
+            this.$sessionStorage.searchParameters.page = pageNumber;
+        }
+
+        return this.$sessionStorage.searchParameters.page
+    }
+
+    size(sizeNumber) {
+        if (angular.isNumber(sizeNumber)) {
+            this.$sessionStorage.searchParameters.size = sizeNumber;
+        }
+
+        return this.$sessionStorage.searchParameters.size;
+    }
+
+    updateSearchParam(searchParam) {
+        this.$sessionStorage.searchParameters.term = searchParam.term;
+        this.$sessionStorage.searchParameters.tags = searchParam.tags;
+        this.$sessionStorage.searchParameters.direction =  searchParam.direction;
+        this.$sessionStorage.searchParameters.properties =  searchParam.properties;
+    }
+}
+
 class ItemSearchCtrl {
 
-    constructor($scope, $cacheFactory, $location, itemService, tagService, DonwloadManager, ItemPerPage, playlistService, items) {
+    constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, items) {
         /* DI */
         this.$location = $location;
         this.itemService = itemService;
         this.tagService = tagService;
         this.DownloadManager = DonwloadManager;
         this.playlistService = playlistService;
+        this.SearchItemCache = SearchItemCache;
 
         /* Constructor Init */
-        this.cache = $cacheFactory.get('paginationCache') || $cacheFactory('paginationCache');
-
         this.totalItems = Number.MAX_VALUE;
         this.maxSize = 10;
-        this.currentPage = this.cache.get("search:currentPage") || 1;
-
-        this.searchParameters = {
-            page : this.currentPage,
-            size : ItemPerPage,
-            term : this.cache.get("search:currentWord") || undefined,
-            searchTags : this.cache.get("search:currentTags") || undefined,
-            direction : this.cache.get("search:direction") || undefined,
-            properties : this.cache.get("search:properties") || undefined
-        };
+        this.currentPage = this.SearchItemCache.page()+1;
+        this.searchParameters = this.SearchItemCache.getParameters();
 
         //** WebSocket Subscription **//
         this.DownloadManager
@@ -49,8 +74,9 @@ class ItemSearchCtrl {
     }
 
     changePage() {
-        this.searchParameters.page = this.calculatePage();
-        return this.itemService.search(this.searchParameters)
+        this.SearchItemCache.page(this.calculatePage());
+        return this.itemService
+            .search(this.SearchItemCache.getParameters())
             .then((itemsResponse) => this.attachResponse(itemsResponse));
     }
 
@@ -58,13 +84,7 @@ class ItemSearchCtrl {
         this.items = itemsResponse.content;
         this.totalPages = itemsResponse.totalPages;
         this.totalItems = itemsResponse.totalElements;
-
-        this.cache.put('search:currentPage', this.currentPage);
-        this.cache.put('search:currentWord', this.term);
-        this.cache.put('search:currentTags', this.searchTags);
-        this.cache.put("search:direction", this.direction);
-        this.cache.put("search:properties", this.properties);
-
+        this.currentPage = this.SearchItemCache.page(itemsResponse.number)+1;
         this.$location.search("page", this.currentPage);
     }
 
@@ -114,10 +134,16 @@ class ItemSearchCtrl {
     calculatePage() {
         return ((this.currentPage <= 1)
                 ? 1
-                : (this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size))
-                    ? Math.ceil(this.totalItems / this.searchParameters.size)
-                    : this.currentPage
+                : (this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size()))
+                ? Math.ceil(this.totalItems / this.SearchItemCache.size())
+                : this.currentPage
             ) - 1;
+    }
+
+    resetSearch() {
+        this.currentPage = 1;
+        this.SearchItemCache.updateSearchParam(this.searchParameters);
+        return this.changePage();
     }
 }
 
@@ -127,7 +153,8 @@ angular.module('ps.search.item', [
     'ps.dataService.tag',
     'ps.player',
     'ps.config.route',
-    'ngTagsInput'
+    'ngTagsInput',
+    'ngStorage'
 ])
     .config(($routeProvider, commonKey) => {
         $routeProvider.
@@ -137,19 +164,23 @@ angular.module('ps.search.item', [
                 controllerAs: 'isc',
                 reloadOnSearch: false,
                 hotkeys: [
-                    ['right', 'Next page', 'isc.currentPage = isc.currentPage+1; isc.changePage();'],
-                    ['left', 'Previous page', 'isc.currentPage = isc.currentPage-1; isc.changePage();']
+                    ['right', 'Next page', 'isc.swipePage(1)'],
+                    ['left', 'Previous page', 'isc.swipePage(-1)']
                 ].concat(commonKey),
                 resolve : {
-                    items : (itemService, ItemPerPage, $location, $cacheFactory) => {
-                        let parameters = { size : ItemPerPage };
-                        parameters.page = ($cacheFactory.get('paginationCache') == undefined)
-                                ? 0
-                                : $cacheFactory.get('paginationCache').get("search:currentPage")-1 || 0;
-                        return itemService.search(parameters);
+                    items : (itemService, SearchItemCache) => {
+                        return itemService.search(SearchItemCache.getParameters());
                     }
                 }
             });
     })
-    .constant('ItemPerPage', 12)
-    .controller('ItemsSearchCtrl', ItemSearchCtrl);
+    .constant('DefaultItemSearchParameters', {
+        page : 0,
+        size : 12,
+        term : undefined,
+        tags : undefined,
+        direction : 'DESC',
+        properties : 'pubdate'
+    })
+    .controller('ItemsSearchCtrl', ItemSearchCtrl)
+    .service("SearchItemCache", SearchItemCache);
