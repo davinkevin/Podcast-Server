@@ -3,9 +3,9 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.service.WorkerService;
+import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -42,59 +44,32 @@ public class UpdatePodcastBusiness  {
     @Resource @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
     @Resource(name="Validator") Validator validator;
     @Resource WorkerService workerService;
+    public static final ExecutorService SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
 
 
     @Transactional(noRollbackFor=Exception.class)
-    public void updatePodcast() {
-        logger.info("Lancement de l'update");
-        List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
-        Updater updater;
-        for (Podcast podcast : podcasts) {
-            try {
-                logger.info("Traitement du Podcast : " + podcast.toString());
-                updater = workerService.updaterOf(podcast);
-                String signature = updater.generateSignature(podcast);
-                if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    updater.updateAndAddItems(podcast);
-
-
-                    podcast.setLastUpdate(ZonedDateTime.now());
-                    podcast.setSignature(signature);
-                    podcastBusiness.update(podcast);
-
-                } else {
-                    logger.info("Podcast non traité car signature identique : {}", podcast.toString());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        logger.info("Fin du traitement des {} podcasts", podcasts.size());
-    }
-
-    @Transactional(noRollbackFor=Exception.class)
-    public void updatePodcast(int id) {
+    public void updatePodcast(Integer id) {
         logger.debug("Lancement de l'update");
-        Podcast podcast = podcastBusiness.findOne(id);
+        final Podcast podcast = podcastBusiness.findOne(id);
         Updater updater;
             try {
-                logger.info("Traitement du Podcast : " + podcast.toString());
+                logger.debug("Traitement du Podcast singulier {}", podcast.getTitle());
 
                 updater = workerService.updaterOf(podcast);
-                String signature = updater.generateSignature(podcast);
-                if ( signature != null && !signature.equals(podcast.getSignature()) ) {
-                    podcast = updater.updateAndAddItems(podcast);
+                Future <UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture = SINGLE_THREAD_EXECUTOR.submit(() -> updater.update(podcast));
+                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
 
-
-                    podcast.setLastUpdate(ZonedDateTime.now());
-                    podcast.setSignature(signature);
-                    podcastBusiness.update(podcast);
+                String signature = updateTuple.first().getSignature();
+                if ( StringUtils.equals(podcast.getSignature(), signature)) {
+                    podcastBusiness.update(
+                            attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last())
+                    );
                 }
 
             } catch (Exception e) {
-                logger.warn("Erreur d'update", e);
-                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.warn("Erreur d'update singulier", e);
             }
+        logger.debug("Fin du traitement singulier de {}", podcast.getTitle());
     }
 
     public void updateAsyncPodcast() {

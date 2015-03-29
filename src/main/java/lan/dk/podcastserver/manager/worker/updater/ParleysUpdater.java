@@ -39,7 +39,6 @@ public class ParleysUpdater extends AbstractUpdater {
     /* Patter to extract value from URL */
     public static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)/.*");
 
-    @Override
     public Podcast updateAndAddItems(Podcast podcast) {
 
         // Si le bean est valide :
@@ -77,11 +76,6 @@ public class ParleysUpdater extends AbstractUpdater {
         return itemSet;
     }
 
-
-    @Override
-    public Podcast findPodcast(String url) {
-        return null;
-    }
 
     @Override
     public String generateSignature(Podcast podcast) {

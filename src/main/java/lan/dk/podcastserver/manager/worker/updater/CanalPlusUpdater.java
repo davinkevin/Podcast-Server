@@ -31,18 +31,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
     @Resource JdomService jdomService;
-    
-    public Podcast updateAndAddItems(Podcast podcast) {
-
-        // Si le bean est valide :
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -81,11 +69,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
         return itemSet;
     }
 
-
-
-    public Podcast findPodcast(String url) {
-        return null; // retourne un Podcast à partir de l'url fournie
-    }
 
     @Override
     public String generateSignature(Podcast podcast) {

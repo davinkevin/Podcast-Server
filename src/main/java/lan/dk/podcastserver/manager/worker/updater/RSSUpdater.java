@@ -23,16 +23,6 @@ import java.util.Set;
 public class RSSUpdater extends AbstractUpdater {
 
     @Resource JdomService jdomService;
-    
-    public Podcast updateAndAddItems(Podcast podcast) {
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
 
     public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
@@ -96,25 +86,6 @@ public class RSSUpdater extends AbstractUpdater {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return itemSet;
-    }
-
-    @Override
-    public Podcast findPodcast(String url) {
-        Podcast podcast = new Podcast();
-        podcast.setUrl(url);
-        Document podcastXML = null;
-        try {
-            podcastXML = jdomService.jdom2Parse(podcast.getUrl());
-            if (podcastXML.getRootElement().getChild("channel").getChildText("title") != null) {
-                podcast.setTitle(podcastXML.getRootElement().getChild("channel").getChildText("title"));
-            }
-            if (podcastXML.getRootElement().getChild("channel").getChild("image").getChildText("url") != null) {
-                podcast.setCover(ImageUtils.getCoverFromURL(new URL(podcastXML.getRootElement().getChild("channel").getChild("image").getChildText("url"))));
-            }
-        } catch (JDOMException | IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return podcast;
     }
 
     @Override

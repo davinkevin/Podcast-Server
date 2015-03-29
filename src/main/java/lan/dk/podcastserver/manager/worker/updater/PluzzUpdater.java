@@ -42,7 +42,6 @@ public class PluzzUpdater extends AbstractUpdater {
         return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateInSecondsSinceEpoch), ZoneId.of("Europe/Paris"));
     }
 
-    @Override
     public Podcast updateAndAddItems(Podcast podcast) {
 
 
@@ -96,11 +95,6 @@ public class PluzzUpdater extends AbstractUpdater {
         return getPluzzItemById(m.group(1));
     }
 
-
-    @Override
-    public Podcast findPodcast(String url) {
-        return null;
-    }
 
     @Override
     public String generateSignature(Podcast podcast) {

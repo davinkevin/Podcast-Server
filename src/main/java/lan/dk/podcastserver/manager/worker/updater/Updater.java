@@ -10,17 +10,13 @@ import java.util.function.Predicate;
 
 public interface Updater {
 
-    public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast);
+    UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast);
 
-    public Set<Item> getItems(Podcast podcast);
+    Set<Item> getItems(Podcast podcast);
 
-    public Podcast updateAndAddItems(Podcast podcast);
+    String generateSignature(Podcast podcast);
 
-    public Podcast findPodcast(String url);
-
-    public String generateSignature(Podcast podcast);
-
-    public default Predicate<Item> notIn(Podcast podcast) {
+    default Predicate<Item> notIn(Podcast podcast) {
         return item -> !podcast.contains(item);
     }
 }

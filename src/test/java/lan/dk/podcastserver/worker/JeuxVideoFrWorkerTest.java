@@ -23,9 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {PropertyConfig.class, ValidatorConfig.class}, loader=AnnotationConfigContextLoader.class)
-public class JeuxVideoFrWorker {
+public class JeuxVideoFrWorkerTest {
 
-    private final Logger logger = LoggerFactory.getLogger(JeuxVideoFrWorker.class);
+    private final Logger logger = LoggerFactory.getLogger(JeuxVideoFrWorkerTest.class);
     private static Podcast defisJVFR, insertDisk;
 
     @Resource JeuxVideoFRUpdater jeuxVideoFRUpdater;

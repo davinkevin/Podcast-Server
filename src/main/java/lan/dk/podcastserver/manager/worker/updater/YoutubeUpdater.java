@@ -34,17 +34,6 @@ public class YoutubeUpdater extends AbstractUpdater {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
     }
 
-    public Podcast updateAndAddItems(Podcast podcast) {
-
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-        
-        return podcast;
-    }
-
     public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
 
@@ -102,11 +91,6 @@ public class YoutubeUpdater extends AbstractUpdater {
             borne += YOUTUBE_MAX_RESULTS;
         }
 
-    }
-
-    @Override
-    public Podcast findPodcast(String url) {
-        return null;
     }
 
     @Override

@@ -41,17 +41,6 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     @Resource JdomService jdomService;
 
-    @Override
-    public Podcast updateAndAddItems(Podcast podcast) {
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
-
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -148,11 +137,6 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .filter(data -> data.contains("stream_hls_url"))
                 .findFirst()
                 .orElse("");
-    }
-
-    @Override
-    public Podcast findPodcast(String url) {
-        return null;
     }
 
     @Override

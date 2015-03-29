@@ -70,23 +70,6 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
     }
 
     @Override
-    public Podcast updateAndAddItems(Podcast podcast) {
-        // Si le bean est valide :
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
-
-    @Override
-    public Podcast findPodcast(String url) {
-        return null;
-    }
-
-    @Override
     public String generateSignature(Podcast podcast) {
         try {
             Document page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();

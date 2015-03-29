@@ -40,7 +40,6 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
     @Resource JdomService jdomService;
     
-    @Override
     public Podcast updateAndAddItems(Podcast podcast) {
 
         // Si le bean est valide :
@@ -111,11 +110,6 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
 
         return item;
-    }
-
-    @Override
-    public Podcast findPodcast(String url) {
-        return null;
     }
 
     @Override
