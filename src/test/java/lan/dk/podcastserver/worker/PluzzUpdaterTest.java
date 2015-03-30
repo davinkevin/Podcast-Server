@@ -64,17 +64,4 @@ public class PluzzUpdaterTest {
         assertThat(signatureSecretDhistoire).isNotEmpty().isNotNull().isEqualTo(signatureSecretDhistoire2);
 
     }
-
-    @Test
-    public void updateFeedPluzz() {
-        Podcast secretDhistoire = pluzzUpdater.updateAndAddItems(SECRET_DHISTOIRE);
-        assertThat(secretDhistoire).isNotNull();
-        assertThat(secretDhistoire.getItems()).isNotEmpty();
-
-        Podcast commentCaVaBien = pluzzUpdater.updateAndAddItems(COMMENT_CA_VA_BIEN);
-        assertThat(commentCaVaBien).isNotNull();
-        assertThat(commentCaVaBien.getItems()).isNotEmpty();
-
-    }
-
 }

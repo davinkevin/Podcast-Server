@@ -55,14 +55,4 @@ public class JeuxVideoFrWorkerTest {
 
         assertThat(signature).isEqualTo(signature2);
     }
-
-    @Test
-    public void updateFeedDefisJVFR() {
-        jeuxVideoFRUpdater.updateAndAddItems(defisJVFR);
-    }
-
-    @Test
-    public void updateInsertDisk() {
-        jeuxVideoFRUpdater.updateAndAddItems(insertDisk);
-    }
 }

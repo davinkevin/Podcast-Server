@@ -46,11 +46,4 @@ public class ParleysUpdaterTest {
 
         assertThat(signature).isEqualTo(signature2);
     }
-
-    @Test
-    public void updateFeedParleys() {
-        Podcast podcast = parleysUpdater.updateAndAddItems(DEVOXX_2014);
-        logger.info(podcast.toString());
-    }
-
 }

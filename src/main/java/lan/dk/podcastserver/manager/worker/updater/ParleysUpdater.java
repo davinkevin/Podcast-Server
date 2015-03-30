@@ -39,19 +39,6 @@ public class ParleysUpdater extends AbstractUpdater {
     /* Patter to extract value from URL */
     public static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)/.*");
 
-    public Podcast updateAndAddItems(Podcast podcast) {
-
-        // Si le bean est valide :
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
-
-
     public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
 

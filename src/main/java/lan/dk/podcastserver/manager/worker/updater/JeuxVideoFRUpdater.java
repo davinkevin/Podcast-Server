@@ -39,18 +39,6 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     public static final String IMG_DELIMITER = "006E0046";
 
     @Resource JdomService jdomService;
-    
-    public Podcast updateAndAddItems(Podcast podcast) {
-
-        // Si le bean est valide :
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -131,7 +119,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         return item -> {
             String nameOfItem = FilenameUtils.getName(item.getUrl());
 
-            return podcast.getItems()
+            return !podcast.getItems()
                     .stream()
                     .map(Item::getUrl)
                     .map(FilenameUtils::getName)

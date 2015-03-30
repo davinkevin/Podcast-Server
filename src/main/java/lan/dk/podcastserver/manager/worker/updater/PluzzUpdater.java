@@ -42,19 +42,6 @@ public class PluzzUpdater extends AbstractUpdater {
         return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateInSecondsSinceEpoch), ZoneId.of("Europe/Paris"));
     }
 
-    public Podcast updateAndAddItems(Podcast podcast) {
-
-
-        // Si le bean est valide :
-        getItems(podcast).stream()
-                .filter(notIn(podcast))
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(podcast::add);
-
-        return podcast;
-    }
-
     public Set<Item> getItems(Podcast podcast) {
         Document page;
         String listingUrl = podcast.getUrl();

@@ -205,4 +205,12 @@ public class Podcast implements Serializable {
         items.add(item.setPodcast(this));
         return this;
     }
+
+    @Transient @JsonIgnore
+    public Podcast lastUpdateToNow() {
+        this.lastUpdate = ZonedDateTime.now();
+        return this;
+    }
+
+
 }

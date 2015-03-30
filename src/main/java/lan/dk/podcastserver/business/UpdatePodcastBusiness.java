@@ -20,13 +20,10 @@ import javax.validation.Validator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -42,9 +39,10 @@ public class UpdatePodcastBusiness  {
     @Resource ItemBusiness itemBusiness;
 
     @Resource @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
+    @Resource @Qualifier("ManualUpdater") AsyncTaskExecutor executor;
+
     @Resource(name="Validator") Validator validator;
     @Resource WorkerService workerService;
-    public static final ExecutorService SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
 
 
     @Transactional(noRollbackFor=Exception.class)
@@ -56,7 +54,7 @@ public class UpdatePodcastBusiness  {
                 logger.debug("Traitement du Podcast singulier {}", podcast.getTitle());
 
                 updater = workerService.updaterOf(podcast);
-                Future <UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture = SINGLE_THREAD_EXECUTOR.submit(() -> updater.update(podcast));
+                Future <UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture = executor.submit(() -> updater.update(podcast));
                 UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
 
                 String signature = updateTuple.first().getSignature();
@@ -142,9 +140,8 @@ public class UpdatePodcastBusiness  {
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(item -> {
                     logger.debug("Add an item to {}", podcast.getTitle());
-                    item.setPodcast(podcast);
                     podcast.getItems().add(item);
-                    podcast.setLastUpdate(ZonedDateTime.now());
+                    podcast.lastUpdateToNow();
                 });
         
         return podcast;
