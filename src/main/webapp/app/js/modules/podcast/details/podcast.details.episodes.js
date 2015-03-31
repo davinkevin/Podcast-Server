@@ -75,6 +75,6 @@ angular.module('ps.podcast.details.episodes', [
             $scope.loadPage();
         };
 
-        $scope.stopDownload = DonwloadManager.ws.stop;
-        $scope.toggleDownload = DonwloadManager.ws.toggle;
+        $scope.stopDownload = (item) => DonwloadManager.ws.stop(item);
+        $scope.toggleDownload = (item) => DonwloadManager.ws.toggle(item);
     });
