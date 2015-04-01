@@ -171,6 +171,21 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         return item;
     });
 }]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -313,22 +328,6 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
-
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
@@ -968,7 +967,7 @@ var ItemSearchCtrl = (function () {
         },
         swipePage: {
             value: function swipePage(val) {
-                this.currentPage += val;
+                this.currentPage = this.SearchItemCache.page() + val + 1;
                 return this.changePage();
             }
         },
@@ -980,7 +979,7 @@ var ItemSearchCtrl = (function () {
                 var _this = this;
 
                 return item.remove().then(function () {
-                    return playlistService.remove(item);
+                    return _this.playlistService.remove(item);
                 }).then(function () {
                     return _this.changePage();
                 });
@@ -1474,8 +1473,12 @@ angular.module("ps.podcast.details.episodes", ["ps.player"]).directive("podcastI
         $scope.loadPage();
     };
 
-    $scope.stopDownload = DonwloadManager.ws.stop;
-    $scope.toggleDownload = DonwloadManager.ws.toggle;
+    $scope.stopDownload = function (item) {
+        return DonwloadManager.ws.stop(item);
+    };
+    $scope.toggleDownload = function (item) {
+        return DonwloadManager.ws.toggle(item);
+    };
 }]);
 
 angular.module("ps.podcast.details", ["ps.config.route", "ps.podcast.details", "ps.podcast.details.episodes", "ps.podcast.details.edition", "ps.podcast.details.upload", "ps.dataService.updateService"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {

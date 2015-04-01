@@ -89,14 +89,14 @@ class ItemSearchCtrl {
     }
 
     swipePage(val) {
-        this.currentPage += val;
+        this.currentPage = this.SearchItemCache.page() + val + 1;
         return this.changePage();
     };
 
     //** Item Operation **//
     remove(item) {
         return item.remove()
-            .then(() => playlistService.remove(item))
+            .then(() => this.playlistService.remove(item))
             .then(() => this.changePage());
     }
 
