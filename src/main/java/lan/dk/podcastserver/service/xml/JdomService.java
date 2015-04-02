@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.service.xml;
 
-import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
@@ -78,6 +77,12 @@ public class JdomService {
     }
 
     public String podcastToXMLGeneric (Podcast podcast) {
+        return podcastToXMLGeneric(podcast, podcastServerParameters.rssDefaultNumberItem());
+    }
+
+    public String podcastToXMLGeneric (Podcast podcast, Long limit) {
+
+        Long limitOfItem = (limit == null) ? podcast.getItems().size() : limit;
 
         Element channel = new Element(CHANNEL);
 
@@ -144,7 +149,10 @@ public class JdomService {
             channel.addContent(itunesImage);
         }
 
-        for (Item item : podcast.getItems()) {
+       podcast.getItems()
+        .stream()
+        .limit(limitOfItem)
+        .forEachOrdered(item -> {
             Element xmlItem = new Element(ITEM);
 
             Element item_title = new Element(TITLE);
@@ -159,8 +167,8 @@ public class JdomService {
 
             item_enclosure.setAttribute(URL, podcastServerParameters.getServeurURL()
                     .concat(item.getProxyURLWithoutExtention())
-                    .concat((item.isDownloaded()) ? "."+FilenameUtils.getExtension(item.getFileName()) : MimeTypeUtils.getExtension(item)));
-            
+                    .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : MimeTypeUtils.getExtension(item)));
+
             if (item.getLength() != null) {
                 item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
             }
@@ -199,7 +207,7 @@ public class JdomService {
             xmlItem.addContent(thumbnail);
 
             channel.addContent(xmlItem);
-        }
+        });
 
         Element rss = new Element(RSS);
         rss.addNamespaceDeclaration(ITUNES_NAMESPACE);

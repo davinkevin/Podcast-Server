@@ -25,6 +25,7 @@ public class PodcastServerParameters {
     @Value("${numberOfTry:10}") Integer numberOfTry;
 
     @Value("${numberofdaytodownload:30}") Long numberOfDayToDownload;
+    @Value("${rss.default.numberItem:50}") Long rssDefaultNumberItem;
 
     //** GETTER OF THE PARAMETERS **//
     public String getRootfolder() {
@@ -52,4 +53,8 @@ public class PodcastServerParameters {
     public Integer concurrentDownload() { return concurrentDownload; }
     public Integer numberOfTry() {return numberOfTry;}
     public String coverDefaultName() { return coverDefaultName;}
+
+    public Long rssDefaultNumberItem() {
+        return rssDefaultNumberItem;
+    }
 }

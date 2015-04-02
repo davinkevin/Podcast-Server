@@ -64,8 +64,8 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
-    public String getRss(@PathVariable Integer id) {
-        return podcastBusiness.getRss(id);
+    public String getRss(@PathVariable Integer id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
+        return podcastBusiness.getRss(id, limit);
     }
 
     @Deprecated

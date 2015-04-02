@@ -112,8 +112,8 @@ public class PodcastBusiness {
     }
 
     @Transactional(readOnly = true)
-    public String getRss(int id) {
-        return jdomService.podcastToXMLGeneric(findOne(id));
+    public String getRss(Integer id, Boolean limit) {
+        return (limit) ? jdomService.podcastToXMLGeneric(findOne(id)) : jdomService.podcastToXMLGeneric(findOne(id), null);
     }
 
     @Transactional
