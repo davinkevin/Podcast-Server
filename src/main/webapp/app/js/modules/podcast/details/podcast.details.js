@@ -10,17 +10,17 @@ class PodcastDetailCtrl {
             { heading : 'Edition', active : false},
             { heading : 'Upload', disabled : this.podcast.type !== 'send'}
         ];
-        this.$scope.$on("podcastEdition:save", this.refreshItems);
+        this.$scope.$on("podcastEdition:save", () => this.refreshItems());
     }
 
     refreshItems() {
-        $scope.$broadcast('podcastItems:refresh');
+        this.$scope.$broadcast('podcastItems:refresh');
     }
 
     refresh() {
         this.UpdateService
             .forceUpdatePodcast(this.podcast.id)
-            .then(this.refreshItems);
+            .then(() => this.refreshItems());
     }
 
 }

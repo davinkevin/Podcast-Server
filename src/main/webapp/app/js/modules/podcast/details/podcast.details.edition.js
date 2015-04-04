@@ -1,37 +1,48 @@
+
+class podcastEditionDirective {
+    constructor() {
+        this.restrict = 'E';
+        this.templateUrl = 'html/podcast-details-edition.html';
+        this.scope = { podcast : '=' };
+        this.controller = 'podcastEditionCtrl';
+        this.controllerAs = 'pec';
+        this.bindToController = true;
+    }
+}
+
+class podcastEditionCtrl {
+    constructor($scope, $location, tagService, podcastService) {
+        this.$scope = $scope;
+        this.$location = $location;
+        this.tagService = tagService;
+        this.podcastService = podcastService;
+    }
+
+    loadTags(query) {
+        return this.tagService.search(query);
+    }
+
+    save() {
+        var podcastToUpdate = _.cloneDeep(this.podcast);
+        podcastToUpdate.items = null;
+
+        return this.podcastService
+            .patch(podcastToUpdate)
+            .then((patchedPodcast) => _.assign(this.podcast, patchedPodcast))
+            .then(() => this.$scope.$emit('podcastEdition:save'));
+    }
+
+    deletePodcast() {
+        return this.podcastService
+            .deletePodcast(this.podcast)
+            .then(() => this.$location.path('/podcasts'));
+    }
+}
+
 angular.module('ps.podcast.details.edition', [
     'ps.dataService.podcast',
     'ps.dataService.tag',
     'ngTagsInput'
 ])
-    .directive('podcastEdition', function () {
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-edition.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastEditionCtrl'
-        };
-    })
-    .controller('podcastEditionCtrl', function ($scope, $location, tagService, podcastService) {
-        $scope.loadTags = function (query) {
-            return tagService.search(query);
-        };
-
-        $scope.save = function () {
-            var podcastToUpdate = _.cloneDeep($scope.podcast);
-            podcastToUpdate.items = null;
-
-            podcastService.patch(podcastToUpdate).then(function (patchedPodcast){
-                _.assign($scope.podcast, patchedPodcast);
-            }).then(function () {
-                $scope.$emit('podcastEdition:save');
-            });
-        };
-
-        $scope.deletePodcast = function () {
-            podcastService.deletePodcast($scope.podcast).then(function () {
-                $location.path('/podcasts');
-            });
-        };
-    });
+    .directive('podcastEdition', () => new podcastEditionDirective())
+    .controller('podcastEditionCtrl', podcastEditionCtrl);
