@@ -1,3 +1,30 @@
+class PodcastDetailCtrl {
+
+    constructor($scope, podcast, UpdateService){
+        this.$scope = $scope;
+        this.UpdateService = UpdateService;
+        this.podcast = podcast;
+
+        this.podcastTabs= [
+            { heading : 'Episodes', active : true},
+            { heading : 'Edition', active : false},
+            { heading : 'Upload', disabled : this.podcast.type !== 'send'}
+        ];
+        this.$scope.$on("podcastEdition:save", this.refreshItems);
+    }
+
+    refreshItems() {
+        $scope.$broadcast('podcastItems:refresh');
+    }
+
+    refresh() {
+        this.UpdateService
+            .forceUpdatePodcast(this.podcast.id)
+            .then(this.refreshItems);
+    }
+
+}
+
 angular.module('ps.podcast.details', [
     'ps.config.route',
     'ps.podcast.details',
@@ -20,24 +47,4 @@ angular.module('ps.podcast.details', [
             resolve : { podcast : (podcastService, $route) => podcastService.findById($route.current.params.podcastId) }
         })
 )
-    .controller('PodcastDetailCtrl', function ($scope, podcast, UpdateService) {
-        var vm = this;
-        
-        vm.podcast = podcast;
-        vm.podcastTabs= [
-            { heading : 'Episodes', active : true},
-            { heading : 'Edition', active : false},
-            { heading : 'Upload', disabled : podcast.type !== 'send'}
-        ];
-
-        vm.refreshItems = function() {
-            $scope.$broadcast('podcastItems:refresh');
-        };
-        
-        vm.refresh = function () {
-            UpdateService.forceUpdatePodcast(vm.podcast.id)
-                .then(vm.refreshItems);
-        };
-
-        $scope.$on("podcastEdition:save", vm.refreshItems);
-    });
+    .controller('PodcastDetailCtrl', PodcastDetailCtrl);
