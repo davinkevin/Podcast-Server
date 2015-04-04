@@ -7,11 +7,6 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -59,7 +54,11 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
-angular.module("ps.search", ["ps.search.item"]);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
 
 var deviceDetectorService = (function () {
     function deviceDetectorService($window) {
@@ -81,6 +80,8 @@ var deviceDetectorService = (function () {
 })();
 
 angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
+angular.module("ps.search", ["ps.search.item"]);
+
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
@@ -168,6 +169,21 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         item.addRestangularMethod("download", "get", "addtoqueue");
         return item;
     });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
 }]);
 (function (module) {
     try {
@@ -286,7 +302,7 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/podcast-details-episodes.html", "<br/>\n" + "<div ng-swipe-right=\"swipePage(-1)\" ng-swipe-left=\"swipePage(1)\">\n" + "    <div class=\"media clearfix\"  ng-repeat=\"item in podcast.items | orderBy:'-pubdate' track by item.id\">\n" + "        <div class=\"buttonList pull-right\">\n" + "            <!-- Téléchargement en cours -->\n" + "        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "            <button ng-click=\"toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "            <button ng-click=\"stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "        </span>\n" + "\n" + "            <!-- Lancer le téléchargement -->\n" + "            <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "\n" + "            <!-- Lire dans le player -->\n" + "            <a ng-href=\"/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"ionicons ion-social-youtube\"></span></a>\n" + "            \n" + "            <!-- Supprimer l'item -->\n" + "            <button ng-click=\"remove(item)\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' )\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n" + "\n" + "            <!-- Menu complémentaire -->\n" + "            <div class=\"btn-group\" dropdown is-open=\"isopen\">\n" + "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                    <li ng-show=\"item.isDownloaded\"><a ng-href=\"{{ item.proxyURL }}\"><span class=\"glyphicon glyphicon-play text-success\"></span> Lire</a></li>\n" + "                    <li ng-show=\"item.isDownloaded\">\n" + "                        <a ng-hide=\"isInPlaylist(item)\" ng-click=\"addOrRemoveInPlaylist(item)\">\n" + "                            <span class=\"glyphicon glyphicon-plus text-primary\"></span> Ajouter à la Playlist\n" + "                        </a>\n" + "                        <a ng-show=\"isInPlaylist(item)\" ng-click=\"addOrRemoveInPlaylist(item)\">\n" + "                            <span class=\"glyphicon glyphicon-minus text-primary\"></span> Retirer de la Playlist\n" + "                        </a>\n" + "                    </li>\n" + "                    <li><a ng-href=\"{{ item.url }}\"><span class=\"glyphicon glyphicon-globe text-info\"></span> Lire en ligne</a></li>\n" + "                    <li><a ng-click=\"reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a></li>\n" + "                </ul>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <a class=\"pull-left\" ng-href=\"#/podcast/{{podcast.id}}/item/{{item.id}}\">\n" + "            <img ng-src=\"{{item.cover.url}}\" width=\"100\" height=\"100\" style=\"\">\n" + "        </a>\n" + "        \n" + "        <div class=\"media-body\">\n" + "            <h4 class=\"media-heading\">{{ item.title }}</h4>\n" + "            <p class=\"description hidden-xs hidden-sm branch-name\">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n" + "            <p><strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>\n" + "        </div>\n" + "    </div>\n" + "\n" + "    <div ng-show=\"podcast.totalItems > itemPerPage\" class=\"text-center\">\n" + "        <pagination items-per-page=\"itemPerPage\" max-size=\"10\" boundary-links=\"true\" total-items=\"podcast.totalItems\" ng-model=\"currentPage\" ng-change=\"loadPage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "    </div>\n" + "</div>\n" + "\n" + "        ");
+        $templateCache.put("html/podcast-details-episodes.html", "<br/>\n" + "<div ng-swipe-right=\"pic.swipePage(-1)\" ng-swipe-left=\"pic.swipePage(1)\">\n" + "    <div class=\"media clearfix\"  ng-repeat=\"item in pic.podcast.items | orderBy:'-pubdate' track by item.id\">\n" + "        <div class=\"buttonList pull-right\">\n" + "            <!-- Téléchargement en cours -->\n" + "        <span ng-show=\"item.status == 'Started' || item.status == 'Paused'\" >\n" + "            <button ng-click=\"pic.toggleDownload(item)\" type=\"button\" class=\"btn btn-primary \"><i class=\"glyphicon glyphicon-play\"></i><i class=\"glyphicon glyphicon-pause\"></i></button>\n" + "            <button ng-click=\"pic.stopDownload(item)\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-stop\"></span></button>\n" + "        </span>\n" + "\n" + "            <!-- Lancer le téléchargement -->\n" + "            <button ng-click=\"item.download()\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded\" type=\"button\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-save\"></span></button>\n" + "\n" + "            <!-- Lire dans le player -->\n" + "            <a ng-href=\"/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play\" ng-show=\"item.isDownloaded\" type=\"button\" class=\"btn btn-success\"><span class=\"ionicons ion-social-youtube\"></span></a>\n" + "            \n" + "            <!-- Supprimer l'item -->\n" + "            <button ng-click=\"pic.remove(item)\" ng-show=\"(item.status != 'Started' && item.status != 'Paused' )\" type=\"button\" class=\"btn btn-danger\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n" + "\n" + "            <!-- Menu complémentaire -->\n" + "            <div class=\"btn-group\" dropdown is-open=\"isopen\">\n" + "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle><i class=\"ionicons ion-android-more\"></i></button>\n" + "                <ul class=\"dropdown-menu dropdown-menu-right\" role=\"menu\">\n" + "                    <li ng-show=\"item.isDownloaded\"><a ng-href=\"{{ item.proxyURL }}\"><span class=\"glyphicon glyphicon-play text-success\"></span> Lire</a></li>\n" + "                    <li ng-show=\"item.isDownloaded\">\n" + "                        <a ng-hide=\"pic.isInPlaylist(item)\" ng-click=\"pic.addOrRemoveInPlaylist(item)\">\n" + "                            <span class=\"glyphicon glyphicon-plus text-primary\"></span> Ajouter à la Playlist\n" + "                        </a>\n" + "                        <a ng-show=\"pic.isInPlaylist(item)\" ng-click=\"pic.addOrRemoveInPlaylist(item)\">\n" + "                            <span class=\"glyphicon glyphicon-minus text-primary\"></span> Retirer de la Playlist\n" + "                        </a>\n" + "                    </li>\n" + "                    <li><a ng-href=\"{{ item.url }}\"><span class=\"glyphicon glyphicon-globe text-info\"></span> Lire en ligne</a></li>\n" + "                    <li><a ng-click=\"pic.reset(item)\"><span class=\"glyphicon glyphicon-repeat\"></span> Reset</a></li>\n" + "                </ul>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <a class=\"pull-left\" ng-href=\"#/podcast/{{podcast.id}}/item/{{item.id}}\">\n" + "            <img ng-src=\"{{item.cover.url}}\" width=\"100\" height=\"100\" style=\"\">\n" + "        </a>\n" + "        \n" + "        <div class=\"media-body\">\n" + "            <h4 class=\"media-heading\">{{ item.title }}</h4>\n" + "            <p class=\"description hidden-xs hidden-sm branch-name\">{{item.description | htmlToPlaintext | characters : 130 }}</p>\n" + "            <p><strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>\n" + "        </div>\n" + "    </div>\n" + "\n" + "    <div ng-show=\"pic.podcast.totalItems > pic.itemPerPage\" class=\"text-center\">\n" + "        <pagination items-per-page=\"pic.itemPerPage\" max-size=\"10\" boundary-links=\"true\" total-items=\"pic.podcast.totalItems\" ng-model=\"pic.currentPage\" ng-change=\"pic.loadPage()\" class=\"pagination pagination-centered\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\" first-text=\"&laquo;\" last-text=\"&raquo;\"></pagination>\n" + "    </div>\n" + "</div>\n" + "\n" + "        ");
     }]);
 })();
 
@@ -311,22 +327,6 @@ angular.module("ps.config.restangular", ["restangular"]).config(["RestangularPro
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
-
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
-}]);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
@@ -1444,79 +1444,125 @@ angular.module("ps.podcast.details.edition", ["ps.dataService.podcast", "ps.data
     return new podcastEditionDirective();
 }).controller("podcastEditionCtrl", podcastEditionCtrl);
 
-angular.module("ps.podcast.details.episodes", ["ps.player"]).directive("podcastItemsList", function () {
-    return {
-        restrcit: "E",
-        templateUrl: "html/podcast-details-episodes.html",
-        scope: {
-            podcast: "="
-        },
-        controller: "podcastItemsListCtrl"
-    };
-}).constant("PodcastItemPerPage", 10).controller("podcastItemsListCtrl", ["$scope", "DonwloadManager", "PodcastItemPerPage", "itemService", "playlistService", function ($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService) {
-    $scope.currentPage = 1;
-    $scope.itemPerPage = PodcastItemPerPage;
+var podcastItemsListDirective = function podcastItemsListDirective() {
+    _classCallCheck(this, podcastItemsListDirective);
 
-    var webSocketUrl = "/topic/podcast/".concat($scope.podcast.id);
+    this.restrict = "E";
+    this.templateUrl = "html/podcast-details-episodes.html";
+    this.scope = { podcast: "=" };
+    this.controller = "podcastItemsListCtrl";
+    this.controllerAs = "pic";
+    this.bindToController = true;
+};
 
-    DonwloadManager.ws.subscribe(webSocketUrl, function (message) {
-        var item = JSON.parse(message.body);
-        var elemToUpdate = _.find($scope.podcast.items, { id: item.id });
-        _.assign(elemToUpdate, item);
-    }, $scope);
+var podcastItemsListCtrl = (function () {
+    function podcastItemsListCtrl($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService) {
+        var _this = this;
 
-    $scope.loadPage = function () {
-        $scope.currentPage = $scope.currentPage < 1 ? 1 : $scope.currentPage > Math.ceil($scope.totalItems / PodcastItemPerPage) ? Math.ceil($scope.totalItems / PodcastItemPerPage) : $scope.currentPage;
-        return itemService.getItemForPodcastWithPagination($scope.podcast, { size: PodcastItemPerPage, page: $scope.currentPage - 1, direction: "DESC", properties: "pubdate" }).then(function (itemsResponse) {
-            $scope.podcast.items = itemService.restangularizePodcastItem($scope.podcast, itemsResponse.content);
-            $scope.podcast.totalItems = itemsResponse.totalElements;
+        _classCallCheck(this, podcastItemsListCtrl);
+
+        /* DI */
+        this.$scope = $scope;
+        this.DownloadManager = DonwloadManager;
+        this.itemService = itemService;
+        this.playlistService = playlistService;
+
+        this.currentPage = 1;
+        this.itemPerPage = PodcastItemPerPage;
+        this.loadPage();
+
+        this.$scope.$on("podcastItems:refresh", function () {
+            _this.currentPage = 1;
+            _this.loadPage();
         });
-    };
 
-    $scope.loadPage();
-    $scope.$on("podcastItems:refresh", function () {
-        $scope.currentPage = 1;
-        $scope.loadPage();
+        this.DownloadManager.ws.subscribe("/topic/podcast/".concat(this.podcast.id), function (message) {
+            return _this.onMessageFromWS(message);
+        }, $scope);
+    }
+    podcastItemsListCtrl.$inject = ["$scope", "DonwloadManager", "PodcastItemPerPage", "itemService", "playlistService"];
+
+    _createClass(podcastItemsListCtrl, {
+        onMessageFromWS: {
+            value: function onMessageFromWS(message) {
+                var item = JSON.parse(message.body);
+                var elemToUpdate = _.find(this.podcast.items, { id: item.id });
+                _.assign(elemToUpdate, item);
+            }
+        },
+        loadPage: {
+            value: function loadPage() {
+                var _this = this;
+
+                this.currentPage = this.currentPage < 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.itemPerPage) ? Math.ceil(this.totalItems / this.itemPerPage) : this.currentPage;
+                return this.itemService.getItemForPodcastWithPagination(this.podcast, { size: this.itemPerPage, page: this.currentPage - 1, direction: "DESC", properties: "pubdate" }).then(function (itemsResponse) {
+                    _this.podcast.items = _this.itemService.restangularizePodcastItem(_this.podcast, itemsResponse.content);
+                    _this.podcast.totalItems = itemsResponse.totalElements;
+                });
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                var _this = this;
+
+                item.remove().then(function () {
+                    return _this.podcast.items = _.reject(_this.podcast.items, function (elem) {
+                        return elem.id === item.id;
+                    });
+                }).then(function () {
+                    return _this.playlistService.remove(item);
+                }).then(function () {
+                    return _this.loadPage();
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    var itemInList = _.find(_this.podcast.items, { id: itemReseted.id });
+                    _.assign(itemInList, itemReseted);
+                    return itemInList;
+                }).then(function (itemToRemove) {
+                    return _this.playlistService.remove(itemToRemove);
+                });
+            }
+        },
+        addOrRemoveInPlaylist: {
+            value: function addOrRemoveInPlaylist(item) {
+                this.playlistService.addOrRemove(item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist(item) {
+                return this.playlistService.contains(item);
+            }
+        },
+        swipePage: {
+            value: function swipePage(val) {
+                this.currentPage += val;
+                this.loadPage();
+            }
+        },
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DownloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DownloadManager.ws.toggle(item);
+            }
+        }
     });
 
-    $scope.remove = function (item) {
-        item.remove().then(function () {
-            $scope.podcast.items = _.reject($scope.podcast.items, function (elem) {
-                return elem.id === item.id;
-            });
-        }).then(function () {
-            playlistService.remove(item);
-        }).then($scope.loadPage);
-    };
+    return podcastItemsListCtrl;
+})();
 
-    $scope.reset = function (item) {
-        return item.reset().then(function (itemReseted) {
-            var itemInList = _.find($scope.podcast.items, { id: itemReseted.id });
-            _.assign(itemInList, itemReseted);
-            playlistService.remove(itemInList);
-        });
-    };
-
-    $scope.addOrRemoveInPlaylist = function (item) {
-        playlistService.addOrRemove(item);
-    };
-
-    $scope.isInPlaylist = function (item) {
-        return playlistService.contains(item);
-    };
-
-    $scope.swipePage = function (val) {
-        $scope.currentPage += val;
-        $scope.loadPage();
-    };
-
-    $scope.stopDownload = function (item) {
-        return DonwloadManager.ws.stop(item);
-    };
-    $scope.toggleDownload = function (item) {
-        return DonwloadManager.ws.toggle(item);
-    };
-}]);
+angular.module("ps.podcast.details.episodes", ["ps.player"]).directive("podcastItemsList", function () {
+    return new podcastItemsListDirective();
+}).constant("PodcastItemPerPage", 10).controller("podcastItemsListCtrl", podcastItemsListCtrl);
 
 var PodcastDetailCtrl = (function () {
     function PodcastDetailCtrl($scope, podcast, UpdateService) {
