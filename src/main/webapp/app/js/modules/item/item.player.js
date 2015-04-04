@@ -17,7 +17,7 @@ class ItemPlayerController {
                 },
                 poster: this.item.cover.url
             }
-        }
+        };
     }
 }
 

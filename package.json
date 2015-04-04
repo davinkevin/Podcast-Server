@@ -23,7 +23,9 @@
     "ng-html2js": "^2.0.0",
     "yargs": "^3.4.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp-jshint": "^1.10.0"
+  },
   "scripts": {
     "postinstall": "./node_modules/bower/bin/bower install"
   },

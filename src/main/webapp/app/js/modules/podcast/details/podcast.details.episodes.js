@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('ps.podcast.details.episodes', [
     'ps.player'
 ])

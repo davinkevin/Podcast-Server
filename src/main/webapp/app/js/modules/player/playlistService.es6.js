@@ -6,7 +6,7 @@ class PlaylistService {
     }
 
     playlist() {
-        return this.$localStorage.playlist
+        return this.$localStorage.playlist;
     }
     add(item) {
         this.$localStorage.playlist.push(item);

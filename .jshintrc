@@ -1,0 +1,8 @@
+{
+  "esnext": true,
+  "expr" : true,
+  "globals": {
+    "angular" : false,
+    "_" : false
+  }
+}

@@ -8,8 +8,8 @@ class wsDownloadManager {
     }
 
     connect() { return this.ngstomp.connect();}
-    subscribe(url, callback, scope) {return this.ngstomp.subscribe(url, callback, scope)}
-    unsubscribe(url) { return this.ngstomp.unsubscribe(url) }
+    subscribe(url, callback, scope) {return this.ngstomp.subscribe(url, callback, scope);}
+    unsubscribe(url) { return this.ngstomp.unsubscribe(url); }
     toggle(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/toogle', item); }
     start(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/start', item); }
     pause(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/pause', item); }

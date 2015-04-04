@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('ps.podcast.details.upload', [
     'angularFileUpload'
 ])

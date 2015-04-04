@@ -29,8 +29,8 @@ class PlayerController {
             this.API.play();
 
         this.isCompleted = false;
-        this.setVideo(0)
-    };
+        this.setVideo(0);
+    }
 
     onCompleteVideo() {
         var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
@@ -42,11 +42,11 @@ class PlayerController {
         }
 
         this.setVideo(indexOfVideo+1);
-    };
+    }
 
     reloadPlaylist() {
         _.updateinplace(this.playlist, this.playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
-    };
+    }
 
 
 
@@ -58,7 +58,7 @@ class PlayerController {
             this.config.sources = [{src : this.currentVideo.proxyURL, type : this.currentVideo.mimeType }];
             this.config.plugins.poster = this.currentVideo.cover.url;
         }
-    };
+    }
 
     remove(item) {
         this.playlistService.remove(item);
@@ -66,12 +66,12 @@ class PlayerController {
         if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
             this.setVideo(0);
         }
-    };
+    }
 
     removeAll() {
         this.playlistService.removeAll();
         this.reloadPlaylist();
-    };
+    }
 
     getIndexOfVideoInPlaylist(item) {
         return this.playlist.indexOf(item);

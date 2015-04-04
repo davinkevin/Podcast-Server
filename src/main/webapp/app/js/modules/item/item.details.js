@@ -47,11 +47,11 @@ class ItemDetailCtrl {
 
     toggleInPlaylist() {
         this.playlistService.addOrRemove(this.item);
-    };
+    }
 
     isInPlaylist() {
         return this.playlistService.contains(this.item);
-    };
+    }
 }
 
 angular.module('ps.item.details', [

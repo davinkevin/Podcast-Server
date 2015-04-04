@@ -384,13 +384,20 @@ var DownloadCtrl = (function () {
                             icon: item.cover.url,
                             delay: 5000
                         });
-                    case "Stopped":
-                        if (elemToUpdate) {
-                            _.remove(this.items, function (item) {
-                                return item.id === elemToUpdate.id;
-                            });
-                        }
+                        this.onStoppedFromWS(elemToUpdate);
                         break;
+                    case "Stopped":
+                        this.onStoppedFromWS(elemToUpdate);
+                        break;
+                }
+            }
+        },
+        onStoppedFromWS: {
+            value: function onStoppedFromWS(elemToUpdate) {
+                if (elemToUpdate) {
+                    _.remove(this.items, function (item) {
+                        return item.id === elemToUpdate.id;
+                    });
                 }
             }
         },
@@ -1028,7 +1035,13 @@ var ItemSearchCtrl = (function () {
         },
         calculatePage: {
             value: function calculatePage() {
-                return (this.currentPage <= 1 ? 1 : this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size()) ? Math.ceil(this.totalItems / this.SearchItemCache.size()) : this.currentPage) - 1;
+                if (this.currentPage <= 1) {
+                    return 0;
+                } else if (this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size())) {
+                    return Math.ceil(this.totalItems / this.SearchItemCache.size()) - 1;
+                } else {
+                    return this.currentPage - 1;
+                }
             }
         },
         resetSearch: {
@@ -1371,8 +1384,6 @@ var UpdateService = (function () {
 })();
 
 angular.module("ps.dataService.updateService", ["restangular"]).service("UpdateService", UpdateService);
-"use strict";
-
 angular.module("ps.podcast.details.edition", ["ps.dataService.podcast", "ps.dataService.tag", "ngTagsInput"]).directive("podcastEdition", function () {
     return {
         restrcit: "E",
@@ -1404,8 +1415,6 @@ angular.module("ps.podcast.details.edition", ["ps.dataService.podcast", "ps.data
         });
     };
 }]);
-
-"use strict";
 
 angular.module("ps.podcast.details.episodes", ["ps.player"]).directive("podcastItemsList", function () {
     return {
@@ -1482,16 +1491,14 @@ angular.module("ps.podcast.details.episodes", ["ps.player"]).directive("podcastI
 }]);
 
 angular.module("ps.podcast.details", ["ps.config.route", "ps.podcast.details", "ps.podcast.details.episodes", "ps.podcast.details.edition", "ps.podcast.details.upload", "ps.dataService.updateService"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId", {
+    return $routeProvider.when("/podcast/:podcastId", {
         templateUrl: "html/podcast-detail.html",
         controller: "PodcastDetailCtrl",
         controllerAs: "pdc",
         hotkeys: [["r", "Refresh", "pdc.refreshItems()"], ["f", "Force Refresh", "pdc.refresh()"], ["l", "List of Items", "pdc.podcastTabs[0].active = true"], ["m", "Modification of Podcast", "pdc.podcastTabs[1].active = true"]].concat(commonKey),
-        resolve: {
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+        resolve: { podcast: ["podcastService", "$route", function (podcastService, $route) {
                 return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
+            }] }
     });
 }]).controller("PodcastDetailCtrl", ["$scope", "podcast", "UpdateService", function ($scope, podcast, UpdateService) {
     var vm = this;
@@ -1509,8 +1516,6 @@ angular.module("ps.podcast.details", ["ps.config.route", "ps.podcast.details", "
 
     $scope.$on("podcastEdition:save", vm.refreshItems);
 }]);
-"use strict";
-
 angular.module("ps.podcast.details.upload", ["angularFileUpload"]).directive("podcastUpload", function () {
     return {
         restrcit: "E",

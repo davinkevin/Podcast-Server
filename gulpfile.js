@@ -1,6 +1,6 @@
 // Include gulp and Our Plugins
 var gulp = require('gulp'),
-    jshint = require('gulp-rename'),
+    jshint = require('gulp-jshint'),
     less = require('gulp-less'),
     minifyCSS = require('gulp-minify-css'),
     ngAnnotate = require('gulp-ng-annotate'),
@@ -27,7 +27,7 @@ var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fil
     angularAppModule = [fileAppLocation.concat('js/**/*.module.js')],
     lessLocation = fileAppLocation.concat('less/*.less'),
     htmlLocation = fileAppLocation.concat('html/*.html'),
-    indexLocation = 'src/main/webapp/WEB-INF/pages/index.jsp';
+    indexLocation = 'src/main/webapp/index.html';
 
 var cssDestionation = fileAppLocation.concat('css'),
     jsDestination = fileAppLocation.concat('js');
@@ -71,7 +71,7 @@ gulp.task('less', function () {
 gulp.task('watch', function() {
     //gulp.watch(angularAppLocation, ['lint']);
     gulp.start("js", "less", 'inject');
-    gulp.watch([angularAppLocation, htmlLocation], ['js']);
+    gulp.watch([angularAppLocation, htmlLocation], ['js', 'lint']);
     gulp.watch(lessLocation, ['less']);
 });
 

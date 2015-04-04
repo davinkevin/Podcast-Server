@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('ps.podcast.details.edition', [
     'ps.dataService.podcast',
     'ps.dataService.tag',

@@ -16,7 +16,7 @@ _.mixin({
             _.forEach(remoteArray, (elem, key) => {
                 var elementToMove = localArray.splice(comparisonFunction(localArray, elem), 1)[0];
                 localArray.splice(key, 0, elementToMove);
-            })
+            });
         }
         
         return localArray;

@@ -1,7 +1,7 @@
 class SearchItemCache {
     constructor(DefaultItemSearchParameters, $sessionStorage) {
         this.$sessionStorage = $sessionStorage;
-        this.$sessionStorage.searchParameters = DefaultItemSearchParameters
+        this.$sessionStorage.searchParameters = DefaultItemSearchParameters;
     }
 
     getParameters() {
@@ -13,7 +13,7 @@ class SearchItemCache {
             this.$sessionStorage.searchParameters.page = pageNumber;
         }
 
-        return this.$sessionStorage.searchParameters.page
+        return this.$sessionStorage.searchParameters.page;
     }
 
     size(sizeNumber) {
@@ -91,7 +91,7 @@ class ItemSearchCtrl {
     swipePage(val) {
         this.currentPage = this.SearchItemCache.page() + val + 1;
         return this.changePage();
-    };
+    }
 
     //** Item Operation **//
     remove(item) {
@@ -105,10 +105,10 @@ class ItemSearchCtrl {
             .then((itemReseted) => {
                 var itemInList = _.find(this.items, { 'id': itemReseted.id });
                 _.assign(itemInList, itemReseted);
-                return itemInList
+                return itemInList;
             })
             .then((itemInList) => this.playlistService.remove(itemInList));
-    };
+    }
 
     stopDownload(item) {
         this.DownloadManager.ws.stop(item);
@@ -125,19 +125,20 @@ class ItemSearchCtrl {
     //** Playlist Manager **//
     addOrRemove(item) {
         return this.playlistService.addOrRemove(item);
-    };
+    }
 
     isInPlaylist(item) {
         return this.playlistService.contains(item);
-    };
+    }
 
     calculatePage() {
-        return ((this.currentPage <= 1)
-                ? 1
-                : (this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size()))
-                ? Math.ceil(this.totalItems / this.SearchItemCache.size())
-                : this.currentPage
-            ) - 1;
+        if (this.currentPage <= 1) {
+            return 0;
+        } else if (this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size())) {
+            return Math.ceil(this.totalItems / this.SearchItemCache.size()) - 1;
+        } else {
+            return this.currentPage - 1;
+        }
     }
 
     resetSearch() {

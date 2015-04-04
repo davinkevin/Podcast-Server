@@ -5,7 +5,7 @@ angular.module('ps.podcast.details', [
     'ps.podcast.details.edition',
     'ps.podcast.details.upload',
     'ps.dataService.updateService'
-]).config(function($routeProvider, commonKey) {
+]).config(($routeProvider, commonKey) =>
     $routeProvider.
         when('/podcast/:podcastId', {
             templateUrl: 'html/podcast-detail.html',
@@ -17,13 +17,9 @@ angular.module('ps.podcast.details', [
                 ['l', 'List of Items', 'pdc.podcastTabs[0].active = true'],
                 ['m', 'Modification of Podcast', 'pdc.podcastTabs[1].active = true']
             ].concat(commonKey),
-            resolve : {
-                podcast : function (podcastService, $route) {
-                    return podcastService.findById($route.current.params.podcastId);
-                }
-            }
-        });
-})
+            resolve : { podcast : (podcastService, $route) => podcastService.findById($route.current.params.podcastId) }
+        })
+)
     .controller('PodcastDetailCtrl', function ($scope, podcast, UpdateService) {
         var vm = this;
         

@@ -43,15 +43,22 @@ class DownloadCtrl {
                     icon: item.cover.url,
                     delay: 5000
                 });
+                this.onStoppedFromWS(elemToUpdate);
+                break;
             case 'Stopped' :
-                if (elemToUpdate){
-                    _.remove(this.items, function (item) {
-                        return item.id === elemToUpdate.id;
-                    });
-                }
+                this.onStoppedFromWS(elemToUpdate);
                 break;
         }
     }
+
+    onStoppedFromWS(elemToUpdate) {
+        if (elemToUpdate) {
+            _.remove(this.items, function (item) {
+                return item.id === elemToUpdate.id;
+            });
+        }
+    }
+
     onWaitingUpdate(message) {
         let remoteWaitingItems = JSON.parse(message.body);
         _.updateinplace(this.waitingitems, remoteWaitingItems, (inArray, elem) => _.findIndex(inArray, { 'id': elem.id }), true);
@@ -68,33 +75,33 @@ class DownloadCtrl {
 
     /** Spécifique aux éléments de la liste : **/
     download(item){
-        this.DonwloadManager.download(item)
+        this.DonwloadManager.download(item);
     }
     stopDownload(item){
-        this.DonwloadManager.ws.stop(item)
+        this.DonwloadManager.ws.stop(item);
     }
     toggleDownload(item){
-        this.DonwloadManager.ws.toggle(item)
+        this.DonwloadManager.ws.toggle(item);
     }
 
     /** Global **/
     stopAllDownload(){
-        this.DonwloadManager.stopAllDownload()
+        this.DonwloadManager.stopAllDownload();
     }
     pauseAllDownload(){
-        this.DonwloadManager.pauseAllDownload()
+        this.DonwloadManager.pauseAllDownload();
     }
     restartAllCurrentDownload(){
-        this.DonwloadManager.restartAllCurrentDownload()
+        this.DonwloadManager.restartAllCurrentDownload();
     }
     removeFromQueue(item){
-        this.DonwloadManager.removeFromQueue(item)
+        this.DonwloadManager.removeFromQueue(item);
     }
     dontDonwload(item){
-        this.DonwloadManager.dontDonwload(item)
+        this.DonwloadManager.dontDonwload(item);
     }
     moveInWaitingList(item, position){
-        this.DonwloadManager.moveInWaitingList(item, position)
+        this.DonwloadManager.moveInWaitingList(item, position);
     }
 
 }
