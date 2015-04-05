@@ -7,6 +7,11 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 angular.module("podcastApp", ["ps.search", "ps.podcast", "ps.item", "ps.download", "ps.player", "ps.common", "ps.dataservice", "ps.config", "ps.partial"]);
 angular.module("ps.common", ["ps.filters", "navbar", "authorize-notification", "device-detection"]);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
 
 var authorizeNotificationDirective = function authorizeNotificationDirective() {
     _classCallCheck(this, authorizeNotificationDirective);
@@ -54,11 +59,7 @@ angular.module("authorize-notification", ["notification"]).directive("authorizeN
     return new authorizeNotificationDirective();
 }).controller("authorizeNotificationController", authorizeNotificationController);
 
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.podcast", ["ps.podcast.details", "ps.podcast.creation", "ps.podcast.list"]);
+angular.module("ps.search", ["ps.search.item"]);
 
 var deviceDetectorService = (function () {
     function deviceDetectorService($window) {
@@ -80,8 +81,6 @@ var deviceDetectorService = (function () {
 })();
 
 angular.module("device-detection", []).service("deviceDetectorService", deviceDetectorService);
-angular.module("ps.search", ["ps.search.item"]);
-
 angular.module("ps.filters", []).filter("htmlToPlaintext", function () {
     return function (text) {
         return String(text || "").replace(/<[^>]+>/gm, "");
@@ -161,29 +160,6 @@ angular.module("ps.config.loading", ["angular-loading-bar"]).config(["cfpLoading
 angular.module("ps.config.module", ["ngTouch", "ngAnimate", "ui.bootstrap", "truncate"]);
 angular.module("ps.config.ngstomp", ["AngularStompDK"]).config(["ngstompProvider", function (ngstompProvider) {
     return ngstompProvider.url("/ws").credential("login", "password")["class"](SockJS);
-}]);
-angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
-    RestangularProvider.setBaseUrl("/api/");
-    RestangularProvider.addElementTransformer("items", false, function (item) {
-        item.addRestangularMethod("reset", "get", "reset");
-        item.addRestangularMethod("download", "get", "addtoqueue");
-        return item;
-    });
-}]);
-angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
-    event.preventDefault();
-    window.location.href = "#/items";
-}], ["s", "Goto Search", function (event) {
-    event.preventDefault();
-    window.location.href = "#/item/search";
-}], ["p", "Goto Podcast List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/podcasts";
-}], ["d", "Goto Download List", function (event) {
-    event.preventDefault();
-    window.location.href = "#/download";
-}]]).config(["$routeProvider", function ($routeProvider) {
-    return $routeProvider.otherwise({ redirectTo: "/items" });
 }]);
 (function (module) {
     try {
@@ -269,7 +245,7 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/podcast-creation.html", "<div class=\"jumbotron\">\n" + "    <div class=\"container\">\n" + "        <h1>Ajouter un Podcast</h1>\n" + "    </div>\n" + "</div>\n" + "\n" + "<div class=\"container\">\n" + "    <form class=\"form-horizontal\" role=\"form\" novalidate>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"title\" class=\"col-sm-1 control-label\">Titre</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"text\" class=\"form-control\" id=\"title\" ng-model=\"pac.podcast.title\" required placeholder=\"Titre\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">URL</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"url\" class=\"form-control\" id=\"url\" ng-model=\"pac.podcast.url\" required placeholder=\"url\" ng-change=\"pac.changeType();pac.findInfo();\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <div class=\"checkbox col-sm-offset-2\">\n" + "                <label>\n" + "                    <input type=\"checkbox\" ng-model=\"pac.podcast.hasToBeDeleted\"> Suppression Automatique\n" + "                </label>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">Tags</label>\n" + "            <div class=\"col-sm-10\">\n" + "                <tags-input ng-model=\"pac.podcast.tags\" display-property=\"name\" min-length=\"1\" class=\"bootstrap\" placeholder=\"Ajouter un tag\">\n" + "                    <auto-complete source=\"pac.loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "                </tags-input>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <label for=\"height\" class=\"col-sm-1 control-label\">Type</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <select class=\"form-control\" ng-model=\"pac.podcast.type\">\n" + "                    <option value=\"BeInSports\">Be In Sports</option>\n" + "                    <option value=\"CanalPlus\">Canal+</option>\n" + "                    <option value=\"JeuxVideoCom\">Jeux Video Com</option>\n" + "                    <option value=\"JeuxVideoFR\">Jeux Video Fr</option>\n" + "                    <option value=\"Parleys\">Parleys</option>\n" + "                    <option value=\"Pluzz\">Pluzz</option>\n" + "                    <option value=\"RSS\">RSS</option>\n" + "                    <option value=\"send\">Send</option>\n" + "                    <option value=\"Youtube\">Youtube</option>\n" + "                </select>\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"col-md-2 col-md-offset-1\">\n" + "            <img ng-src=\"{{ pac.podcast.cover.url || 'http://placehold.it/200x200' }}\" class=\"img-thumbnail\">\n" + "        </div>\n" + "        <div class=\"col-md-9\">\n" + "            <div class=\"form-group\">\n" + "                <label for=\"url\" class=\"col-sm-2 control-label\">URL</label>\n" + "\n" + "                <div class=\"col-sm-9\">\n" + "                    <input class=\"form-control\" ng-model=\"pac.podcast.cover.url\" required placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"width\" class=\"col-sm-2 control-label\">Lageur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"width\" ng-model=\"pac.podcast.cover.width\" required\n" + "                           placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"height\" class=\"col-sm-2 control-label\">Hauteur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"height\" ng-model=\"pac.podcast.cover.height\" required\n" + "                           placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <div class=\"col-sm-offset-2 col-sm-10\">\n" + "                <button ng-click=\"pac.save()\" class=\"btn btn-default\">Sauvegarder</button>\n" + "            </div>\n" + "        </div>\n" + "    </form>\n" + "</div>\n" + "\n" + "\n" + "\n" + "");
+        $templateCache.put("html/podcast-creation.html", "<div class=\"jumbotron\">\n" + "    <div class=\"container\">\n" + "        <h1>Ajouter un Podcast</h1>\n" + "    </div>\n" + "</div>\n" + "\n" + "<div class=\"container\">\n" + "    <form class=\"form-horizontal\" role=\"form\" novalidate>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"title\" class=\"col-sm-1 control-label\">Titre</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"text\" class=\"form-control\" id=\"title\" ng-model=\"pac.podcast.title\" required placeholder=\"Titre\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">URL</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <input type=\"url\" class=\"form-control\" id=\"url\" ng-model=\"pac.podcast.url\" required placeholder=\"url\" ng-change=\"pac.changeType();pac.findInfo();\">\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"url\" class=\"col-sm-1 control-label\">Tags</label>\n" + "            <div class=\"col-sm-10\">\n" + "                <tags-input ng-model=\"pac.podcast.tags\" display-property=\"name\" min-length=\"1\" class=\"bootstrap\" placeholder=\"Ajouter un tag\">\n" + "                    <auto-complete source=\"pac.loadTags($query)\" min-length=\"2\"></auto-complete>\n" + "                </tags-input>\n" + "            </div>\n" + "        </div>\n" + "        <div class=\"form-group\">\n" + "            <label for=\"height\" class=\"col-sm-1 control-label\">Type</label>\n" + "\n" + "            <div class=\"col-sm-10\">\n" + "                <select class=\"form-control\" ng-model=\"pac.podcast.type\">\n" + "                    <option value=\"BeInSports\">Be In Sports</option>\n" + "                    <option value=\"CanalPlus\">Canal+</option>\n" + "                    <option value=\"JeuxVideoCom\">Jeux Video Com</option>\n" + "                    <option value=\"JeuxVideoFR\">Jeux Video Fr</option>\n" + "                    <option value=\"Parleys\">Parleys</option>\n" + "                    <option value=\"Pluzz\">Pluzz</option>\n" + "                    <option value=\"RSS\">RSS</option>\n" + "                    <option value=\"send\">Send</option>\n" + "                    <option value=\"Youtube\">Youtube</option>\n" + "                </select>\n" + "            </div>\n" + "        </div>\n" + "\n" + "        <div class=\"checkbox\">\n" + "            <label>\n" + "                <input type=\"checkbox\" ng-model=\"pac.podcast.hasToBeDeleted\"> Suppression Automatique\n" + "            </label>\n" + "        </div>\n" + "\n" + "        <br/>\n" + "\n" + "        <div class=\"col-md-2 col-md-offset-1 text-center\">\n" + "            <img ng-src=\"{{ pac.podcast.cover.url || 'http://placehold.it/200x200' }}\" class=\"img-thumbnail\" width=\"200\" height=\"200\">\n" + "        </div>\n" + "        <div class=\"col-xs-12 col-md-9\">\n" + "            <div class=\"form-group\">\n" + "                <label for=\"url\" class=\"col-sm-2 control-label\">URL</label>\n" + "\n" + "                <div class=\"col-sm-9\">\n" + "                    <input class=\"form-control\" ng-model=\"pac.podcast.cover.url\" required placeholder=\"url\">\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"width\" class=\"col-sm-2 control-label\">Lageur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"width\" ng-model=\"pac.podcast.cover.width\" required>\n" + "                </div>\n" + "            </div>\n" + "            <div class=\"form-group\">\n" + "                <label for=\"height\" class=\"col-sm-2 control-label\">Hauteur</label>\n" + "\n" + "                <div class=\"col-sm-3\">\n" + "                    <input type=\"number\" class=\"form-control\" id=\"height\" ng-model=\"pac.podcast.cover.height\" required>\n" + "                </div>\n" + "            </div>\n" + "        </div>\n" + "\n" + "\n" + "        <div class=\"form-group\">\n" + "            <div class=\"col-sm-offset-2 col-sm-10\">\n" + "                <button ng-click=\"pac.save()\" class=\"btn btn-default\">Sauvegarder</button>\n" + "            </div>\n" + "        </div>\n" + "    </form>\n" + "</div>\n" + "\n" + "\n" + "\n" + "");
     }]);
 })();
 
@@ -327,6 +303,30 @@ angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKe
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
+
+angular.module("ps.config.restangular", ["restangular"]).config(["RestangularProvider", function (RestangularProvider) {
+    RestangularProvider.setBaseUrl("/api/");
+    RestangularProvider.addElementTransformer("items", false, function (item) {
+        item.addRestangularMethod("reset", "get", "reset");
+        item.addRestangularMethod("download", "get", "addtoqueue");
+        return item;
+    });
+}]);
+angular.module("ps.config.route", ["ngRoute", "cfp.hotkeys"]).constant("commonKey", [["h", "Goto Home", function (event) {
+    event.preventDefault();
+    window.location.href = "#/items";
+}], ["s", "Goto Search", function (event) {
+    event.preventDefault();
+    window.location.href = "#/item/search";
+}], ["p", "Goto Podcast List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/podcasts";
+}], ["d", "Goto Download List", function (event) {
+    event.preventDefault();
+    window.location.href = "#/download";
+}]]).config(["$routeProvider", function ($routeProvider) {
+    return $routeProvider.otherwise({ redirectTo: "/items" });
+}]);
 
 var DownloadCtrl = (function () {
     function DownloadCtrl($scope, DonwloadManager, $notification) {
