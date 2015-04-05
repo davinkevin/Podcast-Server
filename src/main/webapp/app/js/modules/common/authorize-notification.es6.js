@@ -11,9 +11,8 @@ class authorizeNotificationDirective {
 }
 
 class authorizeNotificationController {
-    constructor($window, $notification, $q) {
+    constructor($window, $notification) {
         this.$window = $window;
-        this.$q = $q;
         this.$notification = $notification;
         this.state = this.hasToBeShown();
     }

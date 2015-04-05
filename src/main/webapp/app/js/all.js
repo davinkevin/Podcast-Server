@@ -20,15 +20,14 @@ var authorizeNotificationDirective = function authorizeNotificationDirective() {
 };
 
 var authorizeNotificationController = (function () {
-    function authorizeNotificationController($window, $notification, $q) {
+    function authorizeNotificationController($window, $notification) {
         _classCallCheck(this, authorizeNotificationController);
 
         this.$window = $window;
-        this.$q = $q;
         this.$notification = $notification;
         this.state = this.hasToBeShown();
     }
-    authorizeNotificationController.$inject = ["$window", "$notification", "$q"];
+    authorizeNotificationController.$inject = ["$window", "$notification"];
 
     _createClass(authorizeNotificationController, {
         manuallyactivate: {
