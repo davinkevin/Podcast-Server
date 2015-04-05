@@ -78,6 +78,7 @@ gulp.task('watch', function() {
     gulp.start("js", "less", 'inject');
     gulp.watch([angularAppLocation, htmlLocation], ['js', 'lint']);
     gulp.watch(lessLocation, ['less']);
+    gulp.start('webserver')
 });
 
 gulp.task('inject', function() {
@@ -89,23 +90,31 @@ gulp.task('inject', function() {
         .pipe(gulp.dest("src/main/webapp/app/js/lib/"));
 });
 
-gulp.task('connect', function() {
+gulp.task('webserver', function() {
 
-    function redirect(part, url) {
-        var options = urlparser.parse(url);
-        options.route = part;
-        options.preserveHost = true;
-        return proxy(options);
+    function redirect(from) {
+        return {
+            from : from,
+            to : function(remoteUrl) {
+                var options = urlparser.parse(remoteUrl);
+                options.route = this.from;
+                options.preserveHost = true;
+                return proxy(options);
+            }
+        }
+
     }
+
+    var port = parseInt(args.port) || 8000;
 
     connect.server({
         root: 'src/main/webapp/',
-        port: 8000,
+        port: port,
         livereload: true,
         middleware: function() {
             return [
-                redirect('/api', 'http://localhost:8080/api'),
-                redirect('/ws', 'http://localhost:8080/ws')
+                redirect('/api').to('http://localhost:8080/api'),
+                redirect('/ws').to('http://localhost:8080/ws')
             ];
         }
     });
