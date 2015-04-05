@@ -23,6 +23,10 @@ class PodcastDetailCtrl {
             .then(() => this.refreshItems());
     }
 
+    tabsActive(num) {
+        this.podcastTabs[num].active = true;
+    }
+
 }
 
 angular.module('ps.podcast.details', [
@@ -38,12 +42,13 @@ angular.module('ps.podcast.details', [
             templateUrl: 'html/podcast-detail.html',
             controller: 'PodcastDetailCtrl',
             controllerAs: 'pdc',
-            hotkeys: [
+            /*hotkeys: [
                 ['r', 'Refresh', 'pdc.refreshItems()'],
                 ['f', 'Force Refresh', 'pdc.refresh()'],
-                ['l', 'List of Items', 'pdc.podcastTabs[0].active = true'],
-                ['m', 'Modification of Podcast', 'pdc.podcastTabs[1].active = true']
-            ].concat(commonKey),
+                ['l', 'List of Items', 'pdc.tabsActive(0)'],
+                ['m', 'Modification of Podcast', 'pdc.tabsActive(1)']
+            ].concat(commonKey),*/
+            hotkeys : commonKey,
             resolve : { podcast : (podcastService, $route) => podcastService.findById($route.current.params.podcastId) }
         })
 )
