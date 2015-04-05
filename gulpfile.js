@@ -15,8 +15,11 @@ var gulp = require('gulp'),
     args = require('yargs').argv,
     plumber = require('gulp-plumber'),
     es = require('event-stream'),
-    babel = require('gulp-babel'), 
-    wrap = require('gulp-wrap');
+    babel = require('gulp-babel'),
+    wrap = require('gulp-wrap'),
+    connect = require('gulp-connect'),
+    proxy = require('proxy-middleware'),
+    urlparser = require('url');
 
 var fileAppLocation = 'src/main/webapp/app/';
 
@@ -47,16 +50,17 @@ gulp.task('js', function() {
         gulp.src(angularAppModule),
         gulp.src(angularAppLocation)
     )
-    .pipe(sourcemaps.init())
-    .pipe(concat('all.js'))
-    .pipe(babel())
-    .pipe(wrap('(function(){\n<%= contents %>\n})();'))
-    .pipe(ngAnnotate())
-    .pipe(gulp.dest(jsDestination))
-    .pipe(uglify())
-    .pipe(rename('all.min.js'))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(jsDestination));
+        .pipe(sourcemaps.init())
+        .pipe(concat('all.js'))
+        .pipe(babel())
+        .pipe(wrap('(function(){\n<%= contents %>\n})();'))
+        .pipe(ngAnnotate())
+        .pipe(gulp.dest(jsDestination))
+        .pipe(uglify())
+        .pipe(rename('all.min.js'))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(jsDestination))
+        .pipe(connect.reload());
 });
 
 gulp.task('less', function () {
@@ -64,7 +68,8 @@ gulp.task('less', function () {
         .pipe(less())
         .pipe(concat('podcastserver.css'))
         .pipe(minifyCSS({keepBreaks: true}))
-        .pipe(gulp.dest(cssDestionation));
+        .pipe(gulp.dest(cssDestionation))
+        .pipe(connect.reload());
 });
 
 // Watch Files For Changes
@@ -82,6 +87,28 @@ gulp.task('inject', function() {
 
     gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})
         .pipe(gulp.dest("src/main/webapp/app/js/lib/"));
+});
+
+gulp.task('connect', function() {
+
+    function redirect(part, url) {
+        var options = urlparser.parse(url);
+        options.route = part;
+        options.preserveHost = true;
+        return proxy(options);
+    }
+
+    connect.server({
+        root: 'src/main/webapp/',
+        port: 8000,
+        livereload: true,
+        middleware: function() {
+            return [
+                redirect('/api', 'http://localhost:8080/api'),
+                redirect('/ws', 'http://localhost:8080/ws')
+            ];
+        }
+    });
 });
 
 // Default Task
