@@ -168,11 +168,7 @@ angular.module('ps.search.item', [
                     ['right', 'Next page', 'isc.swipePage(1)'],
                     ['left', 'Previous page', 'isc.swipePage(-1)']
                 ].concat(commonKey),
-                resolve : {
-                    items : (itemService, SearchItemCache) => {
-                        return itemService.search(SearchItemCache.getParameters());
-                    }
-                }
+                resolve : { items : (itemService, SearchItemCache) => itemService.search(SearchItemCache.getParameters()) }
             });
     })
     .constant('DefaultItemSearchParameters', {
