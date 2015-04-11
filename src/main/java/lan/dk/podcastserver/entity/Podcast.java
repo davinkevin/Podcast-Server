@@ -3,7 +3,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lan.dk.podcastserver.service.xml.JdomService;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
@@ -47,8 +47,9 @@ public class Podcast implements Serializable {
         this.id = id;
     }
 
-    @Column(name = "type")
     @Basic
+    @Column(name = "type")
+    @JsonView(PodcastDetailsView.class)
     public String getType() {
         return type;
     }
@@ -58,8 +59,9 @@ public class Podcast implements Serializable {
         return this;
     }
 
-    @Column(name = "title")
     @Basic
+    @Column(name = "title")
+    @JsonView(PodcastListingView.class)
     public String getTitle() {
         return title;
     }
@@ -69,8 +71,9 @@ public class Podcast implements Serializable {
         return this;
     }
 
-    @Column(name = "url", length = 65535)
     @Basic
+    @Column(name = "url", length = 65535)
+    @JsonView(PodcastDetailsView.class)
     public String getUrl() {
         return url;
     }
@@ -80,8 +83,9 @@ public class Podcast implements Serializable {
         return this;
     }
 
-    @Column(name = "signature")
     @Basic
+    @Column(name = "signature")
+    @JsonIgnore
     public String getSignature() {
         return signature;
     }
@@ -92,6 +96,7 @@ public class Podcast implements Serializable {
 
     @Column(name = "last_update")
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
+    @JsonView(PodcastListingView.class)
     public ZonedDateTime getLastUpdate() {
         return lastUpdate;
     }
@@ -100,6 +105,7 @@ public class Podcast implements Serializable {
         this.lastUpdate = lastUpdate;
     }
 
+    @JsonIgnore
     @OneToMany(mappedBy = "podcast", fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
     @OrderBy("pubdate DESC")
     @Fetch(FetchMode.SUBSELECT)
@@ -112,7 +118,7 @@ public class Podcast implements Serializable {
     }
 
     @OneToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval=true)
-    @JoinColumn(name="cover_id")
+    @JoinColumn(name="cover_id") @JsonView(PodcastListingView.class)
     public Cover getCover() {
         return cover;
     }
@@ -121,8 +127,9 @@ public class Podcast implements Serializable {
         this.cover = cover;
     }
 
-    @Column(name = "description", length = 65535 )
     @Basic
+    @Column(name = "description", length = 65535 )
+    @JsonView(PodcastDetailsView.class)
     public String getDescription() {
         return description;
     }
@@ -132,8 +139,9 @@ public class Podcast implements Serializable {
         return this;
     }
 
-    @Column(name = "hasToBeDeleted")
     @Basic
+    @Column(name = "hasToBeDeleted")
+    @JsonView(PodcastDetailsView.class)
     public Boolean getHasToBeDeleted() {
         return hasToBeDeleted;
     }
@@ -147,6 +155,7 @@ public class Podcast implements Serializable {
             joinColumns={@JoinColumn(name="PODCAST_ID", referencedColumnName="ID")},
             inverseJoinColumns={@JoinColumn(name="TAG_ID", referencedColumnName="ID")})
     @Fetch(FetchMode.SUBSELECT)
+    @JsonView(PodcastDetailsView.class)
     public Set<Tag> getTags() {
         return tags;
     }
@@ -212,5 +221,7 @@ public class Podcast implements Serializable {
         return this;
     }
 
+    public interface PodcastListingView {}
+    public interface PodcastDetailsView extends PodcastListingView{};
 
 }

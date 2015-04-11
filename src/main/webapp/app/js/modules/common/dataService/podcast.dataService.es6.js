@@ -36,6 +36,14 @@ class podcastService  {
     findInfo(url) {
         return this.Restangular.one(this.route).findInfo(url);
     }
+
+    statsByPubdate(id) {
+        return this.Restangular.one(this.route, id).one('stats').all('byPubdate').getList();
+    }
+
+    statsByByDownloaddate(id) {
+        return this.Restangular.one(this.route, id).one('stats').all('byDownloaddate').getList();
+    }
     
 }
 

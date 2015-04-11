@@ -5,9 +5,10 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.xml.JdomService;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.utils.facade.StatsPodcast;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+
+import static java.util.stream.Collectors.*;
 
 @Component
 @Transactional
@@ -178,5 +182,31 @@ public class PodcastBusiness {
 
     public ZonedDateTime fromFolder(String pubDate) {
         return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
+    }
+
+    public Set<StatsPodcast> statByPubDate(Integer podcastId) {
+        return statOf(podcastId, Item::getPubdate);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<StatsPodcast> statOf(Integer podcastId, Function<? extends Item, ? extends ZonedDateTime> mapper) {
+        /*LocalDate dateInPast = LocalDate.now().minusMonths(6);*/
+        return podcastRepository.findOne(podcastId)
+                .getItems()
+                .stream()
+                .map((Function<? super Item, ? extends ZonedDateTime>) mapper)
+                .filter(date -> date != null)
+                .map(ZonedDateTime::toLocalDate)
+                /*.filter(date -> dateInPast.isAfter(date))*/
+                .collect(groupingBy(o -> o, counting()))
+                .entrySet()
+                .stream()
+                .map(entry -> new StatsPodcast(entry.getKey(), entry.getValue()))
+                .collect(toSet());
+
+    }
+
+    public Set<StatsPodcast> statsByDownloadDate(Integer id) {
+        return statOf(id, Item::getDownloadDate);
     }
 }

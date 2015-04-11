@@ -8,7 +8,8 @@ class PodcastDetailCtrl {
         this.podcastTabs= [
             { heading : 'Episodes', active : true},
             { heading : 'Edition', active : false},
-            { heading : 'Upload', disabled : this.podcast.type !== 'send'}
+            { heading : 'Upload', disabled : this.podcast.type !== 'send'},
+            { heading : 'Stats', active : false}
         ];
         this.$scope.$on("podcastEdition:save", () => this.refreshItems());
     }
@@ -35,6 +36,7 @@ angular.module('ps.podcast.details', [
     'ps.podcast.details.episodes',
     'ps.podcast.details.edition',
     'ps.podcast.details.upload',
+    'ps.podcast.details.stats',
     'ps.dataService.updateService'
 ]).config(($routeProvider, commonKey) =>
     $routeProvider.
