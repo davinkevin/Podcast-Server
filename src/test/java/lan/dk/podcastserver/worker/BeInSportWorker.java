@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.worker;
 
-import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.manager.worker.updater.BeInSportsUpdater;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -13,7 +12,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
  * Created by kevin on 22/02/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {/*PropertyConfig.class*/}, loader=AnnotationConfigContextLoader.class)
 public class BeInSportWorker {
 
     private final Logger logger = LoggerFactory.getLogger(BeInSportWorker.class);

@@ -21,57 +21,31 @@ import java.util.List;
  * Configuration de la partie Web MVC de l'application
  * Plus d'informations sur le configuration Java-Config de Spring MVC : http://www.luckyryan.com/2013/02/07/migrate-spring-mvc-servlet-xml-to-java-config/
  */
-@EnableWebMvc
-@ComponentScan("lan.dk.podcastserver.controller")
 @Configuration
+@ComponentScan("lan.dk.podcastserver.controller")
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
+
+    @Resource PodcastServerParameters podcastServerParameters;
 
     public static final int CACHE_PERIOD = 31556926;
     public static final String PODCAST_LOCATION_RESOURCE_HANDLER = "/podcast/**";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Resource PodcastServerParameters podcastServerParameters;
 
-    /**
-     * Enregistrement standards des Controllers
-     *
-     * @param registry
-     */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         super.addViewControllers(registry);
     }
 
-    /**
-     * Déclaration des ressources statics, par défaut la racine de la webapp est utilisé.
-     *
-     * @param registry
-     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        //super.addResourceHandlers(registry);
-        
         logger.info("Mapping du dossier {} à {}", PODCAST_LOCATION_RESOURCE_HANDLER, podcastServerParameters.rootFolderWithProtocol());
         
         registry
                 .addResourceHandler(PODCAST_LOCATION_RESOURCE_HANDLER)
-                .addResourceLocations(podcastServerParameters.rootFolderWithProtocol())
-                .setCachePeriod(0);
-        
-        /*
-        registry.addResourceHandler("/css/**").addResourceLocations("/app/css/").setCachePeriod(CACHE_PERIOD);
-        registry.addResourceHandler("/img/**").addResourceLocations("/app/img/").setCachePeriod(CACHE_PERIOD);
-        registry.addResourceHandler("/js/**").addResourceLocations("/app/js/").setCachePeriod(CACHE_PERIOD);
-        registry.addResourceHandler("/font/**").addResourceLocations("/app/font/").setCachePeriod(CACHE_PERIOD);
-        registry.addResourceHandler("/html/**").addResourceLocations("/app/html/").setCachePeriod(CACHE_PERIOD);
-        registry.addResourceHandler("/less/**").addResourceLocations("/app/less/").setCachePeriod(CACHE_PERIOD);
-        */
+                    .addResourceLocations(podcastServerParameters.rootFolderWithProtocol())
+                    .setCachePeriod(CACHE_PERIOD);
     }
 
-    /**
-     * Configuration du InternalResourceViewResolver associé à la localisation des JSPs.
-     *
-     * @return
-     */
     @Bean
     public InternalResourceViewResolver getInternalResourceViewResolver() {
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
@@ -80,11 +54,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return resolver;
     }
 
-    /**
-     * Défini le <mvc:default-servlet-handler/>.
-     *
-     * @param configurer
-     */
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         configurer.enable();

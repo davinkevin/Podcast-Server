@@ -10,7 +10,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {/*PropertyConfig.class*/}, loader=AnnotationConfigContextLoader.class)
 public class PropertyConfigTest {
     
     @Value("#{systemEnvironment['HOME']}")

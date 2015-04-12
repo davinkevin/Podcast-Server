@@ -21,7 +21,7 @@ var gulp = require('gulp'),
     proxy = require('proxy-middleware'),
     urlparser = require('url');
 
-var fileAppLocation = 'src/main/webapp/app/';
+var fileAppLocation = 'src/main/resources/static/app/';
 
 // Location Files :
 var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fileAppLocation).concat('js/all*.js'),
@@ -30,7 +30,7 @@ var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fil
     angularAppModule = [fileAppLocation.concat('js/**/*.module.js')],
     lessLocation = fileAppLocation.concat('less/*.less'),
     htmlLocation = fileAppLocation.concat('html/*.html'),
-    indexLocation = 'src/main/webapp/index.html';
+    indexLocation = 'src/main/resources/static/index.html';
 
 var cssDestionation = fileAppLocation.concat('css'),
     jsDestination = fileAppLocation.concat('js');
@@ -84,10 +84,10 @@ gulp.task('watch', function() {
 gulp.task('inject', function() {
     gulp.src(indexLocation)
         .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { addRootSlash : false, ignorePath : "/bower_components/", addPrefix : "app/js/lib"}))
-        .pipe(gulp.dest("src/main/webapp/"));
+        .pipe(gulp.dest("src/main/resources/static/"));
 
     gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})
-        .pipe(gulp.dest("src/main/webapp/app/js/lib/"));
+        .pipe(gulp.dest("src/main/resources/static/app/js/lib/"));
 });
 
 gulp.task('webserver', function() {
@@ -108,7 +108,7 @@ gulp.task('webserver', function() {
     var port = parseInt(args.port) || 8000;
 
     connect.server({
-        root: 'src/main/webapp/',
+        root: 'src/main/resources/static/',
         port: port,
         livereload: true,
         middleware: function() {

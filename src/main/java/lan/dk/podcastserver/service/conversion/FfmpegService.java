@@ -17,7 +17,7 @@ public class FfmpegService {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${ffmpeg:/usr/bin/ffmpeg}")
+    @Value("${podcastserver.externaltools.ffmpeg:/usr/bin/ffmpeg}")
     public String ffmpeg;
 
     public void concatDemux (File target, File... files) {

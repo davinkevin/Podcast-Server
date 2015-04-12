@@ -2,7 +2,6 @@ package lan.dk.podcastserver.Business;
 
 import lan.dk.podcastserver.business.UpdatePodcastBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.Mock.MockRepository;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
@@ -25,7 +24,7 @@ import java.util.List;
  * Created by kevin on 26/12/2013.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {BeanConfigScan.class, PropertyConfig.class, MockRepository.class})
+@ContextConfiguration(classes = {BeanConfigScan.class, /*PropertyConfig.class,*/ MockRepository.class})
 public class SignatureTest {
 
     private final Logger logger = LoggerFactory.getLogger(SignatureTest.class);

@@ -11,8 +11,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import java.util.List;
 
-@Configuration
 //@EnableWebSocketMessageBroker
+@Configuration
 @ComponentScan(basePackages = {"lan.dk.podcastserver.controller.ws"})
 public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport {
 

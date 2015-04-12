@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -12,20 +12,50 @@ import java.nio.file.Paths;
  * Created by kevin on 03/02/15.
  */
 @Service
+@ConfigurationProperties("podcastserver")
 public class PodcastServerParameters {
 
-    @Value("${rootfolder:${catalina.home}/webapps/podcast/}") String rootfolder;
-    @Value("${serverURL:http://localhost:8080}") String serveurURL;
-    @Value("${fileContainer:http://localhost:8080/podcast}") String fileContainer;
-    @Value("${cover.defaultname:cover}") String coverDefaultName;
-    @Value("${download.extention:.psdownload}") String downloadExtention;
-    
-    @Value("${maxUpdateParallels:3}") Integer maxUpdateParallels;
-    @Value("${concurrentDownload:3}") Integer concurrentDownload;
-    @Value("${numberOfTry:10}") Integer numberOfTry;
+    /**
+     * Location of Podcasts
+     */
+    String rootfolder = "/Users/kevin/Tomcat/podcast/webapps/podcast/";
+    /**
+     * Url of the Server
+     */
+    String serveurURL = "http://localhost:8080";
+    /**
+     * URL to fileContainer
+     */
+    String fileContainer = "http://localhost:8080/podcast";
+    /**
+     * Filename of the cover
+     */
+    String coverDefaultName = "cover";
+    /**
+     * Temp file extension during download
+     */
+    String downloadExtention = ".psdownload";
 
-    @Value("${numberofdaytodownload:30}") Long numberOfDayToDownload;
-    @Value("${rss.default.numberItem:50}") Long rssDefaultNumberItem;
+    /**
+     * Max Update podcast in parallel
+     */
+    Integer maxUpdateParallels = 3;
+    /**
+     * Number of concurrent download
+     */
+    Integer concurrentDownload = 3;
+    /**
+     * Number of retry to download an item
+     */
+    Integer numberOfTry = 10;
+    /**
+     * Number of day to download
+     */
+    Long numberOfDayToDownload = 30L;
+    /**
+     * Number of item by default in RSS exposed by the Podcast Server
+     */
+    Long rssDefaultNumberItem = 50L;
 
     //** GETTER OF THE PARAMETERS **//
     public String getRootfolder() {
@@ -34,15 +64,10 @@ public class PodcastServerParameters {
     public String getServeurURL() {
         return serveurURL;
     }
-    public String getFileContainer() {
-        return fileContainer;
-    }
-    public String getCoverDefaultName() { return coverDefaultName; }
+
     public String getDownloadExtention() {
         return downloadExtention;
     }
-    public Long getNumberOfDayToDownload() { return numberOfDayToDownload; }
-    public Integer getMaxUpdateParallels() { return maxUpdateParallels; }
 
     public Path rootFolder() { return Paths.get(rootfolder); }
     public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
@@ -53,8 +78,47 @@ public class PodcastServerParameters {
     public Integer concurrentDownload() { return concurrentDownload; }
     public Integer numberOfTry() {return numberOfTry;}
     public String coverDefaultName() { return coverDefaultName;}
-
     public Long rssDefaultNumberItem() {
         return rssDefaultNumberItem;
+    }
+
+    public void setRootfolder(String rootfolder) {
+        this.rootfolder = rootfolder;
+    }
+
+    public void setServeurURL(String serveurURL) {
+        this.serveurURL = serveurURL;
+    }
+
+    public void setFileContainer(String fileContainer) {
+        this.fileContainer = fileContainer;
+    }
+
+    public void setCoverDefaultName(String coverDefaultName) {
+        this.coverDefaultName = coverDefaultName;
+    }
+
+    public void setDownloadExtention(String downloadExtention) {
+        this.downloadExtention = downloadExtention;
+    }
+
+    public void setMaxUpdateParallels(Integer maxUpdateParallels) {
+        this.maxUpdateParallels = maxUpdateParallels;
+    }
+
+    public void setConcurrentDownload(Integer concurrentDownload) {
+        this.concurrentDownload = concurrentDownload;
+    }
+
+    public void setNumberOfTry(Integer numberOfTry) {
+        this.numberOfTry = numberOfTry;
+    }
+
+    public void setNumberOfDayToDownload(Long numberOfDayToDownload) {
+        this.numberOfDayToDownload = numberOfDayToDownload;
+    }
+
+    public void setRssDefaultNumberItem(Long rssDefaultNumberItem) {
+        this.rssDefaultNumberItem = rssDefaultNumberItem;
     }
 }

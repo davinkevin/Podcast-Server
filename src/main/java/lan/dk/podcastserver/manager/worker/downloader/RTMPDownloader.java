@@ -17,7 +17,7 @@ public class RTMPDownloader extends AbstractDownloader {
 
     private int pid = 0;
 
-    @Value("${rtmpdump:/usr/local/bin/rtmpdump}")
+    @Value("${podcastserver.externaltools.rtmpdump:/usr/local/bin/rtmpdump}")
     String rtmpdump;
 
     Process p = null;

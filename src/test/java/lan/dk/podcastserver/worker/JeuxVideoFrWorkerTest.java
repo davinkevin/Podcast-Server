@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.worker;
 
-import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.ValidatorConfig;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
@@ -22,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 22/02/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, ValidatorConfig.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {/*PropertyConfig.class,*/ ValidatorConfig.class}, loader=AnnotationConfigContextLoader.class)
 public class JeuxVideoFrWorkerTest {
 
     private final Logger logger = LoggerFactory.getLogger(JeuxVideoFrWorkerTest.class);

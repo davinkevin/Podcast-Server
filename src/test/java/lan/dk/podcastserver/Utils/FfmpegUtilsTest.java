@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.Utils;
 
-import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.UtilsConfig;
 import lan.dk.podcastserver.service.conversion.FfmpegService;
 import org.junit.Test;
@@ -18,7 +17,7 @@ import java.util.List;
  * Created by kevin on 19/07/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, UtilsConfig.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {/*PropertyConfig.class,*/ UtilsConfig.class}, loader=AnnotationConfigContextLoader.class)
 public class FfmpegUtilsTest {
 
     @Resource

@@ -2,8 +2,7 @@
 *.DS_Store
 .idea/
 lib/
-PodcastServer.iml
-Podcast Server.iml
+*.iml
 src/main/resources/application.properties
 node_modules/
 node/
@@ -11,3 +10,6 @@ node_tmp/
 bower_components/
 target/
 src/generated
+.gradle/
+build/
+logs/

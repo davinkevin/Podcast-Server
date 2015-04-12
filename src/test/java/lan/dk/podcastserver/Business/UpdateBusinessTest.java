@@ -2,8 +2,6 @@ package lan.dk.podcastserver.Business;
 
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
-import lan.dk.podcastserver.config.JPAConfig;
-import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import org.junit.runner.RunWith;
@@ -18,7 +16,7 @@ import javax.annotation.Resource;
  * Created by kevin on 01/02/2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, JPAConfig.class, BeanConfigScan.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {/*PropertyConfig.class,*/ /*HibernateSearchConfig.class,*/ BeanConfigScan.class}, loader=AnnotationConfigContextLoader.class)
 @ActiveProfiles("data-embedded")
 public class UpdateBusinessTest {
 

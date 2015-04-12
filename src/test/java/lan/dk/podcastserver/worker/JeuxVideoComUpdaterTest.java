@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.worker;
 
-import lan.dk.podcastserver.config.PropertyConfig;
 import lan.dk.podcastserver.context.ValidatorConfig;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.JeuxVideoComUpdater;
@@ -16,7 +15,7 @@ import javax.annotation.Resource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PropertyConfig.class, ValidatorConfig.class}, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {/*PropertyConfig.class,*/ ValidatorConfig.class}, loader=AnnotationConfigContextLoader.class)
 public class JeuxVideoComUpdaterTest {
 
     @Resource
