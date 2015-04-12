@@ -214,7 +214,7 @@ db.password=MY_PASSWORD
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 
@@ -243,8 +243,8 @@ db.password=MY_PASSWORD
             <li>Keep the framework up-to-date (Spring, Hibernate... )</li>
             <li>Adding more jUnit test (I was really lazy in the past about that subject)</li>
             <li>Create new Worker / Downloader to support other source and other protocol</li>
-            <li>Data-visualisation of the podcast Server (number of download, by type, by podcast...</li>
-            <li>And more... (keeping this page updated !!)</li>
+            <li>And more... (keeping this page updated !!) --> <a href="https://github.com/davinkevin/Podcast-Server/issues">Goto Issue List</a></li>
+            <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Data-visualisation of the podcast Server (number of download, by type, by podcast...</del></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Adding a video player and a playlist manager</del></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Adding a search engine, based on Hibernate Search</del></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Improving the IHM with AngularJS Animation and better presentation</del></li>
@@ -261,49 +261,49 @@ db.password=MY_PASSWORD
 </div>
 
 
+<script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.min.js"></script>
 <script>
-    var psgp = angular.module('psgp', ['ui.bootstrap']);
+    angular.module('psgp', ['ui.bootstrap'])
+            .controller('psgpCtrl', function ($sce) {
+                var vm = this;
 
-    psgp.controller('psgpCtrl', function ($sce) {
-        var vm = this;
-        
-        vm.frameworkList = [
-            { id: "h2", name: "H2 Database", image: "img/framework/h2.png", description: '<ul><li>Very fast, open source, JDBC API </li><li>Embedded and server modes; in-memory databases </li><li>Browser based Console application </li><li>Small footprint: around 1.5 MB jar file size </li></ul>', link : "http://www.h2database.com/" },
-            { id: "tomcat", name: "Apache Tomcat", image: "img/framework/tomcat.png", description: '<div class="text"><p>Apache Tomcat is an open source software implementation of the Java Servlet and JavaServer Pages technologies. The Java Servlet and JavaServer Pages specifications are developed under the <a href="http://jcp.org/en/introduction/overview" rel="nofollow">Java Community Process</a>.</p><p>Apache Tomcat is developed in an open and participatory environment and released under the <a href="http://www.apache.org/licenses">Apache License version 2</a>.  Apache Tomcat is intended to be a collaboration of the best-of-breed developers from around the world.  We invite you to participate in this open development project.  To learn more about getting involved, <a href="getinvolved.html">click here</a>.  </p> <p>Apache Tomcat powers numerous large-scale, mission-critical web applications across a diverse range of industries and organizations.  Some of these users and their stories are listed on the <a href="http://wiki.apache.org/tomcat/PoweredBy">PoweredBy</a> wiki page.</p> </div>', link : "http://tomcat.apache.org/" },
-            { id: "hibernate", name: "Hibernate ORM", image: "img/framework/hibernate.png", description: '<p>Hibernate ORM enables developers to more easily write applications whose data outlives the application process. As an Object/Relational Mapping (ORM) framework, Hibernate is concerned with data persistence as it applies to relational databases (via JDBC). Unfamilar with the notion of ORM? <a href="/orm/what-is-an-orm/">Read here</a>.</p>', link : "http://hibernate.org/orm/" },
-            { id: "spring", name: "Spring Framework", image: "img/framework/Spring.png", description: '<p>The Spring Framework provides a comprehensive programming and configuration model for modern Java-based enterprise applications - on any kind of deployment platform. A key element of Spring is infrastructural support at the application level: Spring focuses on the "plumbing" of enterprise applications so that teams can focus on application-level business logic, without unnecessary ties to specific deployment environments.</p><ul><li>Dependency Injection</li><li>Aspect-Oriented Programming including Spring\'s declarative transaction management</li><li>Spring MVC web application and RESTful web service framework</li><li>Foundational support for JDBC, JPA, JMS</li><li>Much more...</li></ul>', link : "http://spring.io/" },
-            { id: "angular", name: "AngularJS", image: "img/framework/angular.png", description: 'HTML is great for declaring static documents, but it falters when we try to use it for declaring dynamic views in web-applications. AngularJS lets you extend HTML vocabulary for your application. The resulting environment is extraordinarily expressive, readable, and quick to develop.', link : "http://angularjs.org/" },
-            { id: "bootstrap", name: "Twitter Bootstrap", image: "img/framework/TwitterBootstrap.png", description: '<h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2><p class="lead">Bootstrap makes front-end web development faster and easier. It\'s made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>', link : "http://getbootstrap.com/" },
-            { id: "intelliJ", name: "Developped with <strong>IntelliJ IDEA</strong>", image: "img/framework/IntelliJ.png", description: '<h2 class="center-align">The Most Intelligent IDE<br>for the Java Platform</h2><div class="blockcenter block75"><p class="intr -color center-align">Out of the box, IntelliJ IDEA provides a comprehensive feature set including tools and integrations with the most important modern technologies and frameworks for enterprise and web development with <strong>Java, Scala, Groovy</strong> and other languages.</p></div>', link : "http://www.jetbrains.com/idea/" }
-        ];
+                vm.frameworkList = [
+                    { id: "h2", name: "H2 Database", image: "img/framework/h2.png", description: '<ul><li>Very fast, open source, JDBC API </li><li>Embedded and server modes; in-memory databases </li><li>Browser based Console application </li><li>Small footprint: around 1.5 MB jar file size </li></ul>', link : "http://www.h2database.com/" },
+                    { id: "hibernate", name: "Hibernate ORM", image: "img/framework/hibernate.png", description: '<p>Hibernate ORM enables developers to more easily write applications whose data outlives the application process. As an Object/Relational Mapping (ORM) framework, Hibernate is concerned with data persistence as it applies to relational databases (via JDBC). Unfamilar with the notion of ORM? <a href="/orm/what-is-an-orm/">Read here</a>.</p>', link : "http://hibernate.org/orm/" },
+                    { id: "hibernate-search", name:"Hibernate Search", image:"img/framework/hibernate-search.png", description: '<p>Hibernate Search transparently indexes your objects and offers fast regular, full-text and geolocation search. Ease of use and easy clustering are core</p>'},
+                    { id: "springBoot", name: "Spring Boot", image: "img/framework/spring-boot.png", description: '<p>Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run". We take an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration</p>', link : "http://spring.io/" },
+                    { id: "angular", name: "AngularJS", image: "img/framework/angular.png", description: 'HTML is great for declaring static documents, but it falters when we try to use it for declaring dynamic views in web-applications. AngularJS lets you extend HTML vocabulary for your application. The resulting environment is extraordinarily expressive, readable, and quick to develop.', link : "http://angularjs.org/" },
+                    { id: "bootstrap", name: "Twitter Bootstrap", image: "img/framework/TwitterBootstrap.png", description: '<h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2><p class="lead">Bootstrap makes front-end web development faster and easier. It\'s made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>', link : "http://getbootstrap.com/" },
+                    { id: "intelliJ", name: "Developped with <strong>IntelliJ IDEA</strong>", image: "img/framework/IntelliJ.png", description: '<h2 class="center-align">The Most Intelligent IDE<br>for the Java Platform</h2><div class="blockcenter block75"><p class="intr -color center-align">Out of the box, IntelliJ IDEA provides a comprehensive feature set including tools and integrations with the most important modern technologies and frameworks for enterprise and web development with <strong>Java, Scala, Groovy</strong> and other languages.</p></div>', link : "http://www.jetbrains.com/idea/" }
+                ];
 
-        vm.frameworkHover = function(framework) {
-            vm.currentFramework = framework;
-        };
+                vm.frameworkHover = function(framework) {
+                    vm.currentFramework = framework;
+                };
 
-        vm.frameworkHover(vm.frameworkList[0]);
+                vm.frameworkHover(vm.frameworkList[0]);
 
-        vm.getAsHTML = function(text) {
-            return $sce.trustAsHtml(text);
-        };
+                vm.getAsHTML = function(text) {
+                    return $sce.trustAsHtml(text);
+                };
 
-        vm.myInterval = 5000;
-        vm.slides = [
-            {image : "img/slider/01_Home.png" },
-            {image : "img/slider/02_Download.png" },
-            {image : "img/slider/03_PodcastList.mobile.png" },
-            {image : "img/slider/04_PodcastDetails.png" },
-            {image : "img/slider/05_ItemSearch.mobile.png" },
-            {image : "img/slider/06_ItemDetails.png" },
-            {image : "img/slider/07_ItemPlayer.png" },
-            {image : "img/slider/08_Playlist.png" },
-            {image : "img/slider/09_PlayList.mobile.png" }
-        ];
+                vm.myInterval = 5000;
+                vm.slides = [
+                    {image : "img/slider/01_Home.png" },
+                    {image : "img/slider/02_Download.png" },
+                    {image : "img/slider/03_PodcastList.mobile.png" },
+                    {image : "img/slider/04_PodcastDetails.png" },
+                    {image : "img/slider/05_ItemSearch.mobile.png" },
+                    {image : "img/slider/06_ItemDetails.png" },
+                    {image : "img/slider/07_ItemPlayer.png" },
+                    {image : "img/slider/08_Playlist.png" },
+                    {image : "img/slider/09_PlayList.mobile.png" }
+                ];
 
-    });
+            });
 
 </script>
 
