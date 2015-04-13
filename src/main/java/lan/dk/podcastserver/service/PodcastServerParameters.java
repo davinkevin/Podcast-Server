@@ -22,7 +22,7 @@ public class PodcastServerParameters {
     /**
      * Url of the Server
      */
-    String serveurURL = "http://localhost:8080";
+    String serverUrl = "http://localhost:8080";
     /**
      * URL to fileContainer
      */
@@ -61,8 +61,8 @@ public class PodcastServerParameters {
     public String getRootfolder() {
         return rootfolder;
     }
-    public String getServeurURL() {
-        return serveurURL;
+    public String getServerUrl() {
+        return serverUrl;
     }
 
     public String getDownloadExtention() {
@@ -71,7 +71,7 @@ public class PodcastServerParameters {
 
     public Path rootFolder() { return Paths.get(rootfolder); }
     public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
-    public URI serveurURL() throws URISyntaxException { return new URI(serveurURL); }
+    public URI serveurURL() throws URISyntaxException { return new URI(serverUrl); }
     public URI fileContainer() throws URISyntaxException { return new URI(fileContainer); }
     public Long numberOfDayToDownload() { return numberOfDayToDownload; }
     public Integer maxUpdateParallels() { return maxUpdateParallels; }
@@ -86,8 +86,8 @@ public class PodcastServerParameters {
         this.rootfolder = rootfolder;
     }
 
-    public void setServeurURL(String serveurURL) {
-        this.serveurURL = serveurURL;
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 
     public void setFileContainer(String fileContainer) {

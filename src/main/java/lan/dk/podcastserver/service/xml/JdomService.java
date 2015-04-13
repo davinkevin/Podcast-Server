@@ -92,7 +92,7 @@ public class JdomService {
         title.addContent(new Text(podcast.getTitle()));
 
         Element url = new Element(LINK);
-        url.addContent(new Text(String.format(LINK_FORMAT, podcastServerParameters.getServeurURL(), podcast.getId())));
+        url.addContent(new Text(String.format(LINK_FORMAT, podcastServerParameters.getServerUrl(), podcast.getId())));
 
         Element lastUpdate = new Element(PUB_DATE);
         lastUpdate.addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
@@ -165,7 +165,7 @@ public class JdomService {
 
             Element item_enclosure = new Element(ENCLOSURE);
 
-            item_enclosure.setAttribute(URL, podcastServerParameters.getServeurURL()
+            item_enclosure.setAttribute(URL, podcastServerParameters.getServerUrl()
                     .concat(item.getProxyURLWithoutExtention())
                     .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : MimeTypeUtils.getExtension(item)));
 
@@ -195,7 +195,7 @@ public class JdomService {
             xmlItem.addContent(itunesItemSummary);
 
             Element guid = new Element(GUID);
-            guid.addContent(new Text(podcastServerParameters.getServeurURL() + item.getProxyURL()));
+            guid.addContent(new Text(podcastServerParameters.getServerUrl() + item.getProxyURL()));
             xmlItem.addContent(guid);
 
             Element itunesItemThumbnail = new Element(IMAGE, ITUNES_NAMESPACE);
