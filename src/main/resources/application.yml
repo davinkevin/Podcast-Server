@@ -4,7 +4,7 @@
 
 spring :
     datasource:
-        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/beinsport
+        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/rss
         username: sa
         driver-class-name: org.h2.Driver
     jpa:

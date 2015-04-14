@@ -60,7 +60,22 @@ public class RSSFinder implements Finder {
     }
 
     private String getPodcastCover(Element channelElement) {
-        return channelElement.getChild("image").getChildText("url");
+        String cover;
+        Element rssImage = channelElement.getChild("image");
+        if (rssImage == null) {
+            cover = null;
+        } else {
+            cover = rssImage.getChildText("url");
+        }
+
+        if (cover != null)
+            return cover;
+
+        Element itunesImage = channelElement.getChild("image", JdomService.ITUNES_NAMESPACE);
+        if (itunesImage == null)
+            return null;
+
+        return itunesImage.getAttributeValue("href");
     }
 
 }

@@ -51,8 +51,8 @@ public class JdomService {
     private static final String RSS = "rss";
 
     //Useful namespace : 
-    private static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
-    private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+    public static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+    public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     
     // Sax Parser not used in final stage, because it is not thread-safe...:
     /*private static final SAXBuilder SAX_BUILDER = new SAXBuilder();*/
