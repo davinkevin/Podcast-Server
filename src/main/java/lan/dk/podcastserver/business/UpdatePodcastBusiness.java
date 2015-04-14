@@ -47,7 +47,7 @@ public class UpdatePodcastBusiness  {
 
     @Transactional(noRollbackFor=Exception.class)
     public void updatePodcast(Integer id) {
-        logger.debug("Lancement de l'update");
+        logger.info("Lancement de l'update");
         final Podcast podcast = podcastBusiness.findOne(id);
         Updater updater;
             try {
@@ -67,7 +67,7 @@ public class UpdatePodcastBusiness  {
             } catch (Exception e) {
                 logger.warn("Erreur d'update singulier", e);
             }
-        logger.debug("Fin du traitement singulier de {}", podcast.getTitle());
+        logger.info("Fin du traitement singulier de {}", podcast.getTitle());
     }
 
     public void updateAsyncPodcast() {

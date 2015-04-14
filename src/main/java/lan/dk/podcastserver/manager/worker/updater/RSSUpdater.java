@@ -58,7 +58,7 @@ public class RSSUpdater extends AbstractUpdater {
                 if (item.getChild("enclosure") != null || item.getChild("origEnclosureLink", feedburner) != null)   { // est un podcast utilisable
                     Item podcastItem = new Item()
                             .setTitle(item.getChildText("title"))
-                            .setPubdate(ZonedDateTime.parse(item.getChildText("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME))
+                            .setPubdate(getPubDate(item))
                             .setDescription(item.getChildText("description"))
                             .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
                             .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
@@ -86,6 +86,16 @@ public class RSSUpdater extends AbstractUpdater {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return itemSet;
+    }
+
+    private ZonedDateTime getPubDate(Element item) {
+        try {
+            return ZonedDateTime.parse(item.getChildText("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME);
+        } catch (Exception e) {
+            logger.error("Problem during date parsing", e);
+        }
+        // No better idea than returning null for unparseable date
+        return null;
     }
 
     @Override
