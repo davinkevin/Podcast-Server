@@ -289,17 +289,17 @@
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
                         <groupId>org.springframework</groupId>
                         <artifactId>springloaded</artifactId>
-                        <version>1.2.1.RELEASE</version>
+                        <version>1.2.3.RELEASE</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 </project>

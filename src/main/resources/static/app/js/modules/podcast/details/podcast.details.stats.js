@@ -6,6 +6,7 @@ class podcastStatsDirective {
         this.templateUrl = 'html/podcast-details-stats.html';
         this.controller = 'PodcastDetailsStatsCtrl';
         this.controllerAs = 'pdsc';
+        this.bindToController = true;
     }
 
 }
@@ -13,21 +14,12 @@ class podcastStatsDirective {
 class PodcastDetailsStatsCtrl {
 
     constructor($scope, $q, podcastService, numberOfMonthToShow) {
-        let dateInThePast = this.getPastDate(numberOfMonthToShow);
-
-        let dateMapper = (value) => { return { date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems }; },
-            highChartsMapper = (value) => [value.date, value.numberOfItems],
-            timeFilter = (value) => value.date > dateInThePast;
+        this.$q = $q;
+        this.podcastService = podcastService;
+        this.numberOfMonthToShow = numberOfMonthToShow;
 
         this.chartSeries = [];
-
-        $q.all([
-            podcastService.statsByByDownloaddate($scope.podcast.id),
-            podcastService.statsByPubdate($scope.podcast.id)
-        ]).then((arrayResult) => {
-            this.chartSeries.push({"name": "Download Date", "data": _(arrayResult[0]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
-            this.chartSeries.push({"name": "Publication Date", "data": _(arrayResult[1]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
-        });
+        this.generateChartData();
 
         this.chartConfig = {
             options: {
@@ -59,8 +51,10 @@ class PodcastDetailsStatsCtrl {
             credits: {
                 enabled: false
             },
-            loading: false,
+            loading: false
         };
+
+        $scope.$on("podcastItems:refresh", () => this.generateChartData().then((series) => this.chartConfig.series = series));
     }
 
 
@@ -68,6 +62,23 @@ class PodcastDetailsStatsCtrl {
         let dateInThePast = new Date(Date.now());
         dateInThePast.setMonth(dateInThePast.getMonth()-numberOfMonthToShow);
         return dateInThePast;
+    }
+
+    generateChartData() {
+        let dateMapper = (value) => { return { date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems }; },
+            highChartsMapper = (value) => [value.date, value.numberOfItems],
+            timeFilter = (value) => value.date > this.getPastDate(this.numberOfMonthToShow);
+
+        this.chartSeries = [];
+
+        return this.$q.all([
+            this.podcastService.statsByByDownloaddate(this.podcast.id),
+            this.podcastService.statsByPubdate(this.podcast.id)
+        ]).then((arrayResult) => {
+            this.chartSeries.push({"name": "Download Date", "data": _(arrayResult[0]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
+            this.chartSeries.push({"name": "Publication Date", "data": _(arrayResult[1]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
+            return this.chartSeries;
+        });
     }
 }
 
