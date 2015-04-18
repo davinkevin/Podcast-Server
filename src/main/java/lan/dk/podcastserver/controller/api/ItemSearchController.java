@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.controller.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
@@ -24,16 +25,19 @@ public class ItemSearchController {
     @Resource private ItemBusiness itemBusiness;
 
     @RequestMapping(method = RequestMethod.GET)
+    @JsonView(Item.ItemSearchListView.class)
     public List<Item> findAll() {
         return itemBusiness.findAll();
     }
 
     @RequestMapping(value="pagination", method = RequestMethod.GET)
+    @JsonView(Item.ItemSearchListView.class)
     public Page<Item> findAll(PageRequestFacade pageRequestFacade) {
         return itemBusiness.findAll(pageRequestFacade.toPageRequest());
     }
 
     @RequestMapping(value= {"search"}, method = RequestMethod.POST )
+    @JsonView(Item.ItemSearchListView.class)
     public Page<Item> findByDescriptionContaining(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
         return searchWrapper.isSearch()
                 ? itemBusiness.findByTagsAndFullTextTerm(searchWrapper.getTerm(), searchWrapper.getTags(), searchWrapper.toPageRequest())

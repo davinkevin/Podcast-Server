@@ -1,9 +1,6 @@
 package lan.dk.podcastserver.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -68,17 +65,19 @@ public class Item implements Serializable {
         return this;
     }
     
-    @Basic @Column(name = "mimetype")
-    public String getMimeType() {
-        return mimeType;
-    }
-
     public Item setMimeType(String mimeType) {
         this.mimeType = mimeType;
         return this;
     }
 
+    @Basic @Column(name = "mimetype")
+    @JsonView(ItemDetailsView.class)
+    public String getMimeType() {
+        return mimeType;
+    }
+
     @Basic @Column(name = "length")
+    @JsonView(ItemDetailsView.class)
     public Long getLength() {
         return length;
     }
@@ -91,6 +90,7 @@ public class Item implements Serializable {
 
     @Basic @Column(name = "title")
     @Field @Boost(2.0F)
+    @JsonView(ItemSearchListView.class)
     public String getTitle() {
         return title;
     }
@@ -101,6 +101,7 @@ public class Item implements Serializable {
     }
 
     @Basic @Column(name = "url", length = 65535, unique = true)
+    @JsonView(ItemSearchListView.class)
     public String getUrl() {
         return url;
     }
@@ -112,6 +113,7 @@ public class Item implements Serializable {
 
     @Column(name = "pubdate")
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
+    @JsonView(ItemPodcastListView.class)
     public ZonedDateTime getPubdate() {
         return pubdate;
     }
@@ -135,6 +137,7 @@ public class Item implements Serializable {
 
     @Basic
     @Column(name = "status")
+    @JsonView(ItemSearchListView.class)
     public String getStatus() {
         return status.value();
     }
@@ -152,6 +155,7 @@ public class Item implements Serializable {
     }
     
     @Basic
+    @JsonView(ItemDetailsView.class)
     public String getFileName() {
         return fileName;
     }
@@ -162,6 +166,7 @@ public class Item implements Serializable {
     }
 
     @Transient
+    @JsonView(ItemDetailsView.class)
     public Integer getProgression() {
         return progression;
     }
@@ -172,7 +177,7 @@ public class Item implements Serializable {
     }
 
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
-    @JoinColumn(name="cover_id")
+    @JoinColumn(name="cover_id") @JsonIgnore
     public Cover getCover() {
         return this.cover;
     }
@@ -184,6 +189,7 @@ public class Item implements Serializable {
 
     @Column(name = "downloadddate")
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
+    @JsonView(ItemDetailsView.class)
     public ZonedDateTime getDownloadDate() {
         return downloadDate;
     }
@@ -196,6 +202,7 @@ public class Item implements Serializable {
 
     @Column(name = "description", length = 65535)
     @Basic @Field
+    @JsonView(ItemPodcastListView.class)
     public String getDescription() {
         return description;
     }
@@ -215,21 +222,18 @@ public class Item implements Serializable {
         return this;
     }
 
-    @JsonIgnore
-    @Transient
+    @JsonIgnore @Transient
     public Integer getNumberOfTry() {
         return numberOfTry;
     }
 
-    @JsonIgnore
-    @Transient
+    @JsonIgnore @Transient
     public Item setNumberOfTry(Integer numberOfTry) {
         this.numberOfTry = numberOfTry;
         return this;
     }
 
-    @JsonIgnore
-    @Transient
+    @JsonIgnore @Transient
     public Item addATry() {
         this.numberOfTry++;
         return this;
@@ -281,7 +285,7 @@ public class Item implements Serializable {
     }
 
     /* Helpers */
-    @Transient
+    @Transient @JsonView(ItemSearchListView.class)
     public String getLocalUrl() {
         return (fileName == null) ? null : UriComponentsBuilder.fromHttpUrl(fileContainer)
                 .pathSegment(podcast.getTitle())
@@ -290,12 +294,12 @@ public class Item implements Serializable {
                 .toString();
     }
     
-    @Transient @JsonProperty("proxyURL")
+    @Transient @JsonProperty("proxyURL") @JsonView(ItemSearchListView.class)
     public String getProxyURL() {
         return String.format(PROXY_URL, podcast.getId(), id, getExtention());
     }
 
-    @Transient @JsonProperty("isDownloaded")
+    @Transient @JsonProperty("isDownloaded") @JsonView(ItemSearchListView.class)
     public Boolean isDownloaded() {
         return StringUtils.isNotEmpty(fileName);
     }
@@ -328,12 +332,12 @@ public class Item implements Serializable {
         return (ext == null) ? "" : "."+ext;
     }
     
-    @Transient @JsonProperty("cover")
+    @Transient @JsonProperty("cover") @JsonView(ItemSearchListView.class)
     public Cover getCoverOfItemOrPodcast() {
         return (this.cover == null) ? podcast.getCover() : this.cover;
     }
 
-    @Transient @JsonProperty("podcastId")
+    @Transient @JsonProperty("podcastId") @JsonView(ItemSearchListView.class)
     public Integer getPodcastId() { return (podcast == null) ? null : podcast.getId();}
         
     @Transient @JsonIgnore @AssertTrue
@@ -349,4 +353,8 @@ public class Item implements Serializable {
         fileName = null;
         return this;
     }
+
+    public interface ItemSearchListView {}
+    public interface ItemPodcastListView extends ItemSearchListView {}
+    public interface ItemDetailsView extends ItemPodcastListView {}
 }
