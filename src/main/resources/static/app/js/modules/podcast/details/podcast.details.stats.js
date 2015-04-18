@@ -54,7 +54,7 @@ class PodcastDetailsStatsCtrl {
             loading: false
         };
 
-        $scope.$on("podcastItems:refresh", () => this.generateChartData().then((series) => this.chartConfig.series = series));
+        $scope.$on("podcastItems:refresh", () => this.generateChartData());
     }
 
 
@@ -69,7 +69,7 @@ class PodcastDetailsStatsCtrl {
             highChartsMapper = (value) => [value.date, value.numberOfItems],
             timeFilter = (value) => value.date > this.getPastDate(this.numberOfMonthToShow);
 
-        this.chartSeries = [];
+        this.resetChart(this.chartSeries);
 
         return this.$q.all([
             this.podcastService.statsByByDownloaddate(this.podcast.id),
@@ -79,6 +79,10 @@ class PodcastDetailsStatsCtrl {
             this.chartSeries.push({"name": "Publication Date", "data": _(arrayResult[1]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
             return this.chartSeries;
         });
+    }
+
+    resetChart(chartSeries) {
+        _.updateinplace(chartSeries, []);
     }
 }
 

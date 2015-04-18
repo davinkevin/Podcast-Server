@@ -341,6 +341,93 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
         hotkeys: commonKey
     });
 }]).controller("DownloadCtrl", DownloadCtrl);
+
+var ItemDetailCtrl = (function () {
+    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
+        var _this = this;
+
+        _classCallCheck(this, ItemDetailCtrl);
+
+        this.item = item;
+        this.$location = $location;
+        this.item.podcast = podcast;
+        this.playlistService = playlistService;
+        this.DonwloadManager = DonwloadManager;
+
+        //** WebSocket Inscription **//
+        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
+
+        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
+            var itemFromWS = JSON.parse(message.body);
+            if (itemFromWS.id == _this.item.id) {
+                _.assign(_this.item, itemFromWS);
+            }
+        }, $scope);
+    }
+    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
+
+    _createClass(ItemDetailCtrl, {
+        stopDownload: {
+            value: function stopDownload(item) {
+                this.DonwloadManager.ws.stop(item);
+            }
+        },
+        toggleDownload: {
+            value: function toggleDownload(item) {
+                this.DonwloadManager.ws.toggle(item);
+            }
+        },
+        remove: {
+            value: function remove(item) {
+                var _this = this;
+
+                return item.remove().then(function () {
+                    _this.playlistService.remove(item);
+                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
+                });
+            }
+        },
+        reset: {
+            value: function reset(item) {
+                var _this = this;
+
+                return item.reset().then(function (itemReseted) {
+                    _.assign(_this.item, itemReseted);
+                    _this.playlistService.remove(item);
+                });
+            }
+        },
+        toggleInPlaylist: {
+            value: function toggleInPlaylist() {
+                this.playlistService.addOrRemove(this.item);
+            }
+        },
+        isInPlaylist: {
+            value: function isInPlaylist() {
+                return this.playlistService.contains(this.item);
+            }
+        }
+    });
+
+    return ItemDetailCtrl;
+})();
+
+angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
+    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
+        templateUrl: "html/item-detail.html",
+        controller: "ItemDetailCtrl",
+        controllerAs: "idc",
+        hotkeys: commonKey,
+        resolve: {
+            item: ["itemService", "$route", function item(itemService, $route) {
+                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+            }],
+            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
+                return podcastService.findById($route.current.params.podcastId);
+            }]
+        }
+    });
+}]).controller("ItemDetailCtrl", ItemDetailCtrl);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -495,92 +582,6 @@ angular.module("ps.download", ["ps.config.route", "ps.dataService.donwloadManage
     }]);
 })();
 
-var ItemDetailCtrl = (function () {
-    function ItemDetailCtrl($scope, DonwloadManager, $location, playlistService, podcast, item) {
-        var _this = this;
-
-        _classCallCheck(this, ItemDetailCtrl);
-
-        this.item = item;
-        this.$location = $location;
-        this.item.podcast = podcast;
-        this.playlistService = playlistService;
-        this.DonwloadManager = DonwloadManager;
-
-        //** WebSocket Inscription **//
-        var webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
-
-        this.DonwloadManager.ws.subscribe(webSockedUrl, function (message) {
-            var itemFromWS = JSON.parse(message.body);
-            if (itemFromWS.id == _this.item.id) {
-                _.assign(_this.item, itemFromWS);
-            }
-        }, $scope);
-    }
-    ItemDetailCtrl.$inject = ["$scope", "DonwloadManager", "$location", "playlistService", "podcast", "item"];
-
-    _createClass(ItemDetailCtrl, {
-        stopDownload: {
-            value: function stopDownload(item) {
-                this.DonwloadManager.ws.stop(item);
-            }
-        },
-        toggleDownload: {
-            value: function toggleDownload(item) {
-                this.DonwloadManager.ws.toggle(item);
-            }
-        },
-        remove: {
-            value: function remove(item) {
-                var _this = this;
-
-                return item.remove().then(function () {
-                    _this.playlistService.remove(item);
-                    _this.$location.path("/podcast/".concat(_this.item.podcast.id));
-                });
-            }
-        },
-        reset: {
-            value: function reset(item) {
-                var _this = this;
-
-                return item.reset().then(function (itemReseted) {
-                    _.assign(_this.item, itemReseted);
-                    _this.playlistService.remove(item);
-                });
-            }
-        },
-        toggleInPlaylist: {
-            value: function toggleInPlaylist() {
-                this.playlistService.addOrRemove(this.item);
-            }
-        },
-        isInPlaylist: {
-            value: function isInPlaylist() {
-                return this.playlistService.contains(this.item);
-            }
-        }
-    });
-
-    return ItemDetailCtrl;
-})();
-
-angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"]).config(["$routeProvider", "commonKey", function ($routeProvider, commonKey) {
-    $routeProvider.when("/podcast/:podcastId/item/:itemId", {
-        templateUrl: "html/item-detail.html",
-        controller: "ItemDetailCtrl",
-        controllerAs: "idc",
-        hotkeys: commonKey,
-        resolve: {
-            item: ["itemService", "$route", function item(itemService, $route) {
-                return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
-            }],
-            podcast: ["podcastService", "$route", function podcast(podcastService, $route) {
-                return podcastService.findById($route.current.params.podcastId);
-            }]
-        }
-    });
-}]).controller("ItemDetailCtrl", ItemDetailCtrl);
 /**
  * Created by kevin on 01/11/14.
  */
@@ -1700,9 +1701,7 @@ var PodcastDetailsStatsCtrl = (function () {
         };
 
         $scope.$on("podcastItems:refresh", function () {
-            return _this.generateChartData().then(function (series) {
-                return _this.chartConfig.series = series;
-            });
+            return _this.generateChartData();
         });
     }
     PodcastDetailsStatsCtrl.$inject = ["$scope", "$q", "podcastService", "numberOfMonthToShow"];
@@ -1729,13 +1728,18 @@ var PodcastDetailsStatsCtrl = (function () {
                     return value.date > _this.getPastDate(_this.numberOfMonthToShow);
                 };
 
-                this.chartSeries = [];
+                this.resetChart(this.chartSeries);
 
                 return this.$q.all([this.podcastService.statsByByDownloaddate(this.podcast.id), this.podcastService.statsByPubdate(this.podcast.id)]).then(function (arrayResult) {
                     _this.chartSeries.push({ name: "Download Date", data: _(arrayResult[0]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value() });
                     _this.chartSeries.push({ name: "Publication Date", data: _(arrayResult[1]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value() });
                     return _this.chartSeries;
                 });
+            }
+        },
+        resetChart: {
+            value: function resetChart(chartSeries) {
+                _.updateinplace(chartSeries, []);
             }
         }
     });
