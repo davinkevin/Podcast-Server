@@ -5,8 +5,6 @@ import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import lan.dk.podcastserver.utils.facade.SearchItemPageRequestWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +14,12 @@ import java.util.List;
 
 /**
  * Created by kevin on 23/08/2014.
+ * Podcast Server
  */
 @RestController
 @RequestMapping("/api/item")
 public class ItemSearchController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Resource private ItemBusiness itemBusiness;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -38,7 +36,7 @@ public class ItemSearchController {
 
     @RequestMapping(value= {"search"}, method = RequestMethod.POST )
     @JsonView(Item.ItemSearchListView.class)
-    public Page<Item> findByDescriptionContaining(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
+    public Page<Item> search(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
         return searchWrapper.isSearch()
                 ? itemBusiness.findByTagsAndFullTextTerm(searchWrapper.getTerm(), searchWrapper.getTags(), searchWrapper.toPageRequest())
                 : itemBusiness.findAll(searchWrapper.toPageRequest());
