@@ -37,12 +37,12 @@ class podcastService  {
         return this.Restangular.one(this.route).findInfo(url);
     }
 
-    statsByPubdate(id) {
-        return this.Restangular.one(this.route, id).one('stats').all('byPubdate').getList();
+    statsByPubdate(id, numberOfMonth = 6) {
+        return this.Restangular.one(this.route, id).one('stats').all('byPubdate').post(numberOfMonth);
     }
 
-    statsByByDownloaddate(id) {
-        return this.Restangular.one(this.route, id).one('stats').all('byDownloaddate').getList();
+    statsByByDownloaddate(id, numberOfMonth = 6) {
+        return this.Restangular.one(this.route, id).one('stats').all('byDownloaddate').post(numberOfMonth);
     }
     
 }

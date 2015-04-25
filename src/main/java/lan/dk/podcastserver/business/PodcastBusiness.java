@@ -184,29 +184,28 @@ public class PodcastBusiness {
         return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
     }
 
-    public Set<StatsPodcast> statByPubDate(Integer podcastId) {
-        return statOf(podcastId, Item::getPubdate);
+    public Set<StatsPodcast> statByPubDate(Integer podcastId, Long numberOfMonth) {
+        return statOf(podcastId, Item::getPubdate, numberOfMonth);
+    }
+
+    public Set<StatsPodcast> statsByDownloadDate(Integer id, Long numberOfMonth) {
+        return statOf(id, Item::getDownloadDate, numberOfMonth);
     }
 
     @SuppressWarnings("unchecked")
-    public Set<StatsPodcast> statOf(Integer podcastId, Function<? extends Item, ? extends ZonedDateTime> mapper) {
-        /*LocalDate dateInPast = LocalDate.now().minusMonths(6);*/
+    private Set<StatsPodcast> statOf(Integer podcastId, Function<? extends Item, ? extends ZonedDateTime> mapper, long numberOfMonth) {
+        LocalDate dateInPast = LocalDate.now().minusMonths(numberOfMonth);
         return podcastRepository.findOne(podcastId)
                 .getItems()
                 .stream()
                 .map((Function<? super Item, ? extends ZonedDateTime>) mapper)
                 .filter(date -> date != null)
                 .map(ZonedDateTime::toLocalDate)
-                /*.filter(date -> dateInPast.isAfter(date))*/
+                .filter(date -> date.isAfter(dateInPast))
                 .collect(groupingBy(o -> o, counting()))
                 .entrySet()
                 .stream()
                 .map(entry -> new StatsPodcast(entry.getKey(), entry.getValue()))
                 .collect(toSet());
-
-    }
-
-    public Set<StatsPodcast> statsByDownloadDate(Integer id) {
-        return statOf(id, Item::getDownloadDate);
     }
 }

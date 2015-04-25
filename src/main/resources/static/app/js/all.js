@@ -428,6 +428,11 @@ angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"
         }
     });
 }]).controller("ItemDetailCtrl", ItemDetailCtrl);
+/**
+ * Created by kevin on 01/11/14.
+ */
+
+angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
 (function (module) {
     try {
         module = angular.module("ps.partial");
@@ -556,7 +561,7 @@ angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"
         module = angular.module("ps.partial", []);
     }
     module.run(["$templateCache", function ($templateCache) {
-        $templateCache.put("html/podcast-details-stats.html", "<div>\n" + "    <highchart id=\"statsOfPodcast\" config=\"pdsc.chartConfig\"></highchart>\n" + "</div>\n" + "");
+        $templateCache.put("html/podcast-details-stats.html", "<br/>\n" + "<div>\n" + "    <div class=\"input-group col-xs-offset-5 col-sm-offset-5 col-md-offset-5 col-lg-offset-5 col-md-2 col-lg-2 col-xs-2 col-sm-2\">\n" + "        <a class=\"input-group-addon\" ng-click=\"pdsc.navigate(-1)\"> - </a>\n" + "        <input type=\"number\" class=\"form-control text-center\" placeholder=\"Number of Month\" ng-model=\"pdsc.month\" ng-change=\"pdsc.generateChartData()\" ng-model-options=\"{ debounce: 300 }\">\n" + "        <a class=\"input-group-addon\" ng-click=\"pdsc.navigate(1)\"> + </a>\n" + "    </div>\n" + "</div>\n" + "<div class=\"row\">\n" + "    <highchart id=\"statsOfPodcast\" config=\"pdsc.chartConfig\"></highchart>\n" + "</div>\n" + "");
     }]);
 })();
 
@@ -581,12 +586,6 @@ angular.module("ps.item.details", ["ps.dataService.donwloadManager", "ps.player"
         $templateCache.put("html/podcasts-list.html", "<div class=\"container podcastlist\" style=\"margin-top: 15px;\">\n" + "    <div class=\"row\">\n" + "        <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb\" ng-repeat=\"podcast in ::plc.podcasts | orderBy:'-lastUpdate'\">\n" + "            <a ng-href=\"#/podcast/{{ ::podcast.id }}\" >\n" + "                <img    class=\"img-responsive img-rounded\" ng-src=\"{{ ::podcast.cover.url}}\" width=\"{{ ::podcast.cover.width }}\" height=\"{{ ::podcast.cover.height }}\"\n" + "                        notooltip-append-to-body=\"true\" tooltip-placement=\"bottom\" tooltip=\"{{ ::podcast.title }}\"\n" + "                        />\n" + "            </a>\n" + "        </div>\n" + "    </div>\n" + "</div>\n" + "\n" + "");
     }]);
 })();
-
-/**
- * Created by kevin on 01/11/14.
- */
-
-angular.module("ps.item", ["ps.item.details", "ps.item.player"]);
 
 var ItemPlayerController = function ItemPlayerController(podcast, item, $timeout, deviceDetectorService) {
     _classCallCheck(this, ItemPlayerController);
@@ -1333,12 +1332,16 @@ var podcastService = (function () {
         },
         statsByPubdate: {
             value: function statsByPubdate(id) {
-                return this.Restangular.one(this.route, id).one("stats").all("byPubdate").getList();
+                var numberOfMonth = arguments[1] === undefined ? 6 : arguments[1];
+
+                return this.Restangular.one(this.route, id).one("stats").all("byPubdate").post(numberOfMonth);
             }
         },
         statsByByDownloaddate: {
             value: function statsByByDownloaddate(id) {
-                return this.Restangular.one(this.route, id).one("stats").all("byDownloaddate").getList();
+                var numberOfMonth = arguments[1] === undefined ? 6 : arguments[1];
+
+                return this.Restangular.one(this.route, id).one("stats").all("byDownloaddate").post(numberOfMonth);
             }
         }
     });
@@ -1655,18 +1658,17 @@ var podcastStatsDirective = function podcastStatsDirective() {
 };
 
 var PodcastDetailsStatsCtrl = (function () {
-    function PodcastDetailsStatsCtrl($scope, $q, podcastService, numberOfMonthToShow) {
+    function PodcastDetailsStatsCtrl($scope, $q, podcastService) {
         var _this = this;
 
         _classCallCheck(this, PodcastDetailsStatsCtrl);
 
         this.$q = $q;
         this.podcastService = podcastService;
-        this.numberOfMonthToShow = numberOfMonthToShow;
+        this.month = 6;
 
         this.chartSeries = [];
         this.generateChartData();
-
         this.chartConfig = {
             options: {
                 chart: {
@@ -1692,7 +1694,7 @@ var PodcastDetailsStatsCtrl = (function () {
             },
             series: this.chartSeries,
             title: {
-                text: "Répartition par date"
+                text: ""
             },
             credits: {
                 enabled: false
@@ -1704,42 +1706,49 @@ var PodcastDetailsStatsCtrl = (function () {
             return _this.generateChartData();
         });
     }
-    PodcastDetailsStatsCtrl.$inject = ["$scope", "$q", "podcastService", "numberOfMonthToShow"];
+    PodcastDetailsStatsCtrl.$inject = ["$scope", "$q", "podcastService"];
 
     _createClass(PodcastDetailsStatsCtrl, {
-        getPastDate: {
-            value: function getPastDate(numberOfMonthToShow) {
-                var dateInThePast = new Date(Date.now());
-                dateInThePast.setMonth(dateInThePast.getMonth() - numberOfMonthToShow);
-                return dateInThePast;
+        navigate: {
+            value: function navigate(offset) {
+                this.month += offset;
+                return this.generateChartData();
             }
         },
         generateChartData: {
             value: function generateChartData() {
                 var _this = this;
 
-                var dateMapper = function (value) {
-                    return { date: Date.UTC(value.date[0], value.date[1] - 1, value.date[2]), numberOfItems: value.numberOfItems };
-                },
-                    highChartsMapper = function (value) {
-                    return [value.date, value.numberOfItems];
-                },
-                    timeFilter = function (value) {
-                    return value.date > _this.getPastDate(_this.numberOfMonthToShow);
-                };
+                PodcastDetailsStatsCtrl.resetChart(this.chartSeries);
 
-                this.resetChart(this.chartSeries);
+                return this.$q.all([this.podcastService.statsByByDownloaddate(this.podcast.id, this.month), this.podcastService.statsByPubdate(this.podcast.id, this.month)]).then(function (arrayResult) {
+                    var downloadData = _(arrayResult[0]).map(PodcastDetailsStatsCtrl.dateMapper()).sortBy("date").map(PodcastDetailsStatsCtrl.highChartsMapper()).value(),
+                        publicationData = _(arrayResult[1]).map(PodcastDetailsStatsCtrl.dateMapper()).sortBy("date").map(PodcastDetailsStatsCtrl.highChartsMapper()).value();
 
-                return this.$q.all([this.podcastService.statsByByDownloaddate(this.podcast.id), this.podcastService.statsByPubdate(this.podcast.id)]).then(function (arrayResult) {
-                    _this.chartSeries.push({ name: "Download Date", data: _(arrayResult[0]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value() });
-                    _this.chartSeries.push({ name: "Publication Date", data: _(arrayResult[1]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value() });
+                    _this.chartSeries.push({ name: "Download Date", data: downloadData });
+                    _this.chartSeries.push({ name: "Publication Date", data: publicationData });
                     return _this.chartSeries;
                 });
             }
-        },
+        }
+    }, {
         resetChart: {
             value: function resetChart(chartSeries) {
                 _.updateinplace(chartSeries, []);
+            }
+        },
+        dateMapper: {
+            value: function dateMapper() {
+                return function (value) {
+                    return { date: Date.UTC(value.date[0], value.date[1] - 1, value.date[2]), numberOfItems: value.numberOfItems };
+                };
+            }
+        },
+        highChartsMapper: {
+            value: function highChartsMapper() {
+                return function (value) {
+                    return [value.date, value.numberOfItems];
+                };
             }
         }
     });
@@ -1749,7 +1758,7 @@ var PodcastDetailsStatsCtrl = (function () {
 
 angular.module("ps.podcast.details.stats", ["highcharts-ng"]).directive("podcastStats", function () {
     return new podcastStatsDirective();
-}).constant("numberOfMonthToShow", 6).controller("PodcastDetailsStatsCtrl", PodcastDetailsStatsCtrl);
+}).controller("PodcastDetailsStatsCtrl", PodcastDetailsStatsCtrl);
 angular.module("ps.podcast.details.upload", ["angularFileUpload"]).directive("podcastUpload", function () {
     return {
         restrcit: "E",

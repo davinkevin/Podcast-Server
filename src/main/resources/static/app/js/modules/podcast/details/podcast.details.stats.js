@@ -1,5 +1,4 @@
 class podcastStatsDirective {
-
     constructor() {
         this.restrict = 'E';
         this.scope = { podcast : '='};
@@ -8,19 +7,17 @@ class podcastStatsDirective {
         this.controllerAs = 'pdsc';
         this.bindToController = true;
     }
-
 }
 
 class PodcastDetailsStatsCtrl {
 
-    constructor($scope, $q, podcastService, numberOfMonthToShow) {
+    constructor($scope, $q, podcastService) {
         this.$q = $q;
         this.podcastService = podcastService;
-        this.numberOfMonthToShow = numberOfMonthToShow;
+        this.month = 6;
 
         this.chartSeries = [];
         this.generateChartData();
-
         this.chartConfig = {
             options: {
                 chart: {
@@ -46,7 +43,7 @@ class PodcastDetailsStatsCtrl {
             },
             series: this.chartSeries,
             title : {
-                text : 'Répartition par date'
+                text : ''
             },
             credits: {
                 enabled: false
@@ -57,39 +54,49 @@ class PodcastDetailsStatsCtrl {
         $scope.$on("podcastItems:refresh", () => this.generateChartData());
     }
 
-
-    getPastDate(numberOfMonthToShow) {
-        let dateInThePast = new Date(Date.now());
-        dateInThePast.setMonth(dateInThePast.getMonth()-numberOfMonthToShow);
-        return dateInThePast;
+    navigate(offset) {
+        this.month += offset;
+        return this.generateChartData();
     }
 
     generateChartData() {
-        let dateMapper = (value) => { return { date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems }; },
-            highChartsMapper = (value) => [value.date, value.numberOfItems],
-            timeFilter = (value) => value.date > this.getPastDate(this.numberOfMonthToShow);
-
-        this.resetChart(this.chartSeries);
+        PodcastDetailsStatsCtrl.resetChart(this.chartSeries);
 
         return this.$q.all([
-            this.podcastService.statsByByDownloaddate(this.podcast.id),
-            this.podcastService.statsByPubdate(this.podcast.id)
+            this.podcastService.statsByByDownloaddate(this.podcast.id, this.month),
+            this.podcastService.statsByPubdate(this.podcast.id, this.month)
         ]).then((arrayResult) => {
-            this.chartSeries.push({"name": "Download Date", "data": _(arrayResult[0]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
-            this.chartSeries.push({"name": "Publication Date", "data": _(arrayResult[1]).map(dateMapper).sortBy("date").filter(timeFilter).map(highChartsMapper).value()});
+            let downloadData = _(arrayResult[0])
+                    .map(PodcastDetailsStatsCtrl.dateMapper())
+                    .sortBy("date")
+                    .map(PodcastDetailsStatsCtrl.highChartsMapper())
+                    .value(),
+                publicationData = _(arrayResult[1])
+                    .map(PodcastDetailsStatsCtrl.dateMapper())
+                    .sortBy("date")
+                    .map(PodcastDetailsStatsCtrl.highChartsMapper())
+                    .value();
+
+            this.chartSeries.push({"name": "Download Date", "data": downloadData});
+            this.chartSeries.push({"name": "Publication Date", "data": publicationData});
             return this.chartSeries;
         });
     }
 
-    resetChart(chartSeries) {
+    static resetChart(chartSeries) {
         _.updateinplace(chartSeries, []);
+    }
+
+    static dateMapper() {
+        return (value) => { return { date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems }; };
+    }
+
+    static highChartsMapper() {
+        return (value) => [value.date, value.numberOfItems];
     }
 }
 
 
-angular.module('ps.podcast.details.stats', [
-    'highcharts-ng'
-])
+angular.module('ps.podcast.details.stats', [ 'highcharts-ng' ])
     .directive('podcastStats', () => new podcastStatsDirective())
-    .constant('numberOfMonthToShow', 6)
     .controller('PodcastDetailsStatsCtrl', PodcastDetailsStatsCtrl);

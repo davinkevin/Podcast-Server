@@ -100,13 +100,13 @@ public class PodcastController {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/stats/byPubdate", method = RequestMethod.GET)
-    public Set<StatsPodcast> statsByPubdate(@PathVariable Integer id) {
-        return podcastBusiness.statByPubDate(id);
+    @RequestMapping(value="{id:[\\d]+}/stats/byPubdate", method = RequestMethod.POST)
+    public Set<StatsPodcast> statsByPubdate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
+        return podcastBusiness.statByPubDate(id, numberOfMonth);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/stats/byDownloaddate", method = RequestMethod.GET)
-    public Set<StatsPodcast> statsByDownloadDate(@PathVariable Integer id) {
-        return podcastBusiness.statsByDownloadDate(id);
+    @RequestMapping(value="{id:[\\d]+}/stats/byDownloaddate", method = RequestMethod.POST)
+    public Set<StatsPodcast> statsByDownloadDate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
+        return podcastBusiness.statsByDownloadDate(id, numberOfMonth);
     }
 }
