@@ -59,7 +59,7 @@ angular.module('ps.item.details', [
     'ps.player'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
-        when('/podcast/:podcastId/item/:itemId', {
+        when('/podcasts/:podcastId/item/:itemId', {
             templateUrl: 'html/item-detail.html',
             controller: 'ItemDetailCtrl',
             controllerAs: 'idc',

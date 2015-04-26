@@ -50,14 +50,19 @@
                                     <a ng-show="item.status == 'Paused'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>
                                 </li>
                                 <li ng-show="item.status == 'Started' || item.status == 'Paused'">
-                                    <a ng-click="isc.stopDownload(item)"><span class="glyphicon glyphicon-stop text-danger"></span> Stopper</a>
+                                    <a ng-click="isc.stopDownload(item)">
+                                        <span class="glyphicon glyphicon-stop text-danger"></span> Stopper
+                                    </a>
                                 </li>
                                 <li ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded">
-                                    <a ng-click="item.download()"><span class="glyphicon glyphicon-save text-primary"></span> Télécharger</a>
+                                    <a ng-click="item.download()">
+                                        <span class="glyphicon glyphicon-save text-primary"></span> Télécharger
+                                    </a>
                                 </li>
                                 <li>
-                                    <a ng-href="/#/podcast/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded">
-                                        <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player</a>
+                                    <a ng-href="/podcasts/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded">
+                                        <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player
+                                    </a>
                                 </li>
                                 <li ng-show="item.isDownloaded">
                                     <a ng-click="isc.addOrRemove(item)">
@@ -74,12 +79,12 @@
                             </ul>
                         </div>
                     </div>
-                    <a class="overlay-main-button" ng-href="{{ item.proxyURL  }}" >
+                    <a class="overlay-main-button" target="_self" ng-href="{{ item.proxyURL  }}" >
                         <span ng-class="{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}" class="glyphicon "></span>
                     </a>
                 </div>
                 <div class="text-center clearfix itemTitle center" >
-                    <a ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}" tooltip-append-to-body="true" tooltip="{{ item.title }}" tooltip-placement="bottom" >
+                    <a ng-href="/podcasts/{{item.podcastId}}/item/{{item.id}}" tooltip-append-to-body="true" tooltip="{{ item.title }}" tooltip-placement="bottom" >
                         {{ item.title | characters:30 }}
                     </a>
                 </div>
@@ -90,9 +95,9 @@
                         </span>
 
                     <button ng-click="item.download()" ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
-                    <a href="{{ item.proxyURL }}" ng-show="!item.isDownloaded" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
+                    <a target="_self" ng-href="{{ item.proxyURL }}" ng-show="!item.isDownloaded" type="button" class="btn btn-info"><span class="glyphicon glyphicon-globe"></span></a>
 
-                    <a href="{{ item.proxyURL }}" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
+                    <a target="_self" ng-href="{{ item.proxyURL }}" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play"></span></a>
                     <button ng-click="isc.remove(item)" ng-show="item.isDownloaded" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
                 </div>
             </div>

@@ -40,7 +40,7 @@ angular.module('ps.podcast.details', [
     'ps.dataService.updateService'
 ]).config(($routeProvider, commonKey) =>
     $routeProvider.
-        when('/podcast/:podcastId', {
+        when('/podcasts/:podcastId', {
             templateUrl: 'html/podcast-detail.html',
             controller: 'PodcastDetailCtrl',
             controllerAs: 'pdc',

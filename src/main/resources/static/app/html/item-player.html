@@ -1,9 +1,9 @@
 <div class="container item-player">
     <br/>
     <ol class="breadcrumb">
-        <li><a href="/#/podcasts">Podcasts</a></li>
-        <li><a ng-href="/#/podcast/{{ ipc.item.podcast.id }}"> {{ ipc.item.podcast.title }}</a></li>
-        <li class="active"><a ng-href="/#/podcast/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>
+        <li><a href="/podcasts">Podcasts</a></li>
+        <li><a ng-href="/podcasts/{{ ipc.item.podcast.id }}"> {{ ipc.item.podcast.title }}</a></li>
+        <li class="active"><a ng-href="/podcasts/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>
     </ol>
 
     <div ng-show="ipc.item.isDownloaded" class="videogular-container">
@@ -22,7 +22,7 @@
                     <vg-volume-bar></vg-volume-bar>
                 </vg-volume>
                 <vg-fullscreen-button ng-show="ipc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreen-button>
-                <div class='btn-video-share'><a ng-href="{{ ipc.item.proxyURL }}" class="ionicons ion-android-share"></a></div>
+                <div class='btn-video-share'><a target="_self" ng-href="{{ ipc.item.proxyURL }}" class="ionicons ion-android-share"></a></div>
             </vg-controls>
 
             <vg-overlay-play></vg-overlay-play>

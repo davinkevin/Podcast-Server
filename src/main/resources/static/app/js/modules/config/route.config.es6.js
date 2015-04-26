@@ -18,4 +18,5 @@ angular
             window.location.href = '#/download';
         }]
     ])
-    .config(($routeProvider) => $routeProvider.otherwise({redirectTo: '/items'}));
+    .config($routeProvider => $routeProvider.otherwise({redirectTo: '/items'}))
+    .config($locationProvider => $locationProvider.html5Mode(true));

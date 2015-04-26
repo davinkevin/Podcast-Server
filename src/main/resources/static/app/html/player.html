@@ -16,7 +16,7 @@
                     <vg-volume-bar></vg-volume-bar>
                 </vg-volume>
                 <vg-fullscreen-button ng-show="pc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreen-button>
-                <div class='btn-video-share'><a ng-href="{{ pc.config.sources[0].src }}" class="ionicons ion-android-share"></a></div>
+                <div class='btn-video-share'><a target="_self" ng-href="{{ pc.config.sources[0].src }}" class="ionicons ion-android-share"></a></div>
             </vg-controls>
 
             <vg-overlay-play></vg-overlay-play>

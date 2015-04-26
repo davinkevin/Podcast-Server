@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/")
 public class RedirectionController {
 
-    @RequestMapping(value = {""/*, "items", "podcasts", "podcast", "player", "podcast-creation", "download"*/}, method = RequestMethod.GET)
-    private String homePodcast() {
+    @RequestMapping(value = {"", "items", "podcasts", "podcasts/**", "player", "podcast-creation", "download"}, method = RequestMethod.GET)
+    private String home() {
         return "index";
     }
 }

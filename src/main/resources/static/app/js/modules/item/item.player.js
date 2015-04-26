@@ -33,7 +33,7 @@ angular.module('ps.item.player', [
 ])
     .config(($routeProvider) => {
         $routeProvider.
-            when('/podcast/:podcastId/item/:itemId/play', {
+            when('/podcasts/:podcastId/item/:itemId/play', {
                 templateUrl: 'html/item-player.html',
                 controller: 'ItemPlayerController',
                 controllerAs: 'ipc',

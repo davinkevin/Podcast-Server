@@ -1,7 +1,7 @@
 <div class="container podcastlist" style="margin-top: 15px;">
     <div class="row">
         <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in ::plc.podcasts | orderBy:'-lastUpdate'">
-            <a ng-href="#/podcast/{{ ::podcast.id }}" >
+            <a ng-href="/podcasts/{{ ::podcast.id }}" >
                 <img    class="img-responsive img-rounded" ng-src="{{ ::podcast.cover.url}}" width="{{ ::podcast.cover.width }}" height="{{ ::podcast.cover.height }}"
                         notooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ ::podcast.title }}"
                         />

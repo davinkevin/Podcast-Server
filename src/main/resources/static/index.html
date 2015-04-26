@@ -3,6 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
+        <base href="/">
         <title>Podcast Server</title>
     
         <!-- inject:css -->
@@ -23,25 +24,25 @@
     <body>
         <navbar class="hidden">
             <li>
-                <a href="#/podcasts">
+                <a href="/podcasts">
                     <span class="ionicons ion-social-rss">  </span>
                     <span class="hidden-xs"> Podcast</span>
                 </a>
             </li>
             <li>
-                <a href="#/player">
+                <a href="/player">
                     <span class="ionicons ion-social-youtube"></span>
                     <span class="hidden-xs"> Player</span>
                 </a>
             </li>
             <li>
-                <a href="#/podcast-creation">
+                <a href="/podcast-creation">
                     <span class="ionicons ion-android-add"></span>
                     <span class="hidden-xs"> Ajouter</span>
                 </a>
             </li>
             <li>
-                <a href="#/download">
+                <a href="/download">
                     <span class="ionicons ion-android-download"></span>
                     <span class="hidden-xs"> Téléchargement</span>
                 </a>
@@ -81,8 +82,8 @@
         <script src="app/js/lib/AngularStompDK/dist/angular-stomp.min.js"></script>
         <!-- endinject -->
         
-        <!--<script src="app/js/all.min.js"></script>-->
-        <script src="app/js/all.js"></script>
+        <script src="app/js/all.min.js"></script>
+        <!--<script src="app/js/all.js"></script>-->
         
     </body>
 </html>

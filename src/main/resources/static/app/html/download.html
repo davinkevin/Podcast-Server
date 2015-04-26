@@ -22,7 +22,7 @@
             <button ng-click="dc.stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
         </div>
 
-        <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
+        <a class="pull-left" ng-href="/podcasts/{{item.podcastId}}/item/{{item.id}}">
             <img ng-src="{{item.cover.url}}" >
         </a>
 
@@ -58,7 +58,7 @@
                     </div>
                 </div>
 
-                <a class="pull-left" ng-href="#/podcast/{{item.podcastId}}/item/{{item.id}}">
+                <a class="pull-left" ng-href="/podcasts/{{item.podcastId}}/item/{{item.id}}">
                     <img ng-src="{{item.cover.url}}">
                 </a>
 
