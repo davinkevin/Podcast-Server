@@ -33,7 +33,7 @@ class ItemDetailCtrl {
         return item.remove()
             .then(() => {
             this.playlistService.remove(item);
-            this.$location.path('/podcast/'.concat(this.item.podcast.id));
+            this.$location.path('/podcasts/'.concat(this.item.podcast.id));
         });
     }
 

@@ -45,7 +45,7 @@ class PodcastCreationController {
 
     save() {
         this.podcastService.save(this.podcast)
-            .then((podcast) => this.$location.path('/podcast/' + podcast.id));
+            .then((podcast) => this.$location.path('/podcasts/' + podcast.id));
     }
 
 }
