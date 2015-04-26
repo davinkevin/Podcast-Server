@@ -16,7 +16,7 @@ var gulp = require('gulp'),
     plumber = require('gulp-plumber'),
     es = require('event-stream'),
     babel = require('gulp-babel'),
-    wrap = require('gulp-wrap'),
+    wrap = require("gulp-wrap-js"),
     connect = require('gulp-connect'),
     proxy = require('proxy-middleware'),
     urlparser = require('url');
@@ -24,10 +24,7 @@ var gulp = require('gulp'),
 var fileAppLocation = 'src/main/resources/static/app/';
 
 // Location Files :
-var angularAppLocation = [  fileAppLocation.concat('js/**/*.js'), '!'.concat(fileAppLocation).concat('js/all*.js'),
-        '!'.concat(fileAppLocation).concat('js/*.min.js'), '!'.concat(fileAppLocation).concat('js/lib/**/*.js'),
-        '!'.concat(fileAppLocation).concat('js/**/*.module.js')],
-    angularAppModule = [fileAppLocation.concat('js/**/*.module.js')],
+var angularAppLocation =  fileAppLocation.concat('js/modules/**/*.js'),
     lessLocation = fileAppLocation.concat('less/*.less'),
     htmlLocation = fileAppLocation.concat('html/*.html'),
     indexLocation = 'src/main/resources/static/index.html';
@@ -46,14 +43,13 @@ gulp.task('lint', function() {
 
 gulp.task('js', function() {
     es.merge(
-        gulp.src(htmlLocation).pipe(plumber()).pipe(ngHtml2Js({ moduleName: "ps.partial", prefix: "html/" })).pipe(concat("partials.js")),
-        gulp.src(angularAppModule),
-        gulp.src(angularAppLocation)
-    )
-        .pipe(sourcemaps.init())
+            gulp.src(htmlLocation).pipe(plumber()).pipe(ngHtml2Js({ moduleName: "ps.partial", prefix: "html/" })).pipe(concat("partials.js")),
+            gulp.src(angularAppLocation)
+        )
         .pipe(concat('all.js'))
+        .pipe(sourcemaps.init())
         .pipe(babel())
-        .pipe(wrap('(function(){\n<%= contents %>\n})();'))
+        .pipe(wrap('(function() {%= body %})()'))
         .pipe(ngAnnotate())
         .pipe(gulp.dest(jsDestination))
         .pipe(uglify())
@@ -74,7 +70,6 @@ gulp.task('less', function () {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    //gulp.watch(angularAppLocation, ['lint']);
     gulp.start("js", "less", 'inject');
     gulp.watch([angularAppLocation, htmlLocation], ['js', 'lint']);
     gulp.watch(lessLocation, ['less']);
@@ -94,10 +89,9 @@ gulp.task('webserver', function() {
 
     function redirect(from) {
         return {
-            from : from,
             to : function(remoteUrl) {
                 var options = urlparser.parse(remoteUrl);
-                options.route = this.from;
+                options.route = from;
                 options.preserveHost = true;
                 return proxy(options);
             }
@@ -111,6 +105,7 @@ gulp.task('webserver', function() {
         root: 'src/main/resources/static/',
         port: port,
         livereload: true,
+        fallback: indexLocation,
         middleware: function() {
             return [
                 redirect('/api').to('http://localhost:8080/api'),
