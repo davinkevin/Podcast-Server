@@ -71,7 +71,7 @@ public class Item implements Serializable {
     }
 
     @Basic @Column(name = "mimetype")
-    @JsonView(ItemDetailsView.class)
+    @JsonView(ItemSearchListView.class)
     public String getMimeType() {
         return mimeType;
     }
