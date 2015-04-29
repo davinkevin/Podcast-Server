@@ -116,7 +116,9 @@ public class M3U8Downloader extends AbstractDownloader {
         if (target != null)
             return target;
 
-        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + URLUtils.getFileNameM3U8Url(item.getUrl()) );
+        String fileNameFromM3U8Playlist = URLUtils.getFileNameM3U8Url(item.getUrl());
+
+        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + fileNameFromM3U8Playlist);
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
         //logger.debug(file.getAbsolutePath());
 
@@ -128,8 +130,8 @@ public class M3U8Downloader extends AbstractDownloader {
             logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
             try {
                 finalFile  = File.createTempFile(
-                        FilenameUtils.getBaseName(item.getUrl()).concat("-"),
-                        ".".concat(FilenameUtils.getExtension(item.getUrl())),
+                        FilenameUtils.getBaseName(fileNameFromM3U8Playlist).concat("-"),
+                        ".".concat(FilenameUtils.getExtension(fileNameFromM3U8Playlist)),
                         finalFile.getParentFile());
                 finalFile.delete();
             } catch (IOException e) {
