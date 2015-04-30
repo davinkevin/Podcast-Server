@@ -35,6 +35,16 @@ public class ItemSpecifications {
         return QItem.item.downloadDate.lt(dateTime);
     }
 
+    public static BooleanExpression hasBeendDownloadedAfter(ZonedDateTime dateTime) {
+        return QItem.item.downloadDate.gt(dateTime);
+    }
+
+    public static BooleanExpression isOfType(String type) {
+        return QItem.item.podcast.type.eq(type);
+    }
+
+
+
     public static BooleanExpression hasToBeDeleted(Boolean deleted){
         QItem item = QItem.item;
 

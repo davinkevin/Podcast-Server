@@ -4,7 +4,7 @@
 
 spring :
     datasource:
-        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/rss
+        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/stats
         username: sa
         driver-class-name: org.h2.Driver
     jpa:
@@ -33,7 +33,7 @@ podcastserver:
     #file-container: ${podcastserver.server-url}/podcast
     #download-extention: .psdownload
     #rss-default-number-item: 50
-    updateandDownload:
+    update-and-download:
         refresh:
             cron: 0 0 0 * * ?
     externaltools:
