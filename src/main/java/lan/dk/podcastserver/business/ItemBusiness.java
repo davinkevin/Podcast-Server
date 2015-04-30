@@ -61,6 +61,10 @@ public class ItemBusiness {
         return itemRepository.findAll(pageable);
     }
 
+    public Iterable findAll(Predicate predicate) {
+        return itemRepository.findAll(predicate);
+    }
+
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, PageRequest page) {

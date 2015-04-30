@@ -4,6 +4,7 @@ angular.module('podcastApp', [
     'ps.item',
     'ps.download',
     'ps.player',
+    'ps.stats',
     'ps.common',
     'ps.dataservice',
     'ps.config',

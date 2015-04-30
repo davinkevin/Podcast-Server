@@ -6,7 +6,7 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
-import lan.dk.podcastserver.utils.facade.StatsPodcast;
+import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -101,12 +101,12 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id:[\\d]+}/stats/byPubdate", method = RequestMethod.POST)
-    public Set<StatsPodcast> statsByPubdate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
+    public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
         return podcastBusiness.statByPubDate(id, numberOfMonth);
     }
 
     @RequestMapping(value="{id:[\\d]+}/stats/byDownloaddate", method = RequestMethod.POST)
-    public Set<StatsPodcast> statsByDownloadDate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
+    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
         return podcastBusiness.statsByDownloadDate(id, numberOfMonth);
     }
 }
