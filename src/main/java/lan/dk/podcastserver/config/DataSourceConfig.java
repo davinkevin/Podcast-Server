@@ -1,10 +1,8 @@
 package lan.dk.podcastserver.config;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.h2.server.web.WebServlet;
 import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -51,11 +49,4 @@ class DataSourceConfig {
     @Lazy
     @Bean(initMethod = "start", destroyMethod = "stop")
     public Server h2Server() throws SQLException { return Server.createTcpServer(PARAMETER_H2_SERVER); }
-
-    @Bean
-    public ServletRegistrationBean h2Console() {
-        ServletRegistrationBean reg = new ServletRegistrationBean(new WebServlet(), "/console/*");
-        reg.setLoadOnStartup(1);
-        return reg;
-    }
 }

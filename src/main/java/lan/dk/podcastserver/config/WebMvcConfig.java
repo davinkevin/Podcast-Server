@@ -2,8 +2,11 @@ package lan.dk.podcastserver.config;
 
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.jackson.CustomObjectMapper;
+import org.h2.server.web.WebServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +29,7 @@ import java.util.List;
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Resource PodcastServerParameters podcastServerParameters;
+    @Value("${management.context-path:}") String actuatorPath = "";
 
     public static final int CACHE_PERIOD = 31556926;
     public static final String PODCAST_LOCATION_RESOURCE_HANDLER = "/podcast/**";
@@ -73,6 +77,13 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         //Ajout du mapping string par défaut :
         StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         converters.add(stringHttpMessageConverter);
+    }
+
+    @Bean
+    public ServletRegistrationBean h2Console() {
+        ServletRegistrationBean reg = new ServletRegistrationBean(new WebServlet(), actuatorPath + "/database/*");
+        reg.setLoadOnStartup(1);
+        return reg;
     }
 
 }
