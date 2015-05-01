@@ -118,20 +118,33 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     //** Helper Youtube **//
     private String gdataUrlFromYoutubeURL(String youtubeUrl, Integer startIndex) { //
-        String queryParam = "?max-results=".concat(String.valueOf(YOUTUBE_MAX_RESULTS))
+        String queryParam = getUrlParameters(startIndex);
+
+        if (isStandardYoutubeUrl(youtubeUrl)) { //www.youtube.com/[channel|user]*/nom
+            return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
+        }
+
+        if (isGdataYoutubeUrl(youtubeUrl)) {
+            return "https://" + StringUtils.substringAfter(youtubeUrl + queryParam, "://");
+        }
+
+        return null;
+
+    }
+
+    private String getUrlParameters(Integer startIndex) {
+        return "?max-results=".concat(String.valueOf(YOUTUBE_MAX_RESULTS))
                 .concat((startIndex != null)
                         ? "&start-index=" + startIndex.toString()
                         : "");
+    }
 
-        if ( (youtubeUrl.matches(".*.youtube.com/channel/.*") ||
-                youtubeUrl.matches(".*.youtube.com/user/.*") ||
-                youtubeUrl.matches(".*.youtube.com/.*")) && !youtubeUrl.contains("gdata") ) { //www.youtube.com/[channel|user]*/nom
-            return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
-        } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
-            return "https://" + StringUtils.substringAfter(youtubeUrl + queryParam, "://");
-        }
-        return null;
+    private boolean isGdataYoutubeUrl(String youtubeUrl) {
+        return youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*");
+    }
 
+    private boolean isStandardYoutubeUrl(String youtubeUrl) {
+        return (youtubeUrl.matches(".*.youtube.com/channel/.*") || youtubeUrl.matches(".*.youtube.com/user/.*") || youtubeUrl.matches(".*.youtube.com/.*")) && !youtubeUrl.contains("gdata");
     }
 
 
