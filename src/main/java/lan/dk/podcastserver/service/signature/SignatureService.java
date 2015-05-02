@@ -25,7 +25,7 @@ public class SignatureService {
         return "";
     }
     
-    public String generateMD5SignatureFromDOM(String html){
+    public String generateMD5Signature(String html){
         return DigestUtils.md5Hex(html);
     }
 }

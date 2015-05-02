@@ -70,7 +70,7 @@ public class ParleysUpdater extends AbstractUpdater {
             JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
             podcastRepresentation.remove("completedIn");
             podcastRepresentation.remove("results");
-            return signatureService.generateMD5SignatureFromDOM(podcastRepresentation.toJSONString());
+            return signatureService.generateMD5Signature(podcastRepresentation.toJSONString());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }

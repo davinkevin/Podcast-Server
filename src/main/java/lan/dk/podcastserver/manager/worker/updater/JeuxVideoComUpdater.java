@@ -73,7 +73,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
     public String generateSignature(Podcast podcast) {
         try {
             Document page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
-            return signatureService.generateMD5SignatureFromDOM(page.select("article").html());
+            return signatureService.generateMD5Signature(page.select("article").html());
         } catch (IOException e) {
             logger.error("IOException :", e);
         }

@@ -106,7 +106,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
         try {
             page = Jsoup.connect(podcast.getUrl()).timeout(10000).get();
-            return signatureService.generateMD5SignatureFromDOM(page.select(".block-video-tableVideo tbody tr").html());
+            return signatureService.generateMD5Signature(page.select(".block-video-tableVideo tbody tr").html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);

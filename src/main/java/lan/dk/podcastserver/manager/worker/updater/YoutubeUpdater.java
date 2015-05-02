@@ -99,18 +99,15 @@ public class YoutubeUpdater extends AbstractUpdater {
         Document podcastXMLSource;
         try {
             podcastXMLSource = jdomService.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl(), null));
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return "";
-        } catch (IOException e) {
+        } catch (IOException | JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return "";
         }
 
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
-        if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0) != null) {
-            return signatureService.generateMD5SignatureFromDOM(podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));
+        if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(1) != null) {
+            return signatureService.generateMD5Signature(podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(1).getChildText("published", defaultNamespace));
         }
         return "";
     }

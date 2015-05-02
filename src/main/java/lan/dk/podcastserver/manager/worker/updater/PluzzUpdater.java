@@ -98,7 +98,7 @@ public class PluzzUpdater extends AbstractUpdater {
 
             Elements listOfItem = page.select(JSOUP_ITEM_SELECTOR);
 
-            return signatureService.generateMD5SignatureFromDOM((listOfItem.size() == 0) ? page.html() : listOfItem.html());
+            return signatureService.generateMD5Signature((listOfItem.size() == 0) ? page.html() : listOfItem.html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);

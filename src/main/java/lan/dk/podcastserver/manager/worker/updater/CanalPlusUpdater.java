@@ -83,7 +83,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         // Si la page possède un planifier :
         if (page != null) {
             if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-                return signatureService.generateMD5SignatureFromDOM(page.select(".planifier .cursorPointer").html());
+                return signatureService.generateMD5Signature(page.select(".planifier .cursorPointer").html());
             }
         }
 
