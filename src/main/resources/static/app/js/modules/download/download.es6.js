@@ -38,11 +38,15 @@ class DownloadCtrl {
                     this.items.push(item);
                 break;
             case 'Finish' :
-                this.$notification('Téléchargement terminé', {
-                    body: item.title,
-                    icon: item.cover.url,
-                    delay: 5000
-                });
+                try {
+                    this.$notification('Téléchargement terminé', {
+                        body: item.title,
+                        icon: item.cover.url,
+                        delay: 5000
+                    });
+                } catch (e) {
+
+                }
                 this.onStoppedFromWS(elemToUpdate);
                 break;
             case 'Stopped' :

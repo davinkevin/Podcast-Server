@@ -273,11 +273,14 @@
                             this.items.push(item);
                         break;
                     case 'Finish':
-                        this.$notification('T\xE9l\xE9chargement termin\xE9', {
-                            body: item.title,
-                            icon: item.cover.url,
-                            delay: 5000
-                        });
+                        try {
+                            this.$notification('T\xE9l\xE9chargement termin\xE9', {
+                                body: item.title,
+                                icon: item.cover.url,
+                                delay: 5000
+                            });
+                        } catch (e) {
+                        }
                         this.onStoppedFromWS(elemToUpdate);
                         break;
                     case 'Stopped':
@@ -529,117 +532,6 @@
             }
         });
     }]).controller('ItemPlayerController', ItemPlayerController);
-    var PlayerController = function () {
-        function PlayerController(playlistService, $timeout, deviceDetectorService) {
-            _classCallCheck(this, PlayerController);
-            this.playlistService = playlistService;
-            this.$timeout = $timeout;
-            this.playlist = [];
-            this.state = null;
-            this.API = null;
-            this.currentVideo = {};
-            this.config = {
-                autoPlay: true,
-                sources: [],
-                plugins: {
-                    controls: {
-                        autoHide: !deviceDetectorService.isTouchedDevice(),
-                        autoHideTime: 2000
-                    },
-                    poster: ''
-                }
-            };
-            this.reloadPlaylist();
-        }
-        PlayerController.$inject = ["playlistService", "$timeout", "deviceDetectorService"];
-        _createClass(PlayerController, [
-            {
-                key: 'onPlayerReady',
-                value: function onPlayerReady(API) {
-                    this.API = API;
-                    if (this.API.currentState == 'play' || this.isCompleted)
-                        this.API.play();
-                    this.isCompleted = false;
-                    this.setVideo(0);
-                }
-            },
-            {
-                key: 'onCompleteVideo',
-                value: function onCompleteVideo() {
-                    var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
-                    this.isCompleted = true;
-                    if (indexOfVideo + 1 === this.playlist.length) {
-                        this.currentVideo = this.playlist[0];
-                        return;
-                    }
-                    this.setVideo(indexOfVideo + 1);
-                }
-            },
-            {
-                key: 'reloadPlaylist',
-                value: function reloadPlaylist() {
-                    _.updateinplace(this.playlist, this.playlistService.playlist(), function (inArray, elem) {
-                        return _.findIndex(inArray, { id: elem.id });
-                    });
-                }
-            },
-            {
-                key: 'setVideo',
-                value: function setVideo(index) {
-                    this.currentVideo = this.playlist[index];
-                    if (this.currentVideo !== null && this.currentVideo !== undefined) {
-                        this.API.stop();
-                        this.config.sources = [{
-                                src: this.currentVideo.proxyURL,
-                                type: this.currentVideo.mimeType
-                            }];
-                        this.config.plugins.poster = this.currentVideo.cover.url;
-                    }
-                }
-            },
-            {
-                key: 'remove',
-                value: function remove(item) {
-                    this.playlistService.remove(item);
-                    this.reloadPlaylist();
-                    if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
-                        this.setVideo(0);
-                    }
-                }
-            },
-            {
-                key: 'removeAll',
-                value: function removeAll() {
-                    this.playlistService.removeAll();
-                    this.reloadPlaylist();
-                }
-            },
-            {
-                key: 'getIndexOfVideoInPlaylist',
-                value: function getIndexOfVideoInPlaylist(item) {
-                    return this.playlist.indexOf(item);
-                }
-            }
-        ]);
-        return PlayerController;
-    }();
-    angular.module('ps.player', [
-        'ngSanitize',
-        'ngRoute',
-        'device-detection',
-        'com.2fdevs.videogular',
-        'com.2fdevs.videogular.plugins.poster',
-        'com.2fdevs.videogular.plugins.controls',
-        'com.2fdevs.videogular.plugins.overlayplay',
-        'com.2fdevs.videogular.plugins.buffering',
-        'ps.player.playlist'
-    ]).config(["$routeProvider", function ($routeProvider) {
-        $routeProvider.when('/player', {
-            templateUrl: 'html/player.html',
-            controller: 'PlayerController',
-            controllerAs: 'pc'
-        });
-    }]).controller('PlayerController', PlayerController);
     (function (module) {
         try {
             module = angular.module('ps.partial');
@@ -835,6 +727,117 @@
             }
         ]);
     }());
+    var PlayerController = function () {
+        function PlayerController(playlistService, $timeout, deviceDetectorService) {
+            _classCallCheck(this, PlayerController);
+            this.playlistService = playlistService;
+            this.$timeout = $timeout;
+            this.playlist = [];
+            this.state = null;
+            this.API = null;
+            this.currentVideo = {};
+            this.config = {
+                autoPlay: true,
+                sources: [],
+                plugins: {
+                    controls: {
+                        autoHide: !deviceDetectorService.isTouchedDevice(),
+                        autoHideTime: 2000
+                    },
+                    poster: ''
+                }
+            };
+            this.reloadPlaylist();
+        }
+        PlayerController.$inject = ["playlistService", "$timeout", "deviceDetectorService"];
+        _createClass(PlayerController, [
+            {
+                key: 'onPlayerReady',
+                value: function onPlayerReady(API) {
+                    this.API = API;
+                    if (this.API.currentState == 'play' || this.isCompleted)
+                        this.API.play();
+                    this.isCompleted = false;
+                    this.setVideo(0);
+                }
+            },
+            {
+                key: 'onCompleteVideo',
+                value: function onCompleteVideo() {
+                    var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
+                    this.isCompleted = true;
+                    if (indexOfVideo + 1 === this.playlist.length) {
+                        this.currentVideo = this.playlist[0];
+                        return;
+                    }
+                    this.setVideo(indexOfVideo + 1);
+                }
+            },
+            {
+                key: 'reloadPlaylist',
+                value: function reloadPlaylist() {
+                    _.updateinplace(this.playlist, this.playlistService.playlist(), function (inArray, elem) {
+                        return _.findIndex(inArray, { id: elem.id });
+                    });
+                }
+            },
+            {
+                key: 'setVideo',
+                value: function setVideo(index) {
+                    this.currentVideo = this.playlist[index];
+                    if (this.currentVideo !== null && this.currentVideo !== undefined) {
+                        this.API.stop();
+                        this.config.sources = [{
+                                src: this.currentVideo.proxyURL,
+                                type: this.currentVideo.mimeType
+                            }];
+                        this.config.plugins.poster = this.currentVideo.cover.url;
+                    }
+                }
+            },
+            {
+                key: 'remove',
+                value: function remove(item) {
+                    this.playlistService.remove(item);
+                    this.reloadPlaylist();
+                    if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
+                        this.setVideo(0);
+                    }
+                }
+            },
+            {
+                key: 'removeAll',
+                value: function removeAll() {
+                    this.playlistService.removeAll();
+                    this.reloadPlaylist();
+                }
+            },
+            {
+                key: 'getIndexOfVideoInPlaylist',
+                value: function getIndexOfVideoInPlaylist(item) {
+                    return this.playlist.indexOf(item);
+                }
+            }
+        ]);
+        return PlayerController;
+    }();
+    angular.module('ps.player', [
+        'ngSanitize',
+        'ngRoute',
+        'device-detection',
+        'com.2fdevs.videogular',
+        'com.2fdevs.videogular.plugins.poster',
+        'com.2fdevs.videogular.plugins.controls',
+        'com.2fdevs.videogular.plugins.overlayplay',
+        'com.2fdevs.videogular.plugins.buffering',
+        'ps.player.playlist'
+    ]).config(["$routeProvider", function ($routeProvider) {
+        $routeProvider.when('/player', {
+            templateUrl: 'html/player.html',
+            controller: 'PlayerController',
+            controllerAs: 'pc'
+        });
+    }]).controller('PlayerController', PlayerController);
     var PlaylistService = function () {
         function PlaylistService($localStorage) {
             _classCallCheck(this, PlaylistService);
