@@ -2,9 +2,9 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.signature.SignatureService;
+import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public abstract class AbstractUpdater implements Updater {
             e.printStackTrace();
         }
 
-        return UpdateTuple.of(podcast, podcast.getItems(), item -> true);
+        return NO_MODIFICATION_TUPLE;
     }
     
 }

@@ -18,7 +18,7 @@ public class UpdatePodcastController {
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     private void updatePodcast () {
-        updatePodcastBusiness.updateAsyncPodcast();
+        updatePodcastBusiness.updatePodcast();
     }
 
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.POST)
@@ -36,7 +36,7 @@ public class UpdatePodcastController {
     @RequestMapping(value = "/updateAndDownloadPodcast", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     private void updateAndDownloadPodcast() {
-        updatePodcastBusiness.updateAsyncPodcast();
+        updatePodcastBusiness.updatePodcast();
         IDM.launchDownload();
     }
 

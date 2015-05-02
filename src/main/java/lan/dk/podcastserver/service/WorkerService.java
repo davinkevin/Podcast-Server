@@ -8,8 +8,6 @@ import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -22,13 +20,12 @@ import java.util.Arrays;
 @Component("WorkerService")
 public class WorkerService implements ApplicationContextAware {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected ApplicationContext context = null;
     
     @Resource UpdaterSelector updaterSelector;
     @Resource DownloaderSelector downloaderSelector;
 
-    public Updater updaterOf(Podcast podcast) throws Exception {
+    public Updater updaterOf(Podcast podcast) {
         return (Updater) context.getBean(updaterSelector.of(podcast.getUrl()).getSimpleName());
     }
 

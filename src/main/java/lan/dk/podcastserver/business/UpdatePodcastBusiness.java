@@ -6,7 +6,6 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,12 +19,11 @@ import javax.validation.Validator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Predicate;
 
 
@@ -44,71 +42,66 @@ public class UpdatePodcastBusiness  {
     @Resource(name="Validator") Validator validator;
     @Resource WorkerService workerService;
 
-
-    @Transactional(noRollbackFor=Exception.class)
+    public void updatePodcast() {
+        updatePodcast(podcastBusiness.findByUrlIsNotNull(), asyncExecutor);
+    }
     public void updatePodcast(Integer id) {
-        logger.info("Lancement de l'update");
-        final Podcast podcast = podcastBusiness.findOne(id);
-        Updater updater;
-            try {
-                logger.debug("Traitement du Podcast singulier {}", podcast.getTitle());
-
-                updater = workerService.updaterOf(podcast);
-                Future <UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture = executor.submit(() -> updater.update(podcast));
-                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
-
-                String signature = updateTuple.first().getSignature();
-                if ( StringUtils.equals(podcast.getSignature(), signature)) {
-                    podcastBusiness.update(
-                            attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last())
-                    );
-                }
-
-            } catch (Exception e) {
-                logger.warn("Erreur d'update singulier", e);
-            }
-        logger.info("Fin du traitement singulier de {}", podcast.getTitle());
+        updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), executor);
+    }
+    public void forceUpdatePodcast (Integer id){
+        logger.info("Lancement de l'update forcé");
+        Podcast podcast = podcastBusiness.findOne(id);
+        podcast.setSignature("");
+        podcast = podcastBusiness.update(podcast);
+        this.updatePodcast(Collections.singletonList(podcast), executor);
     }
 
-    public void updateAsyncPodcast() {
+    @Transactional(noRollbackFor=Exception.class)
+    private void updatePodcast(List<Podcast> podcasts, Executor selectedExecutor) {
         logger.info("Lancement de l'update");
-        Map<String, Future< UpdateTuple<Podcast, Set<Item>, Predicate<Item>> > > podcastItemsToUpdate = new HashMap<>();
+        Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures = new HashSet<>();
 
-        List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
         logger.info("Traitement de {} podcasts", podcasts.size());
         for (Podcast podcast : podcasts) {
-            try {
-                final Updater updater = workerService.updaterOf(podcast);
-                podcastItemsToUpdate.put(podcast.getSignature(), asyncExecutor.submit(() -> updater.update(podcast)));
-            } catch (Exception e) {
-                logger.error("Error during signature of podcast {}", podcast.getTitle(), e);
-            }
+            futures.add(
+                    CompletableFuture
+                            .supplyAsync(() -> workerService.updaterOf(podcast))
+                            .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor)
+            );
         }
 
-        logger.info("Traitement des ajouts sur {} podcasts", podcastItemsToUpdate.size());
-        for (Map.Entry<String, Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> podcastAndItems : podcastItemsToUpdate.entrySet()) {
-            try {
-                String currentPodcastSignature = podcastAndItems.getKey();
-                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> returnValue = podcastAndItems.getValue().get(5, TimeUnit.MINUTES);
-                if (!StringUtils.isEmpty(returnValue.first().getSignature()) && !StringUtils.equals(currentPodcastSignature, returnValue.first().getSignature())) {
-                    podcastBusiness.update(
-                            attachNewItemsToPodcast(returnValue.first(), returnValue.middle(), returnValue.last())
-                    );
-                }
-            } catch (Exception e) {
-                logger.error("Error during update of podcast", e);
-            }
-        }
+        handleUpdateTuple(futures);
 
         logger.info("Fin du traitement des {} podcasts", podcasts.size());
     }
 
-    public void forceUpdatePodcast (int id){
-        logger.info("Lancement de l'update forcé");
-        Podcast podcast = podcastBusiness.findOne(id);
-        podcast.setSignature("");
-        podcastBusiness.update(podcast);
-        this.updatePodcast(podcast.getId());
+    private void handleUpdateTuple(Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures) {
+        try {
+            for (Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture : futures) {
+                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
+                if (updateTuple != Updater.NO_MODIFICATION_TUPLE)
+                    podcastBusiness.update(attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last()));
+            }
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            logger.error("Error during update", e);
+        }
+    }
+    private Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {
+
+        if (items == null || items.isEmpty() )
+            return podcast;
+
+        items.stream()
+                .filter(filter)
+                .map(item -> item.setPodcast(podcast))
+                .filter(item -> validator.validate(item).isEmpty())
+                .forEach(item -> {
+                    logger.debug("Add an item to {}", podcast.getTitle());
+                    podcast.getItems().add(item);
+                    podcast.lastUpdateToNow();
+                });
+
+        return podcast;
     }
 
     public void deleteOldEpisode() {
@@ -127,24 +120,6 @@ public class UpdatePodcastBusiness  {
                 logger.error("Error during suppression : ", e);
             }
         }
-    }
-
-    public Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {
-        
-        if (items == null || items.isEmpty() )
-            return podcast;
-        
-        items.stream()
-                .filter(filter)
-                .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .forEach(item -> {
-                    logger.debug("Add an item to {}", podcast.getTitle());
-                    podcast.getItems().add(item);
-                    podcast.lastUpdateToNow();
-                });
-        
-        return podcast;
     }
 
     @PostConstruct

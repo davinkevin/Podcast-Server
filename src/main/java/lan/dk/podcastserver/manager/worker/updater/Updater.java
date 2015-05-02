@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 
 public interface Updater {
 
+    UpdateTuple<Podcast, Set<Item>, Predicate<Item>> NO_MODIFICATION_TUPLE = UpdateTuple.of(null, null, null);
+
     UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast);
 
     Set<Item> getItems(Podcast podcast);
