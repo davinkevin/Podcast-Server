@@ -3,6 +3,7 @@ package lan.dk.podcastserver.controller.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import lan.dk.podcastserver.business.FindPodcastBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
+import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -26,8 +27,9 @@ public class PodcastController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Resource private PodcastBusiness podcastBusiness;
-    @Resource private FindPodcastBusiness findPodcastBusiness;
+    @Resource PodcastBusiness podcastBusiness;
+    @Resource FindPodcastBusiness findPodcastBusiness;
+    @Resource StatsBusiness statsBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {
@@ -102,11 +104,11 @@ public class PodcastController {
 
     @RequestMapping(value="{id:[\\d]+}/stats/byPubdate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
-        return podcastBusiness.statByPubDate(id, numberOfMonth);
+        return statsBusiness.statByPubDate(id, numberOfMonth);
     }
 
     @RequestMapping(value="{id:[\\d]+}/stats/byDownloaddate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
-        return podcastBusiness.statsByDownloadDate(id, numberOfMonth);
+        return statsBusiness.statsByDownloadDate(id, numberOfMonth);
     }
 }

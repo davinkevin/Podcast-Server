@@ -8,7 +8,6 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.xml.JdomService;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
-import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -26,9 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.*;
 
 @Component
 @Transactional
@@ -184,28 +180,5 @@ public class PodcastBusiness {
         return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
     }
 
-    public Set<NumberOfItemByDateWrapper> statByPubDate(Integer podcastId, Long numberOfMonth) {
-        return statOf(podcastId, Item::getPubdate, numberOfMonth);
-    }
 
-    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(Integer id, Long numberOfMonth) {
-        return statOf(id, Item::getDownloadDate, numberOfMonth);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Set<NumberOfItemByDateWrapper> statOf(Integer podcastId, Function<? extends Item, ? extends ZonedDateTime> mapper, long numberOfMonth) {
-        LocalDate dateInPast = LocalDate.now().minusMonths(numberOfMonth);
-        return podcastRepository.findOne(podcastId)
-                .getItems()
-                .stream()
-                .map((Function<? super Item, ? extends ZonedDateTime>) mapper)
-                .filter(date -> date != null)
-                .map(ZonedDateTime::toLocalDate)
-                .filter(date -> date.isAfter(dateInPast))
-                .collect(groupingBy(o -> o, counting()))
-                .entrySet()
-                .stream()
-                .map(entry -> new NumberOfItemByDateWrapper(entry.getKey(), entry.getValue()))
-                .collect(toSet());
-    }
 }

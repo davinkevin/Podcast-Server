@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.api;
 
-import lan.dk.podcastserver.business.stats.ItemStatsBusiness;
+import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +17,8 @@ import java.util.List;
 @RequestMapping("/api/stats")
 public class StatsController {
 
-    @Resource ItemStatsBusiness itemStatsBusiness;
+    @Resource
+    StatsBusiness itemStatsBusiness;
 
     @RequestMapping(value="byType", method = RequestMethod.POST)
     public List<StatsPodcastType> statsByType(@RequestBody Integer numberOfMonth) {
