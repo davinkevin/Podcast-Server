@@ -1,70 +1,72 @@
 package lan.dk.podcastserver.worker;
 
-import lan.dk.podcastserver.context.Mock.MockRepository;
-import lan.dk.podcastserver.context.Mock.MockService;
-import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.YoutubeUpdater;
+import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.signature.SignatureService;
+import lan.dk.podcastserver.service.xml.JdomService;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.validation.Validator;
+
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 21/12/2013.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {MockWorkerContextConfiguration.class, MockRepository.class, MockService.class})
+@RunWith(MockitoJUnitRunner.class)
+@ContextConfiguration(classes = {YoutubeUpdater.class})
 public class YoutubeUpdaterTest {
 
     private final Logger logger = LoggerFactory.getLogger(YoutubeUpdaterTest.class);
 
-    @Autowired
-    YoutubeUpdater youtubeUpdater;
-
+    @InjectMocks YoutubeUpdater youtubeUpdater;
+    @Mock PodcastServerParameters podcastServerParameters;
+    @Mock Validator validator;
+    @Spy JdomService jdomService = new JdomService();
+    @Spy SignatureService signatureService = new SignatureService();
 
     @Before
     public void initPodcast() {
         logger.debug("InitPodcast");
     }
-/*
-
+    
     @Test
-    public void updateCauet() {
-        Podcast podcast = new Podcast("Cauet", "http://www.youtube.com/channel/UCe2YQ986DdKliHNvE8va4kQ", "", "Youtube", null, null, new Cover(), null, null);
-        youtubeUpdater.updateAndAddItems(podcast);
+    public void should_generate_signature () {
+        /* Given */
+        Podcast nowTechTvFr = new Podcast();
+        nowTechTvFr.setUrl("https://www.youtube.com/user/NowTechTVfr");
 
-        logger.debug(podcast.toString());
+        /* When */
+        String signature = youtubeUpdater.generateSignature(nowTechTvFr);
+        String signatureBis = youtubeUpdater.generateSignature(nowTechTvFr);
 
+        /* Then */
+        assertThat(signature).isNotNull().isNotEmpty().isEqualTo(signatureBis);
     }
 
     @Test
-    public void updateWillAndCo() {
-        Podcast podcast = new Podcast("Will & Co", "http://www.youtube.com/channel/UCzMawL8sevUd5nZ14x4wRpg", "", "Youtube", null, null, new Cover(), null, null);
-        youtubeUpdater.updateAndAddItems(podcast);
-
-        logger.debug(podcast.toString());
-
+    public void should_get_items () {
+        /* Given */
+        Podcast nowTechTvFr = new Podcast();
+        nowTechTvFr.setUrl("https://www.youtube.com/user/NowTechTVfr");
+                
+        /* When */
+        Set<Item> items = youtubeUpdater.getItems(nowTechTvFr);
+        
+        /* Then */
+        assertThat(items).isNotNull().isNotEmpty();
     }
-    @Test
-    public void updateNowTechTvFr() {
-        Podcast podcast = new Podcast("NowTechTvFr", "https://www.youtube.com/nowtechtvfr", "", "Youtube", null, null, new Cover(), null, null);
-        youtubeUpdater.updateAndAddItems(podcast);
-
-        logger.debug(podcast.toString());
-
-    }
-
-    @Test
-    public void androTechPlayslist() {
-        Podcast podcast = new Podcast("AndroTech", "http://gdata.youtube.com/feeds/api/playlists/PLN6bvn-Db2BoPcPRqSgtvi-TjZgIB9PvW", "", "Youtube", null, null, new Cover(), null, null);
-        youtubeUpdater.updateAndAddItems(podcast);
-
-        logger.debug(podcast.toString());
-
-    }
-*/
-
 }

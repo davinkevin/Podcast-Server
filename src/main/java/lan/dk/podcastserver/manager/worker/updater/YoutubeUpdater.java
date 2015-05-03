@@ -4,18 +4,16 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.xml.JdomService;
-import lan.dk.podcastserver.utils.ImageUtils;
-import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -24,12 +22,12 @@ import java.util.Set;
 @Component("YoutubeUpdater")
 public class YoutubeUpdater extends AbstractUpdater {
 
-    private static final Integer YOUTUBE_MAX_RESULTS = 50;
-    private static final String GDATA_USER_FEED = "https://gdata.youtube.com/feeds/api/users/";
-    //private static final String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
+    private static final String FEED_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
+    public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+    private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
 
     @Resource JdomService jdomService;
-    
+
     public static ZonedDateTime fromYoutube(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
     }
@@ -37,112 +35,84 @@ public class YoutubeUpdater extends AbstractUpdater {
     public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
 
-        Integer borne = 1;
-        String realPodcastURl;
-        ZonedDateTime maxDate = ZonedDateTime.now().plusDays(podcastServerParameters.numberOfDayToDownload());
-        Namespace media = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
-
-        while (true) {
-            // Si l'image de présentation a changé :
-            realPodcastURl = this.gdataUrlFromYoutubeURL(podcast.getUrl(), borne);
-            logger.debug("URL = {}", realPodcastURl);
-            Document podcastXMLSource;
-            try {
-                podcastXMLSource = jdomService.jdom2Parse(realPodcastURl);
-                Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
-
-                if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).size() == 0) {
-                    return itemSet;
-                }
-
-                for (Element item : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
-                    Item podcastItem = new Item()
-                            .setTitle(item.getChildText("title", defaultNamespace))
-                            .setDescription(item.getChildText("content", defaultNamespace))
-                            .setPubdate(fromYoutube(item.getChildText("published", defaultNamespace)))
-                            .setPodcast(podcast);
-
-                    if (podcastItem.getPubdate().isBefore(maxDate) && borne > YOUTUBE_MAX_RESULTS) {
-                        return itemSet;
-                    }
-                    for (Element link : item.getChildren("link", defaultNamespace)) {
-                        if (link.getAttributeValue("rel", null, "").equals("alternate") ) {
-                            podcastItem.setUrl(URLUtils.changeProtocol(link.getAttributeValue("href", null, ""), "http", "https"));
-                            break;
-                        }
-                    }
-
-                    if (    item.getChild("group", media) != null &&
-                            !item.getChild("group", media).getChildren("thumbnail", media).isEmpty() &&
-                            item.getChild("group", media).getChildren("thumbnail", media).get(0) != null) {
-                        Cover cover = ImageUtils.getCoverFromURL(new URL(item.getChild("group", media).getChildren("thumbnail", media).get(0).getAttributeValue("url")));
-                        podcastItem.setCover(cover);
-                    }
-
-                    itemSet.add(podcastItem);
-
-                }
-
-            } catch (JDOMException | IOException e) {
-                e.printStackTrace();
-                return itemSet;
-            }
-
-            borne += YOUTUBE_MAX_RESULTS;
+        Document podcastXMLSource;
+        try {
+            podcastXMLSource = xmlChannelOf(podcast.getUrl());
+        } catch (JDOMException | IOException e) {
+            logger.error("Error during youtube signature & parsing", e);
+            return itemSet;
         }
 
+        Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
+
+        for (Element entry : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
+
+            Element mediaGroup = entry.getChild("group", MEDIA_NAMESPACE);
+            Item itemToAdd = new Item()
+                    .setTitle(entry.getChildText("title", defaultNamespace))
+                    .setPubdate(fromYoutube(entry.getChildText("published", defaultNamespace)))
+                    .setDescription(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
+                    .setUrl(youtubeVideoPage(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")));
+
+
+            Element thumbnail = mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE);
+            if (thumbnail != null) {
+                Cover cover = new Cover(thumbnail.getAttributeValue("url"), Integer.valueOf(thumbnail.getAttributeValue("width")), Integer.valueOf(thumbnail.getAttributeValue("height")));
+                itemToAdd.setCover(cover);
+            }
+
+            itemSet.add(itemToAdd);
+        }
+        return itemSet;
+    }
+
+    private String youtubeVideoPage(String embeddedVideoPage) {
+        String idVideo = StringUtils.substringBefore(StringUtils.substringAfterLast(embeddedVideoPage, "/"), "?");
+        return String.format(URL_PAGE_BASE, idVideo);
     }
 
     @Override
     public String generateSignature(Podcast podcast) {
-        // Si l'image de présentation a changé :
-        Document podcastXMLSource;
+
+        Document podcastXMLSource = null;
         try {
-            podcastXMLSource = jdomService.jdom2Parse(this.gdataUrlFromYoutubeURL(podcast.getUrl(), null));
-        } catch (IOException | JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            podcastXMLSource = xmlChannelOf(podcast.getUrl());
+        } catch (JDOMException | IOException e) {
+            logger.error("Error during youtube signature & parsing", e);
             return "";
         }
 
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
-        if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(1) != null) {
-            return signatureService.generateMD5Signature(podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(1).getChildText("published", defaultNamespace));
+        if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0) != null) {
+            return signatureService.generateMD5Signature(podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));
         }
         return "";
     }
+    private Document xmlChannelOf(String url) throws JDOMException, IOException {
+        String channelId = getChannelId(url);
+        return jdomService.jdom2Parse(String.format(FEED_RSS_BASE, channelId));
+    }
 
+    private String getChannelId(String url) {
+        org.jsoup.nodes.Document page;
 
-    //** Helper Youtube **//
-    private String gdataUrlFromYoutubeURL(String youtubeUrl, Integer startIndex) { //
-        String queryParam = getUrlParameters(startIndex);
-
-        if (isStandardYoutubeUrl(youtubeUrl)) { //www.youtube.com/[channel|user]*/nom
-            return GDATA_USER_FEED + youtubeUrl.substring(youtubeUrl.lastIndexOf("/") + 1) + "/uploads" + queryParam; //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
+        try {
+            page = Jsoup.connect(url)
+                    .timeout(5000)
+                    .userAgent(USER_AGENT)
+                    .referrer("http://www.google.fr")
+                    .execute().parse();
+        } catch (IOException e) {
+            logger.error("IOException :", e);
+            return "";
         }
 
-        if (isGdataYoutubeUrl(youtubeUrl)) {
-            return "https://" + StringUtils.substringAfter(youtubeUrl + queryParam, "://");
+        org.jsoup.nodes.Element elementWithExternalId = page.select("[data-channel-external-id]").first();
+        if (elementWithExternalId != null) {
+            return elementWithExternalId.attr("data-channel-external-id");
         }
 
-        return null;
-
+        return "";
     }
-
-    private String getUrlParameters(Integer startIndex) {
-        return "?max-results=".concat(String.valueOf(YOUTUBE_MAX_RESULTS))
-                .concat((startIndex != null)
-                        ? "&start-index=" + startIndex.toString()
-                        : "");
-    }
-
-    private boolean isGdataYoutubeUrl(String youtubeUrl) {
-        return youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*");
-    }
-
-    private boolean isStandardYoutubeUrl(String youtubeUrl) {
-        return (youtubeUrl.matches(".*.youtube.com/channel/.*") || youtubeUrl.matches(".*.youtube.com/user/.*") || youtubeUrl.matches(".*.youtube.com/.*")) && !youtubeUrl.contains("gdata");
-    }
-
-
 }
