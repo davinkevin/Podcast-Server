@@ -1,6 +1,10 @@
 class PodcastsListCtrl {
     constructor(podcasts) {
         this.podcasts = podcasts;
+        this.filters = {
+            title : '',
+            type : ''
+        };
     }
 }
 
