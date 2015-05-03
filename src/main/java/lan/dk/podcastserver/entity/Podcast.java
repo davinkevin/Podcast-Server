@@ -49,7 +49,7 @@ public class Podcast implements Serializable {
 
     @Basic
     @Column(name = "type")
-    @JsonView(PodcastDetailsView.class)
+    @JsonView(PodcastListingView.class)
     public String getType() {
         return type;
     }
