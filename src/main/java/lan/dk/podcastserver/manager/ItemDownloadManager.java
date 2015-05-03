@@ -90,11 +90,11 @@ public class ItemDownloadManager {
 
         if (!isRunning.get()) {
             isRunning.set(true);
-            Item currentItem = null;
+            Item currentItem;
 
             while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
                 currentItem = this.getWaitingQueue().poll();
-                if ( !Status.STARTED.is(currentItem.getStatus()) && !Status.FINISH.is(currentItem.getStatus()) ) {
+                if (!isStartedOrFinished(currentItem)) {
                      getDownloaderByTypeAndRun(currentItem);
                 }
             }
@@ -103,9 +103,14 @@ public class ItemDownloadManager {
         this.convertAndSendWaitingQueue();
     }
 
+    private boolean isStartedOrFinished(Item currentItem) {
+        return Status.STARTED.is(currentItem.getStatus()) || Status.FINISH.is(currentItem.getStatus());
+    }
+
     private void initDownload() {
         StreamSupport.stream(itemBusiness.findAllToDownload().spliterator(), false)
                 .filter(item -> !waitingQueue.contains(item))
+                .filter(item -> !downloadingQueue.containsKey(item))
                 .forEach(waitingQueue::add);
     }
 
