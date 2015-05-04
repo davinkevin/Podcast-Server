@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.scheduled;
 
-import lan.dk.podcastserver.business.UpdatePodcastBusiness;
+import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

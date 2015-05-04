@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.task;
 
-import lan.dk.podcastserver.business.UpdatePodcastBusiness;
+import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

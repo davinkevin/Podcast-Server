@@ -1,5 +1,7 @@
-package lan.dk.podcastserver.business;
+package lan.dk.podcastserver.business.update;
 
+import lan.dk.podcastserver.business.ItemBusiness;
+import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -33,8 +35,10 @@ public class UpdatePodcastBusiness  {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Resource PodcastBusiness podcastBusiness;
-    @Resource ItemBusiness itemBusiness;
+    @Resource
+    PodcastBusiness podcastBusiness;
+    @Resource
+    ItemBusiness itemBusiness;
 
     @Resource @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
     @Resource @Qualifier("ManualUpdater") AsyncTaskExecutor executor;

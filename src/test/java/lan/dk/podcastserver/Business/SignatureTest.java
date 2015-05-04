@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.Business;
 
-import lan.dk.podcastserver.business.UpdatePodcastBusiness;
+import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.context.Mock.MockRepository;
 import lan.dk.podcastserver.entity.Podcast;
