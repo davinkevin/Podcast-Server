@@ -207,7 +207,7 @@ public class ItemBusiness {
             fileToSave.delete();
         }
         //noinspection ResultOfMethodCallIgnored
-        fileToSave.mkdirs();
+        fileToSave.getParentFile().mkdirs();
 
         uploadedFile.transferTo(fileToSave);
 
