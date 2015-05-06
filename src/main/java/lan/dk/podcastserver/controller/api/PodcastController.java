@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import lan.dk.podcastserver.business.FindPodcastBusiness;
+import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;

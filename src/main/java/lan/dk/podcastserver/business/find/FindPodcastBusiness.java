@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.business;
+package lan.dk.podcastserver.business.find;
 
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
