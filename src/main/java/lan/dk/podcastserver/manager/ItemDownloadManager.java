@@ -56,9 +56,6 @@ public class ItemDownloadManager {
             manageDownload();
     }
 
-    public ItemDownloadManager() {
-    }
-
     public Queue<Item> getWaitingQueue() {
         return waitingQueue;
     }
@@ -67,19 +64,9 @@ public class ItemDownloadManager {
         return downloadingQueue;
     }
 
-    public ItemDownloadManager(Queue<Item> waitingQueue) {
-        this.waitingQueue = waitingQueue;
-    }
-
     public int getNumberOfCurrentDownload() {
         return numberOfCurrentDownload.get();
     }
-
-/*
-    public void setNumberOfCurrentDownload(int numberOfCurrentDownload) {
-        this.numberOfCurrentDownload.set(numberOfCurrentDownload);
-    }
-*/
 
     public String getRootfolder() {
         return podcastServerParameters.getRootfolder();
