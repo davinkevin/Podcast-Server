@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.google.common.base.Charsets;
 import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -202,7 +203,8 @@ public class ItemBusiness {
 
         Item item = new Item();
         //String name = name;
-        File fileToSave = new File(podcastServerParameters.getRootfolder() + File.separator + podcast.getTitle() + File.separator + uploadedFile.getOriginalFilename());
+        String originalFilename = getNameInUTF8(uploadedFile.getOriginalFilename());
+        File fileToSave = new File(podcastServerParameters.getRootfolder() + File.separator + podcast.getTitle() + File.separator + originalFilename);
         if (fileToSave.exists()) {
             fileToSave.delete();
         }
@@ -211,13 +213,15 @@ public class ItemBusiness {
 
         uploadedFile.transferTo(fileToSave);
 
-        item.setTitle(FilenameUtils.removeExtension(uploadedFile.getOriginalFilename().split(" - ")[2]))
-                .setPubdate(podcastBusiness.fromFolder(uploadedFile.getOriginalFilename().split(" - ")[1]))
-                .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(uploadedFile.getOriginalFilename()).build().toUriString())
+
+
+        item.setTitle(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
+                .setPubdate(podcastBusiness.fromFolder(originalFilename.split(" - ")[1]))
+                .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(originalFilename).build().toUriString())
                 .setLength(uploadedFile.getSize())
-                .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(uploadedFile.getOriginalFilename())))
+                .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(originalFilename)))
                 .setDescription(podcast.getDescription())
-                .setFileName(uploadedFile.getOriginalFilename())
+                .setFileName(originalFilename)
                 .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
                 .setPodcast(podcast)
                 .setStatus(Status.FINISH);
@@ -229,6 +233,10 @@ public class ItemBusiness {
         podcastBusiness.save(podcast);
 
         return item;
+    }
+
+    private String getNameInUTF8(String originalFilename) {
+        return new String(FilenameUtils.removeExtension(originalFilename).getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
     }
 
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {
