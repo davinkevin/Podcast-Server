@@ -2,18 +2,18 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
 
-public interface Downloader {
+public interface Downloader extends Runnable{
 
-    public Item download();
+    Item download();
 
-    public Downloader setItem(Item item);
-    public Item getItem();
-    public String getItemUrl();
+    Downloader setItem(Item item);
+    Item getItem();
+    String getItemUrl();
 
-    public void startDownload();
-    public void pauseDownload();
-    public void stopDownload();
-    public void finishDownload();
-    public void resetDownload();
+    void startDownload();
+    void pauseDownload();
+    void stopDownload();
+    void finishDownload();
+    void resetDownload();
 
 }

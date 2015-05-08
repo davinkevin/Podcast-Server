@@ -97,7 +97,6 @@ public class ItemDownloadManager {
     private void initDownload() {
         StreamSupport.stream(itemBusiness.findAllToDownload().spliterator(), false)
                 .filter(item -> !waitingQueue.contains(item))
-                .filter(item -> !downloadingQueue.containsKey(item))
                 .forEach(waitingQueue::add);
     }
 
@@ -205,7 +204,7 @@ public class ItemDownloadManager {
 
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
-                new Thread((Runnable) worker).start();
+                new Thread(worker).start();
             }
         }
     }
@@ -216,7 +215,7 @@ public class ItemDownloadManager {
             Downloader worker = workerService.getDownloaderByType(item);
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
-                new Thread((Runnable) worker).start();
+                new Thread(worker).start();
             }
         }
     }
