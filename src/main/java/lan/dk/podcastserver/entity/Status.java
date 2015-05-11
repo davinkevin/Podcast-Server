@@ -15,7 +15,7 @@ public enum Status {
 
     private final String name;
 
-    private Status(String s) {
+    Status(String s) {
         name = s;
     }
 
