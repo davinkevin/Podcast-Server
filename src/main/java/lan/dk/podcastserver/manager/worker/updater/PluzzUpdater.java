@@ -84,7 +84,7 @@ public class PluzzUpdater extends AbstractUpdater {
 
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         Document page;
         String listingUrl = podcast.getUrl();
         try {
@@ -166,9 +166,14 @@ public class PluzzUpdater extends AbstractUpdater {
 
     private String getPluzzId(String url) {
         Matcher m = ID_PLUZZ_PATTERN.matcher(url);
-            if (m.find()) {
-                return m.group(1);
-            }
-            return "";
+        if (m.find()) {
+            return m.group(1);
         }
+        return "";
+    }
+
+    @Override
+    public Type type() {
+        return new Type("pluzz", "Pluzz");
+    }
 }

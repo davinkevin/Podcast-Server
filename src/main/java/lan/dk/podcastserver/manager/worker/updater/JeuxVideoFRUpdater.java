@@ -101,7 +101,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         Document page = null;
 
         try {
@@ -146,5 +146,10 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         }
         
         return ImageUtils.getCoverFromURL(tinyUrl);
+    }
+
+    @Override
+    public Type type() {
+        return new Type("jeuxvideofr", "JeuxVideo.fr");
     }
 }

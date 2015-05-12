@@ -72,7 +72,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
 
         Document podcastXMLSource = null;
         try {
@@ -114,5 +114,10 @@ public class YoutubeUpdater extends AbstractUpdater {
         }
 
         return "";
+    }
+
+    @Override
+    public Type type() {
+        return new Type("youtube", "Youtube");
     }
 }

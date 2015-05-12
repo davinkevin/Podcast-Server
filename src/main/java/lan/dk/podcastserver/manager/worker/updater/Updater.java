@@ -16,9 +16,11 @@ public interface Updater {
 
     Set<Item> getItems(Podcast podcast);
 
-    String generateSignature(Podcast podcast);
+    String signatureOf(Podcast podcast);
 
     default Predicate<Item> notIn(Podcast podcast) {
         return item -> !podcast.contains(item);
     }
+
+    AbstractUpdater.Type type();
 }

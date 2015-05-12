@@ -26,9 +26,9 @@ public class BeInSportWorker {
         Podcast lexpresso = new Podcast("L'expresso", "http://www.beinsports.fr/replay/category/3361/name/lexpresso",
                 "", "BeInSport", new Timestamp(System.currentTimeMillis()), null, new Cover("http://www.beinsports.fr/di/library/bein/52/dd/lexpresso_xyp5eq14bu9m1o275gi8i1xlb.jpg?t=1074981292", 250, 166), null, true);
 
-        String signature = beInSportUpdater.generateSignature(lexpresso);
+        String signature = beInSportUpdater.signatureOf(lexpresso);
         logger.info("Signature 1 : {}", signature);
-        String signature2 = beInSportUpdater.generateSignature(lexpresso);
+        String signature2 = beInSportUpdater.signatureOf(lexpresso);
         logger.info("Signature 2 : {}", signature2);
 
         Assert.assertEquals(signature, signature2);

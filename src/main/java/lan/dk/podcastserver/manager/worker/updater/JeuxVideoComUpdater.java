@@ -70,7 +70,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         try {
             Document page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
             return signatureService.generateMD5Signature(page.select("article").html());
@@ -79,5 +79,10 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
         }
 
         return "";
+    }
+
+    @Override
+    public Type type() {
+        return new Type("jeuxvideocom", "JeuxVideo.com");
     }
 }

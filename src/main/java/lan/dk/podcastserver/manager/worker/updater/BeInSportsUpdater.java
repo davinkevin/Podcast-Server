@@ -140,7 +140,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         String listingUrl = getListingUrl(podcast);
 
         if (!listingUrl.equals("")) {
@@ -170,5 +170,10 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     public Predicate<Item> notIn(Podcast podcast) {
         return item -> !podcastContains(podcast, item);
+    }
+
+    @Override
+    public Type type() {
+        return new Type("beInSport", "Be In Sports");
     }
 }

@@ -47,9 +47,9 @@ public class JeuxVideoFrWorkerTest {
     @Test
     public void signatureDefisJVFR() {
 
-        String signature = jeuxVideoFRUpdater.generateSignature(defisJVFR);
+        String signature = jeuxVideoFRUpdater.signatureOf(defisJVFR);
         logger.info("Signature 1 : {}", signature);
-        String signature2 = jeuxVideoFRUpdater.generateSignature(defisJVFR);
+        String signature2 = jeuxVideoFRUpdater.signatureOf(defisJVFR);
         logger.info("Signature 2 : {}", signature2);
 
         assertThat(signature).isEqualTo(signature2);

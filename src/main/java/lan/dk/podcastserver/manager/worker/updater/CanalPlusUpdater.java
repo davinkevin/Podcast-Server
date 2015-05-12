@@ -71,7 +71,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         Document page = null;
 
         try {
@@ -261,5 +261,10 @@ public class CanalPlusUpdater extends AbstractUpdater {
     public ZonedDateTime fromCanalPlus(String date, String heure) {
         LocalDateTime localDateTime = LocalDateTime.parse(date.concat("-").concat(heure), DateTimeFormatter.ofPattern(CANALPLUS_PATTERN));
         return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
+    }
+
+    @Override
+    public Type type() {
+        return new Type("canalplus", "Canal+");
     }
 }

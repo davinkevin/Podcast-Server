@@ -53,11 +53,11 @@ public class PluzzUpdaterTest {
     @Test
     public void signaturePluzz() {
 
-        String signatureSecretDhistoire = pluzzUpdater.generateSignature(SECRET_DHISTOIRE);
-        String signatureIronMan = pluzzUpdater.generateSignature(COMMENT_CA_VA_BIEN);
+        String signatureSecretDhistoire = pluzzUpdater.signatureOf(SECRET_DHISTOIRE);
+        String signatureIronMan = pluzzUpdater.signatureOf(COMMENT_CA_VA_BIEN);
 
-        String signatureSecretDhistoire2 = pluzzUpdater.generateSignature(SECRET_DHISTOIRE);
-        String signatureIronMan2 = pluzzUpdater.generateSignature(COMMENT_CA_VA_BIEN);
+        String signatureSecretDhistoire2 = pluzzUpdater.signatureOf(SECRET_DHISTOIRE);
+        String signatureIronMan2 = pluzzUpdater.signatureOf(COMMENT_CA_VA_BIEN);
 
         assertThat(signatureIronMan).isNotEmpty().isNotNull().isEqualTo(signatureIronMan2);
         assertThat(signatureSecretDhistoire).isNotEmpty().isNotNull().isEqualTo(signatureSecretDhistoire2);

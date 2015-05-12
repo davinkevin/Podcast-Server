@@ -71,13 +71,13 @@ public class SignatureTest {
 
             updater = workerService.updaterOf(podcast);
 
-            String signature = updater.generateSignature(podcast);
+            String signature = updater.signatureOf(podcast);
             if ( signature != null) {
                 podcast.setSignature(signature);
             }
             logger.info("s1 : {}", podcast.getSignature());
 
-            signature = updater.generateSignature(podcast);
+            signature = updater.signatureOf(podcast);
             logger.info("s2 : {}", signature);
 
             Assert.isTrue(signature != null && signature.equals(podcast.getSignature()));

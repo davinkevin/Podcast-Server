@@ -40,8 +40,8 @@ public class ParleysUpdaterTest {
 
     @Test
     public void signatureFeedParleys() {
-        String signature =  parleysUpdater.generateSignature(DEVOXX_2014);
-        String signature2 = parleysUpdater.generateSignature(DEVOXX_2014);
+        String signature =  parleysUpdater.signatureOf(DEVOXX_2014);
+        String signature2 = parleysUpdater.signatureOf(DEVOXX_2014);
 
         assertThat(signature).isEqualTo(signature2);
     }

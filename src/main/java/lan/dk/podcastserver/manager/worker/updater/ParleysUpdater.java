@@ -65,7 +65,7 @@ public class ParleysUpdater extends AbstractUpdater {
 
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         try {
             JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
             podcastRepresentation.remove("completedIn");
@@ -140,5 +140,10 @@ public class ParleysUpdater extends AbstractUpdater {
 
     private ZonedDateTime fromParleys(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ofPattern(PARLEYS_PATTERN, Locale.ENGLISH)); // Format : Thu Jun 26 06:34:41 UTC 2014
+    }
+
+    @Override
+    public Type type() {
+        return new Type("parleys", "Parleys");
     }
 }

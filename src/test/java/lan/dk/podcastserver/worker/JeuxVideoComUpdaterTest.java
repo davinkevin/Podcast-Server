@@ -33,8 +33,8 @@ public class JeuxVideoComUpdaterTest {
 
     @Test
     public void should_find_the_same_signature () {
-        String signature = jeuxVideoComUpdater.generateSignature(SPEED_GAME);
-        String signature2 = jeuxVideoComUpdater.generateSignature(SPEED_GAME);
+        String signature = jeuxVideoComUpdater.signatureOf(SPEED_GAME);
+        String signature2 = jeuxVideoComUpdater.signatureOf(SPEED_GAME);
 
         assertThat(signature).isEqualTo(signature2);
     }

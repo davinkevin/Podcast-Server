@@ -6,6 +6,7 @@ import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
+import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -15,6 +16,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 
 @Component("WorkerService")
@@ -24,6 +29,14 @@ public class WorkerService implements ApplicationContextAware {
     
     @Resource UpdaterSelector updaterSelector;
     @Resource DownloaderSelector downloaderSelector;
+    @Resource List<Updater> updaters;
+
+    public Set<AbstractUpdater.Type> types() {
+        return updaters
+                .stream()
+                .map(Updater::type)
+                .collect(toSet());
+    }
 
     public Updater updaterOf(Podcast podcast) {
         return (Updater) context.getBean(updaterSelector.of(podcast.getUrl()).getSimpleName());

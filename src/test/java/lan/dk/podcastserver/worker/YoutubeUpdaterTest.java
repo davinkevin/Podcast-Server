@@ -50,8 +50,8 @@ public class YoutubeUpdaterTest {
         nowTechTvFr.setUrl("https://www.youtube.com/user/NowTechTVfr");
 
         /* When */
-        String signature = youtubeUpdater.generateSignature(nowTechTvFr);
-        String signatureBis = youtubeUpdater.generateSignature(nowTechTvFr);
+        String signature = youtubeUpdater.signatureOf(nowTechTvFr);
+        String signatureBis = youtubeUpdater.signatureOf(nowTechTvFr);
 
         /* Then */
         assertThat(signature).isNotNull().isNotEmpty().isEqualTo(signatureBis);

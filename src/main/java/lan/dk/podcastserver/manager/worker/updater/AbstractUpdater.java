@@ -28,7 +28,7 @@ public abstract class AbstractUpdater implements Updater {
     public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
         try {
             logger.info("Ajout du podcast \"{}\" à l'executor", podcast.getTitle());
-            String signature = generateSignature(podcast);
+            String signature = signatureOf(podcast);
             if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
                 podcast.setSignature(signature);
                 return UpdateTuple.of(podcast, getItems(podcast), notIn(podcast));
@@ -42,5 +42,24 @@ public abstract class AbstractUpdater implements Updater {
 
         return NO_MODIFICATION_TUPLE;
     }
-    
+
+    public static class Type {
+
+        public final String key;
+        public final String name;
+
+        public Type(String key, String name) {
+            this.key = key;
+            this.name = name;
+        }
+
+        public String key() {
+            return key;
+        }
+
+        public String name() {
+            return name;
+        }
+    }
+
 }

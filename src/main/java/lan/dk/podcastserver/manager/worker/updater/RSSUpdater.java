@@ -99,9 +99,12 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
     @Override
-    public String generateSignature(Podcast podcast) {
+    public String signatureOf(Podcast podcast) {
         return signatureService.generateSignatureFromURL(podcast.getUrl());
     }
 
-
+    @Override
+    public Type type() {
+        return new Type("rss", "RSS");
+    }
 }
