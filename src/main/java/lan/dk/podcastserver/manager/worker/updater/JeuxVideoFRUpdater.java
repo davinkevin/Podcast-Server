@@ -150,6 +150,6 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("jeuxvideofr", "JeuxVideo.fr");
+        return new Type("JeuxVideoFR", "JeuxVideo.fr");
     }
 }

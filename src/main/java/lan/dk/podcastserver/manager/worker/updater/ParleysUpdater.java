@@ -144,6 +144,6 @@ public class ParleysUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("parleys", "Parleys");
+        return new Type("Parleys", "Parleys");
     }
 }

@@ -265,6 +265,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("canalplus", "Canal+");
+        return new Type("CanalPlus", "Canal+");
     }
 }

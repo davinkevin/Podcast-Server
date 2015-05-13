@@ -174,6 +174,6 @@ public class PluzzUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("pluzz", "Pluzz");
+        return new Type("Pluzz", "Pluzz");
     }
 }

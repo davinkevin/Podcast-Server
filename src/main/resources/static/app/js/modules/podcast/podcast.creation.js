@@ -1,10 +1,11 @@
 class PodcastCreationController {
 
-    constructor($location, defaultPodcast, tagService, podcastService) {
+    constructor($location, defaultPodcast, tagService, podcastService, types) {
         this.podcastService = podcastService;
         this.$location = $location;
         this.tagService = tagService;
         this.podcast = angular.extend(this.podcastService.getNewPodcast(), defaultPodcast );
+        this.types = types;
     }
 
     findInfo() {
@@ -61,7 +62,10 @@ angular.module('ps.podcast.creation', [
                 templateUrl: 'html/podcast-creation.html',
                 controller: 'PodcastAddCtrl',
                 controllerAs: 'pac',
-                hotkeys: commonKey
+                hotkeys: commonKey,
+                resolve : {
+                    types : typeService => typeService.findAll()
+                }
             });
     })
     .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })

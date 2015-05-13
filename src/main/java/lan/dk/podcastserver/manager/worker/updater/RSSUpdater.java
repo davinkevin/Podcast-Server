@@ -105,6 +105,6 @@ public class RSSUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("rss", "RSS");
+        return new Type("RSS", "RSS");
     }
 }

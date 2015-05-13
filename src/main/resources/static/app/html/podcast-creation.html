@@ -33,15 +33,7 @@
 
             <div class="col-sm-10">
                 <select class="form-control" ng-model="pac.podcast.type">
-                    <option value="BeInSports">Be In Sports</option>
-                    <option value="CanalPlus">Canal+</option>
-                    <option value="JeuxVideoCom">Jeux Video Com</option>
-                    <option value="JeuxVideoFR">Jeux Video Fr</option>
-                    <option value="Parleys">Parleys</option>
-                    <option value="Pluzz">Pluzz</option>
-                    <option value="RSS">RSS</option>
-                    <option value="send">Send</option>
-                    <option value="Youtube">Youtube</option>
+                    <option ng-repeat="type in pac.types | orderBy: 'name'" value="{{type.key}}">{{ type.name }}</option>
                 </select>
             </div>
         </div>

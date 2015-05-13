@@ -118,6 +118,6 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("youtube", "Youtube");
+        return new Type("Youtube", "Youtube");
     }
 }

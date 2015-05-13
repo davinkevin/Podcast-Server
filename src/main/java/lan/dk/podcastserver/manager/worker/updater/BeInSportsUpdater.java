@@ -174,6 +174,6 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("beInSport", "Be In Sports");
+        return new Type("BeInSports", "Be In Sports");
     }
 }

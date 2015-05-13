@@ -83,6 +83,6 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("jeuxvideocom", "JeuxVideo.com");
+        return new Type("JeuxVideoCom", "JeuxVideo.com");
     }
 }
