@@ -72,7 +72,7 @@ gulp.task('less', function () {
         .pipe(concat(appCssFileName))
         .pipe(gulp.dest(cssDestionation))
         .pipe(minifyCSS({keepBreaks: true}))
-        .pipe(rename(rename({suffix : '.min'})))
+        .pipe(rename({suffix : '.min'}))
         .pipe(gulp.dest(cssDestionation))
         .pipe(connect.reload());
 });
