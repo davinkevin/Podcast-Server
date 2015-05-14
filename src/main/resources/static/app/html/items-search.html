@@ -6,18 +6,17 @@
         <div class="form-group col-sm-3 col-md-3 col-lg-3">
             <div class="input-group">
                 <input type="text" class="form-control" ng-model="isc.searchParameters.term" placeholder="Recherche globale" ng-change="isc.resetSearch()" ng-model-options="{ debounce: 500 }">
-                <span class="input-group-addon" ng-click="isc.searchParameters.term = ''; isc.resetSearch()"><i class="glyphicon glyphicon-remove"></i></span>
+                <span class="input-group-addon" ng-click="isc.searchParameters.term = ''; isc.resetSearch()"><i class="ionicons ion-android-cancel"></i></span>
             </div>
         </div>
 
         <div class="form-group col-sm-3 col-md-5 col-lg-5">
-            <!--<div class="input-group">-->
+            <div class="input-group input-group-tags-input">
                 <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="isc.searchParameters.tags" display-property="name" class="bootstrap" on-tag-added="isc.resetSearch()" on-tag-removed="isc.resetSearch()">
                     <auto-complete source="isc.loadTags($query)" min-length="2"></auto-complete>
                 </tags-input>
-
-                <!--<span class="input-group-addon" id="basic-addon2"><i class="glyphicon glyphicon-remove"></i></span>-->
-            <!--</div>-->
+                <span class="input-group-addon" ng-click="isc.searchParameters.tags = []; isc.resetSearch()"><i class="ionicons ion-android-cancel"></i></span>
+            </div>
         </div>
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">

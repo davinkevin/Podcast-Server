@@ -8,6 +8,7 @@
 @media (min-width:992px){.thumbnail{min-height:263px}}
 @media (min-width:1200px){.thumbnail{min-height:263px}}
 .search-bar{margin-top:12px}
+.search-bar tags-input{width:100%}
 .search-bar tags-input .host{margin-top:0}
 .button-row{z-index:1000}
 .podcastlist .search-bar{margin:16px 0}
