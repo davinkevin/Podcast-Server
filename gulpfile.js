@@ -7,7 +7,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
-    ngHtml2Js = require("gulp-ng-html2js"),
+    templateCache = require('gulp-angular-templatecache'),
     inject = require("gulp-inject"),
     bowerFiles = require('main-bower-files'),
     debug = require('gulp-debug'),
@@ -19,18 +19,25 @@ var gulp = require('gulp'),
     wrap = require("gulp-wrap-js"),
     connect = require('gulp-connect'),
     proxy = require('proxy-middleware'),
-    urlparser = require('url');
+    urlparser = require('url'),
+    cachebust = require('gulp-cache-bust');
 
-var fileAppLocation = 'src/main/resources/static/app/';
+const   staticLocation = 'src/main/resources/static/',
+        appLocation = staticLocation + 'app/',
+        bowerComponeentsFiles = 'bower_components/**/*';
 
-// Location Files :
-var angularAppLocation =  fileAppLocation.concat('js/modules/**/*.js'),
-    lessLocation = fileAppLocation.concat('less/*.less'),
-    htmlLocation = fileAppLocation.concat('html/*.html'),
-    indexLocation = 'src/main/resources/static/index.html';
+const   angularAppLocation =  appLocation + 'js/modules/**/*.js',
+        lessLocation = appLocation + 'less/*.less',
+        htmlLocation = appLocation + 'html/*.html',
+        indexLocation = staticLocation + 'index.html';
 
-var cssDestionation = fileAppLocation.concat('css'),
-    jsDestination = fileAppLocation.concat('js');
+const   cssDestionation = appLocation + 'css/',
+        jsDestination = appLocation + 'js/';
+
+const   appName = 'podcastserver',
+        appJsFileName = appName + '.js',
+        appCssFileName = appName + '.css',
+        appFiles = [cssDestionation + appCssFileName, jsDestination + appJsFileName];
 
 var env = args.env  || 'prod';
 
@@ -42,56 +49,64 @@ gulp.task('lint', function() {
 });
 
 gulp.task('js', function() {
-    es.merge(
-            gulp.src(htmlLocation).pipe(plumber()).pipe(ngHtml2Js({ moduleName: "ps.partial", prefix: "html/" })).pipe(concat("partials.js")),
+    return es.merge(
+            gulp.src(htmlLocation).pipe(plumber()).pipe(templateCache('partial.js',{ standalone : true, module: "ps.partial", root: "html/" })).pipe(concat("partials.js")),
             gulp.src(angularAppLocation)
         )
-        .pipe(concat('all.js'))
+        .pipe(concat(appJsFileName))
         .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(wrap('(function() {%= body %})()'))
         .pipe(ngAnnotate())
         .pipe(gulp.dest(jsDestination))
         .pipe(uglify())
-        .pipe(rename('all.min.js'))
+        .pipe(rename({suffix : '.min'}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDestination))
         .pipe(connect.reload());
 });
 
 gulp.task('less', function () {
-    gulp.src(lessLocation)
+    return gulp.src(lessLocation)
         .pipe(less())
-        .pipe(concat('podcastserver.css'))
+        .pipe(concat(appCssFileName))
+        .pipe(gulp.dest(cssDestionation))
         .pipe(minifyCSS({keepBreaks: true}))
+        .pipe(rename(rename({suffix : '.min'})))
         .pipe(gulp.dest(cssDestionation))
         .pipe(connect.reload());
 });
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.start("js", "less", 'inject');
+    gulp.start('js', 'less', 'inject', 'webserver');
     gulp.watch([angularAppLocation, htmlLocation], ['js', 'lint']);
     gulp.watch(lessLocation, ['less']);
-    gulp.start('webserver')
+    gulp.watch(bowerComponeentsFiles , ['inject']);
 });
 
 gulp.task('inject', function() {
+
+    var min = (env === 'dev') ? '' : '.min';
+
     gulp.src(indexLocation)
         .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { addRootSlash : false, ignorePath : "/bower_components/", addPrefix : "app/js/lib"}))
-        .pipe(gulp.dest("src/main/resources/static/"));
+        .pipe(inject(gulp.src(appFiles).pipe(rename({suffix : min})), {addRootSlash : false, ignorePath : staticLocation, name: 'app'}))
+        .pipe(cachebust({ type : 'MD5'}))
+        .pipe(gulp.dest(staticLocation))
+        .pipe(connect.reload());
 
     gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})
-        .pipe(gulp.dest("src/main/resources/static/app/js/lib/"));
+        .pipe(gulp.dest(appLocation + 'js/lib/'));
 });
 
 gulp.task('webserver', function() {
 
-    function redirect(from) {
+    function redirect(route) {
         return {
             to : function(remoteUrl) {
                 var options = urlparser.parse(remoteUrl);
-                options.route = from;
+                options.route = route;
                 options.preserveHost = true;
                 return proxy(options);
             }
@@ -102,7 +117,7 @@ gulp.task('webserver', function() {
     var port = parseInt(args.port) || 8000;
 
     connect.server({
-        root: 'src/main/resources/static/',
+        root: staticLocation,
         port: port,
         livereload: true,
         fallback: indexLocation,
@@ -116,4 +131,4 @@ gulp.task('webserver', function() {
 });
 
 // Default Task
-gulp.task('default', ['less', 'js', 'inject']);
+gulp.task('default', ['lint', 'less', 'js', 'inject']);
