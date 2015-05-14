@@ -119,7 +119,7 @@
 .item-listing {
 
   .pagination {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
   .search-button {
     margin-top: 20px;
@@ -236,8 +236,8 @@
 }
 
 .navbar {
-  margin-bottom: 0px;
-  border-radius: 0px;
+  margin-bottom: 0;
+  border-radius: 0;
 }
 
 .downloadList {
@@ -306,8 +306,8 @@ podcast-items-list {
   background-position : center center;
   width: 100%;
   height: 200px;
-  padding-left: 0px !important;
-  padding-right: 0px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 .information-area {
   padding-top: 95px;
@@ -325,7 +325,7 @@ podcast-items-list {
     border-radius: 5px;
     background-color: rgba(245, 245, 245, 0.58);
     h3, p {
-      margin: 0px;
+      margin: 0;
     }
   }
 }
@@ -334,11 +334,14 @@ podcast-items-list {
   .drop-box {
     background: #F8F8F8;
     border: 5px dashed #DDD;
-    height: 100px;
-    text-align: center;
+    height: 300px;
+    display: flex;
+    justify-content : center;
+    align-items : center;
+    align-content : center;
+    /*text-align: center;*/
     .upload-text {
-      height: 100%;
-      padding-top: 5%;
+      align-self : center;
     }
     &.dropping {
       background: #C7C7C7;
