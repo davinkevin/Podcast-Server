@@ -1,6 +1,7 @@
 class PodcastsListCtrl {
-    constructor(podcasts) {
+    constructor(podcasts, types) {
         this.podcasts = podcasts;
+        this.types = types;
         this.filters = {
             title : '',
             type : ''
@@ -10,7 +11,8 @@ class PodcastsListCtrl {
 
 angular.module('ps.podcast.list', [
     'ps.config.route',
-    'ps.dataService.podcast'
+    'ps.dataService.podcast',
+    'ps.dataService.type'
 ])
     .config(($routeProvider, commonKey) => {
         $routeProvider.
@@ -20,7 +22,8 @@ angular.module('ps.podcast.list', [
                 controllerAs: 'plc',
                 hotkeys: commonKey,
                 resolve: {
-                    podcasts: (podcastService) => podcastService.findAll()
+                    podcasts: (podcastService) => podcastService.findAll(),
+                    types: typeService => typeService.findAll()
                 }
             });
     })

@@ -12,8 +12,15 @@
             <!-- glyphicon glyphicon-download -->
             <div class="input-group">
                 <div class="input-group-addon"><i class="glyphicon glyphicon-download"></i></div>
+                <!--
+                <select class="form-control" ng-model="pac.podcast.type">
+                    <option ng-repeat="type in pac.types | orderBy: 'name'" value="{{type.key}}">{{ type.name }}</option>
+                </select>
+                -->
                 <select class="form-control" ng-model="plc.filters.type">
                     <option value>All</option>
+                    <option ng-repeat="type in plc.types | orderBy: 'name'" value="{{type.key}}">{{ type.name }}</option>
+                    <!--<option value>All</option>
                     <option value="BeInSports">Be In Sports</option>
                     <option value="CanalPlus">Canal+</option>
                     <option value="JeuxVideoCom">Jeux Video Com</option>
@@ -22,7 +29,7 @@
                     <option value="Pluzz">Pluzz</option>
                     <option value="RSS">RSS</option>
                     <option value="send">Send</option>
-                    <option value="Youtube">Youtube</option>
+                    <option value="Youtube">Youtube</option>-->
                 </select>
             </div>
         </div>
