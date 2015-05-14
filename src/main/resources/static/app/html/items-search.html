@@ -4,13 +4,20 @@
 
     <div class="form-inline search-bar row" ng-show="isc.search">
         <div class="form-group col-sm-3 col-md-3 col-lg-3">
-            <input type="text" class="form-control" ng-model="isc.searchParameters.term" placeholder="Recherche globale" ng-change="isc.resetSearch()" ng-model-options="{ debounce: 500 }">
+            <div class="input-group">
+                <input type="text" class="form-control" ng-model="isc.searchParameters.term" placeholder="Recherche globale" ng-change="isc.resetSearch()" ng-model-options="{ debounce: 500 }">
+                <span class="input-group-addon" ng-click="isc.searchParameters.term = ''; isc.resetSearch()"><i class="glyphicon glyphicon-remove"></i></span>
+            </div>
         </div>
 
         <div class="form-group col-sm-3 col-md-5 col-lg-5">
-            <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="isc.searchParameters.tags" display-property="name" class="bootstrap" on-tag-added="isc.resetSearch()" on-tag-removed="isc.resetSearch()">
-                <auto-complete source="isc.loadTags($query)" min-length="2"></auto-complete>
-            </tags-input>
+            <!--<div class="input-group">-->
+                <tags-input placeholder="Search by Tags" add-from-autocomplete-only="true" ng-model="isc.searchParameters.tags" display-property="name" class="bootstrap" on-tag-added="isc.resetSearch()" on-tag-removed="isc.resetSearch()">
+                    <auto-complete source="isc.loadTags($query)" min-length="2"></auto-complete>
+                </tags-input>
+
+                <!--<span class="input-group-addon" id="basic-addon2"><i class="glyphicon glyphicon-remove"></i></span>-->
+            <!--</div>-->
         </div>
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
