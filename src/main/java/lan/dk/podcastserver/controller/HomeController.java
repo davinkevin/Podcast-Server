@@ -9,6 +9,6 @@ public class HomeController {
 
     @RequestMapping(value = {"", "items", "podcasts", "podcasts/**", "player", "podcast-creation", "download", "stats"})
     private String home() {
-        return "forward:/";
+        return "index";
     }
 }
