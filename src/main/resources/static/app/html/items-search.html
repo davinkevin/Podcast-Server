@@ -49,7 +49,7 @@
                     <img ng-class="{'img-grayscale' : (!item.isDownloaded) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />
                     <div class="overlay-button">
                         <div class="btn-group" dropdown>
-                            <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more"></i></button>
+                            <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="ionicons ion-android-more-vertical"></i></button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                 <li ng-show="item.status == 'Started' || item.status == 'Paused'">
                                     <a ng-show="item.status == 'Started'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>
