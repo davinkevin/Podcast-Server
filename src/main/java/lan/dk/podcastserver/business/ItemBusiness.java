@@ -203,7 +203,7 @@ public class ItemBusiness {
 
         Item item = new Item();
         //String name = name;
-        String originalFilename = getNameInUTF8(uploadedFile.getOriginalFilename());
+        String originalFilename = uploadedFile.getOriginalFilename();
         File fileToSave = new File(podcastServerParameters.getRootfolder() + File.separator + podcast.getTitle() + File.separator + originalFilename);
         if (fileToSave.exists()) {
             fileToSave.delete();
@@ -233,10 +233,6 @@ public class ItemBusiness {
         podcastBusiness.save(podcast);
 
         return item;
-    }
-
-    private String getNameInUTF8(String originalFilename) {
-        return new String(FilenameUtils.removeExtension(originalFilename).getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
     }
 
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {
