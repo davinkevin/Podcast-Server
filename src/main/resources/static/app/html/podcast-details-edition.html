@@ -32,16 +32,8 @@
             <div class="form-group">
                 <label for="height" class="col-sm-2 control-label" >Type</label>
                 <div class="col-sm-10" >
-                    <select class="form-control" ng-model="pec.podcast.type">
-                        <option value="BeInSports">Be In Sports</option>
-                        <option value="CanalPlus">Canal+</option>
-                        <option value="JeuxVideoCom">Jeux Video Com</option>
-                        <option value="JeuxVideoFR">Jeux Video Fr</option>
-                        <option value="Parleys">Parleys</option>
-                        <option value="Pluzz">Pluzz</option>
-                        <option value="RSS">RSS</option>
-                        <option value="send">Send</option>
-                        <option value="Youtube">Youtube</option>
+                    <select class="form-control" ng-model="pec.podcast.type" disabled>
+                        <option ng-value="pec.podcast.type">{{ pec.podcast.type }}</option>
                     </select>
                 </div>
             </div>
