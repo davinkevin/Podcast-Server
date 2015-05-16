@@ -24,6 +24,7 @@
 .downloadingItems .progress{margin-top:5px}
 .box{position:relative;border-radius:5px;background-color:#fff;box-shadow:0 0 15px 0 rgba(0,0,0,.1);border:1px solid #ddd}
 .box:hover{box-shadow:0 0 15px 0 rgba(51,122,183,.5)}
+.box .dropdown-toggle{color:#000}
 .item-listing .pagination{margin-bottom:0}
 .item-listing .search-button{margin-top:20px}
 .item-listing .itemInList{padding-top:15px;padding-bottom:15px}
@@ -31,7 +32,7 @@
 @media screen and (min-width:1200px){.item-listing .itemInList img{height:165px}}
 .item-listing .itemInList .overlay-button{opacity:1;position:absolute;top:0;right:0}
 .item-listing .itemInList .overlay-button:hover{opacity:1}
-.item-listing .itemInList .overlay-button .btn-group .btn{background-color:transparent;color:#fff}
+.item-listing .itemInList .overlay-button .btn-group .btn{background-color:transparent;color:#000}
 .item-listing .itemInList .overlay-main-button{opacity:0;position:absolute;top:14%;left:20%;font-size:1000%;width:33%;color:rgba(255,255,255,.82);height:0}
 .item-listing .itemInList .overlay-main-button:hover{opacity:1}
 @media screen and (min-width:1200px){.item-listing .itemInList .overlay-main-button{top:6%;font-size:108px}}
@@ -63,7 +64,7 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .upload-item .drop-box{background:#F8F8F8;border:5px dashed #DDD;height:300px;display:flex;justify-content:center;align-items:center;align-content:center}
 .upload-item .drop-box .upload-text{align-self:center}
 .upload-item .drop-box.dropping{background:#C7C7C7}
-.item-details * .btn-default.dropdown-toggle{border:none}
+.item-details * .btn-default.dropdown-toggle{border:none;color:#000}
 .item-details .thumbnail img{min-height:200px;object-fit:cover}
 .item-player{margin-bottom:16px}
 .item-player video{width:100%;height:auto}
@@ -88,3 +89,7 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .btn-share-video videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
 .btn-share-video videogular div.btn-video-share a,.btn-share-video videogular div.btn-video-share a:hover,.btn-share-video videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
 videogular{background-color:rgba(255,255,255,0)!important}
+@-webkit-keyframes rotate{from{-webkit-transform:rotate(0deg)}
+to{-webkit-transform:rotate(360deg)}}
+update-status .notUpdating{visibility:hidden}
+update-status i.updating{-webkit-animation-name:rotate;-webkit-animation-duration:1s;-webkit-animation-iteration-count:infinite;-webkit-animation-timing-function:linear}

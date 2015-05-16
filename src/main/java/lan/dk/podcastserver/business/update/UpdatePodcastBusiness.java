@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 
@@ -34,17 +36,18 @@ import java.util.function.Predicate;
 public class UpdatePodcastBusiness  {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String WS_TOPIC_UPDATING = "/topic/updating";
 
-    @Resource
-    PodcastBusiness podcastBusiness;
-    @Resource
-    ItemBusiness itemBusiness;
+    @Resource PodcastBusiness podcastBusiness;
+    @Resource ItemBusiness itemBusiness;
+    @Resource WorkerService workerService;
+    @Resource SimpMessagingTemplate template;
 
     @Resource @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
     @Resource @Qualifier("ManualUpdater") AsyncTaskExecutor executor;
-
     @Resource(name="Validator") Validator validator;
-    @Resource WorkerService workerService;
+
+    private AtomicBoolean isUpdating = new AtomicBoolean(false);
 
     public void updatePodcast() {
         updatePodcast(podcastBusiness.findByUrlIsNotNull(), asyncExecutor);
@@ -62,6 +65,8 @@ public class UpdatePodcastBusiness  {
 
     @Transactional(noRollbackFor=Exception.class)
     private void updatePodcast(List<Podcast> podcasts, Executor selectedExecutor) {
+        initUpdate();
+
         logger.info("Lancement de l'update");
         Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures = new HashSet<>();
 
@@ -77,6 +82,20 @@ public class UpdatePodcastBusiness  {
         handleUpdateTuple(futures);
 
         logger.info("Fin du traitement des {} podcasts", podcasts.size());
+        finishUpdate();
+    }
+
+    private void finishUpdate() {
+        communicateUpdate(Boolean.FALSE);
+    }
+
+    private void communicateUpdate(Boolean isUpdating) {
+        this.isUpdating.set(isUpdating);
+        this.template.convertAndSend(WS_TOPIC_UPDATING, this.isUpdating.get());
+    }
+
+    private void initUpdate() {
+        communicateUpdate(Boolean.TRUE);
     }
 
     private void handleUpdateTuple(Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures) {
@@ -85,6 +104,7 @@ public class UpdatePodcastBusiness  {
                 UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
                 if (updateTuple != Updater.NO_MODIFICATION_TUPLE)
                     podcastBusiness.update(attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last()));
+                communicateUpdate(Boolean.TRUE);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("Error during update", e);
@@ -135,4 +155,7 @@ public class UpdatePodcastBusiness  {
         }
     }
 
+    public Boolean isUpdating() {
+        return isUpdating.get();
+    }
 }

@@ -107,6 +107,9 @@
 .box:hover {
   box-shadow: 0 0 15px 0 rgba(51, 122, 183, 0.5);
 }
+.box .dropdown-toggle {
+  color: black;
+}
 .item-listing .pagination {
   margin-bottom: 0;
 }
@@ -151,7 +154,7 @@
 }
 .item-listing .itemInList .overlay-button .btn-group .btn {
   background-color: transparent;
-  color: #ffffff;
+  color: #000000;
 }
 .item-listing .itemInList .overlay-main-button {
   opacity: 0;
@@ -317,6 +320,7 @@ podcast-items-list .media.ng-enter {
 }
 .item-details * .btn-default.dropdown-toggle {
   border: none;
+  color: #000000;
 }
 .item-details .thumbnail img {
   min-height: 200px;
@@ -432,4 +436,22 @@ podcast-items-list .media.ng-enter {
 }
 videogular {
   background-color: rgba(255, 255, 255, 0) !important;
+}
+
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+update-status .notUpdating {
+  visibility: hidden;
+}
+update-status i.updating {
+  -webkit-animation-name: rotate;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
 }
