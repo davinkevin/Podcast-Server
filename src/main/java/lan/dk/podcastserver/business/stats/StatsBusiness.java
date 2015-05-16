@@ -3,7 +3,8 @@ package lan.dk.podcastserver.business.stats;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,20 +31,22 @@ public class StatsBusiness {
 
     ItemBusiness itemBusiness;
     PodcastBusiness podcastBusiness;
+    WorkerService workerService;
 
     @Autowired
-    public StatsBusiness(ItemBusiness itemBusiness, PodcastBusiness podcastBusiness) {
+    public StatsBusiness(ItemBusiness itemBusiness, PodcastBusiness podcastBusiness, WorkerService workerService) {
         this.itemBusiness = itemBusiness;
         this.podcastBusiness = podcastBusiness;
+        this.workerService = workerService;
     }
 
     @SuppressWarnings("unchecked")
-    public StatsPodcastType generateForType(String type, Integer numberOfMonth) {
+    public StatsPodcastType generateForType(AbstractUpdater.Type type, Integer numberOfMonth) {
 
         ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(numberOfMonth);
 
         Set<NumberOfItemByDateWrapper> values =
-                ((List<Item>)itemBusiness.findAll(isOfType(type).and(hasBeendDownloadedAfter(dateInPast))))
+                ((List<Item>)itemBusiness.findAll(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast))))
                 .stream()
                 .map(Item::getDownloadDate)
                 .filter(Objects::nonNull)
@@ -54,16 +57,15 @@ public class StatsBusiness {
                 .map(entry -> new NumberOfItemByDateWrapper(entry.getKey(), entry.getValue()))
                 .collect(toSet());
 
-        return new StatsPodcastType(type, values);
+        return new StatsPodcastType(type.name(), values);
     }
 
     public List<StatsPodcastType> allStatsByType(Integer numberOfMonth) {
-        return podcastBusiness
-                .findAll()
+        return workerService
+                .types()
                 .stream()
-                .map(Podcast::getType)
-                .distinct()
                 .map(type -> generateForType(type, numberOfMonth))
+                .filter(stats -> stats.values().size() > 0)
                 .collect(toList());
     }
 
