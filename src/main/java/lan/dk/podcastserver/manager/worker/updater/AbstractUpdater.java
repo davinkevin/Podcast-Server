@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.PodcastServerParameters;
@@ -45,18 +46,20 @@ public abstract class AbstractUpdater implements Updater {
 
     public static class Type {
 
-        public final String key;
-        public final String name;
+        private final String key;
+        private final String name;
 
         public Type(String key, String name) {
             this.key = key;
             this.name = name;
         }
 
+        @JsonProperty("key")
         public String key() {
             return key;
         }
 
+        @JsonProperty("name")
         public String name() {
             return name;
         }
