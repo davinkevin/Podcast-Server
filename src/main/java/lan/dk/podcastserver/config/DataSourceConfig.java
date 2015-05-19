@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
@@ -14,6 +15,7 @@ import java.sql.SQLException;
  * Created by kevin on 11/04/15
  */
 @Configuration
+@ComponentScan("lan.dk.podcastserver.repository")
 class DataSourceConfig {
 
     @Value("${spring.datasource.username:}")
