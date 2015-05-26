@@ -3,6 +3,8 @@
 @import "../../../../../../bower_components/bootstrap/less/variables.less";
 @import "../../../../../../bower_components/bootstrap/less/mixins.less";
 
+@import "podcasts-list.less";
+
 @media screen and (min-width: @screen-sm-min) {
   .navbar-fixed-top {
     position: relative;
@@ -52,31 +54,7 @@
   z-index: 1000;
 }
 
-.podcastlist {
 
-  .search-bar {
-    margin: 16px 0;
-
-    .form-group {
-      margin-right : 16px
-    }
-  }
-
-
-  * .thumb {
-    margin-bottom: 15px;
-  }
-  img {
-    margin: 0 auto;
-    position: relative;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 2px 6px 2px rgba(66, 66, 66, 0.75);
-    &:hover {
-      box-shadow: 0 2px 6px 2px rgba(51, 122, 183, 0.50);
-    }
-  }
-}
 
 .listItems {
   list-style: none;
