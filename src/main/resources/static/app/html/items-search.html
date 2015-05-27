@@ -1,5 +1,5 @@
 
-<div class="container item-listing" ng-swipe-right="isc.swipePage(-1)" ng-swipe-left="isc.swipePage(1)">
+<div class="container item-search-list" ng-swipe-right="isc.swipePage(-1)" ng-swipe-left="isc.swipePage(1)">
     <!--<div class="col-xs-11 col-sm-11 col-lg-11 col-md-11">-->
 
     <div class="form-inline search-bar row" ng-show="isc.search">
@@ -43,7 +43,7 @@
         <a ng-click="isc.search = !isc.search;" ng-class="{'btn-primary' : isc.search, 'btn-default' : !isc.search}" class="btn pull-right search-button"><i class="glyphicon glyphicon-search"></i></a>
     </div>
     <div class="row">
-        <div ng-repeat="item in isc.items track by item.id" class="col-lg-3  col-md-3 col-sm-4 col-xs-6 itemInList">
+        <div ng-repeat="item in isc.items track by item.id" class="col-lg-3  col-md-3 col-sm-4 col-xs-6 item-in-list">
             <div class="box">
                 <div class="">
                     <img ng-class="{'img-grayscale' : (!item.isDownloaded) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />
