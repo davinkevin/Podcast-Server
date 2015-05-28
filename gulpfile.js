@@ -28,6 +28,7 @@ const   staticLocation = 'src/main/resources/static/',
 
 const   angularAppLocation =  appLocation + 'js/modules/**/*.js',
         lessLocation = appLocation + 'less/*.less',
+        lessMainLocation = appLocation + 'less/podcastserver.less',
         htmlLocation = appLocation + 'html/*.html',
         indexLocation = staticLocation + 'index.html';
 
@@ -67,7 +68,8 @@ gulp.task('js', function() {
 });
 
 gulp.task('less', function () {
-    return gulp.src(lessLocation)
+    return gulp.src(lessMainLocation)
+        .pipe(plumber())
         .pipe(less())
         .pipe(concat(appCssFileName))
         .pipe(gulp.dest(cssDestionation))
