@@ -20,11 +20,12 @@ var gulp = require('gulp'),
     connect = require('gulp-connect'),
     proxy = require('proxy-middleware'),
     urlparser = require('url'),
-    cachebust = require('gulp-cache-bust');
+    cachebust = require('gulp-cache-bust'),
+    bower = require('gulp-bower');
 
 const   staticLocation = 'src/main/resources/static/',
         appLocation = staticLocation + 'app/',
-        bowerComponeentsFiles = 'bower_components/**/*';
+        bowerDependency = 'bower.json';
 
 const   angularAppLocation =  appLocation + 'js/modules/**/*.js',
         lessLocation = appLocation + 'less/*.less',
@@ -84,10 +85,14 @@ gulp.task('watch', function() {
     gulp.start('js', 'less', 'inject', 'webserver');
     gulp.watch([angularAppLocation, htmlLocation], ['js', 'lint']);
     gulp.watch(lessLocation, ['less']);
-    gulp.watch(bowerComponeentsFiles , ['inject']);
+    gulp.watch(bowerDependency , ['inject']);
 });
 
-gulp.task('inject', function() {
+gulp.task('bower-install', function() {
+    return bower();
+});
+
+gulp.task('inject', ['bower-install'], function() {
 
     var min = (env === 'dev') ? '' : '.min';
 

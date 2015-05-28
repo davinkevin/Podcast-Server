@@ -8,6 +8,7 @@
     "gulp": "^3.8.11",
     "gulp-angular-templatecache": "^1.6.0",
     "gulp-babel": "^5.1.0",
+    "gulp-bower": "0.0.10",
     "gulp-cache-bust": "^1.0.1",
     "gulp-concat": "^2.5.2",
     "gulp-debug": "^1.0.1",
