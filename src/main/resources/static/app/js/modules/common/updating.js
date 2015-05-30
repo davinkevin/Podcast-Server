@@ -6,6 +6,20 @@ class UpdatingDirective {
         this.controller = 'UpdatingController';
         this.controllerAs = 'uc';
     }
+
+    link(scope, element) {
+
+        let liParent = element.parent().parent()[0];
+
+        if (liParent && liParent.tagName === 'LI') {
+            let liElement = angular.element(liParent);
+            liElement.addClass('hidden');
+            scope.$watch(
+                'uc.isUpdating',
+                (newValue) => (newValue) ? liElement.removeClass('hidden') : liElement.addClass('hidden')
+            );
+        }
+    }
 }
 
 class UpdatingController {

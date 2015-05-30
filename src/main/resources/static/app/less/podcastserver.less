@@ -7,6 +7,7 @@
 @import "items-search.less";
 @import "bootstrap-adaptation.less";
 @import "updating.less";
+@import "navbar.less";
 
 @media screen and (min-width: @screen-sm-min) {
   .navbar-fixed-top {
@@ -237,17 +238,6 @@ podcast-items-list {
   .btn-share-video();
   vg-controls {
     top: calc(~'100% - 55px') !important;
-  }
-}
-
-.navbar-nav {
-  & >li {
-    float: left;
-  }
-
-  @media screen and (max-width: @screen-sm-min) {
-    margin: 7.5px -15px 0 -15px;
-    padding-right: 16px;
   }
 }
 
