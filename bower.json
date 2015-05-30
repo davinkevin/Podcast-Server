@@ -22,19 +22,20 @@
     "angular-notification": "~1.0.1",
     "ionicons": "~2.0.1",
     "ng-file-upload": "~1.6.12",
-    "videogular": "~1.1.0",
-    "videogular-poster": "~1.1.0",
-    "videogular-themes-default": "~1.1.0",
-    "videogular-buffering": "~1.1.0",
-    "videogular-overlay-play": "~1.1.0",
-    "videogular-controls": "~1.1.0",
+    "videogular": "~1.2.1",
+    "videogular-poster": "~1.2.1",
+    "videogular-themes-default": "~1.2.1",
+    "videogular-buffering": "~1.2.1",
+    "videogular-overlay-play": "~1.2.1",
+    "videogular-controls": "~1.2.1",
     "components-font-awesome": "~4.3.0",
     "highcharts-release": "~4.1.4",
     "highcharts-ng": "~0.0.8"
   },
   "resolutions": {
     "angular": "1.4.0",
-    "angular-sanitize": "1.4.0"
+    "angular-sanitize": "1.4.0",
+    "videogular": "~1.2.1"
   },
   "overrides": {
     "jquery": {
@@ -55,9 +56,9 @@
         ]
       }
     },
-    "highcharts-ng" : {
+    "highcharts-ng": {
       "main": {
-        "dev" : "dist/highcharts-ng.js",
+        "dev": "dist/highcharts-ng.js",
         "prod": "dist/highcharts-ng.min.js"
       }
     },
