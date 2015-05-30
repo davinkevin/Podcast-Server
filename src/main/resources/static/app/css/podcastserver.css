@@ -138,6 +138,15 @@ update-status i.updating {
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
 }
+.navbar-nav > li {
+  float: left;
+}
+@media screen and (max-width: 768px) {
+  .navbar-nav {
+    margin: 7.5px -15px 0 -15px;
+    padding-right: 16px;
+  }
+}
 @media screen and (min-width: 768px) {
   .navbar-fixed-top {
     position: relative;
@@ -359,15 +368,6 @@ podcast-items-list .media.ng-enter {
 }
 .item-player vg-controls {
   top: calc(100% - 55px) !important;
-}
-.navbar-nav > li {
-  float: left;
-}
-@media screen and (max-width: 768px) {
-  .navbar-nav {
-    margin: 7.5px -15px 0 -15px;
-    padding-right: 16px;
-  }
 }
 .video-player videogular div.btn-video-share {
   display: table-cell;

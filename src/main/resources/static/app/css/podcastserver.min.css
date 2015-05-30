@@ -28,6 +28,8 @@
 to{-webkit-transform:rotate(360deg)}}
 update-status .notUpdating{visibility:hidden}
 update-status i.updating{-webkit-animation-name:rotate;-webkit-animation-duration:1s;-webkit-animation-iteration-count:infinite;-webkit-animation-timing-function:linear}
+.navbar-nav>li{float:left}
+@media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
 @media screen and (min-width:768px){.navbar-fixed-top{position:relative}}
 @media screen and (max-width:768px){body{padding-top:55px}}
 .img-grayscale{-webkit-filter:grayscale(100%);-moz-filter:grayscale(100%);-o-filter:grayscale(100%);-ms-filter:grayscale(100%);filter:grayscale(100%)}
@@ -77,8 +79,6 @@ podcast-items-list .media.ng-enter{-webkit-animation:fadeInLeft .5s;animation:fa
 .item-player videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
 .item-player videogular div.btn-video-share a,.item-player videogular div.btn-video-share a:hover,.item-player videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
 .item-player vg-controls{top:calc(100% - 55px)!important}
-.navbar-nav>li{float:left}
-@media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
 .video-player videogular div.btn-video-share{display:table-cell;width:50px;vertical-align:middle;text-align:center;cursor:pointer}
 .video-player videogular div.btn-video-share a,.video-player videogular div.btn-video-share a:hover,.video-player videogular div.btn-video-share a:visited{color:#fff;text-decoration:none}
 .video-player .button-list{color:#fff;padding-bottom:8px}
