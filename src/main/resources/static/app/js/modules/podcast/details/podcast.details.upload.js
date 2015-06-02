@@ -19,9 +19,11 @@ angular.module('ps.podcast.details.upload', [
                 formData.append('file', file);
                 $scope.podcast.all('items')
                     .withHttpConfig({transformRequest: angular.identity})
-                    .customPOST(formData, 'upload', undefined, {'Content-Type': undefined}).then(function (item) {
+                    .customPOST(formData, 'upload', undefined, {'Content-Type': undefined})
+                    .then(function (item) {
                         $log.info("Upload de l'item suivant");
                         $log.info(item);
+                        $scope.$emit("podcastEdition:upload");
                     });
             });
         };

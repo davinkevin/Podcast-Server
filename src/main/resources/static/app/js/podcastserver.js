@@ -1794,6 +1794,9 @@
             this.$scope.$on('podcastEdition:save', function () {
                 return _this23.refreshItems();
             });
+            this.$scope.$on('podcastEdition:upload', function () {
+                return _this23.refreshItems();
+            });
         }
         PodcastDetailCtrl.$inject = ["$scope", "podcast", "UpdateService"];
         _createClass(PodcastDetailCtrl, [
@@ -1971,6 +1974,7 @@
                 $scope.podcast.all('items').withHttpConfig({ transformRequest: angular.identity }).customPOST(formData, 'upload', undefined, { 'Content-Type': undefined }).then(function (item) {
                     $log.info('Upload de l\'item suivant');
                     $log.info(item);
+                    $scope.$emit('podcastEdition:upload');
                 });
             });
         };

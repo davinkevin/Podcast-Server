@@ -12,6 +12,7 @@ class PodcastDetailCtrl {
             { heading : 'Stats', active : false}
         ];
         this.$scope.$on("podcastEdition:save", () => this.refreshItems());
+        this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
     }
 
     refreshItems() {
