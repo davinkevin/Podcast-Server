@@ -81,8 +81,7 @@ gulp.task('less', function () {
 });
 
 // Watch Files For Changes
-gulp.task('watch', function() {
-    gulp.start('js', 'less', 'inject', 'webserver');
+gulp.task('watch',['js', 'less', 'inject', 'webserver'], function() {
     gulp.watch([angularAppLocation, htmlLocation], ['js', 'lint']);
     gulp.watch(lessLocation, ['less']);
     gulp.watch(bowerDependency , ['inject']);
