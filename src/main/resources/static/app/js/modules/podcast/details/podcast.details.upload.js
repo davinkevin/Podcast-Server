@@ -1,30 +1,48 @@
+
+class podcastUploadDirective {
+
+    constructor() {
+        this.restrcit = 'E';
+        this.templateUrl = 'html/podcast-details-upload.html';
+        this.scope = {
+            podcast : '='
+        };
+        this.controller = 'podcastUploadCtrl';
+        this.controllerAs = 'puc';
+        this.bindToController = true;
+    }
+}
+
+class podcastUploadCtrl{
+
+    constructor($scope, itemService, $notification) {
+        this.$scope = $scope;
+        this.itemService = itemService;
+        this.$notification = $notification;
+    }
+
+    onFileSelect($files) {
+        angular.forEach($files, (file) => {
+            this.itemService.upload(this.podcast, file)
+                .then((item) => {
+                    this.$scope.$emit("podcastEdition:upload");
+                    try {
+                        this.$notification('Upload effectué', {
+                            body: item.title,
+                            icon: item.cover.url,
+                            delay: 5000
+                        });
+                    } catch (e) {}
+                });
+        });
+    }
+}
+
+
 angular.module('ps.podcast.details.upload', [
-    'angularFileUpload'
+    'angularFileUpload',
+    'ps.dataService.item',
+    'notification'
 ])
-    .directive('podcastUpload', function () {
-        return {
-            restrcit : 'E',
-            templateUrl : 'html/podcast-details-upload.html',
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastUploadCtrl'
-        };
-    })
-    .controller('podcastUploadCtrl', function ($scope, $log) {
-        $scope.onFileSelect = function($files) {
-            var formData;
-            angular.forEach($files, function (file) {
-                formData = new FormData();
-                formData.append('file', file);
-                $scope.podcast.all('items')
-                    .withHttpConfig({transformRequest: angular.identity})
-                    .customPOST(formData, 'upload', undefined, {'Content-Type': undefined})
-                    .then(function (item) {
-                        $log.info("Upload de l'item suivant");
-                        $log.info(item);
-                        $scope.$emit("podcastEdition:upload");
-                    });
-            });
-        };
-    });
+    .directive('podcastUpload', () => new podcastUploadDirective())
+    .controller('podcastUploadCtrl', podcastUploadCtrl);

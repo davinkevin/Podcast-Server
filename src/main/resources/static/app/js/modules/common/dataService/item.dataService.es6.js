@@ -5,6 +5,7 @@
 class itemService {
     constructor(Restangular) {
         this.Restangular = Restangular;
+        this.childRoute = "items";
     }
 
     search(searchParameters = { page : 0, size : 12} ) {
@@ -17,7 +18,7 @@ class itemService {
     }
 
     findById(podcastId, itemId) {
-        return this.Restangular.one("podcast", podcastId).one("items", itemId).get();
+        return this.Restangular.one("podcast", podcastId).one(this.childRoute, itemId).get();
     }
 
     getItemForPodcastWithPagination(podcast, pageParemeters) {
@@ -25,16 +26,24 @@ class itemService {
     }
 
     restangularizePodcastItem (podcast, items) {
-        return this.Restangular.restangularizeCollection(podcast, items, 'items');
+        return this.Restangular.restangularizeCollection(podcast, items, this.childRoute);
     }
 
     restangularizedItems(itemList) {
         var restangularList = [];
         
         angular.forEach(itemList, (value) => {
-            restangularList.push(this.Restangular.restangularizeElement(this.Restangular.one('podcast', value.podcastId), value, 'items'));
+            restangularList.push(this.Restangular.restangularizeElement(this.Restangular.one('podcast', value.podcastId), value, this.childRoute));
         });
         return restangularList;
+    }
+
+    upload(podcast, file) {
+        var formData = new FormData();
+        formData.append('file', file);
+        return podcast.all(this.childRoute)
+            .withHttpConfig({transformRequest: angular.identity})
+            .customPOST(formData, 'upload', undefined, {'Content-Type': undefined});
     }
 }
 
