@@ -66,6 +66,7 @@ public class StatsBusiness {
                 .stream()
                 .map(type -> generateForType(type, numberOfMonth))
                 .filter(stats -> stats.values().size() > 0)
+                .sorted((s1, s2) -> s1.type().compareTo(s2.type()))
                 .collect(toList());
     }
 
