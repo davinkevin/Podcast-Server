@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Objects;
 
 /**
  * Created by kevin on 01/02/2014.
@@ -81,6 +82,11 @@ public class URLUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (Objects.nonNull(urlToReturn)) {
+            urlToReturn = StringUtils.substringBeforeLast(urlToReturn, "?");
+        }
+
         return urlToReturn;
     }
 
