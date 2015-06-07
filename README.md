@@ -1,4 +1,4 @@
-Copyright 2013 DAVIN KEVIN
+Copyright 2015 DAVIN KEVIN
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,6 +15,5 @@ limitations under the License.
 Podcast-Server
 ==============
 
-Source code of my Web-app.
-It's a WebPodcast application
-
+Application design to be your Podcast local proxy in your lan network.
+It also work on many sources like youtube or CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
