@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.Utils;
 
 import lan.dk.podcastserver.context.UtilsConfig;
-import lan.dk.podcastserver.service.conversion.FfmpegService;
+import lan.dk.podcastserver.service.FfmpegService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

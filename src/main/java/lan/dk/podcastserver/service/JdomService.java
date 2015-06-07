@@ -1,7 +1,6 @@
-package lan.dk.podcastserver.service.xml;
+package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;

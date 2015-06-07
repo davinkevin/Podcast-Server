@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.utils.ImageUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;

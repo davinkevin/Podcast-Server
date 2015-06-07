@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.service.JdomService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;

@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.service.signature;
+package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.codec.digest.DigestUtils;

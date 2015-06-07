@@ -6,7 +6,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;

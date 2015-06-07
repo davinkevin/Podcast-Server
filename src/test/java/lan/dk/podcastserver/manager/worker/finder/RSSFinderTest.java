@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.finder;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
-import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.service.JdomService;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;

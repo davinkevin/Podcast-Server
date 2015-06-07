@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.signature.SignatureService;
+import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
-import lan.dk.podcastserver.service.xml.JdomService;
+import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.utils.ImageUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;

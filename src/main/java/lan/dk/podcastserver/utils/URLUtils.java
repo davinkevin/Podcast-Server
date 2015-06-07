@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.utils;
 
-import lan.dk.podcastserver.service.signature.SignatureService;
+import lan.dk.podcastserver.service.SignatureService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
