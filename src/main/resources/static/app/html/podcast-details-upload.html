@@ -1,9 +1,8 @@
 <br/>
 <div class="upload-item">
     <div class="drop-box"
-         ng-file-drop="puc.onFileSelect($files)"
-         ng-file-drag-over-class="dropping"
-         ng-file-drag-over-delay="100">
+         ngf-drop="puc.onFileSelect($files)"
+         ngf-drag-over-class="{accept:'dropping', reject:'dropping', delay:100}">
         <div class="upload-text">
             Déposer un ou des fichiers ici
         </div>

@@ -40,8 +40,8 @@ class podcastUploadCtrl{
 
 
 angular.module('ps.podcast.details.upload', [
-    'angularFileUpload',
     'ps.dataService.item',
+    'ngFileUpload',
     'notification'
 ])
     .directive('podcastUpload', () => new podcastUploadDirective())

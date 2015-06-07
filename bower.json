@@ -21,7 +21,7 @@
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
     "angular-notification": "~1.0.1",
     "ionicons": "~2.0.1",
-    "ng-file-upload": "~1.6.12",
+    "ng-file-upload": "~5.0.1",
     "videogular": "~1.2.1",
     "videogular-poster": "~1.2.1",
     "videogular-themes-default": "~1.2.1",
@@ -240,8 +240,8 @@
     },
     "ng-file-upload": {
       "main": {
-        "dev": "angular-file-upload.js",
-        "prod": "angular-file-upload.min.js"
+        "dev": "ng-file-upload.js",
+        "prod": "ng-file-upload.min.js"
       }
     },
     "videogular-themes-default": {
