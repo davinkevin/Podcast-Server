@@ -1,6 +1,6 @@
 Podcast-Server
 ==============
-[![Build Status](https://travis-ci.org/davinkevin/Podcast-Server.svg?branch=master)](https://travis-ci.org/davinkevin/Podcast-Server)
+[![Build Status](https://travis-ci.org/davinkevin/Podcast-Server.svg?branch=master)](https://travis-ci.org/davinkevin/Podcast-Server) [![Coverage Status](https://coveralls.io/repos/davinkevin/Podcast-Server/badge.svg?branch=master)](https://coveralls.io/r/davinkevin/Podcast-Server?branch=master)
 
 Application design to be your Podcast local proxy in your lan network.
 It also work on many sources like youtube or CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
