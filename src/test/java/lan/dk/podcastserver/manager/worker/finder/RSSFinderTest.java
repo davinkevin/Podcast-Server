@@ -28,7 +28,8 @@ public class RSSFinderTest {
     @Test
     public void should_find_information_about_an_rss_podcast_with_his_url () throws JDOMException, IOException, FindPodcastNotFoundException {
         //Given
-        when(jdomService.jdom2Parse(anyString())).then(invocationOnMock -> new SAXBuilder().build(Paths.get(RSSFinderTest.class.getResource((String) invocationOnMock.getArguments()[0]).toURI()).toFile()));
+        when(jdomService.jdom2Parse(anyString()))
+                .then(invocationOnMock -> new SAXBuilder().build(Paths.get(RSSFinderTest.class.getResource((String) invocationOnMock.getArguments()[0]).toURI()).toFile()));
         
         //When
         Podcast podcast = rssFinder.find("/remote/podcast/lesGrandesGueules.xml");
