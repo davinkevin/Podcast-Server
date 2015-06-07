@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
-import static lan.dk.podcastserver.repository.specification.ItemSpecifications.hasBeendDownloadedAfter;
-import static lan.dk.podcastserver.repository.specification.ItemSpecifications.isOfType;
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasBeendDownloadedAfter;
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.isOfType;
 
 /**
  * Created by kevin on 28/04/15 for HackerRank problem

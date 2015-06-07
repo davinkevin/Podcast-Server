@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.business;
 
-import com.google.common.base.Charsets;
 import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -9,7 +8,7 @@ import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.repository.specification.ItemSpecifications;
+import lan.dk.podcastserver.repository.predicate.ItemPredicate;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static lan.dk.podcastserver.repository.specification.ItemSpecifications.*;
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
 
 @Component
 @Transactional
@@ -85,7 +84,7 @@ public class ItemBusiness {
         }
         
         // List of all the item matching the search result :
-        List<Item> allResult = (List<Item>) itemRepository.findAll(ItemSpecifications.getSearchSpecifications(fullTextIdsWithOrder, tags));
+        List<Item> allResult = (List<Item>) itemRepository.findAll(ItemPredicate.getSearchSpecifications(fullTextIdsWithOrder, tags));
 
         //Number of result
         Long numberOfResult = (long) allResult.size();
@@ -238,6 +237,6 @@ public class ItemBusiness {
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {
         return (StringUtils.isEmpty(term))
                 ? isInTags(tags)
-                : ItemSpecifications.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
+                : ItemPredicate.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
     }
 }
