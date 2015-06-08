@@ -262,6 +262,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/entity/Q*.*</exclude>
+                        <exclude>**/controller/**/*.*</exclude>
                         <exclude>**/controller/*.*</exclude>
                     </excludes>
                 </configuration>
