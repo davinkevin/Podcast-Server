@@ -35,6 +35,31 @@
   padding-top: 15px;
   padding-bottom: 0;
 }
+.item-search-list .item-in-list .cover {
+  display: flex;
+  justify-content: center;
+  height: 215px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  max-height: 219px;
+  width: 100%;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+@media screen and (min-width: 1200px) {
+  .item-search-list .item-in-list .cover {
+    height: 165px;
+    /*background-position : top center;*/
+  }
+}
+@media screen and (max-width: 767px) {
+  .item-search-list .item-in-list .cover {
+    background-size: 120%;
+  }
+}
 .item-search-list .item-in-list img {
   height: 215px;
   border-top-left-radius: 5px;
@@ -48,37 +73,40 @@
     height: 165px;
   }
 }
-.item-search-list .item-in-list .overlay-button {
-  opacity: 1;
+.item-search-list .item-in-list .more-button {
+  z-index: 100;
   position: absolute;
-  top: 0%;
-  right: 0%;
+  top: 0;
+  right: 0;
 }
-.item-search-list .item-in-list .overlay-button:hover {
-  opacity: 1;
-}
-.item-search-list .item-in-list .overlay-button .btn-group .btn {
+.item-search-list .item-in-list .more-button .btn-group .btn {
   background-color: transparent;
   color: white;
 }
 .item-search-list .item-in-list .overlay-main-button {
+  align-self: center;
+  font-size: 740%;
   opacity: 0;
-  position: absolute;
-  top: 14%;
-  left: 20%;
-  font-size: 1000%;
-  width: 33%;
   color: rgba(255, 255, 255, 0.82);
-  height: 0;
+  /*
+      position: absolute;
+      top: 14%;
+      @media screen and (min-width: @screen-lg-min) {
+        top: 6%;
+        left : 36%;
+        font-size: 108px;
+      }
+      left: 20%;
+
+      width: 33%;
+
+      height: 0;*/
+}
+.item-search-list .item-in-list .overlay-main-button .glyphicon {
+  line-height: 1.42857143;
 }
 .item-search-list .item-in-list .overlay-main-button:hover {
   opacity: 1;
-}
-@media screen and (min-width: 1200px) {
-  .item-search-list .item-in-list .overlay-main-button {
-    top: 6%;
-    font-size: 108px;
-  }
 }
 .item-search-list .item-in-list .itemTitle {
   padding: 2px;
@@ -157,12 +185,19 @@ update-status i.updating {
     padding-top: 55px;
   }
 }
-.img-grayscale {
+.grayscale {
   -webkit-filter: grayscale(100%);
   -moz-filter: grayscale(100%);
   -o-filter: grayscale(100%);
   -ms-filter: grayscale(100%);
   filter: grayscale(100%);
+}
+.no-grayscale {
+  -webkit-filter: grayscale(0%);
+  -moz-filter: grayscale(0%);
+  -o-filter: grayscale(0%);
+  -ms-filter: grayscale(0%);
+  filter: grayscale(0%);
 }
 @media screen and (min-width: 1200px) {
   .center {
