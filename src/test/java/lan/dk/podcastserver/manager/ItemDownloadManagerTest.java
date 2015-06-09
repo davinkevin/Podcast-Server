@@ -273,6 +273,20 @@ public class ItemDownloadManagerTest {
         verify(podcastServerParameters, times(1)).concurrentDownload();
         verify(podcastServerParameters, times(1)).rootFolder();
     }
+    
+    @Test
+    public void should_check_if_can_be_reseted () {
+        /* Given */ when(podcastServerParameters.numberOfTry()).thenReturn(3);
+        /* When */
+        Boolean isResetable = itemDownloadManager.canBeReseted(new Item().setNumberOfTry(2));
+        Boolean isNotResetable = itemDownloadManager.canBeReseted(new Item().setNumberOfTry(4));
+
+        /* Then */
+        assertThat(isResetable).isTrue();
+        assertThat(isNotResetable).isFalse();
+        verify(podcastServerParameters, times(2)).numberOfTry();
+
+    }
 
     @After
     public void afterEach() {
