@@ -3,10 +3,10 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.utils.ImageUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -40,7 +40,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
     private static final Pattern THUMB_NAIL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "thumbnail_large_url"));
 
     @Resource JdomService jdomService;
-
+    @Resource HtmlService htmlService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -48,10 +48,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         String listingUrl = getListingUrl(podcast);
         try {
 
-            Connection.Response response = Jsoup.connect(listingUrl)
-                    .timeout(5000)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
+            Connection.Response response = htmlService.connectWithDefault(listingUrl)
                     .execute();
             page = response.parse();
         } catch (IOException e) {
@@ -94,18 +91,12 @@ public class BeInSportsUpdater extends AbstractUpdater {
     private Item getDetailOfItemByXML(Item item, String urlItemBeInSport) {
         String javascriptCode;
         try {
-            Connection.Response response = Jsoup.connect(String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport))
-                    .timeout(10000)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
+            Connection.Response response = htmlService.connectWithDefault(String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport))
                     .execute();
             Document articlePage = response.parse();
             String apiItemUrl = articlePage.select("iframe").attr("src");
 
-            response = Jsoup.connect(apiItemUrl)
-                    .timeout(10000)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
+            response = htmlService.connectWithDefault(apiItemUrl)
                     .execute();
             javascriptCode = getJavascriptPart(response.parse().select("script"));
         } catch (IOException | IllegalArgumentException e) {

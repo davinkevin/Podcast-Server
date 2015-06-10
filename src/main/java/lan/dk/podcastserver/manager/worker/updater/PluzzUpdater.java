@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.json.simple.JSONArray;
@@ -9,11 +10,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
@@ -38,6 +39,9 @@ public class PluzzUpdater extends AbstractUpdater {
     public static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
     public static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
 
+    @Resource
+    HtmlService htmlService;
+
     public static ZonedDateTime fromPluzz(Long dateInSecondsSinceEpoch){
         return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateInSecondsSinceEpoch), ZoneId.of("Europe/Paris"));
     }
@@ -48,9 +52,7 @@ public class PluzzUpdater extends AbstractUpdater {
         Set<Item> itemList = new HashSet<>();
         try {
 
-            Connection.Response response = Jsoup.connect(listingUrl)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
+            Connection.Response response = htmlService.connectWithDefault(listingUrl)
                     .execute();
             page = response.parse();
 
@@ -89,10 +91,7 @@ public class PluzzUpdater extends AbstractUpdater {
         String listingUrl = podcast.getUrl();
         try {
 
-            Connection.Response response = Jsoup.connect(listingUrl)
-                    .timeout(5000)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
+            Connection.Response response = htmlService.connectWithDefault(listingUrl)
                     .execute();
             page = response.parse();
 

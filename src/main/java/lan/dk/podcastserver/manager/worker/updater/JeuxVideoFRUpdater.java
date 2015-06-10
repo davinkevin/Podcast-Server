@@ -4,12 +4,12 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.utils.ImageUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
@@ -39,16 +39,15 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     public static final String IMG_DELIMITER = "006E0046";
 
     @Resource JdomService jdomService;
+    @Resource
+    HtmlService htmlService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
         Set<Item> itemSet = new HashSet<>();
 
         try {
-            Connection.Response response = Jsoup.connect(podcast.getUrl())
-                    .timeout(10000)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
+            Connection.Response response = htmlService.connectWithDefault(podcast.getUrl())
                     .execute();
             page = response.parse();
 
@@ -105,7 +104,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         Document page = null;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).timeout(10000).get();
+            page = htmlService.connectWithDefault(podcast.getUrl()).get();
             return signatureService.generateMD5Signature(page.select(".block-video-tableVideo tbody tr").html());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

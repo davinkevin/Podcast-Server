@@ -3,11 +3,11 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.utils.ImageUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -31,6 +31,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
     @Resource JdomService jdomService;
+    @Resource
+    HtmlService htmlService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -38,7 +40,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Set<Item> itemSet = new HashSet<>();
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
+            page = htmlService.connectWithDefault(podcast.getUrl()).get();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
@@ -75,7 +77,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Document page = null;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
+            page = htmlService.connectWithDefault(podcast.getUrl()).get();
         } catch (IOException e) {
             logger.error("IOException :", e);
         }
@@ -113,7 +115,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         int ztid = 0;
         Document page = null;
         try {
-            page = Jsoup.connect(canalPlusDirectShowUrl).timeout(5000).get();
+            page = htmlService.connectWithDefault(canalPlusDirectShowUrl).get();
             Pattern p = Pattern.compile(
                     "^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
             //logger.debug(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
@@ -148,7 +150,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         }
 
         try {
-            page = Jsoup.connect(canalPlusFrontToolsUrl).get();
+            page = htmlService.connectWithDefault(canalPlusFrontToolsUrl).get();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
@@ -178,7 +180,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Set<Item> itemSet = new HashSet<>();
         Document page;
         try {
-            page = Jsoup.connect(urlPodcast).get();
+            page = htmlService.connectWithDefault(urlPodcast).get();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
@@ -242,7 +244,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Document page;
         Set<Item> itemSet = new HashSet<>();
         try {
-            page = Jsoup.connect(url).timeout(5000).get();
+            page = htmlService.connectWithDefault(url).get();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);

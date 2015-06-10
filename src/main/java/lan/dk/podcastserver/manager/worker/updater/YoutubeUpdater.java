@@ -4,12 +4,12 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.HtmlService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,6 +27,8 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
 
     @Resource JdomService jdomService;
+    @Resource
+    HtmlService htmlService;
 
     public static ZonedDateTime fromYoutube(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
@@ -98,11 +100,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         org.jsoup.nodes.Document page;
 
         try {
-            page = Jsoup.connect(url)
-                    .timeout(5000)
-                    .userAgent(USER_AGENT)
-                    .referrer("http://www.google.fr")
-                    .execute().parse();
+            page = htmlService.connectWithDefault(url).get();
         } catch (IOException e) {
             logger.error("IOException :", e);
             return "";

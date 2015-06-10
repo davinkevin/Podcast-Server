@@ -2,12 +2,13 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.utils.ImageUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -25,14 +26,15 @@ import java.util.stream.Collectors;
 public class JeuxVideoComUpdater extends AbstractUpdater {
 
     public static final String JEUXVIDEOCOM_HOST = "http://www.jeuxvideo.com";
-
+    @Resource
+    HtmlService htmlService;
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
         Document page;
 
         try {
-            page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
+            page = htmlService.connectWithDefault(podcast.getUrl()).get();
         } catch (IOException e) {
             logger.error("IOException :", e);
             return new HashSet<>();
@@ -49,7 +51,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
         Document page;
 
         try {
-            page = Jsoup.connect(completeUrl).timeout(5000).get();
+            page = htmlService.connectWithDefault(completeUrl).get();
         } catch (IOException e) {
             logger.error("IOException :", e);
             return new Item();
@@ -72,7 +74,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
     @Override
     public String signatureOf(Podcast podcast) {
         try {
-            Document page = Jsoup.connect(podcast.getUrl()).timeout(5000).get();
+            Document page = htmlService.connectWithDefault(podcast.getUrl()).get();
             return signatureService.generateMD5Signature(page.select("article").html());
         } catch (IOException e) {
             logger.error("IOException :", e);
