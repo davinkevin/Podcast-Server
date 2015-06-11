@@ -15,7 +15,7 @@ public class HtmlService {
     private static final Integer TIMEOUT = 5000;
 
     public Connection connectWithDefault(String url) {
-        return Jsoup.connect(url)
+        return connect(url)
                 .timeout(TIMEOUT)
                 .userAgent(USER_AGENT)
                 .referrer(REFERRER);
