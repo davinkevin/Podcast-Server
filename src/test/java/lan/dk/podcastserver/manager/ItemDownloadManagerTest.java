@@ -19,6 +19,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +45,9 @@ public class ItemDownloadManagerTest {
     @Mock WorkerService workerService;
 
     @InjectMocks ItemDownloadManager itemDownloadManager;
+    public static final Item ITEM_1 = new Item().setId(1).setStatus("Not Downloaded").setUrl("http://now.where/" + 1).setPubdate(ZonedDateTime.now());
+    public static final Item ITEM_2 = new Item().setId(2).setStatus("Not Downloaded").setUrl("http://now.where/" + 2).setPubdate(ZonedDateTime.now()).setStatus(Status.STARTED);
+    public static final Item ITEM_3 = new Item().setId(3).setStatus("Not Downloaded").setUrl("http://now.where/" + 3).setPubdate(ZonedDateTime.now()).setStatus(Status.PAUSED);
 
     @Test
     public void should_get_limit_of_download () {
@@ -251,7 +255,7 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.addACurrentDownload();
         
         /* Then */
-        assertThat(itemDownloadManager.getNumberOfCurrentDownload()).isEqualTo(numberOfCurrentDownload+1);
+        assertThat(itemDownloadManager.getNumberOfCurrentDownload()).isEqualTo(numberOfCurrentDownload + 1);
         
     }
     
@@ -286,6 +290,204 @@ public class ItemDownloadManagerTest {
         assertThat(isNotResetable).isFalse();
         verify(podcastServerParameters, times(2)).numberOfTry();
 
+    }
+
+    @Test
+    public void should_stop_a_current_download() {
+        /* Given */
+        final Downloader notCalledDownloader = mock(Downloader.class);
+        final Downloader calledDownloader = mock(Downloader.class);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+
+        /* When */ itemDownloadManager.stopDownload(2);
+
+        /* Then */
+        verify(calledDownloader, times(1)).stopDownload();
+        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+    }
+
+    @Test
+    public void should_pause_a_current_download() {
+        /* Given */
+        final Downloader notCalledDownloader = mock(Downloader.class);
+        final Downloader calledDownloader = mock(Downloader.class);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+
+        /* When */ itemDownloadManager.pauseDownload(2);
+
+        /* Then */
+        verify(calledDownloader, times(1)).pauseDownload();
+        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+    }
+
+    @Test
+    public void should_restart_a_current_download() {
+        /* Given */
+        final Downloader notCalledDownloader = mock(Downloader.class);
+        final Downloader calledDownloader = mock(Downloader.class);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+        when(calledDownloader.getItem()).thenReturn(ITEM_2);
+
+
+        /* When */ itemDownloadManager.restartDownload(2);
+
+        /* Then */
+        verify(calledDownloader, times(1)).startDownload();
+        verify(calledDownloader, times(1)).getItem();
+        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+    }
+
+    @Test
+    public void should_toogle_on_a_STARTED_download() {
+        /* Given */
+        final Downloader notCalledDownloader = mock(Downloader.class);
+        final Downloader calledDownloader = mock(Downloader.class);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+
+        /* When */ itemDownloadManager.toogleDownload(2);
+
+        /* Then */
+        verify(calledDownloader, times(1)).pauseDownload();
+        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+    }
+
+    @Test
+    public void should_toogle_on_a_PAUSED_download() {
+        /* Given */
+        final Downloader notCalledDownloader = mock(Downloader.class);
+        final Downloader calledDownloader = mock(Downloader.class);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_2, notCalledDownloader);
+        itemDownloadManager.getDownloadingQueue().put(ITEM_3, calledDownloader);
+        when(calledDownloader.getItem()).thenReturn(ITEM_3);
+
+        /* When */ itemDownloadManager.toogleDownload(3);
+
+        /* Then */
+        verify(calledDownloader, times(1)).startDownload();
+        verify(calledDownloader, times(1)).getItem();
+        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+    }
+
+    @Test
+    public void should_remove_a_current_download() throws URISyntaxException {
+        /* Given */
+        mockPodcastParametersForPostConstruct();
+        final Downloader calledDownloader = mock(Downloader.class);
+        Item item = new Item().setId(1).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
+        /* When */
+        itemDownloadManager.postConstruct();
+        itemDownloadManager.removeACurrentDownload(item);
+        /* Then */
+        assertThat(itemDownloadManager.getDownloadingQueue()).hasSize(0);
+        verifyPodcastParametersForPostConstruct();
+        verifyConvertAndSave();
+    }
+    
+    
+    @Test
+    public void should_move_item_in_queue() {
+        /* Given */
+        itemDownloadManager.getWaitingQueue().add(ITEM_1);
+        itemDownloadManager.getWaitingQueue().add(ITEM_2);
+        itemDownloadManager.getWaitingQueue().add(ITEM_3);
+        /* When */ itemDownloadManager.moveItemInQueue(2, 2);
+        /* Then */
+        assertThat(itemDownloadManager.getWaitingQueue())
+                .containsSequence(ITEM_1, ITEM_3, ITEM_2);
+
+        verifyConvertAndSave();
+    }
+
+    @Test
+    public void should_do_nothing_on_non_present_item_movement() {
+        itemDownloadManager.getWaitingQueue().add(ITEM_1);
+        itemDownloadManager.getWaitingQueue().add(ITEM_2);
+        itemDownloadManager.getWaitingQueue().add(ITEM_3);
+        /* When */ itemDownloadManager.moveItemInQueue(12, 2);
+        /* Then */
+        assertThat(itemDownloadManager.getWaitingQueue())
+                .containsSequence(ITEM_1, ITEM_2, ITEM_3);
+    }
+
+    @Test
+    public void should_reset_current_download() throws URISyntaxException {
+        /* Given */ mockPodcastParametersForPostConstruct();
+        when(podcastServerParameters.numberOfTry()).thenReturn(3);
+        Downloader downloaderMock = mock(Downloader.class);
+        when(workerService.getDownloaderByType(any())).thenReturn(downloaderMock);
+        final Downloader calledDownloader = mock(Downloader.class);
+        Item item = new Item().setId(1).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
+
+        /* When */ itemDownloadManager.resetDownload(item);
+        /* Then */
+        assertThat(item.getNumberOfTry()).isEqualTo(1);
+        verify(podcastServerParameters, times(1)).numberOfTry();
+        verify(workerService, times(1)).getDownloaderByType(itemArgumentCaptor.capture());
+        assertThat(itemArgumentCaptor.getValue()).isSameAs(item);
+    }
+
+    @Test
+    public void should_remove_from_both_queue() {
+        /* Given */
+        final Downloader calledDownloader = mock(Downloader.class);
+        Item itemWaiting = new Item().setId(1).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        Item itemDownloading = new Item().setId(2).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        itemDownloadManager.getDownloadingQueue().put(itemDownloading, calledDownloader);
+        itemDownloadManager.getWaitingQueue().add(itemWaiting);
+        /* When */
+        itemDownloadManager.removeItemFromQueueAndDownload(itemWaiting);
+        itemDownloadManager.removeItemFromQueueAndDownload(itemDownloading);
+
+        /* Then */
+        assertThat(itemDownloadManager.getWaitingQueue()).isEmpty();
+        verify(calledDownloader, times(1)).stopDownload();
+        verify(template, times(2)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
+        assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
+        assertThat(queueArgumentCaptor.getValue()).isSameAs(itemDownloadManager.getWaitingQueue());
+    }
+    
+    @Test
+    public void should_detect_if_is_in_downloading_queue() {
+        /* Given */
+        final Downloader mockDownloader = mock(Downloader.class);
+        final Item item = new Item().setId(1).setStatus("Not Downloaded").setUrl("http://now.where/").setPubdate(ZonedDateTime.now());
+        itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
+                
+        /* When */
+        Boolean isIn = itemDownloadManager.isInDownloadingQueue(item);
+        Boolean isNotIn = itemDownloadManager.isInDownloadingQueue(new Item());
+
+        /* Then */
+        assertThat(isIn).isTrue();
+        assertThat(isNotIn).isFalse();
+    }
+
+    @Test
+    public void should_get_downloading_item_list() {
+        /* Given */
+        final Downloader mockDownloader = mock(Downloader.class);
+        Item item1 = new Item().setId(1).setStatus("Not Downloaded").setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
+        Item item2 = new Item().setId(2).setStatus("Not Downloaded").setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
+        Item item3 = new Item().setId(3).setStatus("Not Downloaded").setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
+        itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
+        itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
+
+        /* When */ Set<Item> items = itemDownloadManager.getItemInDownloadingQueue();
+
+        /* Then */
+        assertThat(items).contains(item1, item2, item3);
     }
 
     @After
