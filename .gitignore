@@ -4,12 +4,12 @@
 lib/
 *.iml
 src/main/resources/application.properties
+src/main/resources/application.yml
 node_modules/
 node/
 node_tmp/
 bower_components/
 target/
-src/generated
 .gradle/
 build/
 logs/
