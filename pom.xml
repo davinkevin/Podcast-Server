@@ -213,7 +213,8 @@
     <build>
         <finalName>Podcast-Server</finalName>
         <plugins>
-            <plugin>
+            <!-- Build : Frontend -->
+<!--            <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>0.0.23</version>
@@ -245,16 +246,24 @@
                         <phase>generate-resources</phase>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
+            <!-- Build : Spring Boot Build -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Build : Add Git Commit information -->
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+            </plugin>
+            <!-- Code Coverage : publishing to Coveralls.io -->
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>3.1.0</version>
             </plugin>
+            <!-- Code Coverage : generating coverage Report -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -275,6 +284,31 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Test : Assertion Generation -->
+            <plugin>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>generate-assertions</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <classes>
+                        <param>lan.dk.podcastserver.entity.Cover</param>
+                        <param>lan.dk.podcastserver.entity.Item</param>
+                        <param>lan.dk.podcastserver.entity.Podcast</param>
+                        <param>lan.dk.podcastserver.entity.Tag</param>
+                        <param>lan.dk.podcastserver.entity.Status</param>
+                    </classes>
+                    <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>
+                </configuration>
+            </plugin>
+            <!-- DSL : Query DSL Generation -->
             <plugin>
                 <groupId>com.mysema.maven</groupId>
                 <artifactId>apt-maven-plugin</artifactId>
@@ -286,16 +320,13 @@
                             <goal>process</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>src/generated</outputDirectory>
+                            <outputDirectory>target/generated-sources/queryDSL</outputDirectory>
                             <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-            </plugin>
+
         </plugins>
     </build>
 </project>
