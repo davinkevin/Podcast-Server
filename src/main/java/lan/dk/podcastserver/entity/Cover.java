@@ -71,26 +71,6 @@ public class Cover {
         return this;
     }
 
-   /* @JsonIgnore
-    @OneToOne(mappedBy = "cover", fetch = FetchType.LAZY)
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    @JsonIgnore
-    @OneToOne(mappedBy = "cover", fetch = FetchType.LAZY)
-    public Podcast getPodcast() {
-        return podcast;
-    }
-
-    public void setPodcast(Podcast podcast) {
-        this.podcast = podcast;
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
