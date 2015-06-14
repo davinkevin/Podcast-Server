@@ -1,5 +1,5 @@
 language: java
 install: true
-script: mvn test jacoco:report coveralls:report -X
+script: mvn test jacoco:report coveralls:report
 jdk:
   - oraclejdk8
