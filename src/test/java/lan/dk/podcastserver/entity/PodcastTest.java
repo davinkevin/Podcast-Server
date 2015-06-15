@@ -78,7 +78,7 @@ public class PodcastTest {
 
         org.assertj.core.api.Assertions.
                 assertThat(PODCAST.hashCode())
-                .isPositive();
+                .isNotNull();
     }
     
     @Test
