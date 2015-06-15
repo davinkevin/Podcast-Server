@@ -275,7 +275,6 @@ public class Item implements Serializable {
                 ", description='" + description + '\'' +
                 ", mimeType='" + mimeType + '\'' +
                 ", length=" + length +
-                ", cover=" + cover +
                 ", status='" + status + '\'' +
                 ", progression=" + progression +
                 ", downloaddate=" + downloadDate +
