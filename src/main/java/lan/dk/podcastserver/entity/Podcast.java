@@ -184,7 +184,11 @@ public class Podcast implements Serializable {
 
         Podcast that = (Podcast) o;
 
-        return Objects.equals(id, that.id) && !(lastUpdate != null ? !lastUpdate.equals(that.lastUpdate) : that.lastUpdate != null) && !(signature != null ? !signature.equals(that.signature) : that.signature != null) && !(title != null ? !title.equals(that.title) : that.title != null) && !(url != null ? !url.equals(that.url) : that.url != null);
+        return Objects.equals(id, that.id)
+                && !(lastUpdate != null ? !lastUpdate.equals(that.lastUpdate) : that.lastUpdate != null)
+                && !(signature != null ? !signature.equals(that.signature) : that.signature != null)
+                && !(title != null ? !title.equals(that.title) : that.title != null)
+                && !(url != null ? !url.equals(that.url) : that.url != null);
 
     }
 
