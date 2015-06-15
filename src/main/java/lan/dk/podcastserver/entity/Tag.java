@@ -2,6 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -62,13 +63,15 @@ public class Tag {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (!(o instanceof Tag)) return false;
 
         Tag tag = (Tag) o;
 
-        if (!name.equals(tag.name)) return false;
-
-        return true;
+        return new EqualsBuilder()
+                .append(id, tag.id)
+                .append(name, tag.name)
+                .isEquals();
     }
 
     @Override
