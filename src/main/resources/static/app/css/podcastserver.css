@@ -43,7 +43,7 @@
   border-top-right-radius: 5px;
   max-height: 219px;
   width: 100%;
-  background-size: 100%;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
   padding-left: 0 !important;
@@ -53,11 +53,6 @@
   .item-search-list .item-in-list .cover {
     height: 165px;
     /*background-position : top center;*/
-  }
-}
-@media screen and (max-width: 767px) {
-  .item-search-list .item-in-list .cover {
-    background-size: 120%;
   }
 }
 .item-search-list .item-in-list img {

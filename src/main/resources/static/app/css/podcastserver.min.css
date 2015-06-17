@@ -8,9 +8,8 @@
 .item-search-list .search-button{margin-top:20px}
 .item-search-list [class^=col-]{padding-right:8px;padding-left:8px}
 .item-search-list .item-in-list{padding-top:15px;padding-bottom:0}
-.item-search-list .item-in-list .cover{display:flex;justify-content:center;height:215px;border-top-left-radius:5px;border-top-right-radius:5px;max-height:219px;width:100%;background-size:100%;background-repeat:no-repeat;background-position:center center;padding-left:0!important;padding-right:0!important}
+.item-search-list .item-in-list .cover{display:flex;justify-content:center;height:215px;border-top-left-radius:5px;border-top-right-radius:5px;max-height:219px;width:100%;background-size:cover;background-repeat:no-repeat;background-position:center center;padding-left:0!important;padding-right:0!important}
 @media screen and (min-width:1200px){.item-search-list .item-in-list .cover{height:165px}}
-@media screen and (max-width:767px){.item-search-list .item-in-list .cover{background-size:120%}}
 .item-search-list .item-in-list img{height:215px;border-top-left-radius:5px;border-top-right-radius:5px;max-height:219px;width:100%;object-fit:cover}
 @media screen and (min-width:1200px){.item-search-list .item-in-list img{height:165px}}
 .item-search-list .item-in-list .more-button{z-index:100;position:absolute;top:0;right:0}
