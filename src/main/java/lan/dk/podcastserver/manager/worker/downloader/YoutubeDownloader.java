@@ -10,6 +10,8 @@ import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -25,11 +27,8 @@ import java.net.URL;
 @Scope("prototype")
 public class YoutubeDownloader extends AbstractDownloader {
 
-    private long MAX_WAITIN_TIME = 1000*60*5;
-
     VideoInfo info;
     DownloadInfo downloadInfo;
-    long launchDateDownload = System.currentTimeMillis();
     VGet v = null;
 
     @Override
@@ -46,57 +45,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             info = new VideoInfo(url);
 
             // extract infromation from the web
-            Runnable itemSynchronisation = new Runnable() {
-                long last;
-
-                @Override
-                public void run() {
-                    downloadInfo = info.getInfo();
-                    // notify app or save download state
-                    // you can extract information from DownloadInfo info;
-                    switch (info.getState()) {
-                        case EXTRACTING:
-                        case EXTRACTING_DONE:
-                            logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
-                            break;
-                        case ERROR:
-                            stopDownload();
-                            break;
-                        case DONE:
-                            logger.debug("{} - Téléchargement terminé", FilenameUtils.getName( v.getTarget().getAbsolutePath() ));
-                            //itemDownloadManager.removeACurrentDownload(item);
-                            finishDownload();
-                            break;
-                        case RETRYING:
-                            logger.debug(info.getState() + " " + info.getDelay());
-                            if (info.getDelay() == 0) {
-                                logger.error(info.getException().toString());
-                            }
-                            if (info.getException() instanceof DownloadIOCodeError) {
-                                logger.debug("Cause  : " + ((DownloadIOCodeError) info.getException()).getCode());
-                            }
-                            // Si le reset dure trop longtemps. Stopper.
-                            if (System.currentTimeMillis() - launchDateDownload > MAX_WAITIN_TIME) {
-                                stopDownload();
-                            }
-                            break;
-                        case DOWNLOADING:
-                            int currentState = (int) (downloadInfo.getCount()*100 / (float) downloadInfo.getLength());
-                            if (item.getProgression() < currentState) {
-                                item.setProgression(currentState);
-                                logger.debug("{} - {}%", item.getTitle(), item.getProgression());
-                                convertAndSaveBroadcast();
-                            }
-                            break;
-                        case STOP:
-                            logger.debug("Pause / Arrêt du téléchargement du téléchargement");
-                            //stopDownload();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            };
+            YoutubeWatcher watcher = new YoutubeWatcher(this);
 
             VGetParser user = VGet.parser(url);
             info = user.info(url);
@@ -106,12 +55,12 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             // [OPTIONAL] call v.extract() only if you d like to get video title
             // before start download. or just skip it.
-            v.extract(user, stopDownloading, itemSynchronisation);
+            v.extract(user, stopDownloading, watcher);
             //System.out.println(info.getTitle());
 
             v.setTarget(getTagetFile(item, info.getTitle()));
 
-            v.download(user, stopDownloading, itemSynchronisation);
+            v.download(user, stopDownloading, watcher);
         } catch (DownloadMultipartError e) {
             for (DownloadInfo.Part p : e.getInfo().getParts()) {
                 Throwable ee = p.getException();
@@ -135,7 +84,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             stopDownload();
         }
         logger.debug("Download termine");
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return item;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private File getTagetFile(Item item, String youtubleTitle) {
@@ -143,7 +92,7 @@ public class YoutubeDownloader extends AbstractDownloader {
         if (target != null)
             return target;
 
-        File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
+       File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
        if (!file.getParentFile().exists()) {
            file.getParentFile().mkdirs();
        }
@@ -166,4 +115,64 @@ public class YoutubeDownloader extends AbstractDownloader {
         super.finishDownload();
     }
 
+    static class YoutubeWatcher implements Runnable {
+
+        protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+        private final YoutubeDownloader youtubeDownloader;
+        long launchDateDownload = System.currentTimeMillis();
+        long MAX_WAITIN_TIME = 1000*60*5;
+
+        public YoutubeWatcher(YoutubeDownloader youtubeDownloader) {
+            this.youtubeDownloader = youtubeDownloader;
+        }
+
+        @Override
+        public void run() {
+            VideoInfo info = youtubeDownloader.info;
+            youtubeDownloader.downloadInfo = info.getInfo();
+            VGet vgetDownloader = youtubeDownloader.v;
+            // notify app or save download state
+            // you can extract information from DownloadInfo info;
+            switch (info.getState()) {
+                case EXTRACTING:
+                case EXTRACTING_DONE:
+                    logger.debug(FilenameUtils.getName(String.valueOf(youtubeDownloader.item.getUrl())) + " " + info.getState());
+                    break;
+                case ERROR:
+                    youtubeDownloader.stopDownload();
+                    break;
+                case DONE:
+                    logger.debug("{} - Téléchargement terminé", FilenameUtils.getName(vgetDownloader.getTarget().getAbsolutePath()));
+                    youtubeDownloader.finishDownload();
+                    break;
+                case RETRYING:
+                    logger.debug(info.getState() + " " + info.getDelay());
+                    if (info.getDelay() == 0) {
+                        logger.error(info.getException().toString());
+                    }
+                    if (info.getException() instanceof DownloadIOCodeError) {
+                        logger.debug("Cause  : " + ((DownloadIOCodeError) info.getException()).getCode());
+                    }
+                    // Si le reset dure trop longtemps. Stopper.
+                    if (System.currentTimeMillis() - launchDateDownload > MAX_WAITIN_TIME) {
+                        youtubeDownloader.stopDownload();
+                    }
+                    break;
+                case DOWNLOADING:
+                    int currentState = (int) (youtubeDownloader.downloadInfo.getCount()*100 / (float) youtubeDownloader.downloadInfo.getLength());
+                    if (youtubeDownloader.item.getProgression() < currentState) {
+                        youtubeDownloader.item.setProgression(currentState);
+                        logger.debug("{} - {}%", youtubeDownloader.item.getTitle(), youtubeDownloader.item.getProgression());
+                        youtubeDownloader.convertAndSaveBroadcast();
+                    }
+                    break;
+                case STOP:
+                    logger.debug("Pause / Arrêt du téléchargement du téléchargement");
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }
 }
