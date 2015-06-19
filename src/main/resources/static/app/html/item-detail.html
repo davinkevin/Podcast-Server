@@ -55,9 +55,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">{{ idc.item.title }}</h3>
                 </div>
-                <div class="panel-body">
-                    {{ idc.item.description | htmlToPlaintext }}
-                </div>
+                <div class="panel-body" ng-bind-html="idc.item.description"></div>
                 <div class="panel-footer">Date de publication : <strong>{{idc.item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></div>
             </div>
         </div>
