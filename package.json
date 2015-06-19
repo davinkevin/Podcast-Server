@@ -32,9 +32,6 @@
     "gulp-jshint": "^1.10.0",
     "proxy-middleware": "^0.11.0"
   },
-  "scripts": {
-    "postinstall": "./node_modules/bower/bin/bower install"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/davinkevin/Podcast-Server.git"

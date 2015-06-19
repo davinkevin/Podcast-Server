@@ -262,10 +262,16 @@
         ]
       }
     },
-    "ionicons" : {
+    "ionicons": {
       "main": {
-        "dev" : ["css/ionicons.css", "fonts/*"],
-        "prod" : ["css/ionicons.min.css", "fonts/*"]
+        "dev": [
+          "css/ionicons.css",
+          "fonts/*"
+        ],
+        "prod": [
+          "css/ionicons.min.css",
+          "fonts/*"
+        ]
       }
     },
     "components-font-awesome": {

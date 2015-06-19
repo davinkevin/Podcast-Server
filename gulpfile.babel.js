@@ -135,4 +135,4 @@ gulp.task('webserver', () => {
 });
 
 // Default Task
-gulp.task('default', ['lint', 'less', 'js', 'inject']);
+gulp.task('default', ['bower-install', 'lint', 'less', 'js', 'inject']);
