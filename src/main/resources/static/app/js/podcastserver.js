@@ -213,7 +213,6 @@
         'ps.config.ngstomp',
         'ps.config.module'
     ]);
-    angular.module('ps.config.imageLazyLoading', ['afkl.lazyImage']);
     angular.module('ps.config.loading', ['angular-loading-bar']).config(["cfpLoadingBarProvider", function (cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
     }]);
