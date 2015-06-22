@@ -41,6 +41,21 @@ public class AbstractUpdaterTest {
         /* Then */ assertThat(no_change_result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
     }
 
+    @Test
+    public void should_update_the_podcast() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        podcast.setId(1);
+        podcast.setSignature("XYZ");
+
+        /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+        /* Then */
+        assertThat(result).isNotSameAs(Updater.NO_MODIFICATION_TUPLE);
+        assertThat(result.first()).isSameAs(podcast);
+        assertThat(result.second()).isNull();
+        assertThat(result.third()).isNotNull();
+    }
+
     @After
     public void afterEach() {
         verifyNoMoreInteractions(podcastServerParameters, signatureService, validator);
