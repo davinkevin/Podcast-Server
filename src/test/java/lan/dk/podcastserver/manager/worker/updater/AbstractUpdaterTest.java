@@ -56,6 +56,17 @@ public class AbstractUpdaterTest {
         assertThat(result.third()).isNotNull();
     }
 
+    @Test
+    public void should_handle_exception_during_update() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        podcast.setId(99);
+        podcast.setSignature("XYZ");
+
+        /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+        /* Then */ assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
+    }
+
     @After
     public void afterEach() {
         verifyNoMoreInteractions(podcastServerParameters, signatureService, validator);
