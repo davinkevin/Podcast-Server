@@ -46,4 +46,10 @@ public class SendUpdaterTest {
                 .contains(ITEM_1, ITEM_2, ITEM_3);
     }
 
+    @Test
+    public void should_generate_an_empty_signature() {
+        assertThat(sendUpdater.signatureOf(PODCAST))
+                .isEmpty();
+    }
+
 }
