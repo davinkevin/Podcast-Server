@@ -1,19 +1,16 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
-import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.utils.ImageUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
+import lan.dk.podcastserver.service.HtmlService;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -22,50 +19,63 @@ import java.io.IOException;
 @Service("YoutubeFinder")
 public class YoutubeFinder implements Finder {
 
-    public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("http://search.yahoo.com/mrss/");
-    public static final Namespace XMLNS_NAMESPACE = Namespace.getNamespace("http://www.w3.org/2005/Atom");
-    
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String GDATA_USER_FEED = "https://gdata.youtube.com/feeds/api/users/";
-    
-    @Resource JdomService jdomService;
-    
+
+    private HtmlService htmlService;
+
+    @Autowired
+    public YoutubeFinder(HtmlService htmlService) {
+        this.htmlService = htmlService;
+    }
+
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
-        Podcast youtubePodcst = new Podcast()
-                .setUrl(url)
-                .setType("Youtube");
 
-        Document document;
+        Document page;
+
         try {
-            document = jdomService.jdom2Parse(gdataUrlFromYoutubeURL(url));
-        } catch (JDOMException | IOException e) {
-            logger.error("Error during parsing of podcast", e);
+            page = htmlService.connectWithDefault(url).get();
+        } catch (IOException e) {
+            logger.error("IOException :", e);
             throw new FindPodcastNotFoundException();
         }
 
-        Element rootElement = document.getRootElement();
+        Podcast youtubePodcst = new Podcast()
+                .setUrl(url)
+                .setType("Youtube")
+                .setTitle(getTitle(page))
+                .setDescription(getDescription(page));
+
         youtubePodcst
-                .setTitle(rootElement.getChildText("title", XMLNS_NAMESPACE))
-                .setDescription(rootElement.getChildText("content", XMLNS_NAMESPACE));
-
-        try {
-            youtubePodcst.setCover(ImageUtils.getCoverFromURL(rootElement.getChild("thumbnail", MEDIA_NAMESPACE).getAttributeValue("url")));
-        } catch (IOException e) {
-            logger.error("Can't fetch image from gdata_description", e);
-        }
-
+                .setCover(getCover(page));
 
         return youtubePodcst;
     }
 
-    private String gdataUrlFromYoutubeURL(String youtubeUrl) { 
-
-        if ( (youtubeUrl.matches(".*.youtube.com/channel/.*") || youtubeUrl.matches(".*.youtube.com/user/.*") || youtubeUrl.matches(".*.youtube.com/.*")) && !youtubeUrl.contains("gdata") ) { //www.youtube.com/[channel|user]*/nom
-            return GDATA_USER_FEED + StringUtils.substringAfterLast(youtubeUrl, "/"); //http://gdata.youtube.com/feeds/api/users/cauetofficiel/uploads
-        } else if (youtubeUrl.matches(".*gdata.youtube.com/feeds/api/playlists/.*")) {
-            return "https://" + StringUtils.substringAfter(youtubeUrl, "://");
+    private String getDescription(Document page) {
+        Element elementWithExternalId = page.select("meta[name=description]").first();
+        if (elementWithExternalId != null) {
+            return elementWithExternalId.attr("content");
         }
-        return null;
+
+        return "";
+    }
+
+    private String getTitle(Document page) {
+        Element elementWithExternalId = page.select("meta[name=title]").first();
+        if (elementWithExternalId != null) {
+            return elementWithExternalId.attr("content");
+        }
+
+        return "";
+    }
+
+    private Cover getCover(Document page) {
+        Element elementWithExternalId = page.select("img.channel-header-profile-image").first();
+        if (elementWithExternalId != null) {
+            return new Cover(elementWithExternalId.attr("src"), 200, 200);
+        }
+
+        return new Cover();
     }
 }
