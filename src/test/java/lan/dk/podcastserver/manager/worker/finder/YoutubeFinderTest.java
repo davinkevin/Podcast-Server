@@ -52,4 +52,40 @@ public class YoutubeFinderTest {
                 .isNotNull()
                 .hasUrl("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg");
     }
+
+    @Test(expected = FindPodcastNotFoundException.class)
+    public void should_not_find_podcast_for_this_url() throws IOException, FindPodcastNotFoundException {
+        /* Given */
+        Connection mockConnection = mock(Connection.class);
+        when(mockConnection.get()).thenThrow(new IOException());
+        when(htmlService.connectWithDefault(any())).thenReturn(mockConnection);
+        /* When */
+        youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");
+        /* Then -> See @Test Exception*/
+    }
+
+    @Test
+    public void should_set_default_value_for_information_not_found() throws JDOMException, IOException, FindPodcastNotFoundException, URISyntaxException {
+        //Given
+        Connection mockConnection = mock(Connection.class);
+        when(mockConnection.get()).thenReturn(
+                Jsoup.parse(
+                        Paths.get(YoutubeFinderTest.class.getResource("/remote/podcast/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html").toURI()).toFile(),
+                        "UTF-8"
+                )
+        );
+        when(htmlService.connectWithDefault(any())).thenReturn(mockConnection);
+
+        //When
+        Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");
+        Cover cover = podcast.getCover();
+
+        //Then
+        assertThat(podcast)
+                .hasTitle("")
+                .hasDescription("");
+        assertThat(cover)
+                .isNotNull()
+                .hasUrl(null);
+    }
 }
