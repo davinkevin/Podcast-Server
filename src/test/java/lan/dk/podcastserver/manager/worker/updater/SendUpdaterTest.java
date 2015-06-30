@@ -2,16 +2,10 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.SignatureService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.validation.Validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,15 +19,13 @@ public class SendUpdaterTest {
     public static final Item ITEM_2 = new Item().setId(2);
     public static final Item ITEM_3 = new Item().setId(3);
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @InjectMocks SendUpdater sendUpdater;
+    SendUpdater sendUpdater = new SendUpdater();
 
-    public static final Podcast PODCAST = new Podcast();
+    public static Podcast PODCAST;
 
     @Before
     public void beforeEach() {
+        PODCAST = new Podcast();
         PODCAST.add(ITEM_1);
         PODCAST.add(ITEM_2);
         PODCAST.add(ITEM_3);
@@ -52,4 +44,16 @@ public class SendUpdaterTest {
                 .isEmpty();
     }
 
+    @Test
+    public void should_reject_every_item() {
+        assertThat(sendUpdater.notIn(PODCAST).test(new Item()))
+                .isFalse();
+    }
+    
+    @Test
+    public void should_show_his_type() {
+        AbstractUpdater.Type type = sendUpdater.type();
+        assertThat(type.key()).isEqualTo("send");
+        assertThat(type.name()).isEqualTo("Send");
+    }
 }
