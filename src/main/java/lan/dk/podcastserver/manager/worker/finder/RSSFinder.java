@@ -2,16 +2,16 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
+import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.utils.ImageUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -22,8 +22,15 @@ public class RSSFinder implements Finder {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     
-    @Resource JdomService jdomService;
-    
+    JdomService jdomService;
+    ImageService imageService;
+
+    @Autowired
+    public RSSFinder(JdomService jdomService, ImageService imageService) {
+        this.jdomService = jdomService;
+        this.imageService = imageService;
+    }
+
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
         Podcast podcast = new Podcast();
@@ -51,7 +58,7 @@ public class RSSFinder implements Finder {
         podcast.setDescription(channel.getChildText("description"));
 
         try {
-            podcast.setCover(ImageUtils.getCoverFromURL(getPodcastCover(channel)));
+            podcast.setCover(imageService.getCoverFromURL(getPodcastCover(channel)));
         } catch (IOException e) {
             logger.error("Error during the fetch of the cover", e);
         }

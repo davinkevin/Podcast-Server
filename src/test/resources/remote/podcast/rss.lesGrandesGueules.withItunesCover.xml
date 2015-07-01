@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8" ?><rss xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+    <channel>
+        <title>Les Grandes Gueules du Sport</title>
+        <itunes:author>RMC</itunes:author>
+        <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+        <description>Grand en gueule, fort en sport ! </description>
+        <language>fr</language>
+        <copyright>Copyright 2014-2015 - RMC</copyright>
+        <managingEditor>webmaster@nextradiotv.fr (RMC)</managingEditor>
+        <webMaster>webmaster@nextradiotv.fr (RMC)</webMaster>
+        <pubDate>Fri, 31 Aug 2012 14:06:24 +0200</pubDate>
+        <lastBuildDate>Tue, 09 Sep 2014 10:23:33 +0200</lastBuildDate>
+        <category>Sports</category>
+        <generator>Streamakaci</generator>
+        <ttl>1500</ttl>
+        <itunes:image href="http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg"/>
+        <item>
+            <title>RMC : 22/02 - Les Grandes Gueules du Sport en direct des Ménuires - 12h-13h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/997542926919671808/20150222_grandes_gueules_sport_2.mp3" length="41375075" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150222_grandes_gueules_sport_2.mp3</guid>
+            <pubDate>Sun, 22 Feb 2015 13:16:01 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 22/02 - Les Grandes Gueules du Sport en direct des Ménuires - 12h-13h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>43:05</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 22/02 - Les Grandes Gueules du Sport en direct des Ménuires - 11h-12h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/997526305694031872/20150222_grandes_gueules_sport_1.mp3" length="43375847" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150222_grandes_gueules_sport_1.mp3</guid>
+            <pubDate>Sun, 22 Feb 2015 12:11:31 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 22/02 - Les Grandes Gueules du Sport en direct des Ménuires - 11h-12h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>45:10</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 22/02 - Les Grandes Gueules du Sport en direct des Ménuires - 10h-11h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/997511889132986368/20150222_grandes_gueules_sport_0.mp3" length="44134024" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150222_grandes_gueules_sport_0.mp3</guid>
+            <pubDate>Sun, 22 Feb 2015 11:15:34 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 22/02 - Les Grandes Gueules du Sport en direct des Ménuires - 10h-11h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>45:58</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 21/02 - Les Grandes Gueules du Sport en direct des Ménuires – 12h-13h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/997172595247816704/20150221_grandes_gueules_sport_2.mp3" length="38411746" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150221_grandes_gueules_sport_2.mp3</guid>
+            <pubDate>Sat, 21 Feb 2015 13:18:56 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 21/02 - Les Grandes Gueules du Sport en direct des Ménuires – 12h-13h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>40:00</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 21/02 - Les Grandes Gueules du Sport en direct des Ménuires - 11h-12h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/997154301321158656/20150221_grandes_gueules_sport_1.mp3" length="39403980" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150221_grandes_gueules_sport_1.mp3</guid>
+            <pubDate>Sat, 21 Feb 2015 12:07:57 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 21/02 - Les Grandes Gueules du Sport en direct des Ménuires - 11h-12h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>41:02</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 21/02 - Les Grandes Gueules du Sport en direct des Ménuires - 10h-11h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/997141680635256832/20150221_grandes_gueules_sport_0.mp3" length="41360029" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150221_grandes_gueules_sport_0.mp3</guid>
+            <pubDate>Sat, 21 Feb 2015 11:18:59 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 21/02 - Les Grandes Gueules du Sport en direct des Ménuires - 10h-11h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>43:05</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 15/02 - Le Top des Grandes Gueules du Sport : le PSG s'entraîne-t-il assez ?</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le Best-of des interventions des Grandes Gueules du sport sur RMC, la radio du Sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994980350234992640/20150215_grandes_gueules_sport_3.mp3" length="15890016" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150215_grandes_gueules_sport_3.mp3</guid>
+            <pubDate>Sun, 15 Feb 2015 15:31:55 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 15/02 - Le Top des Grandes Gueules du Sport : le PSG s'entraîne-t-il assez ?</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le Best-of des interventions des Grandes Gueules du sport sur RMC, la radio du Sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>16:33</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 15/02 - Les Grandes Gueules du Sport - 12h-13h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994943850634027008/20150215_grandes_gueules_sport_2.mp3" length="40463089" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150215_grandes_gueules_sport_2.mp3</guid>
+            <pubDate>Sun, 15 Feb 2015 13:10:16 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 15/02 - Les Grandes Gueules du Sport - 12h-13h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>42:08</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 15/02 - Les Grandes Gueules du Sport - 11h-12h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994930329921789952/20150215_grandes_gueules_sport_1.mp3" length="45088226" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150215_grandes_gueules_sport_1.mp3</guid>
+            <pubDate>Sun, 15 Feb 2015 12:17:48 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 15/02 - Les Grandes Gueules du Sport - 11h-12h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>46:58</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 15/02 - Les Grandes Gueules du Sport - 10h-11h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994913654157615104/20150215_grandes_gueules_sport_0.mp3" length="46498002" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150215_grandes_gueules_sport_0.mp3</guid>
+            <pubDate>Sun, 15 Feb 2015 11:13:06 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 15/02 - Les Grandes Gueules du Sport - 10h-11h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>48:26</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 14/02 - Le Top des Grandes Gueules du Sport : Sport et sexe font-ils bon ménage ?</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le Best-of des interventions des Grandes Gueules du sport sur RMC, la radio du Sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994629902407835648/20150214_grandes_gueules_sport_3.mp3" length="15350431" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150214_grandes_gueules_sport_3.mp3</guid>
+            <pubDate>Sat, 14 Feb 2015 16:52:00 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 14/02 - Le Top des Grandes Gueules du Sport : Sport et sexe font-ils bon ménage ?</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le Best-of des interventions des Grandes Gueules du sport sur RMC, la radio du Sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>15:59</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 14/02 - Les Grandes Gueules du Sport - 12h-13h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994574277862760448/20150214_grandes_gueules_sport_2.mp3" length="35916947" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150214_grandes_gueules_sport_2.mp3</guid>
+            <pubDate>Sat, 14 Feb 2015 13:16:09 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 14/02 - Les Grandes Gueules du Sport - 12h-13h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>37:24</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 14/02 - Les Grandes Gueules du Sport - 11h-12h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994557568309272576/20150214_grandes_gueules_sport_1.mp3" length="41828145" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150214_grandes_gueules_sport_1.mp3</guid>
+            <pubDate>Sat, 14 Feb 2015 12:11:18 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 14/02 - Les Grandes Gueules du Sport - 11h-12h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>43:34</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 14/02 - Les Grandes Gueules du Sport - 10h-11h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/994543069057523712/20150214_grandes_gueules_sport_0.mp3" length="42897284" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150214_grandes_gueules_sport_0.mp3</guid>
+            <pubDate>Sat, 14 Feb 2015 11:15:02 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 14/02 - Les Grandes Gueules du Sport - 10h-11h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>44:41</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+        <item>
+            <title>RMC : 08/02 - Les Grandes Gueules du Sport - 12h-13h</title>
+            <link>http://rmc.bfmtv.com/mediaplayer/podcast/les-grandes-gueules-du-sport/</link>
+            <description>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</description>
+            <author>RMC</author>
+            <category>Sports</category>
+            <enclosure url="http://r.estat.com/992349328666271744/20150208_grandes_gueules_sport_2.mp3" length="42530316" type="audio/mpeg"/>
+            <guid>http://podcast.rmc.fr/channel244/20150208_grandes_gueules_sport_2.mp3</guid>
+            <pubDate>Sun, 08 Feb 2015 13:22:12 +0100</pubDate>
+            <source url="http://podcast.rmc.fr/channel244/RMCInfochannel244.xml">RMC : 08/02 - Les Grandes Gueules du Sport - 12h-13h</source>
+            <itunes:category text="Sports">
+                <itunes:category text=""></itunes:category>
+            </itunes:category>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Le week-end, les Grandes Gueules du sport renouvellent le débat d'opinion 100% sport.</itunes:subtitle>
+            <itunes:summary></itunes:summary>
+            <itunes:author>RMC</itunes:author>
+            <itunes:duration>44:18</itunes:duration>
+            <itunes:keywords>grandes gueules, gg, sport, talk, simon, brisbois, sport, rmc, rmcsport, radio, opinion, emission</itunes:keywords>
+            <itunes:owner>
+                <itunes:name>RMC</itunes:name>
+                <itunes:email>webmaster@nextradiotv.fr</itunes:email>
+            </itunes:owner>
+        </item>
+    </channel>
+
+</rss>
