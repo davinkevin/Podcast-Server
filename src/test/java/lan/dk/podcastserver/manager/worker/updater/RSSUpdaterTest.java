@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.SignatureService;
 import org.jdom2.JDOMException;
@@ -37,6 +38,7 @@ public class RSSUpdaterTest {
 
     @Mock SignatureService signatureService;
     @Mock JdomService jdomService;
+    @Mock ImageService imageService;
     @InjectMocks RSSUpdater rssUpdater;
 
     @Before
