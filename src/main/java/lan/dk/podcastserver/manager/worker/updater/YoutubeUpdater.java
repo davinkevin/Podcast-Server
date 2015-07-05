@@ -17,18 +17,19 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Component("YoutubeUpdater")
 public class YoutubeUpdater extends AbstractUpdater {
 
-    private static final String FEED_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
+    private static final String CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
+    private static final String PLAYLIST_RSS_PART = "www.youtube.com/feeds/videos.xml?playlist_id";
     public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
 
     @Resource JdomService jdomService;
-    @Resource
-    HtmlService htmlService;
+    @Resource HtmlService htmlService;
 
     public static ZonedDateTime fromYoutube(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
@@ -39,7 +40,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         Document podcastXMLSource;
         try {
-            podcastXMLSource = xmlChannelOf(podcast.getUrl());
+            podcastXMLSource = xmlOf(podcast.getUrl());
         } catch (JDOMException | IOException e) {
             logger.error("Error during youtube signature & parsing", e);
             return itemSet;
@@ -78,7 +79,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         Document podcastXMLSource = null;
         try {
-            podcastXMLSource = xmlChannelOf(podcast.getUrl());
+            podcastXMLSource = xmlOf(podcast.getUrl());
         } catch (JDOMException | IOException e) {
             logger.error("Error during youtube signature & parsing", e);
             return "";
@@ -91,9 +92,18 @@ public class YoutubeUpdater extends AbstractUpdater {
         }
         return "";
     }
-    private Document xmlChannelOf(String url) throws JDOMException, IOException {
+
+    private Document xmlOf(String url) throws JDOMException, IOException {
+        if (isPlaylist(url)) {
+            return jdomService.jdom2Parse(url);
+        }
+
         String channelId = getChannelId(url);
-        return jdomService.jdom2Parse(String.format(FEED_RSS_BASE, channelId));
+        return jdomService.jdom2Parse(String.format(CHANNEL_RSS_BASE, channelId));
+    }
+
+    private Boolean isPlaylist(String url) {
+        return Objects.nonNull(url) && url.contains(PLAYLIST_RSS_PART);
     }
 
     private String getChannelId(String url) {
