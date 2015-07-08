@@ -25,37 +25,16 @@ public class URLUtils {
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
 
-    public static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
+    private static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
         /* http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8 */
         String[] splitUrl = m3u8Url.split(",");
 
         int lenghtTab = splitUrl.length;
-        String urlWithoutAllBandwith = new StringBuffer()
-                .append(splitUrl[0])
-                .append(splitUrl[lenghtTab-2])
-                .append(splitUrl[lenghtTab-1]).toString();
+        String urlWithoutAllBandwith = splitUrl[0] + splitUrl[lenghtTab - 2] + splitUrl[lenghtTab - 1];
 
         int posLastSlash = urlWithoutAllBandwith.lastIndexOf("/");
 
         return FilenameUtils.getName(urlWithoutAllBandwith.substring(0, posLastSlash).replace(".csmil", ""));
-    }
-
-    public static boolean isAValidURL(String url) {
-        URL u = null;
-        HttpURLConnection huc = null;
-        try {
-            u = new URL(url);
-            huc =  (HttpURLConnection)  u.openConnection();
-            huc.setRequestMethod("HEAD");
-            huc.connect();
-            return (huc.getResponseCode() == HttpURLConnection.HTTP_OK);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (huc != null)
-                huc.disconnect();
-        }
-        return false;
     }
 
     public static Reader getReaderFromURL (String url) throws IOException {
@@ -117,10 +96,6 @@ public class URLUtils {
         return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP
                 || status == HttpURLConnection.HTTP_MOVED_PERM
                 || status == HttpURLConnection.HTTP_SEE_OTHER);
-    }
-    
-    public static String changeProtocol(String url, String originalProtocol, String destinationProtocol){
-        return url.replace(originalProtocol.concat(PROTOCOL_SEPARATOR), destinationProtocol.concat(PROTOCOL_SEPARATOR));
     }
     
     public static URLConnection getStreamWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
