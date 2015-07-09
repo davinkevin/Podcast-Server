@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -38,6 +39,8 @@ public class ParleysUpdater extends AbstractUpdater {
 
     /* Patter to extract value from URL */
     public static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)/.*");
+
+    @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
         Set<Item> itemSet = new HashSet<>();
@@ -96,7 +99,7 @@ public class ParleysUpdater extends AbstractUpdater {
                             .setTitle((String) responseObject.get("title"))
                             .setDescription((String) responseObject.get("description"))
                             .setPubdate(fromParleys((String) responseObject.get("publishedOn")))
-                            .setCover(Objects.isNull(responseObject.get("thumbnail")) ? null : ImageUtils.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
+                            .setCover(Objects.isNull(responseObject.get("thumbnail")) ? null : imageService.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
                             .setUrl(String.format(PARLEYS_ITEM_URL, id));
 
 

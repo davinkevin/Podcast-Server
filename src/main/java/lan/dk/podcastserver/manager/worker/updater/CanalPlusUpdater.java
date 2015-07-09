@@ -2,9 +2,9 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
@@ -31,8 +31,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
     @Resource JdomService jdomService;
-    @Resource
-    HtmlService htmlService;
+    @Resource HtmlService htmlService;
+    @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -220,7 +220,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         try {
             currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"))
                     .setPubdate(fromCanalPlus(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
-                    .setCover(ImageUtils.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
+                    .setCover(imageService.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
                     .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
 
             if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null && StringUtils.isNotEmpty(xml_MEDIA.getChild("VIDEOS").getChildText("HLS"))) {

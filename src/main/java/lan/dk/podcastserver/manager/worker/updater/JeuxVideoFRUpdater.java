@@ -3,9 +3,9 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JdomService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
@@ -39,8 +39,8 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
     public static final String IMG_DELIMITER = "006E0046";
 
     @Resource JdomService jdomService;
-    @Resource
-    HtmlService htmlService;
+    @Resource HtmlService htmlService;
+    @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -90,7 +90,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         org.jdom2.Element xml_item = xmlEpisode.getRootElement().getChild("channel").getChild("item");
 
         try {
-            item.setCover(ImageUtils.getCoverFromURL(new URL(xml_item.getChildText("visuel_clip"))));
+            item.setCover(imageService.getCoverFromURL(new URL(xml_item.getChildText("visuel_clip"))));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -136,15 +136,15 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
         }
 
         if (tinyUrl.contains(IMG_DELIMITER)) {
-            return ImageUtils.getCoverFromURL(String.format(IMG_LOCALISATION_THUMB, tinyUrl.substring(tinyUrl.lastIndexOf(IMG_DELIMITER)+IMG_DELIMITER.length())));
+            return imageService.getCoverFromURL(String.format(IMG_LOCALISATION_THUMB, tinyUrl.substring(tinyUrl.lastIndexOf(IMG_DELIMITER)+IMG_DELIMITER.length())));
         }
 
         /* http://2.im6.fr/-99663-photo-crop-pd41f08d993a0ab2c15f76ef444ac1e04-youtube.jpg?options=eNoryywqKU3N0bW0NDMzBgAi7gRK&width=400&height=300 */
         if (tinyUrl.contains("width") && tinyUrl.contains("height")) {
-            return ImageUtils.getCoverFromURL(StringUtils.substringBeforeLast(tinyUrl, "&") + String.format("&width=400&height=300"));
+            return imageService.getCoverFromURL(StringUtils.substringBeforeLast(tinyUrl, "&") + String.format("&width=400&height=300"));
         }
         
-        return ImageUtils.getCoverFromURL(tinyUrl);
+        return imageService.getCoverFromURL(tinyUrl);
     }
 
     @Override

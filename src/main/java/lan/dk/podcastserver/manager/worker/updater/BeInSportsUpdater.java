@@ -2,9 +2,9 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JdomService;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
@@ -41,6 +41,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     @Resource JdomService jdomService;
     @Resource HtmlService htmlService;
+    @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
@@ -113,7 +114,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         Matcher thumNailematcher = THUMB_NAIL_EXTRACTOR_PATTERN.matcher(javascriptCode);
         if (thumNailematcher.find()) {
             try {
-                item.setCover(ImageUtils.getCoverFromURL(thumNailematcher.group(1)));
+                item.setCover(imageService.getCoverFromURL(thumNailematcher.group(1)));
             } catch (IOException e) {
                 e.printStackTrace();
             }

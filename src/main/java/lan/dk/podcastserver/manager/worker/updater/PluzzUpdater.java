@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,8 +39,8 @@ public class PluzzUpdater extends AbstractUpdater {
     public static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
     public static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
 
-    @Resource
-    HtmlService htmlService;
+    @Resource HtmlService htmlService;
+    @Resource ImageService imageService;
 
     public static ZonedDateTime fromPluzz(Long dateInSecondsSinceEpoch){
         return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateInSecondsSinceEpoch), ZoneId.of("Europe/Paris"));
@@ -134,7 +134,7 @@ public class PluzzUpdater extends AbstractUpdater {
                     .setTitle(responseObject.get("titre").toString().concat(seasonEpisode).concat(responseObject.get("sous_titre").toString()))
                     .setDescription(responseObject.get("synopsis").toString())
                     .setPubdate( fromPluzz((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")) )
-                    .setCover(ImageUtils.getCoverFromURL(new URL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image")))))
+                    .setCover(imageService.getCoverFromURL(new URL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image")))))
                     .setUrl(getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
 
 

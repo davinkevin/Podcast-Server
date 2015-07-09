@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.utils.ImageUtils;
+import lan.dk.podcastserver.service.ImageService;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 public class JeuxVideoComUpdater extends AbstractUpdater {
 
     public static final String JEUXVIDEOCOM_HOST = "http://www.jeuxvideo.com";
-    @Resource
-    HtmlService htmlService;
+    @Resource HtmlService htmlService;
+    @Resource ImageService imageService;
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
@@ -65,7 +65,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
                 .setUrl(selectedArea.select("meta[itemprop=contentUrl]").attr("content"))
                 .setPubdate(ZonedDateTime.of(LocalDateTime.parse(selectedArea.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")));
 
-        try { item.setCover(ImageUtils.getCoverFromURL(new URL(selectedArea.select("meta[itemprop=thumbnail]").attr("content")))); }
+        try { item.setCover(imageService.getCoverFromURL(new URL(selectedArea.select("meta[itemprop=thumbnail]").attr("content")))); }
         catch (IOException ignored) {}
 
         return item;
