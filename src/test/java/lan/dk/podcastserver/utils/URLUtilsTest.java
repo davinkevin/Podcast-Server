@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.utils;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(value = { URLUtils.class })
+@Ignore
 public class URLUtilsTest {
 
     @Test

@@ -74,7 +74,7 @@ public class URLUtils {
     }
 
     private static String getRealURL(String url, Integer numberOfRedirection) {
-        if (MAX_NUMBER_OF_REDIRECTION < numberOfRedirection) {
+        if (MAX_NUMBER_OF_REDIRECTION <= numberOfRedirection) {
             throw new RuntimeException("Too Many Redirections");
         }
 
