@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
@@ -19,19 +18,22 @@ import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RSSFinderTest {
     
     @Mock JdomService jdomService;
-    @Spy ImageService imageService;
+    @Mock ImageService imageService;
     @InjectMocks RSSFinder rssFinder;
     
     @Test
     public void should_find_information_about_an_rss_podcast_with_his_url () throws JDOMException, IOException, FindPodcastNotFoundException {
         //Given
         parseFromURI();
+        String coverUrl = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg";
+        when(imageService.getCoverFromURL(eq(coverUrl))).thenReturn(new Cover(coverUrl));
         
         //When
         Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.xml");
@@ -41,7 +43,7 @@ public class RSSFinderTest {
         assertThat(podcast.getTitle()).isEqualToIgnoringCase("Les Grandes Gueules du Sport");
         assertThat(podcast.getDescription()).isEqualToIgnoringCase("Grand en gueule, fort en sport ! ");
         assertThat(cover).isNotNull();
-        assertThat(cover.getUrl()).isEqualToIgnoringCase("http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg");
+        assertThat(cover.getUrl()).isEqualToIgnoringCase(coverUrl);
     }
 
     @Test
@@ -60,14 +62,16 @@ public class RSSFinderTest {
     @Test
     public void should_find_information_with_itunes_cover() throws FindPodcastNotFoundException, IOException, JDOMException {
         //Given
+        String coverUrl = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg";
         parseFromURI();
+        when(imageService.getCoverFromURL(eq(coverUrl))).thenReturn(new Cover(coverUrl));
 
         //When
         Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.withItunesCover.xml");
 
         //Then
         assertThat(podcast.getCover()).isNotNull();
-        assertThat(podcast.getCover().getUrl()).isEqualTo("http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg");
+        assertThat(podcast.getCover().getUrl()).isEqualTo(coverUrl);
     }
 
     @Test
