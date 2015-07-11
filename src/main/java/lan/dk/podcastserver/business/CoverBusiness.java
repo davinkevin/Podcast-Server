@@ -65,7 +65,7 @@ public class CoverBusiness {
                 Files.createDirectories(fileLocation.getParent());
             }
 
-            URLConnection urlConnection = URLUtils.getStreamWithTimeOut(coverUrl, 5000);
+            URLConnection urlConnection = URLUtils.getConnectionWithTimeOut(coverUrl, 5000);
 
             Files.copy(
                     urlConnection.getInputStream(),

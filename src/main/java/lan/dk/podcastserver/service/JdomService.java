@@ -65,7 +65,7 @@ public class JdomService {
         Document doc;
         try {
             logger.debug("Begin Parsing of {}", urlasString);
-            doc = new SAXBuilder().build(URLUtils.getStreamWithTimeOut(urlasString).getInputStream(), urlasString);
+            doc = new SAXBuilder().build(URLUtils.getConnection(urlasString).getInputStream(), urlasString);
             logger.debug("End Parsing of {}", urlasString);
         } catch (JDOMException | IOException e) {
             logger.error("Error during parsin of {}", urlasString, e);

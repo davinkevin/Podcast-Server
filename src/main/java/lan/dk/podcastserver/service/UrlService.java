@@ -25,15 +25,15 @@ public class UrlService {
         return URLUtils.getRealURL(url);
     }
 
-    public URLConnection getStreamWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
-        return URLUtils.getStreamWithTimeOut(stringUrl, timeOutInMilli);
+    public URLConnection getConnectionWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
+        return URLUtils.getConnectionWithTimeOut(stringUrl, timeOutInMilli);
     }
 
-    public URLConnection getStreamWithTimeOut(String stringUrl) throws IOException {
-        return URLUtils.getStreamWithTimeOut(stringUrl);
+    public URLConnection getConnection(String stringUrl) throws IOException {
+        return URLUtils.getConnection(stringUrl);
     }
 
-    public static String getFileNameM3U8Url(String url) {
+    public String getFileNameM3U8Url(String url) {
         return URLUtils.getFileNameM3U8Url(url);
     }
 

@@ -98,7 +98,7 @@ public class URLUtils {
                 || status == HttpURLConnection.HTTP_SEE_OTHER);
     }
     
-    public static URLConnection getStreamWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
+    public static URLConnection getConnectionWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
         URL url = new URL(stringUrl);
         URLConnection urlConnection = url.openConnection();
         urlConnection.setReadTimeout(timeOutInMilli);
@@ -106,8 +106,8 @@ public class URLUtils {
         return urlConnection;
     }
     
-    public static URLConnection getStreamWithTimeOut(String stringUrl) throws IOException {
-        return getStreamWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
+    public static URLConnection getConnection(String stringUrl) throws IOException {
+        return getConnectionWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
     }
 
     public static String getFileNameM3U8Url(String url) {

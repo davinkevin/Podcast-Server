@@ -18,7 +18,7 @@ public class SignatureService {
 
     public String generateSignatureFromURL(String urlAsString) {
         try {
-            return DigestUtils.md5Hex(URLUtils.getStreamWithTimeOut(urlAsString).getInputStream());
+            return DigestUtils.md5Hex(URLUtils.getConnection(urlAsString).getInputStream());
         } catch (IOException e) {
             logger.error("Error during signature of podcast at url {}", urlAsString, e);
         }

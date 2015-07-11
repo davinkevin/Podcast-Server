@@ -26,7 +26,7 @@ public class DailyMotionCloudDownloader extends M3U8Downloader {
 
             BufferedReader in = null;
             try {
-                URLConnection urlConnection = URLUtils.getStreamWithTimeOut(hlsStreamUrl);
+                URLConnection urlConnection = URLUtils.getConnection(hlsStreamUrl);
                 
                 in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
