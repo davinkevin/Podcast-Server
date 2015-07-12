@@ -64,14 +64,12 @@ public class PodcastServerParameters {
     public String getServerUrl() {
         return serverUrl;
     }
-
     public String getDownloadExtention() {
         return downloadExtention;
     }
 
     public Path rootFolder() { return Paths.get(rootfolder); }
     public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
-    public URI serveurURL() throws URISyntaxException { return new URI(serverUrl); }
     public URI fileContainer() throws URISyntaxException { return new URI(fileContainer); }
     public Long numberOfDayToDownload() { return numberOfDayToDownload; }
     public Integer maxUpdateParallels() { return maxUpdateParallels; }
@@ -82,42 +80,35 @@ public class PodcastServerParameters {
         return rssDefaultNumberItem;
     }
 
+
+    /* Setter to initiate the @Bean */
     public void setRootfolder(String rootfolder) {
         this.rootfolder = rootfolder;
     }
-
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
     }
-
     public void setFileContainer(String fileContainer) {
         this.fileContainer = fileContainer;
     }
-
     public void setCoverDefaultName(String coverDefaultName) {
         this.coverDefaultName = coverDefaultName;
     }
-
     public void setDownloadExtention(String downloadExtention) {
         this.downloadExtention = downloadExtention;
     }
-
     public void setMaxUpdateParallels(Integer maxUpdateParallels) {
         this.maxUpdateParallels = maxUpdateParallels;
     }
-
     public void setConcurrentDownload(Integer concurrentDownload) {
         this.concurrentDownload = concurrentDownload;
     }
-
     public void setNumberOfTry(Integer numberOfTry) {
         this.numberOfTry = numberOfTry;
     }
-
     public void setNumberOfDayToDownload(Long numberOfDayToDownload) {
         this.numberOfDayToDownload = numberOfDayToDownload;
     }
-
     public void setRssDefaultNumberItem(Long rssDefaultNumberItem) {
         this.rssDefaultNumberItem = rssDefaultNumberItem;
     }

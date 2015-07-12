@@ -4,7 +4,7 @@
 
 spring :
     datasource:
-        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/youtubeApiV3
+        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/minidb
         username: sa
         driver-class-name: org.h2.Driver
     jpa:
@@ -13,7 +13,9 @@ spring :
         hibernate :
             ddl-auto: update
         properties :
-            hibernate.search.default:
+            hibernate:
+                format_sql: true
+                search.default:
                         indexmanager: near-real-time
                         directory_provider: ram
                         indexBase: /tmp/lucene
@@ -54,10 +56,18 @@ endpoints:
 
 logging:
     path: /private/tmp/logs/podcastserver.log
-    #level:
+    level:
         #lan.dk.podcastserver : DEBUG
+        #org.hibernate.type: TRACE
 
 multipart:
     max-file-size: 512MB
     max-request-size: 512MB
     location : /tmp/
+
+#server:
+#    port: 8443
+#    ssl:
+#        key-store: /private/tmp/ssl/keystore.jks
+#        key-store-password: a
+#        key-password: a
