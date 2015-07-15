@@ -74,4 +74,9 @@ public class DownloaderSelectorTest {
         /* Then  */ assertThat(updaterClass).isEqualTo(ParleysDownloader.class);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void should_reject_empty_url() {
+        /* Given */ DownloaderSelector downloaderSelector = new DownloaderSelector().setDownloaderCompatibilities(downloaderCompatibilities);
+        /* When */  downloaderSelector.of("");
+    }
 }
