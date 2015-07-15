@@ -3,13 +3,14 @@ package lan.dk.podcastserver.manager.worker.updater;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.HtmlService;
+import lan.dk.podcastserver.service.JdomService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.output.XMLOutputter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -85,12 +86,7 @@ public class YoutubeUpdater extends AbstractUpdater {
             return "";
         }
 
-        Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
-
-        if (podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0) != null) {
-            return signatureService.generateMD5Signature(podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace).get(0).getChildText("published", defaultNamespace));
-        }
-        return "";
+        return signatureService.generateMD5Signature(new XMLOutputter().outputString(podcastXMLSource.getRootElement()));
     }
 
     private Document xmlOf(String url) throws JDOMException, IOException {
