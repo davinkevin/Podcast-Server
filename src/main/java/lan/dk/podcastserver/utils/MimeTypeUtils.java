@@ -3,7 +3,6 @@ package lan.dk.podcastserver.utils;
 import lan.dk.podcastserver.entity.Item;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,7 +15,6 @@ import java.util.Map;
  * Date: 08/11/2013
  * Time: 23:36
  */
-@Component
 public class MimeTypeUtils {
 
     private static final Tika tika = new Tika();

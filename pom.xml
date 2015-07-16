@@ -355,6 +355,7 @@
                         <param>lan.dk.podcastserver.entity.Tag</param>
                         <param>lan.dk.podcastserver.entity.Status</param>
                         <param>lan.dk.podcastserver.service.PodcastServerParameters</param>
+                        <param>lan.dk.podcastserver.utils.form.MovingItemInQueueForm</param>
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>
                 </configuration>
