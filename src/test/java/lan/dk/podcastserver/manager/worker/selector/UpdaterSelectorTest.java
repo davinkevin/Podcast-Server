@@ -82,4 +82,10 @@ public class UpdaterSelectorTest {
         /* Then */ assertThat(updaterClass).isEqualTo(PluzzUpdater.class);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void should_reject_empty_url() {
+        /* Given */ UpdaterSelector updaterSelector = new UpdaterSelector().setUpdaterCompatibilities(updaterSelectors);
+        /* When */  updaterSelector.of("");
+    }
+
 }
