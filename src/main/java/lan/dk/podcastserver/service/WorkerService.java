@@ -10,11 +10,11 @@ import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -27,9 +27,16 @@ public class WorkerService implements ApplicationContextAware {
 
     protected ApplicationContext context = null;
     
-    @Resource UpdaterSelector updaterSelector;
-    @Resource DownloaderSelector downloaderSelector;
-    @Resource List<Updater> updaters;
+    final UpdaterSelector updaterSelector;
+    final DownloaderSelector downloaderSelector;
+    final List<Updater> updaters;
+
+    @Autowired
+    public WorkerService(UpdaterSelector updaterSelector, DownloaderSelector downloaderSelector, List<Updater> updaters) {
+        this.updaterSelector = updaterSelector;
+        this.downloaderSelector = downloaderSelector;
+        this.updaters = updaters;
+    }
 
     public Set<AbstractUpdater.Type> types() {
         return updaters
