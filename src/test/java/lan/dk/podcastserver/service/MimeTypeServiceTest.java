@@ -4,6 +4,11 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -64,4 +69,13 @@ public class MimeTypeServiceTest {
         /* Then */ assertThat(extension).isEqualTo(".mp4a");
     }
 
+    @Test
+    public void should_get_mimeType_from_contentType_via_tika() throws URISyntaxException, IOException {
+        /* Given */
+        Path path = Paths.get(MimeTypeServiceTest.class.getResource("/remote/podcast/rss.appload.xml").toURI());
+        MimeTypeService mimeTypeService = new MimeTypeService();
+
+        /* When */ String type = mimeTypeService.probeContentType(path);
+        /* Then */ assertThat(type).isEqualTo("application/rss+xml");
+    }
 }
