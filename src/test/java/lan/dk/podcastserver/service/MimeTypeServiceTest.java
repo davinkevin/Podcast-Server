@@ -72,10 +72,10 @@ public class MimeTypeServiceTest {
     @Test
     public void should_get_mimeType_from_contentType_via_tika() throws URISyntaxException, IOException {
         /* Given */
-        Path path = Paths.get(MimeTypeServiceTest.class.getResource("/remote/podcast/rss.appload.xml").toURI());
+        Path path = Paths.get(MimeTypeServiceTest.class.getResource("/remote/podcast/plain.text.txt").toURI());
         MimeTypeService mimeTypeService = new MimeTypeService();
 
         /* When */ String type = mimeTypeService.probeContentType(path);
-        /* Then */ assertThat(type).isEqualTo("application/rss+xml");
+        /* Then */ assertThat(type).isEqualTo("text/plain");
     }
 }
