@@ -15,8 +15,7 @@ import java.util.*;
 @Transactional
 public class TagBusiness {
 
-    @Resource
-    TagRepository tagRepository;
+    @Resource TagRepository tagRepository;
 
     public List<Tag> findAll() {
         return tagRepository.findAll();
