@@ -4,15 +4,15 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.service.UrlService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -23,7 +23,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 /**
- * Created by kevin on 08/06/2014.
+ * Created by kevin on 08/06/2014 for Podcast-Server
  */
 @Component
 @Transactional
@@ -34,18 +34,20 @@ public class CoverBusiness {
     public static final String QUOTE_CHARACTER = "'";
     public static final String QUOTE_HTML_REPLACEMENT = "%27";
 
-    @Resource CoverRepository coverRepository;
-    @Resource PodcastServerParameters podcastServerParameters;
+    final CoverRepository coverRepository;
+    final PodcastServerParameters podcastServerParameters;
+    final UrlService urlService;
+
+    @Autowired
+    public CoverBusiness(CoverRepository coverRepository, PodcastServerParameters podcastServerParameters, UrlService urlService) {
+        this.coverRepository = coverRepository;
+        this.podcastServerParameters = podcastServerParameters;
+        this.urlService = urlService;
+    }
 
     public Cover findOne(Integer integer) {
         return coverRepository.findOne(integer);
     }
-
-    public Boolean exists(Integer integer) {
-        return coverRepository.exists(integer);
-    }
-
-    public Cover save(Cover cover) { return coverRepository.save(cover); }
 
     public String download(Podcast podcast) {
 
@@ -65,7 +67,7 @@ public class CoverBusiness {
                 Files.createDirectories(fileLocation.getParent());
             }
 
-            URLConnection urlConnection = URLUtils.getConnectionWithTimeOut(coverUrl, 5000);
+            URLConnection urlConnection = urlService.getConnectionWithTimeOut(coverUrl, 5000);
 
             Files.copy(
                     urlConnection.getInputStream(),
@@ -85,6 +87,7 @@ public class CoverBusiness {
     }
 
     public Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
-        return !Objects.isNull(patchPodcast.getCover()) && !Objects.isNull(podcastToUpdate.getCover()) && StringUtils.equalsIgnoreCase(patchPodcast.getCover().getUrl(), podcastToUpdate.getCover().getUrl());
+        return !Objects.isNull(patchPodcast.getCover()) && !Objects.isNull(podcastToUpdate.getCover()) &&
+                patchPodcast.getCover().equals(podcastToUpdate.getCover());
     }
 }

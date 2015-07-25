@@ -1,5 +1,9 @@
 package lan.dk.podcastserver.entity;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.*;
 
 @Table(name = "cover")
@@ -34,8 +38,9 @@ public class Cover {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Cover setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     @Column(name = "url")
@@ -77,14 +82,15 @@ public class Cover {
         if (!(o instanceof Cover)) return false;
 
         Cover cover = (Cover) o;
-
-        if (!url.equals(cover.url)) return false;
-
-        return true;
+        return new EqualsBuilder()
+                .append(StringUtils.lowerCase(url), StringUtils.lowerCase(cover.url))
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return url.hashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(StringUtils.lowerCase(url))
+                .toHashCode();
     }
 }
