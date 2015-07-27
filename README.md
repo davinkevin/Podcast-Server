@@ -2,7 +2,12 @@ Podcast-Server
 ==============
 
 [![Join the chat at https://gitter.im/davinkevin/Podcast-Server](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/davinkevin/Podcast-Server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/davinkevin/Podcast-Server.svg?branch=master)](https://travis-ci.org/davinkevin/Podcast-Server) [![Coverage Status](https://coveralls.io/repos/davinkevin/Podcast-Server/badge.svg?branch=master)](https://coveralls.io/r/davinkevin/Podcast-Server?branch=master)
+
+[![Build Status](https://travis-ci.org/davinkevin/Podcast-Server.svg?branch=master)](https://travis-ci.org/davinkevin/Podcast-Server) 
+
+Back-end : [![Coverage Status](https://coveralls.io/repos/davinkevin/Podcast-Server/badge.svg?branch=master)](https://coveralls.io/r/davinkevin/Podcast-Server?branch=master)
+
+Front-end : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
 
 Application design to be your Podcast local proxy in your lan network.
 It also work on many sources like youtube or CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
