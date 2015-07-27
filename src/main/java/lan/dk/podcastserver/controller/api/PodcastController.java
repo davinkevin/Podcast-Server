@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
+import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -75,25 +74,6 @@ public class PodcastController {
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable Integer id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
         return podcastBusiness.getRss(id, limit);
-    }
-
-    @Deprecated
-    @RequestMapping(value="{id:[\\d]+}/upload", method=RequestMethod.POST)
-    public String handleFileUpload(@PathVariable Integer id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name) throws PodcastNotFoundException {
-        logger.info("Envoie du fichier : {}", name);
-        if (!file.isEmpty()) {
-            try {
-                podcastBusiness.addItemByUpload(id, file, name);
-                logger.debug("Réception de {} effectuée", name);
-                return "You successfully uploaded " + name;
-            } catch (Exception e) {
-                logger.error("Réception de {} échouée", name, e);
-                return "You failed to upload " + name + " => " + e.getMessage();
-            }
-        } else {
-            logger.debug("You failed to upload {} because the file was empty.", name);
-            return "You failed to upload " + name + " because the file was empty.";
-        }
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
