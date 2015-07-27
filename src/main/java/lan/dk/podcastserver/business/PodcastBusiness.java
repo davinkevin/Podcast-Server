@@ -2,24 +2,16 @@ package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
-import org.apache.commons.io.FilenameUtils;
+import lan.dk.podcastserver.service.MimeTypeService;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -32,15 +24,12 @@ public class PodcastBusiness {
 
     public static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
-    @Resource private PodcastServerParameters podcastServerParameters;
-    @Resource private JdomService jdomService;
-    
-    @Resource private PodcastRepository podcastRepository;
-    
-    @Resource private ItemBusiness itemBusiness;
-    @Resource private TagBusiness tagBusiness;
-    @Resource private CoverBusiness coverBusiness;
-
+    @Resource PodcastServerParameters podcastServerParameters;
+    @Resource JdomService jdomService;
+    @Resource PodcastRepository podcastRepository;
+    @Resource TagBusiness tagBusiness;
+    @Resource CoverBusiness coverBusiness;
+    @Resource MimeTypeService mimeTypeService;
 
     //** Delegate du Repository **//
     public List<Podcast> findAll() {
@@ -115,49 +104,6 @@ public class PodcastBusiness {
     public String getRss(Integer id, Boolean limit) {
         return (limit) ? jdomService.podcastToXMLGeneric(findOne(id)) : jdomService.podcastToXMLGeneric(findOne(id), null);
     }
-
-    @Transactional
-    @Deprecated
-    public boolean addItemByUpload(Integer idPodcast, MultipartFile file, String name) throws PodcastNotFoundException, ParseException, IOException, URISyntaxException {
-        Podcast podcast = this.findOne(idPodcast);
-        if (podcast == null) {
-            throw new PodcastNotFoundException();
-        }
-
-        //TODO utiliser BEAN_UTIL pour faire du dynamique :
-        // 1er temps : Template en dure : {title} - {date} - {title}.mp3
-
-        Item item = new Item();
-        //String name = name;
-        /*File fileToSave = new File(rootfolder + File.separator + podcast.getTitle() + File.separator + name);*/
-        File fileToSave = podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(name).toFile();
-        if (fileToSave.exists()) {
-            fileToSave.delete();
-        }
-        fileToSave.mkdirs();
-
-        file.transferTo(fileToSave);
-
-        item.setTitle(FilenameUtils.removeExtension(name.split(" - ")[2]))
-            .setPubdate(fromFolder(name.split(" - ")[1]))
-            .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(name).build().toUriString())
-            .setLength(file.getSize())
-            .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(name)))
-            .setDescription(podcast.getDescription())
-            .setFileName(name)
-            .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
-            .setPodcast(podcast)
-            .setStatus(Status.FINISH);
-
-        podcast.getItems().add(item);
-        podcast.setLastUpdate(ZonedDateTime.now());
-
-        itemBusiness.save(item);
-        this.save(podcast);
-
-        return (item.getId() != 0);
-    }
-
 
     public Set<Item> getItems(int id){
         return this.findOne(id).getItems();
