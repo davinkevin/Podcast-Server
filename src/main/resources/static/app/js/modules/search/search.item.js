@@ -152,7 +152,7 @@ angular.module('ps.search.item', [
     'ps.dataService.donwloadManager',
     'ps.dataService.item',
     'ps.dataService.tag',
-    'ps.player',
+    'ps.players',
     'ps.config.route',
     'ngTagsInput',
     'ngStorage'

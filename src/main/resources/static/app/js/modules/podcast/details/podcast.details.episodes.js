@@ -89,7 +89,7 @@ class podcastItemsListCtrl {
     }
 }
 angular.module('ps.podcast.details.episodes', [
-    'ps.player'
+    'ps.players'
 ])
     .directive('podcastItemsList', () => new podcastItemsListDirective())
     .constant('PodcastItemPerPage', 10)

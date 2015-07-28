@@ -59,7 +59,7 @@ public class UpdatePodcastBusiness  {
         logger.info("Lancement de l'update forcé");
         Podcast podcast = podcastBusiness.findOne(id);
         podcast.setSignature("");
-        podcast = podcastBusiness.update(podcast);
+        podcast = podcastBusiness.save(podcast);
         this.updatePodcast(Collections.singletonList(podcast), executor);
     }
 
@@ -103,7 +103,7 @@ public class UpdatePodcastBusiness  {
             for (Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture : futures) {
                 UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
                 if (updateTuple != Updater.NO_MODIFICATION_TUPLE)
-                    podcastBusiness.update(attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last()));
+                    podcastBusiness.save(attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last()));
                 communicateUpdate(Boolean.TRUE);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {

@@ -3,7 +3,7 @@ angular.module('podcastApp', [
     'ps.podcast',
     'ps.item',
     'ps.download',
-    'ps.player',
+    'ps.players',
     'ps.stats',
     'ps.common',
     'ps.dataservice',

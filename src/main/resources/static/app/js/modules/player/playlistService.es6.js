@@ -25,6 +25,6 @@ class PlaylistService {
     }
 }
 
-angular.module('ps.player.playlist', [
+angular.module('ps.players.playlist', [
     'ngStorage'
 ]).service('playlistService', PlaylistService);

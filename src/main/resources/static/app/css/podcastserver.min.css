@@ -31,6 +31,10 @@ update-status .notUpdating{visibility:hidden}
 update-status i.updating{-webkit-animation-name:rotate;-webkit-animation-duration:1s;-webkit-animation-iteration-count:infinite;-webkit-animation-timing-function:linear}
 .navbar-nav>li{float:left}
 @media screen and (max-width:768px){.navbar-nav{margin:7.5px -15px 0;padding-right:16px}}
+.player-inline-full .spacer{height:100px}
+.player-inline-full .player-inline{position:fixed;left:0;bottom:0;height:100px;width:100%;background:red;z-index:100}
+.player-inline-full .player-inline .player,.player-inline-full .player-inline .poster{padding:0}
+.player-inline-full .player-inline .videogular-container.audio{height:50px}
 @media screen and (min-width:768px){.navbar-fixed-top{position:relative}}
 @media screen and (max-width:768px){body{padding-top:55px}}
 .grayscale{-webkit-filter:grayscale(100%);-moz-filter:grayscale(100%);-o-filter:grayscale(100%);-ms-filter:grayscale(100%);filter:grayscale(100%)}

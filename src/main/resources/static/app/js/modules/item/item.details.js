@@ -56,7 +56,7 @@ class ItemDetailCtrl {
 
 angular.module('ps.item.details', [
     'ps.dataService.donwloadManager',
-    'ps.player'
+    'ps.players'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
         when('/podcasts/:podcastId/item/:itemId', {

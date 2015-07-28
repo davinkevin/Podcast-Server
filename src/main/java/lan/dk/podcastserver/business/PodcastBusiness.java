@@ -96,17 +96,13 @@ public class PodcastBusiness {
         return this.reatachAndSave(podcastToUpdate);
     }
 
-    public Podcast update(Podcast podcast) {
-        return this.save(podcast);
-    }
-
     @Transactional(readOnly = true)
     public String getRss(Integer id, Boolean limit) {
         return (limit) ? jdomService.podcastToXMLGeneric(findOne(id)) : jdomService.podcastToXMLGeneric(findOne(id), null);
     }
 
-    public Set<Item> getItems(int id){
-        return this.findOne(id).getItems();
+    public Set<Item> getItems(Integer id){
+        return podcastRepository.findOne(id).getItems();
     }
 
     public Podcast reatachAndSave(Podcast podcast) {

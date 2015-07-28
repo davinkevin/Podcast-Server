@@ -1,6 +1,18 @@
 
-class PlayerController {
+class PlayerInlineDirective {
+    constructor() {
+        this.replace = true;
+        this.restrict = 'E';
+        this.scope = true;
+        this.templateUrl = 'html/player-inline.html';
+        this.controller = 'PlayerInlineController';
+        this.controllerAs = 'pic';
+    }
+}
+
+class PlayerInlineController {
     constructor(playlistService, $timeout, deviceDetectorService) {
+        this.isReading = true;
         this.playlistService = playlistService;
         this.$timeout = $timeout;
 
@@ -29,7 +41,12 @@ class PlayerController {
             this.API.play();
 
         this.isCompleted = false;
-        this.setVideo(0);
+        if (this.config.autoPlay) {
+            this.$timeout(() => {
+                console.log('play');
+                this.setVideo(0);
+            }, 1000);
+        }
     }
 
     onCompleteVideo() {
@@ -44,11 +61,19 @@ class PlayerController {
         this.setVideo(indexOfVideo+1);
     }
 
-    reloadPlaylist() {
-        _.updateinplace(this.playlist, this.playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
+    onUpdateState(state) {
+        console.log("onUpdateState: "+state);
     }
 
-
+    reloadPlaylist() {
+        _.updateinplace(
+            this.playlist,
+            this.playlistService.playlist(),
+            function(inArray, elem) {
+                return _.findIndex(inArray, { 'id': elem.id });
+            }
+        );
+    }
 
     setVideo(index) {
         this.currentVideo = this.playlist[index];
@@ -57,6 +82,7 @@ class PlayerController {
             this.API.stop();
             this.config.sources = [{src : this.currentVideo.proxyURL, type : this.currentVideo.mimeType }];
             this.config.plugins.poster = this.currentVideo.cover.url;
+            this.API.play();
         }
     }
 
@@ -78,10 +104,8 @@ class PlayerController {
     }
 }
 
-angular.module('ps.players.player', [
+angular.module('ps.players.inline', [
     'ngSanitize',
-    'ngRoute',
-    'device-detection',
     'com.2fdevs.videogular',
     'com.2fdevs.videogular.plugins.poster',
     'com.2fdevs.videogular.plugins.controls',
@@ -89,12 +113,5 @@ angular.module('ps.players.player', [
     'com.2fdevs.videogular.plugins.buffering',
     'ps.players.playlist'
 ])
-    .config(($routeProvider) => {
-        $routeProvider.
-            when('/player', {
-                templateUrl: 'html/player.html',
-                controller: 'PlayerController',
-                controllerAs: 'pc'
-            });
-    })
-    .controller('PlayerController', PlayerController);
+    .directive('playerInline', () => new PlayerInlineDirective())
+    .controller('PlayerInlineController', PlayerInlineController);
