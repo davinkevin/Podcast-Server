@@ -88,4 +88,25 @@ public class PodcastBusinessTest {
         /* When */  podcastBusiness.delete(podcastId);
         /* Then */  verify(podcastRepository, times(1)).delete(eq(podcastId));
     }
+
+    @Test
+    public void should_delete_by_entity() {
+       /* Given */ Podcast podcast = new Podcast();
+       /* When */ podcastBusiness.delete(podcast);
+       /* Then */ verify(podcastRepository, times(1)).delete(eq(podcast));
+    }
+
+    @Test
+    public void should_find_with_url_not_null() {
+       /* Given */
+        ArrayList<Podcast> listOfPodcast = new ArrayList<>();
+        when(podcastRepository.findByUrlIsNotNull()).thenReturn(listOfPodcast);
+
+       /* When */
+        List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
+
+       /* Then */
+        assertThat(podcasts).isSameAs(listOfPodcast);
+        verify(podcastRepository, times(1)).findByUrlIsNotNull();
+    }
 }
