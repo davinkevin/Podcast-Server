@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -13,7 +14,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -108,5 +111,21 @@ public class PodcastBusinessTest {
        /* Then */
         assertThat(podcasts).isSameAs(listOfPodcast);
         verify(podcastRepository, times(1)).findByUrlIsNotNull();
+    }
+
+    @Test
+    public void should_get_items() {
+       /* Given */
+        Integer idPodcast = 2;
+        Podcast podcast = new Podcast();
+        podcast.setItems(new HashSet<>());
+        when(podcastRepository.findOne(anyInt())).thenReturn(podcast);
+
+       /* When */
+        Set<Item> items = podcastBusiness.getItems(idPodcast);
+
+       /* Then */
+        assertThat(items).isSameAs(podcast.getItems());
+        verify(podcastRepository, times(1)).findOne(eq(idPodcast));
     }
 }
