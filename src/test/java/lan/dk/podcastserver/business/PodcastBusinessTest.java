@@ -3,6 +3,7 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
+import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -127,5 +128,28 @@ public class PodcastBusinessTest {
        /* Then */
         assertThat(items).isSameAs(podcast.getItems());
         verify(podcastRepository, times(1)).findOne(eq(idPodcast));
+    }
+
+    @Test
+    public void should_reattach_and_save() {
+       /* Given */
+        Set<Tag> tags = new HashSet<>();
+        tags.add(new Tag().setName("Tag1"));
+        tags.add(new Tag().setName("Tag2"));
+        Podcast podcast = new Podcast()
+                .setTags(tags);
+
+        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).thenReturn(tags);
+        when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
+
+       /* When */
+        Podcast savedPodcast = podcastBusiness.reatachAndSave(podcast);
+
+       /* Then */
+        PodcastAssert
+                .assertThat(savedPodcast)
+                .hasTags(tags.toArray(new Tag[tags.size()]));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
+        verify(podcastRepository, times(1)).save(eq(podcast));
     }
 }
