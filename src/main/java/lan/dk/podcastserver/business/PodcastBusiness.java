@@ -7,13 +7,10 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -21,8 +18,6 @@ import java.util.Set;
 @Component
 @Transactional
 public class PodcastBusiness {
-
-    public static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
     @Resource PodcastServerParameters podcastServerParameters;
     @Resource JdomService jdomService;
@@ -59,21 +54,21 @@ public class PodcastBusiness {
     }
 
     //*****//
-    public Podcast patchUpdate(Podcast patchPodcast) throws PodcastNotFoundException {
+    public Podcast patchUpdate(Podcast patchPodcast) {
         Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
 
         if (podcastToUpdate == null)
             throw new PodcastNotFoundException();
 
-        // Move folder if name has change : 
+        /*
+        // Move folder if name has change :
         if (StringUtils.equals(podcastToUpdate.getTitle(), patchPodcast.getTitle())) {
-            /* 
                 TODO : Move Folder to new Location using java.nio.FILES and java.nio.PATH
                 It must add modification on each item of the podcast (localUrl)
-             */
-            
+
         }
-        
+        */
+
         podcastToUpdate.setTitle(patchPodcast.getTitle());
         podcastToUpdate.setUrl(patchPodcast.getUrl());
         podcastToUpdate.setSignature(patchPodcast.getSignature());
@@ -98,7 +93,9 @@ public class PodcastBusiness {
 
     @Transactional(readOnly = true)
     public String getRss(Integer id, Boolean limit) {
-        return (limit) ? jdomService.podcastToXMLGeneric(findOne(id)) : jdomService.podcastToXMLGeneric(findOne(id), null);
+        return (limit) ?
+                jdomService.podcastToXMLGeneric(findOne(id)) :
+                jdomService.podcastToXMLGeneric(findOne(id), null);
     }
 
     public Set<Item> getItems(Integer id){
@@ -117,10 +114,4 @@ public class PodcastBusiness {
         
         return reatachAndSave(podcast);
     }
-
-    public ZonedDateTime fromFolder(String pubDate) {
-        return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
-    }
-
-
 }

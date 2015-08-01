@@ -9,8 +9,8 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.predicate.ItemPredicate;
+import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,9 +31,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +44,13 @@ import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
 @Transactional
 public class ItemBusiness {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
     @Resource ItemDownloadManager itemDownloadManager;
     @Resource PodcastServerParameters podcastServerParameters;
     @Resource ItemRepository itemRepository;
     @Resource PodcastBusiness podcastBusiness;
+    @Resource MimeTypeService mimeTypeService;
 
     //** Delegation Repository **//
     public List<Item> findAll() {
@@ -215,10 +216,10 @@ public class ItemBusiness {
 
 
         item.setTitle(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
-                .setPubdate(podcastBusiness.fromFolder(originalFilename.split(" - ")[1]))
+                .setPubdate(fromFileName(originalFilename.split(" - ")[1]))
                 .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(originalFilename).build().toUriString())
                 .setLength(uploadedFile.getSize())
-                .setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(originalFilename)))
+                .setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(originalFilename)))
                 .setDescription(podcast.getDescription())
                 .setFileName(originalFilename)
                 .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
@@ -232,6 +233,10 @@ public class ItemBusiness {
         podcastBusiness.save(podcast);
 
         return item;
+    }
+
+    private ZonedDateTime fromFileName(String pubDate) {
+        return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
     }
 
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {

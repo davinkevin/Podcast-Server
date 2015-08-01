@@ -1,9 +1,7 @@
 package lan.dk.podcastserver.business;
 
-import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
-import lan.dk.podcastserver.entity.Tag;
+import lan.dk.podcastserver.entity.*;
+import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -151,5 +149,122 @@ public class PodcastBusinessTest {
                 .hasTags(tags.toArray(new Tag[tags.size()]));
         verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(podcast));
+    }
+
+    @Test
+    public void should_create_podcast() {
+        /* Given */
+        Set<Tag> tags = new HashSet<>();
+        tags.add(new Tag().setName("Tag1"));
+        tags.add(new Tag().setName("Tag2"));
+        Podcast podcast = new Podcast().setTags(tags);
+        Cover cover = new Cover("http://fakeurl.com/image.png");
+        podcast.setCover(cover);
+
+        when(coverBusiness.download(any(Podcast.class))).then(i -> ((Podcast) i.getArguments()[0]).getCover().getUrl());
+        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).thenReturn(tags);
+        when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
+
+        /* When */
+        Podcast savedPodcast = podcastBusiness.create(podcast);
+
+        /* Then */
+        PodcastAssert
+                .assertThat(savedPodcast)
+                .hasTags(tags.toArray(new Tag[tags.size()]))
+                .hasCover(cover);
+
+        verify(coverBusiness, times(1)).download(eq(podcast));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
+        verify(podcastRepository, times(1)).save(eq(podcast));
+    }
+
+    @Test
+    public void should_get_rss_with_default_limit() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        String response = "Success";
+        when(podcastRepository.findOne(any(Integer.class))).thenReturn(podcast);
+        when(jdomService.podcastToXMLGeneric(eq(podcast))).thenReturn(response);
+
+        /* When */
+        String rssReturn = podcastBusiness.getRss(1, true);
+
+        /* Then */
+        assertThat(rssReturn).isEqualTo(response);
+        verify(podcastRepository, times(1)).findOne(eq(1));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast));
+    }
+
+    @Test
+    public void should_get_rss_with_define_limit() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        String response = "Success";
+        when(podcastRepository.findOne(any(Integer.class))).thenReturn(podcast);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), eq(null))).thenReturn(response);
+
+        /* When */
+        String rssReturn = podcastBusiness.getRss(1, false);
+
+        /* Then */
+        assertThat(rssReturn).isEqualTo(response);
+        verify(podcastRepository, times(1)).findOne(eq(1));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(null));
+    }
+
+    @Test(expected = PodcastNotFoundException.class)
+    public void should_reject_patch_of_podcast() {
+        podcastBusiness.patchUpdate(new Podcast());
+    }
+
+    @Test
+    public void should_patch_podcast() {
+        /* Given */
+        Set<Tag> tags = new HashSet<>();
+        tags.add(new Tag().setName("Tag1"));
+        tags.add(new Tag().setName("Tag2"));
+
+        Podcast retrievePodcast = new Podcast(),
+                patchPodcast = new Podcast();
+
+        retrievePodcast.setCover(new Cover("http://fake.url/image2.png"));
+        retrievePodcast.setId(1);
+
+        patchPodcast.setId(1);
+        patchPodcast.setTitle("Toto");
+        patchPodcast.setUrl("http://fake.url/podcast.rss");
+        patchPodcast.setType("RSS");
+        patchPodcast.setCover(new Cover("http://fake.url/image.png").setId(2));
+        patchPodcast.setDescription("Description");
+        patchPodcast.setHasToBeDeleted(true);
+        patchPodcast.setTags(tags);
+
+        when(podcastRepository.findOne(eq(patchPodcast.getId()))).thenReturn(retrievePodcast);
+        when(coverBusiness.hasSameCoverURL(any(Podcast.class), any(Podcast.class))).thenReturn(false);
+        when(coverBusiness.findOne(anyInt())).then(i -> new Cover().setId((Integer) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
+        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).then(i -> i.getArguments()[0]);
+        when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
+
+        /* When */
+        Podcast updatedPodcast = podcastBusiness.patchUpdate(patchPodcast);
+
+        /* Then */
+        PodcastAssert
+                .assertThat(updatedPodcast)
+                .hasId(patchPodcast.getId())
+                .hasTitle(patchPodcast.getTitle())
+                .hasUrl(patchPodcast.getUrl())
+                .hasType(patchPodcast.getType())
+                .hasCover(patchPodcast.getCover())
+                .hasDescription(patchPodcast.getDescription())
+                .hasHasToBeDeleted(patchPodcast.getHasToBeDeleted())
+                .hasTags(tags.toArray(new Tag[tags.size()]));
+
+        verify(podcastRepository, times(1)).findOne(eq(1));
+        verify(coverBusiness, times(1)).hasSameCoverURL(eq(patchPodcast), eq(retrievePodcast));
+        verify(coverBusiness, times(1)).findOne(eq(2));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
+        verify(podcastRepository, times(1)).save(eq(retrievePodcast));
     }
 }
