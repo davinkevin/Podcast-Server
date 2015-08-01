@@ -8,5 +8,5 @@ import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
  */
 public interface Finder {
 
-    public Podcast find(String url) throws FindPodcastNotFoundException;
+    Podcast find(String url) throws FindPodcastNotFoundException;
 }
