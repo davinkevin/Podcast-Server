@@ -8,12 +8,12 @@ import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -30,10 +30,18 @@ public class ItemDownloadManager {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
-    @Resource SimpMessagingTemplate template;
-    @Resource ItemBusiness itemBusiness;
-    @Resource PodcastServerParameters podcastServerParameters;
-    @Resource WorkerService workerService;
+    final SimpMessagingTemplate template;
+    final ItemBusiness itemBusiness;
+    final PodcastServerParameters podcastServerParameters;
+    final WorkerService workerService;
+
+    @Autowired
+    public ItemDownloadManager(SimpMessagingTemplate template, ItemBusiness itemBusiness, PodcastServerParameters podcastServerParameters, WorkerService workerService) {
+        this.template = template;
+        this.itemBusiness = itemBusiness;
+        this.podcastServerParameters = podcastServerParameters;
+        this.workerService = workerService;
+    }
 
     private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<>();
     private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<>();

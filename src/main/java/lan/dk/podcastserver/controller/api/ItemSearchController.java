@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * Created by kevin on 23/08/2014.
@@ -21,12 +20,6 @@ import java.util.List;
 public class ItemSearchController {
 
     @Resource private ItemBusiness itemBusiness;
-
-    @RequestMapping(method = RequestMethod.GET)
-    @JsonView(Item.ItemSearchListView.class)
-    public List<Item> findAll() {
-        return itemBusiness.findAll();
-    }
 
     @RequestMapping(value="pagination", method = RequestMethod.GET)
     @JsonView(Item.ItemSearchListView.class)

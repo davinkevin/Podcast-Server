@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -25,12 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -46,15 +44,18 @@ public class ItemBusiness {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
-    @Resource ItemDownloadManager itemDownloadManager;
-    @Resource PodcastServerParameters podcastServerParameters;
-    @Resource ItemRepository itemRepository;
-    @Resource PodcastBusiness podcastBusiness;
-    @Resource MimeTypeService mimeTypeService;
+    ItemDownloadManager itemDownloadManager;
+    final PodcastServerParameters podcastServerParameters;
+    final ItemRepository itemRepository;
+    final PodcastBusiness podcastBusiness;
+    final MimeTypeService mimeTypeService;
 
-    //** Delegation Repository **//
-    public List<Item> findAll() {
-        return itemRepository.findAll();
+    @Autowired
+    public ItemBusiness(PodcastServerParameters podcastServerParameters, ItemRepository itemRepository, PodcastBusiness podcastBusiness, MimeTypeService mimeTypeService) {
+        this.podcastServerParameters = podcastServerParameters;
+        this.itemRepository = itemRepository;
+        this.podcastBusiness = podcastBusiness;
+        this.mimeTypeService = mimeTypeService;
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -115,18 +116,12 @@ public class ItemBusiness {
     }
 
     public void delete(Integer id) {
-        Item itemToDelete = itemRepository.findOne(id);
+        Item itemToDelete = findOne(id);
 
         //* Si le téléchargement est en cours ou en attente : *//
         itemDownloadManager.removeItemFromQueueAndDownload(itemToDelete);
-
         itemToDelete.getPodcast().getItems().remove(itemToDelete);
-
-        delete(itemToDelete);
-    }
-
-    public void delete(Item entity) {
-        itemRepository.delete(entity);
+        itemRepository.delete(itemToDelete);
     }
 
     //****************************//
@@ -157,27 +152,6 @@ public class ItemBusiness {
     public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
         return itemRepository.findAll(isInPodcast(idPodcast), pageRequest);
     }
-
-
-
-    public String getEpisodeFile(int id) {
-        Item item = findOne(id);
-        try {
-            if (item.isDownloaded()) {
-                logger.info("Interne - Item " + id + " : " + item.getLocalUrl());
-                URL redirectionURL = new URL(item.getLocalUrl());
-                return new URI(redirectionURL.getProtocol(), null, redirectionURL.getHost(), redirectionURL.getPort(), redirectionURL.getPath(), null, null).toASCIIString();
-            }
-            else {
-                logger.info("Externe - Item " + id + " : " + item.getUrl());
-                return item.getUrl();
-            }
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return "";
-    }
-
 
     public void reindex() throws InterruptedException {
         itemRepository.reindex();
@@ -243,5 +217,10 @@ public class ItemBusiness {
         return (StringUtils.isEmpty(term))
                 ? isInTags(tags)
                 : ItemPredicate.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
+    }
+
+    @Autowired
+    public void setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
+        this.itemDownloadManager = itemDownloadManager;
     }
 }
