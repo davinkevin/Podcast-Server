@@ -13,8 +13,6 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,7 +39,6 @@ import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
 @Component
 @Transactional
 public class ItemBusiness {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
     ItemDownloadManager itemDownloadManager;
@@ -63,11 +60,10 @@ public class ItemBusiness {
         return itemRepository.findAll(pageable);
     }
 
-    public Iterable findAll(Predicate predicate) {
+    public Iterable<Item> findAll(Predicate predicate) {
         return itemRepository.findAll(predicate);
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, PageRequest page) {
         return page.getSort().getOrderFor("pertinence") == null 
@@ -75,7 +71,6 @@ public class ItemBusiness {
                 : findByTagsAndFullTextTermOrderByPertinence(term, tags, page);
     }
 
-    @SuppressWarnings("unchecked")
     private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, PageRequest page) {
         // List with the order of pertinence of search result :
         List<Integer> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
@@ -90,7 +85,7 @@ public class ItemBusiness {
 
         //Number of result
         Long numberOfResult = (long) allResult.size();
-        
+
         //Re-order the result list : 
         List<Item> orderedList = fullTextIdsWithOrder
                 .stream()
@@ -126,28 +121,24 @@ public class ItemBusiness {
 
     //****************************//
 
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findByStatus(Status... status) {
-        return itemRepository.findAll(hasStatus(status));
+        return findAll(hasStatus(status));
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDownload() {
-        return itemRepository.findAll(isDownloaded(Boolean.FALSE)
+        return findAll(isDownloaded(Boolean.FALSE)
                 .and(isNewerThan(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload()))));
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Iterable<Item> findAllToDelete() {
-        return itemRepository.findAll(isDownloaded(Boolean.TRUE)
+        return findAll(isDownloaded(Boolean.TRUE)
                 .and(hasBeenDownloadedBefore(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload())))
                 .and(hasToBeDeleted(Boolean.TRUE)));
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
         return itemRepository.findAll(isInPodcast(idPodcast), pageRequest);
@@ -166,7 +157,7 @@ public class ItemBusiness {
         return save(itemToReset.reset());
     }
 
-    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws PodcastNotFoundException, IOException, URISyntaxException {
+    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws IOException, URISyntaxException {
         Podcast podcast = podcastBusiness.findOne(podcastId);
         if (podcast == null) {
             throw new PodcastNotFoundException();
@@ -203,7 +194,7 @@ public class ItemBusiness {
         podcast.getItems().add(item);
         podcast.setLastUpdate(ZonedDateTime.now());
 
-        item = itemRepository.save(item);
+        item = save(item);
         podcastBusiness.save(podcast);
 
         return item;

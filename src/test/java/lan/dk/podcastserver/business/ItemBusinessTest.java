@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -55,6 +57,18 @@ public class ItemBusinessTest {
         verify(itemRepository, times(1)).findAll(eq(pageRequest));
     }
 
+    @Test
+    public void should_find_all_by_predicate() {
+        /* Given */
+        List<Item> items = new ArrayList<>();
+        Predicate predicate = mock(Predicate.class);
+        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
 
+        /* When */
+        Iterable<Item> itemsWithStatus = itemBusiness.findAll(predicate);
 
+        /* Then */
+        assertThat(itemsWithStatus).isSameAs(items);
+        verify(itemRepository, times(1)).findAll(eq(predicate));
+    }
 }

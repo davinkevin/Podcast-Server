@@ -7,6 +7,6 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, Integer>, ItemRepositoryCustom, QueryDslPredicateExecutor {
+public interface ItemRepository extends JpaRepository<Item, Integer>, ItemRepositoryCustom, QueryDslPredicateExecutor<Item> {
 
 }
