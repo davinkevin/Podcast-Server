@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.util.FileSystemUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,8 +32,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CoverBusinessTest {
 
+    String ROOT_FOLDER = "/tmp/podcast";
+
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089); // No-args constructor defaults to port 8080
+
+    @Before
+    public void beforeEach() {
+        FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER).toFile());
+    }
 
     @Mock CoverRepository coverRepository;
     @Mock PodcastServerParameters podcastServerParameters;
@@ -88,7 +97,7 @@ public class CoverBusinessTest {
         Podcast podcast = new Podcast().setTitle(podcastTitle);
         podcast.setCover(new Cover("http://localhost:8089/img/image." + imageExtension));
         when(podcastServerParameters.coverDefaultName()).thenReturn(defaultCoverValue);
-        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get("/tmp"));
+        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get(ROOT_FOLDER));
         when(podcastServerParameters.fileContainer()).thenReturn(new URI(fileContainer));
         /* When */
         String url = coverBusiness.download(podcast);

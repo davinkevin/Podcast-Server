@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -16,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.FileSystemUtils;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ItemBusinessTest {
 
+    String ROOT_FOLDER = "/tmp/podcast";
+
     @Mock ItemDownloadManager itemDownloadManager;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock ItemRepository itemRepository;
@@ -39,6 +44,7 @@ public class ItemBusinessTest {
     @Before
     public void beforeEach() {
         itemBusiness.setItemDownloadManager(itemDownloadManager);
+        FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER).toFile());
     }
 
     @Test
@@ -70,5 +76,34 @@ public class ItemBusinessTest {
         /* Then */
         assertThat(itemsWithStatus).isSameAs(items);
         verify(itemRepository, times(1)).findAll(eq(predicate));
+    }
+
+    @Test
+    public void should_save() {
+        /* Given */
+        Item item = new Item();
+        when(itemRepository.save(any(Item.class))).thenReturn(item);
+        /* When */
+        Item savedItem = itemBusiness.save(item);
+        /* Then */
+        ItemAssert
+                .assertThat(savedItem)
+                .isSameAs(item);
+        verify(itemRepository, times(1)).save(eq(item));
+    }
+
+    @Test
+    public void should_find_by_id() {
+        /* Given */
+        Integer idOfItem = 33;
+        Item item = new Item();
+        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        /* When */
+        Item savedItem = itemBusiness.findOne(idOfItem);
+        /* Then */
+        ItemAssert
+                .assertThat(savedItem)
+                .isSameAs(item);
+        verify(itemRepository, times(1)).findOne(idOfItem);
     }
 }

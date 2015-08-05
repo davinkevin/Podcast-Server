@@ -24,9 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -83,9 +84,6 @@ public class ItemBusiness {
         // List of all the item matching the search result :
         List<Item> allResult = (List<Item>) itemRepository.findAll(ItemPredicate.getSearchSpecifications(fullTextIdsWithOrder, tags));
 
-        //Number of result
-        Long numberOfResult = (long) allResult.size();
-
         //Re-order the result list : 
         List<Item> orderedList = fullTextIdsWithOrder
                 .stream()
@@ -98,7 +96,7 @@ public class ItemBusiness {
                 // Collect them all !
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(orderedList, page, numberOfResult);
+        return new PageImpl<>(orderedList, page, orderedList.size());
     }
 
     public Item save(Item entity) {
@@ -167,16 +165,13 @@ public class ItemBusiness {
         // 1er temps : Template en dure : {title} - {date} - {title}.mp3
 
         Item item = new Item();
-        //String name = name;
         String originalFilename = uploadedFile.getOriginalFilename();
-        File fileToSave = new File(podcastServerParameters.getRootfolder() + File.separator + podcast.getTitle() + File.separator + originalFilename);
-        if (fileToSave.exists()) {
-            fileToSave.delete();
-        }
-        //noinspection ResultOfMethodCallIgnored
-        fileToSave.getParentFile().mkdirs();
 
-        uploadedFile.transferTo(fileToSave);
+        Path fileToSave = podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(originalFilename);
+        Files.deleteIfExists(fileToSave);
+        Files.createDirectories(fileToSave.getParent());
+
+        uploadedFile.transferTo(fileToSave.toFile());
 
 
 
