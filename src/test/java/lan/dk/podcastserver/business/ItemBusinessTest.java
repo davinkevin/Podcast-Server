@@ -3,6 +3,7 @@ package lan.dk.podcastserver.business;
 import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.ItemAssert;
+import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -21,6 +22,7 @@ import org.springframework.util.FileSystemUtils;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -105,5 +107,36 @@ public class ItemBusinessTest {
                 .assertThat(savedItem)
                 .isSameAs(item);
         verify(itemRepository, times(1)).findOne(idOfItem);
+    }
+
+    @Test
+    public void should_delete() {
+        /* Given */
+        Integer idOfItem = 33;
+        Podcast podcast = new Podcast();
+        podcast.setItems(new HashSet<>());
+        Item item = new Item();
+        item.setPodcast(podcast);
+        podcast.getItems().add(item);
+
+        when(itemRepository.findOne(anyInt())).thenReturn(item);
+
+        /* When */
+        itemBusiness.delete(idOfItem);
+        /* Then */
+
+        verify(itemRepository, times(1)).findOne(idOfItem);
+        verify(itemDownloadManager, times(1)).removeItemFromQueueAndDownload(eq(item));
+        verify(itemRepository, times(1)).delete(eq(item));
+        assertThat(podcast.getItems()).isEmpty();
+    }
+
+    @Test
+    public void should_reindex() throws InterruptedException {
+        /* Given */
+        /* When */
+        itemBusiness.reindex();
+        /* Then */
+        verify(itemRepository, times(1)).reindex();
     }
 }
