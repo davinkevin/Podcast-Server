@@ -139,4 +139,44 @@ public class ItemBusinessTest {
         /* Then */
         verify(itemRepository, times(1)).reindex();
     }
+
+    @Test
+    public void should_reset_item() {
+        /* Given */
+        Integer itemId = 33;
+        Item item = mock(Item.class);
+        when(item.reset()).thenReturn(item);
+        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(false);
+        when(itemRepository.save(any(Item.class))).thenReturn(item);
+
+        /* When */
+        Item resetedItem = itemBusiness.reset(itemId);
+
+        /* Then */
+        assertThat(resetedItem)
+                .isSameAs(item);
+        verify(itemRepository, times(1)).findOne(eq(itemId));
+        verify(itemDownloadManager, times(1)).isInDownloadingQueue(eq(item));
+        verify(item, times(1)).reset();
+        verify(itemRepository, times(1)).save(eq(item));
+    }
+
+    @Test
+    public void should_reset_a_downloading_item() {
+        /* Given */
+        Integer itemId = 33;
+        Item item = mock(Item.class);
+        when(item.reset()).thenReturn(item);
+        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(true);
+
+        /* When */
+        Item resetedItem = itemBusiness.reset(itemId);
+
+        /* Then */
+        assertThat(resetedItem).isNull();
+        verify(itemRepository, times(1)).findOne(eq(itemId));
+        verify(itemDownloadManager, times(1)).isInDownloadingQueue(eq(item));
+    }
 }

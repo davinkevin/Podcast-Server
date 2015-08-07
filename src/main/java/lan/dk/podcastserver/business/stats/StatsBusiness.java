@@ -19,8 +19,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasBeendDownloadedAfter;
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.isOfType;
 
 /**
  * Created by kevin on 28/04/15 for HackerRank problem
@@ -29,9 +27,9 @@ import static lan.dk.podcastserver.repository.predicate.ItemPredicate.isOfType;
 @Transactional(readOnly = true)
 public class StatsBusiness {
 
-    ItemBusiness itemBusiness;
-    PodcastBusiness podcastBusiness;
-    WorkerService workerService;
+    final ItemBusiness itemBusiness;
+    final PodcastBusiness podcastBusiness;
+    final WorkerService workerService;
 
     @Autowired
     public StatsBusiness(ItemBusiness itemBusiness, PodcastBusiness podcastBusiness, WorkerService workerService) {
@@ -40,13 +38,11 @@ public class StatsBusiness {
         this.workerService = workerService;
     }
 
-    @SuppressWarnings("unchecked")
-    public StatsPodcastType generateForType(AbstractUpdater.Type type, Integer numberOfMonth) {
-
+    private StatsPodcastType generateForType(AbstractUpdater.Type type, Integer numberOfMonth) {
         ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(numberOfMonth);
 
         Set<NumberOfItemByDateWrapper> values =
-                ((List<Item>)itemBusiness.findAll(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast))))
+                ((List<Item>) itemBusiness.findByTypeAndDownloadDateAfter(type, dateInPast))
                 .stream()
                 .map(Item::getDownloadDate)
                 .filter(Objects::nonNull)

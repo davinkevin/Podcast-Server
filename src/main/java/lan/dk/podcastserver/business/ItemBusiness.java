@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.predicate.ItemPredicate;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -135,6 +136,11 @@ public class ItemBusiness {
         return findAll(isDownloaded(Boolean.TRUE)
                 .and(hasBeenDownloadedBefore(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload())))
                 .and(hasToBeDeleted(Boolean.TRUE)));
+    }
+
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public Iterable<Item> findByTypeAndDownloadDateAfter(AbstractUpdater.Type type, ZonedDateTime dateInPast) {
+        return findAll(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast)));
     }
 
     @Transactional(readOnly = true)
