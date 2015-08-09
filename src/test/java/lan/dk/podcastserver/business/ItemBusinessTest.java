@@ -4,6 +4,7 @@ import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -178,5 +180,19 @@ public class ItemBusinessTest {
         assertThat(resetedItem).isNull();
         verify(itemRepository, times(1)).findOne(eq(itemId));
         verify(itemDownloadManager, times(1)).isInDownloadingQueue(eq(item));
+    }
+
+    @Test
+    public void should_find_by_status() {
+        /* Given */
+        List<Item> items = new ArrayList<>();
+        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
+
+        /* When */
+        Iterable<Item> itemsWithStatus = itemBusiness.findByStatus(Status.NOT_DOWNLOADED, Status.FINISH);
+
+        /* Then */
+        assertThat(itemsWithStatus).isSameAs(items);
+        verify(itemRepository, times(1)).findAll(eq(hasStatus(Status.NOT_DOWNLOADED, Status.FINISH)));
     }
 }
