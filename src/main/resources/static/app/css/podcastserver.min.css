@@ -35,6 +35,13 @@ update-status i.updating{-webkit-animation-name:rotate;-webkit-animation-duratio
 .player-inline-full .player-inline{position:fixed;left:0;bottom:0;height:100px;width:100%;background:red;z-index:100}
 .player-inline-full .player-inline .player,.player-inline-full .player-inline .poster{padding:0}
 .player-inline-full .player-inline .videogular-container.audio{height:50px}
+.item-player vg-controls .controls-container,.video-player vg-controls .controls-container{background:-webkit-linear-gradient(top,rgba(69,72,77,0) 19%,rgba(69,72,77,.0666667) 34%,rgba(69,72,77,.0784314) 37%,rgba(0,0,0,.388235) 100%)}
+.item-player vg-controls .show-animation,.video-player vg-controls .show-animation{animation:psShowControlsAnimationFrames ease-out .5s;animation-iteration-count:1;animation-fill-mode:both}
+.item-player vg-controls .hide-animation,.video-player vg-controls .hide-animation{animation:psHideControlsAnimationFrames ease-out .5s;animation-iteration-count:1;animation-fill-mode:both}
+@keyframes psShowControlsAnimationFrames{0%{background-color:transparent}
+100%{background:-webkit-linear-gradient(top,rgba(69,72,77,0) 19%,rgba(69,72,77,.0666667) 34%,rgba(69,72,77,.0784314) 37%,rgba(0,0,0,.388235) 100%)}}
+@keyframes psHideControlsAnimationFrames{0%{opacity:.3}
+100%{opacity:0}}
 @media screen and (min-width:768px){.navbar-fixed-top{position:relative}}
 @media screen and (max-width:768px){body{padding-top:55px}}
 .grayscale{-webkit-filter:grayscale(100%);-moz-filter:grayscale(100%);-o-filter:grayscale(100%);-ms-filter:grayscale(100%);filter:grayscale(100%)}
