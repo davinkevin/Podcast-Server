@@ -56,10 +56,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .map(subTerm -> qbDsl.keyword().onFields(SEARCH_FIELDS).matching(subTerm).createQuery())
                 .forEach(query::must);
 
-        List results = fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
+        List<Integer> results = fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
                 .setProjection("id")
                 .setResultTransformer(new HibernateIdExtractor())
-                .getResultList();
+                .<Integer>getResultList();
+
+        if (results == null) {
+            return new ArrayList<>();
+        }
 
         logger.debug(results.toString());
         return results;

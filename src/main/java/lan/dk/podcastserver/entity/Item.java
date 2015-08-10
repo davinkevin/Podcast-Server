@@ -9,6 +9,8 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
@@ -29,6 +31,7 @@ public class Item implements Serializable {
     public static Path rootFolder;
     public static String fileContainer;
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     private Integer id;
@@ -306,13 +309,29 @@ public class Item implements Serializable {
     //* CallBack Method JPA *//
     @PreRemove
     public void preRemove() {
+        checkAndDelete();
+    }
+
+    private void checkAndDelete() {
         if (podcast.getHasToBeDeleted() && isDownloaded()) {
-            try {
-                Files.deleteIfExists(getLocalPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            deleteFile();
         }
+    }
+
+    private void deleteFile() {
+        try {
+            Files.deleteIfExists(getLocalPath());
+        } catch (IOException e) {
+            logger.error("Error during deletion of {}", this, e);
+        }
+    }
+
+    @Transient @JsonIgnore
+    public Item delete() {
+        deleteFile();
+        status = Status.DELETED;
+        fileName = null;
+        return this;
     }
 
     @Transient @JsonIgnore
@@ -346,7 +365,7 @@ public class Item implements Serializable {
 
     @Transient @JsonIgnore
     public Item reset() {
-        preRemove();
+        checkAndDelete();
         setStatus(Status.NOT_DOWNLOADED);
         downloadDate = null;
         fileName = null;
