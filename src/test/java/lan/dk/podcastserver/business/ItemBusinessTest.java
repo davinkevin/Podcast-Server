@@ -6,6 +6,7 @@ import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
@@ -22,11 +23,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.FileSystemUtils;
 
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasBeendDownloadedAfter;
 import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasStatus;
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.isOfType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -194,5 +198,21 @@ public class ItemBusinessTest {
         /* Then */
         assertThat(itemsWithStatus).isSameAs(items);
         verify(itemRepository, times(1)).findAll(eq(hasStatus(Status.NOT_DOWNLOADED, Status.FINISH)));
+    }
+
+    @Test
+    public void should_find_all_by_type_and_downloaded_before() {
+        /* Given */
+        List<Item> items = new ArrayList<>();
+        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
+        AbstractUpdater.Type type = new AbstractUpdater.Type("RSS", "RSS");
+        ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(3);
+
+        /* When */
+        Iterable<Item> itemsOfTypeRssAndDownloadedAfterDate = itemBusiness.findByTypeAndDownloadDateAfter(type, dateInPast);
+
+        /* Then */
+        assertThat(itemsOfTypeRssAndDownloadedAfterDate).isSameAs(items);
+        verify(itemRepository, times(1)).findAll(eq(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast))));
     }
 }
