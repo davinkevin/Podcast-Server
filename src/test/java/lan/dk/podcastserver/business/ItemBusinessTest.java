@@ -1,10 +1,8 @@
 package lan.dk.podcastserver.business;
 
 import com.mysema.query.types.Predicate;
-import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.ItemAssert;
-import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.entity.*;
+import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -16,21 +14,26 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.IntStream;
 
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasBeendDownloadedAfter;
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.hasStatus;
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.isOfType;
+import static java.util.stream.Collectors.toList;
+import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -214,5 +217,19 @@ public class ItemBusinessTest {
         /* Then */
         assertThat(itemsOfTypeRssAndDownloadedAfterDate).isSameAs(items);
         verify(itemRepository, times(1)).findAll(eq(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast))));
+    }
+
+    @Test
+    public void should_find_all_to_download() {
+        /* Given */
+        List<Item> items = new ArrayList<>();
+        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
+        when(podcastServerParameters.numberOfDayToDownload()).thenReturn(10L);
+        /* When */
+        Iterable<Item> itemsWithStatus = itemBusiness.findAllToDownload();
+
+        /* Then */
+        assertThat(itemsWithStatus).isSameAs(items);
+        verify(itemRepository, times(1)).findAll(any(Predicate.class));
     }
 }
