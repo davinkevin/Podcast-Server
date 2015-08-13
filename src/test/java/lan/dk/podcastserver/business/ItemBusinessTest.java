@@ -1,8 +1,10 @@
 package lan.dk.podcastserver.business;
 
 import com.mysema.query.types.Predicate;
-import lan.dk.podcastserver.entity.*;
-import lan.dk.podcastserver.exception.PodcastNotFoundException;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.ItemAssert;
+import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -14,25 +16,18 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toList;
 import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -231,5 +226,37 @@ public class ItemBusinessTest {
         /* Then */
         assertThat(itemsWithStatus).isSameAs(items);
         verify(itemRepository, times(1)).findAll(any(Predicate.class));
+    }
+
+    @Test
+    public void should_find_all_to_delete() {
+        /* Given */
+        List<Item> items = new ArrayList<>();
+        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
+        when(podcastServerParameters.numberOfDayToDownload()).thenReturn(10L);
+
+        /* When */
+        Iterable<Item> itemsWithStatus = itemBusiness.findAllToDelete();
+
+        /* Then */
+        assertThat(itemsWithStatus).isSameAs(items);
+        verify(itemRepository, times(1)).findAll(any(Predicate.class));
+    }
+
+    @Test
+    public void should_find_page_in_podcast() {
+        /* Given */
+        Integer idPodcast = 25;
+        PageRequest pageRequest = new PageRequest(0, 20);
+        PageImpl<Item> pageOfItem = new PageImpl<>(new ArrayList<>());
+        when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageOfItem);
+
+        /* When */
+        Page<Item> pageOfPodcast = itemBusiness.findByPodcast(idPodcast, pageRequest);
+
+        /* Then */
+        assertThat(pageOfPodcast.getContent())
+                .isEqualTo(new ArrayList<>());
+        verify(itemRepository, times(1)).findAll(eq(isInPodcast(25)), eq(pageRequest));
     }
 }
