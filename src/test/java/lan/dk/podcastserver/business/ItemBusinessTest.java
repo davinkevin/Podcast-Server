@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -21,9 +22,16 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -258,5 +266,59 @@ public class ItemBusinessTest {
         assertThat(pageOfPodcast.getContent())
                 .isEqualTo(new ArrayList<>());
         verify(itemRepository, times(1)).findAll(eq(isInPodcast(25)), eq(pageRequest));
+    }
+
+    @Test(expected = PodcastNotFoundException.class)
+    public void should_reject_because_no_podcast_found() throws IOException, URISyntaxException {
+        itemBusiness.addItemByUpload(25, mock(MultipartFile.class));
+    }
+
+    @Test
+    public void should_add_item_by_upload() throws IOException, URISyntaxException {
+        /* Given */
+        Integer idPodcast = 25;
+        MultipartFile uploadedFile = mock(MultipartFile.class);
+        Podcast podcast = new Podcast()
+                .setDescription("aDescription");
+        Long length = 123456789L;
+        ROOT_FOLDER = "/tmp/podcast";
+        podcast.setTitle("aPodcast");
+        String aMimeType = "audio/type";
+        String title = "aPodcast - 2015-09-10 - aTitle.mp3";
+        Path ITEM_FILE_PATH = Paths.get(ROOT_FOLDER, podcast.getTitle(), title);
+        Files.createDirectories(ITEM_FILE_PATH.getParent());
+        Files.createFile(ITEM_FILE_PATH);
+
+        when(podcastBusiness.findOne(eq(idPodcast))).thenReturn(podcast);
+        when(uploadedFile.getOriginalFilename()).thenReturn(title);
+        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get(ROOT_FOLDER));
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+        when(podcastBusiness.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
+        when(podcastServerParameters.fileContainer()).thenReturn(new URI("http://localhost:8080/podcast"));
+        when(uploadedFile.getSize()).thenReturn(length);
+        when(mimeTypeService.getMimeType(anyString())).thenReturn(aMimeType);
+        /* When */
+        Item item = itemBusiness.addItemByUpload(idPodcast, uploadedFile);
+
+        /* Then */
+        ItemAssert
+                .assertThat(item)
+                .hasTitle("aTitle")
+                .hasPubdate(ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(title.split(" - ")[1], DateTimeFormatter.ofPattern("yyyy-MM-dd")), LocalTime.of(0, 0)), ZoneId.systemDefault()))
+                .hasUrl("http://localhost:8080/podcast/aPodcast/" + title)
+                .hasLength(length)
+                .hasMimeType(aMimeType)
+                .hasDescription("aDescription")
+                .hasFileName(title)
+                .hasPodcast(podcast)
+                .hasStatus(Status.FINISH.value());
+
+        assertThat(podcast.getItems()).contains(item);
+        verify(podcastServerParameters, times(1)).rootFolder();
+        verify(podcastServerParameters, times(1)).fileContainer();
+        verify(mimeTypeService, times(1)).getMimeType(eq("mp3"));
+        verify(podcastBusiness, times(1)).findOne(eq(idPodcast));
+        verify(podcastBusiness, times(1)).save(eq(podcast));
+        verify(itemRepository, times(1)).save(eq(item));
     }
 }
