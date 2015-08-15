@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
+    private static final HibernateIdExtractor RESULT_TRANSFORMER = new HibernateIdExtractor();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
 
@@ -41,6 +43,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
+    @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> fullTextSearch(String term) {
         if (StringUtils.isEmpty(term))
@@ -58,7 +61,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         List<Integer> results = fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
                 .setProjection("id")
-                .setResultTransformer(new HibernateIdExtractor())
+                .setResultTransformer(RESULT_TRANSFORMER)
                 .<Integer>getResultList();
 
         if (results == null) {
