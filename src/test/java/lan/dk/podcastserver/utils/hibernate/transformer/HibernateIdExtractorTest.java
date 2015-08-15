@@ -3,6 +3,7 @@ package lan.dk.podcastserver.utils.hibernate.transformer;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,9 +21,13 @@ public class HibernateIdExtractorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void should_not_revert_extraction() {
-        assertThat(new HibernateIdExtractor().transformList(Arrays.asList("Elem1", "Elem2")))
-                .isNull();
+        List<String> collection = Arrays.asList("Elem1", "Elem2");
+        assertThat(new HibernateIdExtractor().transformList(collection))
+                .isNotEmpty()
+                .hasSize(collection.size())
+                .containsAll(collection);
     }
 
 }
