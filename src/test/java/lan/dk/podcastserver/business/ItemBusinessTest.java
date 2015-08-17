@@ -1,10 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import com.mysema.query.types.Predicate;
-import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.ItemAssert;
-import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
@@ -17,10 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,9 +27,12 @@ import java.nio.file.Paths;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toList;
 import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -320,5 +317,70 @@ public class ItemBusinessTest {
         verify(podcastBusiness, times(1)).findOne(eq(idPodcast));
         verify(podcastBusiness, times(1)).save(eq(podcast));
         verify(itemRepository, times(1)).save(eq(item));
+    }
+
+    @Test
+    public void should_find_by_tags_and_full_text_without_specific_order() {
+        /* Given */
+        String term = "Foo";
+        List<Tag> tags = Arrays.asList(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
+        PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
+
+        when(itemRepository.fullTextSearch(eq(term))).thenReturn(Arrays.asList(1, 2, 3));
+        when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
+
+        /* When */
+        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, pageRequest);
+
+        /* Then */
+        assertThat(byTagsAndFullTextTerm)
+                .isSameAs(pageResponse);
+
+        verify(itemRepository, times(1)).fullTextSearch(eq(term));
+        verify(itemRepository, times(1)).findAll(any(Predicate.class), eq(pageRequest));
+    }
+
+    @Test
+    public void should_find_by_tags() {
+        /* Given */
+        List<Tag> tags = Arrays.asList(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
+        PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
+
+        when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
+
+        /* When */
+        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, pageRequest);
+
+        /* Then */
+        assertThat(byTagsAndFullTextTerm)
+                .isSameAs(pageResponse);
+
+        verify(itemRepository, times(1)).findAll(any(Predicate.class), eq(pageRequest));
+    }
+
+    @Test
+    public void should_find_by_tags_and_full_text_with_pertinence_order_asc() {
+        /* Given */
+        String term = "Foo";
+        List<Tag> tags = Arrays.asList(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("ASC"), "pertinence");
+        List<Item> itemsFrom1To20 = IntStream.range(1, 20)
+                .mapToObj(id -> new Item().setId(id))
+                .collect(toList());
+
+        when(itemRepository.fullTextSearch(eq(term))).thenReturn(IntStream.range(1, 20).boxed().collect(toList()));
+        when(itemRepository.findAll(any(Predicate.class))).thenReturn(itemsFrom1To20);
+
+        /* When */
+        Page<Item> pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, pageRequest);
+
+        /* Then */
+        assertThat(pageOfItem.getContent())
+                .contains(new Item().setId(16), new Item().setId(15), new Item().setId(14));
+
+        verify(itemRepository, times(1)).fullTextSearch(eq(term));
+        verify(itemRepository, times(1)).findAll(any(Predicate.class));
     }
 }
