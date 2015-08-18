@@ -9,7 +9,7 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.repository.predicate.ItemPredicate;
+import lan.dk.podcastserver.repository.dsl.ItemDSL;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FilenameUtils;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
+import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Component
 @Transactional
@@ -83,7 +83,7 @@ public class ItemBusiness {
         }
         
         // List of all the item matching the search result :
-        List<Item> allResult = (List<Item>) itemRepository.findAll(ItemPredicate.getSearchSpecifications(fullTextIdsWithOrder, tags));
+        List<Item> allResult = (List<Item>) itemRepository.findAll(ItemDSL.getSearchSpecifications(fullTextIdsWithOrder, tags));
 
         //Re-order the result list : 
         List<Item> orderedList = fullTextIdsWithOrder
@@ -208,7 +208,7 @@ public class ItemBusiness {
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {
         return (StringUtils.isEmpty(term))
                 ? isInTags(tags)
-                : ItemPredicate.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
+                : ItemDSL.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
     }
 
     @Autowired

@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
-import static lan.dk.podcastserver.repository.predicate.ItemPredicate.*;
+import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

@@ -31,8 +31,8 @@ public class Item implements Serializable {
     public static Path rootFolder;
     public static String fileContainer;
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Integer id;
     private String title;
@@ -51,9 +51,6 @@ public class Item implements Serializable {
     private Integer progression = 0;
     private ZonedDateTime downloadDate;
     private Integer numberOfTry = 0;
-
-    public Item() {
-    }
 
     @Id
     @DocumentId
