@@ -11,7 +11,7 @@ import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,12 +27,15 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 
 @Component
 @Transactional
 public class UpdatePodcastBusiness  {
 
+    private TimeUnit timeUnit = TimeUnit.MINUTES;
+    private Integer timeValue = 5;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String WS_TOPIC_UPDATING = "/topic/updating";
 
@@ -43,24 +44,23 @@ public class UpdatePodcastBusiness  {
     @Resource WorkerService workerService;
     @Resource SimpMessagingTemplate template;
 
-    @Resource @Qualifier("UpdateExecutor") AsyncTaskExecutor asyncExecutor;
-    @Resource @Qualifier("ManualUpdater") AsyncTaskExecutor executor;
+    @Resource @Qualifier("UpdateExecutor") TaskExecutor updateExecutor;
+    @Resource @Qualifier("ManualUpdater") TaskExecutor manualExecutor;
     @Resource(name="Validator") Validator validator;
 
     private AtomicBoolean isUpdating = new AtomicBoolean(false);
 
     public void updatePodcast() {
-        updatePodcast(podcastBusiness.findByUrlIsNotNull(), asyncExecutor);
+        updatePodcast(podcastBusiness.findByUrlIsNotNull(), updateExecutor);
     }
-    public void updatePodcast(Integer id) {
-        updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), executor);
-    }
+    public void updatePodcast(Integer id) { updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), manualExecutor); }
+
     public void forceUpdatePodcast (Integer id){
         logger.info("Lancement de l'update forcé");
         Podcast podcast = podcastBusiness.findOne(id);
         podcast.setSignature("");
         podcast = podcastBusiness.save(podcast);
-        this.updatePodcast(Collections.singletonList(podcast), executor);
+        updatePodcast(podcast.getId());
     }
 
     @Transactional(noRollbackFor=Exception.class)
@@ -78,6 +78,7 @@ public class UpdatePodcastBusiness  {
                             .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor)
             );
         }
+        logger.info("Attente des retours");
 
         handleUpdateTuple(futures);
 
@@ -86,30 +87,31 @@ public class UpdatePodcastBusiness  {
     }
 
     private void finishUpdate() {
-        communicateUpdate(Boolean.FALSE);
+        changeAndCommunicateUpdate(Boolean.FALSE);
     }
 
-    private void communicateUpdate(Boolean isUpdating) {
+    private void changeAndCommunicateUpdate(Boolean isUpdating) {
         this.isUpdating.set(isUpdating);
         this.template.convertAndSend(WS_TOPIC_UPDATING, this.isUpdating.get());
     }
 
     private void initUpdate() {
-        communicateUpdate(Boolean.TRUE);
+        changeAndCommunicateUpdate(Boolean.TRUE);
     }
 
     private void handleUpdateTuple(Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures) {
         try {
             for (Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture : futures) {
-                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(5, TimeUnit.MINUTES);
+                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(timeValue, timeUnit);
                 if (updateTuple != Updater.NO_MODIFICATION_TUPLE)
                     podcastBusiness.save(attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last()));
-                communicateUpdate(Boolean.TRUE);
+                changeAndCommunicateUpdate(Boolean.TRUE);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("Error during update", e);
         }
     }
+
     private Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {
 
         if (items == null || items.isEmpty() )
@@ -134,28 +136,26 @@ public class UpdatePodcastBusiness  {
         for (Item item : itemBusiness.findAllToDelete()) {
             fileToDelete = item.getLocalPath();
             logger.info("Suppression du fichier associé à l'item {} : {}", item.getId(), fileToDelete.toAbsolutePath().toString());
-            try {
-                Files.deleteIfExists(fileToDelete);
-                itemBusiness.save(
-                        item.setStatus(Status.DELETED)
-                            .setFileName(null)
-                );
-            } catch (IOException e) {
-                logger.error("Error during suppression : ", e);
-            }
+            itemBusiness.save( item.delete() );
         }
     }
 
     @PostConstruct
     public void resetItemWithIncorrectState() {
-        logger.debug("Reset des Started et Paused");
+        logger.info("Reset des Started et Paused");
 
-        for (Item item : itemBusiness.findByStatus(Status.STARTED, Status.PAUSED)) {
-            itemBusiness.save(item.setStatus(Status.NOT_DOWNLOADED));
-        }
+        StreamSupport
+                .stream(itemBusiness.findByStatus(Status.STARTED, Status.PAUSED).spliterator(), false)
+                .map(item -> item.setStatus(Status.NOT_DOWNLOADED))
+                .forEach(itemBusiness::save);
     }
 
     public Boolean isUpdating() {
         return isUpdating.get();
+    }
+
+    public void setTimeOut(Integer timeValue, TimeUnit timeUnit) {
+        this.timeValue = timeValue;
+        this.timeUnit = timeUnit;
     }
 }

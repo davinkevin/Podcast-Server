@@ -35,7 +35,7 @@ public class YoutubeUpdaterTest {
     @InjectMocks YoutubeUpdater youtubeUpdater;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock Validator validator;
-    @Spy JdomService jdomService = new JdomService();
+    @Spy JdomService jdomService;
     @Spy SignatureService signatureService = new SignatureService();
 
     @Before

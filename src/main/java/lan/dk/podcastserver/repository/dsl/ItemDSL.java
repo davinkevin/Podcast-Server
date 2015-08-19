@@ -28,10 +28,6 @@ public class ItemDSL {
         return Q_ITEM.pubdate.gt(dateTime);
     }
 
-    public static BooleanExpression isOlderThan(ZonedDateTime dateTime){
-        return Q_ITEM.pubdate.lt(dateTime);
-    }
-
     public static BooleanExpression hasBeenDownloadedBefore(ZonedDateTime dateTime) {
         return Q_ITEM.downloadDate.lt(dateTime);
     }
