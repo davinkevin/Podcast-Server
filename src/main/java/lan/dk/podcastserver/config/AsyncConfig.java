@@ -5,7 +5,7 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -20,13 +20,12 @@ import javax.annotation.Resource;
 @ComponentScan(basePackages = { "lan.dk.podcastserver.manager"})
 public class AsyncConfig implements AsyncConfigurer {
 
-    /*@Value("${maxUpdateParallels:3}") private int concurrentDownload;*/
     @Resource PodcastServerParameters podcastServerParameters;
     
 
     @Bean(name = "UpdateExecutor")
     @Override
-    public AsyncTaskExecutor getAsyncExecutor() {
+    public TaskExecutor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(podcastServerParameters.concurrentDownload());
         executor.setMaxPoolSize(podcastServerParameters.concurrentDownload());
@@ -36,7 +35,7 @@ public class AsyncConfig implements AsyncConfigurer {
     }
 
     @Bean(name = "ManualUpdater")
-    public AsyncTaskExecutor singleThreadExecutor() {
+    public TaskExecutor singleThreadExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
         executor.setMaxPoolSize(1);
