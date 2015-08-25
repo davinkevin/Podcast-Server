@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -11,13 +10,15 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.time.format.DateTimeFormatter;
+
+import static java.util.Objects.nonNull;
 
 @Service
 public class JdomService {
@@ -52,14 +53,18 @@ public class JdomService {
     //Useful namespace : 
     public static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
     public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
-    
-    // Sax Parser not used in final stage, because it is not thread-safe...:
-    /*private static final SAXBuilder SAX_BUILDER = new SAXBuilder();*/
-    
+
     // URL Format
     private static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
     
-    @Resource PodcastServerParameters podcastServerParameters;
+    final PodcastServerParameters podcastServerParameters;
+    final MimeTypeService mimeTypeService;
+
+    @Autowired
+    public JdomService(PodcastServerParameters podcastServerParameters, MimeTypeService mimeTypeService) {
+        this.podcastServerParameters = podcastServerParameters;
+        this.mimeTypeService = mimeTypeService;
+    }
 
     public Document jdom2Parse(String urlasString) throws JDOMException, IOException {
         Document doc;
@@ -85,16 +90,19 @@ public class JdomService {
 
         Element channel = new Element(CHANNEL);
 
-        String coverUrl = podcast.getCover().getUrl();
-        
+        String coverUrl = StringUtils.replace(podcast.getCover().getUrl(), " ", "%20");
+
         Element title = new Element(TITLE);
         title.addContent(new Text(podcast.getTitle()));
 
         Element url = new Element(LINK);
         url.addContent(new Text(String.format(LINK_FORMAT, podcastServerParameters.getServerUrl(), podcast.getId())));
 
-        Element lastUpdate = new Element(PUB_DATE);
-        lastUpdate.addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
+        if (nonNull(podcast.getLastUpdate())) {
+            Element lastUpdate = new Element(PUB_DATE);
+            lastUpdate.addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
+            channel.addContent(lastUpdate);
+        }
 
         Element description = new Element(DESCRIPTION);
         description.addContent(new Text(podcast.getDescription()));
@@ -119,7 +127,7 @@ public class JdomService {
 
         channel.addContent(url);
         channel.addContent(title);
-        channel.addContent(lastUpdate);
+        /*channel.addContent(lastUpdate);*/
         channel.addContent(description);
         channel.addContent(itunesSub);
         channel.addContent(itunesSummary);
@@ -166,7 +174,7 @@ public class JdomService {
 
             item_enclosure.setAttribute(URL, podcastServerParameters.getServerUrl()
                     .concat(item.getProxyURLWithoutExtention())
-                    .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : MimeTypeUtils.getExtension(item)));
+                    .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
 
             if (item.getLength() != null) {
                 item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
@@ -198,7 +206,7 @@ public class JdomService {
             xmlItem.addContent(guid);
 
             Element itunesItemThumbnail = new Element(IMAGE, ITUNES_NAMESPACE);
-            itunesItemThumbnail.setContent(new Text(item.getCoverOfItemOrPodcast().getUrl()));
+            itunesItemThumbnail.setContent(new Text(StringUtils.replace(item.getCoverOfItemOrPodcast().getUrl(), " ", "%20")));
             xmlItem.addContent(itunesItemThumbnail);
 
             Element thumbnail = new Element(THUMBNAIL, MEDIA_NAMESPACE);
