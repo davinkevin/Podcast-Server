@@ -15,7 +15,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 public class BeanConfigScan {
 
     @Bean(name="Validator")
-    public LocalValidatorFactoryBean getValidator() {
+    public LocalValidatorFactoryBean validator() {
         return new LocalValidatorFactoryBean();
     }
 }
