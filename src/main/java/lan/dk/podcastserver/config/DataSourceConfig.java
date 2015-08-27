@@ -16,7 +16,7 @@ import java.sql.SQLException;
  */
 @Configuration
 @ComponentScan("lan.dk.podcastserver.repository")
-class DataSourceConfig {
+public class DataSourceConfig {
 
     @Value("${spring.datasource.username:}")
     private String user;
@@ -34,7 +34,7 @@ class DataSourceConfig {
     public static final String[] PARAMETER_H2_SERVER = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", "9999"};
 
     @Bean
-    public DataSource primaryDataSource() throws SQLException {
+    public DataSource dataSource() throws SQLException {
         HikariDataSource dataSource = new HikariDataSource();
 
         dataSource.setDriverClassName(dataSourceClassName);
