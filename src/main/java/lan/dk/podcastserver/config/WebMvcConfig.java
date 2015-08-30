@@ -36,17 +36,13 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        super.addViewControllers(registry);
-    }
-
-    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        logger.info("Mapping du dossier {} à {}", PODCAST_LOCATION_RESOURCE_HANDLER, podcastServerParameters.rootFolderWithProtocol());
+        String rootFolderWithProtocol = podcastServerParameters.rootFolderWithProtocol();
+        logger.info("Mapping du dossier {} à {}", PODCAST_LOCATION_RESOURCE_HANDLER, rootFolderWithProtocol);
         
         registry
                 .addResourceHandler(PODCAST_LOCATION_RESOURCE_HANDLER)
-                    .addResourceLocations(podcastServerParameters.rootFolderWithProtocol())
+                    .addResourceLocations(rootFolderWithProtocol)
                     .setCachePeriod(CACHE_PERIOD);
     }
 
@@ -65,8 +61,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureMessageConverters (List<HttpMessageConverter<?>> converters) {
-
-        super.configureMessageConverters(converters);
 
         //Ajout de la librairie de désierialization spécifiques à Hibernate pour Jackson
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
