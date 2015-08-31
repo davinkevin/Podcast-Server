@@ -29,8 +29,6 @@ public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport 
 
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-        //Ajout de la librairie de désierialization spécifiques à Hibernate pour Jackson
-
         MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter();
         mappingJackson2MessageConverter.setObjectMapper(new CustomObjectMapper());
 
