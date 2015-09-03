@@ -15,7 +15,7 @@ public class HibernateSearchIndexation {
     @Resource ItemBusiness itemBusiness;
 
     @Scheduled(fixedDelay = 86400000)
-    private void refreshIndex() throws InterruptedException {
+    public void refreshIndex() throws InterruptedException {
         itemBusiness.reindex();
     }
 
