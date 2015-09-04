@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -7,11 +8,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
+
+import static java.time.ZonedDateTime.now;
 
 /**
  * Created by kevin on 03/02/15.
  */
 @Service
+@Setter
 @ConfigurationProperties("podcastserver")
 public class PodcastServerParameters {
 
@@ -80,36 +85,8 @@ public class PodcastServerParameters {
         return rssDefaultNumberItem;
     }
 
-
-    /* Setter to initiate the @Bean */
-    public void setRootfolder(String rootfolder) {
-        this.rootfolder = rootfolder;
-    }
-    public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
-    }
-    public void setFileContainer(String fileContainer) {
-        this.fileContainer = fileContainer;
-    }
-    public void setCoverDefaultName(String coverDefaultName) {
-        this.coverDefaultName = coverDefaultName;
-    }
-    public void setDownloadExtention(String downloadExtention) {
-        this.downloadExtention = downloadExtention;
-    }
-    public void setMaxUpdateParallels(Integer maxUpdateParallels) {
-        this.maxUpdateParallels = maxUpdateParallels;
-    }
-    public void setConcurrentDownload(Integer concurrentDownload) {
-        this.concurrentDownload = concurrentDownload;
-    }
-    public void setNumberOfTry(Integer numberOfTry) {
-        this.numberOfTry = numberOfTry;
-    }
-    public void setNumberOfDayToDownload(Long numberOfDayToDownload) {
-        this.numberOfDayToDownload = numberOfDayToDownload;
-    }
-    public void setRssDefaultNumberItem(Long rssDefaultNumberItem) {
-        this.rssDefaultNumberItem = rssDefaultNumberItem;
+    /* Utils on attributes */
+    public ZonedDateTime limitDownloadDate() {
+        return now().minusDays(numberOfDayToDownload);
     }
 }

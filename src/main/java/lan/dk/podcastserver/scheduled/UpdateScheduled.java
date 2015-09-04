@@ -21,7 +21,7 @@ public class UpdateScheduled {
     private @Resource ItemDownloadManager IDM;
 
     @Scheduled(cron="${podcastserver.update-and-download.refresh.cron:0 0 * * * *}")
-    private void updateAndDownloadPodcast() {
+    public void updateAndDownloadPodcast() {
         logger.info(">>> Beginning of the update <<<");
         updatePodcastBusiness.updatePodcast();
         IDM.launchDownload();

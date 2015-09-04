@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.manager;
 
-import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
 import org.slf4j.Logger;
@@ -31,14 +31,14 @@ public class ItemDownloadManager {
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
     final SimpMessagingTemplate template;
-    final ItemBusiness itemBusiness;
+    final ItemRepository itemRepository;
     final PodcastServerParameters podcastServerParameters;
     final WorkerService workerService;
 
     @Autowired
-    public ItemDownloadManager(SimpMessagingTemplate template, ItemBusiness itemBusiness, PodcastServerParameters podcastServerParameters, WorkerService workerService) {
+    public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, WorkerService workerService) {
         this.template = template;
-        this.itemBusiness = itemBusiness;
+        this.itemRepository = itemRepository;
         this.podcastServerParameters = podcastServerParameters;
         this.workerService = workerService;
     }
@@ -103,7 +103,8 @@ public class ItemDownloadManager {
     }
 
     private void initDownload() {
-        StreamSupport.stream(itemBusiness.findAllToDownload().spliterator(), false)
+        StreamSupport
+                .stream(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate()).spliterator(), false)
                 .filter(item -> !waitingQueue.contains(item))
                 .forEach(waitingQueue::add);
     }
@@ -156,7 +157,7 @@ public class ItemDownloadManager {
     }
 
     public void addItemToQueue(int id) {
-        this.addItemToQueue(itemBusiness.findOne(id));
+        this.addItemToQueue(itemRepository.findOne(id));
     }
 
     public void addItemToQueue(Item item) {
@@ -169,11 +170,11 @@ public class ItemDownloadManager {
     }
 
     public void removeItemFromQueue(int id, Boolean stopItem) {
-        Item item = itemBusiness.findOne(id);
+        Item item = itemRepository.findOne(id);
         this.removeItemFromQueue(item);
 
         if (stopItem)
-            itemBusiness.save(item.setStatus(Status.STOPPED));
+            itemRepository.save(item.setStatus(Status.STOPPED));
 
         this.convertAndSendWaitingQueue();
     }

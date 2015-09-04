@@ -1,12 +1,13 @@
 package lan.dk.podcastserver.business.update;
 
-import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.assertj.core.api.Condition;
@@ -48,9 +49,10 @@ public class UpdatePodcastBusinessTest {
     @Captor ArgumentCaptor<Item> ITEM_ARGUMENT_CAPTOR;
 
     @Mock PodcastBusiness podcastBusiness;
-    @Mock ItemBusiness itemBusiness;
+    @Mock ItemRepository itemRepository;
     @Mock WorkerService workerService;
     @Mock SimpMessagingTemplate template;
+    @Mock PodcastServerParameters podcastServerParameters;
     @Spy TaskExecutor updateExecutor = new SyncTaskExecutor();
     @Spy TaskExecutor manualExecutor = new SyncTaskExecutor();
     @Mock Validator validator;
@@ -65,7 +67,7 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_do_di() {
         assertThat(updatePodcastBusiness.podcastBusiness).isNotNull();
-        assertThat(updatePodcastBusiness.itemBusiness).isNotNull();
+        assertThat(updatePodcastBusiness.itemRepository).isNotNull();
         assertThat(updatePodcastBusiness.workerService).isNotNull();
         assertThat(updatePodcastBusiness.template).isNotNull();
         assertThat(updatePodcastBusiness.updateExecutor).isNotNull();
@@ -76,7 +78,7 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_delete_old_episode() {
         /* Given */
-        when(itemBusiness.findAllToDelete()).thenReturn(generateItemsOfPodcast(3, new Podcast().setTitle("Title")));
+        when(itemRepository.findAllToDelete(any())).thenReturn(generateItemsOfPodcast(3, new Podcast().setTitle("Title")));
         /* When */
         updatePodcastBusiness.deleteOldEpisode();
         /* Then */
@@ -96,12 +98,12 @@ public class UpdatePodcastBusinessTest {
                 new Item().setStatus(Status.STARTED),
                 new Item().setStatus(Status.PAUSED)
         );
-        when(itemBusiness.findByStatus(anyVararg())).thenReturn(items);
+        when(itemRepository.findByStatus(anyVararg())).thenReturn(items);
         /* When */
         updatePodcastBusiness.resetItemWithIncorrectState();
 
         /* Then */
-        verify(itemBusiness, times(2)).save(ITEM_ARGUMENT_CAPTOR.capture());
+        verify(itemRepository, times(2)).save(ITEM_ARGUMENT_CAPTOR.capture());
         assertThat(ITEM_ARGUMENT_CAPTOR.getAllValues())
                 .are(new Condition<Item>() {
                     @Override

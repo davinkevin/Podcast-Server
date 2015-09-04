@@ -1,11 +1,12 @@
 package lan.dk.podcastserver.business.update;
 
-import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.slf4j.Logger;
@@ -40,9 +41,10 @@ public class UpdatePodcastBusiness  {
     private static final String WS_TOPIC_UPDATING = "/topic/updating";
 
     @Resource PodcastBusiness podcastBusiness;
-    @Resource ItemBusiness itemBusiness;
+    @Resource ItemRepository itemRepository;
     @Resource WorkerService workerService;
     @Resource SimpMessagingTemplate template;
+    @Resource PodcastServerParameters podcastServerParameters;
 
     @Resource @Qualifier("UpdateExecutor") TaskExecutor updateExecutor;
     @Resource @Qualifier("ManualUpdater") TaskExecutor manualExecutor;
@@ -133,10 +135,10 @@ public class UpdatePodcastBusiness  {
     public void deleteOldEpisode() {
         logger.info("Suppression des anciens items");
         Path fileToDelete;
-        for (Item item : itemBusiness.findAllToDelete()) {
+        for (Item item : itemRepository.findAllToDelete(podcastServerParameters.limitDownloadDate())) {
             fileToDelete = item.getLocalPath();
             logger.info("Suppression du fichier associé à l'item {} : {}", item.getId(), fileToDelete.toAbsolutePath().toString());
-            itemBusiness.save( item.delete() );
+            itemRepository.save( item.deleteDownloadedFile() );
         }
     }
 
@@ -145,9 +147,9 @@ public class UpdatePodcastBusiness  {
         logger.info("Reset des Started et Paused");
 
         StreamSupport
-                .stream(itemBusiness.findByStatus(Status.STARTED, Status.PAUSED).spliterator(), false)
+                .stream(itemRepository.findByStatus(Status.STARTED, Status.PAUSED).spliterator(), false)
                 .map(item -> item.setStatus(Status.NOT_DOWNLOADED))
-                .forEach(itemBusiness::save);
+                .forEach(itemRepository::save);
     }
 
     public Boolean isUpdating() {

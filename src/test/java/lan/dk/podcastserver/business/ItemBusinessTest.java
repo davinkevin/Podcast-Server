@@ -4,7 +4,6 @@ import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
-import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -72,21 +70,6 @@ public class ItemBusinessTest {
                 .isSameAs(page);
 
         verify(itemRepository, times(1)).findAll(eq(pageRequest));
-    }
-
-    @Test
-    public void should_find_all_by_predicate() {
-        /* Given */
-        List<Item> items = new ArrayList<>();
-        Predicate predicate = mock(Predicate.class);
-        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
-
-        /* When */
-        Iterable<Item> itemsWithStatus = itemBusiness.findAll(predicate);
-
-        /* Then */
-        assertThat(itemsWithStatus).isSameAs(items);
-        verify(itemRepository, times(1)).findAll(eq(predicate));
     }
 
     @Test
@@ -190,79 +173,19 @@ public class ItemBusinessTest {
     }
 
     @Test
-    public void should_find_by_status() {
-        /* Given */
-        List<Item> items = new ArrayList<>();
-        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
-
-        /* When */
-        Iterable<Item> itemsWithStatus = itemBusiness.findByStatus(Status.NOT_DOWNLOADED, Status.FINISH);
-
-        /* Then */
-        assertThat(itemsWithStatus).isSameAs(items);
-        verify(itemRepository, times(1)).findAll(eq(hasStatus(Status.NOT_DOWNLOADED, Status.FINISH)));
-    }
-
-    @Test
-    public void should_find_all_by_type_and_downloaded_before() {
-        /* Given */
-        List<Item> items = new ArrayList<>();
-        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
-        AbstractUpdater.Type type = new AbstractUpdater.Type("RSS", "RSS");
-        ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(3);
-
-        /* When */
-        Iterable<Item> itemsOfTypeRssAndDownloadedAfterDate = itemBusiness.findByTypeAndDownloadDateAfter(type, dateInPast);
-
-        /* Then */
-        assertThat(itemsOfTypeRssAndDownloadedAfterDate).isSameAs(items);
-        verify(itemRepository, times(1)).findAll(eq(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast))));
-    }
-
-    @Test
-    public void should_find_all_to_download() {
-        /* Given */
-        List<Item> items = new ArrayList<>();
-        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
-        when(podcastServerParameters.numberOfDayToDownload()).thenReturn(10L);
-        /* When */
-        Iterable<Item> itemsWithStatus = itemBusiness.findAllToDownload();
-
-        /* Then */
-        assertThat(itemsWithStatus).isSameAs(items);
-        verify(itemRepository, times(1)).findAll(any(Predicate.class));
-    }
-
-    @Test
-    public void should_find_all_to_delete() {
-        /* Given */
-        List<Item> items = new ArrayList<>();
-        when(itemRepository.findAll(any(Predicate.class))).thenReturn(items);
-        when(podcastServerParameters.numberOfDayToDownload()).thenReturn(10L);
-
-        /* When */
-        Iterable<Item> itemsWithStatus = itemBusiness.findAllToDelete();
-
-        /* Then */
-        assertThat(itemsWithStatus).isSameAs(items);
-        verify(itemRepository, times(1)).findAll(any(Predicate.class));
-    }
-
-    @Test
     public void should_find_page_in_podcast() {
         /* Given */
         Integer idPodcast = 25;
         PageRequest pageRequest = new PageRequest(0, 20);
         PageImpl<Item> pageOfItem = new PageImpl<>(new ArrayList<>());
-        when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageOfItem);
+        when(itemRepository.findByPodcast(anyInt(), any(PageRequest.class))).thenReturn(pageOfItem);
 
         /* When */
         Page<Item> pageOfPodcast = itemBusiness.findByPodcast(idPodcast, pageRequest);
 
         /* Then */
-        assertThat(pageOfPodcast.getContent())
-                .isEqualTo(new ArrayList<>());
-        verify(itemRepository, times(1)).findAll(eq(isInPodcast(25)), eq(pageRequest));
+        assertThat(pageOfPodcast.getContent()).isEqualTo(new ArrayList<>());
+        verify(itemRepository, times(1)).findByPodcast(eq(25), eq(pageRequest));
     }
 
     @Test(expected = PodcastNotFoundException.class)

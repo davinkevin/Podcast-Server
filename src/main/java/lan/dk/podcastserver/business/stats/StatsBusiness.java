@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.business.stats;
 
-import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
@@ -27,13 +27,13 @@ import static java.util.stream.Collectors.*;
 @Transactional(readOnly = true)
 public class StatsBusiness {
 
-    final ItemBusiness itemBusiness;
+    final ItemRepository itemRepository;
     final PodcastBusiness podcastBusiness;
     final WorkerService workerService;
 
     @Autowired
-    public StatsBusiness(ItemBusiness itemBusiness, PodcastBusiness podcastBusiness, WorkerService workerService) {
-        this.itemBusiness = itemBusiness;
+    public StatsBusiness(ItemRepository itemRepository, PodcastBusiness podcastBusiness, WorkerService workerService) {
+        this.itemRepository = itemRepository;
         this.podcastBusiness = podcastBusiness;
         this.workerService = workerService;
     }
@@ -42,7 +42,7 @@ public class StatsBusiness {
         ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(numberOfMonth);
 
         Set<NumberOfItemByDateWrapper> values =
-                ((List<Item>) itemBusiness.findByTypeAndDownloadDateAfter(type, dateInPast))
+                ((List<Item>) itemRepository.findByTypeAndDownloadDateAfter(type, dateInPast))
                 .stream()
                 .map(Item::getDownloadDate)
                 .filter(Objects::nonNull)

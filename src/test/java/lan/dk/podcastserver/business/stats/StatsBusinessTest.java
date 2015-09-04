@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.business.stats;
 
-import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StatsBusinessTest {
 
-    @Mock ItemBusiness itemBusiness;
+    @Mock ItemRepository itemRepository;
     @Mock PodcastBusiness podcastBusiness;
     @Mock WorkerService workerService;
     @InjectMocks StatsBusiness statsBusiness;
@@ -44,10 +44,10 @@ public class StatsBusinessTest {
         AbstractUpdater.Type youtube = new AbstractUpdater.Type("Youtube", "Youtube");
         when(workerService.types()).thenReturn(new HashSet<>(Arrays.asList(rss, beInSport, canalPlus, youtube)));
 
-        when(itemBusiness.findByTypeAndDownloadDateAfter(eq(rss), any(ZonedDateTime.class))).thenReturn(generateItems(5));
-        when(itemBusiness.findByTypeAndDownloadDateAfter(eq(beInSport), any(ZonedDateTime.class))).thenReturn(new ArrayList<>());
-        when(itemBusiness.findByTypeAndDownloadDateAfter(eq(canalPlus), any(ZonedDateTime.class))).thenReturn(generateItems(10));
-        when(itemBusiness.findByTypeAndDownloadDateAfter(eq(youtube), any(ZonedDateTime.class))).thenReturn(generateItems(50));
+        when(itemRepository.findByTypeAndDownloadDateAfter(eq(rss), any(ZonedDateTime.class))).thenReturn(generateItems(5));
+        when(itemRepository.findByTypeAndDownloadDateAfter(eq(beInSport), any(ZonedDateTime.class))).thenReturn(new ArrayList<>());
+        when(itemRepository.findByTypeAndDownloadDateAfter(eq(canalPlus), any(ZonedDateTime.class))).thenReturn(generateItems(10));
+        when(itemRepository.findByTypeAndDownloadDateAfter(eq(youtube), any(ZonedDateTime.class))).thenReturn(generateItems(50));
 
         /* When */
         List<StatsPodcastType> statsPodcastTypes = statsBusiness.allStatsByType(1);

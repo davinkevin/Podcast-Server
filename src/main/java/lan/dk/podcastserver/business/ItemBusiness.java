@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.time.ZonedDateTime.*;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Component
@@ -60,10 +61,6 @@ public class ItemBusiness {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findAll(Pageable pageable) {
         return itemRepository.findAll(pageable);
-    }
-
-    public Iterable<Item> findAll(Predicate predicate) {
-        return itemRepository.findAll(predicate);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -120,32 +117,9 @@ public class ItemBusiness {
 
     //****************************//
 
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Iterable<Item> findByStatus(Status... status) {
-        return findAll(hasStatus(status));
-    }
-
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Iterable<Item> findAllToDownload() {
-        return findAll(isDownloaded(Boolean.FALSE)
-                .and(isNewerThan(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload()))));
-    }
-
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Iterable<Item> findAllToDelete() {
-        return findAll(isDownloaded(Boolean.TRUE)
-                .and(hasBeenDownloadedBefore(ZonedDateTime.now().minusDays(podcastServerParameters.numberOfDayToDownload())))
-                .and(hasToBeDeleted(Boolean.TRUE)));
-    }
-
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Iterable<Item> findByTypeAndDownloadDateAfter(AbstractUpdater.Type type, ZonedDateTime dateInPast) {
-        return findAll(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast)));
-    }
-
     @Transactional(readOnly = true)
     public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
-        return itemRepository.findAll(isInPodcast(idPodcast), pageRequest);
+        return itemRepository.findByPodcast(idPodcast, pageRequest);
     }
 
     public void reindex() throws InterruptedException {
@@ -188,12 +162,12 @@ public class ItemBusiness {
                 .setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(originalFilename)))
                 .setDescription(podcast.getDescription())
                 .setFileName(originalFilename)
-                .setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))
+                .setDownloadDate(of(LocalDateTime.now(), ZoneId.systemDefault()))
                 .setPodcast(podcast)
                 .setStatus(Status.FINISH);
 
         podcast.getItems().add(item);
-        podcast.setLastUpdate(ZonedDateTime.now());
+        podcast.setLastUpdate(now());
 
         item = save(item);
         podcastBusiness.save(podcast);
@@ -202,7 +176,7 @@ public class ItemBusiness {
     }
 
     private ZonedDateTime fromFileName(String pubDate) {
-        return ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
+        return of(LocalDateTime.of(LocalDate.parse(pubDate, DateTimeFormatter.ofPattern(UPLOAD_PATTERN)), LocalTime.of(0, 0)), ZoneId.systemDefault());
     }
 
     private Predicate getSearchSpecifications(String term, List<Tag> tags) {

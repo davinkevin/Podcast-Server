@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.manager;
 
-import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
 import org.junit.After;
@@ -40,7 +40,7 @@ public class ItemDownloadManagerTest {
     @Captor ArgumentCaptor<Integer> integerArgumentCaptor;
 
     @Mock SimpMessagingTemplate template;
-    @Mock ItemBusiness itemBusiness;
+    @Mock ItemRepository itemRepository;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock WorkerService workerService;
 
@@ -104,13 +104,14 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_empty_list() throws URISyntaxException {
         /* Given */
-        when(itemBusiness.findAllToDownload()).thenReturn(new ArrayList<>());
+        when(itemRepository.findAllToDownload(any())).thenReturn(new ArrayList<>());
         mockPodcastParametersForPostConstruct();
         /* When */
         itemDownloadManager.postConstruct();
         itemDownloadManager.launchDownload();
         /* Then */
-        verify(itemBusiness, times(1)).findAllToDownload();
+        verify(podcastServerParameters, times(1)).limitDownloadDate();
+        verify(itemRepository, times(1)).findAllToDownload(any());
         verifyPodcastParametersForPostConstruct();
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
@@ -120,14 +121,15 @@ public class ItemDownloadManagerTest {
     public void should_init_download_with_list_of_item_larger_than_download_limit() throws URISyntaxException {
         /* Given */
         final List<Item> itemList = Arrays.asList(new Item().setId(1).setStatus("Not Downloaded"), new Item().setId(2).setStatus("Not Downloaded"), new Item().setId(3).setStatus("Not Downloaded"), new Item().setId(4).setStatus("Not Downloaded"));
-        when(itemBusiness.findAllToDownload()).thenReturn(itemList);
+        when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
         when(workerService.getDownloaderByType(any(Item.class))).thenReturn(mock(Downloader.class));
         mockPodcastParametersForPostConstruct();
         /* When */
         itemDownloadManager.postConstruct();
         itemDownloadManager.launchDownload();
         /* Then */
-        verify(itemBusiness, times(1)).findAllToDownload();
+        verify(podcastServerParameters, times(1)).limitDownloadDate();
+        verify(itemRepository, times(1)).findAllToDownload(any());
         verifyPodcastParametersForPostConstruct();
         verify(workerService, times(3)).getDownloaderByType(itemArgumentCaptor.capture());
         assertThat(itemArgumentCaptor.getAllValues()).contains(itemList.get(0), itemList.get(1), itemList.get(2));
@@ -141,14 +143,15 @@ public class ItemDownloadManagerTest {
         final Downloader mockDownloader = mock(Downloader.class);
         final Item item = new Item().setId(1).setStatus("Not Downloaded");
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
-        when(itemBusiness.findAllToDownload()).thenReturn(Collections.singletonList(item));
+        when(itemRepository.findAllToDownload(any())).thenReturn(Collections.singletonList(item));
         mockPodcastParametersForPostConstruct();
 
         /* When */
         itemDownloadManager.postConstruct();
         itemDownloadManager.launchDownload();
         /* Then */
-        verify(itemBusiness, times(1)).findAllToDownload();
+        verify(podcastServerParameters, times(1)).limitDownloadDate();
+        verify(itemRepository, times(1)).findAllToDownload(any());
         verifyPodcastParametersForPostConstruct();
         verifyConvertAndSave();
     }
@@ -207,7 +210,7 @@ public class ItemDownloadManagerTest {
     public void should_add_item_to_queue() throws URISyntaxException {
         /* Given */
         Item item = new Item().setId(1).setStatus(Status.FINISH);
-        when(itemBusiness.findOne(anyInt())).thenReturn(item);
+        when(itemRepository.findOne(anyInt())).thenReturn(item);
         mockPodcastParametersForPostConstruct();
 
         /* When */
@@ -217,7 +220,7 @@ public class ItemDownloadManagerTest {
         /* Then */
         verifyPodcastParametersForPostConstruct();
         verifyConvertAndSave();
-        verify(itemBusiness, times(1)).findOne(integerArgumentCaptor.capture());
+        verify(itemRepository, times(1)).findOne(integerArgumentCaptor.capture());
         assertThat(integerArgumentCaptor.getValue()).isEqualTo(item.getId());
         assertThat(itemDownloadManager.getWaitingQueue()).isEmpty();
     }
@@ -235,13 +238,13 @@ public class ItemDownloadManagerTest {
     public void should_remove_from_queue() {
         /* Given */
         final Item item = new Item().setId(1);
-        when(itemBusiness.findOne(anyInt())).thenReturn(item);
+        when(itemRepository.findOne(anyInt())).thenReturn(item);
 
         /* When */ itemDownloadManager.removeItemFromQueue(item.getId(), true);
         /* Then */
-        verify(itemBusiness, times(1)).findOne(integerArgumentCaptor.capture());
+        verify(itemRepository, times(1)).findOne(integerArgumentCaptor.capture());
         assertThat(integerArgumentCaptor.getValue()).isEqualTo(item.getId());
-        verify(itemBusiness, times(1)).save(itemArgumentCaptor.capture());
+        verify(itemRepository, times(1)).save(itemArgumentCaptor.capture());
         assertThat(itemArgumentCaptor.getValue()).isSameAs(item);
         verifyConvertAndSave();
     }
@@ -492,7 +495,7 @@ public class ItemDownloadManagerTest {
 
     @After
     public void afterEach() {
-        verifyNoMoreInteractions(template, itemBusiness, podcastServerParameters, workerService);
+        verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, workerService);
     }
 
 }
