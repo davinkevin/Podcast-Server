@@ -324,7 +324,7 @@ public class Item implements Serializable {
     }
 
     @Transient @JsonIgnore
-    public Item delete() {
+    public Item deleteDownloadedFile() {
         deleteFile();
         status = Status.DELETED;
         fileName = null;

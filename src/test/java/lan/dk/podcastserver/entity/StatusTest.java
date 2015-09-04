@@ -2,8 +2,6 @@ package lan.dk.podcastserver.entity;
 
 import org.junit.Test;
 
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -27,9 +25,10 @@ public class StatusTest {
                 .isEqualTo(Status.NOT_DOWNLOADED);
     }
 
-    @Test(expected = NoSuchElementException.class)
-    public void should_raised_exception_if_not_found() {
-        Status.byValue("_");
+    @Test
+    public void should_return_null_if_not_found() {
+        assertThat(Status.byValue("_"))
+            .isNull();
     }
 
 }

@@ -219,7 +219,7 @@ public class ItemTest {
     @Test
     public void should_delete() {
         /* Given */ ITEM.setStatus(Status.FINISH);
-        /* When  */ ITEM.delete();
+        /* When  */ ITEM.deleteDownloadedFile();
         /* Then  */ ItemAssert.assertThat(ITEM)
                 .hasFileName(null)
                 .hasStatus(Status.DELETED.value());
@@ -244,7 +244,7 @@ public class ItemTest {
         PODCAST.setTitle("sbin");
         ITEM.setFileName("fsck");
 
-        /* When */  ITEM.delete();
+        /* When */  ITEM.deleteDownloadedFile();
     }
 
 }

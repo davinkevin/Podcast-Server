@@ -11,17 +11,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by kevin on 08/06/2014.
+ * Created by kevin on 08/06/2014 for Podcast Server
  */
 public class ItemDSL {
 
     public static final QItem Q_ITEM = QItem.item;
 
+    private ItemDSL() {
+        throw new AssertionError();
+    }
+
     public static BooleanExpression isDownloaded(Boolean downloaded) {
         if (downloaded)
-            return Q_ITEM.status.eq(Status.FINISH.value());
+            return hasStatus(Status.FINISH);
 
-        return Q_ITEM.status.isNull().or(Q_ITEM.status.eq(Status.NOT_DOWNLOADED.value()));
+        return Q_ITEM.status.isNull().or(hasStatus(Status.NOT_DOWNLOADED));
     }
 
     public static BooleanExpression isNewerThan(ZonedDateTime dateTime){

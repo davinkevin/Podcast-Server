@@ -31,7 +31,7 @@ public enum Status {
         return Arrays.stream(Status.values())
                 .filter(status -> status.is(name))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
     
 }

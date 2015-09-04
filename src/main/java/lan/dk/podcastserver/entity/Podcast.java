@@ -32,10 +32,6 @@ public class Podcast implements Serializable {
     private Boolean hasToBeDeleted;
     private Set<Tag> tags = new HashSet<>();
 
-
-    public Podcast() {
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
