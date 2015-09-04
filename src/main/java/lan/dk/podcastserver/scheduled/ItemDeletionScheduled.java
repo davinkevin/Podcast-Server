@@ -12,10 +12,10 @@ import javax.annotation.Resource;
 @Component
 public class ItemDeletionScheduled {
 
-    private @Resource UpdatePodcastBusiness updatePodcastBusiness;
+    @Resource UpdatePodcastBusiness updatePodcastBusiness;
 
     @Scheduled(fixedDelay = 86400000)
-    private void deleteOldItem() {
+    public void deleteOldItem() {
         updatePodcastBusiness.deleteOldEpisode();
     }
     
