@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class BeInSportUpdaterCompatibility implements UpdaterCompatibility<BeInSportsUpdater> {
     @Override
     public Integer compatibility(String url) {
-        return url != null && url.contains("beinsports.fr")
+        return url != null && url.contains("beinsports.com")
                     ? 1 
                     : Integer.MAX_VALUE;
     }

@@ -31,13 +31,11 @@ import java.util.regex.Pattern;
 public class BeInSportsUpdater extends AbstractUpdater {
 
     /* Patter to extract value from URL */
-    private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\": \"([^\"]*)\".*";
+    private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\":\"([^\"]*)\".*";
     private static final String PARAMETER_SEPARATOR = "?";
-    private static final String EPISODE_LISTING_URL = "http://www.beinsports.fr/ajax/filter-videos/siteSection/replay/filterBySelect/%s/ajaxSection/integrales";
-    private static final String VIDEO_ARTICLE_URL_FORMAT = "http://www.beinsports.fr/ajax/swap-video/article/%s";
-    private static final Pattern DATE_PATTERN = Pattern.compile(".*[(]([^)]*)[)].*");
-    private static final Pattern STREAM_HLS_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "stream_hls_url"));
-    private static final Pattern THUMB_NAIL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "thumbnail_large_url"));
+    private static final Pattern STREAM_720_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "url"));
+    private static final Pattern POSTER_URL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url"));
+    private static final String beInSportsDomain = "http://www.beinsports.com/%s";
 
     @Resource JdomService jdomService;
     @Resource HtmlService htmlService;
@@ -46,11 +44,10 @@ public class BeInSportsUpdater extends AbstractUpdater {
     public Set<Item> getItems(Podcast podcast) {
         Document page;
         Set<Item> itemSet = new HashSet<>();
-        String listingUrl = getListingUrl(podcast);
+        String listingUrl = podcast.getUrl();
         try {
 
-            Connection.Response response = htmlService.connectWithDefault(listingUrl)
-                    .execute();
+            Connection.Response response = htmlService.connectWithDefault(listingUrl).execute();
             page = response.parse();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -60,39 +57,27 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
         for(Element article : page.select("article")) {
             Item item = new Item()
-                    .setTitle(article.select("h4").first().text())
-                    .setDescription(article.select("h4").first().text())
-                    .setPubdate(getPubDateFromDescription(article.select("h4").first().text()));
+                    .setTitle(article.select("h3").first().text())
+                    .setDescription(article.select("h3").first().text())
+                    .setPubdate(getPubDateFromDescription(article.select("time").first().attr("datetime")));
             
-            item = getDetailOfItemByXML(item, StringUtils.substringAfterLast(article.select("a").first().attr("href"), "/"));
+            item = getDetailsByJavascript(item, String.format(beInSportsDomain, article.select("a").first().attr("data-url")));
             itemSet.add(item);
         }
 
         return itemSet;
     }
 
-    private ZonedDateTime getPubDateFromDescription(String title) {
-        /* L'Expresso (26/02) - 1\u00e8re partie */
-        Matcher m = DATE_PATTERN.matcher(title);
-        
-        if (!m.find()) {
-            return null;
-        }
-        
-        String dayMonth = m.group(1);
-        return ZonedDateTime
-                .now()
-                .withMonth(Integer.valueOf(StringUtils.substringAfter(dayMonth, "/")))
-                .withDayOfMonth(Integer.valueOf(StringUtils.substringBefore(dayMonth, "/")))
-                .withHour(8)
-                .withMinute(0);
+    private ZonedDateTime getPubDateFromDescription(String dateString) {
+        /* 2015-09-04T04:26:18+00:00 */
+        return ZonedDateTime.parse(dateString);
     }
 
 
-    private Item getDetailOfItemByXML(Item item, String urlItemBeInSport) {
+    private Item getDetailsByJavascript(Item item, String urlItemBeInSport) {
         String javascriptCode;
         try {
-            Connection.Response response = htmlService.connectWithDefault(String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport))
+            Connection.Response response = htmlService.connectWithDefault(urlItemBeInSport)
                     .execute();
             Document articlePage = response.parse();
             String apiItemUrl = articlePage.select("iframe").attr("src");
@@ -101,20 +86,20 @@ public class BeInSportsUpdater extends AbstractUpdater {
                     .execute();
             javascriptCode = getJavascriptPart(response.parse().select("script"));
         } catch (IOException | IllegalArgumentException e) {
-            logger.error("Error during fetch of {}", String.format(VIDEO_ARTICLE_URL_FORMAT, urlItemBeInSport), e);
+            logger.error("Error during fetch of {}", urlItemBeInSport, e);
             return new Item();
         }
 
 
-        Matcher matcher = STREAM_HLS_URL_EXTRACTOR_PATTERN1.matcher(javascriptCode);
+        Matcher matcher = STREAM_720_URL_EXTRACTOR_PATTERN1.matcher(javascriptCode);
         if (matcher.find()) {
-            item.setUrl(matcher.group(1));
+            item.setUrl(matcher.group(1).replace("\\", ""));
         }
 
-        Matcher thumNailematcher = THUMB_NAIL_EXTRACTOR_PATTERN.matcher(javascriptCode);
+        Matcher thumNailematcher = POSTER_URL_EXTRACTOR_PATTERN.matcher(javascriptCode);
         if (thumNailematcher.find()) {
             try {
-                item.setCover(imageService.getCoverFromURL(thumNailematcher.group(1)));
+                item.setCover(imageService.getCoverFromURL(thumNailematcher.group(1).replace("\\", "")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -126,27 +111,26 @@ public class BeInSportsUpdater extends AbstractUpdater {
     private String getJavascriptPart(Elements tagScripts) {
         return tagScripts.stream()
                 .map(Element::data)
-                .filter(data -> data.contains("stream_hls_url"))
+                .filter(data -> data.contains("720"))
                 .findFirst()
                 .orElse("");
     }
 
     @Override
     public String signatureOf(Podcast podcast) {
-        String listingUrl = getListingUrl(podcast);
+        String listingUrl = podcast.getUrl();
+        /* cluster_video */
 
-        if (!listingUrl.equals("")) {
-            return signatureService.generateSignatureFromURL(podcast.getUrl());
-        } else {
-            return "";
+        try {
+            Document page = htmlService.connectWithDefault(listingUrl).execute().parse();
+            return signatureService.generateMD5Signature(page.select("cluster_video").html());
+        } catch (IOException e) {
+            logger.error("IOException :", e);
         }
+
+        return "";
     }
 
-    private String getListingUrl(Podcast podcast) {
-        String idShow = StringUtils.substringAfterLast(podcast.getUrl(), "/");
-        return String.format(EPISODE_LISTING_URL, idShow);
-    }
-    
     public Boolean podcastContains(Podcast podcast, Item item) {
         if (item.getUrl() == null)
             return false;
