@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * Created by kevin on 22/02/15.
+ * Created by kevin on 22/02/15 for Podcast Server
  */
 @Component
 public class FindPodcastBusiness {
 
-    @Resource
-    WorkerService workerService;
+    @Resource WorkerService workerService;
     
     public Podcast fetchPodcastInfoByUrl(String url) throws FindPodcastNotFoundException {
-        Finder specificFinder = workerService.getFinderByUrl(url);
+        Finder specificFinder = workerService.finderOf(url);
         if (specificFinder == null) {
             return null;
         }
