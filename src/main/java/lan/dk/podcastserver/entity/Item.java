@@ -135,20 +135,12 @@ public class Item implements Serializable {
         return this;
     }
 
-    @Basic
-    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     @JsonView(ItemSearchListView.class)
-    public String getStatus() {
-        return status.value();
+    public Status getStatus() {
+        return status;
     }
 
-    @JsonProperty("status")
-    public Item setStatus(String status) {
-        setStatus(Status.byValue(status));
-        return this;
-    }
-    
-    @JsonIgnore
     public Item setStatus(Status status) {
         this.status = status;
         return this;

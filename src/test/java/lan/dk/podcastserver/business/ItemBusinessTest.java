@@ -52,7 +52,6 @@ public class ItemBusinessTest {
 
     @Before
     public void beforeEach() {
-        itemBusiness.setItemDownloadManager(itemDownloadManager);
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER).toFile());
     }
 
@@ -231,7 +230,7 @@ public class ItemBusinessTest {
                 .hasDescription("aDescription")
                 .hasFileName(title)
                 .hasPodcast(podcast)
-                .hasStatus(Status.FINISH.value());
+                .hasStatus(Status.FINISH);
 
         assertThat(podcast.getItems()).contains(item);
         verify(podcastServerParameters, times(1)).rootFolder();

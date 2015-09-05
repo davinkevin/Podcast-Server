@@ -82,7 +82,7 @@ public class RTMPDownloader extends AbstractDownloader {
                             e.printStackTrace();
                             logger.error("IOException :", e);
                         }
-                        if (!Status.FINISH.is(item.getStatus()) && !stopDownloading.get()) {
+                        if (Status.FINISH != item.getStatus() && !stopDownloading.get()) {
                             logger.debug("Terminaison innatendu, reset du downloader");
                             resetDownload();
                         }

@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
+import static java.time.ZonedDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -101,6 +102,10 @@ public class PodcastServerParametersTest {
 
         assertThat(parameters.rssDefaultNumberItem())
                 .isEqualTo(25L);
+
+        assertThat(parameters.limitDownloadDate())
+                .isBeforeOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()))
+                .isAfterOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()).minusMinutes(1));
     }
 
 }

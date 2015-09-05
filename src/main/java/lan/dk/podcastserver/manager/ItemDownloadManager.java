@@ -99,7 +99,7 @@ public class ItemDownloadManager {
     }
 
     private boolean isStartedOrFinished(Item currentItem) {
-        return Status.STARTED.is(currentItem.getStatus()) || Status.FINISH.is(currentItem.getStatus());
+        return Status.STARTED == currentItem.getStatus() || Status.FINISH == currentItem.getStatus();
     }
 
     private void initDownload() {
@@ -127,7 +127,7 @@ public class ItemDownloadManager {
     public void restartAllDownload() {
         downloadingQueue.values()
                 .stream()
-                .filter(downloader -> Status.PAUSED.is(downloader.getItem().getStatus()))
+                .filter(downloader -> Status.PAUSED == downloader.getItem().getStatus())
                 .forEach(downloader -> getDownloaderByTypeAndRun(downloader.getItem()));
     }
 
@@ -147,10 +147,10 @@ public class ItemDownloadManager {
 
     public void toogleDownload(int id) {
         Item item = getItemInDownloadingQueue(id);
-        if (Status.PAUSED.is(item.getStatus())) {
+        if (Status.PAUSED == item.getStatus()) {
             logger.debug("restart du download");
             restartDownload(id);
-        } else if (Status.STARTED.is(item.getStatus())) {
+        } else if (Status.STARTED == item.getStatus()) {
             logger.debug("pause du download");
             pauseDownload(id);
         }

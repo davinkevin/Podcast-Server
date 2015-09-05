@@ -75,7 +75,7 @@ public class ItemDSL {
         return BooleanExpression.anyOf(
                 Arrays
                     .stream(statuses)
-                    .map(status -> Q_ITEM.status.eq(status.value()))
+                    .map(Q_ITEM.status::eq)
                     .toArray(BooleanExpression[]::new)
         );
     }

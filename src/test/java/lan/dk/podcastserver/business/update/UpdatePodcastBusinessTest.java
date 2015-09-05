@@ -108,7 +108,7 @@ public class UpdatePodcastBusinessTest {
                 .are(new Condition<Item>() {
                     @Override
                     public boolean matches(Item value) {
-                        return Status.NOT_DOWNLOADED.is(value.getStatus());
+                        return Status.NOT_DOWNLOADED == value.getStatus();
                     }
                 });
     }
@@ -196,6 +196,9 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_not_handle_too_long_update() {
         /* Given */
+        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, workerService, template, podcastServerParameters, updateExecutor, new SimpleAsyncTaskExecutor("test-update"), validator);
+        updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS);
+
         Podcast podcast1 = new Podcast().setTitle("podcast1");
         podcast1.setId(1);
         Updater updater = mock(Updater.class);
@@ -207,12 +210,10 @@ public class UpdatePodcastBusinessTest {
             return (Predicate<Item>) item -> !podcast.contains(item);
         });
         when(updater.update(any(Podcast.class))).then(i -> {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(15);
             Podcast podcast = (Podcast) i.getArguments()[0];
             return UpdateTuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
         });
-        updatePodcastBusiness.manualExecutor = new SimpleAsyncTaskExecutor("test-update");
-
 
         /* When */
         updatePodcastBusiness.forceUpdatePodcast(1);

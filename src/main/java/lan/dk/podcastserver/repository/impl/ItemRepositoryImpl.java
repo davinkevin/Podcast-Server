@@ -3,35 +3,30 @@ package lan.dk.podcastserver.repository.impl;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import lan.dk.podcastserver.utils.hibernate.transformer.HibernateIdExtractor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
-
+@Slf4j
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
+    private static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
     private static final HibernateIdExtractor RESULT_TRANSFORMER = new HibernateIdExtractor();
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    public static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
 
     final FullTextEntityManager fullTextEntityManager;
 
     @Autowired
-    public ItemRepositoryImpl(EntityManager em) {
-        this.fullTextEntityManager = getFullTextEntityManager(em);
+    public ItemRepositoryImpl(FullTextEntityManager fem) {
+        this.fullTextEntityManager = fem;
     }
 
     @Override
@@ -70,7 +65,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             return new ArrayList<>();
         }
 
-        logger.debug(results.toString());
+        log.debug(results.toString());
         return results;
     }
 }

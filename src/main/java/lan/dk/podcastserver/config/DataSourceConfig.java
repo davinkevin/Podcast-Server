@@ -2,14 +2,19 @@ package lan.dk.podcastserver.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.tools.Server;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.sql.SQLException;
+
+import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 
 /**
  * Created by kevin on 11/04/15
@@ -46,6 +51,12 @@ public class DataSourceConfig {
             h2Server();
 
         return dataSource;
+    }
+
+    @Bean
+    @Autowired
+    public FullTextEntityManager fullTextEntityManager(EntityManager entityManager) {
+        return getFullTextEntityManager(entityManager);
     }
 
     @Lazy

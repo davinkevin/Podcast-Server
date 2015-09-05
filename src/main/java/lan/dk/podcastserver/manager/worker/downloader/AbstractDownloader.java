@@ -5,8 +5,8 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.utils.MimeTypeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -39,6 +39,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Resource protected ItemBusiness itemService;
     @Resource protected PodcastServerParameters podcastServerParameters;
     @Resource protected SimpMessagingTemplate template;
+    @Resource protected MimeTypeService mimeTypeService;
+
+
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
@@ -109,10 +112,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             this.item.setLength(FileUtils.sizeOf(target));
 
             try {
-                this.item.setMimeType(MimeTypeUtils.probeContentType(target.toPath()));
+                this.item.setMimeType(mimeTypeService.probeContentType(target.toPath()));
             } catch (IOException e) {
                 e.printStackTrace();
-                this.item.setMimeType(MimeTypeUtils.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
+                this.item.setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
             }
 
             this.saveSyncWithPodcast();

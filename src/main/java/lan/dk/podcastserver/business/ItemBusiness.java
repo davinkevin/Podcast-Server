@@ -7,7 +7,6 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.dsl.ItemDSL;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -36,22 +35,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.time.ZonedDateTime.*;
-import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
+import static java.time.ZonedDateTime.now;
+import static java.time.ZonedDateTime.of;
+import static lan.dk.podcastserver.repository.dsl.ItemDSL.isInTags;
 
 @Component
 @Transactional
 public class ItemBusiness {
     private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
-    ItemDownloadManager itemDownloadManager;
+    final ItemDownloadManager itemDownloadManager;
     final PodcastServerParameters podcastServerParameters;
     final ItemRepository itemRepository;
     final PodcastBusiness podcastBusiness;
     final MimeTypeService mimeTypeService;
 
     @Autowired
-    public ItemBusiness(PodcastServerParameters podcastServerParameters, ItemRepository itemRepository, PodcastBusiness podcastBusiness, MimeTypeService mimeTypeService) {
+    public ItemBusiness(ItemDownloadManager itemDownloadManager, PodcastServerParameters podcastServerParameters, ItemRepository itemRepository, PodcastBusiness podcastBusiness, MimeTypeService mimeTypeService) {
+        this.itemDownloadManager = itemDownloadManager;
         this.podcastServerParameters = podcastServerParameters;
         this.itemRepository = itemRepository;
         this.podcastBusiness = podcastBusiness;
@@ -153,8 +154,6 @@ public class ItemBusiness {
 
         uploadedFile.transferTo(fileToSave.toFile());
 
-
-
         item.setTitle(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
                 .setPubdate(fromFileName(originalFilename.split(" - ")[1]))
                 .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(originalFilename).build().toUriString())
@@ -183,10 +182,5 @@ public class ItemBusiness {
         return (StringUtils.isEmpty(term))
                 ? isInTags(tags)
                 : ItemDSL.getSearchSpecifications(itemRepository.fullTextSearch(term), tags);
-    }
-
-    @Autowired
-    public void setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
-        this.itemDownloadManager = itemDownloadManager;
     }
 }

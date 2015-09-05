@@ -72,9 +72,9 @@ public class M3U8Downloader extends AbstractDownloader {
 
 
                                 if (stopDownloading.get()) {
-                                    if (Status.STOPPED.is(item.getStatus())) {
+                                    if (Status.STOPPED == item.getStatus()) {
                                         break;
-                                    } else if (Status.PAUSED.is(item.getStatus())) {
+                                    } else if (Status.PAUSED == item.getStatus()) {
 
                                         synchronized(this)
                                         {
@@ -84,7 +84,7 @@ public class M3U8Downloader extends AbstractDownloader {
                                 }
                             }
 
-                            if (Status.STARTED.is(item.getStatus())) {
+                            if (Status.STARTED == item.getStatus()) {
                                 finishDownload();
                             }
                         } catch (IOException | InterruptedException e) {

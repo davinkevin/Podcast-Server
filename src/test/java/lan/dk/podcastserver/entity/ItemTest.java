@@ -68,7 +68,7 @@ public class ItemTest {
                 .hasLength(123456L)
                 .hasCover(COVER)
                 .hasFileName("fakeItem.mp4")
-                .hasStatus(Status.NOT_DOWNLOADED.value())
+                .hasStatus(Status.NOT_DOWNLOADED)
                 .hasProgression(0);
     }
     
@@ -77,11 +77,11 @@ public class ItemTest {
 
         /* When */ ITEM.setStatus(Status.PAUSED);
         /* Then */ ItemAssert.assertThat(ITEM)
-                .hasStatus(Status.PAUSED.value());
+                .hasStatus(Status.PAUSED);
 
-        /* When */ ITEM.setStatus("Finish");
+        /* When */ ITEM.setStatus(Status.FINISH);
         /* Then */ ItemAssert.assertThat(ITEM)
-                        .hasStatus(Status.FINISH.value());
+                        .hasStatus(Status.FINISH);
     }
 
     @Test
@@ -179,7 +179,7 @@ public class ItemTest {
         /* Then  */ ItemAssert.assertThat(ITEM)
                     .hasFileName(null)
                     .hasDownloadDate(null)
-                    .hasStatus(Status.NOT_DOWNLOADED.value());
+                    .hasStatus(Status.NOT_DOWNLOADED);
     }
 
     @Test
@@ -222,7 +222,7 @@ public class ItemTest {
         /* When  */ ITEM.deleteDownloadedFile();
         /* Then  */ ItemAssert.assertThat(ITEM)
                 .hasFileName(null)
-                .hasStatus(Status.DELETED.value());
+                .hasStatus(Status.DELETED);
     }
     
     @Test

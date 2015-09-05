@@ -9,8 +9,8 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -31,24 +30,36 @@ import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 
+@Slf4j
 @Component
 @Transactional
 public class UpdatePodcastBusiness  {
 
     private TimeUnit timeUnit = TimeUnit.MINUTES;
     private Integer timeValue = 5;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String WS_TOPIC_UPDATING = "/topic/updating";
 
-    @Resource PodcastBusiness podcastBusiness;
-    @Resource ItemRepository itemRepository;
-    @Resource WorkerService workerService;
-    @Resource SimpMessagingTemplate template;
-    @Resource PodcastServerParameters podcastServerParameters;
+    final PodcastBusiness podcastBusiness;
+    final ItemRepository itemRepository;
+    final WorkerService workerService;
+    final SimpMessagingTemplate template;
+    final PodcastServerParameters podcastServerParameters;
 
-    @Resource @Qualifier("UpdateExecutor") TaskExecutor updateExecutor;
-    @Resource @Qualifier("ManualUpdater") TaskExecutor manualExecutor;
-    @Resource(name="Validator") Validator validator;
+    final TaskExecutor updateExecutor;
+    final TaskExecutor manualExecutor;
+    final Validator validator;
+
+    @Autowired
+    public UpdatePodcastBusiness(PodcastBusiness podcastBusiness, ItemRepository itemRepository, WorkerService workerService, SimpMessagingTemplate template, PodcastServerParameters podcastServerParameters, @Qualifier("UpdateExecutor") TaskExecutor updateExecutor, @Qualifier("ManualUpdater") TaskExecutor manualExecutor, @Qualifier("Validator") Validator validator) {
+        this.podcastBusiness = podcastBusiness;
+        this.itemRepository = itemRepository;
+        this.workerService = workerService;
+        this.template = template;
+        this.podcastServerParameters = podcastServerParameters;
+        this.updateExecutor = updateExecutor;
+        this.manualExecutor = manualExecutor;
+        this.validator = validator;
+    }
 
     private AtomicBoolean isUpdating = new AtomicBoolean(false);
 
@@ -58,7 +69,7 @@ public class UpdatePodcastBusiness  {
     public void updatePodcast(Integer id) { updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), manualExecutor); }
 
     public void forceUpdatePodcast (Integer id){
-        logger.info("Lancement de l'update forcé");
+        log.info("Lancement de l'update forcé");
         Podcast podcast = podcastBusiness.findOne(id);
         podcast.setSignature("");
         podcast = podcastBusiness.save(podcast);
@@ -69,10 +80,10 @@ public class UpdatePodcastBusiness  {
     private void updatePodcast(List<Podcast> podcasts, Executor selectedExecutor) {
         initUpdate();
 
-        logger.info("Lancement de l'update");
+        log.info("Lancement de l'update");
         Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures = new HashSet<>();
 
-        logger.info("Traitement de {} podcasts", podcasts.size());
+        log.info("Traitement de {} podcasts", podcasts.size());
         for (Podcast podcast : podcasts) {
             futures.add(
                     CompletableFuture
@@ -80,11 +91,11 @@ public class UpdatePodcastBusiness  {
                             .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor)
             );
         }
-        logger.info("Attente des retours");
+        log.info("Attente des retours");
 
         handleUpdateTuple(futures);
 
-        logger.info("Fin du traitement des {} podcasts", podcasts.size());
+        log.info("Fin du traitement des {} podcasts", podcasts.size());
         finishUpdate();
     }
 
@@ -110,7 +121,7 @@ public class UpdatePodcastBusiness  {
                 changeAndCommunicateUpdate(Boolean.TRUE);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error("Error during update", e);
+            log.error("Error during update", e);
         }
     }
 
@@ -124,7 +135,7 @@ public class UpdatePodcastBusiness  {
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
                 .forEach(item -> {
-                    logger.debug("Add an item to {}", podcast.getTitle());
+                    log.debug("Add an item to {}", podcast.getTitle());
                     podcast.getItems().add(item);
                     podcast.lastUpdateToNow();
                 });
@@ -133,18 +144,18 @@ public class UpdatePodcastBusiness  {
     }
 
     public void deleteOldEpisode() {
-        logger.info("Suppression des anciens items");
+        log.info("Suppression des anciens items");
         Path fileToDelete;
         for (Item item : itemRepository.findAllToDelete(podcastServerParameters.limitDownloadDate())) {
             fileToDelete = item.getLocalPath();
-            logger.info("Suppression du fichier associé à l'item {} : {}", item.getId(), fileToDelete.toAbsolutePath().toString());
+            log.info("Suppression du fichier associé à l'item {} : {}", item.getId(), fileToDelete.toAbsolutePath().toString());
             itemRepository.save( item.deleteDownloadedFile() );
         }
     }
 
     @PostConstruct
     public void resetItemWithIncorrectState() {
-        logger.info("Reset des Started et Paused");
+        log.info("Reset des Started et Paused");
 
         StreamSupport
                 .stream(itemRepository.findByStatus(Status.STARTED, Status.PAUSED).spliterator(), false)

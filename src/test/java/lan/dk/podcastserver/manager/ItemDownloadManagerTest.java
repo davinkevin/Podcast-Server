@@ -45,9 +45,9 @@ public class ItemDownloadManagerTest {
     @Mock WorkerService workerService;
 
     @InjectMocks ItemDownloadManager itemDownloadManager;
-    public static final Item ITEM_1 = new Item().setId(1).setStatus("Not Downloaded").setUrl("http://now.where/" + 1).setPubdate(ZonedDateTime.now());
-    public static final Item ITEM_2 = new Item().setId(2).setStatus("Not Downloaded").setUrl("http://now.where/" + 2).setPubdate(ZonedDateTime.now()).setStatus(Status.STARTED);
-    public static final Item ITEM_3 = new Item().setId(3).setStatus("Not Downloaded").setUrl("http://now.where/" + 3).setPubdate(ZonedDateTime.now()).setStatus(Status.PAUSED);
+    public static final Item ITEM_1 = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 1).setPubdate(ZonedDateTime.now());
+    public static final Item ITEM_2 = new Item().setId(2).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 2).setPubdate(ZonedDateTime.now()).setStatus(Status.STARTED);
+    public static final Item ITEM_3 = new Item().setId(3).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 3).setPubdate(ZonedDateTime.now()).setStatus(Status.PAUSED);
 
     @Test
     public void should_get_limit_of_download () {
@@ -120,7 +120,7 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_list_of_item_larger_than_download_limit() throws URISyntaxException {
         /* Given */
-        final List<Item> itemList = Arrays.asList(new Item().setId(1).setStatus("Not Downloaded"), new Item().setId(2).setStatus("Not Downloaded"), new Item().setId(3).setStatus("Not Downloaded"), new Item().setId(4).setStatus("Not Downloaded"));
+        final List<Item> itemList = Arrays.asList(new Item().setId(1).setStatus(Status.NOT_DOWNLOADED), new Item().setId(2).setStatus(Status.NOT_DOWNLOADED), new Item().setId(3).setStatus(Status.NOT_DOWNLOADED), new Item().setId(4).setStatus(Status.NOT_DOWNLOADED));
         when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
         when(workerService.getDownloaderByType(any(Item.class))).thenReturn(mock(Downloader.class));
         mockPodcastParametersForPostConstruct();
@@ -141,7 +141,7 @@ public class ItemDownloadManagerTest {
     public void should_relaunch_a_paused_download() throws URISyntaxException {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        final Item item = new Item().setId(1).setStatus("Not Downloaded");
+        final Item item = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED);
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
         when(itemRepository.findAllToDownload(any())).thenReturn(Collections.singletonList(item));
         mockPodcastParametersForPostConstruct();
@@ -187,8 +187,8 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_restart_all_downloads() {
         /* Given */
-        final Item itemOne = new Item().setId(1).setStatus("Paused");
-        final Item itemTwo = new Item().setId(2).setStatus("Paused");
+        final Item itemOne = new Item().setId(1).setStatus(Status.PAUSED);
+        final Item itemTwo = new Item().setId(2).setStatus(Status.PAUSED);
         final Downloader mockDownloaderItemOne = mock(Downloader.class);
         final Downloader mockDownloaderItemTwo = mock(Downloader.class);
         when(mockDownloaderItemOne.getItem()).thenReturn(itemOne);
@@ -464,7 +464,7 @@ public class ItemDownloadManagerTest {
     public void should_detect_if_is_in_downloading_queue() {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        final Item item = new Item().setId(1).setStatus("Not Downloaded").setUrl("http://now.where/").setPubdate(ZonedDateTime.now());
+        final Item item = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/").setPubdate(ZonedDateTime.now());
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
                 
         /* When */
@@ -480,9 +480,9 @@ public class ItemDownloadManagerTest {
     public void should_get_downloading_item_list() {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        Item item1 = new Item().setId(1).setStatus("Not Downloaded").setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
-        Item item2 = new Item().setId(2).setStatus("Not Downloaded").setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
-        Item item3 = new Item().setId(3).setStatus("Not Downloaded").setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        Item item1 = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
+        Item item2 = new Item().setId(2).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
+        Item item3 = new Item().setId(3).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
         itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);

@@ -36,7 +36,7 @@ public class YoutubeUpdaterTest {
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock Validator validator;
     @Spy JdomService jdomService;
-    @Spy SignatureService signatureService = new SignatureService();
+    @Spy SignatureService signatureService;
 
     @Before
     public void initPodcast() {

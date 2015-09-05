@@ -11,24 +11,11 @@ public class StatusTest {
 
     @Test
     public void should_check_value() {
-        /* Given */ String nd = "Not Downloaded", other = "Other";
-        /* When */  Boolean isSame = Status.NOT_DOWNLOADED.is(nd), isNotSame = Status.NOT_DOWNLOADED.is(other);
-        /* Then */
-            assertThat(isSame).isTrue();
-            assertThat(isNotSame).isFalse();
+        assertThat(Status.of("NOT_DOWNLOADED")).isEqualTo(Status.NOT_DOWNLOADED);
     }
     
-    @Test
-    public void should_find_byValue() {
-        assertThat(Status.byValue("Not Downloaded"))
-                .isNotNull()
-                .isEqualTo(Status.NOT_DOWNLOADED);
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_exception() {
+        assertThat(Status.of("")).isNull();
     }
-
-    @Test
-    public void should_return_null_if_not_found() {
-        assertThat(Status.byValue("_"))
-            .isNull();
-    }
-
 }

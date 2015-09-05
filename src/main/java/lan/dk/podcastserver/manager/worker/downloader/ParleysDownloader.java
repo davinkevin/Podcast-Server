@@ -10,6 +10,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -52,51 +54,7 @@ public class ParleysDownloader extends AbstractDownloader{
         List<ParleysAssets> listOfAssets = getUrlForParleysItem(item);
         totalSize = getTotalSize(listOfAssets);
 
-        Runnable itemSynchronisation = new Runnable() {
-            long last;
-
-            @Override
-            public void run() {
-                // notify app or save download state
-                // you can extract information from DownloadInfo info;
-                switch (info.getState()) {
-                    case EXTRACTING:
-                    case EXTRACTING_DONE:
-                        logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
-                        break;
-                    case ERROR:
-                        stopDownload();
-                        break;
-                    case DONE:
-                        logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - terminé");
-                        avancementIntermediaire = item.getProgression();
-                        break;
-                    case RETRYING:
-                        logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState() + " " + info.getDelay());
-                        break;
-                    case DOWNLOADING:
-                        long now = System.currentTimeMillis();
-
-                        if (now - 1000 > last && info.getLength() != null && info.getLength() != 0L) {
-                            last = now;
-                            int progression = ((int) (info.getCount()*100 / (float) totalSize))+avancementIntermediaire;
-                            if (item.getProgression() < progression) {
-                                item.setProgression(progression);
-                                logger.debug("Progression de {} : {}%", item.getTitle(), progression);
-                                convertAndSaveBroadcast();
-                            }
-                        }
-                        break;
-                    case STOP:
-                        logger.debug("Pause / Arrêt du téléchargement du téléchargement");
-                        //stopDownload();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-
+        Runnable itemSynchronisation = new ParleysWatcher(this);
 
         for(ParleysAssets parleysAssets : listOfAssets) {
             try {
@@ -268,5 +226,62 @@ public class ParleysDownloader extends AbstractDownloader{
         }
 
         return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
+    }
+
+    static class ParleysWatcher implements Runnable {
+
+        protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+        private final ParleysDownloader parleysDownloader;
+        private final DownloadInfo info;
+        private final Item item;
+        private final Long totalSize;
+        private long last;
+        private Integer avancementIntermediaire;
+
+        public ParleysWatcher(ParleysDownloader parleysDownloader) {
+            this.parleysDownloader = parleysDownloader;
+            this.info = parleysDownloader.info;
+            this.item = parleysDownloader.item;
+            this.totalSize = parleysDownloader.totalSize;
+            this.avancementIntermediaire = 0;
+        }
+
+        @Override
+        public void run() {
+          switch (info.getState()) {
+                case EXTRACTING:
+                case EXTRACTING_DONE:
+                    logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
+                    break;
+                case ERROR:
+                    parleysDownloader.stopDownload();
+                    break;
+                case DONE:
+                    logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - terminé");
+                    avancementIntermediaire = item.getProgression();
+                    break;
+                case RETRYING:
+                    logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState() + " " + info.getDelay());
+                    break;
+                case DOWNLOADING:
+                    long now = System.currentTimeMillis();
+
+                    if (now - 1000 > last && info.getLength() != null && info.getLength() != 0L) {
+                        last = now;
+                        int progression = ((int) (info.getCount()*100 / (float) totalSize))+avancementIntermediaire;
+                        if (item.getProgression() < progression) {
+                            item.setProgression(progression);
+                            logger.debug("Progression de {} : {}%", item.getTitle(), progression);
+                            parleysDownloader.convertAndSaveBroadcast();
+                        }
+                    }
+                    break;
+                case STOP:
+                    logger.debug("Pause / Arrêt du téléchargement du téléchargement");
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
