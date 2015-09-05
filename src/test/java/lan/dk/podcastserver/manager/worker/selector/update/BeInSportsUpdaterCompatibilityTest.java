@@ -7,7 +7,7 @@ public class BeInSportsUpdaterCompatibilityTest {
     @Test
     public void should_be_hightly_compatible () {
         /* Given */ BeInSportUpdaterCompatibility beInSportUpdaterCompatibility = new BeInSportUpdaterCompatibility();
-        /* When */ Integer compatibility = beInSportUpdaterCompatibility.compatibility("http://www.beinsports.fr/replay/category/3361/name/lexpresso");
+        /* When */ Integer compatibility = beInSportUpdaterCompatibility.compatibility("http://www.beinsports.com/replay/category/3361/name/lexpresso");
         /* Then */ assertThat(compatibility).isLessThan(5);
     }
 
