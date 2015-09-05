@@ -372,6 +372,7 @@
                         <param>lan.dk.podcastserver.service.PodcastServerParameters</param>
                         <param>lan.dk.podcastserver.utils.form.MovingItemInQueueForm</param>
                         <param>lan.dk.podcastserver.utils.facade.stats.StatsPodcastType</param>
+                        <param>org.springframework.data.domain.Page</param>
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>
                 </configuration>

@@ -54,7 +54,7 @@ public class WorkerService implements ApplicationContextAware {
                 .setItem(item);
     }
 
-    public Finder getFinderByUrl(String url) {
+    public Finder finderOf(String url) {
         
         if (StringUtils.isEmpty(url)) {
             return null;
