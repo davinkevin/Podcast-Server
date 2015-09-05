@@ -43,7 +43,7 @@ public class UpdaterSelectorTest {
     @Test
     public void should_return_a_BeInSportUpdater () {
         /* Given */ UpdaterSelector updaterSelector = new UpdaterSelector().setUpdaterCompatibilities(updaterSelectors);
-        /* When */ Class updaterClass = updaterSelector.of("http://www.beinsports.fr/replay/category/3361/name/lexpresso");
+        /* When */ Class updaterClass = updaterSelector.of("http://www.beinsports.com/replay/category/3361/name/lexpresso");
         /* Then */ assertThat(updaterClass).isEqualTo(BeInSportsUpdater.class);
     }
 
