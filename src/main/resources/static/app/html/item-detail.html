@@ -19,13 +19,13 @@
 
                     <div class="buttonList text-center">
                         <!-- Téléchargement en cours -->
-                        <span ng-show="idc.item.status == 'Started' || idc.item.status == 'Paused'" >
+                        <span ng-show="idc.item.status == 'STARTED' || idc.item.status == 'PAUSED'" >
                             <button ng-click="idc.toggleDownload(idc.item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
                             <button ng-click="idc.stopDownload(idc.item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
                         </span>
 
                         <!-- Lancer le téléchargement -->
-                        <button ng-click="idc.item.download()" ng-show="(idc.item.status != 'Started' && idc.item.status != 'Paused' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <button ng-click="idc.item.download()" ng-show="(idc.item.status != 'STARTED' && idc.item.status != 'PAUSED' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
                         <a ng-href="/podcasts/{{ idc.item.podcast.id }}/item/{{ idc.item.id }}/play" ng-show="idc.item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
 
@@ -39,7 +39,7 @@
                             <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                 <li ng-show="idc.item.isDownloaded"><a target="_self" ng-href="{{ idc.item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
-                                <li><a ng-click="idc.remove(idc.item)" ng-show="(idc.item.status != 'Started' && idc.item.status != 'Paused' )"><span class="glyphicon glyphicon-remove text-danger"></span> Retirer</a></li>
+                                <li><a ng-click="idc.remove(idc.item)" ng-show="(idc.item.status != 'STARTED' && idc.item.status != 'PAUSED' )"><span class="glyphicon glyphicon-remove text-danger"></span> Retirer</a></li>
                                 <li><a ng-href="{{ idc.item.url }}" target="_self"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>
                                 <li><a ng-click="idc.reset(idc.item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
                             </ul>

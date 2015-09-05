@@ -30,14 +30,14 @@ class DownloadCtrl {
         let item = JSON.parse(message.body);
         let elemToUpdate = _.find(this.items, { 'id': item.id });
         switch (item.status) {
-            case 'Started' :
-            case 'Paused' :
+            case 'STARTED' :
+            case 'PAUSED' :
                 if (elemToUpdate)
                     _.assign(elemToUpdate, item);
                 else
                     this.items.push(item);
                 break;
-            case 'Finish' :
+            case 'FINISH' :
                 try {
                     this.$notification('Téléchargement terminé', {
                         body: item.title,
@@ -49,7 +49,7 @@ class DownloadCtrl {
                 }
                 this.onStoppedFromWS(elemToUpdate);
                 break;
-            case 'Stopped' :
+            case 'STOPPED' :
                 this.onStoppedFromWS(elemToUpdate);
                 break;
         }
@@ -69,7 +69,7 @@ class DownloadCtrl {
     }
 
     getTypeFromStatus(item) {
-        if (item.status === "Paused")
+        if (item.status === "PAUSED")
             return "warning";
         return "info";
     }

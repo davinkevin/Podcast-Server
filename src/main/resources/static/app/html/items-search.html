@@ -49,16 +49,16 @@
                     <div class="btn-group" dropdown>
                         <button type="button" class="btn dropdown dropdown-toggle" dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
                         <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                            <li ng-show="item.status == 'Started' || item.status == 'Paused'">
-                                <a ng-show="item.status == 'Started'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>
-                                <a ng-show="item.status == 'Paused'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>
+                            <li ng-show="item.status == 'STARTED' || item.status == 'PAUSED'">
+                                <a ng-show="item.status == 'STARTED'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>
+                                <a ng-show="item.status == 'PAUSED'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>
                             </li>
-                            <li ng-show="item.status == 'Started' || item.status == 'Paused'">
+                            <li ng-show="item.status == 'STARTED' || item.status == 'PAUSED'">
                                 <a ng-click="isc.stopDownload(item)">
                                     <span class="glyphicon glyphicon-stop text-danger"></span> Stopper
                                 </a>
                             </li>
-                            <li ng-show="(item.status != 'Started' && item.status != 'Paused' ) && !item.isDownloaded">
+                            <li ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded">
                                 <a ng-click="item.download()">
                                     <span class="glyphicon glyphicon-save text-primary"></span> Télécharger
                                 </a>
