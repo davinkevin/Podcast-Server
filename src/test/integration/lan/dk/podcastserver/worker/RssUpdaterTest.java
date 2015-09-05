@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.RSSUpdater;
 import lan.dk.podcastserver.service.WorkerService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {/*HibernateSearchConfig.class, */BeanConfigScan.class, PropertyConfigTest.class})
 @ActiveProfiles("data-embedded")
+@Ignore
 public class RssUpdaterTest {
 
     private final Logger logger = LoggerFactory.getLogger(CanalPlusWorkerTest.class);

@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.worker.externalTools;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Map;
 
-
+@Ignore
 public class RtmpDumpTest {
 
     private final Logger logger = LoggerFactory.getLogger(RtmpDumpTest.class);

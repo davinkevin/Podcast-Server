@@ -6,6 +6,7 @@ import lan.dk.podcastserver.context.MockWorkerContextConfiguration;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {MockWorkerContextConfiguration.class, MockRepository.class, MockService.class})
+@Ignore
 public class HttpDownloaderTest {
 
     @Resource

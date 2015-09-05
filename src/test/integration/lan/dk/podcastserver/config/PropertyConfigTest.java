@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.config;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {/*PropertyConfig.class*/}, loader=AnnotationConfigContextLoader.class)
+@Ignore
 public class PropertyConfigTest {
     
     @Value("#{systemEnvironment['HOME']}")

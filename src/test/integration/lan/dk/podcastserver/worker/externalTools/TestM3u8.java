@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.worker.externalTools;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * Created by kevin on 31/12/2013.
  */
+@Ignore
 public class TestM3u8 {
     private final Logger logger = LoggerFactory.getLogger(TestM3u8.class);
     public static final String CHEMIN = "/Users/kdavin/";

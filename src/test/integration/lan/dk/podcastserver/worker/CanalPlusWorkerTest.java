@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.updater.CanalPlusUpdater;
 import lan.dk.podcastserver.service.WorkerService;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {MockWorkerContextConfiguration.class, MockRepository.class, MockService.class})
+@Ignore
 public class CanalPlusWorkerTest {
 
     private final Logger logger = LoggerFactory.getLogger(CanalPlusWorkerTest.class);

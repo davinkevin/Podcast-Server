@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.JeuxVideoFRUpdater;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {/*PropertyConfig.class,*/ ValidatorConfig.class}, loader=AnnotationConfigContextLoader.class)
+@Ignore
 public class JeuxVideoFrWorkerTest {
 
     private final Logger logger = LoggerFactory.getLogger(JeuxVideoFrWorkerTest.class);

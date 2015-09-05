@@ -4,6 +4,7 @@ import lan.dk.podcastserver.config.BeanConfigScan;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.M3U8Downloader;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {BeanConfigScan.class, /*HibernateSearchConfig.class*/})
 @ActiveProfiles("data-embedded")
+@Ignore
 public class M3U8DownloaderTest {
 
     @Resource
