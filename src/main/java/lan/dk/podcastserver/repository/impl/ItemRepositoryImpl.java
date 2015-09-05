@@ -11,9 +11,9 @@ import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,11 +27,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
 
-    @PersistenceContext EntityManager em;
+    final FullTextEntityManager fullTextEntityManager;
+
+    @Autowired
+    public ItemRepositoryImpl(EntityManager em) {
+        this.fullTextEntityManager = getFullTextEntityManager(em);
+    }
 
     @Override
     public void reindex() throws InterruptedException {
-        FullTextEntityManager fullTextEntityManager = getFullTextEntityManager(em);
         fullTextEntityManager
                 .createIndexer(Item.class)
                 .batchSizeToLoadObjects(25)
@@ -48,8 +52,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public List<Integer> fullTextSearch(String term) {
         if (StringUtils.isEmpty(term))
             return new ArrayList<>();
-
-        FullTextEntityManager fullTextEntityManager = getFullTextEntityManager(em);
 
         QueryBuilder qbDsl = fullTextEntityManager.getSearchFactory()
                 .buildQueryBuilder().forEntity(Item.class).get();
