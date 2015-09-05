@@ -27,12 +27,12 @@ public class FindPodcastBusinessTest {
     public void should_not_find_any_finder() {
         /* Given */
         String fakeUrl = "http://any.fake.url/";
-        when(workerService.getFinderByUrl(anyString())).thenReturn(null);
+        when(workerService.finderOf(anyString())).thenReturn(null);
         /* When */
         Podcast podcast = findPodcastBusiness.fetchPodcastInfoByUrl(fakeUrl);
         /* Then */
         assertThat(podcast).isNull();
-        verify(workerService, times(1)).getFinderByUrl(eq(fakeUrl));
+        verify(workerService, times(1)).finderOf(eq(fakeUrl));
     }
 
     @Test
@@ -40,7 +40,7 @@ public class FindPodcastBusinessTest {
          /* Given */
         String fakeUrl = "http://any.fake.url/";
         Finder finder = mock(Finder.class);
-        when(workerService.getFinderByUrl(anyString())).thenReturn(finder);
+        when(workerService.finderOf(anyString())).thenReturn(finder);
         when(finder.find(anyString())).thenReturn(new Podcast());
 
         /* When */
@@ -48,7 +48,7 @@ public class FindPodcastBusinessTest {
 
         /* Then */
         assertThat(podcast).isNotNull().isEqualTo(new Podcast());
-        verify(workerService, times(1)).getFinderByUrl(eq(fakeUrl));
+        verify(workerService, times(1)).finderOf(eq(fakeUrl));
         verify(finder, times(1)).find(eq(fakeUrl));
     }
 }
