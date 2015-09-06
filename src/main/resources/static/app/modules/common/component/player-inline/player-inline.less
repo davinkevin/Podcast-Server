@@ -1,5 +1,6 @@
 
-@player-inline-height : 100px;
+@player-inline-height : 70px;
+@videogular-inline-control-height : 30px;
 
 .player-inline-full {
   .spacer {
@@ -11,20 +12,77 @@
     bottom:0;
     height: @player-inline-height;
     width:100%;
-    background:red;
+    background:rgba(60, 56, 56, 0.96);
+    /*background:ghostwhite;*/
     z-index: 100;
+
+    .current-cover {
+      img {
+        width: @player-inline-height;
+        height: @player-inline-height;
+      }
+    }
 
     .poster {
       padding: 0;
     }
 
     .player {
+      width: calc(~'100% -' @player-inline-height);
       padding: 0;
+
+      .action-button-row {
+        padding-top: 10px;
+        height: @player-inline-height - @videogular-inline-control-height;
+        display: flex;
+        flex-direction: row;
+        justify-content : center;
+        align-items : center;
+
+        .btn-circle {
+          width: 40px;
+          height: 40px;
+          text-align: center;
+          padding: 5px 0 6px 3px;
+          font-size: 21px;
+          line-height: 1.42;
+          border-radius: 25px;
+        }
+
+        .btn.prev, .btn.next {
+          margin: 0 8px;
+          padding: 0 0;
+          color: ghostwhite;
+          width: 25px;
+          height: 25px;
+          text-align: center;
+          font-size: 17px;
+          line-height: 1.42;
+          border-radius: 25px;
+        }
+
+      }
+
     }
 
-    .videogular-container.audio {
-      height: 50px;
-    }
 
+
+    videogular vg-scrub-bar [role=slider], [videogular] vg-scrub-bar [role=slider] {
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+    videogular vg-controls {
+      height: @videogular-inline-control-height ;
+      top: calc(100% - @videogular-inline-control-height );
+      .controls-container {
+        -webkit-animation : none !important;
+        -webkit-animation-fill-mode : none !important;
+        -webkit-animation-iteration-count : 0 !important;
+      }
+    }
+    videogular vg-controls .controls-container, [videogular] vg-controls .controls-container {
+      height: @videogular-inline-control-height ;
+      background-color : rgba(255, 255, 255, 0) !important;
+    }
   }
 }

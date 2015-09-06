@@ -7,19 +7,19 @@
         <title>Podcast Server</title>
     
         <!-- inject:css -->
-        <link rel="stylesheet" href="app/lib/angular-loading-bar/build/loading-bar.css?hash=75f1a661494e249829b86d37a2473eac">
-        <link rel="stylesheet" href="app/lib/animate.css/animate.css?hash=15cdd2dc9fe47611cbb863fd1efc0992">
-        <link rel="stylesheet" href="app/lib/ng-tags-input/ng-tags-input.css?hash=8486791c5afa8b884f16a79e7b370454">
-        <link rel="stylesheet" href="app/lib/ng-tags-input/ng-tags-input.bootstrap.css?hash=1a02a9a8abdd10d627e4904e0c4a2ecf">
-        <link rel="stylesheet" href="app/lib/angular-hotkeys/build/hotkeys.css?hash=ec3fc8f9ec885ce7598efc7bd339556f">
-        <link rel="stylesheet" href="app/lib/ionicons/css/ionicons.css?hash=38ff3fc6006f53b437dfd1e501a61466">
-        <link rel="stylesheet" href="app/lib/videogular-themes-default/videogular.css?hash=dfcbf9f85308c1e2cf74e20a500bbe0c">
-        <link rel="stylesheet" href="app/lib/components-font-awesome/css/font-awesome.css?hash=6313afa890b881932762fdf79ba90762">
-        <link rel="stylesheet" href="app/lib/bootstrap/dist/css/bootstrap.css?hash=a99a150b2b3a697de292de36ca2f4c89">
+        <link rel="stylesheet" href="app/lib/angular-loading-bar/build/loading-bar.min.css?hash=9d0ee258382096dd95f1cf64afab3cb2">
+        <link rel="stylesheet" href="app/lib/animate.css/animate.min.css?hash=317e697f635ee9c4e8d5695bebefabfe">
+        <link rel="stylesheet" href="app/lib/ng-tags-input/ng-tags-input.min.css?hash=cd4057165ac1d5efaea582b63aa588d4">
+        <link rel="stylesheet" href="app/lib/ng-tags-input/ng-tags-input.bootstrap.min.css?hash=6ebe30df79259598fe28e71ca789fd38">
+        <link rel="stylesheet" href="app/lib/angular-hotkeys/build/hotkeys.min.css?hash=f37548ee45354ffef65d386ea086d523">
+        <link rel="stylesheet" href="app/lib/ionicons/css/ionicons.min.css?hash=6d9689aeeb3e879a21130859949b202f">
+        <link rel="stylesheet" href="app/lib/videogular-themes-default/videogular.min.css?hash=0ac01be3c20d66a9122a5e6f900407db">
+        <link rel="stylesheet" href="app/lib/components-font-awesome/css/font-awesome.min.css?hash=6974196236a7c9f38e45bd2e45ba783b">
+        <link rel="stylesheet" href="app/lib/bootstrap/dist/css/bootstrap.min.css?hash=e3c7b731f3c44a9a0bc748e8b1b0a1e3">
         <!-- endinject -->
 
         <!-- app:css -->
-        <link rel="stylesheet" href="app/css/podcast-server.css?hash=17998f51c82dc4767ce54b1e2ece6989">
+        <link rel="stylesheet" href="app/css/podcast-server.min.css?hash=e5e89a5d05bb6a8b9da749dcbfdcaa7d">
         <!-- endinject -->
     
     </head>
@@ -64,39 +64,39 @@
 
         <authorize-notification></authorize-notification>
         <div ng-view autoscroll=""></div>
-        <!--<player-inline></player-inline>-->
+        <player-inline></player-inline>
         
         <!-- inject:js -->
-        <script src="app/lib/angular/angular.js?hash=df261571ccaf6049d6ec61bcb822703b"></script>
-        <script src="app/lib/angular-route/angular-route.js?hash=cd1ba94656c230d67db739a7c00f2189"></script>
-        <script src="app/lib/angular-animate/angular-animate.js?hash=02a123b13ba5adb235512d85c25665ee"></script>
-        <script src="app/lib/angular-sanitize/angular-sanitize.js?hash=4076b0b76e126ee4b11c51c032626dfb"></script>
-        <script src="app/lib/angular-touch/angular-touch.js?hash=0fe7de3e308b0064ee96a149b8e95ac9"></script>
-        <script src="app/lib/angular-bootstrap/ui-bootstrap-tpls.js?hash=1ca444a065d5b9346376893c723ef67c"></script>
-        <script src="app/lib/lodash/lodash.js?hash=bd498826562b6ac6ea1b32b6abee0b23"></script>
-        <script src="app/lib/stomp-websocket/lib/stomp.js?hash=7a9c8328beaf9f655a717ef72d26c6b0"></script>
-        <script src="app/lib/sockjs/sockjs.js?hash=5fd57f2bece73ef62a06f51b7134d222"></script>
-        <script src="app/lib/ngstorage/ngStorage.js?hash=d48a13d908ff55c2972cdfb770a0bb3a"></script>
-        <script src="app/lib/angular-truncate/src/truncate.js?hash=7809ea88992ae4e3b94208e5c57f78c3"></script>
-        <script src="app/lib/angular-loading-bar/build/loading-bar.js?hash=cc43e14e9e544dc94720b4c88d918eab"></script>
-        <script src="app/lib/ng-tags-input/ng-tags-input.js?hash=b38a36fa23dae631352d3fb4ae135d76"></script>
-        <script src="app/lib/angular-hotkeys/build/hotkeys.js?hash=9c57963af77332b92f35434c608fdb80"></script>
-        <script src="app/lib/angular-notification/angular-notification.js?hash=74fb78c42ad7fae61d3399b8301c5041"></script>
-        <script src="app/lib/ng-file-upload/ng-file-upload.js?hash=67f84af875bdf76c0b475b9aca75b953"></script>
-        <script src="app/lib/videogular/videogular.js?hash=a9b190fe4e1769415ddd6df790e5dc11"></script>
-        <script src="app/lib/videogular-poster/vg-poster.js?hash=60390c0343ab1880a5b399d1338f819f"></script>
-        <script src="app/lib/videogular-buffering/vg-buffering.js?hash=a030fec7f74a37bbb6344cfaf286182f"></script>
-        <script src="app/lib/videogular-overlay-play/vg-overlay-play.js?hash=8bf9cc2e5d259c21d0bb492cac335443"></script>
-        <script src="app/lib/videogular-controls/vg-controls.js?hash=58449bb38cc2e163bb18f5cef3bf53d0"></script>
-        <script src="app/lib/highcharts-release/adapters/standalone-framework.src.js?hash=cd42800e6ab272144a5f959ce24ff637"></script>
-        <script src="app/lib/highcharts-release/highcharts.src.js?hash=d9f4c7ebc28f98909a71aed975b2bb5f"></script>
-        <script src="app/lib/highcharts-ng/dist/highcharts-ng.js?hash=0d3a41e3704e1f744dddbab170caeb3b"></script>
-        <script src="app/lib/restangular/dist/restangular.js?hash=576e3413439e741812061ad93f415507"></script>
-        <script src="app/lib/AngularStompDK/dist/angular-stomp.js?hash=698c04bebc69b7ecbc21680889dd1331"></script>
+        <script src="app/lib/angular/angular.min.js?hash=3a6a1a545f3741072559f94c5543910a"></script>
+        <script src="app/lib/angular-route/angular-route.min.js?hash=76dbca80a0319b3ddf487db021d7c929"></script>
+        <script src="app/lib/angular-animate/angular-animate.min.js?hash=95e8bd272215350f29f1d01e44ff378e"></script>
+        <script src="app/lib/angular-sanitize/angular-sanitize.min.js?hash=1703124d9ad0d2212f2feb64180f3860"></script>
+        <script src="app/lib/angular-touch/angular-touch.min.js?hash=610f422555ef0f781fd4ad75f66d2543"></script>
+        <script src="app/lib/angular-bootstrap/ui-bootstrap-tpls.min.js?hash=da4b6ee17b26233bc8341e9b5970924e"></script>
+        <script src="app/lib/lodash/lodash.min.js?hash=1e9114ce99fbe9c491027a6284b49d4f"></script>
+        <script src="app/lib/stomp-websocket/lib/stomp.min.js?hash=ae51883d4b70c8d229581e84faa3db86"></script>
+        <script src="app/lib/sockjs/sockjs.min.js?hash=01718362f48d81402f9d0b4a099e7419"></script>
+        <script src="app/lib/ngstorage/ngStorage.min.js?hash=0620398c11742b6cd1d4c12aa9b6e401"></script>
+        <script src="app/lib/angular-truncate/src/truncate.js?hash=02610a31b0af416cd8ab7dd83c816691"></script>
+        <script src="app/lib/angular-loading-bar/build/loading-bar.min.js?hash=a6bffe1f766aeacd36274e086c5319d8"></script>
+        <script src="app/lib/ng-tags-input/ng-tags-input.min.js?hash=8cf62b7a9b1b28fffe52e0564f0bc1f0"></script>
+        <script src="app/lib/angular-hotkeys/build/hotkeys.min.js?hash=e18515a396de27b18af6894db537d954"></script>
+        <script src="app/lib/angular-notification/angular-notification.min.js?hash=54d397eb3409aa37aec8344254f09ae7"></script>
+        <script src="app/lib/ng-file-upload/ng-file-upload.min.js?hash=9ab8fd5326846320865f29c96e5c0c7d"></script>
+        <script src="app/lib/videogular/videogular.js?hash=418ee2cc505c4cc126648116b41cca19"></script>
+        <script src="app/lib/videogular-poster/vg-poster.js?hash=75ea7f750496eb9f7e933ab54b56eb9a"></script>
+        <script src="app/lib/videogular-buffering/vg-buffering.js?hash=b56d91d81deb61640c203e7e38533e12"></script>
+        <script src="app/lib/videogular-overlay-play/vg-overlay-play.js?hash=0c63ba1b4729b570df95229c015632ed"></script>
+        <script src="app/lib/videogular-controls/vg-controls.js?hash=1bfb6501edfb8ec71e6c342694c05136"></script>
+        <script src="app/lib/highcharts-release/adapters/standalone-framework.js?hash=76fb728d326a3c0aa5bb8b1e69ac4e9c"></script>
+        <script src="app/lib/highcharts-release/highcharts.js?hash=dde1a6a44d7a317cc855f201389ad5a9"></script>
+        <script src="app/lib/highcharts-ng/dist/highcharts-ng.min.js?hash=aeb48059f926b06b88e7ee8bf7f8b921"></script>
+        <script src="app/lib/restangular/dist/restangular.min.js?hash=a9e9c43ab7702c02168b3ce5af7ad0da"></script>
+        <script src="app/lib/AngularStompDK/dist/angular-stomp.min.js?hash=93ac1e14f684ae3fd82d6ecfb40b4361"></script>
         <!-- endinject -->
 
         <!-- app:js -->
-        <script src="app/js/podcast-server.js?hash=7a440c0dc161303569eb7f2a7873072e"></script>
+        <script src="app/js/podcast-server.min.js?hash=2b4d1a7236ce94a563f8bef8447cc1bb"></script>
         <!-- endinject -->
     </body>
 </html>

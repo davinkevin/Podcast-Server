@@ -1,27 +1,37 @@
-<div class="player-inline-full">
+<div class="player-inline-full" ng-hide="pic.playlist.length === 0">
     <div class="spacer"></div>
     <div class="player-inline">
-        <videogular vg-auto-play="pic.config.autoPlay"
-                    vg-player-ready="pic.onPlayerReady($API)"
-                    vg-complete="pic.onCompleteVideo()"
-                    vg-update-state="pic.onUpdateState($state)"
-                    vg-clear-media-on-navigate="false"
-                    class="videogular-container audio pull-left">
 
-            <vg-media vg-src="pic.config.sources" vg-native-controls="false" ></vg-media>
+        <div class="pull-left current-cover">
+            <img class="current-cover" ng-src="{{ pic.currentVideo.cover.url }}" alt=""/>
+        </div>
+        <div class="pull-left player">
+            <div class="action-button-row">
+                <a href="#" ng-click="pic.previous()" class="btn prev"><i class="glyphicon glyphicon-step-backward"></i></a>
+                <a href="#" ng-click="pic.playPause()" class="btn btn-default btn-circle"><i class="glyphicon" ng-class="{'glyphicon-play' : pic.API.currentState === 'pause', 'glyphicon-pause' : pic.API.currentState === 'play'}"></i></a>
+                <a href="#" ng-click="pic.next()" class="btn next"><i class="glyphicon glyphicon-step-forward"></i></a>
+            </div>
+            <videogular vg-auto-play="pic.config.autoPlay"
+                        vg-player-ready="pic.onPlayerReady($API)"
+                        vg-complete="pic.onCompleteVideo()"
+                        vg-update-state="pic.onUpdateState($state)"
+                        vg-clear-media-on-navigate="false"
+                        class="videogular-container audio pull-left">
 
-            <vg-controls vg-autohide="false">
-                <vg-play-pause-button></vg-play-pause-button>
-                <vg-time-display>{{ currentTime | date:'H:mm:ss':'+0000' }}</vg-time-display>
-                <vg-scrub-bar>
-                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
-                </vg-scrub-bar>
-                <vg-time-display>{{ timeLeft | date:'H:mm:ss':'+0000' }}</vg-time-display>
-                <vg-volume>
-                    <vg-mute-button></vg-mute-button>
-                    <vg-volume-bar></vg-volume-bar>
-                </vg-volume>
-            </vg-controls>
-        </videogular>
+                <vg-media vg-src="pic.config.sources" vg-native-controls="false" vg-type="audio"></vg-media>
+
+                <vg-controls vg-autohide="false">
+                    <vg-time-display>{{ currentTime | date:'H:mm:ss':'+0000' }}</vg-time-display>
+                    <vg-scrub-bar>
+                        <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+                    </vg-scrub-bar>
+                    <vg-time-display>{{ timeLeft | date:'H:mm:ss':'+0000' }}</vg-time-display>
+                    <vg-volume>
+                        <vg-mute-button></vg-mute-button>
+                        <vg-volume-bar></vg-volume-bar>
+                    </vg-volume>
+                </vg-controls>
+            </videogular>
+        </div>
     </div>
 </div>

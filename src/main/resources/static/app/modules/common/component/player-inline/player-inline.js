@@ -11,11 +11,11 @@ class PlayerInlineDirective {
 }
 
 class PlayerInlineController {
-    constructor(playlistService, $timeout, deviceDetectorService) {
+    constructor(playlistService, $timeout, deviceDetectorService, $scope) {
         this.isReading = true;
         this.playlistService = playlistService;
         this.$timeout = $timeout;
-
+        this.hasToBeShown = false;
         this.playlist = [];
         this.state = null;
         this.API = null;
@@ -31,7 +31,23 @@ class PlayerInlineController {
                 poster: ''
             }
         };
+
+        $scope.$watch(
+            () => this.playlistService.playlist().length,
+            (newVal) => this.updateOnPlaylistChange(newVal)
+        );
         this.reloadPlaylist();
+    }
+
+    updateOnPlaylistChange(newVal) {
+        this.hasToBeShown = newVal > 0;
+        if (!this.hasToBeShown && this.API && this.API.currentState === 'play') {
+            this.API.stop();
+        }
+        this.reloadPlaylist();
+        if (this.hasToBeShown) {
+            this.setMedia(0);
+        }
     }
 
     onPlayerReady(API) {
@@ -43,26 +59,13 @@ class PlayerInlineController {
         this.isCompleted = false;
         if (this.config.autoPlay) {
             this.$timeout(() => {
-                console.log('play');
-                this.setVideo(0);
+                this.setMedia(0);
             }, 1000);
         }
     }
 
     onCompleteVideo() {
-        var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
-        this.isCompleted = true;
-
-        if (indexOfVideo+1 === this.playlist.length) {
-            this.currentVideo = this.playlist[0];
-            return;
-        }
-
-        this.setVideo(indexOfVideo+1);
-    }
-
-    onUpdateState(state) {
-        console.log("onUpdateState: "+state);
+        this.next();
     }
 
     reloadPlaylist() {
@@ -75,7 +78,7 @@ class PlayerInlineController {
         );
     }
 
-    setVideo(index) {
+    setMedia(index) {
         this.currentVideo = this.playlist[index];
 
         if (this.currentVideo !== null && this.currentVideo !== undefined) {
@@ -86,17 +89,30 @@ class PlayerInlineController {
         }
     }
 
-    remove(item) {
-        this.playlistService.remove(item);
-        this.reloadPlaylist();
-        if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
-            this.setVideo(0);
-        }
+    playPause() {
+        this.API.playPause();
     }
 
-    removeAll() {
-        this.playlistService.removeAll();
-        this.reloadPlaylist();
+    next() {
+        let indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
+
+        if (indexOfVideo+1 === this.playlist.length) {
+            this.setMedia(0);
+            return;
+        }
+
+        this.setMedia(indexOfVideo+1);
+    }
+
+    previous() {
+        let indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
+
+        if (indexOfVideo === 0) {
+            this.setMedia(this.playlist.length-1);
+            return;
+        }
+
+        this.setMedia(indexOfVideo-1);
     }
 
     getIndexOfVideoInPlaylist(item) {
