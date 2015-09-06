@@ -1,0 +1,27 @@
+<div class="player-inline-full">
+    <div class="spacer"></div>
+    <div class="player-inline">
+        <videogular vg-auto-play="pic.config.autoPlay"
+                    vg-player-ready="pic.onPlayerReady($API)"
+                    vg-complete="pic.onCompleteVideo()"
+                    vg-update-state="pic.onUpdateState($state)"
+                    vg-clear-media-on-navigate="false"
+                    class="videogular-container audio pull-left">
+
+            <vg-media vg-src="pic.config.sources" vg-native-controls="false" ></vg-media>
+
+            <vg-controls vg-autohide="false">
+                <vg-play-pause-button></vg-play-pause-button>
+                <vg-time-display>{{ currentTime | date:'H:mm:ss':'+0000' }}</vg-time-display>
+                <vg-scrub-bar>
+                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+                </vg-scrub-bar>
+                <vg-time-display>{{ timeLeft | date:'H:mm:ss':'+0000' }}</vg-time-display>
+                <vg-volume>
+                    <vg-mute-button></vg-mute-button>
+                    <vg-volume-bar></vg-volume-bar>
+                </vg-volume>
+            </vg-controls>
+        </videogular>
+    </div>
+</div>

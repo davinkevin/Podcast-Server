@@ -14,6 +14,9 @@ target/
 build/
 logs/
 src/main/webapp
-src/main/resources/static/app/js/podcastserver.js
-src/main/resources/static/app/js/podcastserver.min.js.map
-src/main/resources/static/app/js/podcastserver.min.js
+/src/main/resources/static/app/js/podcast-server.min.js.map
+/src/main/resources/static/app/css/podcast-server.css
+/src/main/resources/static/app/js/podcast-server.js
+/src/main/resources/static/app/css/podcast-server.min.css
+/src/main/resources/static/app/js/podcast-server.min.js
+/src/main/resources/static/app/lib

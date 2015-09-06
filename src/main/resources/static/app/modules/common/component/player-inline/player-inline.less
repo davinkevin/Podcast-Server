@@ -1,0 +1,30 @@
+
+@player-inline-height : 100px;
+
+.player-inline-full {
+  .spacer {
+    height: @player-inline-height;
+  }
+  .player-inline {
+    position:fixed;
+    left:0;
+    bottom:0;
+    height: @player-inline-height;
+    width:100%;
+    background:red;
+    z-index: 100;
+
+    .poster {
+      padding: 0;
+    }
+
+    .player {
+      padding: 0;
+    }
+
+    .videogular-container.audio {
+      height: 50px;
+    }
+
+  }
+}

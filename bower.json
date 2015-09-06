@@ -8,7 +8,7 @@
     "angular-sanitize": "1.4.0",
     "angular-touch": "1.4.0",
     "bootstrap": "~3.3.4",
-    "angular-bootstrap": "~0.13.0",
+    "angular-bootstrap": "~0.13.1",
     "restangular": "~1.5.1",
     "AngularStompDK": "~0.2.3",
     "stomp-websocket": "~2.3.0",
@@ -22,12 +22,12 @@
     "angular-notification": "~1.0.1",
     "ionicons": "~2.0.1",
     "ng-file-upload": "~5.0.1",
-    "videogular": "~1.2.1",
-    "videogular-poster": "~1.2.1",
-    "videogular-themes-default": "~1.2.1",
-    "videogular-buffering": "~1.2.1",
-    "videogular-overlay-play": "~1.2.1",
-    "videogular-controls": "~1.2.1",
+    "videogular": "~1.2.6",
+    "videogular-poster": "~1.2.6",
+    "videogular-themes-default": "~1.2.6",
+    "videogular-buffering": "~1.2.6",
+    "videogular-overlay-play": "~1.2.6",
+    "videogular-controls": "~1.2.6",
     "components-font-awesome": "~4.3.0",
     "highcharts-release": "~4.1.4",
     "highcharts-ng": "~0.0.8"
@@ -151,7 +151,7 @@
     },
     "AngularStompDK": {
       "main": {
-        "dev": "dist/angular-stomp.es5.js",
+        "dev": "dist/angular-stomp.js",
         "prod": [
           "dist/angular-stomp.min.js",
           "dist/angular-stomp.min.js.map"
