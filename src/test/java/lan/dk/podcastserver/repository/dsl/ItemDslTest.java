@@ -1,0 +1,272 @@
+package lan.dk.podcastserver.repository.dsl;
+
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.DbSetupTracker;
+import com.ninja_squad.dbsetup.destination.DataSourceDestination;
+import com.ninja_squad.dbsetup.operation.Operation;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.entity.Tag;
+import lan.dk.podcastserver.repository.DatabaseConfiguraitonTest;
+import lan.dk.podcastserver.repository.ItemRepository;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.sql.DataSource;
+import javax.transaction.Transactional;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static com.ninja_squad.dbsetup.Operations.insertInto;
+import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
+import static java.time.ZonedDateTime.now;
+import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
+import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.formatter;
+import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Created by kevin on 17/08/15 for Podcast Server
+ */
+@Transactional
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {DatabaseConfiguraitonTest.class, HibernateJpaAutoConfiguration.class})
+public class ItemDslTest {
+
+    @Autowired DataSource dataSource;
+    @Autowired ItemRepository itemRepository;
+
+    private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
+    public static final Operation INSERT_REFERENCE_DATA = sequenceOf(
+            insertInto("PODCAST")
+                    .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
+                    .values(1, "AppLoad", null, "RSS", false)
+                    .values(2, "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true)
+                    .build(),
+            insertInto("ITEM")
+                    .columns("ID", "TITLE", "URL", "PODCAST_ID", "STATUS", "PUBDATE", "DOWNLOADDDATE")
+                    .values(1L, "Appload 1", "http://fakeurl.com/appload.1.mp3", 1, Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
+                    .values(2L, "Appload 2", "http://fakeurl.com/appload.2.mp3", 1, null, now().minusDays(30).format(formatter), now().minusDays(30).format(formatter))
+                    .values(3L, "Appload 3", "http://fakeurl.com/appload.3.mp3", 1, Status.NOT_DOWNLOADED, now().format(formatter), now().format(formatter))
+                    .values(4L, "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", 2, Status.DELETED, now().minusYears(1).format(formatter), now().format(formatter))
+                    .build(),
+            insertInto("TAG")
+                .columns("ID", "NAME")
+                .values(1L, "French Spin")
+                .values(2L, "Studio Knowhere")
+                .build(),
+            insertInto("PODCAST_TAG")
+                .columns("PODCAST_ID", "TAG_ID")
+                .values(1, 1)
+                .values(2, 2)
+                .build()
+    );
+
+    @Test
+    public void should_find_downloaded() {
+        /* When */
+        dbSetupTracker.skipNextLaunch();
+        Iterable<Item> one = itemRepository.findAll(isDownloaded(Boolean.TRUE));
+
+        /* Then */
+        assertThat(one)
+                .hasSize(1)
+                .extracting(Item::getTitle)
+                .contains("Appload 1");
+    }
+
+    @Test
+    public void should_find_not_downloaded() {
+        /* When */
+        dbSetupTracker.skipNextLaunch();
+        Iterable<Item> items = itemRepository.findAll(isDownloaded(Boolean.FALSE));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(2)
+                .extracting(Item::getTitle)
+                .contains("Appload 2", "Appload 3");
+    }
+
+    @Test
+    public void should_find_newer_than_16_days() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(isNewerThan(now().minusDays(16)));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(2)
+                .extracting(Item::getTitle)
+                .contains("Appload 1", "Appload 3");
+    }
+
+    @Test
+    public void should_find_downloaded_newer_than_16_days() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(hasBeenDownloadedBefore(now().minusDays(16)));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(1)
+                .extracting(Item::getTitle)
+                .contains("Appload 2");
+    }
+
+    @Test
+    public void should_find_downloaded_older_than_16_days() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(hasBeendDownloadedAfter(now().minusDays(16)));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(3)
+                .extracting(Item::getTitle)
+                .contains("Appload 1", "Appload 3", "Geek INC 123");
+    }
+
+    @Test
+    public void should_find_item_from_podcast_of_type_YOUTUBE() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(isOfType("YOUTUBE"));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(1)
+                .extracting(Item::getTitle)
+                .contains("Geek INC 123");
+    }
+    
+    @Test
+    public void should_find_item_witch_has_to_be_deleted() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(hasToBeDeleted(Boolean.FALSE));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(3)
+                .extracting(Item::getTitle)
+                .contains("Appload 1", "Appload 2", "Appload 3");
+    }
+
+    @Test
+    public void should_be_in_id_list() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+        List<Integer> listOfId = Arrays.asList(3, 4);
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(isInId(listOfId));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(2)
+                .extracting(Item::getTitle)
+                .contains("Appload 3", "Geek INC 123");
+    }
+
+    @Test
+    public void should_find_in_tag() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+        Tag tag = new Tag().setId(1).setName("French Spin");
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(isInTags(tag));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(3)
+                .extracting(Item::getTitle)
+                .contains("Appload 1", "Appload 2", "Appload 3");
+    }
+
+    @Test
+    public void should_be_in_podcast() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(isInPodcast(1));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(3)
+                .extracting(Item::getTitle)
+                .contains("Appload 1", "Appload 2", "Appload 3");
+    }
+
+    @Test
+    public void should_result_with_search() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+        List<Integer> ids = Arrays.asList(1, 4);
+        List<Tag> tags = Collections.singletonList(new Tag().setId(2).setName("Tag1"));
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(1)
+                .extracting(Item::getTitle)
+                .contains("Geek INC 123");
+    }
+
+    @Test
+    public void should_result_with_search_without_ids() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+        List<Integer> ids = null;
+        List<Tag> tags = Collections.singletonList(new Tag().setId(2).setName("Tag1"));
+
+        /* When */
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags));
+
+        /* Then */
+        assertThat(items)
+                .hasSize(1)
+                .extracting(Item::getTitle)
+                .contains("Geek INC 123");
+    }
+
+    @Test(expected = InvocationTargetException.class)
+    public void should_throw_exception_on_dsl_instanciation() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Constructor<ItemDSL> constructor = ItemDSL.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        constructor.newInstance();
+    }
+
+
+
+    @Before
+    public void prepare() throws Exception {
+        Operation operation = sequenceOf(DELETE_ALL, INSERT_REFERENCE_DATA);
+        DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);
+
+        dbSetupTracker.launchIfNecessary(dbSetup);
+    }
+
+}
