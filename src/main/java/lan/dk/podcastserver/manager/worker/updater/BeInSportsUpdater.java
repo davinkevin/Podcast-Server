@@ -123,7 +123,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
         try {
             Document page = htmlService.connectWithDefault(listingUrl).execute().parse();
-            return signatureService.generateMD5Signature(page.select("cluster_video").html());
+            return signatureService.generateMD5Signature(page.select(".cluster_video").html());
         } catch (IOException e) {
             logger.error("IOException :", e);
         }
