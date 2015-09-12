@@ -1,15 +1,16 @@
 class PodcastDetailCtrl {
 
-    constructor($scope, podcast, UpdateService){
+    constructor($scope, podcast, UpdateService, $timeout){
         this.$scope = $scope;
         this.UpdateService = UpdateService;
         this.podcast = podcast;
+        this.$timeout = $timeout;
 
-        this.podcastTabs= [
+        this.podcastTabs = [
             { heading : 'Episodes', active : true},
             { heading : 'Edition', active : false},
             { heading : 'Upload', disabled : this.podcast.type !== 'send'},
-            { heading : 'Stats', active : false}
+            { heading : 'Stats', active : false }
         ];
         this.$scope.$on("podcastEdition:save", () => this.refreshItems());
         this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
@@ -27,6 +28,12 @@ class PodcastDetailCtrl {
 
     tabsActive(num) {
         this.podcastTabs[num].active = true;
+    }
+
+    chartReflow() {
+        this.$timeout(() => {
+            this.$scope.$broadcast('highchartsng.reflow');
+        }, 10);
     }
 
 }

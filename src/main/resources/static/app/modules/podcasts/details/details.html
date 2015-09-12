@@ -35,7 +35,7 @@
         <tab heading="{{ pdc.podcastTabs[2].heading }}" ng-hide="pdc.podcastTabs[2].disabled" active="pdc.podcastTabs[2].active" disable="pdc.podcastTabs[2].disabled">
             <podcast-upload podcast="pdc.podcast"></podcast-upload>
         </tab>
-        <tab heading="{{ pdc.podcastTabs[3].heading }}" ng-hide="pdc.podcastTabs[3].disabled" active="pdc.podcastTabs[3].active" disable="pdc.podcastTabs[3].disabled">
+        <tab heading="{{ pdc.podcastTabs[3].heading }}" ng-hide="pdc.podcastTabs[3].disabled" active="pdc.podcastTabs[3].active" disable="pdc.podcastTabs[3].disabled" select="pdc.chartReflow()">
             <podcast-stats podcast="pdc.podcast"></podcast-stats>
         </tab>
     </tabset>

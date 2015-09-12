@@ -30,7 +30,7 @@
     "videogular-controls": "~1.2.6",
     "components-font-awesome": "~4.3.0",
     "highcharts-release": "~4.1.4",
-    "highcharts-ng": "~0.0.8"
+    "highcharts-ng": "~0.0.10"
   },
   "resolutions": {
     "angular": "1.4.0",
