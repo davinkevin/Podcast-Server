@@ -8,12 +8,16 @@ class wsDownloadManager {
     }
 
     connect() { return this.ngstomp.connect();}
-    subscribe(url, callback, scope) {return this.ngstomp.subscribe(url, callback, scope);}
-    unsubscribe(url) { return this.ngstomp.unsubscribe(url); }
-    toggle(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/toogle', item); }
-    start(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/start', item); }
-    pause(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/pause', item); }
-    stop(item) { return this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/stop', item); }
+    subscribe(url, callback, scope) {
+        this.ngstomp.subscribe(url, callback, {}, scope); return this;
+    }
+    unsubscribe(url) {
+        this.ngstomp.unsubscribe(url); return this;
+    }
+    toggle(item) { this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/toogle', item); return this;}
+    start(item) { this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/start', item); return this;}
+    pause(item) { this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/pause', item); return this;}
+    stop(item) { this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/stop', item); return this;}
 }
 
 class DownloadManager {

@@ -29,8 +29,8 @@ class UpdatingController {
         this.$scope = $scope;
 
         this.ngstomp
-            .subscribe('/app/updating', (message) => this.updateStatus(message), $scope)
-            .subscribe('/topic/updating', (message) => this.updateStatus(message), $scope);
+            .subscribe('/app/updating', (message) => this.updateStatus(message), {}, $scope)
+            .subscribe('/topic/updating', (message) => this.updateStatus(message), {}, $scope);
     }
 
     updateStatus(message) {
