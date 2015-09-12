@@ -185,4 +185,10 @@ public class UrlServiceTest {
         /* Then */  assertThat(result).isEqualTo("http://www.google.fr/subdomain");
     }
 
+    @Test
+    public void should_define_user_agent_on_construct() {
+        /* When */ urlService.postConstruct();
+        /* Then */ assertThat(System.getProperty("http.agent")).isEqualTo(HtmlService.USER_AGENT);
+    }
+
 }

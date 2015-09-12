@@ -3,6 +3,7 @@ package lan.dk.podcastserver.service;
 import lan.dk.podcastserver.utils.URLUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URLConnection;
@@ -39,6 +40,11 @@ public class UrlService {
 
     public String urlWithDomain(String urlWithDomain, String domaineLessUrl) {
         return URLUtils.urlWithDomain(urlWithDomain, domaineLessUrl);
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        System.setProperty("http.agent", HtmlService.USER_AGENT);
     }
 
 }

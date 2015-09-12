@@ -20,7 +20,7 @@ public class HtmlServiceTest {
         /* When */ HttpConnection connection = (HttpConnection) htmlService.connectWithDefault(URL);
 
         /* Then */
-            assertThat(connection.request().header(USER_AGENT)).isEqualTo("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.81 Safari/537.36");
+            assertThat(connection.request().header(USER_AGENT)).isEqualTo(HtmlService.USER_AGENT);
             assertThat(connection.request().header(REFERER)).isEqualTo("http://www.google.fr");
             assertThat(connection.request().timeout()).isEqualTo(5000);
     }
