@@ -115,6 +115,10 @@ class PlayerInlineController {
         this.setMedia(indexOfVideo-1);
     }
 
+    clearPlaylist() {
+        this.playlistService.removeAll();
+    }
+
     getIndexOfVideoInPlaylist(item) {
         return this.playlist.indexOf(item);
     }

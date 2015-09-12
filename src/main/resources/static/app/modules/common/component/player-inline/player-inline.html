@@ -7,9 +7,13 @@
         </div>
         <div class="pull-left player">
             <div class="action-button-row">
-                <a href="#" ng-click="pic.previous()" class="btn prev"><i class="glyphicon glyphicon-step-backward"></i></a>
-                <a href="#" ng-click="pic.playPause()" class="btn btn-default btn-circle"><i class="glyphicon" ng-class="{'glyphicon-play' : pic.API.currentState === 'pause', 'glyphicon-pause' : pic.API.currentState === 'play'}"></i></a>
-                <a href="#" ng-click="pic.next()" class="btn next"><i class="glyphicon glyphicon-step-forward"></i></a>
+                <div></div>
+                <div>
+                    <a href="#" ng-click="pic.previous()" class="btn prev"><i class="glyphicon glyphicon-step-backward"></i></a>
+                    <a href="#" ng-click="pic.playPause()" class="btn btn-default btn-circle"><i class="glyphicon" ng-class="{'glyphicon-play' : pic.API.currentState === 'pause', 'glyphicon-pause' : pic.API.currentState === 'play'}"></i></a>
+                    <a href="#" ng-click="pic.next()" class="btn next"><i class="glyphicon glyphicon-step-forward"></i></a>
+                </div>
+                <a href="#" ng-click="pic.clearPlaylist()" class="btn clean"><i class="ionicons ion-trash-b"></i></a>
             </div>
             <videogular vg-auto-play="pic.config.autoPlay"
                         vg-player-ready="pic.onPlayerReady($API)"
