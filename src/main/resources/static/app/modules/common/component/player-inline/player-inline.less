@@ -49,7 +49,7 @@
           border-radius: 25px;
         }
 
-        .btn.prev, .btn.next, .btn.clean {
+        .btn.prev, .btn.next, .btn.clean, .btn.playlist {
           margin: 0 8px;
           padding: 0 0;
           color: ghostwhite;
@@ -59,6 +59,36 @@
           font-size: 17px;
           line-height: 1.42;
           border-radius: 25px;
+        }
+
+        .dropdown-menu {
+          width: 450px;
+
+          a {
+            display: flex;
+            flex-direction: row;
+            align-items : center;
+            align-content : center;
+            padding: 3px 10px;
+
+            .playlist-cover {
+              width: 48px;
+              height: 48px;
+            }
+
+            .playlist-title {
+              padding-left: 16px;
+              width: 360px;
+            }
+
+            &.currently-playing {
+              background-color: #d9edf7;
+            }
+          }
+
+
+
+
         }
 
       }

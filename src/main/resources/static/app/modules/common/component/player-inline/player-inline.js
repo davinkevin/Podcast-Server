@@ -41,13 +41,19 @@ class PlayerInlineController {
 
     updateOnPlaylistChange(newVal) {
         this.hasToBeShown = newVal > 0;
-        if (!this.hasToBeShown && this.API && this.API.currentState === 'play') {
-            this.API.stop();
-        }
         this.reloadPlaylist();
-        if (this.hasToBeShown) {
+
+        if (!this.hasToBeShown && this.API && this.API.currentState === 'play') {
+            return this.API.stop();
+        }
+
+        if (this.hasToStartPlaying()) {
             this.setMedia(0);
         }
+    }
+
+    hasToStartPlaying() {
+        return this.hasToBeShown && this.API && (this.API.currentState !== 'play' || this.getIndexOfVideoInPlaylist(this.currentVideo) === -1);
     }
 
     onPlayerReady(API) {
@@ -122,6 +128,25 @@ class PlayerInlineController {
     getIndexOfVideoInPlaylist(item) {
         return this.playlist.indexOf(item);
     }
+
+    removeFromPlaylist(item) {
+        this.playlistService.remove(item);
+    }
+
+    play(item) {
+        let indexToRead = this.getIndexOfVideoInPlaylist(item);
+
+        if (indexToRead === this.getIndexOfVideoInPlaylist(this.currentVideo)){
+            this.playPause();
+            return;
+        }
+
+        this.setMedia(indexToRead);
+    }
+
+    isCurrentlyPlaying(item) {
+        return item.id === this.currentVideo.id;
+    }
 }
 
 angular.module('ps.common.component.players-inline', [
@@ -131,7 +156,8 @@ angular.module('ps.common.component.players-inline', [
     'com.2fdevs.videogular.plugins.controls',
     'com.2fdevs.videogular.plugins.overlayplay',
     'com.2fdevs.videogular.plugins.buffering',
-    'ps.common.service.playlist'
+    'ps.common.service.playlist',
+    'truncate'
 ])
     .directive('playerInline', () => new PlayerInlineDirective())
     .controller('PlayerInlineController', PlayerInlineController);
