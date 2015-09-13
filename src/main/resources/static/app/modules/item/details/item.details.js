@@ -56,7 +56,8 @@ class ItemDetailCtrl {
 
 angular.module('ps.item.details', [
     'ps.common.service.data.downloadManager',
-    'ps.common.service.playlist'
+    'ps.common.service.playlist',
+    'ps.common.filter.html2plainText'
 ]).config(function($routeProvider, commonKey) {
     $routeProvider.
         when('/podcasts/:podcastId/item/:itemId', {
