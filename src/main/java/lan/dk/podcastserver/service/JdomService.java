@@ -1,15 +1,14 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.utils.URLUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +16,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
+@Slf4j
 @Service
 public class JdomService {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdomService.class);
-    
-    // Element names : 
+    // Element names :
     private static final String CHANNEL = "channel";
     private static final String TITLE = "title";
     private static final String LINK = "link";
@@ -56,35 +56,43 @@ public class JdomService {
 
     // URL Format
     private static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
-    
+    public static final Comparator<Item> PUBDATE_COMPARATOR = (one, another) -> one.getPubdate().isAfter(another.getPubdate()) ? -1 : 1;
+
     final PodcastServerParameters podcastServerParameters;
     final MimeTypeService mimeTypeService;
+    final UrlService urlService;
 
     @Autowired
-    public JdomService(PodcastServerParameters podcastServerParameters, MimeTypeService mimeTypeService) {
+    public JdomService(PodcastServerParameters podcastServerParameters, MimeTypeService mimeTypeService, UrlService urlService) {
         this.podcastServerParameters = podcastServerParameters;
         this.mimeTypeService = mimeTypeService;
+        this.urlService = urlService;
     }
 
     public Document jdom2Parse(String urlasString) throws JDOMException, IOException {
         Document doc;
         try {
-            logger.debug("Begin Parsing of {}", urlasString);
-            doc = new SAXBuilder().build(URLUtils.getConnection(urlasString).getInputStream(), urlasString);
-            logger.debug("End Parsing of {}", urlasString);
+            log.debug("Begin Parsing of {}", urlasString);
+            doc = new SAXBuilder().build(urlService.getConnection(urlasString).getInputStream(), urlasString);
+            log.debug("End Parsing of {}", urlasString);
         } catch (JDOMException | IOException e) {
-            logger.error("Error during parsin of {}", urlasString, e);
+            log.error("Error during parsing of {}", urlasString, e);
             throw e;
         }
 
         return doc;
     }
 
-    public String podcastToXMLGeneric (Podcast podcast) {
-        return podcastToXMLGeneric(podcast, podcastServerParameters.rssDefaultNumberItem());
+
+    public String podcastToXMLGeneric (Podcast podcast, Boolean limit) throws IOException {
+        return podcastToXMLGeneric( podcast, withNumberOfItem(podcast, limit));
     }
 
-    public String podcastToXMLGeneric (Podcast podcast, Long limit) {
+    private long withNumberOfItem(Podcast podcast, Boolean limit) {
+        return Boolean.TRUE.equals(limit) ? podcastServerParameters.rssDefaultNumberItem() : podcast.getItems().size();
+    }
+
+    public String podcastToXMLGeneric (Podcast podcast, Long limit) throws IOException {
 
         Long limitOfItem = (limit == null) ? podcast.getItems().size() : limit;
 
@@ -156,8 +164,11 @@ public class JdomService {
             channel.addContent(itunesImage);
         }
 
-       podcast.getItems()
+
+        podcast.getItems()
         .stream()
+        .filter(i -> Objects.nonNull(i.getPubdate()))
+        .sorted(PUBDATE_COMPARATOR)
         .limit(limitOfItem)
         .forEachOrdered(item -> {
             Element xmlItem = new Element(ITEM);
@@ -221,16 +232,9 @@ public class JdomService {
         rss.addNamespaceDeclaration(MEDIA_NAMESPACE);
         rss.addContent(channel);
 
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         Writer writer = new StringWriter();
-        try {
-            xout.output(new Document(rss), writer);
-            return writer.toString();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
 
-        return null;
-
+        new XMLOutputter(Format.getPrettyFormat()).output(new Document(rss), writer);
+        return writer.toString();
     }
 }

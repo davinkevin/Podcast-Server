@@ -4,6 +4,9 @@ package lan.dk.podcastserver.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
@@ -18,6 +21,8 @@ import java.util.Set;
 @Table(name = "podcast")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor @AllArgsConstructor
+@Builder
 public class Podcast implements Serializable {
 
     private Integer id;
@@ -222,6 +227,6 @@ public class Podcast implements Serializable {
     }
 
     public interface PodcastListingView {}
-    public interface PodcastDetailsView extends PodcastListingView{};
+    public interface PodcastDetailsView extends PodcastListingView{}
 
 }

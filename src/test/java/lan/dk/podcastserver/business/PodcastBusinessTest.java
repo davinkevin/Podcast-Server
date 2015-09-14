@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -180,12 +181,12 @@ public class PodcastBusinessTest {
     }
 
     @Test
-    public void should_get_rss_with_default_limit() {
+    public void should_get_rss_with_default_limit() throws IOException {
         /* Given */
         Podcast podcast = new Podcast();
         String response = "Success";
         when(podcastRepository.findOne(any(Integer.class))).thenReturn(podcast);
-        when(jdomService.podcastToXMLGeneric(eq(podcast))).thenReturn(response);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean())).thenReturn(response);
 
         /* When */
         String rssReturn = podcastBusiness.getRss(1, true);
@@ -193,16 +194,16 @@ public class PodcastBusinessTest {
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
         verify(podcastRepository, times(1)).findOne(eq(1));
-        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(true));
     }
 
     @Test
-    public void should_get_rss_with_define_limit() {
+    public void should_get_rss_with_define_limit() throws IOException {
         /* Given */
         Podcast podcast = new Podcast();
         String response = "Success";
         when(podcastRepository.findOne(any(Integer.class))).thenReturn(podcast);
-        when(jdomService.podcastToXMLGeneric(eq(podcast), eq(null))).thenReturn(response);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean())).thenReturn(response);
 
         /* When */
         String rssReturn = podcastBusiness.getRss(1, false);
@@ -210,7 +211,19 @@ public class PodcastBusinessTest {
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
         verify(podcastRepository, times(1)).findOne(eq(1));
-        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(null));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(false));
+    }
+    
+    @Test
+    public void should_return_empty_string_for_exception() throws IOException {
+        /* Given */
+        doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean());
+
+        /* When */
+        String rssReturn = podcastBusiness.getRss(1, false);
+
+        /* Then */
+        assertThat(rssReturn).isEqualTo("");
     }
 
     @Test(expected = PodcastNotFoundException.class)

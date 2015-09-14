@@ -7,14 +7,17 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 @Component
 @Transactional
 public class PodcastBusiness {
@@ -93,9 +96,12 @@ public class PodcastBusiness {
 
     @Transactional(readOnly = true)
     public String getRss(Integer id, Boolean limit) {
-        return (limit) ?
-                jdomService.podcastToXMLGeneric(findOne(id)) :
-                jdomService.podcastToXMLGeneric(findOne(id), null);
+        try {
+            return jdomService.podcastToXMLGeneric(findOne(id), limit);
+        } catch (IOException e) {
+            log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e);
+            return "";
+        }
     }
 
     public Set<Item> getItems(Integer id){

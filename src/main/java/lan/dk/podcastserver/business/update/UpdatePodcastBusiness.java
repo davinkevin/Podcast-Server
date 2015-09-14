@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
-
 @Slf4j
 @Component
 @Transactional
