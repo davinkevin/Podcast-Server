@@ -2,11 +2,11 @@ package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.service.WorkerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.Set;
 
 /**
@@ -16,7 +16,11 @@ import java.util.Set;
 @RequestMapping("/api/types")
 public class TypeController {
 
-    @Resource WorkerService workerService;
+    final WorkerService workerService;
+
+    @Autowired TypeController(WorkerService workerService) {
+        this.workerService = workerService;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public Set<AbstractUpdater.Type> types() {
