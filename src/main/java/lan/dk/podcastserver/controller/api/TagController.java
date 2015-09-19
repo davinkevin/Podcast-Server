@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Created by kevin on 07/06/2014.
+ * Created by kevin on 07/06/2014 for Podcast Server
  */
 @RestController
 @RequestMapping("/api/tag")
@@ -16,8 +16,7 @@ public class TagController {
 
     final TagBusiness tagBusiness;
 
-    @Autowired
-    public TagController(TagBusiness tagBusiness) {
+    @Autowired TagController(TagBusiness tagBusiness) {
         this.tagBusiness = tagBusiness;
     }
 
