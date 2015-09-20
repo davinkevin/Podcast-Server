@@ -53,6 +53,21 @@ public class TagControllerTest {
 
         /* Then */
         assertThat(tagList).isSameAs(tags);
+        verify(tagBusiness, only()).findAll();
     }
 
+    @Test
+    public void should_find_by_name() {
+        /* Given */
+        String name = "Foo";
+        List<Tag> tags = new ArrayList<>();
+        when(tagBusiness.findByNameLike(eq(name))).thenReturn(tags);
+
+        /* When */
+        List<Tag> tagsFoundByName = tagController.findByNameLike(name);
+
+        /* Then */
+        assertThat(tagsFoundByName).isSameAs(tags);
+        verify(tagBusiness, only()).findByNameLike(eq(name));
+    }
 }
