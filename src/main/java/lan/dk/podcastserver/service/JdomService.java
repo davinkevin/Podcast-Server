@@ -69,7 +69,7 @@ public class JdomService {
         this.urlService = urlService;
     }
 
-    public Document jdom2Parse(String urlasString) throws JDOMException, IOException {
+    public Document parse(String urlasString) throws JDOMException, IOException {
         Document doc;
         try {
             log.debug("Begin Parsing of {}", urlasString);

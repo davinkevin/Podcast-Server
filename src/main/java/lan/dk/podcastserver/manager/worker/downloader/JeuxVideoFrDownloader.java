@@ -47,7 +47,7 @@ public class JeuxVideoFrDownloader extends HTTPDownloader {
 
         org.jdom2.Document xmlEpisode = null;
         try {
-            xmlEpisode = jdomService.jdom2Parse(String.format(XML_PREFIX_DESCRIPTOR_URL, idJeuxVideoFr));
+            xmlEpisode = jdomService.parse(String.format(XML_PREFIX_DESCRIPTOR_URL, idJeuxVideoFr));
         } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return item;

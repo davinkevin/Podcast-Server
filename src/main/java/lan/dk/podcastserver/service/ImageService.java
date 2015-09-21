@@ -30,11 +30,15 @@ public class ImageService {
         this.urlService = urlService;
     }
 
-    public Cover getCoverFromURL(String url) throws IOException {
+    public Cover getCoverFromURL(String url) {
         if (StringUtils.isEmpty(url))
             return null;
 
-        return getCoverFromURL(new URL(url));
+        try {
+            return getCoverFromURL(new URL(url));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Cover getCoverFromURL (URL url) throws IOException {

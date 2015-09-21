@@ -53,7 +53,7 @@ public class JdomServiceTest {
         when(urlConnection.getInputStream()).thenReturn(Files.newInputStream(Paths.get(JdomServiceTest.class.getResource("/remote/podcast/rss.lesGrandesGueules.xml").toURI())));
 
         /* When */
-        Document document = jdomService.jdom2Parse("aUrl");
+        Document document = jdomService.parse("aUrl");
 
         /* Then */
         assertThat(document)
@@ -70,7 +70,7 @@ public class JdomServiceTest {
         doThrow(IOException.class).when(urlConnection).getInputStream();
 
         /* When */
-        jdomService.jdom2Parse("aUrl");
+        jdomService.parse("aUrl");
     }
 
     @Test

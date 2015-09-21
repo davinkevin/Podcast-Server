@@ -98,11 +98,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
         Matcher thumNailematcher = POSTER_URL_EXTRACTOR_PATTERN.matcher(javascriptCode);
         if (thumNailematcher.find()) {
-            try {
-                item.setCover(imageService.getCoverFromURL(thumNailematcher.group(1).replace("\\", "")));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            item.setCover(imageService.getCoverFromURL(thumNailematcher.group(1).replace("\\", "")));
         }
 
         return item;

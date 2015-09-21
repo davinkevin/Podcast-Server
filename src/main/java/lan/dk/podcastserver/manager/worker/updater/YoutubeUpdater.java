@@ -91,11 +91,11 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     private Document xmlOf(String url) throws JDOMException, IOException {
         if (isPlaylist(url)) {
-            return jdomService.jdom2Parse(url);
+            return jdomService.parse(url);
         }
 
         String channelId = getChannelId(url);
-        return jdomService.jdom2Parse(String.format(CHANNEL_RSS_BASE, channelId));
+        return jdomService.parse(String.format(CHANNEL_RSS_BASE, channelId));
     }
 
     private Boolean isPlaylist(String url) {

@@ -47,19 +47,6 @@ public class RSSFinderTest {
     }
 
     @Test
-    public void should_find_information_but_cover_generate_exception() throws JDOMException, IOException, FindPodcastNotFoundException {
-        //Given
-        parseFromURI();
-        when(imageService.getCoverFromURL(anyString())).thenThrow(new IOException());
-
-        //When
-        Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.xml");
-
-        //Then
-        assertThat(podcast.getCover()).isNull();
-    }
-
-    @Test
     public void should_find_information_with_itunes_cover() throws FindPodcastNotFoundException, IOException, JDOMException {
         //Given
         String coverUrl = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg";
@@ -88,7 +75,7 @@ public class RSSFinderTest {
 
     @Test(expected = FindPodcastNotFoundException.class)
     public void should_reject_if_not_found() throws JDOMException, IOException, FindPodcastNotFoundException {
-        /* Given */ when(jdomService.jdom2Parse(anyString())).thenThrow(new JDOMException());
+        /* Given */ when(jdomService.parse(anyString())).thenThrow(new JDOMException());
         /* When */  rssFinder.find("/remote/podcast/rss.lesGrandesGueules.xml");
         /* Then -> see @Test */
     }
@@ -101,7 +88,7 @@ public class RSSFinderTest {
     }
 
     private void parseFromURI() throws JDOMException, IOException {
-        when(jdomService.jdom2Parse(anyString()))
+        when(jdomService.parse(anyString()))
                 .then(invocationOnMock -> new SAXBuilder().build(Paths.get(RSSFinderTest.class.getResource((String) invocationOnMock.getArguments()[0]).toURI()).toFile()));
     }
 

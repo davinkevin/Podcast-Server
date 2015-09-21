@@ -41,7 +41,7 @@ public class RSSFinder implements Finder {
         Element channel; 
         // Get information about podcast
         try {
-            podcastXML = jdomService.jdom2Parse(podcast.getUrl());
+            podcastXML = jdomService.parse(podcast.getUrl());
             channel = podcastXML.getRootElement().getChild("channel");
         } catch (JDOMException | IOException e) {
             logger.error("Error during parsing of podcast", e);
@@ -54,15 +54,12 @@ public class RSSFinder implements Finder {
         }
         
         
-        podcast.setTitle(channel.getChildText("title"));
-        podcast.setDescription(channel.getChildText("description"));
+        podcast
+                .setTitle(channel.getChildText("title"))
+                .setDescription(channel.getChildText("description"))
+                .setCover(imageService.getCoverFromURL(getPodcastCover(channel)));
 
-        try {
-            podcast.setCover(imageService.getCoverFromURL(getPodcastCover(channel)));
-        } catch (IOException e) {
-            logger.error("Error during the fetch of the cover", e);
-        }
-        
+
         return podcast;
     }
 

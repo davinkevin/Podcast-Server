@@ -81,7 +81,7 @@ public class JeuxVideoFRUpdater extends AbstractUpdater {
 
         org.jdom2.Document xmlEpisode = null;
         try {
-            xmlEpisode = jdomService.jdom2Parse(XML_PREFIX_DESCRIPTOR_URL.concat(String.valueOf(idJeuxVideoFr)));
+            xmlEpisode = jdomService.parse(XML_PREFIX_DESCRIPTOR_URL.concat(String.valueOf(idJeuxVideoFr)));
         } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return item;

@@ -13,11 +13,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toSet;
 
 @Component("RSSUpdater")
 public class RSSUpdater extends AbstractUpdater {
@@ -29,52 +31,62 @@ public class RSSUpdater extends AbstractUpdater {
     @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
-        Set<Item> itemSet = new HashSet<>();
-        // Si l'image de présentation a changé :
         Document podcastXMLSource;
         try {
-            podcastXMLSource = jdomService.jdom2Parse(podcast.getUrl());
-            String currentCoverURL = getCoverUrl(podcastXMLSource);
-
-            if (podcast.getCover() == null) {
-                logger.debug("Traitement de la cover général du podcast");
-                podcast.setCover(imageService.getCoverFromURL(new URL(currentCoverURL)));
-            }
-
-            logger.debug("Traitement des Items");
-            // Parcours des éléments :
-            for (Element item : podcastXMLSource.getRootElement().getChild("channel").getChildren("item")) {
-                if (item.getChild("enclosure") != null || item.getChild("origEnclosureLink", FEEDBURNER) != null)   { // est un podcast utilisable
-                    Item podcastItem = new Item()
-                            .setTitle(item.getChildText("title"))
-                            .setPubdate(getPubDate(item))
-                            .setDescription(item.getChildText("description"))
-                            .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
-                            .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
-                                    ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
-                                    : 0L);
-
-                    if ((item.getChild("thumbnail", MEDIA) != null)) {
-                        if (item.getChild("thumbnail", MEDIA).getAttributeValue("url") != null) {
-                            podcastItem.setCover(imageService.getCoverFromURL(new URL(item.getChild("thumbnail", MEDIA).getAttributeValue("url"))));
-                        } else {
-                            podcastItem.setCover(imageService.getCoverFromURL(new URL(item.getChild("thumbnail", MEDIA).getText())));
-                        }
-                    }
-                    // Gestion des cas pour l'url :
-                    if (item.getChild("origEnclosureLink", FEEDBURNER) != null) {
-                        podcastItem.setUrl(item.getChildText("origEnclosureLink", FEEDBURNER));
-                    } else if (item.getChild("enclosure") != null) {
-                        podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
-                    }
-
-                    itemSet.add(podcastItem);
-                }
-            }
+            podcastXMLSource = jdomService.parse(podcast.getUrl());
         } catch (JDOMException | IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return new HashSet<>();
         }
-        return itemSet;
+
+        String currentCoverURL = getCoverUrl(podcastXMLSource);
+
+        if (podcast.getCover() == null) {
+            logger.debug("Traitement de la cover général du podcast");
+            podcast.setCover(imageService.getCoverFromURL(currentCoverURL));
+        }
+
+        logger.debug("Traitement des Items");
+        // Parcours des éléments :
+        return podcastXMLSource
+                .getRootElement()
+                .getChild("channel")
+                .getChildren("item")
+                .stream()
+                .filter(hasEnclosure())
+                .map(this::extractItem)
+                .collect(toSet());
+    }
+
+    private Predicate<Element> hasEnclosure() {
+        return item -> item.getChild("enclosure") != null || item.getChild("origEnclosureLink", FEEDBURNER) != null;
+    }
+
+    private Item extractItem(Element item) {
+        Item podcastItem = new Item()
+                .setTitle(item.getChildText("title"))
+                .setPubdate(getPubDate(item))
+                .setDescription(item.getChildText("description"))
+                .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
+                .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
+                        ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
+                        : 0L);
+
+        if ((item.getChild("thumbnail", MEDIA) != null)) {
+            if (item.getChild("thumbnail", MEDIA).getAttributeValue("url") != null) {
+                podcastItem.setCover(imageService.getCoverFromURL(item.getChild("thumbnail", MEDIA).getAttributeValue("url")));
+            } else {
+                podcastItem.setCover(imageService.getCoverFromURL(item.getChild("thumbnail", MEDIA).getText()));
+            }
+        }
+        // Gestion des cas pour l'url :
+        if (item.getChild("origEnclosureLink", FEEDBURNER) != null) {
+            podcastItem.setUrl(item.getChildText("origEnclosureLink", FEEDBURNER));
+        } else if (item.getChild("enclosure") != null) {
+            podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
+        }
+
+        return podcastItem;
     }
 
     private String getCoverUrl(Document podcastXMLSource) {
@@ -85,12 +97,12 @@ public class RSSUpdater extends AbstractUpdater {
 
     private ZonedDateTime getPubDate(Element item) {
         try {
-            return ZonedDateTime.parse(item.getChildText("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME);
+            return ZonedDateTime.parse(item.getChildText("pubDate").replace(" PST", " +0800"), DateTimeFormatter.RFC_1123_DATE_TIME);
         } catch (Exception e) {
             logger.error("Problem during date parsing", e);
+            // No better idea than returning null for unparseable date
+            return null;
         }
-        // No better idea than returning null for unparseable date
-        return null;
     }
 
     @Override

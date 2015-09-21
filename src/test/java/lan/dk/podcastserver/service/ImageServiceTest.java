@@ -65,4 +65,9 @@ public class ImageServiceTest {
                 .hasHeight(0)
                 .hasUrl(HTTP_LOCALHOST + "/img/image.png");
     }
+    
+    @Test( expected = RuntimeException.class)
+    public void should_throw_exception_if_url_not_valid() {
+        imageService.getCoverFromURL("blabla");
+    }
 }

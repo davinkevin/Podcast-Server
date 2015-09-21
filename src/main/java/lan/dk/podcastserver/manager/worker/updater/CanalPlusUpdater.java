@@ -209,7 +209,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         //currentEpisode.setTitle(episode.select("h4 a").first().text());
         org.jdom2.Document xmlAboutCurrentEpisode = null;
         try {
-            xmlAboutCurrentEpisode = jdomService.jdom2Parse("http://service.canal-plus.com/video/rest/getVideos/cplus/" + idCanalPlusVideo);
+            xmlAboutCurrentEpisode = jdomService.parse("http://service.canal-plus.com/video/rest/getVideos/cplus/" + idCanalPlusVideo);
         } catch (IOException | JDOMException e) {
             logger.error("IOException | JDOMException :", e);
             return new Item();

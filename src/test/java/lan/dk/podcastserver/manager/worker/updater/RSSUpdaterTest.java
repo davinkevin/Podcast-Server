@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class RSSUpdaterTest {
 
-    public static final String PODCAST_URL = "/remote/podcast/rss.appload.xml";
+    public static final String PODCAST_APPLOAD_URL = "/remote/podcast/rss.appload.xml";
     public static final String MOCK_URL = "http://mockUrl.com/";
     public Podcast rssAppload;
 
@@ -39,12 +39,12 @@ public class RSSUpdaterTest {
 
     @Before
     public void beforeEach() throws JDOMException, IOException {
-        rssAppload = new Podcast().setUrl(PODCAST_URL);
+        rssAppload = new Podcast().setUrl(PODCAST_APPLOAD_URL);
 
-        when(jdomService.jdom2Parse(eq(PODCAST_URL)))
-                .then(invocationOnMock -> new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(PODCAST_URL).toURI()).toFile()));
+        when(jdomService.parse(eq(PODCAST_APPLOAD_URL)))
+                .then(invocationOnMock -> new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(PODCAST_APPLOAD_URL).toURI()).toFile()));
 
-        when(jdomService.jdom2Parse(not(eq(PODCAST_URL)))).thenThrow(new JDOMException());
+        when(jdomService.parse(not(eq(PODCAST_APPLOAD_URL)))).thenThrow(new JDOMException());
 
     }
 
@@ -52,7 +52,7 @@ public class RSSUpdaterTest {
     public void should_get_items() throws JDOMException, IOException {
         /* When */ Set<Item> items = rssUpdater.getItems(rssAppload);
         /* Then */
-        verify(jdomService, times(1)).jdom2Parse(eq(PODCAST_URL));
+        verify(jdomService, times(1)).parse(eq(PODCAST_APPLOAD_URL));
         assertThat(items).hasSize(217);
     }
 
@@ -73,7 +73,7 @@ public class RSSUpdaterTest {
     @Test
     public void should_call_signature_from_url() {
         /* When */ rssUpdater.signatureOf(rssAppload);
-        /* Then */ verify(signatureService, times(1)).generateSignatureFromURL(eq(PODCAST_URL));
+        /* Then */ verify(signatureService, times(1)).generateSignatureFromURL(eq(PODCAST_APPLOAD_URL));
     }
 
     @Test
@@ -82,6 +82,4 @@ public class RSSUpdaterTest {
         assertThat(type.key()).isEqualTo("RSS");
         assertThat(type.name()).isEqualTo("RSS");
     }
-
-
 }
