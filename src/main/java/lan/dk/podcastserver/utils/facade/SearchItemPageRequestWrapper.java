@@ -6,16 +6,20 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 /**
  * Created by kevin on 08/06/2014.
  */
-public class SearchItemPageRequestWrapper extends AbstractPageRequestFacade {
+public class SearchItemPageRequestWrapper extends PageRequestFacade {
 
     private List<Tag> tags = new ArrayList<>();
     private String term;
+    private Boolean downloaded;
 
     public SearchItemPageRequestWrapper() {
-        setProperties("pubdate");
+        this.properties = "pubdate";
+        this.downloaded = Boolean.TRUE;
     }
 
     public List<Tag> getTags() {
@@ -34,7 +38,16 @@ public class SearchItemPageRequestWrapper extends AbstractPageRequestFacade {
         return this;
     }
 
+    public SearchItemPageRequestWrapper downloaded(Boolean downloaded) {
+        this.downloaded = downloaded;
+        return this;
+    }
+
+    public Boolean getDownloaded() {
+        return downloaded;
+    }
+
     public Boolean isSearch() {
-        return !StringUtils.isEmpty(term) || !tags.isEmpty();
+        return !StringUtils.isEmpty(term) || !tags.isEmpty() || nonNull(downloaded);
     }
 }
