@@ -226,7 +226,7 @@ public class ItemDslTest {
         List<Tag> tags = Collections.singletonList(new Tag().setId(2).setName("Tag1"));
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags));
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
 
         /* Then */
         assertThat(items)
@@ -243,7 +243,7 @@ public class ItemDslTest {
         List<Tag> tags = Collections.singletonList(new Tag().setId(2).setName("Tag1"));
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags));
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
 
         /* Then */
         assertThat(items)

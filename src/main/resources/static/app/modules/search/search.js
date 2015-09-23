@@ -29,6 +29,7 @@ class SearchItemCache {
         this.$sessionStorage.searchParameters.tags = searchParam.tags;
         this.$sessionStorage.searchParameters.direction =  searchParam.direction;
         this.$sessionStorage.searchParameters.properties =  searchParam.properties;
+        this.$sessionStorage.searchParameters.downloaded = searchParam.downloaded;
     }
 }
 
@@ -178,7 +179,8 @@ angular.module('ps.search', [
         term : undefined,
         tags : undefined,
         direction : 'DESC',
-        properties : 'pubdate'
+        properties : 'pubdate',
+        downloaded : "true"
     })
     .controller('ItemsSearchCtrl', ItemSearchCtrl)
     .service("SearchItemCache", SearchItemCache);

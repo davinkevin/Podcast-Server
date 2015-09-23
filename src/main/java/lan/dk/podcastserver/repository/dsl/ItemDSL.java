@@ -10,6 +10,9 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 /**
  * Created by kevin on 08/06/2014 for Podcast Server
  */
@@ -22,8 +25,8 @@ public class ItemDSL {
     }
 
     public static BooleanExpression isDownloaded(Boolean downloaded) {
-        if (downloaded)
-            return hasStatus(Status.FINISH);
+        if (isNull(downloaded)) return null;
+        if (downloaded) return hasStatus(Status.FINISH);
 
         return Q_ITEM.status.isNull().or(hasStatus(Status.NOT_DOWNLOADED));
     }
@@ -84,10 +87,11 @@ public class ItemDSL {
         return Q_ITEM.podcast.id.eq(podcastId);
     }
 
-    public static Predicate getSearchSpecifications(List<Integer> ids, List<Tag> tags) {
-        if (ids != null) {
-            return isInId(ids).and(isInTags(tags) );
-        }
-        return isInTags(tags);
+    public static Predicate getSearchSpecifications(List<Integer> ids, List<Tag> tags, Boolean downloaded) {
+        return BooleanExpression.allOf(
+                nonNull(ids) ? isInId(ids) : null,
+                isInTags(tags),
+                isDownloaded(downloaded)
+        );
     }
 }

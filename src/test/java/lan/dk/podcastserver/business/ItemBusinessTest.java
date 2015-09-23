@@ -253,7 +253,7 @@ public class ItemBusinessTest {
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
 
         /* When */
-        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, pageRequest);
+        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, true, pageRequest);
 
         /* Then */
         assertThat(byTagsAndFullTextTerm)
@@ -273,7 +273,7 @@ public class ItemBusinessTest {
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
 
         /* When */
-        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, pageRequest);
+        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, true, pageRequest);
 
         /* Then */
         assertThat(byTagsAndFullTextTerm)
@@ -296,7 +296,7 @@ public class ItemBusinessTest {
         when(itemRepository.findAll(any(Predicate.class))).thenReturn(itemsFrom1To20);
 
         /* When */
-        Page<Item> pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, pageRequest);
+        Page<Item> pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, true, pageRequest);
 
         /* Then */
         assertThat(pageOfItem.getContent())

@@ -8,7 +8,7 @@ class itemService {
         this.childRoute = "items";
     }
 
-    search(searchParameters = { page : 0, size : 12} ) {
+    search(searchParameters = { page : 0, size : 12, downloaded : true} ) {
         return this.Restangular.one("item/search")
             .post(null, searchParameters)
             .then((responseFromServer) => {

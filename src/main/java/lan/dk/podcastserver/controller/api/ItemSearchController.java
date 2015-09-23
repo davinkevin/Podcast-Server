@@ -31,7 +31,7 @@ public class ItemSearchController {
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
         return searchWrapper.isSearch()
-                ? itemBusiness.findByTagsAndFullTextTerm(searchWrapper.getTerm(), searchWrapper.getTags(), searchWrapper.toPageRequest())
+                ? itemBusiness.findByTagsAndFullTextTerm(searchWrapper.getTerm(), searchWrapper.getTags(), searchWrapper.getDownloaded(), searchWrapper.toPageRequest())
                 : itemBusiness.findAll(searchWrapper.toPageRequest());
     }
 
