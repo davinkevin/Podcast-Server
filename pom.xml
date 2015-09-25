@@ -356,7 +356,7 @@
                 <version>1.6.0</version>
                 <executions>
                     <execution>
-                        <phase>generate-test-resources</phase>
+                        <phase>generate-test-sources</phase>
                         <goals>
                             <goal>generate-assertions</goal>
                         </goals>
@@ -372,6 +372,8 @@
                         <param>lan.dk.podcastserver.service.PodcastServerParameters</param>
                         <param>lan.dk.podcastserver.utils.form.MovingItemInQueueForm</param>
                         <param>lan.dk.podcastserver.utils.facade.stats.StatsPodcastType</param>
+                        <param>lan.dk.podcastserver.utils.facade.SearchItemPageRequestWrapper</param>
+                        <param>lan.dk.podcastserver.utils.facade.PageRequestFacade</param>
                         <param>org.springframework.data.domain.Page</param>
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>
