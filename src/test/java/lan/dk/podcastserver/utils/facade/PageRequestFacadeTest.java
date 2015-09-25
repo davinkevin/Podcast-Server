@@ -45,7 +45,7 @@ public class PageRequestFacadeTest {
     @Test
     public void should_generate_page_request() {
         /* Given */
-        PageRequestFacade pageRequestFacade = new PageRequestFacade();
+        PageRequestFacade pageRequestFacade = new PageRequestFacade().setProperties("Property");
 
         /* When */
         PageRequest pageRequest = pageRequestFacade.toPageRequest();
