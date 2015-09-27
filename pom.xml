@@ -59,17 +59,17 @@
         <dependency>
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-core</artifactId>
-            <version>3.6.6</version>
+            <version>3.6.7</version>
         </dependency>
         <dependency>
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
-            <version>3.6.6</version>
+            <version>3.6.7</version>
         </dependency>
          <dependency>
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>3.6.6</version>
+            <version>3.6.7</version>
         </dependency>
 
 
