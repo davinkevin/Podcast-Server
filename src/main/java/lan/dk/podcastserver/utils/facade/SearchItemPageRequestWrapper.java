@@ -9,7 +9,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 /**
- * Created by kevin on 08/06/2014.
+ * Created by kevin on 08/06/2014 for Podcast Server
  */
 public class SearchItemPageRequestWrapper extends PageRequestFacade {
 
