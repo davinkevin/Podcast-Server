@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D"/>
+ <id>yt:playlist:PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D</id>
+ <yt:playlistId>PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D</yt:playlistId>
+ <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+ <title>Geek Inc Bits</title>
+ <author>
+  <name>Geek Inc</name>
+  <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+ </author>
+ <published>2015-07-01T22:30:39+00:00</published>
+ <entry>
+  <id>yt:video:TPpjZBwtnpU</id>
+  <yt:videoId>TPpjZBwtnpU</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 002 : Retour vers le failure !</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=TPpjZBwtnpU"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-07-02T09:28:12+00:00</published>
+  <updated>2015-09-29T22:55:28+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 002 : Retour vers le failure !</media:title>
+   <media:content url="https://www.youtube.com/v/TPpjZBwtnpU?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/TPpjZBwtnpU/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Au programme de ce 2ème numéro de Bits :
+
+News
+
+1 - Le OnePlus One 2 
+2 - SoftBank met en vente son robot Pepper au japon
+3 - Gestimer l’app mac os simple et design
+4 - Apple va supprimer des apps de votre iphone 
+5 - Meizu MX4 ubuntu edition
+6 - Nouvelle norme QI
+7 - HAPPI GameCenter 
+8 - liveCoding 
+9 - Abandon de la publicité en ligne par Microsoft. 
+10 - Facebook passe un nouveau partenariat avec Kaspersky 
+11 - Ford le vélo du futur 
+12 - Space X détruit 2 Hololens !
+13 - Hyperloop premiers tests en 2016 Quay Valley 
+14 - Trim des SSD tiers pour 10.10.4 et El Capitan
+15 - Bluestacks vient de sortir pour Mac
+
+
+On aime ou pas
+
+- Homebridge
+- iOS 9
+- Apple Music</media:description>
+   <media:community>
+    <media:starRating count="67" average="4.88" min="1" max="5"/>
+    <media:statistics views="3214"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:yMYA1Nvwl-Q</id>
+  <yt:videoId>yMYA1Nvwl-Q</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 003 : Windows Phone Hate</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=yMYA1Nvwl-Q"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-07-10T17:38:37+00:00</published>
+  <updated>2015-09-26T08:49:18+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 003 : Windows Phone Hate</media:title>
+   <media:content url="https://www.youtube.com/v/yMYA1Nvwl-Q?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/yMYA1Nvwl-Q/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Episode enregistré le 09 Juillet 2015 à 22h00.
+
+Au programme de ce 3ème numéro de Bits :
+
+News
+
+1 - WattUP
+
+2 - Forum plex hacké
+
+3 - Elon Musk finance 37 équipes de chercheurs
+
+4 - Waze teste le covoiturage avec Ridewith
+
+5 - Appleet les packaging en boutique apple
+
+6 - Uber veut acheter 500 000 tesla...
+
+7 - Go pro 4 session
+
+8 - One plus 2
+
+9 - Free itinérance partout en Europe
+
+10 - Buddy le robot français
+
+12 - Logitech change de logo et lance logi
+
+13 - Update de plex xbox one
+
+14 - Hololens et les vrais champs de vision
+
+15 - Chromecast en ethernet
+
+16 - L’authentification en 2 étapes d’office sur El Capitan et iOS 9
+
+17 - PITA pour 300$
+
+18 - Premier JetPack Grand Public
+
+
+
+On aime ou pas
+
+Cédric : Windows Phone Hate
+
+Stéphane : Windows 10</media:description>
+   <media:community>
+    <media:starRating count="40" average="5.00" min="1" max="5"/>
+    <media:statistics views="2485"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:MsblGUhi-Ek</id>
+  <yt:videoId>MsblGUhi-Ek</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 004 : Assistants et IA</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=MsblGUhi-Ek"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-07-19T19:19:19+00:00</published>
+  <updated>2015-09-26T08:49:09+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 004 : Assistants et IA</media:title>
+   <media:content url="https://www.youtube.com/v/MsblGUhi-Ek?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/MsblGUhi-Ek/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Le LaBRI est le représentant français à la coupe du monde foot de robots
+2 - Apple va privilégier les adresses IP V6 par rapport aux V4 pour iOS9 et El Capitan
+3 - Le décret mettant fin à la prise péritel est passé.
+4 - Microsoft dévoilera ses nouveaux terminaux mobile le 24 septembre
+5 -  Le directeur technique de Pixar crée un petit robot compagnon 
+6 - Misfit Flash Link 
+7 - Google cherche un spécialiste SEO 
+8 - Andoird M gère enfin la MVV
+9 - Windows 10 mises à jour  auto obligatoires
+10 - Pebble Time vendu chez Bouygues Telecom le 1er Aout
+11 - Action collective contre Apple
+12 - Le HTC Vive
+13 - Google Map Maker 
+14 - La version RTM de Windows 10 est dispo.
+15 - Eddystone
+16 - Android wear va recevoir une mise à jour avec les Interactive watchfaces.
+17 - Microsoft msn apps, photosynth.
+18 - Facebook Moneypenny l’assistant mi IA mi Humain
+19 - Conf motorola le 28 Juillet pour annonce smartphones et montre
+20 - Beme
+
+On aime / ou pas :
+
+Le futur des assistants numériques. L'IA pour les rendre vraiment intéressants?</media:description>
+   <media:community>
+    <media:starRating count="49" average="5.00" min="1" max="5"/>
+    <media:statistics views="3418"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:liF4wiPCV8I</id>
+  <yt:videoId>liF4wiPCV8I</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 005 : Le futur de la TV</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=liF4wiPCV8I"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-03T16:01:01+00:00</published>
+  <updated>2015-09-26T08:49:03+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 005 : Le futur de la TV</media:title>
+   <media:content url="https://www.youtube.com/v/liF4wiPCV8I?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/liF4wiPCV8I/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Twitch passe au HTML 5
+
+2 - Premier téléphone Force Touch ! ZTE Axon Mini
+
+3 - Mise à jour Pebble en 3.2.0
+
+4 - Moto G 3ème gen
+
+5 - Le financial time déclare que la france est leader dans les objets connectés.
+
+6 - Le conseil constitutionnel valide la surveillance de masse…
+
+7 - RCSAndroid de la hacking team dans la nature avec son code source…
+
+8 - Apple ne vend plus les thermostats nest
+
+9 - Homekit un calvaire pour les devs.
+
+10 - Samsung Galaxy S6 Edge+ et note5
+
+11 - Arkyd 3 et 6
+
+12 - A partir du 24 août le forfait sensation de bouygues passe à 40go à partager entre les cartes sim
+
+13 - Pirater une jeep cherokee
+
+14 - Amazon Underground, le store d’apsp gratuites vraiment gratuites
+
+15 - Qu’est ce que c’est ? Sony SRS-LSR100 
+
+16 - Google OnHub 
+
+17 - Direct X12 booste de façon spectaculaire les perfs des cartes AMD.
+
+18 - Philips Hue Wireless Dimming Kit
+
+19 - Les apps android sous windows 10 mobile…
+
+20 - LG Rolly
+
+21 - Facebook M
+
+22 - keynote apple
+
+On aime ou pas
+
+Nexus Android TV</media:description>
+   <media:community>
+    <media:starRating count="27" average="4.85" min="1" max="5"/>
+    <media:statistics views="1521"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:VYZ6J8RIwDs</id>
+  <yt:videoId>VYZ6J8RIwDs</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits Event 001 : Keynote Apple 09/09</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=VYZ6J8RIwDs"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-10T23:49:46+00:00</published>
+  <updated>2015-09-14T09:14:51+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits Event 001 : Keynote Apple 09/09</media:title>
+   <media:content url="https://www.youtube.com/v/VYZ6J8RIwDs?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/VYZ6J8RIwDs/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="23" average="5.00" min="1" max="5"/>
+    <media:statistics views="1047"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:ZgEsJUQnX3Q</id>
+  <yt:videoId>ZgEsJUQnX3Q</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 006 : Windows 10, l'aimer ou le détester?</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=ZgEsJUQnX3Q"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-18T14:03:49+00:00</published>
+  <updated>2015-09-29T14:24:33+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 006 : Windows 10, l'aimer ou le détester?</media:title>
+   <media:content url="https://www.youtube.com/v/ZgEsJUQnX3Q?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/ZgEsJUQnX3Q/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Nest 3ème génération
+
+2 - Batterie Li Ion transparente
+
+3 - Robot Interact Centaur
+
+4 - Xperia Z5 premium
+
+5 - Intel core m
+
+6 - Honor
+
+7 - Logo Google
+
+8 - Moto 360 2
+
+9 - VP10 vs H.265
+
+10 - Asus RT-AC5300
+
+11 - Acer Revo Build
+
+12 - HTC Vive
+
+13 - Philips Hue homekit
+
+14 - iOS9
+
+15 - Amazon fire
+
+On aime ou pas
+
+Windows 10 : L'aimer ou le détester</media:description>
+   <media:community>
+    <media:starRating count="28" average="4.86" min="1" max="5"/>
+    <media:statistics views="1921"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:05A4YJxx2AM</id>
+  <yt:videoId>05A4YJxx2AM</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 007 : Le logiciel pour sauver le diesel...</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=05A4YJxx2AM"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-24T14:57:29+00:00</published>
+  <updated>2015-09-30T14:10:20+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 007 : Le logiciel pour sauver le diesel...</media:title>
+   <media:content url="https://www.youtube.com/v/05A4YJxx2AM?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/05A4YJxx2AM/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - 2 lives Bits à suivre
+
+2 - Pebble Round
+
+3 - Nouvelle AppleTV démontable
+
+4 - WatchOS 2 dispo
+
+5 - XCodeGhost
+
+6 - Google Science Fair
+
+7 - Volkswagen et le diesel
+
+8 - Samsung Serif
+
+9 - Microsoft Band 2
+
+10 - Quirky en faillite
+
+11 - Nexus 5X et 6P</media:description>
+   <media:community>
+    <media:starRating count="22" average="5.00" min="1" max="5"/>
+    <media:statistics views="1072"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:jpFecMetpLM</id>
+  <yt:videoId>jpFecMetpLM</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits Event 002 : Google Nexus</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=jpFecMetpLM"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-29T18:27:06+00:00</published>
+  <updated>2015-09-30T17:24:22+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits Event 002 : Google Nexus</media:title>
+   <media:content url="https://www.youtube.com/v/jpFecMetpLM?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jpFecMetpLM/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="21" average="5.00" min="1" max="5"/>
+    <media:statistics views="660"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>

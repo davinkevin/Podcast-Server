@@ -18,75 +18,76 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toSet;
 
 @Component("YoutubeUpdater")
 public class YoutubeUpdater extends AbstractUpdater {
 
     private static final String CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
     private static final String PLAYLIST_RSS_PART = "www.youtube.com/feeds/videos.xml?playlist_id";
-    public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+    private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
 
     @Resource JdomService jdomService;
     @Resource HtmlService htmlService;
 
-    public static ZonedDateTime fromYoutube(String pubDate) {
-        return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
-    }
-
     public Set<Item> getItems(Podcast podcast) {
-        Set<Item> itemSet = new HashSet<>();
-
         Document podcastXMLSource;
         try {
             podcastXMLSource = xmlOf(podcast.getUrl());
         } catch (JDOMException | IOException e) {
-            logger.error("Error during youtube signature & parsing", e);
-            return itemSet;
+            logger.error("Error during youtube parsing", e);
+            return new HashSet<>();
         }
 
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
 
-        for (Element entry : podcastXMLSource.getRootElement().getChildren("entry", defaultNamespace)) {
-
-            Element mediaGroup = entry.getChild("group", MEDIA_NAMESPACE);
-            Item itemToAdd = new Item()
-                    .setTitle(entry.getChildText("title", defaultNamespace))
-                    .setPubdate(fromYoutube(entry.getChildText("published", defaultNamespace)))
-                    .setDescription(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
-                    .setUrl(youtubeVideoPage(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")));
-
-
-            Element thumbnail = mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE);
-            if (thumbnail != null) {
-                Cover cover = new Cover(thumbnail.getAttributeValue("url"), Integer.valueOf(thumbnail.getAttributeValue("width")), Integer.valueOf(thumbnail.getAttributeValue("height")));
-                itemToAdd.setCover(cover);
-            }
-
-            itemSet.add(itemToAdd);
-        }
-        return itemSet;
+        return podcastXMLSource
+                .getRootElement()
+                .getChildren("entry", defaultNamespace)
+                .stream()
+                .map(elem -> generateItemFromElement(elem, defaultNamespace))
+                .collect(toSet());
     }
 
-    private String youtubeVideoPage(String embeddedVideoPage) {
+    private Item generateItemFromElement(Element entry, Namespace defaultNamespace) {
+        Element mediaGroup = entry.getChild("group", MEDIA_NAMESPACE);
+        return new Item()
+                .setTitle(entry.getChildText("title", defaultNamespace))
+                .setDescription(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
+                .setPubdate(pubdateOf(entry.getChildText("published", defaultNamespace)))
+                .setUrl(urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")))
+                .setCover(coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)));
+    }
+
+    private ZonedDateTime pubdateOf(String pubDate) {
+        return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
+    }
+
+    private Cover coverOf(Element thumbnail) {
+        return thumbnail != null
+                ? new Cover(thumbnail.getAttributeValue("url"), Integer.valueOf(thumbnail.getAttributeValue("width")), Integer.valueOf(thumbnail.getAttributeValue("height")))
+                : null;
+    }
+
+    private String urlOf(String embeddedVideoPage) {
         String idVideo = StringUtils.substringBefore(StringUtils.substringAfterLast(embeddedVideoPage, "/"), "?");
         return String.format(URL_PAGE_BASE, idVideo);
     }
 
     @Override
     public String signatureOf(Podcast podcast) {
-
-        Document podcastXMLSource = null;
         try {
-            podcastXMLSource = xmlOf(podcast.getUrl());
+            Document podcastXMLSource = xmlOf(podcast.getUrl());
+            return signatureService.generateMD5Signature(new XMLOutputter().outputString(podcastXMLSource.getRootElement()));
         } catch (JDOMException | IOException e) {
             logger.error("Error during youtube signature & parsing", e);
             return "";
         }
 
-        return signatureService.generateMD5Signature(new XMLOutputter().outputString(podcastXMLSource.getRootElement()));
     }
 
     private Document xmlOf(String url) throws JDOMException, IOException {
@@ -99,7 +100,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     private Boolean isPlaylist(String url) {
-        return Objects.nonNull(url) && url.contains(PLAYLIST_RSS_PART);
+        return nonNull(url) && url.contains(PLAYLIST_RSS_PART);
     }
 
     private String getChannelId(String url) {
