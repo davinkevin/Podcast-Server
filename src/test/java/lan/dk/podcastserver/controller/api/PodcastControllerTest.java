@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static lan.dk.podcastserver.entity.PodcastAssert.assertThat;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
@@ -39,6 +40,20 @@ public class PodcastControllerTest {
         /* Then */
         assertThat(createdPodcast).isEqualTo(podcast);
         verify(podcastBusiness, only()).create(eq(podcast));
+    }
+
+    @Test
+    public void should_find_by_id() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+
+        /* When */
+        Podcast podcastById = podcastController.findById(1);
+
+        /* Then */
+        assertThat(podcastById).isSameAs(podcast);
+        verify(podcastBusiness, only()).findOne(1);
     }
     
 }
