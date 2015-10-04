@@ -53,7 +53,7 @@ public class PodcastControllerTest {
 
         /* Then */
         assertThat(podcastById).isSameAs(podcast);
-        verify(podcastBusiness, only()).findOne(1);
+        verify(podcastBusiness, only()).findOne(eq(1));
     }
     
 }
