@@ -36,6 +36,10 @@ class PodcastDetailCtrl {
         }, 10);
     }
 
+    isUpdatable() {
+        return this.podcast.type !== 'send';
+    }
+
 }
 
 angular.module('ps.podcasts.details', [
