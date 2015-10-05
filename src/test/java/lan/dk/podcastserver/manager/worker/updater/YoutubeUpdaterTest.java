@@ -110,6 +110,56 @@ public class YoutubeUpdaterTest {
         verify(htmlService, only()).connectWithDefault(eq("https://www.youtube.com/user/androiddevelopers"));
     }
 
+    @Test
+    public void should_handle_error_during_signature() throws IOException, JDOMException, URISyntaxException {
+        Podcast podcast = Podcast.builder()
+                .url("https://www.youtube.com/user/androiddevelopers")
+                .build();
+
+        Connection connection = mock(Connection.class);
+        Document document = mock(Document.class);
+        Elements elements = mock(Elements.class);
+        Element theFirstElement = mock(Element.class);
+        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
+        when(connection.get()).thenReturn(document);
+        when(document.select(anyString())).thenReturn(elements);
+        when(elements.first()).thenReturn(theFirstElement);
+        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
+        doThrow(JDOMException.class).when(jdomService).parse(anyString());
+
+
+        /* When */
+        String signature = youtubeUpdater.signatureOf(podcast);
+
+        /* Then */
+        assertThat(signature).isEmpty();
+    }
+
+    @Test
+    public void should_return_empty_if_parsing_error() throws JDOMException, IOException, URISyntaxException {
+        /* Given */
+        Podcast podcast = Podcast.builder()
+                .url("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D")
+                .build();
+
+        Connection connection = mock(Connection.class);
+        Document document = mock(Document.class);
+        Elements elements = mock(Elements.class);
+        Element theFirstElement = mock(Element.class);
+        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
+        when(connection.get()).thenReturn(document);
+        when(document.select(anyString())).thenReturn(elements);
+        when(elements.first()).thenReturn(theFirstElement);
+        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
+        doThrow(JDOMException.class).when(jdomService).parse(anyString());
+
+        /* When */
+        Set<Item> items = youtubeUpdater.getItems(podcast);
+
+        /* Then */
+        assertThat(items).hasSize(0);
+    }
+
     private Answer<Object> parseFromFile(String file) throws JDOMException, IOException, URISyntaxException {
         return invocationOnMock -> new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(file).toURI()).toFile());
     }
