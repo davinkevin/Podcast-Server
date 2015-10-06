@@ -160,6 +160,23 @@ public class YoutubeUpdaterTest {
         assertThat(items).hasSize(0);
     }
 
+    @Test
+    public void should_return_empty_set_because_html_page_not_found() throws IOException, JDOMException {
+        /* Given */
+        Podcast podcast = Podcast.builder()
+                .url("https://www.youtube.com/user/androiddevelopers")
+                .build();
+
+        doThrow(IOException.class).when(htmlService).connectWithDefault(any(String.class));
+        doThrow(IOException.class).when(jdomService).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
+
+        /* When */
+        Set<Item> items = youtubeUpdater.getItems(podcast);
+
+        /* Then */
+        assertThat(items).hasSize(0);
+    }
+
     private Answer<Object> parseFromFile(String file) throws JDOMException, IOException, URISyntaxException {
         return invocationOnMock -> new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(file).toURI()).toFile());
     }
