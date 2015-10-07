@@ -177,6 +177,30 @@ public class YoutubeUpdaterTest {
         assertThat(items).hasSize(0);
     }
 
+    @Test
+    public void should_return_empty_set_because_of_data_tag_not_find() throws JDOMException, IOException, URISyntaxException {
+        /* Given */
+        Podcast podcast = Podcast.builder()
+                .url("https://www.youtube.com/user/androiddevelopers")
+                .build();
+
+        Connection connection = mock(Connection.class);
+        Document document = mock(Document.class);
+        Elements elements = mock(Elements.class);
+        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
+        when(connection.get()).thenReturn(document);
+        when(document.select(anyString())).thenReturn(elements);
+        doThrow(IOException.class).when(jdomService).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
+
+        /* When */
+        Set<Item> items = youtubeUpdater.getItems(podcast);
+
+        /* Then */
+        assertThat(items).hasSize(0);
+        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
+        verify(htmlService, only()).connectWithDefault(eq("https://www.youtube.com/user/androiddevelopers"));
+    }
+
     private Answer<Object> parseFromFile(String file) throws JDOMException, IOException, URISyntaxException {
         return invocationOnMock -> new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(file).toURI()).toFile());
     }
