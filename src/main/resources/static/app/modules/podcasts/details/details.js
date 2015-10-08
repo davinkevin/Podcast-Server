@@ -14,6 +14,10 @@ class PodcastDetailCtrl {
         ];
         this.$scope.$on("podcastEdition:save", () => this.refreshItems());
         this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
+
+        this.podcast.isUpdatable = function() {
+            return this.type !== 'send';
+        };
     }
 
     refreshItems() {
@@ -37,7 +41,7 @@ class PodcastDetailCtrl {
     }
 
     isUpdatable() {
-        return this.podcast.type !== 'send';
+        return this.podcast.isUpdatable();
     }
 
 }
