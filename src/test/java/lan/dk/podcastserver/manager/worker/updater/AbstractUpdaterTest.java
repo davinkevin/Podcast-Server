@@ -13,9 +13,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.validation.Validator;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -52,7 +55,9 @@ public class AbstractUpdaterTest {
         /* Then */
         assertThat(result).isNotSameAs(Updater.NO_MODIFICATION_TUPLE);
         assertThat(result.first()).isSameAs(podcast);
-        assertThat(result.second()).isNull();
+        assertThat(result.second())
+                .isInstanceOf(HashSet.class)
+                .hasSize(3);
         assertThat(result.third()).isNotNull();
     }
 
@@ -66,6 +71,29 @@ public class AbstractUpdaterTest {
         /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
         /* Then */ assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
     }
+    
+    @Test
+    public void should_filter_with_default_predicate() {
+        /* Given */
+        Podcast podcast = Podcast.builder()
+                    .id(123)
+                    .url("http://a.fake.url/rss.xml")
+                    .items(new HashSet<>())
+                .build();
+        podcast.add(new Item().setId(2));
+
+
+        /* When */
+        UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+        Set<Item> collectedItem = result.second()
+                .stream()
+                .filter(result.third())
+                .collect(toSet());
+
+        /* Then */
+        assertThat(collectedItem).hasSize(2);
+
+    }
 
     @After
     public void afterEach() {
@@ -76,7 +104,7 @@ public class AbstractUpdaterTest {
 
         @Override
         public Set<Item> getItems(Podcast podcast) {
-            return null;
+            return new HashSet<>(Arrays.asList(new Item().setId(1), new Item().setId(2), new Item().setId(3)));
         }
 
         @Override
