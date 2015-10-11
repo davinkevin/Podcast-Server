@@ -11,8 +11,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static lan.dk.podcastserver.entity.PodcastAssert.assertThat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,6 +53,21 @@ public class PodcastControllerTest {
         /* Then */
         assertThat(podcastById).isSameAs(podcast);
         verify(podcastBusiness, only()).findOne(eq(1));
+    }
+
+    @Test
+    public void should_update() {
+        Podcast podcast = new Podcast();
+        when(podcastBusiness.reatachAndSave(any(Podcast.class))).thenReturn(podcast);
+
+        /* When */
+        Podcast podcastUpdated = podcastController.update(podcast, 1);
+
+        /* Then */
+        assertThat(podcastUpdated)
+                .isInstanceOf(Podcast.class)
+                .hasId(1);
+        verify(podcastBusiness, only()).reatachAndSave(same(podcast));
     }
     
 }
