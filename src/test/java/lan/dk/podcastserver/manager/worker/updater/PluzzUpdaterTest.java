@@ -36,15 +36,11 @@ public class PluzzUpdaterTest {
     @Mock ImageService imageService;
     @Mock UrlService urlService;
     @InjectMocks PluzzUpdater pluzzUpdater;
+    public static final Podcast PODCAST = Podcast.builder().url(PLUZZ_URL).build();
 
     @Test
     public void should_sign_the_podcast() throws IOException, URISyntaxException {
         /* Given */
-        Podcast podcast = Podcast
-                .builder()
-                    .url(PLUZZ_URL)
-                .build();
-
         Connection connection = mock(Connection.class);
         Connection.Response response = mock(Connection.Response.class);
         when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
@@ -54,7 +50,7 @@ public class PluzzUpdaterTest {
 
 
         /* When */
-        String signature = pluzzUpdater.signatureOf(podcast);
+        String signature = pluzzUpdater.signatureOf(PODCAST);
 
         /* Then */
         assertThat(signature)
@@ -65,5 +61,7 @@ public class PluzzUpdaterTest {
     private Document parse(String file) throws URISyntaxException, IOException {
         return Jsoup.parse(Paths.get(PluzzUpdaterTest.class.getResource(file).toURI()).toFile(), "UTF-8" );
     }
+
+
 
 }

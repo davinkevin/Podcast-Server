@@ -4,30 +4,33 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.service.UrlService;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toSet;
 
 /**
- * Created by kevin on 09/08/2014.
+ * Created by kevin on 09/08/2014 for Podcast Server
  */
 @Component("PluzzUpdater")
 public class PluzzUpdater extends AbstractUpdater {
@@ -41,39 +44,42 @@ public class PluzzUpdater extends AbstractUpdater {
 
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
-
-    public static ZonedDateTime fromPluzz(Long dateInSecondsSinceEpoch){
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateInSecondsSinceEpoch), ZoneId.of("Europe/Paris"));
-    }
+    @Resource UrlService urlService;
 
     public Set<Item> getItems(Podcast podcast) {
         Document page;
         String listingUrl = podcast.getUrl();
-        Set<Item> itemList = new HashSet<>();
         try {
-
-            Connection.Response response = htmlService.connectWithDefault(listingUrl)
-                    .execute();
-            page = response.parse();
-
-
-            //get from current page, for the first of the panel
-
-            itemList.add(getCurrentPlayedItem(page));
-
-            // get from right panel
-            Elements listOfEpisodes = page.select(JSOUP_ITEM_SELECTOR);
-            itemList.addAll(listOfEpisodes.select("a.row")
-                    .stream()
-                    .map(element -> getPluzzItemByUrl(element.attr("href")))
-                    .collect(Collectors.toList()));
+            page = htmlService.connectWithDefault(listingUrl).execute().parse();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
+            return new HashSet<>();
         }
-        return itemList;
 
+        //get from current page, for the first of the panel
+        Set<Item> items = new HashSet<>();
+        items.add(getCurrentPlayedItem(page));
+
+        // get from right panel
+        Elements listOfEpisodes = page.select(JSOUP_ITEM_SELECTOR);
+        items.addAll(
+                listOfEpisodes.select("a.row")
+                .stream()
+                .map(element -> getPluzzItemByUrl(element.attr("href")))
+                .collect(toSet())
+        );
+
+        return items;
     }
+
+    private ZonedDateTime fromPluzz(JSONObject responseObject){
+        if (isNull(responseObject) || isNull(responseObject.get("diffusion")) || isNull(((JSONObject) responseObject.get("diffusion")).get("timestamp"))) {
+            return null;
+        }
+
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")), ZoneId.of("Europe/Paris"));
+    }
+
 
     private Item getCurrentPlayedItem(Document page) {
         String urlContainingId = page.select("meta[name=og:image]").attr("content");
@@ -90,16 +96,11 @@ public class PluzzUpdater extends AbstractUpdater {
         Document page;
         String listingUrl = podcast.getUrl();
         try {
-
-            Connection.Response response = htmlService.connectWithDefault(listingUrl)
-                    .execute();
-            page = response.parse();
-
+            page = htmlService.connectWithDefault(listingUrl).execute().parse();
             Elements listOfItem = page.select(JSOUP_ITEM_SELECTOR);
 
             return signatureService.generateMD5Signature((listOfItem.size() == 0) ? page.html() : listOfItem.html());
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
         }
         return "";
@@ -118,45 +119,41 @@ public class PluzzUpdater extends AbstractUpdater {
         JSONParser parser = new JSONParser();
         try {
             logger.debug(getPluzzJsonInformation(pluzzId));
-            JSONObject responseObject = (JSONObject) parser.parse(URLUtils.getReaderFromURL(getPluzzJsonInformation(pluzzId)));
+            JSONObject responseObject = (JSONObject) parser.parse(urlService.getReaderFromURL(getPluzzJsonInformation(pluzzId)));
 
-            String seasonEpisode = " - ";
-            try {
-                String season = String.valueOf(responseObject.get("saison"));
-                String episode = String.valueOf(responseObject.get("episode"));
-                if (!"null".equals(season) && !"null".equals(episode))
-                    seasonEpisode = " - S".concat(season).concat("E").concat(episode).concat(" - ");
-            } catch (Exception e) {
-                logger.error("Problème sur Saison / Episode", e);
-            }
+            String season = String.valueOf(responseObject.get("saison"));
+            String episode = String.valueOf(responseObject.get("episode"));
+            String seasonEpisode = !"null".equals(season) && !"null".equals(episode) ? " - S".concat(season).concat("E").concat(episode).concat(" - ") : " - ";
 
             Item itemToReturn = new Item()
-                    .setTitle(responseObject.get("titre").toString().concat(seasonEpisode).concat(responseObject.get("sous_titre").toString()))
-                    .setDescription(responseObject.get("synopsis").toString())
-                    .setPubdate( fromPluzz((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")) )
-                    .setCover(imageService.getCoverFromURL(new URL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image")))))
-                    .setUrl(getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
-
-
+                    .setTitle( StringUtils.join(responseObject.get("titre").toString(), seasonEpisode,responseObject.get("sous_titre").toString()) )
+                    .setDescription( String.valueOf(responseObject.get("synopsis")))
+                    .setPubdate( fromPluzz(responseObject) )
+                    .setCover( imageService.getCoverFromURL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image"))))
+                    .setUrl( getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
 
             logger.debug(itemToReturn.toString());
             return itemToReturn;
-
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            logger.error("Error during getPluzzItemById", e);
         }
 
         return new Item();
     }
 
+    @SuppressWarnings("unchecked")
     private String getPluzzM38uUrl(JSONArray videosArray) {
-        for (Object video : videosArray) {
-            JSONObject jsonVideo = (JSONObject) video;
-            if (jsonVideo.get("format") != null && ((String)jsonVideo.get("format")).contains("m3u8")) {
-                return URLUtils.getM3U8UrlFormMultiStreamFile((String) jsonVideo.get("url"));
-            }
-        }
-        return "";
+        return ((List<JSONObject>) videosArray)
+                .stream()
+                .filter(hasFormatWithM3U())
+                .map(o -> ((String) o.get("url")))
+                .findFirst()
+                .map(urlService::getM3U8UrlFormMultiStreamFile)
+                .orElse("");
+    }
+
+    private Predicate<JSONObject> hasFormatWithM3U() {
+        return video -> video.get("format") != null && ((String) video.get("format")).contains("m3u8");
     }
 
     private String getPluzzJsonInformation(String pluzzId) {
