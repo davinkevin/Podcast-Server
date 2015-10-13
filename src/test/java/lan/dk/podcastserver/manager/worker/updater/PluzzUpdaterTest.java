@@ -13,9 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.validation.Validator;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
