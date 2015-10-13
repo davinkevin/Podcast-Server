@@ -13,13 +13,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.validation.Validator;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 10/10/2015 for Podcast Server
@@ -54,14 +55,26 @@ public class PluzzUpdaterTest {
 
         /* Then */
         assertThat(signature)
-                    .isNotEmpty()
-                    .isEqualTo("1234567889azerty");
+                .isNotEmpty()
+                .isEqualTo("1234567889azerty");
+    }
+
+    @Test
+    public void should_return_empty_string_if_signature_fails() throws IOException {
+         /* Given */
+        Connection connection = mock(Connection.class);
+        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
+        doThrow(IOException.class).when(connection).execute();
+
+        /* When */
+        String signature = pluzzUpdater.signatureOf(PODCAST);
+
+        /* Then */
+        assertThat(signature)
+                .isEmpty();
     }
 
     private Document parse(String file) throws URISyntaxException, IOException {
-        return Jsoup.parse(Paths.get(PluzzUpdaterTest.class.getResource(file).toURI()).toFile(), "UTF-8" );
+        return Jsoup.parse(Paths.get(PluzzUpdaterTest.class.getResource(file).toURI()).toFile(), "UTF-8");
     }
-
-
-
 }
