@@ -65,7 +65,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
                 .setUrl(selectedArea.select("meta[itemprop=contentUrl]").attr("content"))
                 .setPubdate(ZonedDateTime.of(LocalDateTime.parse(selectedArea.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")));
 
-        try { item.setCover(imageService.getCoverFromURL(new URL(selectedArea.select("meta[itemprop=thumbnail]").attr("content")))); }
+        try { item.setCover(imageService.getCoverFromURL(new URL(selectedArea.select("meta[itemprop=thumbnailUrl]").attr("content")))); }
         catch (IOException ignored) {}
 
         return item;
