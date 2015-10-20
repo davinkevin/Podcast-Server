@@ -1,21 +1,22 @@
 @import "../../../../../../../../../bower_components/bootstrap/less/variables.less";
 
-@media screen and (min-width: @screen-sm-min) {
+@media screen and (min-width: (@screen-sm-min)) {
   .navbar-fixed-top {
     position: relative;
   }
 }
-@media screen and (max-width: (@screen-sm-min+1)) {
+
+@media screen and (max-width: (@screen-sm-min - 1)) {
   body { padding-top: 55px; };
+}
+
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
 }
 
 .navbar-nav {
   & >li {
     float: left;
-  }
-
-  @media screen and (max-width: (@screen-sm-min+1)) {
-    margin: 7.5px -15px 0 -15px;
-    padding-right: 16px;
   }
 }
