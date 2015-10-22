@@ -100,6 +100,21 @@ public class PluzzUpdaterTest {
                 .hasSize(5);
     }
 
+    @Test
+    public void should_get_empty_list_of_item_if_connection_failed() throws IOException, URISyntaxException {
+        /* Given */
+        Connection connection = mock(Connection.class);
+        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
+        doThrow(IOException.class).when(connection).execute();
+
+        /* When */
+        Set<Item> items = pluzzUpdater.getItems(PODCAST);
+
+        /* Then */
+        assertThat(items)
+                .isEmpty();
+    }
+
     private Reader loadEpisode(String id) throws URISyntaxException, IOException {
         return Files.newBufferedReader(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI()));
     }
