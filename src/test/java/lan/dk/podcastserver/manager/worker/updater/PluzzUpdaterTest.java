@@ -115,6 +115,24 @@ public class PluzzUpdaterTest {
                 .isEmpty();
     }
 
+    @Test
+    public void should_get_items_if_no_played_item() throws IOException, URISyntaxException {
+        /* Given */
+        Connection connection = mock(Connection.class);
+        Connection.Response response = mock(Connection.Response.class);
+        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
+        when(connection.execute()).thenReturn(response);
+        when(response.parse()).thenReturn(parse("/remote/podcast/pluzz.commentcavabien.noplayeditem.html"));
+        when(urlService.getReaderFromURL(anyString())).then(invocation -> loadEpisode(StringUtils.substringBetween(String.valueOf(invocation.getArguments()[0]), "?idDiffusion=", "&catalogue")));
+
+        /* When */
+        Set<Item> items = pluzzUpdater.getItems(PODCAST);
+
+        /* Then */
+        assertThat(items)
+                .hasSize(5);
+    }
+
     private Reader loadEpisode(String id) throws URISyntaxException, IOException {
         return Files.newBufferedReader(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI()));
     }
