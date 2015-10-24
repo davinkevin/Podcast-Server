@@ -2,8 +2,8 @@ import EpisodesModule from './episodes/episodes';
 import EditionModule from './edition/edition';
 import UploadModule from './upload/upload';
 import StatsModule from './stats/stats';
-
-
+import AppRouteConfig from 'config/route.config';
+import UpdateService from 'common/service/data/updateService';
 import PodcastDetailCtrl from './details.controller';
 
 export default angular.module('ps.podcasts.details', [
@@ -11,10 +11,8 @@ export default angular.module('ps.podcasts.details', [
     EditionModule.name,
     UploadModule.name,
     StatsModule.name,
-
-    'ps.config.route',
-
-    'ps.common.service.data.updateService'
+    AppRouteConfig.name,
+    UpdateService.name
 ])
     .config(PodcastDetailCtrl.routeConfig)
     .controller('PodcastDetailCtrl', PodcastDetailCtrl);

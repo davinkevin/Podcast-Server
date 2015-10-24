@@ -1,4 +1,6 @@
 
+import RestangularConfig from 'config/restangular.config';
+
 class UpdateService {
     constructor(Restangular) {
         this.Restangular = Restangular;
@@ -9,5 +11,8 @@ class UpdateService {
     }
 } 
 
-angular.module('ps.common.service.data.updateService', ['restangular'])
+export default angular
+    .module('ps.common.service.data.updateService', [
+        RestangularConfig.name
+    ])
     .service('UpdateService', UpdateService);
