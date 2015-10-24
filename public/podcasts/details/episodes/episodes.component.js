@@ -2,7 +2,7 @@
     * Created by kevin on 25/10/2015 for PodcastServer
     */
 
-import template from './episodes.js';
+import template from './episodes.html!text';
 
 export default class PodcastItemsListComponent {
 

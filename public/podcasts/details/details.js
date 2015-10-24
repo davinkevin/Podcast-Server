@@ -1,14 +1,16 @@
-import EpisodesComponent from './episodes/episodes';
-import EditionComponent from './edition/edition';
-import UploadComponent from './upload/upload';
+import EpisodesModule from './episodes/episodes';
+import EditionModule from './edition/edition';
+import UploadModule from './upload/upload';
+import StatsModule from './stats/stats';
+
 
 import PodcastDetailCtrl from './details.controller';
 
 export default angular.module('ps.podcasts.details', [
-    EpisodesComponent.name,
-    EditionComponent.name,
-    'ps.podcasts.details.upload',
-    'ps.podcasts.details.stats',
+    EpisodesModule.name,
+    EditionModule.name,
+    UploadModule.name,
+    StatsModule.name,
 
     'ps.config.route',
 

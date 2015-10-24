@@ -1,7 +1,9 @@
 /**
     * Created by kevin on 25/10/2015 for PodcastServer
     */
-    
+
+import template from './edition.html!text';
+
 export default class podcastEditionCtrl {
     constructor($scope, $location, tagService, podcastService) {
         this.$scope = $scope;
@@ -33,8 +35,8 @@ export default class podcastEditionCtrl {
     static component() {
         return {
             restrict : 'E',
-            templateUrl : 'podcasts/details/edition/edition.html',
-            scope : { podcast : ':' },
+            template : template,
+            scope : { podcast : '=' },
             controller : 'podcastEditionCtrl',
             controllerAs : 'pec',
             bindToController : true

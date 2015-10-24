@@ -2,6 +2,8 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 
+import template from './upload.html!text';
+
 export default class PodcastUploadComponent{
 
     constructor($scope, itemService, $notification) {
@@ -29,9 +31,9 @@ export default class PodcastUploadComponent{
     static component() {
         return {
             restrict : 'E',
-            templateUrl : 'podcasts/details/upload/upload.html',
+            template : template,
             scope : {
-                podcast : ':'
+                podcast : '='
             },
             controller : 'podcastUploadCtrl',
             controllerAs : 'puc',

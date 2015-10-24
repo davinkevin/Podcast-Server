@@ -5,7 +5,7 @@ import NgFileUpload from 'ng-file-upload';
 import AngularNotification from 'config/angularNotification';
 import ItemService from 'common/service/data/itemService';
 
-angular.module('ps.podcasts.details.upload', [
+export default angular.module('ps.podcasts.details.upload', [
     NgFileUpload,
     AngularNotification.name,
     ItemService.name
