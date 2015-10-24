@@ -1,6 +1,7 @@
 /**
 * Created by kevin on 01/11/14 for Podcast Server
 */
+import RestangularConfig from 'config/restangular.config';
 
 class typeService {
 
@@ -13,5 +14,8 @@ class typeService {
     }
 }
 
-angular.module('ps.common.service.data.typeService', ['restangular'])
+export default angular
+    .module('ps.common.service.data.typeService', [
+        RestangularConfig.name
+    ])
     .service('typeService', typeService);

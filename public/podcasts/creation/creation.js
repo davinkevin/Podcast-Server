@@ -1,76 +1,19 @@
-class PodcastCreationController {
+import angular from 'angular';
+import AppRouteConfig from 'config/route.config';
+import NgTagsInput from 'config/ngTagsInput';
+import PodcastService from 'common/service/data/podcastService';
+import TypeService from 'common/service/data/typeService';
+import TagService from 'common/service/data/tagService';
 
-    constructor($location, defaultPodcast, tagService, podcastService, types) {
-        this.podcastService = podcastService;
-        this.$location = $location;
-        this.tagService = tagService;
-        this.podcast = angular.extend(this.podcastService.getNewPodcast(), defaultPodcast );
-        this.types = types;
-    }
+import PodcastCreationCtrl from './creation.controller';
 
-    findInfo() {
-        return this.podcastService.findInfo(this.podcast.url)
-            .then((podcastFetched) => {
-                this.podcast.title = podcastFetched.title;
-                this.podcast.description = podcastFetched.description;
-                this.podcast.type = podcastFetched.type;
-                this.podcast.cover.url = podcastFetched.cover.url;
-            });
-    }
-
-    loadTags(query) {
-        return this.tagService.search(query);
-    }
-
-    changeType() {
-        if (/beinsports\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "BeInSports";
-        } else if (/canalplus\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "CanalPlus";
-        } else if (/jeuxvideo\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "JeuxVideoFR";
-        } else if (/jeuxvideo\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "JeuxVideoCom";
-        } else if (/parleys\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "Parleys";
-        } else if (/pluzz\.francetv\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "Pluzz";
-        } else if (/youtube\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "Youtube";
-        } else if (this.podcast.url.length > 0) {
-            this.podcast.type = "RSS";
-        } else {
-            this.podcast.type = "Send";
-        }
-    }
-
-    save() {
-        this.podcastService.save(this.podcast)
-            .then((podcast) => this.$location.path('/podcasts/' + podcast.id));
-    }
-
-}
-
-angular.module('ps.podcasts.creation', [
-    'ps.config.route',
-
-    'ngTagsInput',
-
-    'ps.common.service.data.podcastService',
-    'ps.common.service.data.typeService',
-    'ps.common.service.data.tagService'
+export default angular.module('ps.podcasts.creation', [
+    AppRouteConfig.name,
+    NgTagsInput.name,
+    PodcastService.name,
+    TypeService.name,
+    TagService.name
 ])
-    .config(($routeProvider, commonKey) => {
-        $routeProvider.
-            when('/podcast-creation', {
-                templateUrl: 'podcasts/creation/creation.html',
-                controller: 'PodcastAddCtrl',
-                controllerAs: 'pac',
-                hotkeys: commonKey,
-                resolve : {
-                    types : typeService => typeService.findAll()
-                }
-            });
-    })
+    .config(PodcastCreationCtrl.routeConfig)
     .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })
-    .controller('PodcastAddCtrl', PodcastCreationController);
+    .controller('PodcastAddCtrl', PodcastCreationCtrl);

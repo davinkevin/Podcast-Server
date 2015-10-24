@@ -1,10 +1,8 @@
 import angular from 'angular';
-
 import AppRouteConfig from 'config/route.config';
-import PodcastDetailsModule from './details/details.js';
-
+import PodcastDetailsModule from './details/details';
 import PodcastsListCtrl from './pocasts.controller';
-
+import PodcastCreationModule from './creation/creation';
 
 export default angular.module('ps.podcasts', [
     AppRouteConfig.name,
