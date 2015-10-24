@@ -5,7 +5,7 @@ import SearchItemCache from './searchitemcache.service';
 
 import NgStorage from 'ngstorage';
 
-import ngTagsInput from 'config/ngTagsInput';
+import NgTagsInput from 'config/ngTagsInput';
 import AppRouteConfig from 'config/route.config';
 
 import DownloadManager from 'common/service/data/downloadManager';
@@ -14,7 +14,7 @@ import TagService from 'common/service/data/tagService';
 import PlaylistService from 'common/service/playlistService';
 
 export default angular.module('ps.search', [
-    ngTagsInput.name,
+    NgTagsInput.name,
     NgStorage.name,
     AppRouteConfig.name,
     DownloadManager.name,

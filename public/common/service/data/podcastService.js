@@ -2,7 +2,9 @@
  * Created by kevin on 02/11@/14 for Podcast Server
  */
 
-class podcastService  {
+import RestangularConfig from 'config/restangular.config';
+
+class PodcastService  {
 
     constructor(Restangular) {
         this.Restangular = Restangular;
@@ -45,13 +47,16 @@ class podcastService  {
         return this.Restangular.one(this.route, id).one('stats').all('byDownloaddate').post(numberOfMonth);
     }
 
-}
-
-angular.module('ps.common.service.data.podcastService', ['restangular'])
-    .config((RestangularProvider) => {
+    static config(RestangularProvider) {
         RestangularProvider.addElementTransformer('podcast', false, (podcast) => {
             podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
             return podcast;
         });
-    })
-    .service('podcastService', podcastService);
+    }
+}
+
+export default angular.module('ps.common.service.data.podcastService', [
+    RestangularConfig.name
+])
+    .config(PodcastService.config)
+    .service('podcastService', PodcastService);
