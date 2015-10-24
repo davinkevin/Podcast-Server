@@ -31,24 +31,21 @@ System.config({
     "animate.css": "github:daneden/animate.css@3.4.0",
     "babel": "npm:babel-core@5.8.25",
     "babel-runtime": "npm:babel-runtime@5.8.25",
-    "bootstrap": "github:twbs/bootstrap@3.3.5",
-    "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.5",
-    "chieffancypants/angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.6.0",
-    "chieffancypants/angular-loading-bar": "github:chieffancypants/angular-loading-bar@0.8.0",
+    "bootstrap-less": "github:distros/bootstrap-less@3.3.9",
     "clean-css": "npm:clean-css@3.4.6",
-    "components/font-awesome": "github:components/font-awesome@4.4.0",
     "core-js": "npm:core-js@1.2.2",
     "css": "github:systemjs/plugin-css@0.1.19",
     "font-awesome": "github:components/font-awesome@4.4.0",
     "highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
     "highcharts-release": "github:highslide-software/highcharts-release@4.1.9",
     "ionicons": "github:driftyco/ionicons@2.0.1",
+    "lodash": "github:lodash/lodash@3.10.1",
     "ng-file-upload": "github:danialfarid/ng-file-upload@9.1.1",
     "ng-tags-input": "github:mbenford/ngTagsInput@3.0.0",
     "ngstorage": "github:gsklee/ngStorage@0.3.9",
     "pablojim/highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
     "restangular": "github:mgonto/restangular@1.5.1",
-    "sockjs": "github:sockjs/sockjs-client@1.0.3",
+    "sockjs-client": "github:sockjs/sockjs-client@0.3.4",
     "stomp-websocket": "github:jmesnil/stomp-websocket@2.3.4",
     "systemjs/plugin-text": "github:systemjs/plugin-text@0.0.2",
     "text": "github:systemjs/plugin-text@0.0.2",
@@ -72,12 +69,12 @@ System.config({
     "github:chieffancypants/angular-hotkeys@1.4.5": {
       "angular": "github:angular/bower-angular@1.4.7"
     },
-    "github:chieffancypants/angular-hotkeys@1.6.0": {
-      "angular": "github:angular/bower-angular@1.4.7"
-    },
     "github:chieffancypants/angular-loading-bar@0.8.0": {
       "angular": "github:angular/bower-angular@1.4.7",
       "css": "github:systemjs/plugin-css@0.1.19"
+    },
+    "github:distros/bootstrap-less@3.3.9": {
+      "jquery": "github:components/jquery@2.1.4"
     },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
@@ -124,9 +121,6 @@ System.config({
     "github:mgonto/restangular@1.5.1": {
       "angular": "github:angular/bower-angular@1.4.7",
       "lodash": "npm:lodash@3.10.1"
-    },
-    "github:twbs/bootstrap@3.3.5": {
-      "jquery": "github:components/jquery@2.1.4"
     },
     "npm:amdefine@1.0.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",

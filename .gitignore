@@ -3,7 +3,6 @@
 .idea/
 lib/
 *.iml
-src/main/resources/application.properties
 src/main/resources/application.yml
 node_modules/
 node/
@@ -12,9 +11,4 @@ bower_components/
 target/
 .gradle/
 build/
-logs/
-src/main/webapp
-/src/main/resources/static/app/js/*.map
-/src/main/resources/static/app/css/*.css
-/src/main/resources/static/app/js/*.js
-/src/main/resources/static/app/lib
+/public/**/*.css
