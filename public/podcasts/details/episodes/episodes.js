@@ -3,8 +3,6 @@ import HtmlFilters from 'common/filter/html2plainText';
 import PlaylistService from 'common/service/playlistService';
 import PodcastItemsListComponent from './episodes.component.js';
 
-
-
 export default angular.module('ps.podcasts.details.episodes', [
     PlaylistService.name,
     HtmlFilters.name
