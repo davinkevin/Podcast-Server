@@ -1,9 +1,10 @@
 import angular from 'angular';
-import searchModule from './search/search';
+import SearchModule from './search/search';
+import PodcastsModule from './podcasts/podcasts';
 
 let app = angular.module('podcastApp', [
-    searchModule.name,
-    'ps.podcasts',
+    SearchModule.name,
+    PodcastsModule.name,
     'ps.item',
     'ps.download',
     'ps.player',

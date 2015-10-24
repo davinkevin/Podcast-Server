@@ -1,53 +1,9 @@
-class PodcastDetailCtrl {
+import EpisodesComponent from './episodes/episodes';
 
-    constructor($scope, podcast, UpdateService, $timeout){
-        this.$scope = $scope;
-        this.UpdateService = UpdateService;
-        this.podcast = podcast;
-        this.$timeout = $timeout;
+import PodcastDetailCtrl from './details.controller';
 
-        this.podcastTabs = [
-            { heading : 'Episodes', active : true},
-            { heading : 'Edition', active : false},
-            { heading : 'Upload', disabled : this.podcast.type !== 'send'},
-            { heading : 'Stats', active : false }
-        ];
-        this.$scope.$on("podcastEdition:save", () => this.refreshItems());
-        this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
-
-        this.podcast.isUpdatable = function() {
-            return this.type !== 'send';
-        };
-    }
-
-    refreshItems() {
-        this.$scope.$broadcast('podcastItems:refresh');
-    }
-
-    refresh() {
-        this.UpdateService
-            .forceUpdatePodcast(this.podcast.id)
-            .then(() => this.refreshItems());
-    }
-
-    tabsActive(num) {
-        this.podcastTabs[num].active = true;
-    }
-
-    chartReflow() {
-        this.$timeout(() => {
-            this.$scope.$broadcast('highchartsng.reflow');
-        }, 10);
-    }
-
-    isUpdatable() {
-        return this.podcast.isUpdatable();
-    }
-
-}
-
-angular.module('ps.podcasts.details', [
-    'ps.podcasts.details.episodes',
+export default angular.module('ps.podcasts.details', [
+    EpisodesComponent.name,
     'ps.podcasts.details.edition',
     'ps.podcasts.details.upload',
     'ps.podcasts.details.stats',
@@ -56,16 +12,5 @@ angular.module('ps.podcasts.details', [
 
     'ps.common.service.data.updateService'
 ])
-    .config(($routeProvider, commonKey) =>
-        $routeProvider.
-            when('/podcasts/:podcastId', {
-                templateUrl: 'podcasts/details/details.html',
-                controller: 'PodcastDetailCtrl',
-                controllerAs: 'pdc',
-                hotkeys : commonKey,
-                resolve : {
-                    podcast : (podcastService, $route) => podcastService.findById($route.current.params.podcastId)
-                }
-            })
-)
+    .config(PodcastDetailCtrl.routeConfig)
     .controller('PodcastDetailCtrl', PodcastDetailCtrl);

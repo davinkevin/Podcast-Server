@@ -123,7 +123,7 @@ export default class ItemSearchCtrl {
     static routeConfig($routeProvider, commonKey) {
         $routeProvider.
             when('/items', {
-                templateUrl: 'search/search.html',
+                template: template,
                 controller: 'ItemsSearchCtrl',
                 controllerAs: 'isc',
                 reloadOnSearch: false,
