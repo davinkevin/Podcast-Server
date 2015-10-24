@@ -1,0 +1,55 @@
+<br/>
+<div ng-swipe-right="pic.swipePage(-1)" ng-swipe-left="pic.swipePage(1)">
+    <div class="media clearfix"  ng-repeat="item in pic.podcast.items | orderBy:'-pubdate' track by item.id">
+        <div class="buttonList pull-right">
+            <!-- Téléchargement en cours -->
+        <span ng-show="item.status == 'STARTED' || item.status == 'PAUSED'" >
+            <button ng-click="pic.toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+            <button ng-click="pic.stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
+        </span>
+
+            <!-- Lancer le téléchargement -->
+            <button ng-click="item.download()" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+
+            <!-- Lire dans le player -->
+            <a ng-href="/podcasts/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
+            
+            <!-- Supprimer l'item -->
+            <button ng-click="pic.remove(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+
+            <!-- Menu complémentaire -->
+            <div class="btn-group" dropdown is-open="isopen">
+                <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    <li ng-show="item.isDownloaded"><a target="_self" ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
+                    <li ng-show="item.isDownloaded">
+                        <a ng-hide="pic.isInPlaylist(item)" ng-click="pic.addOrRemoveInPlaylist(item)">
+                            <span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist
+                        </a>
+                        <a ng-show="pic.isInPlaylist(item)" ng-click="pic.addOrRemoveInPlaylist(item)">
+                            <span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist
+                        </a>
+                    </li>
+                    <li><a target="_self" ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>
+                    <li><a ng-click="pic.reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <a class="pull-left" ng-href="/podcasts/{{pic.podcast.id}}/item/{{item.id}}">
+            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+        </a>
+        
+        <div class="media-body">
+            <h4 class="media-heading">{{ item.title }}</h4>
+            <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>
+            <p><strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>
+        </div>
+    </div>
+
+    <div ng-show="pic.podcast.totalItems > pic.itemPerPage" class="text-center">
+        <pagination items-per-page="pic.itemPerPage" max-size="10" boundary-links="true" total-items="pic.podcast.totalItems" ng-model="pic.currentPage" ng-change="pic.loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+</div>
+
+        

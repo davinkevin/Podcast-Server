@@ -1,0 +1,35 @@
+<div class="container podcast-list">
+
+    <div class="form-inline search-bar row">
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+                <input type="text" class="form-control" ng-model="plc.filters.title" placeholder="Recherche globale" ng-model-options="{ debounce: 500 }">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <!-- glyphicon glyphicon-download -->
+            <div class="input-group">
+                <div class="input-group-addon"><i class="glyphicon glyphicon-download"></i></div>
+                <select class="form-control" ng-model="plc.filters.type">
+                    <option value>All</option>
+                    <option ng-repeat="type in plc.types | orderBy: 'name'" value="{{type.key}}">{{ type.name }}</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in plc.podcasts | filter: plc.filters | orderBy:'-lastUpdate'">
+            <a ng-href="/podcasts/{{ ::podcast.id }}" >
+                <img    class="img-responsive img-rounded" ng-src="{{ ::podcast.cover.url}}" width="200" height="200"
+                        notooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ ::podcast.title }}"
+                        />
+            </a>
+        </div>
+    </div>
+</div>
+

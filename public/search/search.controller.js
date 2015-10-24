@@ -1,39 +1,11 @@
-class SearchItemCache {
-    constructor(DefaultItemSearchParameters, $sessionStorage) {
-        this.$sessionStorage = $sessionStorage;
-        this.$sessionStorage.searchParameters = DefaultItemSearchParameters;
-    }
+/**
+ * Created by kevin on 24/10/2015 for PodcastServer
+ */
 
-    getParameters() {
-        return this.$sessionStorage.searchParameters;
-    }
+import template from './search.html!text';
+import style from './search.css!';
 
-    page(pageNumber) {
-        if (angular.isNumber(pageNumber)) {
-            this.$sessionStorage.searchParameters.page = pageNumber;
-        }
-
-        return this.$sessionStorage.searchParameters.page;
-    }
-
-    size(sizeNumber) {
-        if (angular.isNumber(sizeNumber)) {
-            this.$sessionStorage.searchParameters.size = sizeNumber;
-        }
-
-        return this.$sessionStorage.searchParameters.size;
-    }
-
-    updateSearchParam(searchParam) {
-        this.$sessionStorage.searchParameters.term = searchParam.term;
-        this.$sessionStorage.searchParameters.tags = searchParam.tags;
-        this.$sessionStorage.searchParameters.direction =  searchParam.direction;
-        this.$sessionStorage.searchParameters.properties =  searchParam.properties;
-        this.$sessionStorage.searchParameters.downloaded = searchParam.downloaded;
-    }
-}
-
-class ItemSearchCtrl {
+export default class ItemSearchCtrl {
 
     constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, items) {
         /* DI */
@@ -147,19 +119,8 @@ class ItemSearchCtrl {
         this.SearchItemCache.updateSearchParam(this.searchParameters);
         return this.changePage();
     }
-}
 
-angular.module('ps.search', [
-    'ngTagsInput',
-    'ngStorage',
-
-    'ps.config.route',
-    'ps.common.service.data.downloadManager',
-    'ps.common.service.data.itemService',
-    'ps.common.service.data.tagService',
-    'ps.common.service.playlist',
-])
-    .config(($routeProvider, commonKey) => {
+    static routeConfig($routeProvider, commonKey) {
         $routeProvider.
             when('/items', {
                 templateUrl: 'search/search.html',
@@ -172,15 +133,5 @@ angular.module('ps.search', [
                 ].concat(commonKey),
                 resolve : { items : (itemService, SearchItemCache) => itemService.search(SearchItemCache.getParameters()) }
             });
-    })
-    .constant('DefaultItemSearchParameters', {
-        page : 0,
-        size : 12,
-        term : undefined,
-        tags : undefined,
-        direction : 'DESC',
-        properties : 'pubdate',
-        downloaded : "true"
-    })
-    .controller('ItemsSearchCtrl', ItemSearchCtrl)
-    .service("SearchItemCache", SearchItemCache);
+    }
+}

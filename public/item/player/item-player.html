@@ -1,0 +1,33 @@
+<div class="container item-player">
+    <br/>
+    <ol class="breadcrumb">
+        <li><a href="/podcasts">Podcasts</a></li>
+        <li><a ng-href="/podcasts/{{ ipc.item.podcast.id }}"> {{ ipc.item.podcast.title }}</a></li>
+        <li class="active"><a ng-href="/podcasts/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>
+    </ol>
+
+    <div ng-show="ipc.item.isDownloaded" class="videogular-container">
+        <videogular vg-theme="ipc.config.theme.url" vg-auto-play="ipc.config.autoPlay" >
+            <vg-media vg-src="ipc.config.sources" vg-native-controls="false"></vg-media>
+
+            <vg-controls vg-autohide="ipc.config.sources[0].type.indexOf('audio') === -1 && ipc.config.plugins.controls.autoHide" vg-autohide-time="ipc.config.plugins.controls.autoHideTime">
+                <vg-play-pause-button></vg-play-pause-button>
+                <vg-time-display>{{ currentTime | date:'H:mm:ss':'+0000' }}</vg-time-display>
+                <vg-scrub-bar>
+                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+                </vg-scrub-bar>
+                <vg-time-display>{{ timeLeft | date:'H:mm:ss':'+0000' }}</vg-time-display>
+                <vg-volume>
+                    <vg-mute-button></vg-mute-button>
+                    <vg-volume-bar></vg-volume-bar>
+                </vg-volume>
+                <vg-fullscreen-button ng-show="ipc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreen-button>
+                <div class='btn-video-share'><a target="_self" ng-href="{{ ipc.item.proxyURL }}" class="ionicons ion-android-share"></a></div>
+            </vg-controls>
+
+            <vg-overlay-play></vg-overlay-play>
+            
+            <vg-poster vg-url='ipc.config.plugins.poster'></vg-poster>
+        </videogular>
+    </div>
+</div>

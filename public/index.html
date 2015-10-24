@@ -1,0 +1,64 @@
+<!doctype html>
+<html ng-app="podcastApp">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <base href="/">
+        <title>Podcast Server</title>
+    
+        <!-- inject:css -->
+        <!-- endinject -->
+    
+    </head>
+    <body>
+        <navbar class="hidden">
+            <li>
+                <a href="/podcasts">
+                    <span class="ionicons ion-social-rss">  </span>
+                    <span class="hidden-xs"> Podcast</span>
+                </a>
+            </li>
+            <li>
+                <a href="/stats">
+                    <span class="ionicons ion-stats-bars">  </span>
+                    <span class="hidden-xs"> Stats</span>
+                </a>
+            </li>
+            <li>
+                <a href="/player">
+                    <span class="ionicons ion-social-youtube"></span>
+                    <span class="hidden-xs"> Player</span>
+                </a>
+            </li>
+            <li>
+                <a href="/podcast-creation">
+                    <span class="ionicons ion-android-add"></span>
+                    <span class="hidden-xs"> Ajouter</span>
+                </a>
+            </li>
+            <li>
+                <a href="/download">
+                    <span class="glyphicon glyphicon-download"></span>
+                    <span class="hidden-xs"> Téléchargement</span>
+                </a>
+            </li>
+            <li>
+                <a>
+                    <update-status></update-status>
+                </a>
+            </li>
+        </navbar>
+
+        <authorize-notification></authorize-notification>
+        <div ng-view autoscroll=""></div>
+        <player-inline></player-inline>
+
+        <!-- inject:js -->
+        <script src="jspm_packages/system.js"></script>
+        <script src="system.config.js"></script>
+        <script>
+            System.import("app");
+        </script>
+        <!-- endinject -->
+    </body>
+</html>

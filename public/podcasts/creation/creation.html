@@ -1,0 +1,91 @@
+<div class="jumbotron">
+    <div class="container">
+        <h1>Ajouter un Podcast</h1>
+    </div>
+</div>
+
+<div class="container">
+    <form class="form-horizontal" role="form" novalidate>
+        <div class="form-group">
+            <label for="title" class="col-sm-1 control-label">Titre</label>
+
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="title" ng-model="pac.podcast.title" required placeholder="Titre">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="url" class="col-sm-1 control-label">URL</label>
+
+            <div class="col-sm-10">
+                <input type="url" class="form-control" id="url" ng-model="pac.podcast.url" required placeholder="url" ng-change="pac.changeType();pac.findInfo();">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="url" class="col-sm-1 control-label">Tags</label>
+            <div class="col-sm-10">
+                <tags-input ng-model="pac.podcast.tags" display-property="name" min-length="1" class="bootstrap" placeholder="Ajouter un tag">
+                    <auto-complete source="pac.loadTags($query)" min-length="2"></auto-complete>
+                </tags-input>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="height" class="col-sm-1 control-label">Type</label>
+
+            <div class="col-sm-10">
+                <select class="form-control" ng-model="pac.podcast.type">
+                    <option ng-repeat="type in pac.types | orderBy: 'name'" value="{{type.key}}">{{ type.name }}</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="pac.podcast.hasToBeDeleted"> Suppression Automatique
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <br/>
+
+        <div class="col-md-2 col-md-offset-1 text-center">
+            <img ng-src="{{ pac.podcast.cover.url || 'http://placehold.it/200x200' }}" class="img-thumbnail" width="200" height="200">
+        </div>
+        <div class="col-xs-12 col-md-9">
+            <div class="form-group">
+                <label for="url" class="col-sm-2 control-label">URL</label>
+
+                <div class="col-sm-9">
+                    <input class="form-control" ng-model="pac.podcast.cover.url" required placeholder="url">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="width" class="col-sm-2 control-label">Lageur</label>
+
+                <div class="col-sm-3">
+                    <input type="number" class="form-control" id="width" ng-model="pac.podcast.cover.width" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="height" class="col-sm-2 control-label">Hauteur</label>
+
+                <div class="col-sm-3">
+                    <input type="number" class="form-control" id="height" ng-model="pac.podcast.cover.height" required>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button ng-click="pac.save()" class="btn btn-default">Sauvegarder</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
