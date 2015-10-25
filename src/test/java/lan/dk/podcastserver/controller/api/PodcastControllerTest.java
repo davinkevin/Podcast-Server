@@ -69,5 +69,21 @@ public class PodcastControllerTest {
                 .hasId(1);
         verify(podcastBusiness, only()).reatachAndSave(same(podcast));
     }
-    
+
+    @Test
+    public void should_patch_update() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        when(podcastBusiness.patchUpdate(any(Podcast.class))).thenReturn(podcast);
+
+        /* When */
+        Podcast podcastUpdated = podcastController.patchUpdate(podcast, 1);
+
+        /* Then */
+        assertThat(podcastUpdated)
+                .isInstanceOf(Podcast.class)
+                .hasId(1);
+        verify(podcastBusiness, only()).patchUpdate(same(podcast));
+    }
+
 }
