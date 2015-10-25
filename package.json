@@ -75,6 +75,7 @@
       "videogular": "github:2fdevs/bower-videogular@^1.3.2",
       "videogular-buffering": "github:2fdevs/bower-videogular-buffering@^1.3.2",
       "videogular-controls": "github:2fdevs/bower-videogular-controls@^1.3.2",
+      "videogular-overlay-play": "github:2fdevs/bower-videogular-overlay-play@^1.3.2",
       "videogular-poster": "github:2fdevs/bower-videogular-poster@^1.3.2",
       "videogular-themes-default": "github:2fdevs/bower-videogular-themes-default@^1.3.2"
     },
