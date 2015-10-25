@@ -3,13 +3,14 @@ import SearchModule from './search/search';
 import PodcastsModule from './podcasts/podcasts';
 import ItemModule from './item/item';
 import DownloadModule from './download/download';
+import PlayerModule from './player/player';
 
 let app = angular.module('podcastApp', [
     SearchModule.name,
     PodcastsModule.name,
     ItemModule.name,
-    'ps.download',
-    'ps.player',
+    DownloadModule.name,
+    PlayerModule.name,
     'ps.stats',
     'ps.config'
 ]);

@@ -1,4 +1,3 @@
-
 import angular from 'angular';
 import SearchCtrl from './search.controller';
 import SearchItemCache from './searchitemcache.service';
