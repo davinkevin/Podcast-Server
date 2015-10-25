@@ -3,7 +3,7 @@
  */
 
 import angular from 'angular';
-import angularSanitize from 'angular-sanitize';
+import 'angular-sanitize';
 import Videogular from 'videogular';
 import VideogularBuffering from 'videogular-buffering';
 import VideogularControls from 'videogular-controls';
