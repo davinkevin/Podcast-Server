@@ -1,8 +1,9 @@
 /**
 * Created by kevin on 01/11/14 for Podcast Server
 */
+import AppRestangularConfig from 'config/restangular.config';
 
-class statService {
+class StatService {
 
     constructor(Restangular) {
         this.Restangular = Restangular;
@@ -14,5 +15,8 @@ class statService {
     }
 }
 
-angular.module('ps.common.service.data.statsService', ['restangular'])
-    .service('statService', statService);
+export default angular
+    .module('ps.common.service.data.statsService', [
+        AppRestangularConfig.name
+    ])
+    .service('statService', StatService);

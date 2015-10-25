@@ -6,7 +6,7 @@ import PlaylistService from 'common/service/playlistService';
 
 import PlayerCtrl from './player.controller';
 
-angular.module('ps.player', [
+export default angular.module('ps.player', [
     AppVideogularConfig.name,
     AppRouteConfig.name,
     DeviceDetectionService.name,

@@ -4,6 +4,7 @@ import PodcastsModule from './podcasts/podcasts';
 import ItemModule from './item/item';
 import DownloadModule from './download/download';
 import PlayerModule from './player/player';
+import StatsModule from './stats/stats';
 
 let app = angular.module('podcastApp', [
     SearchModule.name,
@@ -11,7 +12,7 @@ let app = angular.module('podcastApp', [
     ItemModule.name,
     DownloadModule.name,
     PlayerModule.name,
-    'ps.stats',
+    StatsModule.name,
     'ps.config'
 ]);
 
