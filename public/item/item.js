@@ -7,5 +7,5 @@ import ItemPlayer from './player/item.player';
 
 export default angular.module('ps.item', [
     ItemDetailsModule.name,
-    'ps.item.player'
+    ItemPlayer.name
 ]);
