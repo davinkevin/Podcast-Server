@@ -5,6 +5,7 @@ import ItemModule from './item/item';
 import DownloadModule from './download/download';
 import PlayerModule from './player/player';
 import StatsModule from './stats/stats';
+import ConfigModule from './config/config';
 
 let app = angular.module('podcastApp', [
     SearchModule.name,
@@ -13,7 +14,7 @@ let app = angular.module('podcastApp', [
     DownloadModule.name,
     PlayerModule.name,
     StatsModule.name,
-    'ps.config'
+    ConfigModule.name
 ]);
 
 angular.element(document).ready(() =>  angular.bootstrap(document.body, [ app.name ], { strictDi: false }));
