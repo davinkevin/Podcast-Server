@@ -3,23 +3,26 @@ import AppLoadingBar from './loading.config';
 import uiBootstrap from 'angular-bootstrap';
 import ngFileUpload from 'ng-file-upload';
 import PlayerInlineModule from 'common/component/player-inline/player-inline';
+import NavbarModule from 'common/component/navbar/navbar';
+import AuthorizeNotificationModule from 'common/component/authorize-notification/authorize-notification';
+import UpdatingModule from 'common/component/updating/updating';
 import 'angular-touch';
 import 'angular-animate';
 import 'angular-truncate';
-
-
-console.log(ngFileUpload);
+import 'common/mixins.js';
+import './bootstrap/bootstrap';
+import './styles/styles';
+/*import HighCharts from 'highcharts-release';*/
 
 export default angular.module('ps.config', [
-    AppLoadingBar.name,
     'ngTouch',
     'ngAnimate',
-    uiBootstrap,
     'truncate',
+    uiBootstrap,
     ngFileUpload,
-    'ps.common.component.players-inline',
-    'ps.common.component.navbar',
-    'ps.common.component.authorize-notification',
-    'ps.common.component.device-detection',
-    'ps.common.component.updating'
+    AppLoadingBar.name,
+    PlayerInlineModule.name,
+    NavbarModule.name,
+    AuthorizeNotificationModule.name,
+    UpdatingModule.name
 ]);
