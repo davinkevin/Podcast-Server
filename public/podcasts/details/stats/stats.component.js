@@ -51,21 +51,21 @@ export default class PodcastDetailsStatsComponent {
     }
 
     generateChartData() {
-        PodcastDetailsStatsCtrl.resetChart(this.chartSeries);
+        PodcastDetailsStatsComponent.resetChart(this.chartSeries);
 
         return this.$q.all([
             this.podcastService.statsByByDownloaddate(this.podcast.id, this.month),
             this.podcastService.statsByPubdate(this.podcast.id, this.month)
         ]).then((arrayResult) => {
             let downloadData = _(arrayResult[0])
-                    .map(PodcastDetailsStatsCtrl.dateMapper())
+                    .map(PodcastDetailsStatsComponent.dateMapper())
                     .sortBy("date")
-                    .map(PodcastDetailsStatsCtrl.highChartsMapper())
+                    .map(PodcastDetailsStatsComponent.highChartsMapper())
                     .value(),
                 publicationData = _(arrayResult[1])
-                    .map(PodcastDetailsStatsCtrl.dateMapper())
+                    .map(PodcastDetailsStatsComponent.dateMapper())
                     .sortBy("date")
-                    .map(PodcastDetailsStatsCtrl.highChartsMapper())
+                    .map(PodcastDetailsStatsComponent.highChartsMapper())
                     .value();
 
             this.chartSeries.push({"name": "Download Date", "data": downloadData});
