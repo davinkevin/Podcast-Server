@@ -2,6 +2,8 @@
     * Created by kevin on 14/08/2014 for Podcast Server
     */
 
+import _ from 'lodash';
+
 _.mixin({
     // Update in place, does not preserve order
     updateinplace : function(localArray, remoteArray, comparisonFunction = (inArray, elem) => inArray.indexOf(elem), withOrder = false) {

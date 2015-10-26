@@ -8,3 +8,4 @@ node/
 target/
 build/
 /public/**/*.css
+jspm_packages/
