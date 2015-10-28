@@ -11,6 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -97,5 +101,18 @@ public class PodcastControllerTest {
 
         /* Then */
         verify(podcastBusiness, only()).delete(eq(id));
+    }
+
+    @Test
+    public void should_find_all() {
+        /* Given */
+        List<Podcast> podcasts = new ArrayList<>();
+        when(podcastBusiness.findAll()).thenReturn(podcasts);
+
+        /* When */
+        List<Podcast> all = podcastController.findAll();
+
+        /* Then */
+        assertThat(podcasts).isSameAs(all);
     }
 }
