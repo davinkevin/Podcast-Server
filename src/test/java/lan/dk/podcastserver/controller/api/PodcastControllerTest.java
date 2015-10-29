@@ -115,4 +115,19 @@ public class PodcastControllerTest {
         /* Then */
         assertThat(podcasts).isSameAs(all);
     }
+
+    @Test
+    public void should_get_rss() {
+        /* Given */
+        Integer id = 123;
+        Boolean limit = Boolean.TRUE;
+        when(podcastBusiness.getRss(anyInt(), anyBoolean())).thenReturn("Foo");
+
+        /* When */
+        String rss = podcastController.getRss(id, limit);
+
+        /* Then */
+        assertThat(rss).isEqualTo("Foo");
+        verify(podcastBusiness, only()).getRss(eq(id), eq(limit));
+    }
 }
