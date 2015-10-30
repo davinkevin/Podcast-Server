@@ -23,6 +23,7 @@ import proxy from 'proxy-middleware';
 import urlparser from 'url';
 import cachebust from 'gulp-cache-bust';
 import bower from 'gulp-bower';
+import runSequence from 'run-sequence';
 
 let args = yargs.argv;
 let env = args.env  || 'prod';
@@ -54,6 +55,8 @@ let redirect = (route) => {
         }
     }
 };
+
+let min = (env === 'dev') ? '' : '.min';
 
 // Lint Task
 gulp.task('lint', () =>
@@ -95,19 +98,22 @@ gulp.task('less', () =>
 
 gulp.task('bower-install', () => bower() );
 
-gulp.task('inject', ['bower-install'], () => {
+gulp.task('inject:files', () =>
+    gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})
+        .pipe(gulp.dest(appLocation + 'lib/'))
+);
 
-    var min = (env === 'dev') ? '' : '.min';
-
+gulp.task('inject:index', () =>
     gulp.src(indexLocation)
         .pipe(inject(gulp.src(bowerFiles({read: false, debugging : false, env : env})), { addRootSlash : false, ignorePath : "/bower_components/", addPrefix : "app/lib"}))
         .pipe(inject(gulp.src(appFiles).pipe(rename({suffix : min})), {addRootSlash : false, ignorePath : staticLocation , name: 'app'}))
-        .pipe(cachebust({ type : 'MD5'}))
+        .pipe(cachebust({ type : 'MD5', basePath : staticLocation}))
         .pipe(gulp.dest(staticLocation))
-        .pipe(connect.reload());
+        .pipe(connect.reload())
+);
 
-    gulp.src(bowerFiles({checkExistence : true, read: true, debugging : false, env : env}), {base: 'bower_components'})
-        .pipe(gulp.dest(appLocation + 'lib/'));
+gulp.task('inject', ['bower-install'], (cb) => {
+    return runSequence('inject:files', 'inject:index', cb);
 });
 
 gulp.task('web-server', () => {
