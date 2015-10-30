@@ -130,4 +130,17 @@ public class PodcastControllerTest {
         assertThat(rss).isEqualTo("Foo");
         verify(podcastBusiness, only()).getRss(eq(id), eq(limit));
     }
+
+    @Test
+    public void should_fetch_podcast() {
+        /* Given */
+        Podcast podcast = new Podcast();
+        when(findPodcastBusiness.fetchPodcastInfoByUrl(anyString())).thenReturn(podcast);
+
+        /* When */
+        Podcast anUrl = podcastController.fetchPodcastInfoByUrl("anUrl");
+
+        /* Then */
+        PodcastAssert.assertThat(anUrl).isSameAs(podcast);
+    }
 }
