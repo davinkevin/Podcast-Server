@@ -3,6 +3,7 @@
 lib/
 *.iml
 src/main/resources/application.yml
+src/main/resources/static
 node_modules/
 node/
 target/
