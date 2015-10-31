@@ -2,14 +2,10 @@ language: java
 install: true
 
 before_script:
-- npm install -g jspm
-- jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
+  - npm install -g jspm
+  - jspm config registries.github.auth $JSPM_GITHUB_TOKEN
 
 script: mvn test jacoco:report coveralls:report
 
 jdk:
-- oraclejdk8
-
-env:
-  global:
-    secure: jZmGvyjfPwuXeElkEDZVvh3hlLwgkJLx0sRxiOqNWc5wlfPEKdpa5U+/bJ4F3X7lfGNZ8BSNrZg/ceYg4scKkvXo8osplwBONokm0xhosnMcX+aPH6xxrCcAc+QLwqBx4bh5axsRdHgcFBKBa4npUuG+HW7sv4T8c8PdGIzMhiA=
+  - oraclejdk8
