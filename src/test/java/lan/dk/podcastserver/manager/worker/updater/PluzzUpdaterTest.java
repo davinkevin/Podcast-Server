@@ -133,6 +133,12 @@ public class PluzzUpdaterTest {
                 .hasSize(5);
     }
 
+    @Test
+    public void should_has_pluzz_type() {
+        assertThat(pluzzUpdater.type().key()).isEqualTo("Pluzz");
+        assertThat(pluzzUpdater.type().name()).isEqualTo("Pluzz");
+    }
+
     private Reader loadEpisode(String id) throws URISyntaxException, IOException {
         return Files.newBufferedReader(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI()));
     }
