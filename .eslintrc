@@ -1,0 +1,19 @@
+{
+  "rules": {
+    "linebreak-style": [ 2, "unix" ],
+    "semi": [ 2, "always" ]
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "jasmine": true
+  },
+  "globals": {
+    "inject": true,
+    "module": true
+  },
+  "extends": "eslint:recommended",
+  "ecmaFeatures": {
+    "modules" : true
+  }
+}

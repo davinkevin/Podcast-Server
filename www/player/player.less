@@ -1,0 +1,37 @@
+.ps {
+  .item-player, .video-player {
+    vg-controls {
+      .controls-container {
+        background: -webkit-linear-gradient(top, rgba(69, 72, 77, 0) 19%, rgba(69, 72, 77, 0.0666667) 34%, rgba(69, 72, 77, 0.0784314) 37%, rgba(0, 0, 0, 0.388235) 100%);
+      }
+      .show-animation {
+        animation: psShowControlsAnimationFrames ease-out 0.5s;
+        animation-iteration-count: 1;
+        animation-fill-mode: both;
+      }
+      .hide-animation {
+        animation: psHideControlsAnimationFrames ease-out 0.5s;
+        animation-iteration-count: 1;
+        animation-fill-mode: both;
+      }
+    }
+  }
+
+  @keyframes psShowControlsAnimationFrames {
+    0% {
+      background-color: transparent;
+    }
+    100% {
+      background: -webkit-linear-gradient(top, rgba(69, 72, 77, 0) 19%, rgba(69, 72, 77, 0.0666667) 34%, rgba(69, 72, 77, 0.0784314) 37%, rgba(0, 0, 0, 0.388235) 100%);
+    }
+  }
+
+  @keyframes psHideControlsAnimationFrames {
+    0% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}

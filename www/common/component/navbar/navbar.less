@@ -1,0 +1,25 @@
+@import "/jspm_packages/github/distros/bootstrap-less@3.3.9/bootstrap/variables.less";
+.ps {
+
+  @media screen and (min-width: (@screen-sm-min)) {
+    .navbar-fixed-top {
+      position: relative; 
+    }
+  }
+
+  @media screen and (max-width: (@screen-sm-min - 1)) {
+    body { padding-top: 55px; };
+  }
+
+  .navbar {
+    margin-bottom: 0; 
+    border-radius: 0; 
+  }
+
+  .navbar-nav {
+    & >li {
+      float: left; 
+    }
+  }
+
+}
