@@ -5,7 +5,7 @@ import path from 'path';
 
 const appName = 'app';
 const srcDirName = 'www';
-const releaseDirName = 'src/main/resources/static/';
+const releaseDirName = 'src/main/resources/static';
 const root = path.dirname(__dirname);
 const fontsExtension = '{eot,woff2,woff,ttf,svg}';
 
