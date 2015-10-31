@@ -11,6 +11,8 @@ import 'angular-animate';
 import 'angular-truncate';
 import 'common/mixins.js';
 import './bootstrap/bootstrap';
+import './font-awesome/font-awesome';
+import './ionicons/ionicons';
 import './styles/styles';
 
 export default angular.module('ps.config', [
