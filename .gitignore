@@ -7,5 +7,5 @@ node_modules/
 node/
 target/
 build/
-/public/**/*.css
+/www/**/*.css
 jspm_packages/

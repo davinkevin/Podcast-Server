@@ -1,0 +1,302 @@
+.media-left,
+.media-right,
+.media-body {
+  display: block;
+}
+.media-body {
+  width: auto;
+}
+.grayscale {
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+  -o-filter: grayscale(100%);
+  -ms-filter: grayscale(100%);
+  filter: grayscale(100%);
+}
+.no-grayscale {
+  -webkit-filter: grayscale(0%);
+  -moz-filter: grayscale(0%);
+  -o-filter: grayscale(0%);
+  -ms-filter: grayscale(0%);
+  filter: grayscale(0%);
+}
+@media screen and (min-width: 1200px) {
+  .center {
+    display: table-cell;
+    vertical-align: middle;
+    float: none;
+  }
+}
+.thumbnail {
+  min-height: 263px;
+}
+@media (min-width: 992px) {
+  .thumbnail {
+    min-height: 263px;
+  }
+}
+@media (min-width: 1200px) {
+  .thumbnail {
+    min-height: 263px;
+  }
+}
+.search-bar {
+  margin-top: 12px;
+}
+.search-bar tags-input {
+  width: 100%;
+}
+.search-bar tags-input .host {
+  margin-top: 0;
+}
+.button-row {
+  z-index: 1000;
+}
+.listItems {
+  list-style: none;
+}
+.listItems li {
+  clear: both;
+  max-height: 100px;
+  height: 100px;
+  line-height: 25px;
+}
+.listItems li img {
+  float: left;
+}
+.listItems li .description {
+  padding-left: 25px;
+  vertical-align: middle;
+}
+.downloadingItems {
+  list-style: none;
+}
+.downloadingItems .progress {
+  margin-top: 5px;
+}
+.box {
+  position: relative;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+.box:hover {
+  box-shadow: 0 0 15px 0 rgba(51, 122, 183, 0.5);
+}
+.box .dropdown-toggle {
+  color: black;
+}
+.downloadList .media {
+  background-color: white;
+  margin-left: 5px;
+  padding-right: 5px;
+  margin-right: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px 0 rgba(0, 0, 0, 0.1);
+}
+.downloadList .media * img {
+  width: 100px;
+  height: 90px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  object-fit: cover;
+}
+.downloadList .media .media-heading {
+  padding-top: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.downloadList .media .buttonList {
+  padding-top: 24px;
+}
+.downloadList .item-in-waiting-list {
+  overflow: visible;
+}
+.downloadList .item-in-waiting-list .btn {
+  border: none;
+}
+podcast-items-list .media {
+  margin-left: 5px;
+  margin-right: 5px;
+  overflow: visible;
+}
+podcast-items-list .media .media-heading {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+podcast-items-list .media img {
+  object-fit: cover;
+}
+podcast-items-list .media .btn {
+  border: none;
+}
+podcast-items-list .media.ng-leave {
+  -webkit-animation: fadeOutRight 0.5s;
+  animation: fadeOutRight 0.5s;
+}
+podcast-items-list .media.ng-enter {
+  -webkit-animation: fadeInLeft 0.5s;
+  animation: fadeInLeft 0.5s;
+}
+.podcast-details-header {
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 100%;
+  height: 200px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.information-area {
+  padding-top: 95px;
+}
+@media screen and (max-width: 768px) {
+  .information-area {
+    padding-top: 115px;
+  }
+}
+.information-area .action-button {
+  display: inline-block;
+  padding: 6px;
+}
+.information-area .information-text {
+  display: inline-block;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 5px;
+  background-color: rgba(245, 245, 245, 0.58);
+}
+.information-area .information-text h3,
+.information-area .information-text p {
+  margin: 0;
+}
+.upload-item .drop-box {
+  background: #F8F8F8;
+  border: 5px dashed #DDD;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  /*text-align: center;*/
+}
+.upload-item .drop-box .upload-text {
+  align-self: center;
+}
+.upload-item .drop-box.dropping {
+  background: #C7C7C7;
+}
+.item-details * .btn-default.dropdown-toggle {
+  border: none;
+  color: black;
+}
+.item-details .thumbnail img {
+  min-height: 200px;
+  object-fit: cover;
+}
+.item-player {
+  margin-bottom: 16px;
+}
+.item-player video {
+  width: 100%;
+  height: auto;
+}
+.item-player videogular div.btn-video-share {
+  display: table-cell;
+  width: 50px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+.item-player videogular div.btn-video-share a,
+.item-player videogular div.btn-video-share a:hover,
+.item-player videogular div.btn-video-share a:visited {
+  color: white;
+  text-decoration: none;
+}
+.item-player vg-controls {
+  top: calc(100% - 55px) !important;
+}
+.video-player videogular div.btn-video-share {
+  display: table-cell;
+  width: 50px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+.video-player videogular div.btn-video-share a,
+.video-player videogular div.btn-video-share a:hover,
+.video-player videogular div.btn-video-share a:visited {
+  color: white;
+  text-decoration: none;
+}
+.video-player .button-list {
+  color: white;
+  padding-bottom: 8px;
+}
+.video-player .player {
+  padding-top: 16px;
+}
+.video-player .player,
+.video-player .playlist {
+  background: #000000;
+}
+@media screen and (min-width: 1200px) {
+  .video-player .player,
+  .video-player .playlist {
+    height: 500px;
+  }
+}
+.video-player video {
+  width: 100%;
+  height: auto;
+}
+.video-player .playlist {
+  overflow-x: scroll;
+  height: 500px;
+}
+@media screen and (min-width: 1200px) {
+  .video-player .playlist {
+    padding-top: 8px;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .video-player .playlist {
+    padding-bottom: 16px;
+  }
+}
+.video-player .playlist .media {
+  margin-top: 0;
+  height: 115px;
+  padding-top: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  font-weight: bold;
+}
+.video-player .playlist .isReading {
+  background: #6F6F6F;
+}
+.video-player .playlist .isReading img {
+  border: 2px solid rgba(216, 41, 41, 0.81);
+}
+.btn-share-video videogular div.btn-video-share {
+  display: table-cell;
+  width: 50px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+.btn-share-video videogular div.btn-video-share a,
+.btn-share-video videogular div.btn-video-share a:hover,
+.btn-share-video videogular div.btn-video-share a:visited {
+  color: white;
+  text-decoration: none;
+}
+videogular {
+  background-color: rgba(255, 255, 255, 0) !important;
+}
