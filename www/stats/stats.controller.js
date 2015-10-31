@@ -7,6 +7,7 @@ import template from './stats.html!text';
 export default class StatsController {
 
     constructor(statService, stats) {
+        "ngInject";
         this.statService = statService;
         this.month = 1;
 
@@ -81,6 +82,7 @@ export default class StatsController {
     }
 
     static routeConfig($routeProvider, commonKey) {
+        "ngInject";
         $routeProvider.
             when('/stats', {
                 template: template,

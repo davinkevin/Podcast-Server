@@ -8,6 +8,7 @@ import style from './search.css!';
 export default class ItemSearchCtrl {
 
     constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, items) {
+        "ngInject";
         /* DI */
         this.$location = $location;
         this.itemService = itemService;
@@ -121,6 +122,7 @@ export default class ItemSearchCtrl {
     }
 
     static routeConfig($routeProvider, commonKey) {
+        "ngInject";
         $routeProvider.
             when('/items', {
                 template: template,

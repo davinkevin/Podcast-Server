@@ -7,6 +7,7 @@ import template from './creation.html!text';
 export default class PodcastCreationController {
 
     constructor($location, defaultPodcast, tagService, podcastService, types) {
+        "ngInject";
         this.podcastService = podcastService;
         this.$location = $location;
         this.tagService = tagService;
@@ -56,6 +57,7 @@ export default class PodcastCreationController {
     }
 
     static routeConfig($routeProvider, commonKey) {
+        "ngInject";
         $routeProvider
             .when('/podcast-creation', {
                 template: template,

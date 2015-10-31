@@ -3,6 +3,7 @@ import template from './details.html!text';
 export default class PodcastDetailCtrl {
 
     constructor($scope, podcast, UpdateService, $timeout){
+        "ngInject";
         this.$scope = $scope;
         this.UpdateService = UpdateService;
         this.podcast = podcast;
@@ -47,6 +48,7 @@ export default class PodcastDetailCtrl {
     }
 
     static routeConfig($routeProvider, commonKey) {
+        "ngInject";
         $routeProvider
             .when('/podcasts/:podcastId', {
                 template: template,

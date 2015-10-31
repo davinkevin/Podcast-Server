@@ -7,6 +7,7 @@ import template from './episodes.html!text';
 export default class PodcastItemsListComponent {
 
     constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService ) {
+        "ngInject";
         /* DI */
         this.$scope = $scope;
         this.DownloadManager = DonwloadManager;

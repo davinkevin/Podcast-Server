@@ -7,6 +7,7 @@ import RestangularConfig from '../../../config/restangular.config';
 class PodcastService  {
 
     constructor(Restangular) {
+        "ngInject";
         this.Restangular = Restangular;
         this.route = 'podcast';
     }
@@ -48,6 +49,7 @@ class PodcastService  {
     }
 
     static config(RestangularProvider) {
+        "ngInject";
         RestangularProvider.addElementTransformer('podcast', false, (podcast) => {
             podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
             return podcast;

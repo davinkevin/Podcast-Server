@@ -7,6 +7,7 @@ import './podcasts.css!';
 
 export default class PodcastsListCtrl {
     constructor(podcasts, types) {
+        "ngInject";
         this.podcasts = podcasts;
         this.types = types;
         this.filters = {
@@ -16,6 +17,7 @@ export default class PodcastsListCtrl {
     }
 
     static routeConfig($routeProvider, commonKey){
+        "ngInject";
         $routeProvider.
             when('/podcasts', {
                 template: template,
@@ -23,8 +25,8 @@ export default class PodcastsListCtrl {
                 controllerAs: 'plc',
                 hotkeys: commonKey,
                 resolve: {
-                    podcasts: podcastService => podcastService.findAll(),
-                    types: typeService => typeService.findAll()
+                    podcasts: podcastService => {"ngInject"; return podcastService.findAll()},
+                    types: typeService => {"ngInject"; return typeService.findAll() }
                 }
             })
     }

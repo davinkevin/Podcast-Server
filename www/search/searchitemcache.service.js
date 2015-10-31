@@ -4,6 +4,7 @@
 
 export default class SearchItemCache {
     constructor(DefaultItemSearchParameters, $sessionStorage) {
+        "ngInject";
         this.$sessionStorage = $sessionStorage;
         this.$sessionStorage.searchParameters = DefaultItemSearchParameters;
     }

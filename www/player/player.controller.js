@@ -6,6 +6,7 @@ import template from './player.html!text';
 
 export default class PlayerController {
     constructor(playlistService, $timeout, deviceDetectorService) {
+        "ngInject";
         this.playlistService = playlistService;
         this.$timeout = $timeout;
 
@@ -81,6 +82,7 @@ export default class PlayerController {
     }
 
     static routeConfig($routeProvider) {
+        "ngInject";
         $routeProvider.
             when('/player', {
                 template: template,

@@ -6,6 +6,7 @@ import AppRestangularConfig from '../../../config/restangular.config';
 class StatService {
 
     constructor(Restangular) {
+        "ngInject";
         this.Restangular = Restangular;
         this.base = this.Restangular.one('stats');
     }

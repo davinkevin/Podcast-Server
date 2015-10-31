@@ -3,6 +3,7 @@ import NgStorage from 'ngstorage';
 class PlaylistService {
 
     constructor($localStorage) {
+        "ngInject";
         this.$localStorage = $localStorage;
         this.$localStorage.playlist = this.$localStorage.playlist || [];
     }

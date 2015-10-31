@@ -2,9 +2,12 @@
     * Created by kevin on 25/10/2015 for PodcastServer
     */
 
+import template from './download.html!text';
+
 export default class DownloadCtrl {
 
     constructor($scope, DonwloadManager, $notification) {
+        "ngInject";
         this.DonwloadManager = DonwloadManager;
         this.$notification = $notification;
         this.items =[];
@@ -112,9 +115,10 @@ export default class DownloadCtrl {
     }
 
     static routeConfig($routeProvider, commonKey) {
+        "ngInject";
         $routeProvider.
             when('/download', {
-                templateUrl: 'download/download.html',
+                template: template,
                 controller: 'DownloadCtrl',
                 controllerAs: 'dc',
                 hotkeys: commonKey

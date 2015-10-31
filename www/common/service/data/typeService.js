@@ -6,6 +6,7 @@ import RestangularConfig from '../../../config/restangular.config';
 class typeService {
 
     constructor(Restangular) {
+        "ngInject";
         this.baseAll = Restangular.all('types');
     }
 

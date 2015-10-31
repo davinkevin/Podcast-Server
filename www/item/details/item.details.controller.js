@@ -7,6 +7,7 @@ import template from './item-details.html!text';
 export default class ItemDetailCtrl {
 
     constructor($scope, DonwloadManager, $location, playlistService, podcast, item){
+        "ngInject";
         this.item = item;
         this.$location = $location;
         this.item.podcast = podcast;
@@ -60,6 +61,7 @@ export default class ItemDetailCtrl {
     }
 
     static routeConfig($routeProvider, commonKey) {
+        "ngInject";
         $routeProvider.
             when('/podcasts/:podcastId/item/:itemId', {
                 template: template,
@@ -67,11 +69,9 @@ export default class ItemDetailCtrl {
                 controllerAs: 'idc',
                 hotkeys: commonKey,
                 resolve : {
-                    item : function (itemService, $route) {
-                        return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
+                    item : (itemService, $route) => { "ngInject"; return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);
                     },
-                    podcast : function (podcastService, $route) {
-                        return podcastService.findById($route.current.params.podcastId);
+                    podcast : (podcastService, $route) => { "ngInject"; return podcastService.findById($route.current.params.podcastId);
                     }
                 }
             });

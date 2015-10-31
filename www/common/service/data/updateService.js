@@ -3,6 +3,7 @@ import RestangularConfig from '../../../config/restangular.config';
 
 class UpdateService {
     constructor(Restangular) {
+        "ngInject";
         this.Restangular = Restangular;
     }
 

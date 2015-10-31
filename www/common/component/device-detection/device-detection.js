@@ -2,6 +2,7 @@ import angular from 'angular';
 
 class deviceDetectorService {
     constructor($window) {
+        "ngInject";
         this.$window = $window;
     }
 

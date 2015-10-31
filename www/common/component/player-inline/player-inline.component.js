@@ -5,7 +5,9 @@
 import template from './player-inline.html!text';
 
 export default class PlayerInlineComponent {
+
     constructor(playlistService, $timeout, deviceDetectorService, $scope) {
+        "ngInject";
         this.isReading = true;
         this.playlistService = playlistService;
         this.$timeout = $timeout;

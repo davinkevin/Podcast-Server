@@ -7,6 +7,7 @@ import template from './upload.html!text';
 export default class PodcastUploadComponent{
 
     constructor($scope, itemService, $notification) {
+        "ngInject";
         this.$scope = $scope;
         this.itemService = itemService;
         this.$notification = $notification;

@@ -6,6 +6,7 @@ import template from './edition.html!text';
 
 export default class podcastEditionCtrl {
     constructor($scope, $location, tagService, podcastService) {
+        "ngInject";
         this.$scope = $scope;
         this.$location = $location;
         this.tagService = tagService;

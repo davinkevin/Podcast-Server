@@ -7,6 +7,7 @@ import AppRestangularConfig from '../../../config/restangular.config';
 
 class itemService {
     constructor(Restangular) {
+        "ngInject";
         this.Restangular = Restangular;
         this.childRoute = "items";
     }

@@ -7,6 +7,7 @@ import AppRestangularConfig from '../../../config/restangular.config';
 class tagService {
 
     constructor(Restangular) {
+        "ngInject";
         this.baseAll = Restangular.all('tag');
     }
 

@@ -6,7 +6,9 @@ import './updating.css!';
 import template from './updating.html!text';
 
 export default class UpdatingController {
+
     constructor(ngstomp, $scope) {
+        "ngInject";
         this.ngstomp = ngstomp;
         this.isUpdating = false;
         this.$scope = $scope;

@@ -2,8 +2,6 @@ import angular from 'angular';
 import 'angular-route';
 import 'angular-hotkeys';
 
-console.log();
-
 export default angular
     .module('ps.config.route', ['ngRoute','cfp.hotkeys'])
     .constant('commonKey', [
@@ -24,5 +22,5 @@ export default angular
             window.location.href = '/download';
         }]
     ])
-    .config($routeProvider => $routeProvider.otherwise({redirectTo: '/items'}))
-    .config($locationProvider => $locationProvider.html5Mode(true));
+    .config($routeProvider => {"ngInject"; return $routeProvider.otherwise({redirectTo: '/items'})})
+    .config($locationProvider => {"ngInject"; return $locationProvider.html5Mode(true)});

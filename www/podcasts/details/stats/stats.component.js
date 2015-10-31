@@ -3,6 +3,7 @@ import template from './stats.html!text';
 export default class PodcastDetailsStatsComponent {
 
     constructor($scope, $q, podcastService) {
+        "ngInject";
         this.$q = $q;
         this.podcastService = podcastService;
         this.month = 6;

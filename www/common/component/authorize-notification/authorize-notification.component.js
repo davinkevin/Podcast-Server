@@ -6,6 +6,7 @@ import template from './authorize-notification.html!text';
 
 export default class AuthorizeNotificationComponent {
     constructor($window, $notification) {
+        "ngInject";
         this.$window = $window;
         this.$notification = $notification;
         this.state = this.hasToBeShown();

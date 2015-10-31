@@ -3,7 +3,6 @@ import RestangularConfig from '../../../config/restangular.config';
 import AngularStompDKConfig from '../../../config/ngstomp.config';
 
 class wsDownloadManager {
-
     /*@ngNoInject*/
     constructor(urlBase, ngstomp) {
         this.WS_DOWNLOAD_BASE = urlBase;
@@ -26,6 +25,7 @@ class wsDownloadManager {
 class DownloadManager {
 
     constructor(Restangular, ngstomp) {
+        "ngInject";
         this.Restangular = Restangular;
         this.baseTask = this.Restangular.one("task");
         this.baseDownloadManager = this.baseTask.one('downloadManager');

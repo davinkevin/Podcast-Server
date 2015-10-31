@@ -17,4 +17,4 @@ let app = angular.module('podcastApp', [
     ConfigModule.name
 ]);
 
-angular.element(document).ready(() =>  angular.bootstrap(document.body, [ app.name ], { strictDi: false }));
+angular.element(document).ready(() =>  angular.bootstrap(document, [ app.name ], { strictDi: false }));

@@ -7,6 +7,7 @@ import template from './item-player.html!text';
 export default class ItemPlayerController {
 
     constructor(podcast, item, $timeout, deviceDetectorService) {
+        "ngInject";
         this.item = item;
         this.item.podcast = podcast;
         this.$timeout = $timeout;
@@ -27,6 +28,7 @@ export default class ItemPlayerController {
     }
 
     static routeConfig($routeProvider) {
+        "ngInject";
         $routeProvider.
             when('/podcasts/:podcastId/item/:itemId/play', {
                 template: template,
