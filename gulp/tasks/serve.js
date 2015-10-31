@@ -1,6 +1,5 @@
 import gulp from 'gulp';
 import util from 'gulp-util';
-import browserSync from 'browser-sync';
 import proxy from 'proxy-middleware';
 import connect from 'gulp-connect';
 import urlParser from 'url';
