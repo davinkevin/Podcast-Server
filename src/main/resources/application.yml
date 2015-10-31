@@ -59,6 +59,7 @@ logging:
     level:
         #lan.dk.podcastserver : DEBUG
         #org.hibernate.type: TRACE
+        org.springframework.web.socket: TRACE
 
 multipart:
     max-file-size: 512MB

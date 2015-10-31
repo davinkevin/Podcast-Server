@@ -12,7 +12,6 @@ import 'angular-truncate';
 import 'common/mixins.js';
 import './bootstrap/bootstrap';
 import './styles/styles';
-/*import HighCharts from 'highcharts-release';*/
 
 export default angular.module('ps.config', [
     'ngTouch',

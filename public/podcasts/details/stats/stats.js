@@ -1,10 +1,10 @@
 import angular from 'angular';
-import HighChartsNg from 'highcharts-ng';
+import AppHighChartsConfig from 'config/highCharts';
 import PodcastDetailsStatsComponent from './stats.component';
 
 export default angular
     .module('ps.podcasts.details.stats', [
-        HighChartsNg
+        AppHighChartsConfig.name
     ])
     .directive('podcastStats', PodcastDetailsStatsComponent.component)
     .controller('PodcastDetailsStatsCtrl', PodcastDetailsStatsComponent);
