@@ -6,10 +6,10 @@
     -webkit-transform: rotate(360deg);
   }
 }
-update-status .notUpdating {
+.ps update-status .notUpdating {
   visibility: hidden;
 }
-update-status i.updating {
+.ps update-status i.updating {
   -webkit-animation-name: rotate;
   -webkit-animation-duration: 1s;
   -webkit-animation-iteration-count: infinite;

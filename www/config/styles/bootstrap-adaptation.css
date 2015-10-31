@@ -1,8 +1,8 @@
-.media-left,
-.media-right,
-.media-body {
+.ps .media-left,
+.ps .media-right,
+.ps .media-body {
   display: block;
 }
-.media-body {
+.ps .media-body {
   width: auto;
 }

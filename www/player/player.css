@@ -1,15 +1,15 @@
-.item-player vg-controls .controls-container,
-.video-player vg-controls .controls-container {
+.ps .item-player vg-controls .controls-container,
+.ps .video-player vg-controls .controls-container {
   background: -webkit-linear-gradient(top, rgba(69, 72, 77, 0) 19%, rgba(69, 72, 77, 0.0666667) 34%, rgba(69, 72, 77, 0.0784314) 37%, rgba(0, 0, 0, 0.388235) 100%);
 }
-.item-player vg-controls .show-animation,
-.video-player vg-controls .show-animation {
+.ps .item-player vg-controls .show-animation,
+.ps .video-player vg-controls .show-animation {
   animation: psShowControlsAnimationFrames ease-out 0.5s;
   animation-iteration-count: 1;
   animation-fill-mode: both;
 }
-.item-player vg-controls .hide-animation,
-.video-player vg-controls .hide-animation {
+.ps .item-player vg-controls .hide-animation,
+.ps .video-player vg-controls .hide-animation {
   animation: psHideControlsAnimationFrames ease-out 0.5s;
   animation-iteration-count: 1;
   animation-fill-mode: both;

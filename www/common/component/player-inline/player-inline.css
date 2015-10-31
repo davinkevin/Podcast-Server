@@ -1,7 +1,7 @@
-.player-inline-full .spacer {
+.ps .player-inline-full .spacer {
   height: 70px;
 }
-.player-inline-full .player-inline {
+.ps .player-inline-full .player-inline {
   position: fixed;
   left: 0;
   bottom: 0;
@@ -11,18 +11,18 @@
   /*background:ghostwhite;*/
   z-index: 100;
 }
-.player-inline-full .player-inline .current-cover img {
+.ps .player-inline-full .player-inline .current-cover img {
   width: 70px;
   height: 70px;
 }
-.player-inline-full .player-inline .poster {
+.ps .player-inline-full .player-inline .poster {
   padding: 0;
 }
-.player-inline-full .player-inline .player {
+.ps .player-inline-full .player-inline .player {
   width: calc(100% - 70px);
   padding: 0;
 }
-.player-inline-full .player-inline .player .action-button-row {
+.ps .player-inline-full .player-inline .player .action-button-row {
   padding-top: 10px;
   height: 40px;
   display: flex;
@@ -30,7 +30,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.player-inline-full .player-inline .player .action-button-row .btn-circle {
+.ps .player-inline-full .player-inline .player .action-button-row .btn-circle {
   width: 40px;
   height: 40px;
   text-align: center;
@@ -39,10 +39,10 @@
   line-height: 1.42;
   border-radius: 25px;
 }
-.player-inline-full .player-inline .player .action-button-row .btn.prev,
-.player-inline-full .player-inline .player .action-button-row .btn.next,
-.player-inline-full .player-inline .player .action-button-row .btn.clean,
-.player-inline-full .player-inline .player .action-button-row .btn.playlist {
+.ps .player-inline-full .player-inline .player .action-button-row .btn.prev,
+.ps .player-inline-full .player-inline .player .action-button-row .btn.next,
+.ps .player-inline-full .player-inline .player .action-button-row .btn.clean,
+.ps .player-inline-full .player-inline .player .action-button-row .btn.playlist {
   margin: 0 8px;
   padding: 0 0;
   color: ghostwhite;
@@ -53,43 +53,43 @@
   line-height: 1.42;
   border-radius: 25px;
 }
-.player-inline-full .player-inline .player .action-button-row .dropdown-menu {
+.ps .player-inline-full .player-inline .player .action-button-row .dropdown-menu {
   width: 450px;
 }
-.player-inline-full .player-inline .player .action-button-row .dropdown-menu a {
+.ps .player-inline-full .player-inline .player .action-button-row .dropdown-menu a {
   display: flex;
   flex-direction: row;
   align-items: center;
   align-content: center;
   padding: 3px 10px;
 }
-.player-inline-full .player-inline .player .action-button-row .dropdown-menu a .playlist-cover {
+.ps .player-inline-full .player-inline .player .action-button-row .dropdown-menu a .playlist-cover {
   width: 48px;
   height: 48px;
 }
-.player-inline-full .player-inline .player .action-button-row .dropdown-menu a .playlist-title {
+.ps .player-inline-full .player-inline .player .action-button-row .dropdown-menu a .playlist-title {
   padding-left: 16px;
   width: 360px;
 }
-.player-inline-full .player-inline .player .action-button-row .dropdown-menu a.currently-playing {
+.ps .player-inline-full .player-inline .player .action-button-row .dropdown-menu a.currently-playing {
   background-color: #d9edf7;
 }
-.player-inline-full .player-inline videogular vg-scrub-bar [role=slider],
-.player-inline-full .player-inline [videogular] vg-scrub-bar [role=slider] {
+.ps .player-inline-full .player-inline videogular vg-scrub-bar [role=slider],
+.ps .player-inline-full .player-inline [videogular] vg-scrub-bar [role=slider] {
   margin-top: 12px;
   margin-bottom: 12px;
 }
-.player-inline-full .player-inline videogular vg-controls {
+.ps .player-inline-full .player-inline videogular vg-controls {
   height: 30px;
   top: calc(70%);
 }
-.player-inline-full .player-inline videogular vg-controls .controls-container {
+.ps .player-inline-full .player-inline videogular vg-controls .controls-container {
   -webkit-animation: none !important;
   -webkit-animation-fill-mode: none !important;
   -webkit-animation-iteration-count: 0 !important;
 }
-.player-inline-full .player-inline videogular vg-controls .controls-container,
-.player-inline-full .player-inline [videogular] vg-controls .controls-container {
+.ps .player-inline-full .player-inline videogular vg-controls .controls-container,
+.ps .player-inline-full .player-inline [videogular] vg-controls .controls-container {
   height: 30px;
   background-color: rgba(255, 255, 255, 0) !important;
 }

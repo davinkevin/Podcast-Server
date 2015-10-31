@@ -10,6 +10,7 @@ import inject from 'gulp-inject';
 import runSequence from 'run-sequence';
 import del from 'del';
 import Builder from 'systemjs-builder';
+import replace from 'gulp-replace';
 import paths from '../paths';
 
 let prodFiles = ['min.css', 'min.js'].map(ext => `${paths.releaseDir}/${paths.app.name}.${ext}`);
@@ -38,6 +39,7 @@ gulp.task('build-js', () => {
 gulp.task('build-css', () => {
     return gulp.src(`${paths.releaseDir}/${paths.app.name}.css`)
         .pipe(minifyCSS())
+        .pipe(replace(/url\([^\)]*jspm_packages[^\)]*\/fonts\/([^\)]*)\)/g, 'url(/fonts/$1)'))
         .pipe(rename({suffix : '.min'}))
         .pipe(gulp.dest(paths.release.root))
 });
