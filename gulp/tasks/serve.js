@@ -35,11 +35,12 @@ function startServer(directoryBase) {
 
 }
 
-gulp.task('serve', ['less'], () => {
+gulp.task('serve', ['less', 'fonts', 'lint-js'], () => {
 
   startServer([paths.srcDir, paths.root ]);
 
-  gulp.watch(`${paths.glob.less}`, ['less', connect.reload ]);
-  gulp.watch(`${paths.glob.js}`, ['lint-js', connect.reload ]);
+  gulp.watch(paths.glob.less,                       ['less',    connect.reload ]);
+  gulp.watch(paths.glob.js,                         ['lint-js', connect.reload ]);
+  gulp.watch([paths.jspm.fonts, paths.glob.fonts],  ['fonts',   connect.reload ]);
 
 });
