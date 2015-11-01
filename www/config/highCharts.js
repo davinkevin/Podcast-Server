@@ -1,6 +1,5 @@
-
-import HighChartsAdapter from 'highcharts-release/adapters/standalone-framework';
-import HighCharts from 'highcharts-release';
+import 'highcharts-release';
+import angular from 'angular';
 import HighChartsNg from 'highcharts-ng';
 
 export default angular.module('ps.config.highCharts', [
