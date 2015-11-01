@@ -32,6 +32,7 @@ export default {
     less : `${root}/${srcDirName}/**/*.less`,
     js : `${root}/${srcDirName}/**/!(*.spec).js`,
     fonts : `${root}/${srcDirName}/fonts/**/*.${fontsExtension}`,
-    projectFonts : `${root}/${srcDirName}/**/*.${fontsExtension}`
+    projectFonts : `${root}/${srcDirName}/**/*.${fontsExtension}`,
+    html : `${root}/${srcDirName}/**/*.html`
   }
 }

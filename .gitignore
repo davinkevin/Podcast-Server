@@ -11,3 +11,6 @@ target/
 build/
 /www/**/*.css
 jspm_packages/
+*.log
+lan.dk.podcastserver.*
+etc

@@ -74,6 +74,10 @@ System.config({
       "angular": "github:angular/bower-angular@1.4.7",
       "css": "github:systemjs/plugin-css@0.1.19"
     },
+    "github:davinkevin/AngularStompDK@0.3.2": {
+      "angular": "github:angular/bower-angular@1.4.7",
+      "stomp-websocket": "github:jmesnil/stomp-websocket@2.3.4"
+    },
     "github:distros/bootstrap-less@3.3.9": {
       "jquery": "github:components/jquery@2.1.4"
     },
