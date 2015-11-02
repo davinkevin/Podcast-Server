@@ -1,6 +1,7 @@
 /**
     * Created by kevin on 24/10/2015 for PodcastServer
     */
+import angular from 'angular';
 
 export default class SearchItemCache {
     constructor(DefaultItemSearchParameters, $sessionStorage) {
