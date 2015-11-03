@@ -3,7 +3,8 @@
  */
 
 import template from './search.html!text';
-import style from './search.css!';
+import './search.css!';
+import _ from 'lodash';
 
 export default class ItemSearchCtrl {
 

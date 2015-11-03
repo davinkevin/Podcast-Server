@@ -1,3 +1,12 @@
+.ps .item-search-list .search-bar {
+  margin-top: 12px;
+}
+.ps .item-search-list .search-bar tags-input {
+  width: 100%;
+}
+.ps .item-search-list .search-bar tags-input .host {
+  margin: 0;
+}
 .ps .item-search-list .pagination {
   margin-bottom: 0;
 }
