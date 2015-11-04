@@ -1,7 +1,7 @@
 /**
     * Created by kevin on 25/10/2015 for PodcastServer
     */
-
+import _ from 'lodash';
 import template from './edition.html!text';
 
 export default class podcastEditionCtrl {
@@ -41,6 +41,6 @@ export default class podcastEditionCtrl {
             controller : 'podcastEditionCtrl',
             controllerAs : 'pec',
             bindToController : true
-        }
+        };
     }
 }
