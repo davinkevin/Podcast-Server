@@ -3,6 +3,7 @@
     */
 
 import template from './episodes.html!text';
+import _ from 'lodash';
 
 export default class PodcastItemsListComponent {
 
