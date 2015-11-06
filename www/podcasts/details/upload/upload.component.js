@@ -3,6 +3,7 @@
  */
 
 import template from './upload.html!text';
+import angular from 'angular';
 
 export default class PodcastUploadComponent{
 
@@ -18,13 +19,11 @@ export default class PodcastUploadComponent{
             this.itemService.upload(this.podcast, file)
                 .then((item) => {
                     this.$scope.$emit("podcastEdition:upload");
-                    try {
-                        this.$notification('Upload effectué', {
-                            body: item.title,
-                            icon: item.cover.url,
-                            delay: 5000
-                        });
-                    } catch (e) {}
+                    this.$notification('Upload effectué', {
+                        body: item.title,
+                        icon: item.cover.url,
+                        delay: 5000
+                    });
                 });
         });
     }
@@ -39,7 +38,7 @@ export default class PodcastUploadComponent{
             controller : 'podcastUploadCtrl',
             controllerAs : 'puc',
             bindToController : true
-        }
+        };
     }
 }
 
