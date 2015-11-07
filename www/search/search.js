@@ -9,7 +9,7 @@ import ItemService from '../common/service/data/itemService';
 import TagService from '../common/service/data/tagService';
 import PlaylistService from '../common/service/playlistService';
 
-import SearchCtrl from './search.controller';
+import ItemSearchCtrl from './search.controller';
 import SearchItemCache from './searchitemcache.service';
 
 export default angular.module('ps.search', [
@@ -21,7 +21,7 @@ export default angular.module('ps.search', [
     TagService.name,
     PlaylistService.name
 ])
-    .config(SearchCtrl.routeConfig)
+    .config(ItemSearchCtrl.routeConfig)
     .constant('DefaultItemSearchParameters', {
         page : 0,
         size : 12,
@@ -31,5 +31,5 @@ export default angular.module('ps.search', [
         properties : 'pubdate',
         downloaded : "true"
     })
-    .controller('ItemsSearchCtrl', SearchCtrl)
+    .controller(ItemSearchCtrl.name, ItemSearchCtrl)
     .service("SearchItemCache", SearchItemCache);

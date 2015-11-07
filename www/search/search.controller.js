@@ -2,10 +2,29 @@
  * Created by kevin on 24/10/2015 for PodcastServer
  */
 
-import template from './search.html!text';
-import './search.css!';
+import {RouteConfig, View, HotKeys} from '../decorators';
 import _ from 'lodash';
+import './search.css!';
+import template from './search.html!text';
 
+@RouteConfig({
+    path : '/items',
+    as : 'isc',
+    reloadOnSearch : false,
+    resolve : {
+        items : (itemService, SearchItemCache) => {"ngInject"; return itemService.search(SearchItemCache.getParameters());}
+    }
+})
+@HotKeys({
+    useDefault : true,
+    hotKeys : [
+        ['right', 'Next page', 'isc.swipePage(1)'],
+        ['left', 'Previous page', 'isc.swipePage(-1)']
+    ]
+})
+@View({
+    template : template
+})
 export default class ItemSearchCtrl {
 
     constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, items) {
@@ -120,21 +139,5 @@ export default class ItemSearchCtrl {
         this.currentPage = 1;
         this.SearchItemCache.updateSearchParam(this.searchParameters);
         return this.changePage();
-    }
-
-    static routeConfig($routeProvider, commonKey) {
-        "ngInject";
-        $routeProvider.
-            when('/items', {
-                template: template,
-                controller: 'ItemsSearchCtrl',
-                controllerAs: 'isc',
-                reloadOnSearch: false,
-                hotkeys: [
-                    ['right', 'Next page', 'isc.swipePage(1)'],
-                    ['left', 'Previous page', 'isc.swipePage(-1)']
-                ].concat(commonKey),
-                resolve : { items : (itemService, SearchItemCache) => itemService.search(SearchItemCache.getParameters()) }
-            });
     }
 }

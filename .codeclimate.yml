@@ -3,3 +3,4 @@ languages:
 exclude_paths:
 - "src/main/resources/static/app/js/podcastserver.js"
 - "gulpfile.babel.js"
+- "gulp/**/*.js"
