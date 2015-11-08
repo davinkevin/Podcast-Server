@@ -1,7 +1,7 @@
 import angular from 'angular';
 import AppRouteConfig from '../config/route.config';
-import PodcastService from '../common/service/data/podcastService'
-import TypeService from '../common/service/data/typeService'
+import PodcastService from '../common/service/data/podcastService';
+import TypeService from '../common/service/data/typeService';
 import PodcastDetailsModule from './details/details';
 import PodcastCreationModule from './creation/creation';
 
@@ -14,5 +14,5 @@ export default angular.module('ps.podcasts', [
     PodcastService.name,
     TypeService.name
 ])
-    .controller('PodcastsListCtrl', PodcastsListCtrl)
+    .controller(PodcastsListCtrl.name, PodcastsListCtrl)
     .config(PodcastsListCtrl.routeConfig);

@@ -1,10 +1,22 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-
+import {RouteConfig, View, HotKeys} from '../decorators';
 import template from './podcasts.html!text';
 import './podcasts.css!';
 
+@RouteConfig({
+    path : '/podcasts',
+    as : 'plc',
+    resolve: {
+        podcasts: (podcastService) => {"ngInject"; return podcastService.findAll(); },
+        types: typeService => {"ngInject"; return typeService.findAll(); }
+    }
+})
+@HotKeys({})
+@View({
+    template : template
+})
 export default class PodcastsListCtrl {
     constructor(podcasts, types) {
         "ngInject";
@@ -14,20 +26,5 @@ export default class PodcastsListCtrl {
             title : '',
             type : ''
         };
-    }
-
-    static routeConfig($routeProvider, commonKey){
-        "ngInject";
-        $routeProvider.
-            when('/podcasts', {
-                template: template,
-                controller: 'PodcastsListCtrl',
-                controllerAs: 'plc',
-                hotkeys: commonKey,
-                resolve: {
-                    podcasts: podcastService => {"ngInject"; return podcastService.findAll()},
-                    types: typeService => {"ngInject"; return typeService.findAll() }
-                }
-            })
     }
 }

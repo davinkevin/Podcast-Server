@@ -26,7 +26,7 @@
         <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 thumb" ng-repeat="podcast in plc.podcasts | filter: plc.filters | orderBy:'-lastUpdate'">
             <a ng-href="/podcasts/{{ ::podcast.id }}" >
                 <img    class="img-responsive img-rounded" ng-src="{{ ::podcast.cover.url}}" width="200" height="200"
-                        notooltip-append-to-body="true" tooltip-placement="bottom" tooltip="{{ ::podcast.title }}"
+                        tooltip-append-to-body="true" tooltip-placement="bottom" uib-tooltip="{{ ::podcast.title }}"
                         />
             </a>
         </div>

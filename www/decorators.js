@@ -1,9 +1,9 @@
 /**
 * Created by kevin on 07/11/2015 for Podcast Server
 */
-import angular from 'angular';
+import _ from 'lodash';
 
-export function RouteConfig({ path, as, controller, reloadOnSearch, resolve}) {
+export function RouteConfig({ path, as = 'vm', controller, reloadOnSearch = true, resolve = {}}) {
     return Target => {
         if (!Target.$template) throw new TypeError("Template should be defined");
         if (!path) throw new TypeError("Path should be Defined");
@@ -14,9 +14,9 @@ export function RouteConfig({ path, as, controller, reloadOnSearch, resolve}) {
                 template: Target.$template,
                 hotkeys : Target.$hotKeys,
                 controller: controller || Target.name,
-                controllerAs : as || 'vm',
-                reloadOnSearch : angular.isDefined(reloadOnSearch) ? reloadOnSearch : true,
-                resolve : angular.isDefined(resolve) ? resolve : {}
+                controllerAs : as,
+                reloadOnSearch : reloadOnSearch,
+                resolve : resolve
             });
         };
     };
@@ -40,29 +40,30 @@ let defaultKeys = [
         window.location.href = '/download';
     }]
 ];
-export function HotKeys({useDefault, hotKeys}) {
-    return Target => {
-        Target.$hotKeys = useDefault ? hotKeys.concat(defaultKeys) : hotKeys;
+export function HotKeys({useDefault = true, hotKeys = []}) {
+    return Target =>  {
+        Target.$hotKeys = useDefault ? defaultKeys.concat(hotKeys) : hotKeys;
     };
 }
 
-export function Component({restrict, scope, as, bindToController, selector}) {
+export function Component({restrict = 'E', scope = true, as = 'vm', bindToController = true, replace = false, transclude = false, selector}) {
     return Target => {
         if (!Target.$template) throw new TypeError("A Template should be defined with the annotation @View");
         if (!selector) throw new TypeError("A selector should be defined in the current annotation @Component");
 
         Target.$componentName = snakeCaseToCamelCase(selector);
-
         Target.component = () => {
-            return {
-                restrict : restrict || 'E',
+            return _({
+                restrict : restrict,
+                transclude : transclude,
+                replace : replace,
                 template: Target.$template,
-                scope : angular.isDefined(scope) ? scope : true,
+                scope : scope,
                 controller : Target.name,
-                controllerAs : as || 'vm',
-                bindToController : angular.isDefined(bindToController) ? bindToController : true,
-                link : Target.link || angular.noop
-            };
+                controllerAs : as,
+                bindToController : bindToController,
+                link : Target.link
+            }).omit(_.isUndefined).value();
         };
     };
 }
