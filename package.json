@@ -81,12 +81,12 @@
       "stomp-websocket": "github:jmesnil/stomp-websocket@^2.3.4",
       "systemjs/plugin-text": "github:systemjs/plugin-text@^0.0.2",
       "text": "github:systemjs/plugin-text@^0.0.2",
-      "videogular": "github:2fdevs/bower-videogular@^1.3.2",
-      "videogular-buffering": "github:2fdevs/bower-videogular-buffering@^1.3.2",
-      "videogular-controls": "github:2fdevs/bower-videogular-controls@^1.3.2",
-      "videogular-overlay-play": "github:2fdevs/bower-videogular-overlay-play@^1.3.2",
-      "videogular-poster": "github:2fdevs/bower-videogular-poster@^1.3.2",
-      "videogular-themes-default": "github:2fdevs/bower-videogular-themes-default@^1.3.2"
+      "videogular": "github:videogular/bower-videogular@^1.3.2",
+      "videogular-buffering": "github:videogular/bower-videogular-buffering@^1.3.2",
+      "videogular-controls": "github:videogular/bower-videogular-controls@^1.3.2",
+      "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@^1.3.2",
+      "videogular-poster": "github:videogular/bower-videogular-poster@^1.3.2",
+      "videogular-themes-default": "github:videogular/bower-videogular-themes-default@^1.3.2"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.24",

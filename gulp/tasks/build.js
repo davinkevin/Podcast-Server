@@ -26,23 +26,25 @@ gulp.task('build:jspm', function(cal){
         });
 });
 
-gulp.task('build:js', () => {
-    return gulp.src(`${paths.release.root}/${paths.app.name}.js`)
+gulp.task('build:js', () =>
+    gulp.src(`${paths.release.root}/${paths.app.name}.js`)
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(ngAnnotate())
-        .pipe(uglify())
+        .pipe(uglify({
+            mangle : false
+        }))
         .pipe(rename({suffix : '.min'}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.release.root))
-});
+);
 
-gulp.task('build:css', () => {
-    return gulp.src(`${paths.releaseDir}/${paths.app.name}.css`)
+gulp.task('build:css', () =>
+    gulp.src(`${paths.releaseDir}/${paths.app.name}.css`)
         .pipe(minifyCSS())
         .pipe(replace(/url\([^\)]*jspm_packages[^\)]*\/fonts\/([^\)]*)\)/g, 'url(/fonts/$1)'))
         .pipe(rename({suffix : '.min'}))
         .pipe(gulp.dest(paths.release.root))
-});
+);
 
 gulp.task('build:index', () => {
     let sources = gulp.src(prodFiles, {read: false});
@@ -51,11 +53,11 @@ gulp.task('build:index', () => {
         .pipe(gulp.dest(paths.release.root))
 });
 
-gulp.task('build:fonts', () => {
+gulp.task('build:fonts', () =>
     gulp.src([paths.jspm.fonts, paths.glob.projectFonts, '!'+paths.glob.fonts])
         .pipe(flatten())
-        .pipe(gulp.dest(paths.release.fonts));
-});
+        .pipe(gulp.dest(paths.release.fonts))
+);
 
 gulp.task('build:pre-clean', (cb) =>
         del([`${paths.release.root}/**/*`, `!${paths.release.root}/.keep`], cb)
