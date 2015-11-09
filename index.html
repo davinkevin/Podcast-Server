@@ -116,13 +116,18 @@
         <h1 class="page-header">Installation</h1>
         <p>This application is built with Maven (maybe Gradle soon) and uses a lot of embeddebale stack (Embedded Database, Embedded Container, Embedded Message Queuing Server...) limiting the dependancy...</p>
         <p>So, to test the application you just have to clone the repo and launch it with the embedded Tomcat Server</p>
-        <pre>$ git clone https://github.com/davinkevin/Podcast-Server.git
-$ cd Podcast-Server/ && mvn clean install tomcat7:run-war-only</pre>
-        <p>If you want to tweak the application, you have to create an application.properties (based upon <a href="https://github.com/davinkevin/Podcast-Server/blob/master/src/test/resources/application.properties">application-example.properties</a> template) to change the default value of the application</p>
-        <pre>db.driver=com.mysql.jdbc.Driver
-db.url=jdbc:mysql://YOUR_DOMAIN_NAME/YOUR_DATABASE
-db.username=MY_DATABASE_USER
-db.password=MY_PASSWORD
+        <pre>
+$ git clone https://github.com/davinkevin/Podcast-Server.git
+$ cd Podcast-Server/ && mvn clean install && cd target
+$ java -jar Podcast-Server.jar</pre>
+        <p>If you want to tweak the application, you have to create an application.properties (or yml) (based upon <a href="https://github.com/davinkevin/Podcast-Server/blob/master/src/main/resources/application.yml">application-example.yml</a> template) to change the default value of the application</p>
+        <pre>
+spring :
+    datasource:
+        url: jdbc:h2:exampledb
+        username: foo
+        password: bar
+        driver-class-name: org.h2.Driver
         ...</pre>
     </div>
     <div id="compatibility">
@@ -241,8 +246,9 @@ db.password=MY_PASSWORD
         <p>I really want to improve this application, so this enhancement is a kind of roadmap...</p>
         <ul>
             <li>Keep the framework up-to-date (Spring, Hibernate... )</li>
-            <li>Adding more jUnit test (I was really lazy in the past about that subject)</li>
+            <li>Adding more jUnit test</li>
             <li>Create new Worker / Downloader to support other source and other protocol</li>
+            <li>Anticipate the migration to Angular 2 by using better front-end tools | elements ( JSPM, Decorator...)</li>
             <li>And more... (keeping this page updated !!) --> <a href="https://github.com/davinkevin/Podcast-Server/issues">Goto Issue List</a></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Data-visualisation of the podcast Server (number of download, by type, by podcast...</del></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Adding a video player and a playlist manager</del></li>
@@ -276,7 +282,9 @@ db.password=MY_PASSWORD
                     { id: "hibernate", name: "Hibernate ORM", image: "img/framework/hibernate.png", description: '<p>Hibernate ORM enables developers to more easily write applications whose data outlives the application process. As an Object/Relational Mapping (ORM) framework, Hibernate is concerned with data persistence as it applies to relational databases (via JDBC). Unfamilar with the notion of ORM? <a href="/orm/what-is-an-orm/">Read here</a>.</p>', link : "http://hibernate.org/orm/" },
                     { id: "hibernate-search", name:"Hibernate Search", image:"img/framework/hibernate-search.png", description: '<p>Hibernate Search transparently indexes your objects and offers fast regular, full-text and geolocation search. Ease of use and easy clustering are core</p>'},
                     { id: "springBoot", name: "Spring Boot", image: "img/framework/spring-boot.png", description: '<p>Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run". We take an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration</p>', link : "http://spring.io/" },
+                    { id: "es2015", name: "EcmasScript 2015+", image: "img/framework/ecmascript2015.png", description: 'In the July 2008 announcement, Eich also stated that the ECMAScript 4 proposal would be superseded by a new project, code-named ECMAScript Harmony. ECMAScript Harmony names the agreed upon design trajectory of post-ES5 editions. It will include syntactic extensions, but the changes will be more modest than ECMAScript 4 in both semantic and syntactic innovation. Packages, namespaces, and early binding from ECMAScript 4 are no longer included for planned releases. In addition, other goals and ideas from ECMAScript 4 are being rephrased to keep consensus in the committee; these include a notion of classes based on ECMAScript, 5th Edition (being an update to ECMAScript, 3rd edition). Drafts of ES.next have been published periodically since July 2011 and was finalized in June 2015', link : "https://en.wikipedia.org/wiki/ECMAScript" },
                     { id: "angular", name: "AngularJS", image: "img/framework/angular.png", description: 'HTML is great for declaring static documents, but it falters when we try to use it for declaring dynamic views in web-applications. AngularJS lets you extend HTML vocabulary for your application. The resulting environment is extraordinarily expressive, readable, and quick to develop.', link : "http://angularjs.org/" },
+                    { id: "jspm", name: "JSPM", image: "img/framework/jspm.png", description: '<ul><li><p>jspm is a package manager for the <a href="https://github.com/systemjs/systemjs">SystemJS universal module loader</a>, built on top of the dynamic <a href="https://github.com/ModuleLoader/es6-module-loader">ES6 module loader</a></p></li><li><p>Load any module format (ES6, AMD, CommonJS and globals) directly from any registry such as <code>npm</code> and <code>GitHub</code> with flat versioned dependency management. Any custom registry endpoints can be created through the Registry API.</p></li><li><p>For development, load modules as separate files with ES6 and plugins compiled in the browser.</p></li><li><p>For production (or development too), optimize into a bundle, layered bundles or a self-executing bundle with a single command.</p></li></ul>', link : "http://jspm.io/" },
                     { id: "bootstrap", name: "Twitter Bootstrap", image: "img/framework/TwitterBootstrap.png", description: '<h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2><p class="lead">Bootstrap makes front-end web development faster and easier. It\'s made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>', link : "http://getbootstrap.com/" },
                     { id: "intelliJ", name: "Developped with <strong>IntelliJ IDEA</strong>", image: "img/framework/IntelliJ.png", description: '<h2 class="center-align">The Most Intelligent IDE<br>for the Java Platform</h2><div class="blockcenter block75"><p class="intr -color center-align">Out of the box, IntelliJ IDEA provides a comprehensive feature set including tools and integrations with the most important modern technologies and frameworks for enterprise and web development with <strong>Java, Scala, Groovy</strong> and other languages.</p></div>', link : "http://www.jetbrains.com/idea/" }
                 ];
