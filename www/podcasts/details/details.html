@@ -25,20 +25,20 @@
 
 <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
 
-    <tabset>
-        <tab heading="{{ pdc.podcastTabs[0].heading }}" active="pdc.podcastTabs[0].active" >
+    <uib-tabset>
+        <uib-tab heading="{{ pdc.podcastTabs[0].heading }}" active="pdc.podcastTabs[0].active" >
             <podcast-items-list podcast="pdc.podcast"></podcast-items-list>
-        </tab>
-        <tab heading="{{ pdc.podcastTabs[1].heading }}" active="pdc.podcastTabs[1].active" >
+        </uib-tab>
+        <uib-tab heading="{{ pdc.podcastTabs[1].heading }}" active="pdc.podcastTabs[1].active" >
             <podcast-edition podcast="pdc.podcast"></podcast-edition>
-        </tab>
-        <tab heading="{{ pdc.podcastTabs[2].heading }}" ng-hide="pdc.podcastTabs[2].disabled" active="pdc.podcastTabs[2].active" disable="pdc.podcastTabs[2].disabled">
+        </uib-tab>
+        <uib-tab heading="{{ pdc.podcastTabs[2].heading }}" ng-if="!pdc.podcastTabs[2].disabled" active="pdc.podcastTabs[2].active" disable="pdc.podcastTabs[2].disabled">
             <podcast-upload podcast="pdc.podcast"></podcast-upload>
-        </tab>
-        <tab heading="{{ pdc.podcastTabs[3].heading }}" ng-hide="pdc.podcastTabs[3].disabled" active="pdc.podcastTabs[3].active" disable="pdc.podcastTabs[3].disabled" select="pdc.chartReflow()">
+        </uib-tab>
+        <uib-tab heading="{{ pdc.podcastTabs[3].heading }}" ng-if="!pdc.podcastTabs[3].disabled" active="pdc.podcastTabs[3].active" disable="pdc.podcastTabs[3].disabled" select="pdc.chartReflow()">
             <podcast-stats podcast="pdc.podcast"></podcast-stats>
-        </tab>
-    </tabset>
+        </uib-tab>
+    </uib-tabset>
 
 
 </div>

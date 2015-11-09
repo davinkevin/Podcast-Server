@@ -1,5 +1,17 @@
+import {RouteConfig, View, HotKeys} from '../../decorators';
 import template from './details.html!text';
 
+@RouteConfig({
+    path : '/podcasts/:podcastId',
+    as : 'pdc',
+    resolve : {
+        podcast: (podcastService, $route) => {"ngInject"; return podcastService.findById($route.current.params.podcastId);}
+    }
+})
+@HotKeys({})
+@View({
+    template : template
+})
 export default class PodcastDetailCtrl {
 
     constructor($scope, podcast, UpdateService, $timeout){
@@ -46,19 +58,4 @@ export default class PodcastDetailCtrl {
     isUpdatable() {
         return this.podcast.isUpdatable();
     }
-
-    static routeConfig($routeProvider, commonKey) {
-        "ngInject";
-        $routeProvider
-            .when('/podcasts/:podcastId', {
-                template: template,
-                controller: 'PodcastDetailCtrl',
-                controllerAs: 'pdc',
-                hotkeys: commonKey,
-                resolve: {
-                    podcast: (podcastService, $route) => podcastService.findById($route.current.params.podcastId)
-                }
-            })
-    }
-
 }
