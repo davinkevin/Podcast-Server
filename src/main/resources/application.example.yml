@@ -1,0 +1,73 @@
+##############################
+# Database and Lucene Config #
+##############################
+
+spring :
+    datasource:
+        url: jdbc:h2:exampledb
+        username: foo
+        password: bar
+        driver-class-name: org.h2.Driver
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        hibernate :
+            ddl-auto: update
+        properties :
+            hibernate:
+                search.default:
+                        indexmanager: near-real-time
+                        directory_provider: ram
+                        indexBase: /tmp/lucene
+
+##############################
+#    Application Specific    #
+##############################
+
+podcastserver:
+    rootfolder: /Users/kevin/Tomcat/podcast/
+    concurrent-download: 3
+    max-update-parallels: 3
+    cover-default-name: cover
+    number-of-day-to-download: 1
+    number-of-try: 10
+    #server-url: http://192.168.1.203:8080
+    #file-container: ${podcastserver.server-url}/podcast
+    #download-extension: .psdownload
+    #rss-default-number-item: 50
+    update-and-download:
+        refresh:
+            cron: 0 0 0 * * ?
+    externaltools:
+        #rtmpdump: /usr/local/bin/rtmpdump
+        #ffmpeg: /usr/bin/ffmpeg
+
+
+##############################
+#          Actuator          #
+##############################
+
+management:
+    context-path: /system
+
+endpoints:
+    health:
+        sensitive : false
+
+logging:
+    path: /tmp/podcastserver.log
+    level:
+        #lan.dk.podcastserver : DEBUG
+        #org.hibernate.type: TRACE
+        #org.springframework.web.socket: TRACE
+
+multipart:
+    max-file-size: 512MB
+    max-request-size: 512MB
+    location : /tmp/
+
+#server:
+#    port: 8443
+#    ssl:
+#        key-store: /private/tmp/ssl/keystore.jks
+#        key-store-password: a
+#        key-password: a
