@@ -1,9 +1,18 @@
 /**
- * Created by kevin on 25/10/2015.
+ * Created by kevin on 25/10/2015 for Podcast Server
  */
-
+import {RouteConfig, View, HotKeys} from '../decorators';
+import _ from 'lodash';
 import template from './player.html!text';
 
+@RouteConfig({
+    path : '/player',
+    as : 'pc'
+})
+@HotKeys({})
+@View({
+    template : template
+})
 export default class PlayerController {
     constructor(playlistService, $timeout, deviceDetectorService) {
         "ngInject";
@@ -79,15 +88,5 @@ export default class PlayerController {
 
     getIndexOfVideoInPlaylist(item) {
         return this.playlist.indexOf(item);
-    }
-
-    static routeConfig($routeProvider) {
-        "ngInject";
-        $routeProvider.
-            when('/player', {
-                template: template,
-                controller: 'PlayerController',
-                controllerAs: 'pc'
-            });
     }
 }

@@ -4,7 +4,8 @@ import AppRouteConfig from '../config/route.config';
 import DeviceDetectionService from '../common/component/device-detection/device-detection';
 import PlaylistService from '../common/service/playlistService';
 
-import PlayerCtrl from './player.controller';
+import PlayerController from './player.controller';
+import './player.css!';
 
 export default angular.module('ps.player', [
     AppVideogularConfig.name,
@@ -12,5 +13,5 @@ export default angular.module('ps.player', [
     DeviceDetectionService.name,
     PlaylistService.name
 ])
-    .config(PlayerCtrl.routeConfig)
-    .controller('PlayerController', PlayerCtrl);
+    .config(PlayerController.routeConfig)
+    .controller(PlayerController.name, PlayerController);
