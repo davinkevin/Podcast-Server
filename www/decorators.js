@@ -13,7 +13,7 @@ export function RouteConfig({ path, as = 'vm', controller, reloadOnSearch = true
             $routeProvider.when(path, {
                 template: Target.$template,
                 hotkeys : Target.$hotKeys,
-                controller: controller || Target.name,
+                controller: Target,
                 controllerAs : as,
                 reloadOnSearch : reloadOnSearch,
                 resolve : resolve
@@ -59,7 +59,7 @@ export function Component({restrict = 'E', scope = true, as = 'vm', bindToContro
                 replace : replace,
                 template: Target.$template,
                 scope : scope,
-                controller : Target.name,
+                controller : Target,
                 controllerAs : as,
                 bindToController : bindToController,
                 link : Target.link

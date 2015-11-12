@@ -30,9 +30,7 @@ gulp.task('build:js', () =>
     gulp.src(`${paths.release.root}/${paths.app.name}.js`)
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(ngAnnotate())
-        .pipe(uglify({
-            mangle : false
-        }))
+        .pipe(uglify())
         .pipe(rename({suffix : '.min'}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.release.root))

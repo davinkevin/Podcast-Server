@@ -31,5 +31,5 @@ export default angular.module('ps.search', [
         properties : 'pubdate',
         downloaded : "true"
     })
-    .controller(ItemSearchCtrl.name, ItemSearchCtrl)
+    /*.controller(ItemSearchCtrl.name, ItemSearchCtrl)*/
     .service("SearchItemCache", SearchItemCache);
