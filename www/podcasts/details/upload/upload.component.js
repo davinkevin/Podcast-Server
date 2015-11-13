@@ -1,10 +1,20 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-
-import template from './upload.html!text';
 import angular from 'angular';
+import {Component, View} from '../../../decorators';
+import template from './upload.html!text';
 
+@Component({
+    selector : 'podcast-upload',
+    bindToController : {
+        podcast : '='
+    },
+    as : 'puc'
+})
+@View({
+    template : template
+})
 export default class PodcastUploadComponent{
 
     constructor($scope, itemService, $notification) {
@@ -26,19 +36,6 @@ export default class PodcastUploadComponent{
                     });
                 });
         });
-    }
-
-    static component() {
-        return {
-            restrict : 'E',
-            template : template,
-            scope : {
-                podcast : '='
-            },
-            controller : 'podcastUploadCtrl',
-            controllerAs : 'puc',
-            bindToController : true
-        };
     }
 }
 

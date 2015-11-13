@@ -10,5 +10,4 @@ export default angular.module('ps.podcasts.details.upload', [
     AngularNotification.name,
     ItemService.name
 ])
-    .directive('podcastUpload', PodcastUploadComponent.component)
-    .controller('podcastUploadCtrl', PodcastUploadComponent);
+    .directive(PodcastUploadComponent.$componentName, PodcastUploadComponent.component);

@@ -14,5 +14,4 @@ export default angular.module('ps.podcasts', [
     PodcastService.name,
     TypeService.name
 ])
-    .controller(PodcastsListCtrl.name, PodcastsListCtrl)
     .config(PodcastsListCtrl.routeConfig);

@@ -15,5 +15,4 @@ export default angular.module('ps.podcasts.details', [
     AppRouteConfig.name,
     UpdateService.name
 ])
-    .config(PodcastDetailCtrl.routeConfig)
-    .controller(PodcastDetailCtrl.name, PodcastDetailCtrl);
+    .config(PodcastDetailCtrl.routeConfig);

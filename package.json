@@ -95,9 +95,9 @@
     },
     "overrides": {
       "github:davinkevin/AngularStompDK@0.3.2": {
-        "main": "dist/angular-stomp.min",
+        "main": "dist/angular-stomp",
         "shim": {
-          "dist/angular-stomp.min": {
+          "dist/angular-stomp": {
             "deps": [
               "angular",
               "stomp-websocket"
