@@ -7,6 +7,6 @@ export default angular.module('ps.podcasts.details.episodes', [
     PlaylistService.name,
     HtmlFilters.name
 ])
-    .directive('podcastItemsList', PodcastItemsListComponent.component)
+    .directive(PodcastItemsListComponent.$componentName, PodcastItemsListComponent.component)
     .constant('PodcastItemPerPage', 10)
-    .controller('PodcastItemsListCtrl', PodcastItemsListComponent);
+    /*.controller(PodcastItemsListComponent.name, PodcastItemsListComponent)*/;

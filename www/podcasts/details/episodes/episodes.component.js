@@ -1,10 +1,20 @@
 /**
     * Created by kevin on 25/10/2015 for PodcastServer
     */
-
+import {Component, View} from '../../../decorators';
 import template from './episodes.html!text';
 import _ from 'lodash';
 
+@Component({
+    selector : 'podcast-items-list',
+    bindToController : {
+        podcast : '='
+    },
+    as : 'pic'
+})
+@View({
+    template : template
+})
 export default class PodcastItemsListComponent {
 
     constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService ) {
@@ -83,16 +93,5 @@ export default class PodcastItemsListComponent {
     }
     toggleDownload(item) {
         this.DownloadManager.ws.toggle(item);
-    }
-
-    static component() {
-        return {
-            restrict : 'E',
-            template : template,
-            scope : { podcast : '=' },
-            controller : 'PodcastItemsListCtrl',
-            controllerAs : 'pic',
-            bindToController : true
-        };
     }
 }

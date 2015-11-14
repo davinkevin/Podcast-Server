@@ -18,8 +18,8 @@
             <button ng-click="pic.remove(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
 
             <!-- Menu complémentaire -->
-            <div class="btn-group" dropdown is-open="isopen">
-                <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
+            <div class="btn-group" uib-dropdown is-open="isopen">
+                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
                     <li ng-show="item.isDownloaded"><a target="_self" ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
                     <li ng-show="item.isDownloaded">
@@ -48,7 +48,7 @@
     </div>
 
     <div ng-show="pic.podcast.totalItems > pic.itemPerPage" class="text-center">
-        <pagination items-per-page="pic.itemPerPage" max-size="10" boundary-links="true" total-items="pic.podcast.totalItems" ng-model="pic.currentPage" ng-change="pic.loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+        <uib-pagination items-per-page="pic.itemPerPage" max-size="10" boundary-links="true" total-items="pic.podcast.totalItems" ng-model="pic.currentPage" ng-change="pic.loadPage()" class="pagination pagination-centered" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
     </div>
 </div>
 
