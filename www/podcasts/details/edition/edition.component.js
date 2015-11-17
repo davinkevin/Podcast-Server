@@ -1,10 +1,21 @@
 /**
     * Created by kevin on 25/10/2015 for PodcastServer
     */
+import {Component, View} from '../../../decorators';
 import _ from 'lodash';
 import template from './edition.html!text';
 
-export default class podcastEditionCtrl {
+@Component({
+    selector : 'podcast-edition',
+    bindToController : {
+        podcast : '='
+    },
+    as : 'pec'
+})
+@View({
+    template : template
+})
+export default class PodcastEditionCtrl {
     constructor($scope, $location, tagService, podcastService) {
         "ngInject";
         this.$scope = $scope;
@@ -31,16 +42,5 @@ export default class podcastEditionCtrl {
         return this.podcastService
             .deletePodcast(this.podcast)
             .then(() => this.$location.path('/podcasts'));
-    }
-    
-    static component() {
-        return {
-            restrict : 'E',
-            template : template,
-            scope : { podcast : '=' },
-            controller : 'podcastEditionCtrl',
-            controllerAs : 'pec',
-            bindToController : true
-        };
     }
 }

@@ -1,6 +1,6 @@
 <br/>
-<accordion close-others="true">
-    <accordion-group heading="Podcast" is-open="true">
+<uib-accordion close-others="true">
+    <uib-accordion-group heading="Podcast" is-open="true">
         <form class="form-horizontal" role="form">
             <div class="form-group">
                 <label for="title" class="col-sm-2 control-label">Titre</label>
@@ -46,8 +46,8 @@
                 </div>
             </div>
         </form>
-    </accordion-group>
-    <accordion-group heading="Cover">
+    </uib-accordion-group>
+    <uib-accordion-group heading="Cover">
         <form class="form-horizontal" role="form">
             <div class="form-group">
                 <label for="cover-url" class="col-sm-2 control-label">URL</label>
@@ -74,10 +74,10 @@
                 </div>
             </div>
         </form>
-    </accordion-group>
-    <accordion-group heading="Actions">
+    </uib-accordion-group>
+    <uib-accordion-group heading="Actions">
         <button type="button" class="btn btn-warning" ng-click="pec.deletePodcast()">
             <span class="glyphicon glyphicon-trash"></span> Delete
         </button>
-    </accordion-group>
-</accordion>
+    </uib-accordion-group>
+</uib-accordion>
