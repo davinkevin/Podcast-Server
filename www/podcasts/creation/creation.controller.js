@@ -1,9 +1,21 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-
+import {RouteConfig, View, HotKeys} from '../../decorators';
+import angular from 'angular';
 import template from './creation.html!text';
 
+@RouteConfig({
+    path : '/podcast-creation',
+    as : 'pac',
+    resolve : {
+        types : typeService => {"ngInject"; return typeService.findAll();}
+    }
+})
+@HotKeys({})
+@View({
+    template : template
+})
 export default class PodcastCreationController {
 
     constructor($location, defaultPodcast, tagService, podcastService, types) {
@@ -55,20 +67,5 @@ export default class PodcastCreationController {
         this.podcastService.save(this.podcast)
             .then((podcast) => this.$location.path('/podcasts/' + podcast.id));
     }
-
-    static routeConfig($routeProvider, commonKey) {
-        "ngInject";
-        $routeProvider
-            .when('/podcast-creation', {
-                template: template,
-                controller: 'PodcastAddCtrl',
-                controllerAs: 'pac',
-                hotkeys: commonKey,
-                resolve : {
-                    types : typeService => typeService.findAll()
-                }
-            });
-    }
-
 }
 

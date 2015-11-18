@@ -5,7 +5,7 @@ import PodcastService from '../../common/service/data/podcastService';
 import TypeService from '../../common/service/data/typeService';
 import TagService from '../../common/service/data/tagService';
 
-import PodcastCreationCtrl from './creation.controller';
+import PodcastCreationController from './creation.controller';
 
 export default angular.module('ps.podcasts.creation', [
     AppRouteConfig.name,
@@ -14,6 +14,6 @@ export default angular.module('ps.podcasts.creation', [
     TypeService.name,
     TagService.name
 ])
-    .config(PodcastCreationCtrl.routeConfig)
+    .config(PodcastCreationController.routeConfig)
     .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })
-    .controller('PodcastAddCtrl', PodcastCreationCtrl);
+    /*.controller(PodcastCreationController.name, PodcastCreationController);*/
