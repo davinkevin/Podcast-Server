@@ -22,7 +22,7 @@ public class PodcastServerParametersTest {
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
                 .hasServerUrl("http://localhost:8080")
-                .hasDownloadExtention(".psdownload");
+                .hasDownloadExtension(".psdownload");
 
         assertThat(parameters.rootFolder())
                 .isEqualTo(Paths.get(ROOT_FOLDER));
@@ -63,7 +63,7 @@ public class PodcastServerParametersTest {
         parameters.setServerUrl("http://localhost:9191");
         parameters.setFileContainer("http://localhost:9191/podcast");
         parameters.setCoverDefaultName("default");
-        parameters.setDownloadExtention(".pdownload");
+        parameters.setDownloadExtension(".pdownload");
         parameters.setMaxUpdateParallels(5);
         parameters.setConcurrentDownload(5);
         parameters.setNumberOfTry(20);
@@ -74,7 +74,7 @@ public class PodcastServerParametersTest {
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
                 .hasServerUrl("http://localhost:9191")
-                .hasDownloadExtention(".pdownload");
+                .hasDownloadExtension(".pdownload");
 
         assertThat(parameters.rootFolder())
                 .isEqualTo(Paths.get(ROOT_FOLDER));

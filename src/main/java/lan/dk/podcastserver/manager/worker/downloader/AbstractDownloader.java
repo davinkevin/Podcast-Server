@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import lan.dk.podcastserver.business.ItemBusiness;
-import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FileUtils;
@@ -34,14 +34,12 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected String temporaryExtension;
     protected File target = null;
 
+    @Resource protected PodcastRepository podcastRepository;
+    @Resource protected ItemRepository itemRepository;
     @Resource protected ItemDownloadManager itemDownloadManager;
-    @Resource protected PodcastBusiness podcastBusiness;
-    @Resource protected ItemBusiness itemService;
     @Resource protected PodcastServerParameters podcastServerParameters;
     @Resource protected SimpMessagingTemplate template;
     @Resource protected MimeTypeService mimeTypeService;
-
-
 
     protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
@@ -173,8 +171,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Transactional
     protected Item saveSyncWithPodcast() {
         try {
-            this.item.setPodcast(podcastBusiness.findOne(this.item.getPodcast().getId()));
-            return itemService.save(this.item);
+            this.item.setPodcast(podcastRepository.findOne(this.item.getPodcast().getId()));
+            return itemRepository.save(this.item);
         } catch (Exception e) {
             logger.error("Error during save and Sync of the item {}", this.item, e);
             return new Item();
@@ -193,6 +191,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     
     @PostConstruct
     public void postConstruct() {
-        this.temporaryExtension = podcastServerParameters.getDownloadExtention();
+        this.temporaryExtension = podcastServerParameters.getDownloadExtension();
     }
 }
