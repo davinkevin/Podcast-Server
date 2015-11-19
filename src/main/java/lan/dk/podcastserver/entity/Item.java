@@ -30,6 +30,7 @@ public class Item implements Serializable {
 
     public static Path rootFolder;
     public static String fileContainer;
+    public static Item DEFAULT_ITEM = new Item();
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -235,6 +236,7 @@ public class Item implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Item)) return false;
+        if (this == DEFAULT_ITEM && o != DEFAULT_ITEM || this != DEFAULT_ITEM && o == DEFAULT_ITEM) return false;
 
         Item item = (Item) o;
 
@@ -246,7 +248,6 @@ public class Item implements Serializable {
         }
 
         return StringUtils.equals(getLocalUrl(), item.getLocalUrl());
-
     }
 
     @Override

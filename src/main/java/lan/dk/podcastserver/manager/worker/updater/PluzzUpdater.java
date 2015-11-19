@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by kevin on 09/08/2014 for Podcast Server
@@ -62,11 +62,12 @@ public class PluzzUpdater extends AbstractUpdater {
 
         // get from right panel
         Elements listOfEpisodes = page.select(JSOUP_ITEM_SELECTOR);
-        items.addAll(
-                listOfEpisodes.select("a.row")
+        List<Item> itemList = listOfEpisodes.select("a.row")
                 .stream()
                 .map(element -> getPluzzItemByUrl(element.attr("href")))
-                .collect(toSet())
+                .collect(toList());
+        items.addAll(
+                itemList
         );
 
         return items;
@@ -85,7 +86,7 @@ public class PluzzUpdater extends AbstractUpdater {
         String urlContainingId = page.select("meta[name=og:image]").attr("content");
         Matcher m = ID_PLUZZ_MAIN_PAGE_PATTERN.matcher(urlContainingId);
         if (!m.find()) {
-            return new Item();
+            return Item.DEFAULT_ITEM;
         }
         return getPluzzItemById(m.group(1));
     }
@@ -110,7 +111,7 @@ public class PluzzUpdater extends AbstractUpdater {
         String pluzzId = getPluzzId(url);
 
         if (pluzzId.isEmpty())
-            return new Item();
+            return Item.DEFAULT_ITEM;
 
         return getPluzzItemById(pluzzId);
     }
@@ -138,7 +139,7 @@ public class PluzzUpdater extends AbstractUpdater {
             logger.error("Error during getPluzzItemById", e);
         }
 
-        return new Item();
+        return Item.DEFAULT_ITEM;
     }
 
     @SuppressWarnings("unchecked")
