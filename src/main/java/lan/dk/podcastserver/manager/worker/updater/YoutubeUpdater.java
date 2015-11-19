@@ -1,23 +1,30 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.UrlService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.output.XMLOutputter;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
@@ -26,21 +33,94 @@ import static java.util.stream.Collectors.toSet;
 @Component("YoutubeUpdater")
 public class YoutubeUpdater extends AbstractUpdater {
 
-    private static final String CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
-    private static final String PLAYLIST_RSS_PART = "www.youtube.com/feeds/videos.xml?playlist_id";
     private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+
+    private static final String CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
+    private static final String PLAYLIST_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?playlist_id=%s";
+    private static final String PLAYLIST_URL_PART = "www.youtube.com/playlist?list=";
     private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
+    private static final String API_PLAYLIST_URL = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=%s&key=%s";
 
     @Resource JdomService jdomService;
     @Resource HtmlService htmlService;
+    @Resource UrlService urlService;
+    private JSONParser parser = new JSONParser();
+
 
     public Set<Item> getItems(Podcast podcast) {
+        return Strings.isNullOrEmpty(podcastServerParameters.api().youtube())
+                ? getItemsByRss(podcast)
+                : getItemsByAPI(podcast);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<Item> getItemsByAPI(Podcast podcast) {
+        logger.info("Youtube Update by API");
+
+        String playlistId = isPlaylist(podcast.getUrl()) ? playlistIdOf(podcast.getUrl()) : transformChannelIdToPlaylistId(channelIdOf(podcast.getUrl()));
+        String url = String.format(API_PLAYLIST_URL, playlistId, podcastServerParameters.api().youtube());
+        JSONObject response;
+        try {
+            response = JSONObject.class.cast(parser.parse(urlService.getReaderFromURL(url)));
+        } catch (ParseException | IOException e) {
+            logger.error("Error during fetching of API Playlist", e);
+            return Sets.newHashSet();
+        }
+
+        return ((List<JSONObject>) response.get("items"))
+                .stream()
+                .map(this::generateItemFromJson)
+                .collect(toSet());
+    }
+
+    private String transformChannelIdToPlaylistId(String channelId) {
+        return channelId.startsWith("UC") ? channelId.replaceFirst("UC", "UU") : channelId;
+    }
+
+    private Item generateItemFromJson(JSONObject item) {
+        JSONObject snippet = JSONObject.class.cast(item.get("snippet"));
+        JSONObject resourceId = JSONObject.class.cast(snippet.get("resourceId"));
+        return new Item()
+                .setTitle(snippet.get("title").toString())
+                .setDescription(snippet.get("description").toString())
+                .setPubdate(pubdateOf(snippet.get("publishedAt").toString()))
+                .setUrl(String.format(URL_PAGE_BASE, resourceId.get("videoId")))
+                .setCover(coverFromJson(((JSONObject) snippet.get("thumbnails"))));
+    }
+
+    private Cover coverFromJson(JSONObject thumbnails) {
+        return getBetterThumbnails(thumbnails)
+                .map(c -> new Cover(c.get("url").toString(), Integer.valueOf(c.get("width").toString()), Integer.valueOf(c.get("height").toString())))
+                .orElse(new Cover());
+    }
+
+    private Optional<JSONObject> getBetterThumbnails(JSONObject thumbnails) {
+        if (thumbnails.containsKey("maxres"))
+            return Optional.of((JSONObject) thumbnails.get("maxres"));
+
+        if (thumbnails.containsKey("standard"))
+            return Optional.of((JSONObject) thumbnails.get("standard"));
+
+        if (thumbnails.containsKey("high"))
+            return Optional.of((JSONObject) thumbnails.get("high"));
+
+        if (thumbnails.containsKey("medium"))
+            return Optional.of((JSONObject) thumbnails.get("medium"));
+
+        if (thumbnails.containsKey("default"))
+            return Optional.of((JSONObject) thumbnails.get("default"));
+
+        return Optional.empty();
+    }
+
+    private Set<Item> getItemsByRss(Podcast podcast) {
+        logger.info("Youtube Update by RSS");
         Document podcastXMLSource;
         try {
             podcastXMLSource = xmlOf(podcast.getUrl());
         } catch (JDOMException | IOException e) {
             logger.error("Error during youtube parsing", e);
-            return new HashSet<>();
+            return Sets.newHashSet();
         }
 
         Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
@@ -51,6 +131,18 @@ public class YoutubeUpdater extends AbstractUpdater {
                 .stream()
                 .map(elem -> generateItemFromElement(elem, defaultNamespace))
                 .collect(toSet());
+    }
+
+    @Override
+    public String signatureOf(Podcast podcast) {
+        try {
+            Document podcastXMLSource = xmlOf(podcast.getUrl());
+            return signatureService.generateMD5Signature(new XMLOutputter().outputString(podcastXMLSource.getRootElement()));
+        } catch (JDOMException | IOException e) {
+            logger.error("Error during youtube signature & parsing", e);
+            return "";
+        }
+
     }
 
     private Item generateItemFromElement(Element entry, Namespace defaultNamespace) {
@@ -68,7 +160,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     private Cover coverOf(Element thumbnail) {
-        return thumbnail != null
+        return nonNull(thumbnail)
                 ? new Cover(thumbnail.getAttributeValue("url"), Integer.valueOf(thumbnail.getAttributeValue("width")), Integer.valueOf(thumbnail.getAttributeValue("height")))
                 : null;
     }
@@ -78,32 +170,23 @@ public class YoutubeUpdater extends AbstractUpdater {
         return String.format(URL_PAGE_BASE, idVideo);
     }
 
-    @Override
-    public String signatureOf(Podcast podcast) {
-        try {
-            Document podcastXMLSource = xmlOf(podcast.getUrl());
-            return signatureService.generateMD5Signature(new XMLOutputter().outputString(podcastXMLSource.getRootElement()));
-        } catch (JDOMException | IOException e) {
-            logger.error("Error during youtube signature & parsing", e);
-            return "";
-        }
-
-    }
-
     private Document xmlOf(String url) throws JDOMException, IOException {
         if (isPlaylist(url)) {
-            return jdomService.parse(url);
+            return jdomService.parse(String.format(PLAYLIST_RSS_BASE, playlistIdOf(url)));
         }
 
-        String channelId = getChannelId(url);
-        return jdomService.parse(String.format(CHANNEL_RSS_BASE, channelId));
+        return jdomService.parse(String.format(CHANNEL_RSS_BASE, channelIdOf(url)));
+    }
+
+    private String playlistIdOf(String url) {
+        return StringUtils.substringAfter(url, "list=");
     }
 
     private Boolean isPlaylist(String url) {
-        return nonNull(url) && url.contains(PLAYLIST_RSS_PART);
+        return nonNull(url) && url.contains(PLAYLIST_URL_PART);
     }
 
-    private String getChannelId(String url) {
+    private String channelIdOf(String url) {
         org.jsoup.nodes.Document page;
 
         try {

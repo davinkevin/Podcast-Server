@@ -17,7 +17,7 @@ import static java.time.ZonedDateTime.now;
  */
 @Service
 @Setter
-@ConfigurationProperties("podcastserver")
+@ConfigurationProperties(value = "podcastserver"/*, ignoreUnknownFields = false*/)
 public class PodcastServerParameters {
 
     /**
@@ -39,7 +39,7 @@ public class PodcastServerParameters {
     /**
      * Temp file extension during download
      */
-    String downloadExtention = ".psdownload";
+    String downloadExtension = ".psdownload";
 
     /**
      * Max Update podcast in parallel
@@ -62,6 +62,11 @@ public class PodcastServerParameters {
      */
     Long rssDefaultNumberItem = 50L;
 
+    /**
+     * Api Key of different provider
+     */
+    Api api;
+
     //** GETTER OF THE PARAMETERS **//
     public String getRootfolder() {
         return rootfolder;
@@ -69,10 +74,15 @@ public class PodcastServerParameters {
     public String getServerUrl() {
         return serverUrl;
     }
-    public String getDownloadExtention() {
-        return downloadExtention;
+    public String getDownloadExtension() {
+        return downloadExtension;
     }
-
+    public Api getApi() {
+        return api;
+    }
+    public Api api() {
+        return api;
+    }
     public Path rootFolder() { return Paths.get(rootfolder); }
     public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
     public URI fileContainer() throws URISyntaxException { return new URI(fileContainer); }
@@ -85,8 +95,33 @@ public class PodcastServerParameters {
         return rssDefaultNumberItem;
     }
 
+
+
     /* Utils on attributes */
     public ZonedDateTime limitDownloadDate() {
         return now().minusDays(numberOfDayToDownload);
+    }
+
+    public static class Api {
+        private String youtube;
+        private String dailymotion;
+
+        public Api setYoutube(String youtube) {
+            this.youtube = youtube;
+            return this;
+        }
+
+        public Api setDailymotion(String dailymotion) {
+            this.dailymotion = dailymotion;
+            return this;
+        }
+
+        public String youtube() {
+            return youtube;
+        }
+
+        public String dailymotion() {
+            return dailymotion;
+        }
     }
 }

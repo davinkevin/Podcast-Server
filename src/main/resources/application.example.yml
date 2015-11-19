@@ -40,6 +40,8 @@ podcastserver:
     externaltools:
         #rtmpdump: /usr/local/bin/rtmpdump
         #ffmpeg: /usr/bin/ffmpeg
+    api :
+      youtube : YOUR_API_KEY_OR_EMPTY_IF_NO_ONE
 
 
 ##############################

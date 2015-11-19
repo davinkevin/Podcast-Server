@@ -41,6 +41,8 @@ podcastserver:
     externaltools:
         #rtmpdump: /usr/local/bin/rtmpdump
         #ffmpeg: /usr/bin/ffmpeg
+    api :
+      youtube :
 
 
 ##############################
@@ -59,7 +61,7 @@ logging:
     level:
         #lan.dk.podcastserver : DEBUG
         #org.hibernate.type: TRACE
-        org.springframework.web.socket: TRACE
+        #org.springframework.web.socket: TRACE
 
 multipart:
     max-file-size: 512MB
