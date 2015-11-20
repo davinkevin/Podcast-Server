@@ -1,9 +1,35 @@
 /**
 * Created by kevin on 07/11/2015 for Podcast Server
 */
-import _ from 'lodash';
 
-export function RouteConfig({ path, as = 'vm', controller, reloadOnSearch = true, resolve = {}}) {
+import angular from 'angular';
+
+export function Module({name, inject, modules = []}) {
+    return Target => {
+
+        if (angular.isDefined(name) && angular.isDefined(inject))
+            throw new TypeError ("Name and Inject can't be define in the same @Module");
+
+        if (!Target.component && !Target.routeConfig && !Target.$serviceName)
+            throw new TypeError ("A @Component, @RouteConfig or @Service should be defined first");
+
+        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules) : inject;
+
+        if (Target.component) {
+            Target.$angularModule.directive(Target.$componentName, Target.component);
+            return;
+        }
+
+        if (Target.routeConfig) {
+            Target.$angularModule.config(Target.routeConfig);
+            return;
+        }
+
+        Target.$angularModule.service(Target.$serviceName, Target);
+    };
+}
+
+export function RouteConfig({ path, as = 'vm', reloadOnSearch = true, resolve = {}}) {
     return Target => {
         if (!Target.$template) throw new TypeError("Template should be defined");
         if (!path) throw new TypeError("Path should be Defined");
@@ -53,7 +79,7 @@ export function Component({restrict = 'E', scope = true, as = 'vm', bindToContro
 
         Target.$componentName = snakeCaseToCamelCase(selector);
         Target.component = () => {
-            return _({
+            let ddo = {
                 restrict : restrict,
                 transclude : transclude,
                 replace : replace,
@@ -61,9 +87,12 @@ export function Component({restrict = 'E', scope = true, as = 'vm', bindToContro
                 scope : scope,
                 controller : Target,
                 controllerAs : as,
-                bindToController : bindToController,
-                link : Target.link
-            }).omit(_.isUndefined).value();
+                bindToController : bindToController
+            };
+
+            Target.link && (ddo.link = Target.link);
+
+            return ddo;
         };
     };
 }

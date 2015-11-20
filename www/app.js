@@ -9,7 +9,7 @@ import ConfigModule from './config/config';
 
 let app = angular.module('podcastApp', [
     SearchModule.name,
-    PodcastsModule.name,
+    PodcastsModule.$angularModule.name,
     ItemModule.name,
     DownloadModule.name,
     PlayerModule.name,
