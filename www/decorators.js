@@ -10,24 +10,18 @@ export function Module({name, inject, modules = []}) {
         if (angular.isDefined(name) && angular.isDefined(inject))
             throw new TypeError ("Name and Inject can't be define in the same @Module");
 
-        if (!Target.component && !Target.routeConfig && !Target.$serviceName)
-            throw new TypeError ("A @Component, @RouteConfig or @Service should be defined first");
+        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModule)) : inject;
 
-        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules) : inject;
+        if (Target.component) Target.$angularModule.directive(Target.$directiveName, Target.component);
+        if (Target.routeConfig) Target.$angularModule.config(Target.routeConfig);
+        if (Target.$serviceName) Target.$angularModule.service(Target.$serviceName, Target);
 
-        if (Target.component) {
-            Target.$angularModule.directive(Target.$componentName, Target.component);
-            return;
+        for (let config of Target.$config || []) {
+            Target.$angularModule.config(config);
         }
-
-        if (Target.routeConfig) {
-            Target.$angularModule.config(Target.routeConfig);
-            return;
-        }
-
-        Target.$angularModule.service(Target.$serviceName, Target);
     };
 }
+
 
 export function RouteConfig({ path, as = 'vm', reloadOnSearch = true, resolve = {}}) {
     return Target => {
@@ -103,6 +97,35 @@ export function View({template}) {
     };
 }
 
+export function Service(name) {
+    return Target => {
+        Target.$serviceName = name;
+    };
+}
+
+export function Config(configFunction) {
+    return Target => {
+        if (!Target.$config) Target.$config = [];
+        Target.$config.push(configFunction);
+    };
+}
+
+export function Boot({ element = document, strictDi = false}) {
+    return Target => {
+        if (!angular.isDefined(Target.$angularModule))
+            throw new TypeError ("@Boot should be used only on a @Module Class");
+
+        angular.element(document).ready(() =>  angular.bootstrap(element, [ Target.$angularModule.name ], { strictDi: strictDi }));
+    };
+}
+
 function snakeCaseToCamelCase(string) {
     return string.replace( /-([a-z])/ig, (_,letter) => letter.toUpperCase());
+}
+
+function extractAngularModule(clazz) {
+    if (clazz.$angularModule)
+        return clazz.$angularModule.name;
+
+    return clazz.name ? clazz.name : clazz;
 }

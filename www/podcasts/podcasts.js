@@ -37,9 +37,6 @@ export default class PodcastsListCtrl {
         "ngInject";
         this.podcasts = podcasts;
         this.types = types;
-        this.filters = {
-            title : '',
-            type : ''
-        };
+        this.filters = { title : '', type : '' };
     }
 }

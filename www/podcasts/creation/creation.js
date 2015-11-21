@@ -15,5 +15,4 @@ export default angular.module('ps.podcasts.creation', [
     TagService.name
 ])
     .config(PodcastCreationController.routeConfig)
-    .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } })
-    /*.controller(PodcastCreationController.name, PodcastCreationController);*/
+    .constant('defaultPodcast', { hasToBeDeleted : true, cover : { height: 200, width: 200 } });

@@ -17,6 +17,7 @@
     "gulp-eslint": "^1.0.0",
     "gulp-flatten": "^0.2.0",
     "gulp-git": "^1.6.0",
+    "gulp-gzip": "^1.2.0",
     "gulp-inject": "^3.0.0",
     "gulp-less": "^3.0.3",
     "gulp-minify-css": "^1.2.1",

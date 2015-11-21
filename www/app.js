@@ -1,4 +1,4 @@
-import angular from 'angular';
+import {Boot, Module} from './decorators';
 import SearchModule from './search/search';
 import PodcastsModule from './podcasts/podcasts';
 import ItemModule from './item/item';
@@ -7,14 +7,15 @@ import PlayerModule from './player/player';
 import StatsModule from './stats/stats';
 import ConfigModule from './config/config';
 
-let app = angular.module('podcastApp', [
-    SearchModule.name,
-    PodcastsModule.$angularModule.name,
-    ItemModule.name,
-    DownloadModule.name,
-    PlayerModule.name,
-    StatsModule.name,
-    ConfigModule.name
-]);
+@Boot({ element : document })
+@Module({name : 'podcastApp', modules : [
+    SearchModule,
+    PodcastsModule,
+    ItemModule,
+    DownloadModule,
+    PlayerModule,
+    StatsModule,
+    ConfigModule
+]})
+export default class App {}
 
-angular.element(document).ready(() =>  angular.bootstrap(document, [ app.name ], { strictDi: false }));

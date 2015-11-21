@@ -11,10 +11,11 @@ import runSequence from 'run-sequence';
 import del from 'del';
 import Builder from 'systemjs-builder';
 import replace from 'gulp-replace';
+import gzip from 'gulp-gzip';
 import paths from '../paths';
 
-let prodFiles = ['min.css', 'min.js'].map(ext => `${paths.releaseDir}/${paths.app.name}.${ext}`);
-let filesToDelete = ['css', 'css.map', 'js', 'js.map'].map(ext => `${paths.releaseDir}/${paths.app.name}.${ext}`);
+let prodFiles = ['min.css', 'min.js'].map(ext => `${paths.release.root}/${paths.app.name}.${ext}`);
+let filesToDelete = ['css', 'css.map', 'js', 'js.map'].map(ext => `${paths.release.root}/${paths.app.name}.${ext}`);
 
 gulp.task('build:jspm', function(cal){
     let builder = new Builder();
@@ -34,6 +35,8 @@ gulp.task('build:js', () =>
         .pipe(rename({suffix : '.min'}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.release.root))
+        .pipe(gzip())
+        .pipe(gulp.dest(paths.release.root))
 );
 
 gulp.task('build:css', () =>
@@ -41,6 +44,8 @@ gulp.task('build:css', () =>
         .pipe(minifyCSS())
         .pipe(replace(/url\([^\)]*jspm_packages[^\)]*\/fonts\/([^\)]*)\)/g, 'url(/fonts/$1)'))
         .pipe(rename({suffix : '.min'}))
+        .pipe(gulp.dest(paths.release.root))
+        .pipe(gzip())
         .pipe(gulp.dest(paths.release.root))
 );
 
