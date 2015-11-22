@@ -1,6 +1,7 @@
 /**
 * Created by kevin on 01/11/14 for Podcast Server
 */
+import angular from 'angular';
 import RestangularConfig from '../../../config/restangular.config';
 
 class typeService {

@@ -1,4 +1,5 @@
 
+import angular from 'angular';
 import RestangularConfig from '../../../config/restangular.config';
 
 class UpdateService {

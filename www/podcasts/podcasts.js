@@ -13,11 +13,11 @@ import './podcasts.css!';
 @Module({
     name : 'ps.podcasts',
     modules : [
-        AppRouteConfig.name,
-        PodcastDetailsModule.name,
-        PodcastCreationModule.name,
-        PodcastService.name,
-        TypeService.name
+        PodcastDetailsModule,
+        PodcastCreationModule,
+        PodcastService,
+        AppRouteConfig,
+        TypeService
     ]
 })
 @RouteConfig({

@@ -1,3 +1,4 @@
+import angular from 'angular';
 import 'angular-loading-bar';
 
 export default angular

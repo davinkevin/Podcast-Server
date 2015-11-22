@@ -17,14 +17,10 @@ import paths from '../paths';
 let prodFiles = ['min.css', 'min.js'].map(ext => `${paths.release.root}/${paths.app.name}.${ext}`);
 let filesToDelete = ['css', 'css.map', 'js', 'js.map'].map(ext => `${paths.release.root}/${paths.app.name}.${ext}`);
 
-gulp.task('build:jspm', function(cal){
-    let builder = new Builder();
-    builder.loadConfig(paths.systemConfigJs)
-        .then(() => {
-            builder.buildStatic(paths.app.entryPoint, `${paths.release.root}/${paths.app.name}.js`, {sourceMaps: true})
-                .then(() => cal())
-                .catch((ex) => cal(new Error(ex)));
-        });
+gulp.task('build:jspm', function(cb){
+    new jspm.Builder().buildStatic(paths.app.entryPoint, `${paths.release.root}/${paths.app.name}.js`, {sourceMaps: true})
+        .then(() => cb())
+        .catch((ex) => cb(new Error(ex)));
 });
 
 gulp.task('build:js', () =>
@@ -49,12 +45,11 @@ gulp.task('build:css', () =>
         .pipe(gulp.dest(paths.release.root))
 );
 
-gulp.task('build:index', () => {
-    let sources = gulp.src(prodFiles, {read: false});
-    return gulp.src(`${paths.srcDir}/index.html`)
-        .pipe(inject(sources, { ignorePath: paths.releaseDirName }))
+gulp.task('build:index', () =>
+    gulp.src(`${paths.srcDir}/index.html`)
+        .pipe(inject(gulp.src(prodFiles, {read: false}), { ignorePath: paths.releaseDirName }))
         .pipe(gulp.dest(paths.release.root))
-});
+);
 
 gulp.task('build:fonts', () =>
     gulp.src([paths.jspm.fonts, paths.glob.projectFonts, '!'+paths.glob.fonts])

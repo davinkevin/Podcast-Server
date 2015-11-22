@@ -5,4 +5,4 @@ import 'angular-truncate';
 
 export default {
     name : 'truncate'
-}
+};

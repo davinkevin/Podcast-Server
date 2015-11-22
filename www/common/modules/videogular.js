@@ -3,19 +3,17 @@
  */
 
 import angular from 'angular';
+import {Module} from '../../decorators';
 import 'angular-sanitize';
-import Videogular from 'videogular';
+import VideogularModule from 'videogular';
 import VideogularBuffering from 'videogular-buffering';
 import VideogularControls from 'videogular-controls';
 import VideogularPoster from 'videogular-poster';
 import VideogularOverlayPlay from 'videogular-overlay-play';
 import 'videogular-themes-default/videogular.css!';
 
-export default angular.module('ps.config.videogular', [
-    'ngSanitize',
-    Videogular,
-    VideogularPoster,
-    VideogularControls,
-    VideogularOverlayPlay,
-    VideogularBuffering
-]);
+@Module({
+    name : 'ps.config.videogular',
+    modules : [ 'ngSanitize', VideogularModule, VideogularPoster, VideogularControls, VideogularOverlayPlay, VideogularBuffering ]
+})
+export default class Videogular{}

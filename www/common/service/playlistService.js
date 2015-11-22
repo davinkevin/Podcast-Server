@@ -1,6 +1,14 @@
+import {Module, Service} from '../../decorators';
+import _ from 'lodash';
+import angular from 'angular';
 import NgStorage from 'ngstorage';
 
-class PlaylistService {
+@Module({
+    name : 'ps.common.service.playlist',
+    modules : [ NgStorage.name ]
+})
+@Service('playlistService')
+export default class PlaylistService {
 
     constructor($localStorage) {
         "ngInject";
@@ -27,8 +35,3 @@ class PlaylistService {
         this.$localStorage.playlist = [];
     }
 }
-
-export default angular.module('ps.common.service.playlist', [
-    NgStorage.name
-])
-    .service('playlistService', PlaylistService);

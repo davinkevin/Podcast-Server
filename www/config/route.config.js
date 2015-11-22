@@ -22,5 +22,5 @@ export default angular
             window.location.href = '/download';
         }]
     ])
-    .config($routeProvider => {"ngInject"; return $routeProvider.otherwise({redirectTo: '/items'})})
-    .config($locationProvider => {"ngInject"; return $locationProvider.html5Mode(true)});
+    .config($routeProvider => {"ngInject"; return $routeProvider.otherwise({redirectTo: '/items'});})
+    .config($locationProvider => {"ngInject"; return $locationProvider.html5Mode(true);});

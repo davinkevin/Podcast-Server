@@ -1,5 +1,5 @@
 import angular from 'angular';
-import restangular from 'restangular';
+import 'restangular';
 import 'lodash';
 
 export default angular

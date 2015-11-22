@@ -10,15 +10,20 @@ export function Module({name, inject, modules = []}) {
         if (angular.isDefined(name) && angular.isDefined(inject))
             throw new TypeError ("Name and Inject can't be define in the same @Module");
 
-        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModule)) : inject;
+        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModule)) : inject.$angularModule;
 
-        if (Target.component) Target.$angularModule.directive(Target.$directiveName, Target.component);
+        if (Target.component) Target.$angularModule.directive(Target.$componentName, Target.component);
         if (Target.routeConfig) Target.$angularModule.config(Target.routeConfig);
         if (Target.$serviceName) Target.$angularModule.service(Target.$serviceName, Target);
 
         for (let config of Target.$config || []) {
             Target.$angularModule.config(config);
         }
+
+        for (let constant of Target.$constant || []) {
+            Target.$angularModule.constant(constant.name, constant.value);
+        }
+
     };
 }
 
@@ -116,6 +121,17 @@ export function Boot({ element = document, strictDi = false}) {
             throw new TypeError ("@Boot should be used only on a @Module Class");
 
         angular.element(document).ready(() =>  angular.bootstrap(element, [ Target.$angularModule.name ], { strictDi: strictDi }));
+    };
+}
+
+export function Constant({ name, value}) {
+    return Target => {
+
+        if (!angular.isDefined(name) || !angular.isDefined(value))
+            throw new TypeError ("Name and value should be defined for @Constant");
+
+        if (!Target.$constant) Target.$constant = [];
+        Target.$constant.push({name : name, value : value});
     };
 }
 

@@ -14,9 +14,9 @@
                     <a href="#" ng-click="pic.next()" class="btn next"><i class="glyphicon glyphicon-step-forward"></i></a>
                 </div>
                 <div>
-                    <div ng-show="pic.playlist.length > 1" class="dropup btn-group" dropdown auto-close="outsideClick">
-                        <a href="#" class="btn dropdown dropdown-toggle playlist" dropdown-toggle><i class="glyphicon glyphicon-menu-hamburger"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    <div ng-show="pic.playlist.length > 1" class="dropup btn-group" uib-dropdown auto-close="outsideClick">
+                        <a href="#" class="btn dropdown playlist" uib-dropdown-toggle><i class="glyphicon glyphicon-menu-hamburger"></i></a>
+                        <ul uib-dropdown-menu class="dropdown-menu-right" role="menu">
                             <li ng-repeat="item in pic.playlist">
                                 <a ng-class="{ 'currently-playing' : pic.isCurrentlyPlaying(item) }">
                                     <div class="pull-left" ng-click="pic.play(item)">

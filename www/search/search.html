@@ -29,7 +29,6 @@
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
             <select class="form-control" ng-model="isc.searchParameters.properties" ng-change="isc.resetSearch()">
-                <option value>Tri</option>
                 <option value="pertinence">Pertinence</option>
                 <option value="pubdate">Date publication</option>
                 <option value="downloadDate">Date de download</option>
@@ -39,7 +38,6 @@
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
             <!--<select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()" ng-disabled="searchParameters.properties === 'pertinence'">-->
             <select class="form-control" ng-model="isc.searchParameters.direction" ng-change="isc.resetSearch()">
-                <option value>Ordre</option>
                 <option value="DESC">Descendant</option>
                 <option value="ASC">Ascendant</option>
             </select>

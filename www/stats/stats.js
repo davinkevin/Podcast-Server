@@ -1,15 +1,58 @@
-
-import angular from 'angular';
+/**
+ * Created by kevin on 25/10/2015 for PodcastServer
+ */
+import _ from 'lodash';
+import {RouteConfig, View, HotKeys, Module} from '../decorators';
 import AppRouteConfig from '../config/route.config';
 import StatsService from '../common/service/data/statsService';
-import AppHighChartsConfig from '../config/highCharts';
+import HighCharts from '../common/modules/highCharts';
+import template from './stats.html!text';
 
-import StatsController from './stats.controller';
+@Module({
+    name : 'ps.stats',
+    modules : [
+        AppRouteConfig,
+        HighCharts,
+        StatsService
+    ]
+})
+@RouteConfig({
+    path : '/stats',
+    as : 'sc',
+    resolve : {
+        stats : statService => {"ngInject"; return statService.statsByType();}
+    }
+})
+@HotKeys({})
+@View({
+    template : template
+})
+export default class StatsController {
 
-export default angular.module('ps.stats', [
-    AppRouteConfig.name,
-    AppHighChartsConfig.name,
-    StatsService.name
-])
-    .config(StatsController.routeConfig)
-    .controller('StatsController', StatsController);
+    constructor(statService, stats) {
+        "ngInject";
+        this.statService = statService;
+        this.month = 1;
+
+        this.chartSeries = [];
+        this.transform(stats);
+        this.chartConfig = statService.highChartsConfig(this.chartSeries);
+    }
+
+    transform(stats) {
+        _.updateinplace(this.chartSeries, []);
+        stats.map((value) => this.chartSeries.push({ name : value.type, data : this.statService.mapToHighCharts(value.values) }) );
+    }
+
+    navigate(offset) {
+        this.month += offset;
+        this.generateChartData();
+    }
+
+    generateChartData() {
+        return this.statService
+            .statsByType(this.month)
+            .then(statsByType => this.transform(statsByType));
+    }
+}
+

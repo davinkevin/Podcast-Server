@@ -40,15 +40,6 @@
     min-height: 263px;
   }
 }
-.ps .search-bar {
-  margin-top: 12px;
-}
-.ps .search-bar tags-input {
-  width: 100%;
-}
-.ps .search-bar tags-input .host {
-  margin-top: 0;
-}
 .ps .button-row {
   z-index: 1000;
 }

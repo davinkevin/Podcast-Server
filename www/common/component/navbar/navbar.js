@@ -1,6 +1,28 @@
-import angular from 'angular';
-import NavbarComponent from './navbar.component';
+/**
+ * Created by kevin on 25/10/2015 for PodcastServer
+ */
+import {Component, View, Module} from '../../../decorators';
+import template from './navbar.html!text';
+import './navbar.css!';
 
-export default angular.module('ps.common.component.navbar', [])
-    .directive('navbar', NavbarComponent.component)
-    .controller('navBarController', NavbarComponent);
+@Module({
+    name : 'ps.common.component.navbar'
+})
+@Component({
+    selector : 'navbar',
+    transclude : true,
+    replace : true,
+    as : 'navbar'
+})
+@View({
+    template : template
+})
+export default class NavbarComponent {
+    constructor() {
+        this.navCollapsed = true;
+    }
+
+    static link(_, element) {
+        element.removeClass('hidden');
+    }
+}

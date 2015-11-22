@@ -1,11 +1,15 @@
 /**
 *  Created by kevin on 01/11/14 for Podcast Server
 */
-import angular from 'angular';
+import {Module} from '../decorators';
 import ItemDetailsModule from './details/item.details';
 import ItemPlayer from './player/item.player';
 
-export default angular.module('ps.item', [
-    ItemDetailsModule.name,
-    ItemPlayer.name
-]);
+@Module({
+    name : 'ps.item',
+    modules : [
+        ItemDetailsModule,
+        ItemPlayer
+    ]
+})
+export default class Item{}

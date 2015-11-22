@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 02/11@/14 for Podcast Server
  */
-
+import angular from 'angular';
 import RestangularConfig from '../../../config/restangular.config';
 
 class PodcastService  {
@@ -37,15 +37,19 @@ class PodcastService  {
     }
 
     findInfo(url) {
-        return this.Restangular.one(this.route).findInfo(url);
+        return this.getNewPodcast().findInfo(url);
     }
 
     statsByPubdate(id, numberOfMonth = 6) {
-        return this.Restangular.one(this.route, id).one('stats').all('byPubdate').post(numberOfMonth);
+        return this.statsOf(id).all('byPubdate').post(numberOfMonth);
     }
 
     statsByByDownloaddate(id, numberOfMonth = 6) {
-        return this.Restangular.one(this.route, id).one('stats').all('byDownloaddate').post(numberOfMonth);
+        return this.statsOf(id).all('byDownloaddate').post(numberOfMonth);
+    }
+
+    statsOf(id) {
+        return this.Restangular.one(this.route, id).one('stats');
     }
 
     static config(RestangularProvider) {
