@@ -24,7 +24,7 @@ import './styles/styles';
         ngFileUpload,
         NavbarModule,
         AuthorizeNotificationModule,
-        AppLoadingBar.name,
+        AppLoadingBar,
         PlayerInlineModule,
         UpdatingModule
     ]

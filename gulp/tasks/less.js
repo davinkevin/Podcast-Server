@@ -9,10 +9,10 @@ function logError(err) {
 }
 
 gulp.task('less', () =>
-        gulp.src(['./www/**/*.less'])
+        gulp.src([paths.glob.less])
             .pipe(less({
-                paths: [ paths.root ]
+                paths: [ paths.srcDir ]
             })
                 .on('error', logError))
-            .pipe(gulp.dest('./www'))
+            .pipe(gulp.dest(paths.app.app))
 );

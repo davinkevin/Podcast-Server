@@ -2,7 +2,6 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 
-import angular from 'angular';
 import {Module} from '../../decorators';
 import 'angular-sanitize';
 import VideogularModule from 'videogular';

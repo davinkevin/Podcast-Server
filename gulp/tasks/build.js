@@ -55,6 +55,8 @@ gulp.task('build:fonts', () =>
     gulp.src([paths.jspm.fonts, paths.glob.projectFonts, '!'+paths.glob.fonts])
         .pipe(flatten())
         .pipe(gulp.dest(paths.release.fonts))
+        .pipe(gzip())
+        .pipe(gulp.dest(paths.release.fonts))
 );
 
 gulp.task('build:pre-clean', (cb) =>

@@ -116,7 +116,7 @@ export default class ItemSearchCtrl {
     }
 
     swipePage(val) {
-        this.currentPage = this.SearchItemCache.page() + val + 1;
+        this.currentPage = this.SearchItemCache.page + val + 1;
         return this.changePage();
     }
 
