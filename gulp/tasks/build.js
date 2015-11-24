@@ -9,7 +9,6 @@ import flatten from 'gulp-flatten';
 import inject from 'gulp-inject';
 import runSequence from 'run-sequence';
 import del from 'del';
-import Builder from 'systemjs-builder';
 import replace from 'gulp-replace';
 import gzip from 'gulp-gzip';
 import paths from '../paths';
