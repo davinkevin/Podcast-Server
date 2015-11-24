@@ -19,11 +19,11 @@ import './search.css!';
     name : 'ps.search',
     modules : [
         NgTagsInput,
-        NgStorage.name,
-        AppRouteConfig.name,
-        DownloadManager.name,
-        ItemService.name,
-        TagService.name,
+        NgStorage,
+        AppRouteConfig,
+        DownloadManager,
+        ItemService,
+        TagService,
         PlaylistService
     ]
 })
@@ -36,7 +36,6 @@ import './search.css!';
     }
 })
 @HotKeys({
-    useDefault : true,
     hotKeys : [
         ['right', 'Next page', 'isc.swipePage(1)'],
         ['left', 'Previous page', 'isc.swipePage(-1)']

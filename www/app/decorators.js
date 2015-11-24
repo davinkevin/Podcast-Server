@@ -27,7 +27,6 @@ export function Module({name, inject, modules = []}) {
     };
 }
 
-
 export function RouteConfig({ path, as = 'vm', reloadOnSearch = true, resolve = {}}) {
     return Target => {
         if (!Target.$template) throw new TypeError("Template should be defined");
@@ -35,39 +34,25 @@ export function RouteConfig({ path, as = 'vm', reloadOnSearch = true, resolve = 
 
         Target.routeConfig = ($routeProvider) => {
             "ngInject";
-            $routeProvider.when(path, {
+
+            let parameters = {
                 template: Target.$template,
-                hotkeys : Target.$hotKeys,
                 controller: Target,
                 controllerAs : as,
                 reloadOnSearch : reloadOnSearch,
                 resolve : resolve
-            });
+            };
+
+            Target.$hotKeys && (parameters.hotkeys = Target.$hotKeys);
+
+            $routeProvider.when(path, parameters);
         };
     };
 }
 
-let defaultKeys = [
-    ['h', 'Goto Home', (event) => {
-        event.preventDefault();
-        window.location.href = '/items';
-    }],
-    ['s', 'Goto Search', (event) =>  {
-        event.preventDefault();
-        window.location.href = '/item/search';
-    }],
-    ['p', 'Goto Podcast List', (event) =>  {
-        event.preventDefault();
-        window.location.href = '/podcasts';
-    }],
-    ['d', 'Goto Download List', (event) =>  {
-        event.preventDefault();
-        window.location.href = '/download';
-    }]
-];
-export function HotKeys({useDefault = true, hotKeys = []}) {
+export function HotKeys({hotKeys = []}) {
     return Target =>  {
-        Target.$hotKeys = useDefault ? defaultKeys.concat(hotKeys) : hotKeys;
+        Target.$hotKeys = hotKeys;
     };
 }
 

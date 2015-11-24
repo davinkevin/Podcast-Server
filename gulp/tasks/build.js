@@ -13,9 +13,12 @@ import Builder from 'systemjs-builder';
 import replace from 'gulp-replace';
 import gzip from 'gulp-gzip';
 import paths from '../paths';
+import '../utils';
 
-let prodFiles = ['min.css', 'min.js'].map(ext => `${paths.release.root}/${paths.app.name}.${ext}`);
-let filesToDelete = ['css', 'css.map', 'js', 'js.map'].map(ext => `${paths.release.root}/${paths.app.name}.${ext}`);
+let prodFiles = ['css', 'js'].map(ext => `${paths.release.root}/${paths.app.name}.min.${ext}`);
+let filesToDelete = ['css', 'js']
+    .flatMap(ext => [ext, `${ext}.map`, `${ext}.map.gz`, `${ext}.gz`])
+    .map(ext => `${paths.releaseDir}/${paths.app.name}.${ext}`);
 
 gulp.task('build:jspm', function(cb){
     new jspm.Builder().buildStatic(paths.app.entryPoint, `${paths.release.root}/${paths.app.name}.js`, {sourceMaps: true})

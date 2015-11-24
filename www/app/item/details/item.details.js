@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import _ from 'lodash';
-import {RouteConfig, View, HotKeys, Module} from '../../decorators';
+import {RouteConfig, View, Module} from '../../decorators';
 import DownloadManager from '../../common/service/data/downloadManager';
 import PlaylistService from '../../common/service/playlistService';
 import HtmlFilters from '../../common/filter/html2plainText';
@@ -24,7 +24,6 @@ import template from './item-details.html!text';
         podcast : (podcastService, $route) => { "ngInject"; return podcastService.findById($route.current.params.podcastId);}
     }
 })
-@HotKeys({})
 @View({
     template : template
 })

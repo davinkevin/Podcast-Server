@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import _ from 'lodash';
-import {RouteConfig, View, HotKeys, Module} from '../decorators';
+import {RouteConfig, View, Module} from '../decorators';
 import AngularNotification from '../common/modules/angularNotification';
 import AppRouteConfig from '../config/route.config';
 import DownloadManager from '../common/service/data/downloadManager';
@@ -20,7 +20,6 @@ import template from './download.html!text';
     path : '/download',
     as : 'dc'
 })
-@HotKeys({})
 @View({
     template : template
 })

@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import angular from 'angular';
-import {RouteConfig, View, HotKeys, Module, Constant} from '../../decorators';
+import {RouteConfig, View, Module, Constant} from '../../decorators';
 import AppRouteConfig from '../../config/route.config';
 import NgTagsInput from '../../common/modules/ngTagsInput';
 import PodcastService from '../../common/service/data/podcastService';
@@ -27,7 +27,6 @@ import template from './creation.html!text';
         types : typeService => {"ngInject"; return typeService.findAll();}
     }
 })
-@HotKeys({})
 @Constant({ name : 'defaultPodcast', value : { hasToBeDeleted : true, cover : { height: 200, width: 200 }} })
 @View({
     template : template

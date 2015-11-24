@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import _ from 'lodash';
-import {RouteConfig, View, HotKeys, Module} from '../decorators';
+import {RouteConfig, View, Module} from '../decorators';
 import AppRouteConfig from '../config/route.config';
 import StatsService from '../common/service/data/statsService';
 import HighCharts from '../common/modules/highCharts';
@@ -23,7 +23,6 @@ import template from './stats.html!text';
         stats : statService => {"ngInject"; return statService.statsByType();}
     }
 })
-@HotKeys({})
 @View({
     template : template
 })

@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {RouteConfig, View, HotKeys, Module} from '../decorators';
+import {RouteConfig, View, Module} from '../decorators';
 import AppRouteConfig from '../config/route.config';
 import PodcastService from '../common/service/data/podcastService';
 import TypeService from '../common/service/data/typeService';
@@ -28,7 +28,6 @@ import './podcasts.css!';
         types: typeService => {"ngInject"; return typeService.findAll(); }
     }
 })
-@HotKeys({})
 @View({
     template : template
 })
