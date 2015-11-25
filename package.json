@@ -35,6 +35,7 @@
     "jasmine-expect": "^2.0.0-beta2",
     "jasmine-reporters": "^2.0.7",
     "jspm": "^0.16.13",
+    "mkdirp": "^0.5.1",
     "proxy-middleware": "^0.15.0",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.1.4",

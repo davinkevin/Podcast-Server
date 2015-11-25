@@ -12,12 +12,17 @@ import del from 'del';
 import replace from 'gulp-replace';
 import gzip from 'gulp-gzip';
 import paths from '../paths';
+import mkdirp from 'mkdirp';
 import '../utils';
 
 let prodFiles = ['css', 'js'].map(ext => `${paths.release.root}/${paths.app.name}.min.${ext}`);
 let filesToDelete = ['css', 'js']
     .flatMap(ext => [ext, `${ext}.map`, `${ext}.map.gz`, `${ext}.gz`])
     .map(ext => `${paths.releaseDir}/${paths.app.name}.${ext}`);
+
+gulp.task('build:create-folder', (cal) =>
+    mkdirp(paths.release.root, (err) => (err) ?  cal(new Error(err)) : cal())
+);
 
 gulp.task('build:jspm', function(cb){
     new jspm.Builder().buildStatic(paths.app.entryPoint, `${paths.release.root}/${paths.app.name}.js`, {sourceMaps: true})
@@ -69,6 +74,7 @@ gulp.task('build:clean', (cal) =>  del(filesToDelete, cal));
 
 gulp.task('build', (cal) => {
     runSequence(
+        ['build:create-folder'],
         ['build:pre-clean'],
         'build:jspm',
         ['build:js', 'build:css', 'build:fonts'],
