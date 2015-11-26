@@ -13,12 +13,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.resource.GzipResourceResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.annotation.Resource;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Configuration de la partie Web MVC de l'application
@@ -38,12 +42,27 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String rootFolderWithProtocol = podcastServerParameters.rootFolderWithProtocol();
+        GzipResourceResolver gzipResourceResolver = new GzipResourceResolver();
         logger.info("Mapping du dossier {} à {}", PODCAST_LOCATION_RESOURCE_HANDLER, rootFolderWithProtocol);
-        
+
         registry
                 .addResourceHandler(PODCAST_LOCATION_RESOURCE_HANDLER)
-                    .addResourceLocations(rootFolderWithProtocol)
-                    .setCachePeriod(CACHE_PERIOD);
+                .addResourceLocations(rootFolderWithProtocol)
+                .setCachePeriod(CACHE_PERIOD);
+
+        registry
+                .addResourceHandler(Stream.of("js", "css").flatMap(ext -> Stream.of("/*." + ext, "/*." + ext + ".map")).toArray(String[]::new))
+                .addResourceLocations("classpath:/static/")
+                .setCachePeriod(CACHE_PERIOD)
+                .resourceChain(true)
+                .addResolver(gzipResourceResolver);
+
+        registry
+                .addResourceHandler("/fonts/*")
+                .addResourceLocations("classpath:/static/fonts/")
+                .setCachePeriod(CACHE_PERIOD)
+                .resourceChain(true)
+                .addResolver(gzipResourceResolver);
     }
 
     @Bean
