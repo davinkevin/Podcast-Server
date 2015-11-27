@@ -1,8 +1,12 @@
-
-import angular from 'angular';
+import {Module, Service} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular.config';
 
-class UpdateService {
+@Module({
+    name : 'ps.common.service.data.updateService',
+    modules : [ RestangularConfig ]
+})
+@Service('UpdateService')
+export default class UpdateService {
     constructor(Restangular) {
         "ngInject";
         this.Restangular = Restangular;
@@ -11,10 +15,5 @@ class UpdateService {
     forceUpdatePodcast(idPodcast) {
         return this.Restangular.one("task").customPOST(idPodcast, "updateManager/updatePodcast/force");
     }
-} 
+}
 
-export default angular
-    .module('ps.common.service.data.updateService', [
-        RestangularConfig.name
-    ])
-    .service('UpdateService', UpdateService);
