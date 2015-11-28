@@ -10,7 +10,7 @@ export function Module({name, inject, modules = []}) {
         if (angular.isDefined(name) && angular.isDefined(inject))
             throw new TypeError ("Name and Inject can't be define in the same @Module");
 
-        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModule)) : inject.$angularModule;
+        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModuleName)) : extractAngularModule(inject);
 
         if (Target.component) Target.$angularModule.directive(Target.$componentName, Target.component);
         if (Target.routeConfig) Target.$angularModule.config(Target.routeConfig);
@@ -58,7 +58,7 @@ export function HotKeys({hotKeys = []}) {
 
 export function Component({restrict = 'E', scope = true, as = 'vm', bindToController = true, replace = false, transclude = false, selector}) {
     return Target => {
-        if (!Target.$template) throw new TypeError("A Template should be defined with the annotation @View");
+        if (!Target.$template && restrict.indexOf('E') !== -1 ) throw new TypeError("A Template should be defined with the annotation @View for Element Component (restrict : E)");;
         if (!selector) throw new TypeError("A selector should be defined in the current annotation @Component");
 
         Target.$componentName = snakeCaseToCamelCase(selector);
@@ -124,9 +124,13 @@ function snakeCaseToCamelCase(string) {
     return string.replace( /-([a-z])/ig, (_,letter) => letter.toUpperCase());
 }
 
-function extractAngularModule(clazz) {
+function extractAngularModuleName(clazz) {
     if (clazz.$angularModule)
         return clazz.$angularModule.name;
 
     return clazz.name ? clazz.name : clazz;
+}
+
+function extractAngularModule(clazz) {
+    return clazz.$angularModule ? clazz.$angularModule : clazz;
 }
