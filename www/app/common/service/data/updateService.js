@@ -9,11 +9,11 @@ import RestangularConfig from '../../../config/restangular.config';
 export default class UpdateService {
     constructor(Restangular) {
         "ngInject";
-        this.Restangular = Restangular;
+        this.baseTask = Restangular.one("task");
     }
 
     forceUpdatePodcast(idPodcast) {
-        return this.Restangular.one("task").customPOST(idPodcast, "updateManager/updatePodcast/force");
+        return this.baseTask.customPOST(idPodcast, "updateManager/updatePodcast/force");
     }
 }
 

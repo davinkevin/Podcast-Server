@@ -1,10 +1,15 @@
 /**
 * Created by kevin on 01/11/14 for Podcast Server
 */
-import angular from 'angular';
+import {Module, Service} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular.config';
 
-class typeService {
+@Module({
+    name : 'ps.common.service.data.typeService',
+    modules : [ RestangularConfig ]
+})
+@Service('typeService')
+export default class typeService {
 
     constructor(Restangular) {
         "ngInject";
@@ -15,9 +20,3 @@ class typeService {
         return this.baseAll.getList();
     }
 }
-
-export default angular
-    .module('ps.common.service.data.typeService', [
-        RestangularConfig.name
-    ])
-    .service('typeService', typeService);
