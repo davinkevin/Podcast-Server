@@ -1,10 +1,15 @@
 /**
  * Created by kevin on 01/11/14 for Podcast Server
  */
-import angular from 'angular';
-import AppRestangularConfig from '../../../config/restangular.config';
+import {Module, Service} from '../../../decorators';
+import RestangularConfig from '../../../config/restangular.config';
 
-class tagService {
+@Module({
+    name : 'ps.common.service.data.tagService',
+    modules : [ RestangularConfig ]
+})
+@Service('tagService')
+export default class tagService {
 
     constructor(Restangular) {
         "ngInject";
@@ -20,9 +25,3 @@ class tagService {
     }
 
 }
-
-export default angular
-    .module('ps.common.service.data.tagService', [
-        AppRestangularConfig.name
-    ])
-    .service('tagService', tagService);
