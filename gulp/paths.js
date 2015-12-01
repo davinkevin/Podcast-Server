@@ -27,7 +27,8 @@ export default {
   app: {
     app : `${root}/${srcDirName}/${appName}`,
     entryPoint : `${appName}/${appName}`,
-    name: appName
+    name: appName,
+    fonts : `${root}/${srcDirName}/fonts`
   },
   glob: {
     less : `${root}/${srcDirName}/${appName}/**/*.less`,
