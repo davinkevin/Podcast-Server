@@ -1,11 +1,16 @@
 /**
 * Created by kevin on 01/11/14 for Podcast Server
 */
-import angular from 'angular';
 import _ from 'lodash';
-import AppRestangularConfig from '../../../config/restangular.config';
+import {Module, Service} from '../../../decorators';
+import RestangularConfig from '../../../config/restangular.config';
 
-class StatService {
+@Module({
+    name : 'ps.common.service.data.tagService',
+    modules : [ RestangularConfig ]
+})
+@Service('statService')
+export default class StatService {
 
     constructor(Restangular) {
         "ngInject";
@@ -72,9 +77,3 @@ class StatService {
         };
     }
 }
-
-export default angular
-    .module('ps.common.service.data.statsService', [
-        AppRestangularConfig.name
-    ])
-    .service('statService', StatService);
