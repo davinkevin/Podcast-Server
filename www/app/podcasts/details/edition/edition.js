@@ -10,11 +10,7 @@ import template from './edition.html!text';
 
 @Module({
     name : 'ps.podcasts.details.edition',
-    modules : [
-        PodcastService.name,
-        TagService.name,
-        NgTagsInput
-    ]
+    modules : [ PodcastService, TagService, NgTagsInput ]
 })
 @Component({
     selector : 'podcast-edition',

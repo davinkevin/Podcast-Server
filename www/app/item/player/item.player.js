@@ -9,7 +9,7 @@ import template from './item-player.html!text';
 
 @Module({
     name : 'ps.item.player',
-    modules : [ AppRouteConfig.name, Videogular, DeviceDetectionService ]
+    modules : [ AppRouteConfig, Videogular, DeviceDetectionService ]
 })
 @RouteConfig({
     path : '/podcasts/:podcastId/item/:itemId/play',

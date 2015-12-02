@@ -11,12 +11,7 @@ import template from './player.html!text';
 
 @Module({
     name : 'ps.player',
-    modules : [
-        AppRouteConfig.name,
-        Videogular,
-        DeviceDetectionService,
-        PlaylistService
-    ]
+    modules : [ AppRouteConfig, Videogular, DeviceDetectionService, PlaylistService ]
 })
 @RouteConfig({
     path : '/player',

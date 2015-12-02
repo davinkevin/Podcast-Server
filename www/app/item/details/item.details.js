@@ -10,11 +10,7 @@ import template from './item-details.html!text';
 
 @Module({
     name : 'ps.item.details',
-    modules : [
-        DownloadManager.name,
-        HtmlFilters.name,
-        PlaylistService
-    ]
+    modules : [ DownloadManager, HtmlFilters, PlaylistService ]
 })
 @RouteConfig({
     path : '/podcasts/:podcastId/item/:itemId',

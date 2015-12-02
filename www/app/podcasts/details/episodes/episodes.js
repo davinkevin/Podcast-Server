@@ -9,10 +9,7 @@ import template from './episodes.html!text';
 
 @Module({
     name : 'ps.podcasts.details.episodes',
-    modules : [
-        PlaylistService.$angularModule.name,
-        HtmlFilters.name
-    ]
+    modules : [ PlaylistService, HtmlFilters ]
 })
 @Component({
     selector : 'podcast-items-list',

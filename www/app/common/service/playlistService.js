@@ -5,7 +5,7 @@ import NgStorage from 'ngstorage';
 
 @Module({
     name : 'ps.common.service.playlist',
-    modules : [ NgStorage.name ]
+    modules : [ NgStorage ]
 })
 @Service('playlistService')
 export default class PlaylistService {

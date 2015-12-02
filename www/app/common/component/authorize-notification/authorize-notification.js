@@ -7,7 +7,7 @@ import template from './authorize-notification.html!text';
 
 @Module({
     name : 'ps.common.component.authorize-notification',
-    modules : [ AngularNotification.name ]
+    modules : [ AngularNotification ]
 })
 @Component({
     selector : 'authorize-notification',

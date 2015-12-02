@@ -9,7 +9,7 @@ import './updating.css!';
 
 @Module({
     name : 'ps.common.component.updating',
-    modules : [ AngularStompDKConfig.name ]
+    modules : [ AngularStompDKConfig ]
 })
 @Component({
     selector : 'update-status',

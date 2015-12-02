@@ -12,13 +12,7 @@ import template from './creation.html!text';
 
 @Module({
     name : 'ps.podcasts.creation',
-    modules : [
-        AppRouteConfig.name,
-        NgTagsInput,
-        PodcastService.name,
-        TypeService.name,
-        TagService.name
-    ]
+    modules : [ AppRouteConfig, NgTagsInput, PodcastService, TypeService, TagService ]
 })
 @RouteConfig({
     path : '/podcast-creation',

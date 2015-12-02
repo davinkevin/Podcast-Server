@@ -112,7 +112,7 @@
         }
       },
       "github:driftyco/ionicons@2.0.1": {
-        "main" : false,
+        "main": false,
         "files": [
           "css/**.css",
           "fonts/*",

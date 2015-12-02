@@ -10,11 +10,7 @@ import template from './upload.html!text';
 
 @Module({
     name : 'ps.podcasts.details.upload',
-    modules : [
-        NgFileUpload,
-        AngularNotification.name,
-        ItemService.name
-    ]
+    modules : [ NgFileUpload, AngularNotification, ItemService ]
 })
 @Component({
     selector : 'podcast-upload',
