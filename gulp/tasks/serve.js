@@ -40,7 +40,6 @@ function startBrowserSync(directoryBase, files, browser) {
     });
 }
 
-gulp.task('serve', ['less', 'fonts', 'lint-js'], () => {
+gulp.task('serve', ['watch'], () => {
     startBrowserSync([paths.srcDir, './' ]);
-    gulp.start('watch');
 });
