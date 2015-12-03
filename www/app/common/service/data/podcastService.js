@@ -2,9 +2,22 @@
  * Created by kevin on 02/11@/14 for Podcast Server
  */
 import angular from 'angular';
+import {Module, Service, Config} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular.config';
 
-class PodcastService  {
+@Module({
+    name : 'ps.common.service.data.podcastService',
+    modules : [ RestangularConfig ]
+})
+@Service('podcastService')
+@Config((RestangularProvider) => {
+    "ngInject";
+    RestangularProvider.addElementTransformer('podcast', false, (podcast) => {
+        podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
+        return podcast;
+    });
+})
+export default class PodcastService  {
 
     constructor(Restangular) {
         "ngInject";
@@ -51,18 +64,4 @@ class PodcastService  {
     statsOf(id) {
         return this.Restangular.one(this.route, id).one('stats');
     }
-
-    static config(RestangularProvider) {
-        "ngInject";
-        RestangularProvider.addElementTransformer('podcast', false, (podcast) => {
-            podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
-            return podcast;
-        });
-    }
 }
-
-export default angular.module('ps.common.service.data.podcastService', [
-    RestangularConfig.name
-])
-    .config(PodcastService.config)
-    .service('podcastService', PodcastService);
