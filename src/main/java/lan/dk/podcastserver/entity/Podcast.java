@@ -91,8 +91,9 @@ public class Podcast implements Serializable {
         return signature;
     }
 
-    public void setSignature(String signature) {
+    public Podcast setSignature(String signature) {
         this.signature = signature;
+        return this;
     }
 
     @Column(name = "last_update")
