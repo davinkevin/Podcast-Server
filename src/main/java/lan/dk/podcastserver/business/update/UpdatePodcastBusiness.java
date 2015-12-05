@@ -21,13 +21,14 @@ import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
+
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Component
@@ -80,16 +81,14 @@ public class UpdatePodcastBusiness  {
         initUpdate();
 
         log.info("Lancement de l'update");
-        Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures = new HashSet<>();
-
         log.info("Traitement de {} podcasts", podcasts.size());
-        for (Podcast podcast : podcasts) {
-            futures.add(
-                    CompletableFuture
-                            .supplyAsync(() -> workerService.updaterOf(podcast))
-                            .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor)
-            );
-        }
+        Set<CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures = podcasts
+                .stream()
+                .map(podcast -> CompletableFuture
+                        .supplyAsync(() -> workerService.updaterOf(podcast))
+                        .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor))
+                .collect(toSet());
+
         log.info("Attente des retours");
 
         handleUpdateTuple(futures);
@@ -111,7 +110,7 @@ public class UpdatePodcastBusiness  {
         changeAndCommunicateUpdate(Boolean.TRUE);
     }
 
-    private void handleUpdateTuple(Set<Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures) {
+    private void handleUpdateTuple(Set<CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures) {
         try {
             for (Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture : futures) {
                 UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(timeValue, timeUnit);
@@ -126,8 +125,10 @@ public class UpdatePodcastBusiness  {
 
     private Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {
 
-        if (items == null || items.isEmpty() )
-            return podcast;
+        if (items == null || items.isEmpty() ) {
+            log.info("Reset de la signature afin de forcer le prochain update de : {}", podcast.getTitle());
+            return podcast.setSignature("");
+        }
 
         items.stream()
                 .filter(filter)
