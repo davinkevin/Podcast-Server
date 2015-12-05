@@ -6,7 +6,7 @@ import {Module, Service} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular.config';
 
 @Module({
-    name : 'ps.common.service.data.tagService',
+    name : 'ps.common.service.data.statsService',
     modules : [ RestangularConfig ]
 })
 @Service('statService')
