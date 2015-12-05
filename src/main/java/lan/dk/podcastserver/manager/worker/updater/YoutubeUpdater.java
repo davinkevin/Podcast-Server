@@ -13,7 +13,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.output.XMLOutputter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
 @Component("YoutubeUpdater")
@@ -62,8 +62,8 @@ public class YoutubeUpdater extends AbstractUpdater {
         JSONObject response;
         try {
             response = JSONObject.class.cast(parser.parse(urlService.getReaderFromURL(url)));
-        } catch (ParseException | IOException e) {
-            logger.error("Error during fetching of API Playlist", e);
+        } catch (ParseException | IOException | Error e) {
+            logger.error("Error during fetching of API Playlist {} => {}", podcast.getTitle(), url, e);
             return Sets.newHashSet();
         }
 
@@ -119,7 +119,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         try {
             podcastXMLSource = xmlOf(podcast.getUrl());
         } catch (JDOMException | IOException e) {
-            logger.error("Error during youtube parsing", e);
+            logger.error("Error during youtube parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
             return Sets.newHashSet();
         }
 
@@ -137,9 +137,18 @@ public class YoutubeUpdater extends AbstractUpdater {
     public String signatureOf(Podcast podcast) {
         try {
             Document podcastXMLSource = xmlOf(podcast.getUrl());
-            return signatureService.generateMD5Signature(new XMLOutputter().outputString(podcastXMLSource.getRootElement()));
+
+            Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
+            String stringToSign = podcastXMLSource
+                    .getRootElement()
+                    .getChildren("entry", defaultNamespace)
+                    .stream()
+                    .map(elem -> elem.getChildText("id", defaultNamespace))
+                    .collect(joining());
+
+            return signatureService.generateMD5Signature(stringToSign);
         } catch (JDOMException | IOException e) {
-            logger.error("Error during youtube signature & parsing", e);
+            logger.error("Error during youtube signature & parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
             return "";
         }
 
@@ -179,6 +188,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     private String playlistIdOf(String url) {
+        // TODO  : Use Pattern Match to extract PlaylistID in Feed case and url case
         return StringUtils.substringAfter(url, "list=");
     }
 
@@ -192,7 +202,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         try {
             page = htmlService.connectWithDefault(url).get();
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            logger.error("IOException : {}", url, e);
             return "";
         }
 
