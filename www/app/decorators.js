@@ -58,7 +58,7 @@ export function HotKeys({hotKeys = []}) {
 
 export function Component({restrict = 'E', scope = true, as = 'vm', bindToController = true, replace = false, transclude = false, selector}) {
     return Target => {
-        if (!Target.$template && restrict.indexOf('E') !== -1 ) throw new TypeError("A Template should be defined with the annotation @View for Element Component (restrict : E)");;
+        if (!Target.$template && restrict.indexOf('E') !== -1 ) throw new TypeError("A Template should be defined with the annotation @View for Element Component (restrict : E)");
         if (!selector) throw new TypeError("A selector should be defined in the current annotation @Component");
 
         Target.$componentName = snakeCaseToCamelCase(selector);

@@ -55,20 +55,8 @@ export default class ItemDetailCtrl {
         this.DonwloadManager.ws.toggle(item);
     }
 
-    remove(item) {
-        return item.remove()
-            .then(() => {
-                this.playlistService.remove(item);
-                this.$location.path('/podcasts/'.concat(this.item.podcast.id));
-            });
-    }
-
-    reset(item) {
-        return item.reset()
-            .then((itemReseted) => {
-                _.assign(this.item, itemReseted);
-                this.playlistService.remove(item);
-            });
+    redirect() {
+        this.$location.path('/podcasts/'.concat(this.item.podcast.id));
     }
 
     toggleInPlaylist() {

@@ -9,31 +9,23 @@
         </span>
 
             <!-- Lancer le téléchargement -->
-            <button ng-click="item.download()" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+            <button ng-click="item.download()" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary hidden-xs"><span class="glyphicon glyphicon-save"></span></button>
 
             <!-- Lire dans le player -->
-            <a ng-href="/podcasts/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
+            <a ng-href="/podcasts/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded" type="button" class="btn btn-success hidden-xs"><span class="ionicons ion-social-youtube"></span></a>
             
             <!-- Supprimer l'item -->
-            <button ng-click="pic.remove(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' )" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+            <button ng-click="pic.remove(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' )" type="button" class="btn btn-danger hidden-xs"><span class="glyphicon glyphicon-remove"></span></button>
 
             <!-- Menu complémentaire -->
-            <div class="btn-group" uib-dropdown is-open="isopen">
-                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
-                <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    <li ng-show="item.isDownloaded"><a target="_self" ng-href="{{ item.proxyURL }}"><span class="glyphicon glyphicon-play text-success"></span> Lire</a></li>
-                    <li ng-show="item.isDownloaded">
-                        <a ng-hide="pic.isInPlaylist(item)" ng-click="pic.addOrRemoveInPlaylist(item)">
-                            <span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist
-                        </a>
-                        <a ng-show="pic.isInPlaylist(item)" ng-click="pic.addOrRemoveInPlaylist(item)">
-                            <span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist
-                        </a>
-                    </li>
-                    <li><a target="_self" ng-href="{{ item.url }}"><span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a></li>
-                    <li><a ng-click="pic.reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>
-                </ul>
-            </div>
+            <item-menu class="hidden-xs"
+                    item="item"
+                    local-read="true"
+                    on-line-read="true"
+                    playlist-control="true"
+                    reset-item="true"
+            >
+            </item-menu>
         </div>
 
         <a class="pull-left" ng-href="/podcasts/{{pic.podcast.id}}/item/{{item.id}}">

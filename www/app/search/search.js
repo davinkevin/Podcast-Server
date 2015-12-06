@@ -12,12 +12,14 @@ import DownloadManager from '../common/service/data/downloadManager';
 import ItemService from '../common/service/data/itemService';
 import TagService from '../common/service/data/tagService';
 import PlaylistService from '../common/service/playlistService';
+import ItemMenu from '../common/component/item-menu/item-menu';
 import template from './search.html!text';
 import './search.css!';
 
 @Module({
     name : 'ps.search',
     modules : [
+        ItemMenu,
         NgTagsInput,
         NgStorage,
         AppRouteConfig,
@@ -119,42 +121,8 @@ export default class ItemSearchCtrl {
         return this.changePage();
     }
 
-    //** Item Operation **//
-    remove(item) {
-        return item.remove()
-            .then(() => this.playlistService.remove(item))
-            .then(() => this.changePage());
-    }
-
-    reset(item) {
-        return item.reset()
-            .then((itemReseted) => {
-                var itemInList = _.find(this.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-                return itemInList;
-            })
-            .then((itemInList) => this.playlistService.remove(itemInList));
-    }
-
-    stopDownload(item) {
-        this.DownloadManager.ws.stop(item);
-    }
-
-    toggleDownload(item){
-        return this.DownloadManager.ws.toggle(item);
-    }
-
     loadTags(query){
         return this.tagService.search(query);
-    }
-
-    //** Playlist Manager **//
-    addOrRemove(item) {
-        return this.playlistService.addOrRemove(item);
-    }
-
-    isInPlaylist(item) {
-        return this.playlistService.contains(item);
     }
 
     calculatePage() {

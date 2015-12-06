@@ -22,7 +22,7 @@ export default {
   },
   releaseDirName: releaseDirName,
   jspm : {
-    fonts : `${srcDirName}/jspm_packages/**/*.${fontsExtension}`
+    fonts : `${root}/${srcDirName}/jspm_packages/**/*.${fontsExtension}`
   },
   app: {
     app : `${root}/${srcDirName}/${appName}`,

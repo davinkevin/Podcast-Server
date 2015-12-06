@@ -52,46 +52,18 @@
         <div ng-repeat="item in isc.items track by item.id" class="col-lg-3  col-md-3 col-sm-4 col-xs-6 item-in-list">
             <div class="box">
                 <div class="more-button">
-                    <div class="btn-group" uib-dropdown>
-                        <button type="button" class="btn dropdown" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
-                        <ul uib-dropdown-menu class="dropdown-menu-right" role="menu">
-                            <li ng-show="item.status == 'STARTED' || item.status == 'PAUSED'">
-                                <a ng-show="item.status == 'STARTED'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>
-                                <a ng-show="item.status == 'PAUSED'" ng-click="isc.toggleDownload(item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>
-                            </li>
-                            <li ng-show="item.status == 'STARTED' || item.status == 'PAUSED'">
-                                <a ng-click="isc.stopDownload(item)">
-                                    <span class="glyphicon glyphicon-stop text-danger"></span> Stopper
-                                </a>
-                            </li>
-                            <li ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded">
-                                <a ng-click="item.download()">
-                                    <span class="glyphicon glyphicon-save text-primary"></span> Télécharger
-                                </a>
-                            </li>
-                            <li>
-                                <a ng-href="/podcasts/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded">
-                                    <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player
-                                </a>
-                            </li>
-                            <li ng-show="item.isDownloaded">
-                                <a ng-click="isc.addOrRemove(item)">
-                                    <span ng-hide="isc.isInPlaylist(item)"><span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist</span>
-                                    <span ng-show="isc.isInPlaylist(item)"><span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a ng-click="isc.remove(item)"><span class="glyphicon glyphicon-remove text-danger"></span> Supprimer</a>
-                            </li>
-                            <li>
-                                <a ng-click="isc.reset(item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
-                            </li>
-                        </ul>
-                    </div>
+                    <item-menu
+                            item="item"
+                            download-control="true"
+                            read-in-player="true"
+                            playlist-control="true"
+                            delete-item="true"
+                            on-delete-item="isc.changePage()"
+                            reset-item="true"
+                    >
+                    </item-menu>
                 </div>
                 <div class="cover" ng-style="{ 'background-image' : 'url(\''+ item.cover.url + '\')'}" ng-class="{'grayscale' : (!item.isDownloaded) }">
-                    <!--<img ng-class="{'img-grayscale' : (!item.isDownloaded) }" ng-src="{{ item.cover.url }}" alt="" class="img-responsive" />-->
-
                     <a class="overlay-main-button no-grayscale" target="_self" ng-href="{{ item.proxyURL  }}" >
                         <span ng-class="{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}" class="glyphicon "></span>
                     </a>

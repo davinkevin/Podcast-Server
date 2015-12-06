@@ -1,7 +1,6 @@
 /**
  * Created by kevin on 02/11@/14 for Podcast Server
  */
-import angular from 'angular';
 import {Module, Service, Config} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular.config';
 

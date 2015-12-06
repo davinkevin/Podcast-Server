@@ -71,25 +71,6 @@ export default class PodcastItemsListComponent {
             .then(() => this.loadPage());
     }
 
-
-    reset(item) {
-        return item.reset()
-            .then((itemReseted) => {
-                var itemInList = _.find(this.podcast.items, { 'id': itemReseted.id });
-                _.assign(itemInList, itemReseted);
-                return itemInList;
-            })
-            .then((itemToRemove) => this.playlistService.remove(itemToRemove));
-    }
-
-    addOrRemoveInPlaylist(item) {
-        this.playlistService.addOrRemove(item);
-    }
-
-    isInPlaylist(item) {
-        return this.playlistService.contains(item);
-    }
-
     swipePage(val) {
         this.currentPage += val;
         this.loadPage();
