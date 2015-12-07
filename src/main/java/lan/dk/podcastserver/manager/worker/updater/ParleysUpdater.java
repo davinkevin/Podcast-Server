@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.utils.URLUtils;
-import org.json.simple.JSONArray;
+import lan.dk.podcastserver.service.UrlService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,15 +14,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 12/07/2014.
@@ -30,92 +29,93 @@ import java.util.regex.Pattern;
 @Component("ParleysUpdater")
 public class ParleysUpdater extends AbstractUpdater {
 
-    public static final String PARLEYS_PATTERN = "EEE MMM dd HH:mm:ss z yyyy";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public static final String PARLEYS_PATTERN = "EEE MMM dd HH:mm:ss z yyyy";
     public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/%s?index=0&size=%s&text=&orderBy=date";
     public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/%s?view=true";
     public static final String PARLEYS_ITEM_URL = "http://www.parleys.com/play/%s";
-
-    /* Patter to extract value from URL */
     public static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)/.*");
 
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_COUNT = "count";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_PUBLISHED_ON = "publishedOn";
+    public static final String FIELD_BASE_PATH = "basePath";
+    public static final String FIELD_THUMBNAIL = "thumbnail";
+    public static final String FIELD_RESULTS = "results";
+    public static final String FIELD_VISIBILITY = "visibility";
+    public static final String FIELD_FREE = "free";
+    public static final String FIELD_COMPLETED_IN = "completedIn";
+
     @Resource ImageService imageService;
+    @Resource UrlService urlService;
+    private JSONParser parser = new JSONParser();
 
     public Set<Item> getItems(Podcast podcast) {
-        Set<Item> itemSet = new HashSet<>();
-
+        JSONObject jsonObject;
         try {
-            JSONObject responseObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
-
-            JSONArray resultArray = getParleysPresentationResultsArray(responseObject);
-
-            for (Object jsonObject : resultArray) {
-
-                JSONObject currentObject = (JSONObject) jsonObject;
-
-                String _id = (String) currentObject.get("_id");
-                if (isFree(currentObject)) {
-                    itemSet.add(getParleysItem(_id));
-                }
-            }
-
+            jsonObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            logger.error("Error during fetch of Parleys Podcast {}", podcast.getUrl(), e);
+            return Sets.newHashSet();
         }
-        return itemSet;
+
+        return getParleysPresentationResultsArray(jsonObject)
+                .stream()
+                .filter(this::isFree)
+                .map(elem -> elem.get(FIELD_ID))
+                .map(String::valueOf)
+                .map(this::getParleysItem)
+                .collect(toSet());
     }
 
 
     @Override
     public String signatureOf(Podcast podcast) {
+        JSONObject podcastRepresentation;
         try {
-            JSONObject podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
-            podcastRepresentation.remove("completedIn");
-            podcastRepresentation.remove("results");
-            return signatureService.generateMD5Signature(podcastRepresentation.toJSONString());
+            podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            logger.error("Error during parsing of {}", podcast, e);
+            return "";
         }
-        return "";
-    }
 
-    private JSONObject getParseJsonObject(String url, Integer numberOfItem) throws IOException, ParseException {
-        return (JSONObject) new JSONParser().parse(URLUtils.getReaderFromURL(getParleysPresentationUrl(url, numberOfItem)));
-    }
+        podcastRepresentation.remove(FIELD_COMPLETED_IN);
+        podcastRepresentation.remove(FIELD_RESULTS);
+        return signatureService.generateMD5Signature(podcastRepresentation.toJSONString());
 
-    private JSONArray getParleysPresentationResultsArray(JSONObject responseObject) {
-        return (JSONArray) responseObject.get("results");
     }
 
     private Item getParleysItem(String id) {
+        JSONObject responseObject;
         try {
-            JSONParser parser = new JSONParser();
-            JSONObject responseObject = (JSONObject) parser.parse(URLUtils.getReaderFromURL(getItemUrl(id)));
-
-            String baseURL = (String) responseObject.get("basePath");
-
-            return new Item()
-                            .setTitle((String) responseObject.get("title"))
-                            .setDescription((String) responseObject.get("description"))
-                            .setPubdate(fromParleys((String) responseObject.get("publishedOn")))
-                            .setCover(Objects.isNull(responseObject.get("thumbnail")) ? null : imageService.getCoverFromURL(new URL(baseURL.concat((String) responseObject.get("thumbnail")))))
-                            .setUrl(String.format(PARLEYS_ITEM_URL, id));
-
-
+            responseObject = (JSONObject) parser.parse(urlService.getReaderFromURL(getItemUrl(id)));
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            logger.error("Error during fetching of item of id {}", id, e);
+            return Item.DEFAULT_ITEM;
         }
 
-        return new Item();
+        return new Item()
+                .setTitle((String) responseObject.get(FIELD_TITLE))
+                .setDescription((String) responseObject.get(FIELD_DESCRIPTION))
+                .setPubdate(fromParleys((String) responseObject.get(FIELD_PUBLISHED_ON)))
+                .setCover(imageService.getCoverFromURL(((String) responseObject.get(FIELD_BASE_PATH)).concat((String) responseObject.get(FIELD_THUMBNAIL))))
+                .setUrl(String.format(PARLEYS_ITEM_URL, id));
+    }
+
+    private JSONObject getParseJsonObject(String url, Integer numberOfItem) throws IOException, ParseException {
+        return (JSONObject) parser.parse(urlService.getReaderFromURL(getParleysPresentationUrl(url, numberOfItem)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<JSONObject> getParleysPresentationResultsArray(JSONObject responseObject) {
+        return (List<JSONObject>) responseObject.get(FIELD_RESULTS);
     }
 
     private String getItemUrl(String id) {
         return String.format(PARLEYS_ITEM_API_URL, id);
-    }
-
-    private String getParleysPresentationUrl(String url) {
-        return getParleysPresentationUrl(url, null);
     }
 
     private String getParleysPresentationUrl(String url, Integer numberOfItem) {
@@ -133,12 +133,11 @@ public class ParleysUpdater extends AbstractUpdater {
 
     private Integer getNumberOfItem(String url) throws IOException, ParseException {
         JSONObject responseObject = getParseJsonObject(url, 1);
-        return (responseObject.get("count") != null) ? ((Long) responseObject.get("count")).intValue() : 100 ;
+        return nonNull(responseObject.get(FIELD_COUNT)) ? ((Long) responseObject.get(FIELD_COUNT)).intValue() : 100;
     }
 
-
     private Boolean isFree(JSONObject currentObject) {
-        return (Boolean) ((JSONObject) currentObject.get("visibility")).get("free");
+        return (Boolean) ((JSONObject) currentObject.get(FIELD_VISIBILITY)).get(FIELD_FREE);
     }
 
     private ZonedDateTime fromParleys(String pubDate) {
