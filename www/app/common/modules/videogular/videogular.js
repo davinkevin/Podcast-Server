@@ -2,14 +2,15 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 
-import {Module} from '../../decorators';
 import 'angular-sanitize';
+import {Module} from '../../../decorators';
 import VideogularModule from 'videogular';
 import VideogularBuffering from 'videogular-buffering';
 import VideogularControls from 'videogular-controls';
 import VideogularPoster from 'videogular-poster';
 import VideogularOverlayPlay from 'videogular-overlay-play';
 import 'videogular-themes-default/videogular.css!';
+import './videogular.css!';
 
 @Module({
     name : 'ps.config.videogular',

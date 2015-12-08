@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import {Component, View, Module} from '../../../decorators';
-import AppVideogular from '../../../common/modules/videogular';
+import AppVideogular from '../../../common/modules/videogular/videogular';
 import Truncate from '../../../common/modules/truncate';
 import PlaylistService from '../../../common/service/playlistService';
 import template from './player-inline.html!text';

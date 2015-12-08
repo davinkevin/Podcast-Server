@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import {RouteConfig, View, HotKeys, Module} from '../decorators';
-import Videogular from '../common/modules/videogular';
+import Videogular from '../common/modules/videogular/videogular';
 import AppRouteConfig from '../config/route.config';
 import DeviceDetectionService from '../common/service/device-detection';
 import PlaylistService from '../common/service/playlistService';

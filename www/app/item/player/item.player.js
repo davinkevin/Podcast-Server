@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {RouteConfig, View, Module} from '../../decorators';
-import Videogular from '../../common/modules/videogular';
+import Videogular from '../../common/modules/videogular/videogular';
 import AppRouteConfig from '../../config/route.config';
 import DeviceDetectionService from '../../common/service/device-detection';
 import template from './item-player.html!text';
