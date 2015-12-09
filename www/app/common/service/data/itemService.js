@@ -1,11 +1,15 @@
 /**
  * Created by kevin on 01/11/14 for PodcastServer
  */
-import angular from 'angular';
-import AppRestangularConfig from '../../../config/restangular.config';
+import {Module, Service} from '../../../decorators';
+import RestangularConfig from '../../../config/restangular.config';
 
-
-class itemService {
+@Module({
+    name : 'ps.common.service.data.itemService',
+    modules : [ RestangularConfig ]
+})
+@Service('itemService')
+export default class itemService {
     constructor(Restangular) {
         "ngInject";
         this.Restangular = Restangular;
@@ -50,9 +54,3 @@ class itemService {
             .customPOST(formData, 'upload', undefined, {'Content-Type': undefined});
     }
 }
-
-export default angular
-    .module('ps.common.service.data.itemService', [
-        AppRestangularConfig.name
-    ])
-    .service('itemService', itemService);
