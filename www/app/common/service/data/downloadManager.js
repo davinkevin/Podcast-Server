@@ -1,4 +1,4 @@
-import angular from 'angular';
+import {Module, Service} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular.config';
 import AngularStompDKConfig from '../../../config/ngstomp.config';
 
@@ -22,7 +22,13 @@ class wsDownloadManager {
     stop(item) { this.ngstomp.send(this.WS_DOWNLOAD_BASE + '/stop', item); return this;}
 }
 
-class DownloadManager {
+
+@Module({
+    name : 'ps.common.service.data.downloadManager',
+    modules : [ RestangularConfig, AngularStompDKConfig ]
+})
+@Service('DonwloadManager')
+export default class DownloadManager {
 
     constructor(Restangular, ngstomp) {
         "ngInject";
@@ -70,12 +76,4 @@ class DownloadManager {
     moveInWaitingList  (item, position) {
         this.baseDownloadManager.customPOST({id : item.id, position : position } , 'move');
     }
-
 }
-
-export default angular
-    .module('ps.common.service.data.downloadManager', [
-        RestangularConfig.name,
-        AngularStompDKConfig.name
-    ])
-    .service('DonwloadManager', DownloadManager);
