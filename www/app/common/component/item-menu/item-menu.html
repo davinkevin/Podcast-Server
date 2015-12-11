@@ -2,38 +2,38 @@
     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
     <ul uib-dropdown-menu class="dropdown-menu-right" role="menu">
         <li ng-if="imc.localRead" ng-show="imc.item.isDownloaded"><a target="_self" ng-href="{{ imc.item.proxyURL }}">
-            <span class="glyphicon glyphicon-play text-success"></span> Lire</a>
+            <span class="glyphicon glyphicon-play text-success"></span> Read</a>
         </li>
         <li ng-if="imc.downloadControl" ng-show="imc.item.status == 'STARTED' || imc.item.status == 'PAUSED'">
-            <a ng-show="imc.item.status == 'STARTED'" ng-click="imc.toggleDownload(imc.item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Mettre en pause</a>
-            <a ng-show="imc.item.status == 'PAUSED'" ng-click="imc.toggleDownload(imc.item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Reprendre</a>
+            <a ng-show="imc.item.status == 'STARTED'" ng-click="imc.toggleDownload(imc.item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Pause</a>
+            <a ng-show="imc.item.status == 'PAUSED'" ng-click="imc.toggleDownload(imc.item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Resume</a>
         </li>
         <li ng-if="imc.downloadControl" ng-show="imc.item.status == 'STARTED' || imc.item.status == 'PAUSED'">
             <a ng-click="imc.stopDownload(imc.item)">
-                <span class="glyphicon glyphicon-stop text-danger"></span> Stopper
+                <span class="glyphicon glyphicon-stop text-danger"></span> Stop
             </a>
         </li>
         <li ng-if="imc.downloadControl" ng-show="(imc.item.status != 'STARTED' && imc.item.status != 'PAUSED' ) && !imc.item.isDownloaded">
             <a ng-click="imc.item.download()">
-                <span class="glyphicon glyphicon-save text-primary"></span> Télécharger
+                <span class="glyphicon glyphicon-save text-primary"></span> Download
             </a>
         </li>
         <li ng-if="imc.readInPlayer">
             <a ng-href="/podcasts/{{ imc.item.podcastId }}/item/{{ imc.item.id }}/play" ng-show="imc.item.isDownloaded">
-                <span class="ionicons ion-social-youtube text-success"></span> Lire dans le player
+                <span class="ionicons ion-social-youtube text-success"></span> Read in the player
             </a>
         </li>
         <li ng-if="imc.playlistControl" ng-show="imc.item.isDownloaded">
             <a ng-click="imc.addOrRemove(imc.item)">
-                <span ng-hide="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-plus text-primary"></span> Ajouter à la Playlist</span>
-                <span ng-show="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-minus text-primary"></span> Retirer de la Playlist</span>
+                <span ng-hide="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-plus text-primary"></span> Add to Playlist</span>
+                <span ng-show="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-minus text-primary"></span> Remove from Playlist</span>
             </a>
         </li>
         <li><a target="_self" ng-href="{{ imc.item.url }}">
-            <span class="glyphicon glyphicon-globe text-info"></span> Lire en ligne</a>
+            <span class="glyphicon glyphicon-globe text-info"></span> Read OnLine</a>
         </li>
         <li ng-if="imc.deleteItem">
-            <a ng-click="imc.remove(imc.item)"><span class="glyphicon glyphicon-remove text-danger"></span> Supprimer</a>
+            <a ng-click="imc.remove(imc.item)"><span class="glyphicon glyphicon-remove text-danger"></span> Delete</a>
         </li>
         <li ng-if="imc.resetItem">
             <a ng-click="imc.reset(imc.item)"><span class="glyphicon glyphicon-repeat"></span> Reset</a>

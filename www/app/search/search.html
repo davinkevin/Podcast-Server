@@ -5,7 +5,7 @@
     <div class="form-inline search-bar row" ng-show="isc.search">
         <div class="form-group col-sm-3 col-md-3 col-lg-3">
             <div class="input-group">
-                <input type="text" class="form-control" ng-model="isc.searchParameters.term" placeholder="Recherche globale" ng-change="isc.resetSearch()" ng-model-options="{ debounce: 500 }">
+                <input type="text" class="form-control" ng-model="isc.searchParameters.term" placeholder="Global Search" ng-change="isc.resetSearch()" ng-model-options="{ debounce: 500 }">
                 <span class="input-group-addon" ng-click="isc.searchParameters.term = ''; isc.resetSearch()"><i class="ionicons ion-android-cancel"></i></span>
             </div>
         </div>
@@ -21,7 +21,7 @@
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
             <select class="form-control" ng-model="isc.searchParameters.downloaded" ng-change="isc.resetSearch()">
-                <option value="">Tous</option>
+                <option value="">All</option>
                 <option value="true">Downloaded</option>
                 <option value="false">Not Downloaded</option>
             </select>
@@ -29,17 +29,17 @@
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
             <select class="form-control" ng-model="isc.searchParameters.properties" ng-change="isc.resetSearch()">
-                <option value="pertinence">Pertinence</option>
-                <option value="pubdate">Date publication</option>
-                <option value="downloadDate">Date de download</option>
+                <option value="pertinence">Relevance</option>
+                <option value="pubdate">Publication Date</option>
+                <option value="downloadDate">Download Date</option>
             </select>
         </div>
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
             <!--<select class="form-control" ng-model="searchParameters.direction" ng-change="changePage()" ng-disabled="searchParameters.properties === 'pertinence'">-->
             <select class="form-control" ng-model="isc.searchParameters.direction" ng-change="isc.resetSearch()">
-                <option value="DESC">Descendant</option>
-                <option value="ASC">Ascendant</option>
+                <option value="DESC">Descending</option>
+                <option value="ASC">Ascending</option>
             </select>
         </div>
     </div>

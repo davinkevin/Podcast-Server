@@ -26,8 +26,8 @@
     </div>
     <div class="playlist col-lg-4">
         <div class="row button-list">
-            <div class="col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center" ng-click="pc.reloadPlaylist()"><span class="ionicons ion-refresh"></span> Rafraichir</div>
-            <div class="col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center" ng-click="pc.removeAll ()"><span class="ionicons ion-trash-b"></span> Vider</div>
+            <div class="col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center" ng-click="pc.reloadPlaylist()"><span class="ionicons ion-refresh"></span> Refresh</div>
+            <div class="col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center" ng-click="pc.removeAll ()"><span class="ionicons ion-trash-b"></span> Empty</div>
         </div>
         <div class="media clearfix"  ng-repeat="item in pc.playlist track by item.id" ng-class="{'isReading' : pc.currentVideo.id === item.id}">
 

@@ -3,9 +3,9 @@
     <uib-accordion-group heading="Podcast" is-open="true">
         <form class="form-horizontal" role="form">
             <div class="form-group">
-                <label for="title" class="col-sm-2 control-label">Titre</label>
+                <label for="title" class="col-sm-2 control-label">Title</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="title" ng-model="pec.podcast.title" required placeholder="Titre">
+                    <input type="text" class="form-control" id="title" ng-model="pec.podcast.title" required placeholder="Title">
                 </div>
             </div>
             <div class="form-group" ng-if="pec.podcast.isUpdatable()">
@@ -18,7 +18,7 @@
                 <div class="col-sm-offset-2 col-sm-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" ng-model="pec.podcast.hasToBeDeleted"> Suppression Auto
+                            <input type="checkbox" ng-model="pec.podcast.hasToBeDeleted"> Auto-Deletion
                         </label>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
 
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button ng-click="pec.save()" class="btn btn-default">Sauvegarder</button>
+                    <button ng-click="pec.save()" class="btn btn-default">Save</button>
                 </div>
             </div>
         </form>
@@ -56,13 +56,13 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="width" class="col-sm-2 control-label">Largeur</label>
+                <label for="width" class="col-sm-2 control-label">Width</label>
                 <div class="col-sm-10">
                     <input type="number" class="form-control" id="width" ng-model="pec.podcast.cover.width" required placeholder="width">
                 </div>
             </div>
             <div class="form-group">
-                <label for="height" class="col-sm-2 control-label">Hauteur</label>
+                <label for="height" class="col-sm-2 control-label">Height</label>
                 <div class="col-sm-10">
                     <input type="number" class="form-control" id="height" ng-model="pec.podcast.cover.height" required placeholder="height">
                 </div>
@@ -70,7 +70,7 @@
 
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button ng-click="pec.save()" class="btn btn-default">Sauvegarder</button>
+                    <button ng-click="pec.save()" class="btn btn-default">Save</button>
                 </div>
             </div>
         </form>
