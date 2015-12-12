@@ -56,6 +56,7 @@ System.config({
     "videogular-overlay-play": "github:2fdevs/bower-videogular-overlay-play@1.3.2",
     "videogular-poster": "github:2fdevs/bower-videogular-poster@1.3.2",
     "videogular-themes-default": "github:2fdevs/bower-videogular-themes-default@1.3.2",
+    "clipboard": "github:zenorocha/clipboard.js@1.5.5",
     "github:angular/bower-angular-animate@1.4.7": {
       "angular": "github:angular/bower-angular@1.4.7"
     },

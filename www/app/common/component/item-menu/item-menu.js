@@ -6,11 +6,13 @@ import _ from 'lodash';
 import {Component, View, Module} from '../../../decorators';
 import DownloadManager from '../../service/data/downloadManager';
 import playlistService from '../../service/playlistService';
+import Copy from '../copy/copy';
 import template from './item-menu.html!text';
+import './item-menu.css!';
 
 @Module({
     name : 'ps.common.component.item-menu',
-    modules : [ DownloadManager, playlistService ]
+    modules : [ DownloadManager, playlistService, Copy ]
 })
 @Component({
     selector : 'item-menu',

@@ -1,8 +1,13 @@
 <div class="btn-group" uib-dropdown>
     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
     <ul uib-dropdown-menu class="dropdown-menu-right" role="menu">
-        <li ng-if="imc.localRead" ng-show="imc.item.isDownloaded"><a target="_self" ng-href="{{ imc.item.proxyURL }}">
-            <span class="glyphicon glyphicon-play text-success"></span> Read</a>
+        <li ng-if="imc.localRead" ng-show="imc.item.isDownloaded">
+            <a target="_self" ng-href="{{ imc.item.proxyURL }}">
+                <span class="glyphicon glyphicon-play text-success"></span> Read
+            </a>
+            <a ng-show="imc.item.isDownloaded" copy="{{ imc.item.proxyURL }}" class="pull-right">
+                <span class="glyphicon glyphicon-copy"></span>
+            </a>
         </li>
         <li ng-if="imc.downloadControl" ng-show="imc.item.status == 'STARTED' || imc.item.status == 'PAUSED'">
             <a ng-show="imc.item.status == 'STARTED'" ng-click="imc.toggleDownload(imc.item)"><i class="glyphicon glyphicon-play text-primary"></i><i class="glyphicon glyphicon-pause text-primary"></i> Pause</a>
@@ -29,8 +34,13 @@
                 <span ng-show="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-minus text-primary"></span> Remove from Playlist</span>
             </a>
         </li>
-        <li><a target="_self" ng-href="{{ imc.item.url }}">
-            <span class="glyphicon glyphicon-globe text-info"></span> Read OnLine</a>
+        <li>
+            <a target="_self" ng-href="{{ imc.item.url }}">
+                <span class="glyphicon glyphicon-globe text-info"></span> Read OnLine
+            </a>
+            <a copy="{{ imc.item.url }}" class="pull-right">
+                <span class="glyphicon glyphicon-copy"></span>
+            </a>
         </li>
         <li ng-if="imc.deleteItem">
             <a ng-click="imc.remove(imc.item)"><span class="glyphicon glyphicon-remove text-danger"></span> Delete</a>
