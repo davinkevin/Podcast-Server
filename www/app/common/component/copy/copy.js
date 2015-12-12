@@ -19,6 +19,7 @@ import Clipboard from 'clipboard';
 export default class Copy {
 
     constructor($window) {
+        "ngInject";
         this.baseUrl = $window.location.origin;
     }
 
