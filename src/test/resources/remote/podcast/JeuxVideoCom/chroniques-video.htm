@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" id="meta-viewport" content="">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Toutes les chroniques de jeux vidéo - jeuxvideo.com</title>
+    <meta name="description" content="Découvrez toutes les chroniques de jeux vidéo ainsi que les dernières vidéos de chroniques comme Chronique,Chronique,Chronique,..." />
+                    <meta name="apple-itunes-app" content="app-id=393077232" />
+    <meta name="google-site-verification" content="1LxApCLYt6SF4NFRJUP_6nseZQBSGcqZz6LMwii-vr4" />
+    <meta property="fb:app_id" content="202446416762"/>
+    <meta property="fb:admins" content="576404360"/>
+    <meta property="og:site_name" content="Jeuxvideo.com"/>
+                        <meta property="og:title" content="Dernières vidéos de chroniques" />
+                    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script type="text/javascript">
+                window.WadsUtil = {
+
+                        _initTimeoutMs: 4000,
+
+                        _initTimeoutID: null,
+
+                        _initTimestamp: null,
+
+                        _loadTimestamp: null,
+
+                        _callbacks: [],
+
+                        _ads: [],
+
+                        Ad: function(adEl, adPosition, styleWhenHidden, styleWhenShown) {
+                this.el = adEl;
+                this.position = adPosition;
+                this.hideStyle = styleWhenHidden;
+                this.showStyle = styleWhenShown;
+            },
+
+                        addWadsCallback: function(callbacks) {
+
+                callbacks.load = callbacks.load || function() {};
+                callbacks.timeout = callbacks.timeout || function() {};
+
+                var callback = {
+                    onLoad: callbacks.load,
+                    onTimeoutReached: callbacks.timeout,
+                };
+
+                WadsUtil._callbacks.push(callback);
+
+                if (wads.isReady) {
+                    setTimeout(function() {
+                        callbacks.load();
+                    }, 0);
+                }
+            },
+
+                        _onWebediadsTimeoutReached: function() {
+                WadsUtil._callbacks.forEach(function(callback) {
+                    callback.onTimeoutReached();
+                });
+            },
+
+                        _onWebediadsSuccess: function() {
+                WadsUtil._callbacks.forEach(function(callback) {
+                    callback.onLoad();
+                });
+            },
+
+                        _addLog: function(state, timeout) {
+                var url = '/webediads/ajax/add_log.php?state=' + state + '&timestamp=' + timeout;
+
+                if (state === 'load') {
+                    url += '&load_time='
+                        + (WadsUtil._loadTimestamp - WadsUtil._initTimestamp);
+                }
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.send(null);
+            },
+
+                        setElementStyle: function(el, style) {
+                for (var prop in style) {
+                    el.style[prop] = style[prop];
+                }
+            },
+
+                        createAdWithStyle: function (adPosition, style, hideStyle, showStyle) {
+                wads.createAdPosition(adPosition);
+                var ad = document.getElementById(wads.encryptPositionName(adPosition));
+
+                style = style || {};
+                hideStyle = hideStyle || {};
+                showStyle = showStyle || {};
+
+                WadsUtil.setElementStyle(ad, style);
+                WadsUtil.registerAndHideAd(new WadsUtil.Ad(
+                    ad,
+                    adPosition,
+                    hideStyle,
+                    showStyle
+                ));
+            },
+
+                        registerAndHideAd: function(ad) {
+                WadsUtil._ads.push(ad);
+                WadsUtil.setElementStyle(ad.el, ad.hideStyle);
+            },
+
+                        showAds: function() {
+                if (!wads.ads) {
+                    return;
+                }
+
+                                wads.display(0);
+
+                                WadsUtil._ads.forEach(function(adElement, index) {
+                    if (wads.ads[adElement.position] && !wads.ads[adElement.position][0].empty) {
+                        WadsUtil.setElementStyle(adElement.el, adElement.showStyle);
+                    }
+                })
+            },
+
+                        init: function() {
+                                WadsUtil.addWadsCallback({
+                    timeout: function() {
+                                                WadsUtil._addLog('timeout', Date.now());
+                    },
+                    load: function() {
+                                                WadsUtil._loadTimestamp = Date.now();
+                        WadsUtil._addLog('load', WadsUtil._loadTimestamp);
+                    },
+                });
+
+                wads.setAsyncCallback(function() {
+                    clearTimeout(WadsUtil._initTimeoutID);
+                    WadsUtil._onWebediadsSuccess();
+                });
+
+                WadsUtil._startTimeout();
+            },
+
+                        _startTimeout: function() {
+
+                WadsUtil._initTimestamp = Date.now();
+
+                WadsUtil._initTimeoutID = window.setTimeout(function() {
+                    if (!wads.isReady) {
+                        WadsUtil._onWebediadsTimeoutReached();
+                    }
+                }, WadsUtil._initTimeoutMs);
+
+                                WadsUtil._addLog('init', WadsUtil._initTimestamp);
+            },
+        };
+
+                window.wadsBeforeStart = function() {
+            wads.autoload = false;
+            WadsUtil.init();
+        };
+
+    </script>
+
+    <script type='text/javascript' src='http://c.amazon-adsystem.com/aax2/amzn_ads.js'></script>
+<script type='text/javascript'>
+    var amznAdsResponse = function() {
+        var amazonTargeting = '';
+        if ("amznads" in window && "getTargeting" in window.amznads) {
+            var targeting = amznads.getTargeting();
+            if (targeting) {
+                for (var key in targeting) {
+                    var val = targeting[key];
+                    if (val instanceof Array) {
+                        val = val.join('|');
+                    }
+                    amazonTargeting = amazonTargeting + '&' + key + '=' + val;
+                }
+            }
+        }
+        return amazonTargeting;
+    };
+    try {
+        amznads.getAds('3309');
+    } catch(e) {}
+</script>
+<script>
+    wadsBlocking = 1;
+</script>
+<script src="http://avorteronmedia.lol/files/adblk2.js?ad_type=" onload="wadsBlocking=0"></script>
+<script src="http://avorteronmedia.lol/files/mobile-detect.min.js"></script>
+<script>
+    // 09-12-2015 10:50:37
+    var wads;
+
+    (function() {
+
+        var params = window.location.search.replace("?","");
+        var wbddsPreview = "";
+        if (params.indexOf("wbdds_preview=") == 0) {
+            wbddsPreview = "/" + params;
+        }
+
+        wads = {
+
+            sitepage : 'jeux_video_com/section',
+            query : 'section=chroniques&rubrique=videos&referer='+encodeURI(document.referrer),
+            mode : 'async',
+                
+            callBaseUrl : 'http://blueste.diet',
+            cookieBaseUrl : 'http://enmediadonner.pl',
+            jsSyncCallMethod : 'p-c-js',
+            jsAsyncCallMethod : 'p-c-async',
+            jsSyncCallPositionMethod : 'p-cp-js',
+            jsAsyncCallPositionMethod : 'p-cp-async',
+            vastCallMethod : 'p-cp-vast2',
+            includeUrl : '/include/async',
+            adBlocking : wadsBlocking,
+            wbddsPreview : wbddsPreview,
+            positionCryptKey : Math.round(Math.random()*1000000).toString(),
+            cnxtype : ((navigator != undefined && navigator.connection != undefined && navigator.connection.type != undefined) ? navigator.connection.type : "unknown"),
+            devicetype: "unknown",
+            os: "unknowm",
+            site: '',
+            page: '',
+            pbi: [],
+            autoload: true,
+            isReady: false,
+            
+            createAdPosition : function (positionName, element) {
+                if (this.mode == 'sync') {
+                    if (typeof wads_script == 'undefined') {
+                        return;
+                    }
+                    document.write('<div id="' + this.encryptPositionName(positionName) + '">');
+                    wads_script(positionName);
+                    document.write('</div>');
+                } else if (this.mode == 'async') {
+                    if (element) {
+                        var position = document.createElement('div');
+                        position.id = this.encryptPositionName(positionName);
+                        element.appendChild(position);
+                    }
+                    else {
+                        document.write('<div id="' + this.encryptPositionName(positionName) + '"></div>');
+                    }
+                } else if (this.mode == 'deferred') {
+                    if ((positionName == 'header-top' || positionName == 'interstitiel-ft') && typeof wads_script != 'undefined') {
+                        wads_script(positionName);
+                    } else {
+                        var styles = "";
+                        if (wads && wads.ads && wads.ads[positionName] && wads.ads[positionName][0] && wads.ads[positionName][0].empty) {
+                            styles = ' style="height:0;visibility:hidden;"';
+                        }
+                        document.write('<div id="t' + this.encryptPositionName(positionName) + '"'+styles+'></div>');
+                    }
+                } else {
+                    console.warn('wads_unknow_mode');
+                }
+            },
+            launchDeferredAdPositions : function() {
+                if (this.mode == 'deferred') {
+                    console.log('wads_launchDeferred');
+                    if (typeof wads_script == 'function') {
+                        for (var positionName in wads.ads) {
+                            if (document.getElementById('t' + this.encryptPositionName(positionName))) {
+                                document.write('<div id="' + this.encryptPositionName(positionName) + '">');
+                                wads_script(positionName);
+                                document.write('</div>');
+                            }
+                        }
+                    }
+                }
+                //window.onload = wads.moveDeferredAdPositions;
+                if (window.addEventListener) {
+                    window.addEventListener("load", wads.moveDeferredAdPositions, false);
+                } else if (window.attachEvent) {
+                    window.attachEvent("onload", wads.moveDeferredAdPositions);
+                }
+            },
+            moveDeferredAdPositions : function () {
+                if (wads.mode == 'deferred') {
+                    for (var positionName in wads.ads) {
+                        if (document.getElementById('t' + wads.encryptPositionName(positionName))) {
+                            //console.log('+' + positionName);
+                            var adDiv = wads.getElement(positionName);
+                            if (adDiv) {
+                                adDiv = adDiv.parentNode.removeChild(adDiv);
+                                document.getElementById('t' + wads.encryptPositionName(positionName)).appendChild(adDiv);
+                            }
+                        }
+                    }
+                }
+            },
+            passback : function (positionName) {
+                var adPosition = this.getElement(positionName);
+                if (adPosition
+                    && typeof(wads.ads[positionName]) != 'undefined'
+                    && typeof(wads.ads[positionName][0]) != 'undefined'
+                    && typeof(wads.ads[positionName][0]['id']) != 'undefined'
+                    && typeof(wads.ads[positionName][0]['cm2']) != 'undefined'
+                ) {
+                    adPosition.innerHTML = '';
+
+                    var cm2 = document.createElement('img');
+                    cm2.src = wads.ads[positionName][0]['cm2'];
+                    
+                    // passBackInsertions
+                    if (typeof(this.pbi[positionName]) == 'undefined') {
+                        this.pbi[positionName] = [];
+                    }
+                    this.pbi[positionName].push(wads.ads[positionName][0]['id']);
+                    var pbi = '&pbi=' + this.pbi[positionName].join('|');
+                    
+                    if (this.mode == 'sync') {
+                        wads.ads[positionName].splice(0, 1);
+                        this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsSyncCallPositionMethod + '/' + this.sitepage + '@' + positionName + '/w' + this.wid + this.getTechnicalQuery() + pbi + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                        this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                        this.loadSync(document, this.callUrl, 'call');
+                    } else if (this.mode == 'async') {
+                        this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsAsyncCallPositionMethod + '/' + this.sitepage + '@' + positionName + '/w' + this.wid + this.getTechnicalQuery() + pbi + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                        this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                        this.loadAsync(top.document, this.callBaseUrl + '/' + this.encryptStringIfAdBlocking(this.includeUrl), 'include');
+                    }
+                }
+            },
+            encryptPositionName : function(positionName) {
+                positionName = 'wads_po_' + positionName;
+                var cryptedPositionName = '';
+                for (i = 0 ; i < positionName.length ; i++) {
+                    cryptedPositionName += this.positionCryptKey.charAt(i % this.positionCryptKey.length) + positionName.charAt(i);
+                }
+                return this.Base64.encode(cryptedPositionName);
+            },
+            encryptStringIfAdBlocking : function(str) {
+                if (this.adBlocking) {
+                    return this.encryptString(str);
+                } else {
+                    return str;
+                }
+            },
+            encryptString : function(str) {
+                var chars = 'abcdef', temp = this.Base64.encode(escape(str)), out = '';
+                var k = chars.charAt(Math.round(Math.random() * (chars.length - 1)));
+                for (i = 0; i < temp.length; i++) {
+                    if (i != 0 && Math.random() > 0.9) {
+                        out += '/';
+                    }
+                    out += k + temp.charAt(i);
+                }
+                return out;
+            },
+            decryptString : function(str) {
+                str = str.replace(/\//g, '');
+                var str2 = '';
+                for ( var i = 0; i < str.length; i++) {
+                    if (i % 2 == 1) {
+                        str2 += str.charAt(i);
+                    }
+                }
+                str2 = unescape(this.Base64.decode(str2.replace(/\\/g, '/')));
+                return str2;
+            },
+            getTechnicalQuery : function () {
+                var tq = '/tq,adb=' + this.adBlocking + '&cnxtype=' + this.cnxtype + '&devicetype=' + this.devicetype + '&os=' + this.os;
+                if (this.cookies.get('wb_proxy')) {
+                    tq = tq + '&proxy=1';
+                }
+                if (this.mode == 'async') {
+                    tq = tq + '&autoload=' + (this.autoload ? '1' : '0');
+                }
+                return tq;
+            },
+            getVideoAdUrl : function(position) {
+                if (wads.ads && wads.ads[position] && wads.ads[position][0] && wads.ads[position][0]['videoAdUrl'] && ! wads.ads[position][0]['empty'] && wads.ads[position][0]['videoAdUrl'] != "") {
+                    return wads.ads[position][0]['videoAdUrl'];
+                }
+                if (typeof(this.wid) == 'undefined') {
+                    this.wid = this.cookies.get('wid');
+                    if (this.wid == null) {
+                        this.wid = 0;
+                    }
+                }
+                return this.callBaseUrl + '/' + this.encryptStringIfAdBlocking(this.vastCallMethod + '/' + this.sitepage + '@' + position + '/w' + this.wid + this.getTechnicalQuery() + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query);
+            },
+            getVastUrl : function(position) {
+                return this.getVideoAdUrl(position);
+            },
+            getVideoAdType : function(position) {
+                if (wads.ads && wads.ads[position] && wads.ads[position][0] && wads.ads[position][0]['videoAdType'] && ! wads.ads[position][0]['empty'] && wads.ads[position][0]['videoAdType'] != "") {
+                    return wads.ads[position][0]['videoAdType'];
+                }
+                return "vast";
+            },
+            loadSync : function(d, src, id) {
+                d.write('<'+'script src="' + src + '"><\/scr' + 'ipt>');
+            },
+            loadAsync : function(d, src, id) {
+                var dv;
+                dv = d.getElementById('wads_' + id);
+                if (dv)
+                    dv.parentNode.removeChild(dv);
+                var a = d.createElement('script');
+                a.async = "async";
+                a.src = src;
+                if (id) {
+                    a.id = 'wads_' + id;
+                }
+                if (id == 'fetchAll' && false) {
+                    if (typeof wads.callback == 'function') {
+                        var loaded = false;
+                        a.onreadystatechange = function(callback) {
+                            if (a.readyState === "loaded" || a.readyState === "complete") {
+                                a.onreadystatechange = null;
+                                loaded = true;
+                                wads.callback();
+                            }
+                        };
+                        a.onload = function() {
+                            if (!loaded) {
+                                wads.callback();
+                            }
+                        };
+                    }
+                }
+                var h = d.getElementsByTagName('head')[0];
+                h.appendChild(a);
+            },
+            setSitePage : function(sp) {
+                this.sitepage = sp;
+            },
+            setQuery : function(q) {
+                this.query = q;
+            },
+            fetchAll : function() {
+                this.loadAsync(top.document, this.callUrl, 'fetchAll');
+            },
+            refreshAll : function() {
+                this.cleanAllPositions();
+                this.creativeAndCallMasterInit();
+                this.fetchAll();
+            },
+            refreshOnePosition : function(positionName) {
+                if (this.mode == 'async') {
+                    var adPosition = this.getElement(positionName);
+                    if (adPosition && this.ads[positionName] != undefined) {
+                        top.wads.creativeMasters = new Array();
+                        this.clean(adPosition);
+                        adPosition.innerHTML = '';
+                        adPosition.style.cssText = "border:none;padding:0px;margin:0px;";
+                        this.sendToPosition(positionName, this.ads[positionName]);
+                    } else {
+                        console.log('wads_debug: problem refreshOnePosition()');
+                    }
+                } else {
+                    console.log('wads_debug: cannot refreshOnePosition() in sync mode');
+                }
+            },
+            setAsyncCallback : function(callback) {
+                this.callback = callback;
+            },
+            unsetAsyncCallback : function() {
+                this.callback = null;
+            },
+            cookies : {
+                get : function(sKey) {
+                    if (!sKey) {
+                        return null;
+                    }
+                    return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+                },
+                set : function(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+                    if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
+                        return false;
+                    }
+                    var sExpires = "";
+                    if (vEnd) {
+                        switch (vEnd.constructor) {
+                        case Number:
+                            sExpires = vEnd === Infinity ? "; expires=Tue, 19 Jan 2038 03:14:07 GMT" : "; max-age=" + vEnd;
+                            break;
+                        case String:
+                            sExpires = "; expires=" + vEnd;
+                            break;
+                        case Date:
+                            sExpires = "; expires=" + vEnd.toUTCString();
+                            break;
+                        }
+                    }
+                    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+                    return true;
+                },
+                exists : function(sKey) {
+                    if (!sKey) {
+                        return false;
+                    }
+                    return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+                }
+            },
+            dmp : {
+                get : function(key) {
+                    var xhttp;
+                    if (window.XMLHttpRequest) {
+                        xhttp = new XMLHttpRequest();
+                    } else {
+                        // code for IE6, IE5
+                        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xhttp.onreadystatechange = function() {
+                        if (xhttp.readyState == 4 && xhttp.status == 200) {
+                            var data = JSON.parse(xhttp.responseText);
+                            console.log(data.value);
+                        }
+                    };
+                    var url = top.wads.callBaseUrl + '/' + top.wads.encryptStringIfAdBlocking('dmp/get/' + key + '/w' + top.wads.wid + '/r' + Math.round(Math.random() * 1000000000));
+                    xhttp.open("GET", url, true);
+                    xhttp.send();
+                },
+                set : function(key, value, ttl) {
+                    var pixel = document.createElement('img');
+                    pixel.src = top.wads.callBaseUrl + '/' + top.wads.encryptStringIfAdBlocking('dmp/set/' + key + '/' + value + '/ttl' + ttl + '/w' + top.wads.wid + '/r' + Math.round(Math.random() * 1000000000));
+                },
+                incr : function(key) {
+                    var pixel = document.createElement('img');
+                    pixel.src = top.wads.callBaseUrl + '/' + top.wads.encryptStringIfAdBlocking('dmp/incr/' + key + '/w' + top.wads.wid + '/r' + Math.round(Math.random() * 1000000000));
+                }
+            },
+            getCookieFromGlobal : function() {
+                var localCookieId = this.cookies.get('wid');
+                if (localCookieId == null) {
+                    localCookieId = 0;
+                }
+                this.cookieUrl = this.cookieBaseUrl + '/' + this.encryptStringIfAdBlocking('/c/w' + localCookieId + '/r' + Math.round(Math.random() * 1000000000));
+                if (this.mode == 'sync' || this.mode == 'deferred') {
+                    if (this.site == 'allocine_fr') {
+                        this.loadSync(document, this.cookieUrl, 'cookie');
+                    } else {
+                        this.loadSync(top.document, this.cookieUrl, 'cookie');
+                    }
+                } else {
+                    this.loadAsync(top.document, this.cookieUrl, 'cookie');
+                }
+            },
+            afterGlobalCookieCall : function(globalCookieId) {
+                this.wid = globalCookieId;
+                this.cookies.set('wid', this.wid, Infinity, '/', '' /* or other cookie domain */, false);
+                if (this.mode == 'sync' || this.mode == 'deferred') {
+                    this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsSyncCallMethod + '/' + this.sitepage + '/w' + this.wid + this.getTechnicalQuery() + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                    this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                    if (this.site == 'allocine_fr') {
+                        this.loadSync(document, this.callBaseUrl + '/' + this.encryptedCallUri, 'call');
+                    } else {
+                        this.loadSync(top.document, this.callBaseUrl + '/' + this.encryptedCallUri, 'call');
+                    }
+                } else {
+                    this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsAsyncCallMethod + '/' + this.sitepage + '/w' + this.wid + this.getTechnicalQuery() + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                    this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                    this.loadAsync(top.document, this.callBaseUrl + '/' + this.encryptStringIfAdBlocking(this.includeUrl), 'include');
+                }
+            },
+            getDeviceType: function() {
+                var md = new MobileDetect(window.navigator.userAgent);
+                this.devicetype = md.phone() ? "mobile" : this.devicetype = md.tablet() ? "tablet" : "web";
+                this.os = md.os();
+                return this.devicetype;
+            },
+            initSitePage: function() {
+                var slashPosition = this.sitepage.indexOf('/');
+                if (slashPosition >= 1) {
+                    this.site = this.sitepage.substring(0, slashPosition);
+                    this.page = this.sitepage.substring(slashPosition + 1);
+                }
+            },
+            start : function() {
+                
+                if (typeof wads_no_start != "undefined" && wads_no_start == true) {
+                    return;
+                }
+                
+                this.initSitePage();
+                try { this.getDeviceType(); } catch (e) { console.warn(e); }
+                if (location.protocol == 'https') {
+                    this.callBaseUrl = this.callBaseUrl.replace('http:', 'https:');
+                    this.cookieBaseUrl = this.cookieBaseUrl.replace('http:', 'https:');
+                }
+
+                if (this.cookies.get('wb_wads_mode')) {
+                    this.mode = this.cookies.get('wb_wads_mode');
+                }
+                
+                if (this.cookies.get('wb_from_db')) {
+                    this.query = this.query + '&from_db=1';
+                }
+                
+                if (this.cookies.get('nugg')) {
+                    var cookieSync = document.createElement('img');
+                    cookieSync.src = this.callBaseUrl + '/' + this.encryptStringIfAdBlocking('setcookie/nugg/' + this.cookies.get('nugg') + '/r' + Math.round(Math.random() * 1000000000));
+                }
+                
+                this.query = this.query + amznAdsResponse();
+
+                if( typeof wadsBeforeStart == 'function') wadsBeforeStart();
+                
+                this.getCookieFromGlobal();
+            },
+            display : function(timeout) {
+                if( typeof(timeout) == 'undefined' ){
+                    timeout = 2000;
+                }
+                if (top.wads.mode == 'async') {
+                    if (top.wads.isReady) {
+                        for (var position in top.wads.ads) {
+                            top.wads.sendToPosition(position, top.wads.ads[position]);
+                        }
+                    } else if (timeout > 0) {
+                        setTimeout(top.wads.display, 500, timeout - 500);
+                    }
+                }
+                
+            },
+            Base64 : {
+                // private property
+                _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+                // public method for encoding
+                encode : function (input) {
+                    if (typeof (btoa) == "function") {
+                        return btoa(input).replace('+', '-').replace('/', '_');
+                    } else {
+                        var output = "";
+                        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+                        var i = 0;
+                        input = this._utf8_encode(input);
+                        while (i < input.length) {
+                            chr1 = input.charCodeAt(i++);
+                            chr2 = input.charCodeAt(i++);
+                            chr3 = input.charCodeAt(i++);
+                            enc1 = chr1 >> 2;
+                            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                            enc4 = chr3 & 63;
+                            if (isNaN(chr2)) {
+                                enc3 = enc4 = 64;
+                            } else if (isNaN(chr3)) {
+                                enc4 = 64;
+                            }
+                            output = output +
+                            this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
+                            this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+                        }
+                        return output.replace('+', '-').replace('/', '_');
+                    }
+                },
+                // public method for decoding
+                decode : function (input) {
+                    input = input.replace('-', '+').replace('_', '/');
+                    if (typeof (atob) == "function") {
+                        return atob(input);
+                    } else {
+                        var output = "";
+                        var chr1, chr2, chr3;
+                        var enc1, enc2, enc3, enc4;
+                        var i = 0;
+                        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+                        while (i < input.length) {
+                            enc1 = this._keyStr.indexOf(input.charAt(i++));
+                            enc2 = this._keyStr.indexOf(input.charAt(i++));
+                            enc3 = this._keyStr.indexOf(input.charAt(i++));
+                            enc4 = this._keyStr.indexOf(input.charAt(i++));
+                            chr1 = (enc1 << 2) | (enc2 >> 4);
+                            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                            chr3 = ((enc3 & 3) << 6) | enc4;
+                            output = output + String.fromCharCode(chr1);
+                            if (enc3 != 64) {
+                                output = output + String.fromCharCode(chr2);
+                            }
+                            if (enc4 != 64) {
+                                output = output + String.fromCharCode(chr3);
+                            }
+                        }
+                        output = this._utf8_decode(output);
+                        return output;
+                    }
+                },
+                // private method for UTF-8 encoding
+                _utf8_encode : function (string) {
+                    string = string.replace(/\r\n/g,"\n");
+                    var utftext = "";
+                    for (var n = 0; n < string.length; n++) {
+                        var c = string.charCodeAt(n);
+                        if (c < 128) {
+                            utftext += String.fromCharCode(c);
+                        }
+                        else if((c > 127) && (c < 2048)) {
+                            utftext += String.fromCharCode((c >> 6) | 192);
+                            utftext += String.fromCharCode((c & 63) | 128);
+                        }
+                        else {
+                            utftext += String.fromCharCode((c >> 12) | 224);
+                            utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                            utftext += String.fromCharCode((c & 63) | 128);
+                        }
+                    }
+                    return utftext;
+                },
+                // private method for UTF-8 decoding
+                _utf8_decode : function (utftext) {
+                    var string = "";
+                    var i = 0;
+                    var c, c2, c3 = 0;
+                    while ( i < utftext.length ) {
+                        c = utftext.charCodeAt(i);
+                        if (c < 128) {
+                            string += String.fromCharCode(c);
+                            i++;
+                        }
+                        else if((c > 191) && (c < 224)) {
+                            c2 = utftext.charCodeAt(i+1);
+                            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                            i += 2;
+                        }
+                        else {
+                            c2 = utftext.charCodeAt(i+1);
+                            c3 = utftext.charCodeAt(i+2);
+                            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                            i += 3;
+                        }
+                    }
+                    return string;
+                }
+            }
+        };
+        
+        if (wads.sitepage.indexOf('allocine_fr') != 0) {
+            top.wads = wads;
+        } 
+        wads.start();
+    })();
+</script>
+
+<link rel="manifest" href="/manifest.json" />
+<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/css/jqueryui/jqueryui.css" rel="stylesheet" type="text/css" />
+<link href="/skin/skin-jv/modal.css" rel="stylesheet" type="text/css" />
+<link rel="publisher" href="https://plus.google.com/105261500849864742219/" />
+        <link href="/cache/skin.php?q=skin-jv&amp;t=2" rel="stylesheet" type="text/css" />
+    <link href="/skin/skin-jv/icomoon.css" rel="stylesheet" type="text/css" />
+    
+
+    <link href="/css/owl.carousel.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+<![endif]-->
+<script type="text/javascript" src="//try.abtasty.com/bea2a8ac75dac1f676c114aa8090ae28.js"></script>
+</head>
+<body  data-aa-webediads="1">
+
+<script type="text/javascript">
+// <![CDATA[
+dataLayer = [{"page_type":"shp","rubric":"rubrique","content_type":"chronique"}];
+// ]]>
+</script>
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-T9WX8T"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T9WX8T');</script>
+<!-- End Google Tag Manager -->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/fr_FR/all.js#xfbml=1&appId=202446416762";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<input type="hidden" name="ajax_timestamp_gestion_abo" id="ajax_timestamp_gestion_abo" value="1449732122" />
+<input type="hidden" name="ajax_hash_gestion_abo" id="ajax_hash_gestion_abo" value="949079dd4e47aba0a06aa29249f132308853df16" />
+
+
+
+<header id="jv-header">
+    <div id="header-top">
+        <div class="container container-empty">
+
+                        <div id="header-logo"><span class="JvCare 1F a-logo">LOGO JEUXVIDEO.COM</span></div>
+
+                        <div id="header-links">
+                <ul><li class="header-twitter"><span class="JvCare 1F1FCBCC46CBCB43C119424F4E1FBD34B24F4E a-head" target="_blank" rel="nofollow" title="Suivez nous sur Twitter"><span>Twitter</span></span></li><li class="header-facebook"><span class="JvCare 1F1FCCCCCC19444A4243414F4F4719424F4E1F4DC4424F4E a-head" target="_blank" rel="nofollow" title="Suivez nous sur Facebook"><span>Facebook</span></span></li><li class="header-googleplus"><span class="JvCare 1F1FC048C3C2194C4F4F4C484319424F4E1F174D43C3C5C4464B434F1F a-head" target="_blank" rel="publisher" title="Suivez nous sur Google +"><span>Google+</span></span></li><li class="header-youtube"><span class="JvCare 1F1FCCCCCC19C64FC3CBC3414319424F4E1FC3C243C11F4DC4424F4E a-head" target="_blank" rel="nofollow" title="Abonnez vous à nos chaines YouTube"><span>Youtube</span></span></li><li class="header-rss"><span class="JvCare 1FC1C2C21FC1C2C219C54E48 a-head"><span>RSS</span></span></li></ul>            </div>
+        </div>
+    </div>
+    <div id="header-bottom">
+        <div class="bloc-sticker">
+            <div class="bloc-menu-navbar">
+                <div class="container container-empty container-relatif">
+                    <div class="JvCare 1F a-back-home">Accueil jeuxvideo.com</div>
+                                        <nav id="navbar-jv" role="navigation"><ul class="liste-rubrique"><li class="dropdown"><span id="rub-genre" class="JvCare 1FCB4FC3C21E4843C21E4D43C3C51F dropdown-toggle rubrique-menu">Jeux<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-genre" data-onglet="genres"></div></li><li class="dropdown"><span id="rub-actu" class="JvCare 1F4A42CBC34A4846CB43C21945CB4E dropdown-toggle rubrique-menu">Actu<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-actu" data-onglet="actu"></div></li><li class="dropdown"><span id="rub-video" class="JvCare 1FC4464B434FC21E4B431E4D43C3C51945CB4E dropdown-toggle rubrique-menu">Vidéos<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-video" data-onglet="videos"></div></li><li class="dropdown"><span id="rub-chroniques" class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1945CB4E dropdown-toggle rubrique-menu">Chroniques<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-chroniques" data-onglet="chroniques"></div></li><li class="dropdown"><span id="rub-live" class="JvCare 1F4C4A4E46494C1E4846C4431FCBC4202A1945CB4E dropdown-toggle rubrique-menu">Web TV<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-live" data-onglet="webtv"></div></li><li class="dropdown"><span id="rub-forum" class="JvCare 1F444FC1C34EC21945CB4E dropdown-toggle rubrique-menu">Forums<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-forum" data-onglet="forums"></div></li><li class="dropdown"><span id="rub-etajv" class="dropdown-toggle rubrique-menu">Astuces / wiki<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-etajv" data-onglet="etajvwiki"></div></li><li class="dropdown"><span class="JvCare 1F414FC3CB46CAC3431F414FC3CB4647C24F4E4E221945CB4E lien-alone"><span id="rub-boutique" class="rubrique-menu titre-rubrique-alone">Bons plans</span></span></li></ul></nav>                                            <script type="text/javascript">
+        WadsUtil.createAdWithStyle('onglet', {
+            zIndex: 0,             maxWidth: '150px',             maxHeight: '35px',             overflow: 'hidden',         });
+    </script>
+
+                                        <div id="header-search-jv">
+                        <form action="/recherche.php">
+                            <span class="loupe-search"></span><span class="bloc-input-plus-ok"><span class="posi-input ui-front"><input type="search" id="header-recherche" placeholder="Rechercher un jeu, une news" name="q" /></span><button class="launcher-search" type="submit">OK</button></span>
+                        </form>
+                    </div>
+                                        <div id="header-store-jv">
+                                                    <span id="header-store-jv-link" class="JvCare 45CBCBC02D1F1FCCCCCC19CC434AC143444A49C219424F4E1F2FC3CB4E3FC24FC3C142432E4DC442 deco"  target="_blank">
+                                                                <span id="header-store-jv-text">
+                                    Boutique
+                                </span>
+                                                            </span>
+                                            </div>
+                                        <div id="header-user">
+                        
+<ul class="connexion-jv">
+    <li><span class="JvCare 1FC2C24F1FC1434C46C2CB43C119C045C0 a-connect">Inscription</span></li>
+    <li><span class="JvCare 1F484F4C46492FC3C1482E1321B44245C14F4946CAC343C21EC4464B434F1945CB4E14454AC2452E23442B26244A424A2C422A224A22442323214122442B2642412242254B254B26 a-connect">Connexion</span></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <!-- bloc machine -->
+            <div class="bloc-menu-liste-machine">
+                <div class="container container-empty container-relatif">
+                    <ul class="menu-liste-machine">
+                                                <li><span class="JvCare 1FC0421945CB4E item-machine-alpha">PC</span></li>
+                        <li><span class="JvCare 1FC0C22B1EC0484AC6C2CB4ACB464F491E2B1945CB4E item-machine-alpha">PS4</span></li>
+                        <li><span class="JvCare 1FC5414FC51E4F49431EC54F49431EC54F1945CB4E item-machine-alpha">XBOX ONE</span></li>
+                        <li><span class="JvCare 1FCC46461EC31E494649CB43494B4F1ECC46461ECC4646C31945CB4E item-machine-alpha">Wii U</span></li>
+                        <li><span class="JvCare 1FC0C2221EC0484AC6C2CB4ACB464F491E221945CB4E item-machine-alpha">PS3</span></li>
+                        <li><span class="JvCare 1FC52224201EC5414FC51E2224201945CB4E item-machine-alpha">XBOX 360</span></li>
+                        <li><span class="JvCare 1F224BC21E494649CB43494B4F1E224BC21945CB4E item-machine-alpha">3DS</span></li>
+                        <li><span class="JvCare 1FC0C21EC446CB4A1EC0484AC6C2CB4ACB464F491EC446CB4A1945CB4E item-machine-alpha">PS VITA</span></li>
+                        <li><span class="JvCare 1F4BC21945CB4E item-machine-alpha">DS</span></li>
+                        <li><span class="JvCare 1FCC46461E494649CB43494B4F1ECC46461945CB4E item-machine-alpha">Wii</span></li>
+                        <li><span class="JvCare 1F4AC0C048431E46C0454F49431E46C04F4B1ECB4FC342451945CB4E item-machine-alpha">iOS</span></li>
+                        <li><span class="JvCare 1F4A494BC14F464B1945CB4E item-machine-alpha">ANDROID</span></li>
+                        
+                                                <li class="hit-parade-menu-item"><span class="JvCare 1F4E4346484843C3C1C21F4E4F4E4349CB1F hit-parade-link"><span>Hit Parade</span></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+        <script type="text/javascript">
+        WadsUtil.createAdWithStyle('interstitiel-ft');
+    </script>
+
+<div id="content">
+    <div id="zone-sponso"></div>
+        <script type="text/javascript" data-top-wads>
+        var scriptTag = document.querySelectorAll('[data-top-wads]')[0];
+        var prospectElement = document.createElement('div');
+        prospectElement.className = 'container';
+        var tableElement = document.createElement('div');
+        var cellElement = document.createElement('div');
+
+        WadsUtil.setElementStyle(prospectElement, {
+            minHeight: '120px',
+            padding: '0 0 10px 0',
+            position: 'relative',
+            zIndex: 0,
+                            minHeight: 0,
+                    });
+
+        WadsUtil.setElementStyle(tableElement, {
+            display: 'table',
+            width: '100%',
+            padding: '5px 0',
+            position: 'relative',
+                            height: 'auto',
+                background: 'none',
+                    });
+
+        WadsUtil.setElementStyle(cellElement, {
+            display: 'table-cell',
+            verticalAlign: 'middle',
+            textAlign: 'center',
+            lineHeight: 0,
+            fontSize: 0,
+        });
+
+        wads.createAdPosition('header-top', cellElement);
+        tableElement.appendChild(cellElement);
+        prospectElement.appendChild(tableElement);
+        scriptTag.parentNode.appendChild(prospectElement);
+
+        WadsUtil.registerAndHideAd(new WadsUtil.Ad(
+            prospectElement,
+            'header-top',
+            { visibility: 'hidden' },
+            { visibility: 'visible' }
+        ));
+
+    </script>
+    <div >
+                <div class="container container-content">
+                <div class="row">
+        <div class="col-md-12">
+            <div class="bloc-fil-ariane-crumb">
+                <div class="options-crumb"><span class="lien-jv action-abonnement ajax-create-abonnement" title="S&#039;abonner à Chronique" data-id="7100">Abonnement à cette page</span></div>                <div class="fil-ariane-crumb">
+                    <span><a href="//www.jeuxvideo.com">jeuxvideo.com</a></span>
+                                                                        /
+                                                            <span><a href="/videos-de-jeux.htm">Vidéos du moment</a></span>
+                                                                                /
+                                                                <h1 class="highlight">Dernières vidéos de chroniques</h1>
+                                                                                        </div>
+            </div>
+        </div>
+    </div>
+            
+
+
+
+                                  
+<div class="row">
+    <div class="col-md-8">
+        <div class="titre-head-bloc no-border"><h2 class="titre-bloc">TOUTES LES CHRONIQUES DE JEUXVIDEO.COM</h2></div>
+        <div class="row">
+
+            <div class="col-md-12">
+                                                        <article class="accr-item-extra-l">
+                <div class="mask-img">
+                    <a href="/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm" title="Chronique - Seul Face aux Ténèbres - Le rôdeur de la bibliothèque - PC - 3DO - SATURN">
+                        <span class="mtag">Chronique</span>
+                         <img src="//image.jeuxvideo.com/medias-md/144925/1449245113-5085-card.jpg" alt="" />                         <span class="play-on-xbig"></span>
+                        <div class="footer-accr">
+                            <h3 class="titre-item">Seul Face aux Ténèbres - Le rôdeur de la bibliothèque</h3>
+                            <div class="date-comm">
+                                <time datetime="2015-12-08">08/12/2015</time>
+                                                                        <span class="nb-comm-pict-sec"><span class="nombre">38</span></span>
+                                                            </div>
+                            <div class="bloc-machine-one-line">
+                                                                    <span class="label-machine label-pc">PC</span>
+                                                                    <span class="label-machine label-3do">3DO</span>
+                                                                    <span class="label-machine label-saturn">SATURN</span>
+                                                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="extra-footer"><a href="/chroniques-video-seul-face-aux-tenebres.htm" class="lien-jv">Les vidéos Seul face aux ténèbres</a></div>            </article>
+            </div>
+
+            <div class="col-md-6">
+                                                        <article class="accr-item-large">
+                <div class="mask-img">
+                                        <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B23212023241FC2C04F464843C1C21E48431EC0C1434E4643C11E454A48441E484644431945CB4E" title="Chronique - Spoilers - Le premier Half Life - PC - DCAST - MAC - PS2">
+                        <span class="mtag">Chronique</span>
+                         <img src="//image.jeuxvideo.com/medias-sm/144949/1449489286-6716-card.jpg" alt="" />                         <span class="play-on-big"></span>
+                    </span>
+                </div>
+                <div class="foot-accr-item-large">
+                    <h3 class="titre-item"><a href="/videos/chroniques/452056/spoilers-le-premier-half-life.htm" title="Chronique - Spoilers - Le premier Half Life - PC - DCAST - MAC - PS2" class="a-titre-item">Spoilers - Le premier Half Life</a></h3>
+                    <div class="line-infos"><time datetime="2015-12-07">07/12/2015</time>|<span class="duree-li">Durée : 05:31</span>|<span class="vues-li">35379 vues</span></div>
+                                            <span class="nb-comm-pict"><span class="nombre">184</span></span>
+                                        <div class="bloc-machine-one-line">
+                                                    <span class="label-machine label-pc">PC</span>
+                                                    <span class="label-machine label-dcast">DCAST</span>
+                                                    <span class="label-machine label-mac">MAC</span>
+                                                    <span class="label-machine label-ps2">PS2</span>
+                                            </div>
+                    <a href="/chroniques-video-spoilers.htm" class="lien-jv a-lien-bottom">Les vidéos Spoilers</a>                </div>
+            </article>
+            </div>
+            <div class="col-md-6">
+                                                    <article class="accr-item-large">
+                <div class="mask-img">
+                                       <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2625241F48431E4B4344461E4BC31E42454A484843494C431E4B4FC1464A491EC4C21EC3C2C3481945CB4E" title="Chronique - Le Défi du Challenge  - Dorian Vs Usul - NES - SNES">
+                        <span class="mtag">Chronique</span>
+                         <img src="//image.jeuxvideo.com/medias-sm/144924/1449244720-7122-card.jpg" alt="" />                         <span class="play-on-big"></span>
+                    </span>
+                </div>
+                <div class="foot-accr-item-large">
+                    <h3 class="titre-item"><a href="/videos/chroniques/451986/le-defi-du-challenge-dorian-vs-usul.htm" title="Chronique - Le Défi du Challenge  - Dorian Vs Usul - NES - SNES" class="a-titre-item">Le Défi du Challenge  - Dorian Vs Usul</a></h3>
+                    <div class="line-infos"><time datetime="2015-12-06">06/12/2015</time>|<span class="duree-li">Durée : 29:08</span>|<span class="vues-li">51691 vues</span></div>
+                                            <span class="nb-comm-pict"><span class="nombre">154</span></span>
+                                        <div class="bloc-machine-one-line">
+                                                    <span class="label-machine label-nes">NES</span>
+                                                    <span class="label-machine label-snes">SNES</span>
+                                            </div>
+                    <a href="/chroniques-video-le-defi-du-challenge.htm" class="lien-jv a-lien-bottom">Les vidéos Le Défi du Challenge</a>                </div>
+            </article>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+            <script type="text/javascript">
+        WadsUtil.createAdWithStyle('middle');
+    </script>
+<span id="image-promo-1" class="JvCare 45CBCBC02D1F1FCCCCCC19CC4F4FCB414FC51944C11F12C3CB4E3FC24FC3C142432E4D43C3C5C4464B434F424F4E14C3CB4E3F4E434B46C34E2EBAB1222214C3CB4E3F424A4EC04A464C492ECC4F4FCB414FC5 hide" target="_blank"><img src="//image.jeuxvideo.com/medias/144672/1446719489-3522-photo.jpg"></span>
+    </div>
+</div>
+
+<div class="row">
+            <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2621241FC2C043434B1E4C4A4E431E444A48484FC3CB1E221ECB43C14E4649431E43491E21231E4E4649C3CB43C21945CB4E" title="Chronique - Speed Game - Fallout 3 terminé en 25 minutes ? - PC - PS3 - 360">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144924/1449239206-1132-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451926/speed-game-fallout-3-termine-en-25-minutes.htm" title="Chronique - Speed Game - Fallout 3 terminé en 25 minutes ? - PC - PS3 - 360" class="a-titre-item">Speed Game - Fallout 3 terminé en 25 minutes ?</a></h3>
+                <div class="line-infos"><time datetime="2015-12-05">05/12/2015</time> |<span class="duree-li">Durée : 39:06 </span>|<span class="vues-li">51235 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">141</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps3">PS3</span>
+                                            <span class="label-machine label-360">360</span>
+                                    </div>
+                <a href="/chroniques-video-speed-game.htm" class="lien-jv a-lien-bottom">Les vidéos Speed Game</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A26212A1F4843C21E231E4D43C3C51EC0C1434443C143C21E4B431EC2CB4AC14C4ACD43C11945CB4E" title="Chronique - Les 5 jeux préférés de... [Stargazer]">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144914/1449137293-4985-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451921/les-5-jeux-preferes-de-stargazer.htm" title="Chronique - Les 5 jeux préférés de... [Stargazer]" class="a-titre-item">Les 5 jeux préférés de... [Stargazer]</a></h3>
+                <div class="line-infos"><time datetime="2015-12-05">05/12/2015</time> |<span class="duree-li">Durée : 08:08 </span>|<span class="vues-li">15979 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">135</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-les-5-jeux-preferes-de.htm" class="lien-jv a-lien-bottom">Les vidéos Les 5 jeux préférés de...</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2526201F414A42471ECB4F1E212020261E4843C21E4D43C3C51E4E4AC1CAC34A49CBC21E4B431E481E4A494943431E43491E464E4A4C43C21E43CB1E43491E4EC3C246CAC3431E4B431E481E43C04FCAC3431945CB4E" title="Chronique - Back to... 2009 : Les jeux marquants de l&#039;année en images et en musique de l&#039;époque">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144924/1449237751-1422-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451890/back-to-2009-les-jeux-marquants-de-l-annee-en-images-et-en-musique-de-l-epoque.htm" title="Chronique - Back to... 2009 : Les jeux marquants de l&#039;année en images et en musique de l&#039;époque" class="a-titre-item">Back to... 2009 : Les jeux marquants de l&#039;année en images et en musique de l&#039;époque</a></h3>
+                <div class="line-infos"><time datetime="2015-12-04">04/12/2015</time> |<span class="duree-li">Durée : 07:28 </span>|<span class="vues-li">26503 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">202</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-back-to.htm" class="lien-jv a-lien-bottom">Les vidéos Back To...</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2522251F481EC34946C443C1C21E4BC31E4D43C31E46494B43C043494B4A49CB1E4BC3494C434F491E4746494C4B4F4E1EC3491E4BC3494C434F491E42C14ACC4843C11E4A1E484A1E4CC1464EC14F42471945CB4E" title="Chronique - L&#039;univers du jeu indépendant - Dungeon Kingdom, un dungeon-crawler à la Grimrock - PC">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144916/1449160691-9195-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451838/l-univers-du-jeu-independant-dungeon-kingdom-un-dungeon-crawler-a-la-grimrock.htm" title="Chronique - L&#039;univers du jeu indépendant - Dungeon Kingdom, un dungeon-crawler à la Grimrock - PC" class="a-titre-item">L&#039;univers du jeu indépendant - Dungeon Kingdom, un dungeon-crawler à la Grimrock</a></h3>
+                <div class="line-infos"><time datetime="2015-12-04">04/12/2015</time> |<span class="duree-li">Durée : 16:56 </span>|<span class="vues-li">8701 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">31</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                    </div>
+                <a href="/chroniques-video-l-univers-du-jeu-independant.htm" class="lien-jv a-lien-bottom">Les vidéos L&#039;univers du jeu indépendant</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2C242A1FC44C4E1EC14AC64E4A491E4FC1464C4649C21E41C146C2431E484A1E42454A4649431E4BC31E44C14F464B1E43491E4EC3C246CAC3431945CB4E" title="Chronique - VGM : Rayman Origins brise la chaîne du froid en musique - PC - PS3 - 360 - 3DS - VITA - MAC - WII - BOX ORANGE">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144915/1449148654-9282-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451761/vgm-rayman-origins-brise-la-chaine-du-froid-en-musique.htm" title="Chronique - VGM : Rayman Origins brise la chaîne du froid en musique - PC - PS3 - 360 - 3DS - VITA - MAC - WII - BOX ORANGE" class="a-titre-item">VGM : Rayman Origins brise la chaîne du froid en musique</a></h3>
+                <div class="line-infos"><time datetime="2015-12-04">04/12/2015</time> |<span class="duree-li">Durée : 01:34 </span>|<span class="vues-li">6045 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">30</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps3">PS3</span>
+                                            <span class="label-machine label-360">360</span>
+                                            <span class="label-machine label-3ds">3DS</span>
+                                            <span class="label-machine label-vita">VITA</span>
+                                            <span class="label-machine label-mac">MAC</span>
+                                            <span class="label-machine label-wii">WII</span>
+                                            <span class="label-machine label-box-orange">BOX ORANGE</span>
+                                    </div>
+                <a href="/chroniques-video-vgm.htm" class="lien-jv a-lien-bottom">Les vidéos VGM</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2C26201FC443C1C2C3C21E4DC3C2CB1E424AC3C2431E221E4843C21EC443C1C2464F49C21EC0421E4B431E484FCC1E4A1EC348CBC14A1E424F4EC04AC14343C21945CB4E" title="Chronique - Versus Just Cause 3 : Les versions PC de Low à Ultra comparées - PC - PS4 - ONE">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144907/1449068467-2668-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451790/versus-just-cause-3-les-versions-pc-de-low-a-ultra-comparees.htm" title="Chronique - Versus Just Cause 3 : Les versions PC de Low à Ultra comparées - PC - PS4 - ONE" class="a-titre-item">Versus Just Cause 3 : Les versions PC de Low à Ultra comparées</a></h3>
+                <div class="line-infos"><time datetime="2015-12-04">04/12/2015</time> |<span class="duree-li">Durée : 05:01 </span>|<span class="vues-li">5677 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">33</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps4">PS4</span>
+                                            <span class="label-machine label-one">ONE</span>
+                                    </div>
+                <a href="/chroniques-video-versus.htm" class="lien-jv a-lien-bottom">Les vidéos Versus</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2C2A221FC04AC1484F49C21EC043C31EC04AC1484F49C21EC0C3411EC2C04342464A481E494F43481945CB4E" title="Chronique - Parlons Peu Parlons Pub spécial Noël - PC - PS4 - ONE - WIIU - PS3 - 360 - 3DS - VITA - WII">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144907/1449070080-5871-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451713/parlons-peu-parlons-pub-special-noel.htm" title="Chronique - Parlons Peu Parlons Pub spécial Noël - PC - PS4 - ONE - WIIU - PS3 - 360 - 3DS - VITA - WII" class="a-titre-item">Parlons Peu Parlons Pub spécial Noël</a></h3>
+                <div class="line-infos"><time datetime="2015-12-03">03/12/2015</time> |<span class="duree-li">Durée : 08:58 </span>|<span class="vues-li">11730 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">136</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps4">PS4</span>
+                                            <span class="label-machine label-one">ONE</span>
+                                            <span class="label-machine label-wiiu">WIIU</span>
+                                            <span class="label-machine label-ps3">PS3</span>
+                                            <span class="label-machine label-360">360</span>
+                                            <span class="label-machine label-3ds">3DS</span>
+                                            <span class="label-machine label-vita">VITA</span>
+                                            <span class="label-machine label-wii">WII</span>
+                                    </div>
+                <a href="/chroniques-video-parlons-peu-parlons-pub.htm" class="lien-jv a-lien-bottom">Les vidéos Parlons Peu Parlons Pub</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A24252B1F4C4A4E431EC21EC3C01E251E4A49C21E4B1E4AC2C24AC2C246491EC21E42C143434B1E43491EC4464B434F1945CB4E" title="Chronique - Game&#039;s Up : 8 ans d&#039;Assassin&#039;s Creed en vidéo">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144889/1448891642-5491-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451684/game-s-up-8-ans-d-assassin-s-creed-en-video.htm" title="Chronique - Game&#039;s Up : 8 ans d&#039;Assassin&#039;s Creed en vidéo" class="a-titre-item">Game&#039;s Up : 8 ans d&#039;Assassin&#039;s Creed en vidéo</a></h3>
+                <div class="line-infos"><time datetime="2015-12-03">03/12/2015</time> |<span class="duree-li">Durée : 03:45 </span>|<span class="vues-li">12111 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">112</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-game-s-up.htm" class="lien-jv a-lien-bottom">Les vidéos Game&#039;s up</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2420261FCB4FC01E2A201E4B43C21E48464243494243C21EC143C2C2C3C24246CB4343C21945CB4E" title="Chronique - Top 10 des licences ressuscitées ">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144905/1449052266-3423-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451609/top-10-des-licences-ressuscitees.htm" title="Chronique - Top 10 des licences ressuscitées " class="a-titre-item">Top 10 des licences ressuscitées </a></h3>
+                <div class="line-infos"><time datetime="2015-12-02">02/12/2015</time> |<span class="duree-li">Durée : 12:41 </span>|<span class="vues-li">20079 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">100</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-top-10.htm" class="lien-jv a-lien-bottom">Les vidéos Top 10</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A222C231F4E43C142461E4B4FC1464A491E48431EC2CB4ACBC3CB1E4BC31E4D43C31E4B431EC14F48431E4B4A49C21E48431E4D43C31EC4464B434F1945CB4E" title="Chronique - Merci Dorian - Le statut du jeu de rôle dans le jeu vidéo">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144855/1448554732-3939-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451375/merci-dorian-le-statut-du-jeu-de-role-dans-le-jeu-video.htm" title="Chronique - Merci Dorian - Le statut du jeu de rôle dans le jeu vidéo" class="a-titre-item">Merci Dorian - Le statut du jeu de rôle dans le jeu vidéo</a></h3>
+                <div class="line-infos"><time datetime="2015-11-29">29/11/2015</time> |<span class="duree-li">Durée : 08:24 </span>|<span class="vues-li">29597 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">153</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-merci-dorian.htm" class="lien-jv a-lien-bottom">Les vidéos Merci Dorian</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2024221FC04AC3C2431EC0C14F4243C2C21E4843C21E43444443CBC21E4B431EC04AC1CB4642C34843C21945CB4E" title="Chronique - Pause Process - Les effets de particules">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144846/1448462849-7638-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/451063/pause-process-les-effets-de-particules.htm" title="Chronique - Pause Process - Les effets de particules" class="a-titre-item">Pause Process - Les effets de particules</a></h3>
+                <div class="line-infos"><time datetime="2015-11-26">26/11/2015</time> |<span class="duree-li">Durée : 07:33 </span>|<span class="vues-li">22697 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">109</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-pause-process.htm" class="lien-jv a-lien-bottom">Les vidéos Pause Process</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B23202423261F48431E444F494B1E4B431E481E4A44444A46C1431E4843C21EC24342C143CBC21E4B431E484A1EC243C146431EC2CB4AC142C14A44CB1945CB4E" title="Chronique - Le Fond de l&#039;Affaire - Les secrets de la série Starcraft - PC - MAC">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144827/1448267454-1841-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/450659/le-fond-de-l-affaire-les-secrets-de-la-serie-starcraft.htm" title="Chronique - Le Fond de l&#039;Affaire - Les secrets de la série Starcraft - PC - MAC" class="a-titre-item">Le Fond de l&#039;Affaire - Les secrets de la série Starcraft</a></h3>
+                <div class="line-infos"><time datetime="2015-11-23">23/11/2015</time> |<span class="duree-li">Durée : 07:09 </span>|<span class="vues-li">36513 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">45</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-mac">MAC</span>
+                                    </div>
+                <a href="/chroniques-video-le-fond-de-l-affaire.htm" class="lien-jv a-lien-bottom">Les vidéos Le Fond De L&#039;Affaire</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2B2426212C1F481E4546C2CB4F46C1431E4BC31E4D43C31EC4464B434F1E424F4E4E4349CB1EC1434A4846C243C11EC349431E4245C14F4946CAC3431945CB4E" title="Chronique - L&#039;histoire du jeu vidéo - Comment réaliser une chronique ?">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144500/1444999206-9343-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/446927/l-histoire-du-jeu-video-comment-realiser-une-chronique.htm" title="Chronique - L&#039;histoire du jeu vidéo - Comment réaliser une chronique ?" class="a-titre-item">L&#039;histoire du jeu vidéo - Comment réaliser une chronique ?</a></h3>
+                <div class="line-infos"><time datetime="2015-10-20">20/10/2015</time> |<span class="duree-li">Durée : 06:41 </span>|<span class="vues-li">16393 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">175</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-l-histoire-du-jeu-video.htm" class="lien-jv a-lien-bottom">Les vidéos L&#039;histoire du jeu vidéo</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2B2A242C211F4A44CB43C11ECC4FC1471EC349CB46481E4B4ACC491ECB4FC3CB431E484A1EC443C146CB431EC2C3C11E414641C0C143C31945CB4E" title="Chronique - After Work : Until Dawn - Suite et fin du slasher entre amis ! - PS4">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/144138/1441383970-5987-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/441672/after-work-until-dawn-toute-la-verite-sur-bibpreu.htm" title="Chronique - After Work : Until Dawn - Suite et fin du slasher entre amis ! - PS4" class="a-titre-item">After Work : Until Dawn - Suite et fin du slasher entre amis !</a></h3>
+                <div class="line-infos"><time datetime="2015-09-04">04/09/2015</time> |<span class="duree-li">Durée : 54:57 </span>|<span class="vues-li">23286 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">83</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-ps4">PS4</span>
+                                    </div>
+                <a href="/chroniques-video-after-work.htm" class="lien-jv a-lien-bottom">Les vidéos After Work</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B22232624251F4AC31E4243C3C11E4B431E481E4546C2CB4F46C1431E4B431ECB45431ECC46CB424543C11E221E43C046C24F4B431E241945CB4E" title="Chronique - Au cœur de l&#039;histoire de The Witcher 3 - Episode 6 - PC - PS4 - ONE">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/143757/1437574655-9679-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/435968/au-ceur-de-l-histoire-de-the-witcher-3-episode-6.htm" title="Chronique - Au cœur de l&#039;histoire de The Witcher 3 - Episode 6 - PC - PS4 - ONE" class="a-titre-item">Au cœur de l&#039;histoire de The Witcher 3 - Episode 6</a></h3>
+                <div class="line-infos"><time datetime="2015-07-25">25/07/2015</time> |<span class="duree-li">Durée : 16:17 </span>|<span class="vues-li">19267 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">42</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps4">PS4</span>
+                                            <span class="label-machine label-one">ONE</span>
+                                    </div>
+                <a href="/chroniques-video-au-ceur-de-l-histoire.htm" class="lien-jv a-lien-bottom">Les vidéos Au cœur de l&#039;Histoire</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B222221262B1F4A44CB43C11E4146CB1E481E4AC0C0C14349CB46C2C24A4C431E4EC3C246424A481EC04AC11E48431E4D43C31EC4464B434F1945CB4E" title="Chronique - After Bit – L&#039;apprentissage musical par le jeu vidéo">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/143626/1436261034-6482-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/433294/after-bit-l-apprentissage-musical-par-le-jeu-video.htm" title="Chronique - After Bit – L&#039;apprentissage musical par le jeu vidéo" class="a-titre-item">After Bit – L&#039;apprentissage musical par le jeu vidéo</a></h3>
+                <div class="line-infos"><time datetime="2015-07-08">08/07/2015</time> |<span class="duree-li">Durée : 18:14 </span>|<span class="vues-li">20584 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">92</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-after-bit.htm" class="lien-jv a-lien-bottom">Les vidéos After Bit</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B22212A20241F484F4F4746494C1E444FC11E4C4A4E43C21ECAC343481E43C2CB1E48431E4E4E4F1E464B434A481945CB4E" title="Chronique - Looking for Games - Quel est le MMO idéal ?">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/143582/1435824083-9760-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/432106/looking-for-games-quel-est-le-mmo-ideal.htm" title="Chronique - Looking for Games - Quel est le MMO idéal ?" class="a-titre-item">Looking for Games - Quel est le MMO idéal ?</a></h3>
+                <div class="line-infos"><time datetime="2015-07-02">02/07/2015</time> |<span class="duree-li">Durée : 15:48 </span>|<span class="vues-li">53936 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">250</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-looking-for-games.htm" class="lien-jv a-lien-bottom">Les vidéos Looking for Games</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B222A262A201F424FC443C11EC143C446C246CB431EC3491ECB45434E431E4B431ECD43484B4A1ECBCC4648464C45CB1EC0C146494243C2C21945CB4E" title="Chronique - Cover revisite un thème de Zelda : Twilight Princess - NGC - WII">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/143567/1435669766-4174-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/431910/cover-revisite-un-theme-de-zelda-twilight-princess.htm" title="Chronique - Cover revisite un thème de Zelda : Twilight Princess - NGC - WII" class="a-titre-item">Cover revisite un thème de Zelda : Twilight Princess</a></h3>
+                <div class="line-infos"><time datetime="2015-07-01">01/07/2015</time> |<span class="duree-li">Durée : 02:38 </span>|<span class="vues-li">18809 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">62</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-ngc">NGC</span>
+                                            <span class="label-machine label-wii">WII</span>
+                                    </div>
+                <a href="/chroniques-video-cover.htm" class="lien-jv a-lien-bottom">Les vidéos Cover</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B22242024201F4FC443C1C44643CC1E4E4F414648431EC24F484B4ACBC21E4649424F4949C3C21945CB4E" title="Chronique - Overview Mobile : Soldats Inconnus  - IOS - ANDROID">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/143228/1432282404-4203-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/436060/overview-mobile-soldats-inconnus.htm" title="Chronique - Overview Mobile : Soldats Inconnus  - IOS - ANDROID" class="a-titre-item">Overview Mobile : Soldats Inconnus </a></h3>
+                <div class="line-infos"><time datetime="2015-05-22">22/05/2015</time> |<span class="duree-li">Durée : 01:30 </span>|<span class="vues-li">1112 vues</span></div>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-ios">IOS</span>
+                                            <span class="label-machine label-android">ANDROID</span>
+                                    </div>
+                            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B212B202A211F4E46494342C14A44CB1E454AC14B424FC1431EC046C14ACB431E4B43C21E42C3414F464B43C21E43C046C24F4B431E251945CB4E" title="Chronique - Minecraft Hardcore : Pirate des Cuboïdes - Episode 8 - WEB">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/143021/1430208291-7999-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/424012/minecraft-hardcore-pirate-des-cuboides-episode-8.htm" title="Chronique - Minecraft Hardcore : Pirate des Cuboïdes - Episode 8 - WEB" class="a-titre-item">Minecraft Hardcore : Pirate des Cuboïdes - Episode 8</a></h3>
+                <div class="line-infos"><time datetime="2015-04-28">28/04/2015</time> |<span class="duree-li">Durée : 18:38 </span>|<span class="vues-li">13637 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">75</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-web">WEB</span>
+                                    </div>
+                <a href="/chroniques-video-minecraft-hardcore.htm" class="lien-jv a-lien-bottom">Les vidéos Minecraft Hardcore</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2A2625262C1FC0C146C24F491E4AC1424546CB4342CB1E2A21434E431E43CB1E4B43C1494643C11E43C046C24F4B431945CB4E" title="Chronique - Prison Architect - 12ème et dernier épisode - PC">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/142651/1426514233-5069-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/419897/prison-architect-12eme-et-dernier-episode.htm" title="Chronique - Prison Architect - 12ème et dernier épisode - PC" class="a-titre-item">Prison Architect - 12ème et dernier épisode</a></h3>
+                <div class="line-infos"><time datetime="2015-03-17">17/03/2015</time> |<span class="duree-li">Durée : 23:28 </span>|<span class="vues-li">27629 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">164</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                    </div>
+                <a href="/chroniques-video-prison-architect.htm" class="lien-jv a-lien-bottom">Les vidéos Prison Architect</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2A2C232A251F484A1EC143424F49494A46C2C24A4942431EC44F424A48431E424F4E4E4349CB1E424A1E4E4AC14245431945CB4E" title="Chronique - La reconnaissance vocale, comment ça marche ?">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141986/1419863402-8951-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/417518/la-reconnaissance-vocale-comment-ca-marche.htm" title="Chronique - La reconnaissance vocale, comment ça marche ?" class="a-titre-item">La reconnaissance vocale, comment ça marche ?</a></h3>
+                <div class="line-infos"><time datetime="2015-02-18">18/02/2015</time> |<span class="duree-li">Durée : 03:24 </span>|<span class="vues-li">25333 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">60</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-comment-ca-marche.htm" class="lien-jv a-lien-bottom">Les vidéos Comment ça marche ?</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2A242124251F4D4FC343C3C11E4BC31E4CC143494643C11E424F4F481ECC4FC1484B1E4943C21EC2C3C043C14943C21945CB4E" title="Chronique - Joueur du Grenier - Cool World - Nes/SuperNes">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/142306/1423059376-8101-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/416268/joueur-du-grenier-cool-world-nes-supernes.htm" title="Chronique - Joueur du Grenier - Cool World - Nes/SuperNes" class="a-titre-item">Joueur du Grenier - Cool World - Nes/SuperNes</a></h3>
+                <div class="line-infos"><time datetime="2015-01-17">17/01/2015</time> |<span class="duree-li">Durée : 18:21 </span>|<span class="vues-li">19628 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">26</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-test-du-grenier.htm" class="lien-jv a-lien-bottom">Les vidéos Test du grenier</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2A2B212A241F484A1E444ACA1E4245464A49CB431E4BC31E4CC143494643C11945CB4E" title="Chronique - La FAQ chiante du grenier !">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/142123/1421226318-954-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/414216/la-faq-chiante-du-grenier.htm" title="Chronique - La FAQ chiante du grenier !" class="a-titre-item">La FAQ chiante du grenier !</a></h3>
+                <div class="line-infos"><time datetime="2015-01-14">14/01/2015</time> |<span class="duree-li">Durée : 18:10 </span>|<span class="vues-li">39462 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">19</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-hors-serie-joueur-du-grenier.htm" class="lien-jv a-lien-bottom">Les vidéos Hors Série (Joueur du Grenier)</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202322251FCB4FC3C11E4B431E44C14A4942431E4D43C3C5C4464B434F1E424F4E1E212A434E431E43CB4AC0431E43C4C1C61EC04AC146C21E42454A4EC0C21E4348C6C24343C21EC0484AC6C2CB4ACB464F491E2B1EC0C22B1E20202A212A2320231945CB4E" title="Chronique - 21ème Etape : Évry - Paris Champs-Élysées - PS4">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141898/1418984689-738-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000538/tour-de-france-jeuxvideo-com-21eme-etape-evry-paris-champs-elysees-playstation-4-ps4-00121505.htm" title="Chronique - 21ème Etape : Évry - Paris Champs-Élysées - PS4" class="a-titre-item">21ème Etape : Évry - Paris Champs-Élysées</a></h3>
+                <div class="line-infos"><time datetime="2014-07-27">27/07/2014</time> |<span class="duree-li">Durée : 19:31 </span>|<span class="vues-li">21943 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">256</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-ps4">PS4</span>
+                                    </div>
+                <a href="/chroniques-video-tour-de-france-jeuxvideo-com.htm" class="lien-jv a-lien-bottom">Les vidéos Tour de France jeuxvideo.com</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202322241F424FC3C0431E4BC31E4E4F494B431E4D43C3C5C4464B434F1E424F4E1E424FCB431E4B1E46C44F46C1431E41C143C246481E4446494A48431EC0484AC6C2CB4ACB464F491E221EC0C2221E20202A212A2C2C231945CB4E" title="Chronique - Côte d&#039;Ivoire - Brésil (Finale) - PS3">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141840/1418397362-654-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000536/coupe-du-monde-jeuxvideo-com-cote-d-ivoire-bresil-finale-playstation-3-ps3-00121775.htm" title="Chronique - Côte d&#039;Ivoire - Brésil (Finale) - PS3" class="a-titre-item">Côte d&#039;Ivoire - Brésil (Finale)</a></h3>
+                <div class="line-infos"><time datetime="2014-07-13">13/07/2014</time> |<span class="duree-li">Durée : 21:54 </span>|<span class="vues-li">28693 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">32</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-ps3">PS3</span>
+                                    </div>
+                <a href="/chroniques-video-coupe-du-monde-jeuxvideo-com.htm" class="lien-jv a-lien-bottom">Les vidéos Coupe du Monde jeuxvideo.com</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F202020201F202020202A2526231F46481E43CB4A46CB1EC349431E444F46C21EC2C3C043C11E4E4AC1464F1E474AC1CB1EC2C3C043C11E494649CB43494B4F1EC24943C21E46481E43CB4A46CB1EC349431E444F46C21E4E4AC1464F1E474AC1CB1E20202A21202425261945CB4E" title="Chronique - Super Mario Kart : Il Etait Une Fois Mario Kart - WIIU - 3DS - GBA - NGC - N64 - DS - SNES - WII">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141838/1418379305-7538-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/0000/00001895/il-etait-une-fois-super-mario-kart-super-nintendo-snes-il-etait-une-fois-mario-kart-00120689.htm" title="Chronique - Super Mario Kart : Il Etait Une Fois Mario Kart - WIIU - 3DS - GBA - NGC - N64 - DS - SNES - WII" class="a-titre-item">Super Mario Kart : Il Etait Une Fois Mario Kart</a></h3>
+                <div class="line-infos"><time datetime="2014-05-23">23/05/2014</time> |<span class="duree-li">Durée : 09:39 </span>|<span class="vues-li">90297 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">226</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-wiiu">WIIU</span>
+                                            <span class="label-machine label-3ds">3DS</span>
+                                            <span class="label-machine label-gba">GBA</span>
+                                            <span class="label-machine label-ngc">NGC</span>
+                                            <span class="label-machine label-n64">N64</span>
+                                            <span class="label-machine label-ds">DS</span>
+                                            <span class="label-machine label-snes">SNES</span>
+                                            <span class="label-machine label-wii">WII</span>
+                                    </div>
+                <a href="/chroniques-video-il-etait-une-fois.htm" class="lien-jv a-lien-bottom">Les vidéos Il était une fois</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202B22241F42C14FC2C2434B1EC2424FCBCB1EC046484CC1464E1EC4C21ECB45431ECC4FC1484B1E20202A212020242B1945CB4E" title="Chronique - Scott Pilgrim vs the World">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141898/1418977702-7875-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000436/crossed-scott-pilgrim-vs-the-world-00120064.htm" title="Chronique - Scott Pilgrim vs the World" class="a-titre-item">Scott Pilgrim vs the World</a></h3>
+                <div class="line-infos"><time datetime="2014-04-16">16/04/2014</time> |<span class="duree-li">Durée : 15:02 </span>|<span class="vues-li">232663 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">1622</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-crossed.htm" class="lien-jv a-lien-bottom">Les vidéos Crossed</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202321211F43C046421E4A49494F4942431E4B431E484A1E494FC3C4434848431E4245C14F4946CAC3431E43C046421E20202A2A262620231945CB4E" title="Chronique - Annonce de la nouvelle chronique Epic">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/images-sm/videos/chroniques-images/0011/annonce-de-la-nouvelle-chronique-epic-00119905-1396886143-low.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000522/epic-annonce-de-la-nouvelle-chronique-epic-00119905.htm" title="Chronique - Annonce de la nouvelle chronique Epic" class="a-titre-item">Annonce de la nouvelle chronique Epic</a></h3>
+                <div class="line-infos"><time datetime="2014-04-04">04/04/2014</time> |<span class="duree-li">Durée : 02:10 </span>|<span class="vues-li">83599 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">82</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/informations/#7610" class="lien-jv a-lien-bottom">Les vidéos Epic</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F2020202B1F2020202B252623251F4BC14ACC1E46491E4C4A4E431ECB46CB4A49444A48481EC5414FC51E4F49431E4245C3CB431E4B431ECB46CB4A491E20202A2A262326251945CB4E" title="Chronique - Titanfall : Chute de titan - PC - ONE - 360">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/142348/1423476492-7015-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/0004/00048958/draw-in-game-titanfall-xbox-one-chute-de-titan-00119598.htm" title="Chronique - Titanfall : Chute de titan - PC - ONE - 360" class="a-titre-item">Titanfall : Chute de titan</a></h3>
+                <div class="line-infos"><time datetime="2014-03-25">25/03/2014</time> |<span class="duree-li">Durée : 06:46 </span>|<span class="vues-li">24754 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">174</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-one">ONE</span>
+                                            <span class="label-machine label-360">360</span>
+                                    </div>
+                <a href="/chroniques-video-draw-in-game.htm" class="lien-jv a-lien-bottom">Les vidéos Draw in Game</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B2A212A23221FC04AC0C61E4CC143494643C11E4446494A481E444A49CB4AC2C61EC446461945CB4E" title="Chronique - Papy Grenier - Final Fantasy VII">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141883/1418833316-5367-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/videos/chroniques/412153/papy-grenier-final-fantasy-vii.htm" title="Chronique - Papy Grenier - Final Fantasy VII" class="a-titre-item">Papy Grenier - Final Fantasy VII</a></h3>
+                <div class="line-infos"><time datetime="2014-02-11">11/02/2014</time> |<span class="duree-li">Durée : 09:37 </span>|<span class="vues-li">18961 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">6</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-papy-grenier.htm" class="lien-jv a-lien-bottom">Les vidéos Papy Grenier</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F2020202020222B231F22242A231EC3C2C3481E484A1EC0C143C2C2431E4DC41E20202A2A25212A251945CB4E" title="Chronique - La presse JV">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141926/1419256038-7565-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000345/3615-usul-la-presse-jv-00118218.htm" title="Chronique - La presse JV" class="a-titre-item">La presse JV</a></h3>
+                <div class="line-infos"><time datetime="2014-01-19">19/01/2014</time> |<span class="duree-li">Durée : 10:32 </span>|<span class="vues-li">227709 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">3541</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-3615-usul.htm" class="lien-jv a-lien-bottom">Les vidéos 3615 Usul</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202B252B1F4349C64B1EC14A424F49CB431E494FC3C21EC349431E4546C2CB4F46C1431E484A1E4CC14FCBCB431E4E4AC34B46CB431E20202A2A2C2224221945CB4E" title="Chronique - La grotte maudite">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/images-sm/videos/chroniques-images/0011/la-grotte-maudite-00117363-1385458839-low.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000484/enyd-raconte-nous-une-histoire-la-grotte-maudite-00117363.htm" title="Chronique - La grotte maudite" class="a-titre-item">La grotte maudite</a></h3>
+                <div class="line-infos"><time datetime="2013-12-03">03/12/2013</time> |<span class="duree-li">Durée : 08:20 </span>|<span class="vues-li">39201 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">628</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-enyd-raconte-nous-une-histoire.htm" class="lien-jv a-lien-bottom">Les vidéos Enyd, raconte-nous une histoire</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F2020202020222B2B1F43C5C0434B46CB464F49C21E4649C3CB464843C21E4E464848434946C34E1EC2454FCC1E20202A2A2326212B1945CB4E" title="Chronique - Millenium Show">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/images-sm/videos/chroniques-images/0011/millenium-show-00115924-1380031289-low.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000344/expeditions-inutiles-millenium-show-00115924.htm" title="Chronique - Millenium Show" class="a-titre-item">Millenium Show</a></h3>
+                <div class="line-infos"><time datetime="2013-09-24">24/09/2013</time> |<span class="duree-li">Durée : 06:40 </span>|<span class="vues-li">16164 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">105</span></span>
+                                <div class="bloc-machine-one-line">
+                                    </div>
+                <a href="/chroniques-video-wow-expeditions-inutiles.htm" class="lien-jv a-lien-bottom">Les vidéos Expéditions inutiles</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F202020221F20202022212C2B221F4943CC1E4C4A4E43C1C21E444A42CB4FC1C61EC2CBC14343CB1E44464C45CB43C11EC0421E4143494D461E43CB1E4E4647431E4B43424FC3C4C14349CB1EC2CBC14343CB1E44464C45CB43C11E20202A2A2B2C262C1945CB4E" title="Chronique - Street Fighter : Benji et Mike découvrent Street Fighter - PC - PS3 - 360">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/images-sm/videos/chroniques-images/0011/street-fighter-pc-00114797-1375436243-low.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/0003/00032743/new-gamers-factory-street-fighter-pc-benji-et-mike-decouvrent-street-fighter-00114797.htm" title="Chronique - Street Fighter : Benji et Mike découvrent Street Fighter - PC - PS3 - 360" class="a-titre-item">Street Fighter : Benji et Mike découvrent Street Fighter</a></h3>
+                <div class="line-infos"><time datetime="2013-08-03">03/08/2013</time> |<span class="duree-li">Durée : 09:15 </span>|<span class="vues-li">63275 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">1079</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps3">PS3</span>
+                                            <span class="label-machine label-360">360</span>
+                                    </div>
+                <a href="/chroniques-video-new-gamers-factory.htm" class="lien-jv a-lien-bottom">Les vidéos New Gamers Factory</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F202020201F20202020252426241F4843C21E4C4A4E43C1C21E4B431E481E43C5CBC1434E431ECB43CBC146C21ECC4FC1484BC21E4C4A4E43414FC61E4A4BC44A4942431E4C414A1ECB43CBC146C21E4B4A49C21E4FC246C146C21E20202A2A2B2A22211945CB4E" title="Chronique - Tetris Worlds : Tetris dans Osiris - GBA">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/images-sm/videos/chroniques-images/0011/tetris-worlds-gba-00114132-1372693852-low.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/0000/00008696/les-gamers-de-l-extreme-tetris-worlds-gameboy-advance-gba-tetris-dans-osiris-00114132.htm" title="Chronique - Tetris Worlds : Tetris dans Osiris - GBA" class="a-titre-item">Tetris Worlds : Tetris dans Osiris</a></h3>
+                <div class="line-infos"><time datetime="2013-07-02">02/07/2013</time> |<span class="duree-li">Durée : 07:27 </span>|<span class="vues-li">61134 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">432</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-gba">GBA</span>
+                                    </div>
+                <a href="/chroniques-video-les-gamers-de-l-extreme.htm" class="lien-jv a-lien-bottom">Les vidéos Les Gamers de l&#039;Extrême</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F202020211F202020212122222C1FC242434943C21E4B431E4D43C31E4CC14A494B1ECB454344CB1E4AC3CB4F1E46C41EC0421EC44FC3C21E49431EC44FC3C21E4649CAC34643CB43CD1EC04AC21EC04FC3C11EC44FCBC1431E4A4E431E202020202021242B1945CB4E" title="Chronique - Grand Theft Auto IV : Vous ne vous inquiétez pas pour votre âme ? - PC - PS3 - 360">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/141924/1419243672-5246-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/0002/00022337/scenes-de-jeu-grand-theft-auto-iv-pc-vous-ne-vous-inquietez-pas-pour-votre-ame-00000264.htm" title="Chronique - Grand Theft Auto IV : Vous ne vous inquiétez pas pour votre âme ? - PC - PS3 - 360" class="a-titre-item">Grand Theft Auto IV : Vous ne vous inquiétez pas pour votre âme ?</a></h3>
+                <div class="line-infos"><time datetime="2012-10-02">02/10/2012</time> |<span class="duree-li">Durée : 15:30 </span>|<span class="vues-li">211559 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">11</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps3">PS3</span>
+                                            <span class="label-machine label-360">360</span>
+                                    </div>
+                <a href="/chroniques-video-scenes-de-jeu.htm" class="lien-jv a-lien-bottom">Les vidéos Scènes de jeu</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202220211F4B464A41484FC5261E414ACBCB4843444643484B1E221E4B43C1494643C1431E4245C14F4946CAC3431EC5414FC51E2224201E20202020202025231945CB4E" title="Chronique - Battlefield 3 - Dernière chronique - PC - PS3 - 360">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/medias-sm/142348/1423479296-1871-card.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000302/diablox9-battlefield-3-derniere-chronique-xbox-360-00000085.htm" title="Chronique - Battlefield 3 - Dernière chronique - PC - PS3 - 360" class="a-titre-item">Battlefield 3 - Dernière chronique</a></h3>
+                <div class="line-infos"><time datetime="2011-11-16">16/11/2011</time> |<span class="duree-li">Durée : 08:56 </span>|<span class="vues-li">139557 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">4</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-pc">PC</span>
+                                            <span class="label-machine label-ps3">PS3</span>
+                                            <span class="label-machine label-360">360</span>
+                                    </div>
+                <a href="/chroniques-video-diablox9.htm" class="lien-jv a-lien-bottom">Les vidéos Les parties multi de Diablox9</a>            </div>
+        </article>
+    </div>
+        <div class="col-md-4">
+                            <article class="accr-item-large">
+            <div class="mask-img">
+                                <span class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1F20202020202220231F444A49CB4A1E414F411E4E46494342C14A44CB1E484A1E4E4AC01E4AC34B464FC2C3C1441ECC43411E2020202020202B241945CB4E" title="Chronique - Minecraft - La map Audiosurf - WEB">
+                    <span class="mtag">Chronique</span>
+                     <img src="//image.jeuxvideo.com/images-sm/videos/chroniques-images/0000/la_map_audiosurf_web-00000046-low.jpg" alt="" />                     <span class="play-on-big"></span>
+                </span>
+            </div>
+            <div class="foot-accr-item-large">
+                <h3 class="titre-item"><a href="/chroniques-video/00000305/fanta-bob-minecraft-la-map-audiosurf-web-00000046.htm" title="Chronique - Minecraft - La map Audiosurf - WEB" class="a-titre-item">Minecraft - La map Audiosurf</a></h3>
+                <div class="line-infos"><time datetime="2011-08-19">19/08/2011</time> |<span class="duree-li">Durée : 10:28 </span>|<span class="vues-li">314802 vues</span></div>
+                                    <span class="nb-comm-pict"><span class="nombre">1</span></span>
+                                <div class="bloc-machine-one-line">
+                                            <span class="label-machine label-web">WEB</span>
+                                    </div>
+                <a href="/chroniques-video-fanta-et-bob.htm" class="lien-jv a-lien-bottom">Les vidéos Fanta &amp; Bob, les aventuriers de Minecraft</a>            </div>
+        </article>
+    </div>
+</div>
+
+
+             <script>var gaudata = {"dimension76":"shp","dimension69":"7100","dimension70":"Chronique","dimension39":"no"};</script>
+            <div class="row" id="video-footer">
+    <div class="col-md-8 col-md-offset-2">
+        <div id="video-footer-container" style="display:none">
+            <span class=" video-footer-titre" ><strong>Vidéo</strong> - Fallout 4 : Guide crafting avec Morrigh4n</span>
+            <div class="player-contenu">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <div class="embed-responsive-item" >
+                        <div class="player-jv-footer" id="player-jv-2198283-131" data-src="/contenu/medias/video.php?id=2198283&amp;autostart=true&amp;videoposition=footer&amp;pre=preroll2">Chargement du lecteur vidéo...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+
+<footer id="jv-footer">
+    </footer>
+
+
+
+
+<script src="/js/lib/jquery.js" type="text/javascript"></script>
+<script src="/js/lib/jqueryui.js" type="text/javascript"></script>
+<script src="/js/lib/jv_care.js" type="text/javascript"></script>
+<script src="/js/lib/bootstrap.js" type="text/javascript"></script>
+<script src="/js/common.js" type="text/javascript"></script>
+<script src="/js/lib/modal.js" type="text/javascript"></script>
+<script src="/js/html2canvas.js" type="text/javascript"></script>
+<script src="/js/lib/notifier.js" type="text/javascript"></script>
+<script src="/js/seo/tr_aff_bout.js" type="text/javascript"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <script src="/js/lib/owl.carousel.js"></script>
+    <script src="/js/contenu/tag.js"></script>
+    <script src="/js/lib/swfobject.js"></script>
+    <script src="/js/contenu/hp.js"></script>
+    
+    <div class="stats">
+    <script>
+        var writeAffiliationScript = function () {
+            // Amazon
+            var amazon_affiliation_script = document.createElement("script");
+            amazon_affiliation_script.type = "text/javascript";
+            amazon_affiliation_script.src = "//wms.assoc-amazon.com/20070822/US"
+                + "/js/auto-tagger.js?tag=jeuxvideo_autotag-21&locale=FR"
+                + "&overwrite=1";
+
+            document.body.appendChild(amazon_affiliation_script);
+
+            // Itunes
+            var _merchantSettings=_merchantSettings || [];_merchantSettings.push(['AT', '11lHhL']);
+            (function(){var autolink=document.createElement('script');autolink.type='text/javascript';autolink.async=true;
+                autolink.src= ('https:' == document.location.protocol) ? 'https://autolinkmaker.itunes.apple.com/js/itunes_autolinkmaker.js' : 'http://autolinkmaker.itunes.apple.com/js/itunes_autolinkmaker.js';
+                var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(autolink, s);})();
+        };
+
+        if (jsli && !jsli.IsDone) {
+            jsli.callbackStoreScript = writeAffiliationScript;
+        } else {
+            writeAffiliationScript();
+        }
+    </script>
+</div>
+    <script>var isAdBlocked = true;</script>
+<script src="http://eu1.swbdds.com/files/adblk.js?&amp;ad_type=" onload="isAdBlocked=false;"></script>
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-30147725-3', 'auto');
+    
+    
+    
+        ga('set', 'dimension1', isAdBlocked ? 'adblock' : 'noblock');
+    ga('set', 'dimension2', isAdBlocked ? 'adblock' : 'noblock');
+    ga('set', 'dimension3', isAdBlocked ? 'adblock' : 'noblock');
+
+    
+        var has_video_content = jQuery('.player-jv').length > 0;
+    ga('set', 'dimension8', has_video_content ? '1':'0');
+
+        function getVideoDimensionsAndMetrics(data, label) {
+        var ga_data = {};
+        ga_data.dimension4 = '';
+        ga_data.dimension5 = '';
+        ga_data.dimension6 = data.data_ga.title;
+        ga_data.metric1 = data.data_ga.length;
+
+        if (data.data_ga.hasOwnProperty('video_position')) {
+            var manuallyLaunched = ['sorties', 'jvcode-content', 'jvcode-comment', 'fichejeu'];
+
+            if (data.data_ga.video_position === 'footer') {
+                ga_data.dimension4 = 'auto-play-on-scroll';
+            } else if (jQuery.inArray(data.data_ga.video_position, manuallyLaunched)) {
+                ga_data.dimension4 = 'play';
+            } else {
+                ga_data.dimension4 = 'auto-play';
+            }
+
+            if (data.data_ga.video_position === 'footer') {
+                ga_data.dimension5 = 'footer';
+            } else if (data.data_ga.video_position === 'jvcode-comment'){
+                ga_data.dimension5 = 'in-comment';
+            } else {
+                ga_data.dimension5 = 'in-content';
+            }
+        }
+
+                if (typeof label === 'undefined') {
+            ga_data.label = data.file;
+        } else {             ga_data.label = label;
+        }
+        return ga_data;
+    }
+
+        function rollStatus(id) {
+        if (getVideoStatus(id) === 'completed') {
+            return 'video-postroll';
+        } else {
+            return 'video-preroll';
+        }
+    }
+
+    function isPlayerLaunched(id) {
+         return players[id];
+    }
+
+    function setPlayerLaunched(id, state) {
+        players[id] = state;
+    }
+
+    function getVideoStatus(id) {
+        return id_status[id + '_video'];
+    }
+
+    function setVideoStatus(id, status) {
+        id_status[id + '_video'] = status;
+    }
+
+    function getAdStatus(id) {
+        return id_status[id + '_ad'];
+    }
+
+    function setAdStatus(id, status) {
+        id_status[id + '_ad'] = status;
+    }
+
+    function getVideoDuration(id) {
+        return id_status[id + '_video_duration'];
+    }
+
+    function setVideoDuration(id, duration) {
+        id_status[id + '_video_duration'] = duration;
+    }
+
+    function getVideoPrerollDuration(id) {
+        return id_status[id + '_video-preroll_duration'];
+    }
+
+    function setVideoPrerollDuration(id, duration) {
+        id_status[id + '_video-preroll_duration'] = duration;
+    }
+
+    function getVideoPostrollDuration(id) {
+        return id_status[id + '_video-postroll_duration'];
+    }
+
+    function setVideoPostrollDuration(id, duration) {
+        id_status[id + '_video-postroll_duration'] = duration;
+    }
+
+    function getCurrentAdDuration(id) {
+        return id_status[id + '_' + rollStatus(id) + '_duration'];
+    }
+
+    function setCurrentAdDuration(id, duration) {
+        id_status[id + '_' + rollStatus(id) + '_duration'] = duration;
+    }
+
+    
+        var id_status = {};
+
+    var players = {};
+
+    
+        jQuery(document).on("video_player_starts", function (event, data) {
+        if (getVideoStatus(data.id) === 'pause') {
+            setVideoStatus(data.id, 'playing');
+            ga('send', 'event', 'video-content', 'resume', getVideoDimensionsAndMetrics(data));
+        } else {
+                        if (!isPlayerLaunched(data.id)) {
+                setPlayerLaunched(data.id, true);
+
+                if (typeof getVideoPrerollDuration(data.id) === 'undefined') {
+                    setVideoPrerollDuration(data.id, 0);
+                }
+                if (typeof getVideoStatus(data.id) === 'undefined') {
+                    setVideoStatus(data.id, '');
+                }
+                if (typeof getVideoDuration(data.id) === 'undefined') {
+                    setVideoDuration(data.id, 0);
+                }
+                if (typeof getVideoPostrollDuration(data.id) === 'undefined') {
+                    setVideoPostrollDuration(data.id, 0);
+                }
+
+                ga_data = getVideoDimensionsAndMetrics(data);
+                if (data.data_ga.hasOwnProperty('video_position')) {
+                    if (ga_data.dimension4 !== 'play') {
+                        ga_data.nonInteraction = 1;
+                    }
+                }
+                ga('send', 'event', 'video-player', 'starts', ga_data);
+            }
+        }
+    });
+
+        jQuery(document).on("video_player_thumbnail_displayed", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-player', 'thumbnail-displayed', ga_data);
+    });
+
+    jQuery(document).on("video_player_crashes", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-player', 'crashes', ga_data);
+    });
+
+    
+        jQuery(document).on("video_ad_play", function(event, data) {
+        if (getAdStatus(data.id) === 'pause') {
+            setAdStatus(data.id, '');
+            ga('send', 'event', rollStatus(data.id), 'resume', getVideoDimensionsAndMetrics(data));
+        } else {
+            if (data.data_ga.hasOwnProperty('vast_url')) {
+                var dimension7 = data.data_ga.vast_url;
+                ga_data = getVideoDimensionsAndMetrics(data);
+                ga_data.dimension7 = dimension7;
+                ga_data.nonInteraction = 1;
+                ga('send', 'event', rollStatus(data.id), 'calls-vast', ga_data);
+
+                if (data.data_ga.hasOwnProperty('video_position')) {
+                    if (ga_data.dimension4 === 'play') {
+                        ga_data.nonInteraction = 0;
+                    }
+                }
+                ga('send', 'event', rollStatus(data.id), 'starts', ga_data);
+            } else {
+                ga_data = getVideoDimensionsAndMetrics(data);
+                if (data.data_ga.hasOwnProperty('video_position')) {
+                    if (ga_data.dimension4 !== 'play') {
+                        ga_data.nonInteraction = 1;
+                    }
+                }
+                ga('send', 'event', rollStatus(data.id), 'starts', ga_data);
+            }
+        }
+    });
+
+    jQuery(document).on("video_ad_paused", function(event, data) {
+        setAdStatus(data.id, 'pause');
+        ga('send', 'event', rollStatus(data.id), 'pause', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_ad_clicked", function(event, data) {
+        ga('send', 'event', rollStatus(data.id), 'clic', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_ad_skipped", function(event, data) {
+        setAdStatus(data.id, '');
+        if (rollStatus(data.id) === 'video-postroll') {
+            setVideoPostrollDuration(data.id, 0);
+            setVideoStatus(data.id, '');
+        }
+        ga('send', 'event', rollStatus(data.id), 'skip', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_ad_completed", function(event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', rollStatus(data.id), 'finish', ga_data);
+        if (rollStatus(data.id) === 'video-postroll') {
+            setVideoPostrollDuration(data.id, 0);
+            setVideoStatus(data.id, '');
+            setPlayerLaunched(false);
+        }
+    });
+
+    jQuery(document).on("video_ad_time", function(event, data) {
+
+        
+        ga_data = getVideoDimensionsAndMetrics(data);
+        if (data.data_ga.hasOwnProperty('video_position')) {
+            if (ga_data.dimension4 !== 'play') {
+                ga_data.nonInteraction = 1;
+            }
+        }
+
+        if ((data.pub_percent === 25) && (getCurrentAdDuration(data.id) < 25)) {
+            setCurrentAdDuration(data.id, 25);
+            ga('send', 'event', rollStatus(data.id), 'play-25', ga_data);
+        } else if ((data.pub_percent === 50) && (getCurrentAdDuration(data.id) < 50)) {
+            setCurrentAdDuration(data.id, 50);
+            ga('send', 'event', rollStatus(data.id), 'play-50', ga_data);
+        } else if ((data.pub_percent === 75) && (getCurrentAdDuration(data.id) < 75)) {
+            setCurrentAdDuration(data.id, 75);
+            ga('send', 'event', rollStatus(data.id), 'play-75', ga_data);
+        }
+    });
+
+    jQuery(document).on("video_ad_crashes", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', rollStatus(data.id), 'crash', ga_data);
+        ga_data2 = getVideoDimensionsAndMetrics(data, data.pub_error_label);
+        ga_data2.nonInteraction = 1;
+        ga('send', 'event', rollStatus(data.id), 'crash-details', ga_data2);
+        setPlayerLaunched(data.id, true);
+        setVideoStatus(data.id, '');
+        setAdStatus(data.id, '');
+        setVideoDuration(data.id, 0);
+        setVideoPrerollDuration(data.id, 0);
+        setVideoPostrollDuration(data.id, 0);
+    });
+
+    
+    jQuery(document).on("video_content_starts", function (event, data) {
+
+        
+        if (getVideoStatus(data.id) !== 'playing') {
+            setVideoStatus(data.id, 'playing');
+            ga_data = getVideoDimensionsAndMetrics(data);
+            if (data.data_ga.hasOwnProperty('video_position')) {
+                if (ga_data.dimension4 !== 'play') {
+                    ga_data.nonInteraction = 1;
+                }
+            }
+            ga('send', 'event', 'video-content', 'start', ga_data);
+        }
+    });
+
+    jQuery(document).on("video_content_pause", function (event, data) {
+        if (getVideoStatus(data.id) === 'playing') {
+            setVideoStatus(data.id, 'pause');
+            ga('send', 'event', 'video-content', 'pause', getVideoDimensionsAndMetrics(data));
+        }
+    });
+
+    jQuery(document).on("video_content_seek", function (event, data) {
+        setVideoStatus(data.id, 'playing');
+        ga('send', 'event', 'video-content', 'seek', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_content_finish", function (event, data) {
+        setVideoPrerollDuration(data.id, 0);
+        setVideoDuration(data.id, 0);
+        setVideoStatus(data.id, 'completed');
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-content', 'finish', ga_data);
+    });
+
+    jQuery(document).on("video_content_time", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        if (data.data_ga.hasOwnProperty('video_position')) {
+            if (ga_data.dimension4 !== 'play') {
+                ga_data.nonInteraction = 1;
+            }
+        }
+
+        if ((data.video_percent === 25) && (getVideoDuration(data.id) < 25)) {
+            setVideoDuration(data.id, 25);
+            ga('send', 'event', 'video-content', 'play-25', ga_data);
+        } else if ((data.video_percent === 50) && (getVideoDuration(data.id) < 50)) {
+            setVideoDuration(data.id, 50);
+            ga('send', 'event', 'video-content', 'play-50', ga_data);
+        } else if ((data.video_percent === 75) && (getVideoDuration(data.id) < 75)) {
+            setVideoDuration(data.id, 75);
+            ga('send', 'event', 'video-content', 'play-75', ga_data);
+        }
+    });
+
+    jQuery(document).on("video_content_crash", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-content', 'crash', ga_data);
+
+        ga_data2 = getVideoDimensionsAndMetrics(data, data.video_error_label);
+        ga_data2.nonInteraction = 1;
+        ga('send', 'event', 'video-content', 'crash-details', ga_data2);
+        setPlayerLaunched(data.id, true);
+        setVideoStatus(data.id, '');
+        setAdStatus(data.id, '');
+        setVideoDuration(data.id, 0);
+        setVideoPrerollDuration(data.id, 0);
+        setVideoPostrollDuration(data.id, 0);
+    });
+
+        jQuery(document).find('.registerconfirmed').filter(function() {
+        ga('send', 'event', 'register', 'registration-complete', 'email');
+    });
+    jQuery(document).find('.registeremailconfirmed').filter(function() {
+        ga('send', 'event', 'register', 'email-confirmed');
+    });
+
+            sessionStorage.setItem("loggedEventSent", "false");
+    
+    if ((typeof gaudata == 'undefined') || (gaudata.length == 0)) {
+        ga('send', 'pageview');
+    } else {
+        ga('send', 'pageview', gaudata);
+    }
+
+</script>
+    <script type="text/javascript">
+<!--
+var _eStat_Whap_loaded=0;
+//-->
+</script>
+<script type="text/javascript" src="http://w.estat.com/js/whap.js"></script>
+<script type="text/javascript">
+<!--
+if(_eStat_Whap_loaded){
+eStatWhap.serial("800000207013");
+eStatWhap.send();}
+//-->
+</script>
+
+</body>
+</html>

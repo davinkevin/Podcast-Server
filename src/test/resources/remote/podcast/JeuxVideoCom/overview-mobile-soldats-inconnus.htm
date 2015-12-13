@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" id="meta-viewport" content="">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Chronique vidéo Chronique : Overview Mobile : Soldats Inconnus  - jeuxvideo.com</title>
+    <meta name="description" content="Découvrez la vidéo de l&#039;épisode Overview Mobile : Soldats Inconnus de la chronique Chronique. Cette fois Seagull vous propose de découvrir [id:54907 Soldats Inconnus : Mémoires de la Grande Guerre]. Portage des versions consoles, le titre mobile propose une maniabilité adaptée, une histoire toujours..." />
+                    <meta name="apple-itunes-app" content="app-id=393077232" />
+    <meta name="google-site-verification" content="1LxApCLYt6SF4NFRJUP_6nseZQBSGcqZz6LMwii-vr4" />
+    <meta property="fb:app_id" content="202446416762"/>
+    <meta property="fb:admins" content="576404360"/>
+    <meta property="og:site_name" content="Jeuxvideo.com"/>
+                        <meta property="og:title" content="Chronique vidéo Chronique : Overview Mobile : Soldats Inconnus" />
+                    <meta property="og:type" content="video" />
+                    <meta property="og:url" content="http://www.jeuxvideo.com/videos/chroniques/436060/overview-mobile-soldats-inconnus.htm" />
+                    <meta property="og:description" content="Cette fois Seagull vous propose de découvrir Soldats Inconnus : Mémoires de la Grande Guerre. Portage des versions consoles, le titre mobile propose u..." />
+                    <meta property="og:image" content="http://image.jeuxvideo.com/images/videos/chroniques-images/o/v/overview-mobile-soldats-inconnus-88506-1431964185-high.jpg" />
+                    <meta property="og:video" content="http://www.jeuxvideo.com/videos/chroniques/iframe/2131462" />
+                    <meta property="og:video:type" content="application/x-shockwave-flash" />
+                    <meta property="og:video:height" content="640" />
+                    <meta property="og:video:width" content="360" />
+                        
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@JVCom">
+<meta name="twitter:title" content="Chronique vidéo Chronique : Overview Mobile : Soldats Inconnus ">
+<meta name="twitter:description" content="Cette fois Seagull vous propose de découvrir Soldats Inconnus : Mémoires de la Grande Guerre. Portage des versions consoles, le titre mobile propose u...">
+    <meta name="twitter:image" content="http://image.jeuxvideo.com/images/videos/chroniques-images/o/v/overview-mobile-soldats-inconnus-88506-1431964185-high.jpg">
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script type="text/javascript">
+                window.WadsUtil = {
+
+                        _initTimeoutMs: 4000,
+
+                        _initTimeoutID: null,
+
+                        _initTimestamp: null,
+
+                        _loadTimestamp: null,
+
+                        _callbacks: [],
+
+                        _ads: [],
+
+                        Ad: function(adEl, adPosition, styleWhenHidden, styleWhenShown) {
+                this.el = adEl;
+                this.position = adPosition;
+                this.hideStyle = styleWhenHidden;
+                this.showStyle = styleWhenShown;
+            },
+
+                        addWadsCallback: function(callbacks) {
+
+                callbacks.load = callbacks.load || function() {};
+                callbacks.timeout = callbacks.timeout || function() {};
+
+                var callback = {
+                    onLoad: callbacks.load,
+                    onTimeoutReached: callbacks.timeout,
+                };
+
+                WadsUtil._callbacks.push(callback);
+
+                if (wads.isReady) {
+                    setTimeout(function() {
+                        callbacks.load();
+                    }, 0);
+                }
+            },
+
+                        _onWebediadsTimeoutReached: function() {
+                WadsUtil._callbacks.forEach(function(callback) {
+                    callback.onTimeoutReached();
+                });
+            },
+
+                        _onWebediadsSuccess: function() {
+                WadsUtil._callbacks.forEach(function(callback) {
+                    callback.onLoad();
+                });
+            },
+
+                        _addLog: function(state, timeout) {
+                var url = '/webediads/ajax/add_log.php?state=' + state + '&timestamp=' + timeout;
+
+                if (state === 'load') {
+                    url += '&load_time='
+                        + (WadsUtil._loadTimestamp - WadsUtil._initTimestamp);
+                }
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.send(null);
+            },
+
+                        setElementStyle: function(el, style) {
+                for (var prop in style) {
+                    el.style[prop] = style[prop];
+                }
+            },
+
+                        createAdWithStyle: function (adPosition, style, hideStyle, showStyle) {
+                wads.createAdPosition(adPosition);
+                var ad = document.getElementById(wads.encryptPositionName(adPosition));
+
+                style = style || {};
+                hideStyle = hideStyle || {};
+                showStyle = showStyle || {};
+
+                WadsUtil.setElementStyle(ad, style);
+                WadsUtil.registerAndHideAd(new WadsUtil.Ad(
+                    ad,
+                    adPosition,
+                    hideStyle,
+                    showStyle
+                ));
+            },
+
+                        registerAndHideAd: function(ad) {
+                WadsUtil._ads.push(ad);
+                WadsUtil.setElementStyle(ad.el, ad.hideStyle);
+            },
+
+                        showAds: function() {
+                if (!wads.ads) {
+                    return;
+                }
+
+                                wads.display(0);
+
+                                WadsUtil._ads.forEach(function(adElement, index) {
+                    if (wads.ads[adElement.position] && !wads.ads[adElement.position][0].empty) {
+                        WadsUtil.setElementStyle(adElement.el, adElement.showStyle);
+                    }
+                })
+            },
+
+                        init: function() {
+                                WadsUtil.addWadsCallback({
+                    timeout: function() {
+                                                WadsUtil._addLog('timeout', Date.now());
+                    },
+                    load: function() {
+                                                WadsUtil._loadTimestamp = Date.now();
+                        WadsUtil._addLog('load', WadsUtil._loadTimestamp);
+                    },
+                });
+
+                wads.setAsyncCallback(function() {
+                    clearTimeout(WadsUtil._initTimeoutID);
+                    WadsUtil._onWebediadsSuccess();
+                });
+
+                WadsUtil._startTimeout();
+            },
+
+                        _startTimeout: function() {
+
+                WadsUtil._initTimestamp = Date.now();
+
+                WadsUtil._initTimeoutID = window.setTimeout(function() {
+                    if (!wads.isReady) {
+                        WadsUtil._onWebediadsTimeoutReached();
+                    }
+                }, WadsUtil._initTimeoutMs);
+
+                                WadsUtil._addLog('init', WadsUtil._initTimestamp);
+            },
+        };
+
+                window.wadsBeforeStart = function() {
+            wads.autoload = false;
+            WadsUtil.init();
+        };
+
+    </script>
+
+    <script type='text/javascript' src='http://c.amazon-adsystem.com/aax2/amzn_ads.js'></script>
+<script type='text/javascript'>
+    var amznAdsResponse = function() {
+        var amazonTargeting = '';
+        if ("amznads" in window && "getTargeting" in window.amznads) {
+            var targeting = amznads.getTargeting();
+            if (targeting) {
+                for (var key in targeting) {
+                    var val = targeting[key];
+                    if (val instanceof Array) {
+                        val = val.join('|');
+                    }
+                    amazonTargeting = amazonTargeting + '&' + key + '=' + val;
+                }
+            }
+        }
+        return amazonTargeting;
+    };
+    try {
+        amznads.getAds('3309');
+    } catch(e) {}
+</script>
+<script>
+    wadsBlocking = 1;
+</script>
+<script src="http://avorteronmedia.lol/files/adblk2.js?ad_type=" onload="wadsBlocking=0"></script>
+<script src="http://avorteronmedia.lol/files/mobile-detect.min.js"></script>
+<script>
+    // 09-12-2015 10:50:37
+    var wads;
+
+    (function() {
+
+        var params = window.location.search.replace("?","");
+        var wbddsPreview = "";
+        if (params.indexOf("wbdds_preview=") == 0) {
+            wbddsPreview = "/" + params;
+        }
+
+        wads = {
+
+            sitepage : 'jeux_video_com/chronique',
+            query : 'contenu_id=436060&genre=aventure&machine=ios|android&pegi=16-ans&editeur=ubisoft-montpellier|ubisoft&evenement=&jeu=soldats-inconnus-memoires-de-la-grande-guerre&rubrique=videos&section=chronique&referer='+encodeURI(document.referrer),
+            mode : 'async',
+                
+            callBaseUrl : 'http://blueste.diet',
+            cookieBaseUrl : 'http://enmediadonner.pl',
+            jsSyncCallMethod : 'p-c-js',
+            jsAsyncCallMethod : 'p-c-async',
+            jsSyncCallPositionMethod : 'p-cp-js',
+            jsAsyncCallPositionMethod : 'p-cp-async',
+            vastCallMethod : 'p-cp-vast2',
+            includeUrl : '/include/async',
+            adBlocking : wadsBlocking,
+            wbddsPreview : wbddsPreview,
+            positionCryptKey : Math.round(Math.random()*1000000).toString(),
+            cnxtype : ((navigator != undefined && navigator.connection != undefined && navigator.connection.type != undefined) ? navigator.connection.type : "unknown"),
+            devicetype: "unknown",
+            os: "unknowm",
+            site: '',
+            page: '',
+            pbi: [],
+            autoload: true,
+            isReady: false,
+            
+            createAdPosition : function (positionName, element) {
+                if (this.mode == 'sync') {
+                    if (typeof wads_script == 'undefined') {
+                        return;
+                    }
+                    document.write('<div id="' + this.encryptPositionName(positionName) + '">');
+                    wads_script(positionName);
+                    document.write('</div>');
+                } else if (this.mode == 'async') {
+                    if (element) {
+                        var position = document.createElement('div');
+                        position.id = this.encryptPositionName(positionName);
+                        element.appendChild(position);
+                    }
+                    else {
+                        document.write('<div id="' + this.encryptPositionName(positionName) + '"></div>');
+                    }
+                } else if (this.mode == 'deferred') {
+                    if ((positionName == 'header-top' || positionName == 'interstitiel-ft') && typeof wads_script != 'undefined') {
+                        wads_script(positionName);
+                    } else {
+                        var styles = "";
+                        if (wads && wads.ads && wads.ads[positionName] && wads.ads[positionName][0] && wads.ads[positionName][0].empty) {
+                            styles = ' style="height:0;visibility:hidden;"';
+                        }
+                        document.write('<div id="t' + this.encryptPositionName(positionName) + '"'+styles+'></div>');
+                    }
+                } else {
+                    console.warn('wads_unknow_mode');
+                }
+            },
+            launchDeferredAdPositions : function() {
+                if (this.mode == 'deferred') {
+                    console.log('wads_launchDeferred');
+                    if (typeof wads_script == 'function') {
+                        for (var positionName in wads.ads) {
+                            if (document.getElementById('t' + this.encryptPositionName(positionName))) {
+                                document.write('<div id="' + this.encryptPositionName(positionName) + '">');
+                                wads_script(positionName);
+                                document.write('</div>');
+                            }
+                        }
+                    }
+                }
+                //window.onload = wads.moveDeferredAdPositions;
+                if (window.addEventListener) {
+                    window.addEventListener("load", wads.moveDeferredAdPositions, false);
+                } else if (window.attachEvent) {
+                    window.attachEvent("onload", wads.moveDeferredAdPositions);
+                }
+            },
+            moveDeferredAdPositions : function () {
+                if (wads.mode == 'deferred') {
+                    for (var positionName in wads.ads) {
+                        if (document.getElementById('t' + wads.encryptPositionName(positionName))) {
+                            //console.log('+' + positionName);
+                            var adDiv = wads.getElement(positionName);
+                            if (adDiv) {
+                                adDiv = adDiv.parentNode.removeChild(adDiv);
+                                document.getElementById('t' + wads.encryptPositionName(positionName)).appendChild(adDiv);
+                            }
+                        }
+                    }
+                }
+            },
+            passback : function (positionName) {
+                var adPosition = this.getElement(positionName);
+                if (adPosition
+                    && typeof(wads.ads[positionName]) != 'undefined'
+                    && typeof(wads.ads[positionName][0]) != 'undefined'
+                    && typeof(wads.ads[positionName][0]['id']) != 'undefined'
+                    && typeof(wads.ads[positionName][0]['cm2']) != 'undefined'
+                ) {
+                    adPosition.innerHTML = '';
+
+                    var cm2 = document.createElement('img');
+                    cm2.src = wads.ads[positionName][0]['cm2'];
+                    
+                    // passBackInsertions
+                    if (typeof(this.pbi[positionName]) == 'undefined') {
+                        this.pbi[positionName] = [];
+                    }
+                    this.pbi[positionName].push(wads.ads[positionName][0]['id']);
+                    var pbi = '&pbi=' + this.pbi[positionName].join('|');
+                    
+                    if (this.mode == 'sync') {
+                        wads.ads[positionName].splice(0, 1);
+                        this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsSyncCallPositionMethod + '/' + this.sitepage + '@' + positionName + '/w' + this.wid + this.getTechnicalQuery() + pbi + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                        this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                        this.loadSync(document, this.callUrl, 'call');
+                    } else if (this.mode == 'async') {
+                        this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsAsyncCallPositionMethod + '/' + this.sitepage + '@' + positionName + '/w' + this.wid + this.getTechnicalQuery() + pbi + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                        this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                        this.loadAsync(top.document, this.callBaseUrl + '/' + this.encryptStringIfAdBlocking(this.includeUrl), 'include');
+                    }
+                }
+            },
+            encryptPositionName : function(positionName) {
+                positionName = 'wads_po_' + positionName;
+                var cryptedPositionName = '';
+                for (i = 0 ; i < positionName.length ; i++) {
+                    cryptedPositionName += this.positionCryptKey.charAt(i % this.positionCryptKey.length) + positionName.charAt(i);
+                }
+                return this.Base64.encode(cryptedPositionName);
+            },
+            encryptStringIfAdBlocking : function(str) {
+                if (this.adBlocking) {
+                    return this.encryptString(str);
+                } else {
+                    return str;
+                }
+            },
+            encryptString : function(str) {
+                var chars = 'abcdef', temp = this.Base64.encode(escape(str)), out = '';
+                var k = chars.charAt(Math.round(Math.random() * (chars.length - 1)));
+                for (i = 0; i < temp.length; i++) {
+                    if (i != 0 && Math.random() > 0.9) {
+                        out += '/';
+                    }
+                    out += k + temp.charAt(i);
+                }
+                return out;
+            },
+            decryptString : function(str) {
+                str = str.replace(/\//g, '');
+                var str2 = '';
+                for ( var i = 0; i < str.length; i++) {
+                    if (i % 2 == 1) {
+                        str2 += str.charAt(i);
+                    }
+                }
+                str2 = unescape(this.Base64.decode(str2.replace(/\\/g, '/')));
+                return str2;
+            },
+            getTechnicalQuery : function () {
+                var tq = '/tq,adb=' + this.adBlocking + '&cnxtype=' + this.cnxtype + '&devicetype=' + this.devicetype + '&os=' + this.os;
+                if (this.cookies.get('wb_proxy')) {
+                    tq = tq + '&proxy=1';
+                }
+                if (this.mode == 'async') {
+                    tq = tq + '&autoload=' + (this.autoload ? '1' : '0');
+                }
+                return tq;
+            },
+            getVideoAdUrl : function(position) {
+                if (wads.ads && wads.ads[position] && wads.ads[position][0] && wads.ads[position][0]['videoAdUrl'] && ! wads.ads[position][0]['empty'] && wads.ads[position][0]['videoAdUrl'] != "") {
+                    return wads.ads[position][0]['videoAdUrl'];
+                }
+                if (typeof(this.wid) == 'undefined') {
+                    this.wid = this.cookies.get('wid');
+                    if (this.wid == null) {
+                        this.wid = 0;
+                    }
+                }
+                return this.callBaseUrl + '/' + this.encryptStringIfAdBlocking(this.vastCallMethod + '/' + this.sitepage + '@' + position + '/w' + this.wid + this.getTechnicalQuery() + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query);
+            },
+            getVastUrl : function(position) {
+                return this.getVideoAdUrl(position);
+            },
+            getVideoAdType : function(position) {
+                if (wads.ads && wads.ads[position] && wads.ads[position][0] && wads.ads[position][0]['videoAdType'] && ! wads.ads[position][0]['empty'] && wads.ads[position][0]['videoAdType'] != "") {
+                    return wads.ads[position][0]['videoAdType'];
+                }
+                return "vast";
+            },
+            loadSync : function(d, src, id) {
+                d.write('<'+'script src="' + src + '"><\/scr' + 'ipt>');
+            },
+            loadAsync : function(d, src, id) {
+                var dv;
+                dv = d.getElementById('wads_' + id);
+                if (dv)
+                    dv.parentNode.removeChild(dv);
+                var a = d.createElement('script');
+                a.async = "async";
+                a.src = src;
+                if (id) {
+                    a.id = 'wads_' + id;
+                }
+                if (id == 'fetchAll' && false) {
+                    if (typeof wads.callback == 'function') {
+                        var loaded = false;
+                        a.onreadystatechange = function(callback) {
+                            if (a.readyState === "loaded" || a.readyState === "complete") {
+                                a.onreadystatechange = null;
+                                loaded = true;
+                                wads.callback();
+                            }
+                        };
+                        a.onload = function() {
+                            if (!loaded) {
+                                wads.callback();
+                            }
+                        };
+                    }
+                }
+                var h = d.getElementsByTagName('head')[0];
+                h.appendChild(a);
+            },
+            setSitePage : function(sp) {
+                this.sitepage = sp;
+            },
+            setQuery : function(q) {
+                this.query = q;
+            },
+            fetchAll : function() {
+                this.loadAsync(top.document, this.callUrl, 'fetchAll');
+            },
+            refreshAll : function() {
+                this.cleanAllPositions();
+                this.creativeAndCallMasterInit();
+                this.fetchAll();
+            },
+            refreshOnePosition : function(positionName) {
+                if (this.mode == 'async') {
+                    var adPosition = this.getElement(positionName);
+                    if (adPosition && this.ads[positionName] != undefined) {
+                        top.wads.creativeMasters = new Array();
+                        this.clean(adPosition);
+                        adPosition.innerHTML = '';
+                        adPosition.style.cssText = "border:none;padding:0px;margin:0px;";
+                        this.sendToPosition(positionName, this.ads[positionName]);
+                    } else {
+                        console.log('wads_debug: problem refreshOnePosition()');
+                    }
+                } else {
+                    console.log('wads_debug: cannot refreshOnePosition() in sync mode');
+                }
+            },
+            setAsyncCallback : function(callback) {
+                this.callback = callback;
+            },
+            unsetAsyncCallback : function() {
+                this.callback = null;
+            },
+            cookies : {
+                get : function(sKey) {
+                    if (!sKey) {
+                        return null;
+                    }
+                    return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+                },
+                set : function(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+                    if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
+                        return false;
+                    }
+                    var sExpires = "";
+                    if (vEnd) {
+                        switch (vEnd.constructor) {
+                        case Number:
+                            sExpires = vEnd === Infinity ? "; expires=Tue, 19 Jan 2038 03:14:07 GMT" : "; max-age=" + vEnd;
+                            break;
+                        case String:
+                            sExpires = "; expires=" + vEnd;
+                            break;
+                        case Date:
+                            sExpires = "; expires=" + vEnd.toUTCString();
+                            break;
+                        }
+                    }
+                    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+                    return true;
+                },
+                exists : function(sKey) {
+                    if (!sKey) {
+                        return false;
+                    }
+                    return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+                }
+            },
+            dmp : {
+                get : function(key) {
+                    var xhttp;
+                    if (window.XMLHttpRequest) {
+                        xhttp = new XMLHttpRequest();
+                    } else {
+                        // code for IE6, IE5
+                        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xhttp.onreadystatechange = function() {
+                        if (xhttp.readyState == 4 && xhttp.status == 200) {
+                            var data = JSON.parse(xhttp.responseText);
+                            console.log(data.value);
+                        }
+                    };
+                    var url = top.wads.callBaseUrl + '/' + top.wads.encryptStringIfAdBlocking('dmp/get/' + key + '/w' + top.wads.wid + '/r' + Math.round(Math.random() * 1000000000));
+                    xhttp.open("GET", url, true);
+                    xhttp.send();
+                },
+                set : function(key, value, ttl) {
+                    var pixel = document.createElement('img');
+                    pixel.src = top.wads.callBaseUrl + '/' + top.wads.encryptStringIfAdBlocking('dmp/set/' + key + '/' + value + '/ttl' + ttl + '/w' + top.wads.wid + '/r' + Math.round(Math.random() * 1000000000));
+                },
+                incr : function(key) {
+                    var pixel = document.createElement('img');
+                    pixel.src = top.wads.callBaseUrl + '/' + top.wads.encryptStringIfAdBlocking('dmp/incr/' + key + '/w' + top.wads.wid + '/r' + Math.round(Math.random() * 1000000000));
+                }
+            },
+            getCookieFromGlobal : function() {
+                var localCookieId = this.cookies.get('wid');
+                if (localCookieId == null) {
+                    localCookieId = 0;
+                }
+                this.cookieUrl = this.cookieBaseUrl + '/' + this.encryptStringIfAdBlocking('/c/w' + localCookieId + '/r' + Math.round(Math.random() * 1000000000));
+                if (this.mode == 'sync' || this.mode == 'deferred') {
+                    if (this.site == 'allocine_fr') {
+                        this.loadSync(document, this.cookieUrl, 'cookie');
+                    } else {
+                        this.loadSync(top.document, this.cookieUrl, 'cookie');
+                    }
+                } else {
+                    this.loadAsync(top.document, this.cookieUrl, 'cookie');
+                }
+            },
+            afterGlobalCookieCall : function(globalCookieId) {
+                this.wid = globalCookieId;
+                this.cookies.set('wid', this.wid, Infinity, '/', '' /* or other cookie domain */, false);
+                if (this.mode == 'sync' || this.mode == 'deferred') {
+                    this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsSyncCallMethod + '/' + this.sitepage + '/w' + this.wid + this.getTechnicalQuery() + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                    this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                    if (this.site == 'allocine_fr') {
+                        this.loadSync(document, this.callBaseUrl + '/' + this.encryptedCallUri, 'call');
+                    } else {
+                        this.loadSync(top.document, this.callBaseUrl + '/' + this.encryptedCallUri, 'call');
+                    }
+                } else {
+                    this.encryptedCallUri = this.encryptStringIfAdBlocking(this.jsAsyncCallMethod + '/' + this.sitepage + '/w' + this.wid + this.getTechnicalQuery() + '/r' + Math.round(Math.random() * 1000000000) + '/' + this.query + this.wbddsPreview);
+                    this.callUrl = this.callBaseUrl + '/' + this.encryptedCallUri;
+                    this.loadAsync(top.document, this.callBaseUrl + '/' + this.encryptStringIfAdBlocking(this.includeUrl), 'include');
+                }
+            },
+            getDeviceType: function() {
+                var md = new MobileDetect(window.navigator.userAgent);
+                this.devicetype = md.phone() ? "mobile" : this.devicetype = md.tablet() ? "tablet" : "web";
+                this.os = md.os();
+                return this.devicetype;
+            },
+            initSitePage: function() {
+                var slashPosition = this.sitepage.indexOf('/');
+                if (slashPosition >= 1) {
+                    this.site = this.sitepage.substring(0, slashPosition);
+                    this.page = this.sitepage.substring(slashPosition + 1);
+                }
+            },
+            start : function() {
+                
+                if (typeof wads_no_start != "undefined" && wads_no_start == true) {
+                    return;
+                }
+                
+                this.initSitePage();
+                try { this.getDeviceType(); } catch (e) { console.warn(e); }
+                if (location.protocol == 'https') {
+                    this.callBaseUrl = this.callBaseUrl.replace('http:', 'https:');
+                    this.cookieBaseUrl = this.cookieBaseUrl.replace('http:', 'https:');
+                }
+
+                if (this.cookies.get('wb_wads_mode')) {
+                    this.mode = this.cookies.get('wb_wads_mode');
+                }
+                
+                if (this.cookies.get('wb_from_db')) {
+                    this.query = this.query + '&from_db=1';
+                }
+                
+                if (this.cookies.get('nugg')) {
+                    var cookieSync = document.createElement('img');
+                    cookieSync.src = this.callBaseUrl + '/' + this.encryptStringIfAdBlocking('setcookie/nugg/' + this.cookies.get('nugg') + '/r' + Math.round(Math.random() * 1000000000));
+                }
+                
+                this.query = this.query + amznAdsResponse();
+
+                if( typeof wadsBeforeStart == 'function') wadsBeforeStart();
+                
+                this.getCookieFromGlobal();
+            },
+            display : function(timeout) {
+                if( typeof(timeout) == 'undefined' ){
+                    timeout = 2000;
+                }
+                if (top.wads.mode == 'async') {
+                    if (top.wads.isReady) {
+                        for (var position in top.wads.ads) {
+                            top.wads.sendToPosition(position, top.wads.ads[position]);
+                        }
+                    } else if (timeout > 0) {
+                        setTimeout(top.wads.display, 500, timeout - 500);
+                    }
+                }
+                
+            },
+            Base64 : {
+                // private property
+                _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+                // public method for encoding
+                encode : function (input) {
+                    if (typeof (btoa) == "function") {
+                        return btoa(input).replace('+', '-').replace('/', '_');
+                    } else {
+                        var output = "";
+                        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+                        var i = 0;
+                        input = this._utf8_encode(input);
+                        while (i < input.length) {
+                            chr1 = input.charCodeAt(i++);
+                            chr2 = input.charCodeAt(i++);
+                            chr3 = input.charCodeAt(i++);
+                            enc1 = chr1 >> 2;
+                            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                            enc4 = chr3 & 63;
+                            if (isNaN(chr2)) {
+                                enc3 = enc4 = 64;
+                            } else if (isNaN(chr3)) {
+                                enc4 = 64;
+                            }
+                            output = output +
+                            this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
+                            this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+                        }
+                        return output.replace('+', '-').replace('/', '_');
+                    }
+                },
+                // public method for decoding
+                decode : function (input) {
+                    input = input.replace('-', '+').replace('_', '/');
+                    if (typeof (atob) == "function") {
+                        return atob(input);
+                    } else {
+                        var output = "";
+                        var chr1, chr2, chr3;
+                        var enc1, enc2, enc3, enc4;
+                        var i = 0;
+                        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+                        while (i < input.length) {
+                            enc1 = this._keyStr.indexOf(input.charAt(i++));
+                            enc2 = this._keyStr.indexOf(input.charAt(i++));
+                            enc3 = this._keyStr.indexOf(input.charAt(i++));
+                            enc4 = this._keyStr.indexOf(input.charAt(i++));
+                            chr1 = (enc1 << 2) | (enc2 >> 4);
+                            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                            chr3 = ((enc3 & 3) << 6) | enc4;
+                            output = output + String.fromCharCode(chr1);
+                            if (enc3 != 64) {
+                                output = output + String.fromCharCode(chr2);
+                            }
+                            if (enc4 != 64) {
+                                output = output + String.fromCharCode(chr3);
+                            }
+                        }
+                        output = this._utf8_decode(output);
+                        return output;
+                    }
+                },
+                // private method for UTF-8 encoding
+                _utf8_encode : function (string) {
+                    string = string.replace(/\r\n/g,"\n");
+                    var utftext = "";
+                    for (var n = 0; n < string.length; n++) {
+                        var c = string.charCodeAt(n);
+                        if (c < 128) {
+                            utftext += String.fromCharCode(c);
+                        }
+                        else if((c > 127) && (c < 2048)) {
+                            utftext += String.fromCharCode((c >> 6) | 192);
+                            utftext += String.fromCharCode((c & 63) | 128);
+                        }
+                        else {
+                            utftext += String.fromCharCode((c >> 12) | 224);
+                            utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                            utftext += String.fromCharCode((c & 63) | 128);
+                        }
+                    }
+                    return utftext;
+                },
+                // private method for UTF-8 decoding
+                _utf8_decode : function (utftext) {
+                    var string = "";
+                    var i = 0;
+                    var c, c2, c3 = 0;
+                    while ( i < utftext.length ) {
+                        c = utftext.charCodeAt(i);
+                        if (c < 128) {
+                            string += String.fromCharCode(c);
+                            i++;
+                        }
+                        else if((c > 191) && (c < 224)) {
+                            c2 = utftext.charCodeAt(i+1);
+                            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                            i += 2;
+                        }
+                        else {
+                            c2 = utftext.charCodeAt(i+1);
+                            c3 = utftext.charCodeAt(i+2);
+                            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                            i += 3;
+                        }
+                    }
+                    return string;
+                }
+            }
+        };
+        
+        if (wads.sitepage.indexOf('allocine_fr') != 0) {
+            top.wads = wads;
+        } 
+        wads.start();
+    })();
+</script>
+
+<link rel="manifest" href="/manifest.json" />
+<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/css/jqueryui/jqueryui.css" rel="stylesheet" type="text/css" />
+<link href="/skin/skin-jv/modal.css" rel="stylesheet" type="text/css" />
+<link rel="publisher" href="https://plus.google.com/105261500849864742219/" />
+        <link href="/skin/skin-jv/icomoon.css" rel="stylesheet" type="text/css" />
+    <link href="/skin/skin-jv/jv-editor.css" rel="stylesheet" type="text/css" />
+            <link href="/cache/skin.php?q=skin-jv&amp;t=2" rel="stylesheet" type="text/css" />
+    <link href="/skin/skin-jv/icomoon.css" rel="stylesheet" type="text/css" />
+    
+
+    <link href="/skin/skin-jv/print-jv.css" rel="stylesheet" type="text/css" />
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+<![endif]-->
+<script type="text/javascript" src="//try.abtasty.com/bea2a8ac75dac1f676c114aa8090ae28.js"></script>
+</head>
+<body  data-aa-webediads="1">
+
+<script type="text/javascript">
+// <![CDATA[
+dataLayer = [{"page_type":"contenu","rubric":"video","content_type":"chronique","platform":["ios","android"],"pegi":["16-ans"],"game_publisher":["ubisoft-montpellier","ubisoft"],"game_name":["soldats-inconnus-memoires-de-la-grande-guerre"],"game_id":[54907,53897],"game_genre":["aventure"],"game_payment":["payant-a-l-acquisition"],"tags":["ios","android","aventure","ubisoft-montpellier","ubisoft","1ere-guerre-mondiale","overview-mobile"]}];
+// ]]>
+</script>
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-T9WX8T"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T9WX8T');</script>
+<!-- End Google Tag Manager -->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/fr_FR/all.js#xfbml=1&appId=202446416762";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<input type="hidden" name="ajax_timestamp_gestion_abo" id="ajax_timestamp_gestion_abo" value="1449734305" />
+<input type="hidden" name="ajax_hash_gestion_abo" id="ajax_hash_gestion_abo" value="949079dd4e47aba0a06aa29249f132308853df16" />
+
+
+
+<header id="jv-header">
+    <div id="header-top">
+        <div class="container container-empty">
+
+                        <div id="header-logo"><span class="JvCare 1F a-logo">LOGO JEUXVIDEO.COM</span></div>
+
+                        <div id="header-links">
+                <ul><li class="header-twitter"><span class="JvCare 1F1FCBCC46CBCB43C119424F4E1FBD34B24F4E a-head" target="_blank" rel="nofollow" title="Suivez nous sur Twitter"><span>Twitter</span></span></li><li class="header-facebook"><span class="JvCare 1F1FCCCCCC19444A4243414F4F4719424F4E1F4DC4424F4E a-head" target="_blank" rel="nofollow" title="Suivez nous sur Facebook"><span>Facebook</span></span></li><li class="header-googleplus"><span class="JvCare 1F1FC048C3C2194C4F4F4C484319424F4E1F174D43C3C5C4464B434F1F a-head" target="_blank" rel="publisher" title="Suivez nous sur Google +"><span>Google+</span></span></li><li class="header-youtube"><span class="JvCare 1F1FCCCCCC19C64FC3CBC3414319424F4E1FC3C243C11F4DC4424F4E a-head" target="_blank" rel="nofollow" title="Abonnez vous à nos chaines YouTube"><span>Youtube</span></span></li><li class="header-rss"><span class="JvCare 1FC1C2C21FC1C2C219C54E48 a-head"><span>RSS</span></span></li></ul>            </div>
+        </div>
+    </div>
+    <div id="header-bottom">
+        <div class="bloc-sticker">
+            <div class="bloc-menu-navbar">
+                <div class="container container-empty container-relatif">
+                    <div class="JvCare 1F a-back-home">Accueil jeuxvideo.com</div>
+                                        <nav id="navbar-jv" role="navigation"><ul class="liste-rubrique"><li class="dropdown"><span id="rub-genre" class="JvCare 1FCB4FC3C21E4843C21E4D43C3C51F dropdown-toggle rubrique-menu">Jeux<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-genre" data-onglet="genres"></div></li><li class="dropdown"><span id="rub-actu" class="JvCare 1F4A42CBC34A4846CB43C21945CB4E dropdown-toggle rubrique-menu">Actu<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-actu" data-onglet="actu"></div></li><li class="dropdown"><span id="rub-video" class="JvCare 1FC4464B434FC21E4B431E4D43C3C51945CB4E dropdown-toggle rubrique-menu">Vidéos<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-video" data-onglet="videos"></div></li><li class="dropdown"><span id="rub-chroniques" class="JvCare 1F4245C14F4946CAC343C21EC4464B434F1945CB4E dropdown-toggle rubrique-menu">Chroniques<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-chroniques" data-onglet="chroniques"></div></li><li class="dropdown"><span id="rub-live" class="JvCare 1F4C4A4E46494C1E4846C4431FCBC4202A1945CB4E dropdown-toggle rubrique-menu">Web TV<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-live" data-onglet="webtv"></div></li><li class="dropdown"><span id="rub-forum" class="JvCare 1F444FC1C34EC21945CB4E dropdown-toggle rubrique-menu">Forums<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-forum" data-onglet="forums"></div></li><li class="dropdown"><span id="rub-etajv" class="dropdown-toggle rubrique-menu">Astuces / wiki<span class="fleche-menu"></span></span><div class="dropdown-menu content-menu-jv" role="menu" aria-labelledby="rub-etajv" data-onglet="etajvwiki"></div></li><li class="dropdown"><span class="JvCare 1F414FC3CB46CAC3431F414FC3CB4647C24F4E4E221945CB4E lien-alone"><span id="rub-boutique" class="rubrique-menu titre-rubrique-alone">Bons plans</span></span></li></ul></nav>                                            <script type="text/javascript">
+        WadsUtil.createAdWithStyle('onglet', {
+            zIndex: 0,             maxWidth: '150px',             maxHeight: '35px',             overflow: 'hidden',         });
+    </script>
+
+                                        <div id="header-search-jv">
+                        <form action="/recherche.php">
+                            <span class="loupe-search"></span><span class="bloc-input-plus-ok"><span class="posi-input ui-front"><input type="search" id="header-recherche" placeholder="Rechercher un jeu, une news" name="q" /></span><button class="launcher-search" type="submit">OK</button></span>
+                        </form>
+                    </div>
+                                        <div id="header-store-jv">
+                                                    <span id="header-store-jv-link" class="JvCare 45CBCBC02D1F1FCCCCCC19CC434AC143444A49C219424F4E1F2FC3CB4E3FC24FC3C142432E4DC442 deco"  target="_blank">
+                                                                <span id="header-store-jv-text">
+                                    Boutique
+                                </span>
+                                                            </span>
+                                            </div>
+                                        <div id="header-user">
+                        
+<ul class="connexion-jv">
+    <li><span class="JvCare 1FC2C24F1FC1434C46C2CB43C119C045C0 a-connect">Inscription</span></li>
+    <li><span class="JvCare 1F484F4C46492FC3C1482E1321B4C4464B434FC21321B44245C14F4946CAC343C21321B42B22242024201321B44FC443C1C44643CC1E4E4F414648431EC24F484B4ACBC21E4649424F4949C3C21945CB4E14454AC2452E252A202B252C4A26222325412B232A2043264241412A2C444A24234324212A44 a-connect">Connexion</span></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <!-- bloc machine -->
+            <div class="bloc-menu-liste-machine">
+                <div class="container container-empty container-relatif">
+                    <ul class="menu-liste-machine">
+                                                <li><span class="JvCare 1FC0421945CB4E item-machine-alpha">PC</span></li>
+                        <li><span class="JvCare 1FC0C22B1EC0484AC6C2CB4ACB464F491E2B1945CB4E item-machine-alpha">PS4</span></li>
+                        <li><span class="JvCare 1FC5414FC51E4F49431EC54F49431EC54F1945CB4E item-machine-alpha">XBOX ONE</span></li>
+                        <li><span class="JvCare 1FCC46461EC31E494649CB43494B4F1ECC46461ECC4646C31945CB4E item-machine-alpha">Wii U</span></li>
+                        <li><span class="JvCare 1FC0C2221EC0484AC6C2CB4ACB464F491E221945CB4E item-machine-alpha">PS3</span></li>
+                        <li><span class="JvCare 1FC52224201EC5414FC51E2224201945CB4E item-machine-alpha">XBOX 360</span></li>
+                        <li><span class="JvCare 1F224BC21E494649CB43494B4F1E224BC21945CB4E item-machine-alpha">3DS</span></li>
+                        <li><span class="JvCare 1FC0C21EC446CB4A1EC0484AC6C2CB4ACB464F491EC446CB4A1945CB4E item-machine-alpha">PS VITA</span></li>
+                        <li><span class="JvCare 1F4BC21945CB4E item-machine-alpha">DS</span></li>
+                        <li><span class="JvCare 1FCC46461E494649CB43494B4F1ECC46461945CB4E item-machine-alpha">Wii</span></li>
+                        <li><span class="JvCare 1F4AC0C048431E46C0454F49431E46C04F4B1ECB4FC342451945CB4E item-machine-alpha">iOS</span></li>
+                        <li><span class="JvCare 1F4A494BC14F464B1945CB4E item-machine-alpha">ANDROID</span></li>
+                        
+                                                <li class="hit-parade-menu-item"><span class="JvCare 1F4E4346484843C3C1C21F4E4F4E4349CB1F hit-parade-link"><span>Hit Parade</span></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="content">
+    <div id="zone-sponso"></div>
+        <script type="text/javascript" data-top-wads>
+        var scriptTag = document.querySelectorAll('[data-top-wads]')[0];
+        var prospectElement = document.createElement('div');
+        prospectElement.className = 'container';
+        var tableElement = document.createElement('div');
+        var cellElement = document.createElement('div');
+
+        WadsUtil.setElementStyle(prospectElement, {
+            minHeight: '120px',
+            padding: '0 0 10px 0',
+            position: 'relative',
+            zIndex: 0,
+                    });
+
+        WadsUtil.setElementStyle(tableElement, {
+            display: 'table',
+            width: '100%',
+            padding: '5px 0',
+            position: 'relative',
+                            height: '110px',
+                    });
+
+        WadsUtil.setElementStyle(cellElement, {
+            display: 'table-cell',
+            verticalAlign: 'middle',
+            textAlign: 'center',
+            lineHeight: 0,
+            fontSize: 0,
+        });
+
+        wads.createAdPosition('header-top', cellElement);
+        tableElement.appendChild(cellElement);
+        prospectElement.appendChild(tableElement);
+        scriptTag.parentNode.appendChild(prospectElement);
+
+        WadsUtil.registerAndHideAd(new WadsUtil.Ad(
+            prospectElement,
+            'header-top',
+            { visibility: 'hidden' },
+            { visibility: 'visible' }
+        ));
+
+    </script>
+    <div  id="video-small-large"  class="small-player" >
+        <div id="bloc-meta-titre-jeu" class="container ">
+    <div class="poutre-machine"></div>
+    <div class="table-meta">
+        <div class="cell-meta">
+            <div class="bloc-txt-meta">
+                <div class="titre-meta" itemprop="name"><span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F">Soldats Inconnus : Mémoires de la Grande Guerre</span></div>
+                <meta itemprop="url" content="http://www.jeuxvideo.com/jeux/jeu-81316/" />
+            </div>
+        </div>
+    </div>
+    <div class="bloc-support">
+                <div class="bloc-all-support">
+                             <span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F label-support active">TOUS SUPPORTS</span>
+                    </div>
+                <div class="bloc-version-dispo">
+                            // VERSIONS DISPONIBLES :
+                                                                            <span class="JvCare 1F4D43C3C51FC0421F20202023202A2B221EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">PC</span>
+                                                                                <span class="JvCare 1F4D43C3C51FC0484AC6C2CB4ACB464F491E2B1EC0C22B1F20202023202A2B2C1EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">PS4</span>
+                                                                                <span class="JvCare 1F4D43C3C51FC5414FC51E4F49431F20202023202A2B241EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">ONE</span>
+                                                                                <span class="JvCare 1F4D43C3C51FC0484AC6C2CB4ACB464F491E221EC0C2221F20202023202A2B231EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">PS3</span>
+                                                                                <span class="JvCare 1F4D43C3C51FC5414FC51E2224201F20202023202A2B2B1EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">360</span>
+                                                                                <span class="JvCare 1F4D43C3C51F46C0454F49431E46C04F4B1F202020232225262C1EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">iOS</span>
+                                                                                <span class="JvCare 1F4D43C3C51F4A494BC14F464B1F202020232B26202C1EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E label-support">Android</span>
+                                                        </div>
+    </div>
+        <div class="bloc-onglet-fiche">
+                <span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F onglet-fiche"><span class="titre-onglet">Accueil</span></span><!--
+                        --><span class="JvCare 1F4D43C3C51F4D43C31E252A222A241FCB43C2CBC21F onglet-fiche"><span class="titre-onglet">Tests <span class="info-plus">(12)</span></span></span><!--
+                                --><span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F4943CCC21F onglet-fiche"><span class="titre-onglet">News <span class="info-plus">(16)</span></span></span><!--
+                                --><span class="JvCare 1F4D43C3C51F4D43C31E252A222A241FC4464B434FC21F onglet-fiche active"><span class="titre-onglet">Vidéos <span class="info-plus">(16)</span></span></span><!--
+                                --><span class="JvCare 1FC242C1434349C2454FCBC21F252A222A241E201E20 onglet-fiche" target="_blank">
+            <span class="titre-onglet">Images<span class="info-plus"> (174)</span></span>
+        </span><!--
+                            --><span class="JvCare 1FCC464746C21EC24F48C342431E4AC2CBC34243C21FCC4647461E4B431EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431F222321222620 onglet-fiche"><span class="titre-onglet">ASTUCES / WIKI</span></span><!--
+                                                    --><span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F1241484F421ECC4A4848C04AC043C1C21E4D43C3 onglet-fiche"><span class="titre-onglet">Wallpapers <span class="info-plus">(1)</span></span></span><!--
+                                    --><span class="JvCare 1F444FC1C34EC21F201E222A2420221E201E2A1E201E2A1E201EC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431945CB4E onglet-fiche"><span class="titre-onglet">Forum</span></span><!--
+                                                --><span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F414FC3CB46CAC3431F onglet-fiche onglet-boutique "><span class="titre-onglet">Boutique</span></span><!--
+                             -->
+    </div>
+</div>
+
+        <div class="container container-content">
+            
+<div class="row">
+            
+    <div class="col-md-12">
+        <div class="bloc-fil-ariane-crumb">
+            <div class="options-crumb"><span class="picto-to-small-player" title="Réduire le player"><span>Small player</span></span><span class="picto-to-big-player" title="Agrandir le player"><span>Big player</span></span><span class="JvCare 1F424F49CB4349C31F4C43C2CB464F493F424F49CB4349C319C045C0 picto-crayon" title="Créer un contenu" target="_blank"><span>Créer un contenu</span></span></div>            <div class="fil-ariane-crumb">
+                <span><a href="//www.jeuxvideo.com">jeuxvideo.com</a></span>
+                                    /
+                                            <span><a href="/videos-de-jeux.htm">Vidéos du moment</a></span>
+                                                        /
+                                            <span><a href="/chroniques-video.htm">Toutes les chroniques</a></span>
+                                                        /
+                                            <h1 class="highlight">Overview Mobile : Soldats Inconnus </h1>
+                                                </div>
+        </div>
+    </div>
+</div>
+            <div class="row">
+    <div class="col-md-12">
+        
+<div class="player-contenu">
+        <div class="embed-responsive embed-responsive-16by9">
+        <div class="embed-responsive-item" >
+            <div class="player-jv" id="player-jv-2131462-357" data-src="/contenu/medias/video.php?id=2131462&amp;autostart=true&amp;videoposition=autoplay">Chargement du lecteur vidéo...</div>
+        </div>
+    </div>
+</div>    </div>
+</div>
+            <div class="row">
+        <div class="col-md-8"  itemprop="video" itemscope itemtype="http://schema.org/VideoObject">
+        
+                
+
+<div id="blocs-reseaux-sociaux-new">
+        <div class="bloc-reseaux-sociaux-new">
+        <span class="JvCare 45CBCBC0C22D1F1FCCCCCC19444A4243414F4F4719424F4E1FC2454AC143C11FC2454AC143C119C045C02FC32E45CBCBC02D1F1FCCCCCC194D43C3C5C4464B434F19424F4E1FC4464B434FC21F4245C14F4946CAC343C21F2B22242024201F4FC443C1C44643CC1E4E4F414648431EC24F484B4ACBC21E4649424F4949C3C21945CB4E brsn-icon-facebook"></span>
+    </div>
+        <div class="bloc-reseaux-sociaux-new">
+        <span class="JvCare 45CBCBC0C22D1F1FCBCC46CBCB43C119424F4E1F4649CB4349CB1FCBCC4343CB2FCB43C5CB2EBFC443C1C44643CC132120BE4F414648431321201322BA132120324F484B4ACBC2132120B649424F4949C3C213212014C3C1482E45CBCBC01322BA1321B41321B4CCCCCC194D43C3C5C4464B434F19424F4E1321B4C4464B434FC21321B44245C14F4946CAC343C21321B42B22242024201321B44FC443C1C44643CC1E4E4F414648431EC24F484B4ACBC21E4649424F4949C3C21945CB4E14C4464A2EBD34B24F4E brsn-icon-twitter"></span>
+    </div>
+        <div class="bloc-reseaux-sociaux-new">
+        <span class="JvCare 45CBCBC0C22D1F1FC048C3C2194C4F4F4C484319424F4E1FC2454AC1432FC3C1482E45CBCBC02D1F1FCCCCCC194D43C3C5C4464B434F19424F4E1FC4464B434FC21F4245C14F4946CAC343C21F2B22242024201F4FC443C1C44643CC1E4E4F414648431EC24F484B4ACBC21E4649424F4949C3C21945CB4E brsn-icon-gplus"></span>
+    </div>
+</div>
+
+                <div class="header-video">
+        <meta itemprop="videoFrameSize" content="mp4" />
+    <meta itemprop="description" content="cette fois seagull vous propose de decouvrir id 54907 soldats inconnus memoires de la grande guerre ..." />
+    <meta itemprop="contentUrl" content="http://video720.jeuxvideo.com/chroniques/o/v/overview-mobile-soldats-inconnus-88506-1431964185-720p.mp4" />
+    <meta itemprop="duration" content="PT0H1M30S" />
+    <meta itemprop="videoQuality" content="720p" />
+    <meta itemprop="encodingFormat" content="mpeg4" />
+    <meta itemprop="thumbnailUrl" content="http://image.jeuxvideo.com/images/videos/chroniques-images/o/v/overview-mobile-soldats-inconnus-88506-1431964185-low.jpg" />
+    <meta itemprop="playerType" content="Flash" />
+    <meta itemprop="name" content="Overview Mobile : Soldats Inconnus " />
+    <meta itemprop="uploadDate" content="2015-05-22T09:00" />
+        <div class="titre-video">
+        <span>Chronique</span> Overview Mobile : Soldats Inconnus 
+    </div>
+    <div class="foot-video">
+        <div class="date-comm">
+            <time datetime="2015-05-22T09:00">22/05/2015 à 09:00</time>
+                            <span>1112 vues</span>
+                                </div>
+        <div class="bloc-machine-one-line">
+                        <span class="label-machine label-ios">iOS</span>
+                        <span class="label-machine label-android">Android</span>
+                    </div>
+    </div>
+</div>
+                <div class="corps-video text-enrichi-default" >
+    <p>Cette fois Seagull vous propose de découvrir <a href="/jeux/android/00054907-soldats-inconnus-memoires-de-la-grande-guerre.htm">Soldats Inconnus : Mémoires de la Grande Guerre</a>. Portage des versions consoles, le titre mobile propose une maniabilité adaptée, une histoire toujours aussi prenante et une direction artistique atypique.</p>
+</div>
+
+
+<div class="bloc-lien-revision">
+        Mis à jour le 27/07/2015
+            </div>
+                <div class="bloc-tags-default">
+    <div class="tag-arrow">
+        <span class="icon-tag"></span><div class="arrow"></div>
+    </div>
+                                                <a href="/apple-iphone-ipod-touch.htm" class="btn btn-jv-tag">iOS</a>
+                    
+                
+                                                                <a href="/android.htm" class="btn btn-jv-tag">Android</a>
+                    
+                
+                                                                <a href="/aventure.htm" class="btn btn-jv-tag">Aventure</a>
+                    
+                
+                                                                <span class="JvCare 1F4649444FC14E4ACB464F49C21F122A20212B2A21 btn btn-jv-tag">Ubisoft Montpellier</span>
+                    
+                
+                                                                <span class="JvCare 1F4649444FC14E4ACB464F49C21F122A2020202B2A btn btn-jv-tag">Ubisoft</span>
+                    
+                        <span class="btn btn-jv-tag plus-de-tags">+</span>
+        <span class="list-tags-en-plus">
+        
+                                                                <span class="JvCare 1F4649444FC14E4ACB464F49C21F1223212620 btn btn-jv-tag">1ère Guerre Mondiale</span>
+                    
+                
+                                                <span class="label-jv-tag">Overview Mobile</span>
+        
+                
+                        </span>
+            </div>
+
+                <div class="bonus-track">
+    <div class="header-bonus"><span>Ces articles peuvent aussi vous intéresser</span></div>
+    <div class="content-bonus">
+                <a href="/videos-editeurs/0005/00053897/soldats-inconnus-memoires-de-la-grande-guerre-iphone-ipod-sortie-ios-00122849.htm" >            <figure>
+                <div>
+                     <img src="//image.jeuxvideo.com/images-xs/videos/videos_editeurs_images/0012/00122849-1409824443-low.jpg" />                 </div>
+                <figcaption><span>Bande-annonce : </span>Soldats Inconnus : Mémoires de la Grande Guerre : Sortie iOS</figcaption>
+            </figure>
+        </a>                <a href="/news/2014/00076065-soldats-inconnus-memoires-de-la-grande-guerre-disponible-sur-android.htm" >            <figure>
+                <div>
+                     <img src="//image.jeuxvideo.com/images-xs/pc/s/o/soldats-inconnus-memoires-de-la-grande-guerre-pc-1399483337-008-card.jpg" />                 </div>
+                <figcaption><span>News jeu : </span>Soldats Inconnus : Mémoires de la Grande Guerre disponible sur Android</figcaption>
+            </figure>
+        </a>                <a href="/news/2014/00074464-soldats-inconnus-sort-sur-ios.htm" >            <figure>
+                <div>
+                     <img src="//image.jeuxvideo.com/images-xs/pc/s/o/soldats-inconnus-memoires-de-la-grande-guerre-pc-1402361400-027.jpg" />                 </div>
+                <figcaption><span>News jeu : </span>Soldats Inconnus sort sur iOS</figcaption>
+            </figure>
+        </a>                <a href="/news/2014/00074042-gamescom-soldats-inconnus-arrive-sur-ios.htm" class="last-bonus">            <figure>
+                <div>
+                     <img src="//image.jeuxvideo.com/images-xs/pc/s/o/soldats-inconnus-memoires-de-la-grande-guerre-pc-1378803738-001.jpg" />                 </div>
+                <figcaption><span>News jeu : </span>Gamescom : Soldats Inconnus arrive sur iOS</figcaption>
+            </figure>
+        </a>            </div>
+    <div class="footer-bonus"></div>
+</div>
+
+                <div class="outbrain" data-widget="APP_6" data-verticale="false" data-titre="Ailleurs sur le web"></div>
+                
+<div class="titre-affli-ligne">
+    <span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F414FC3CB46CAC3431F titre-affli-ligne-text">Commander Soldats Inconnus : Mémoires de la Grande Guerre</span>
+</div>
+
+<div id="affli-ligne-blocs" class="row affiliation-boutique-tr">
+                    <div class="col-md-4 0">
+            <div
+                class="JvCare 45CBCBC0C22D1F1F44C1194C4A4E43C2C0484A4943CB19424F4E1F4C4A4E431FC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21E4B431E484A1E4CC14A494B431E4CC343C1C1431EC3C0484AC61E4743C61E1E21242A221E2A2FC143442E4DC4424E affli-ligne-bloc datalayer-push"
+                target="_blank"
+                data-category="affiliateclick-article_bottom"
+                data-urlboutique="https://fr.gamesplanet.com/game/soldats-inconnus-memoires-de-la-grande-guerre-uplay-key--2613-1?ref=jvcm"
+                data-partner="gamesplanet"
+                data-push="affiliation_click"
+            >
+                                <div class="cell-affli-ligne cell-machine">
+                    <span class="label-machine label-pc">PC</span>
+                </div>
+                                <div class="cell-affli-ligne cell-boutique">
+                    <img class="affli-ligne-img" src="/img/logos-boutique/gamesplanet-logo.png">
+                </div>
+                                                    <div class="cell-affli-ligne cell-prix">
+                        <div class="prix-neuf">14.99€</div>
+                    </div>
+                            </div>
+        </div>
+                    <div class="col-md-4 0">
+            <div
+                class="JvCare 45CBCBC0C22D1F1F46CBC34943C2194AC0C0484319424F4E1F44C11F4AC0C01FC24F484B4ACBC21E4649424F4949C3C21E4E434E4F46C143C21F464B252B202A26202224202F4ECB2E2514C34F2E2B144ACB2E2A2A48B545B8 affli-ligne-bloc datalayer-push"
+                target="_blank"
+                data-category="affiliateclick-article_bottom"
+                data-urlboutique="https://itunes.apple.com/fr/app/soldats-inconnus-memoires/id840190360?mt=8&amp;uo=4&amp;at=11lHhL"
+                data-partner="itunes"
+                data-push="affiliation_click"
+            >
+                                <div class="cell-affli-ligne cell-machine">
+                    <span class="label-machine label-ios">iOS</span>
+                </div>
+                                <div class="cell-affli-ligne cell-boutique">
+                    <img class="affli-ligne-img" src="/img/logos-boutique/itunes-logo.png">
+                </div>
+                                                    <div class="cell-affli-ligne cell-prix">
+                        <div class="prix-neuf">4.49€</div>
+                    </div>
+                            </div>
+        </div>
+                    <div class="col-md-4">
+            <span class="JvCare 1F4D43C3C51F4D43C31E252A222A241F414FC3CB46CAC3431F affli-ligne-bloc">
+                <div class="cell-affli-ligne cell-toutes">
+                    <span class="affli-plus"></span> Toutes les offres
+                </div>
+            </span>
+        </div>
+    </div>
+
+                
+<script type="text/javascript">
+var id_contenu = 436060;
+</script>
+
+<input type="hidden" name="ajax_timestamp_liste_commentaire" id="ajax_timestamp_liste_commentaire" value="1449734305" />
+<input type="hidden" name="ajax_hash_liste_commentaire" id="ajax_hash_liste_commentaire" value="4d96168e4228aeefd0ac1c363bad28595c95a4de" />
+
+
+<div id="barre-moderation" class="btn-moderation-topic" style="display: none;">
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="bloc-commentaires">
+            <div class="titre-head-bloc">
+                <h2 class="titre-bloc">COMMENTAIRES</h2>
+                                            </div>
+                                        <div id="tous-les-commentaires">
+                                            <div class="titre-tous-commentaire">
+                            Tous les commentaires (<span>0</span>)
+                        </div>
+                                                            <div class="wrapper-tous-commentaire">
+                                                        <div class="alert alert-warning">
+                            <div class="alert-row"> Vous devez être connecté pour poster un commentaire. </div>
+            </div>
+
+                                                                        <div class="commentaire-liste">
+                            
+                        </div>
+                                            </div>
+                </div>
+                                    </div>
+    </div>
+</div>
+<script>var gaudata = {"dimension76":"video_commentaire","dimension46":"81316","dimension47":"Soldats Inconnus : M\u00e9moires de la Grande Guerre","dimension31":"2100","dimension32":"Aventure","dimension25":"102412|100041","dimension26":"Ubisoft Montpellier|Ubisoft","dimension21":"102412|100041","dimension22":"Ubisoft Montpellier|Ubisoft","dimension33":"2100","dimension34":"Aventure","dimension69":"7100|7450|7070|154971|90|100|2100|102412|100041|3000|3200|5290|3400|3410|3630|3690|4550|174108|169646","dimension70":"Chronique|Jeu|Video|Soldats Inconnus _ Memoires de la Grande Guerre|iOS|Android|Aventure|Ubisoft Montpellier|Ubisoft|Payant a l_acquisition|Jouable en solo|1ere Guerre Mondiale|Voix en francais|Textes en francais|Google Play|App Store|_16 ans|Overview Mobile|2015","dimension60":"4550","dimension61":"+16 ans","dimension52":"3200","dimension53":"Jouable en solo","dimension54":"3000","dimension55":"Payant \u00e0 l'acquisition","dimension43":"54907|53897","dimension44":"Soldats Inconnus : M\u00e9moires de la Grande Guerre Android|Soldats Inconnus : M\u00e9moires de la Grande Guerre iOS","dimension62":"90|100","dimension63":"iOS|Android","dimension78":"2131462","dimension79":"0022_SoldatsInconnus_mov","dimension80":"Chronique","dimension20":"2015-05-18 | 17-57","dimension16":"436060","dimension17":"Overview Mobile _ Soldats Inconnus "};</script>
+
+            </div>
+
+        <div class="col-md-4 col-droite-player">
+                    <script type="text/javascript">
+        WadsUtil.createAdWithStyle('middle');
+    </script>
+<span id="image-promo-1" class="JvCare 45CBCBC02D1F1FCCCCCC19CC4F4FCB414FC51944C11F12C3CB4E3FC24FC3C142432E4D43C3C5C4464B434F424F4E14C3CB4E3F4E434B46C34E2EBAB1222214C3CB4E3F424A4EC04A464C492ECC4F4FCB414FC5 hide" target="_blank"><img src="//image.jeuxvideo.com/medias/144672/1446719489-3522-photo.jpg"></span>
+                <div class="bloc-pres1">
+    <div class="heading-pres1">
+        <span class="titre-pres1">PLAYLIST</span>
+    </div>
+    <div class="content-slice-pres1">
+        <ul class="list-slice-pres1">
+                                                <li >
+                        <div class="slice-pres1 img-w">
+                            <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232121222B1FC243C3481E444A42431E4AC3C51ECB43494341C143C21E48431EC14F4B43C3C11E4B431E484A1E41464148464FCB4543CAC3431945CB4E mask-thumb">
+                                 <img class="thumb" src="//image.jeuxvideo.com/medias-xs/144925/1449245113-5085-card.jpg" />                                 <span class="play-on-small"></span>                             </span>
+                            <div class="info-slice-pres1">
+                                                                    <a href="/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm" class="lien-jv titre-slice-pres1">
+                                        <span class="type">Chronique :</span> Seul Face aux Ténèbres - Le rôdeur de la bibliothèque
+                                    </a>
+                                                                <div class="line-option">PC - 3DO - SATURN</div>
+                                <div class="line-option">11:13 - 6798 vues</div>                                                            </div>
+                        </div>
+                    </li>
+                                    <li >
+                        <div class="slice-pres1 img-w">
+                            <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B23212023241FC2C04F464843C1C21E48431EC0C1434E4643C11E454A48441E484644431945CB4E mask-thumb">
+                                 <img class="thumb" src="//image.jeuxvideo.com/medias-xs/144949/1449489286-6716-card.jpg" />                                 <span class="play-on-small"></span>                             </span>
+                            <div class="info-slice-pres1">
+                                                                    <a href="/videos/chroniques/452056/spoilers-le-premier-half-life.htm" class="lien-jv titre-slice-pres1">
+                                        <span class="type">Chronique :</span> Spoilers - Le premier Half Life
+                                    </a>
+                                                                <div class="line-option">PC - DCAST - MAC - PS2</div>
+                                <div class="line-option">05:31 - 35379 vues</div>                                                            </div>
+                        </div>
+                    </li>
+                                    <li >
+                        <div class="slice-pres1 img-w">
+                            <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2625241F48431E4B4344461E4BC31E42454A484843494C431E4B4FC1464A491EC4C21EC3C2C3481945CB4E mask-thumb">
+                                 <img class="thumb" src="//image.jeuxvideo.com/medias-xs/144924/1449244720-7122-card.jpg" />                                 <span class="play-on-small"></span>                             </span>
+                            <div class="info-slice-pres1">
+                                                                    <a href="/videos/chroniques/451986/le-defi-du-challenge-dorian-vs-usul.htm" class="lien-jv titre-slice-pres1">
+                                        <span class="type">Chronique :</span> Le Défi du Challenge  - Dorian Vs Usul
+                                    </a>
+                                                                <div class="line-option">NES - SNES</div>
+                                <div class="line-option">29:08 - 51691 vues</div>                                                            </div>
+                        </div>
+                    </li>
+                                    <li >
+                        <div class="slice-pres1 img-w">
+                            <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2622201F4DCB1E46494B431E4B4F491ECB1EC2CB4AC1C4431E4AC1471EC14F424743CB1E48434A4CC3431945CB4E mask-thumb">
+                                 <img class="thumb" src="//image.jeuxvideo.com/medias-xs/144916/1449155376-2368-card.jpg" />                                 <span class="play-on-small"></span>                             </span>
+                            <div class="info-slice-pres1">
+                                                                    <a href="/videos/chroniques/451930/jt-inde-don-t-starve-ark-rocket-league.htm" class="lien-jv titre-slice-pres1">
+                                        <span class="type">Chronique :</span> JT indé - Don&#039;t Starve, Ark, Rocket League... 
+                                    </a>
+                                                                <div class="line-option"></div>
+                                <div class="line-option">06:59 - 16691 vues</div>                                                            </div>
+                        </div>
+                    </li>
+                                    <li >
+                        <div class="slice-pres1 img-w">
+                            <span class="JvCare 1FC4464B434FC21F4245C14F4946CAC343C21F2B232A2621241FC2C043434B1E4C4A4E431E444A48484FC3CB1E221ECB43C14E4649431E43491E21231E4E4649C3CB43C21945CB4E mask-thumb">
+                                 <img class="thumb" src="//image.jeuxvideo.com/medias-xs/144924/1449239206-1132-card.jpg" />                                 <span class="play-on-small"></span>                             </span>
+                            <div class="info-slice-pres1">
+                                                                    <a href="/videos/chroniques/451926/speed-game-fallout-3-termine-en-25-minutes.htm" class="lien-jv titre-slice-pres1">
+                                        <span class="type">Chronique :</span> Speed Game - Fallout 3 terminé en 25 minutes ?
+                                    </a>
+                                                                <div class="line-option">PC - PS3 - 360</div>
+                                <div class="line-option">39:06 - 51235 vues</div>                                                            </div>
+                        </div>
+                    </li>
+                                    </ul>
+                                    <a href="/chroniques-video.htm" class="bloc-chev-pix light-two"><span>Toutes les chroniques</span></a>
+                        </div>
+</div>
+
+                <div class="bloc-pres1">
+    <div class="fb-page" data-href="https://www.facebook.com/jvcom"
+         data-small-header="false" data-adapt-container-width="true"
+         data-hide-cover="false" data-show-facepile="true" data-show-posts="false">
+        <div class="fb-xfbml-parse-ignore">
+            <blockquote cite="https://www.facebook.com/jvcom">
+                <a href="https://www.facebook.com/jvcom">Jeuxvideo.com</a>
+            </blockquote>
+        </div>
+    </div>
+</div>
+
+                <div class="outbrain" data-widget="AR_4" data-verticale="1" data-titre="A voir sur nos sites partenaires"></div>
+                    <script type="text/javascript">
+        WadsUtil.createAdWithStyle('push-right-1',
+            {},
+            { display: 'none' },
+            { display: 'block' }
+        );
+    </script>
+<span id="image-promo-2" class="JvCare 45CBCBC02D1F1FCCCCCC19CC434AC143444A49C219424F4E1FC0421FC24FC3C146C21F12C3CB4E3FC24FC3C142432E4D43C3C5C4464B434F424F4E14C3CB4E3F4E434B46C34E2EBAB12214C3CB4E3F424A4EC04A464C492E4A4DC442 hide" target="_blank"><img src="//image.jeuxvideo.com/medias/143749/1437489781-1611-artwork.jpg"></span>
+                <div class="outbrain" data-widget="AR_2" data-verticale="1" data-titre="A regarder aussi sur JV.com"></div>
+                
+                    <script type="text/javascript">
+        WadsUtil.createAdWithStyle('middle2',
+            {},
+            { display: 'none' },
+            { display: 'block' }
+        );
+    </script>
+
+            </div>
+</div>
+<script>var gaudata = {"dimension76":"video","dimension46":"81316","dimension47":"Soldats Inconnus : M\u00e9moires de la Grande Guerre","dimension31":"2100","dimension32":"Aventure","dimension25":"102412|100041","dimension26":"Ubisoft Montpellier|Ubisoft","dimension21":"102412|100041","dimension22":"Ubisoft Montpellier|Ubisoft","dimension33":"2100","dimension34":"Aventure","dimension69":"7100|7450|7070|154971|90|100|2100|102412|100041|3000|3200|5290|3400|3410|3630|3690|4550|174108|169646","dimension70":"Chronique|Jeu|Video|Soldats Inconnus _ Memoires de la Grande Guerre|iOS|Android|Aventure|Ubisoft Montpellier|Ubisoft|Payant a l_acquisition|Jouable en solo|1ere Guerre Mondiale|Voix en francais|Textes en francais|Google Play|App Store|_16 ans|Overview Mobile|2015","dimension60":"4550","dimension61":"+16 ans","dimension52":"3200","dimension53":"Jouable en solo","dimension54":"3000","dimension55":"Payant \u00e0 l'acquisition","dimension43":"54907|53897","dimension44":"Soldats Inconnus : M\u00e9moires de la Grande Guerre Android|Soldats Inconnus : M\u00e9moires de la Grande Guerre iOS","dimension62":"90|100","dimension63":"iOS|Android","dimension12":"1209970","dimension13":"la_redaction","dimension35":"5","dimension36":"Journaliste","dimension78":"2131462","dimension79":"0022_SoldatsInconnus_mov","dimension80":"Chronique","dimension20":"2015-05-18 | 17-57","dimension16":"436060","dimension17":"Overview Mobile _ Soldats Inconnus "};</script>
+                    </div>
+    </div>
+</div>
+
+<footer id="jv-footer">
+    </footer>
+
+
+
+
+<script src="/js/lib/jquery.js" type="text/javascript"></script>
+<script src="/js/lib/jqueryui.js" type="text/javascript"></script>
+<script src="/js/lib/jv_care.js" type="text/javascript"></script>
+<script src="/js/lib/bootstrap.js" type="text/javascript"></script>
+<script src="/js/common.js" type="text/javascript"></script>
+<script src="/js/lib/modal.js" type="text/javascript"></script>
+<script src="/js/html2canvas.js" type="text/javascript"></script>
+<script src="/js/lib/notifier.js" type="text/javascript"></script>
+<script src="/js/seo/tr_aff_bout.js" type="text/javascript"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+        <script src="/js/commentaire.js"></script>
+    <script src="/js/lib/jv-editor.js"></script>
+    <script src="/js/lib/jquery.expander.js"></script>
+    <script src="/js/gta/signalement.js"></script>
+        <script src="/js/spoil.js"></script>
+    <script src="/js/contenu/page.js"></script>
+    
+    <div class="stats">
+    <script>
+        var writeAffiliationScript = function () {
+            // Amazon
+            var amazon_affiliation_script = document.createElement("script");
+            amazon_affiliation_script.type = "text/javascript";
+            amazon_affiliation_script.src = "//wms.assoc-amazon.com/20070822/US"
+                + "/js/auto-tagger.js?tag=jeuxvideo_autotag-21&locale=FR"
+                + "&overwrite=1";
+
+            document.body.appendChild(amazon_affiliation_script);
+
+            // Itunes
+            var _merchantSettings=_merchantSettings || [];_merchantSettings.push(['AT', '11lHhL']);
+            (function(){var autolink=document.createElement('script');autolink.type='text/javascript';autolink.async=true;
+                autolink.src= ('https:' == document.location.protocol) ? 'https://autolinkmaker.itunes.apple.com/js/itunes_autolinkmaker.js' : 'http://autolinkmaker.itunes.apple.com/js/itunes_autolinkmaker.js';
+                var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(autolink, s);})();
+        };
+
+        if (jsli && !jsli.IsDone) {
+            jsli.callbackStoreScript = writeAffiliationScript;
+        } else {
+            writeAffiliationScript();
+        }
+    </script>
+</div>
+    <script>var isAdBlocked = true;</script>
+<script src="http://eu1.swbdds.com/files/adblk.js?&amp;ad_type=" onload="isAdBlocked=false;"></script>
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-30147725-3', 'auto');
+    
+    
+    
+        ga('set', 'dimension1', isAdBlocked ? 'adblock' : 'noblock');
+    ga('set', 'dimension2', isAdBlocked ? 'adblock' : 'noblock');
+    ga('set', 'dimension3', isAdBlocked ? 'adblock' : 'noblock');
+
+    
+        var has_video_content = jQuery('.player-jv').length > 0;
+    ga('set', 'dimension8', has_video_content ? '1':'0');
+
+        function getVideoDimensionsAndMetrics(data, label) {
+        var ga_data = {};
+        ga_data.dimension4 = '';
+        ga_data.dimension5 = '';
+        ga_data.dimension6 = data.data_ga.title;
+        ga_data.metric1 = data.data_ga.length;
+
+        if (data.data_ga.hasOwnProperty('video_position')) {
+            var manuallyLaunched = ['sorties', 'jvcode-content', 'jvcode-comment', 'fichejeu'];
+
+            if (data.data_ga.video_position === 'footer') {
+                ga_data.dimension4 = 'auto-play-on-scroll';
+            } else if (jQuery.inArray(data.data_ga.video_position, manuallyLaunched)) {
+                ga_data.dimension4 = 'play';
+            } else {
+                ga_data.dimension4 = 'auto-play';
+            }
+
+            if (data.data_ga.video_position === 'footer') {
+                ga_data.dimension5 = 'footer';
+            } else if (data.data_ga.video_position === 'jvcode-comment'){
+                ga_data.dimension5 = 'in-comment';
+            } else {
+                ga_data.dimension5 = 'in-content';
+            }
+        }
+
+                if (typeof label === 'undefined') {
+            ga_data.label = data.file;
+        } else {             ga_data.label = label;
+        }
+        return ga_data;
+    }
+
+        function rollStatus(id) {
+        if (getVideoStatus(id) === 'completed') {
+            return 'video-postroll';
+        } else {
+            return 'video-preroll';
+        }
+    }
+
+    function isPlayerLaunched(id) {
+         return players[id];
+    }
+
+    function setPlayerLaunched(id, state) {
+        players[id] = state;
+    }
+
+    function getVideoStatus(id) {
+        return id_status[id + '_video'];
+    }
+
+    function setVideoStatus(id, status) {
+        id_status[id + '_video'] = status;
+    }
+
+    function getAdStatus(id) {
+        return id_status[id + '_ad'];
+    }
+
+    function setAdStatus(id, status) {
+        id_status[id + '_ad'] = status;
+    }
+
+    function getVideoDuration(id) {
+        return id_status[id + '_video_duration'];
+    }
+
+    function setVideoDuration(id, duration) {
+        id_status[id + '_video_duration'] = duration;
+    }
+
+    function getVideoPrerollDuration(id) {
+        return id_status[id + '_video-preroll_duration'];
+    }
+
+    function setVideoPrerollDuration(id, duration) {
+        id_status[id + '_video-preroll_duration'] = duration;
+    }
+
+    function getVideoPostrollDuration(id) {
+        return id_status[id + '_video-postroll_duration'];
+    }
+
+    function setVideoPostrollDuration(id, duration) {
+        id_status[id + '_video-postroll_duration'] = duration;
+    }
+
+    function getCurrentAdDuration(id) {
+        return id_status[id + '_' + rollStatus(id) + '_duration'];
+    }
+
+    function setCurrentAdDuration(id, duration) {
+        id_status[id + '_' + rollStatus(id) + '_duration'] = duration;
+    }
+
+    
+        var id_status = {};
+
+    var players = {};
+
+    
+        jQuery(document).on("video_player_starts", function (event, data) {
+        if (getVideoStatus(data.id) === 'pause') {
+            setVideoStatus(data.id, 'playing');
+            ga('send', 'event', 'video-content', 'resume', getVideoDimensionsAndMetrics(data));
+        } else {
+                        if (!isPlayerLaunched(data.id)) {
+                setPlayerLaunched(data.id, true);
+
+                if (typeof getVideoPrerollDuration(data.id) === 'undefined') {
+                    setVideoPrerollDuration(data.id, 0);
+                }
+                if (typeof getVideoStatus(data.id) === 'undefined') {
+                    setVideoStatus(data.id, '');
+                }
+                if (typeof getVideoDuration(data.id) === 'undefined') {
+                    setVideoDuration(data.id, 0);
+                }
+                if (typeof getVideoPostrollDuration(data.id) === 'undefined') {
+                    setVideoPostrollDuration(data.id, 0);
+                }
+
+                ga_data = getVideoDimensionsAndMetrics(data);
+                if (data.data_ga.hasOwnProperty('video_position')) {
+                    if (ga_data.dimension4 !== 'play') {
+                        ga_data.nonInteraction = 1;
+                    }
+                }
+                ga('send', 'event', 'video-player', 'starts', ga_data);
+            }
+        }
+    });
+
+        jQuery(document).on("video_player_thumbnail_displayed", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-player', 'thumbnail-displayed', ga_data);
+    });
+
+    jQuery(document).on("video_player_crashes", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-player', 'crashes', ga_data);
+    });
+
+    
+        jQuery(document).on("video_ad_play", function(event, data) {
+        if (getAdStatus(data.id) === 'pause') {
+            setAdStatus(data.id, '');
+            ga('send', 'event', rollStatus(data.id), 'resume', getVideoDimensionsAndMetrics(data));
+        } else {
+            if (data.data_ga.hasOwnProperty('vast_url')) {
+                var dimension7 = data.data_ga.vast_url;
+                ga_data = getVideoDimensionsAndMetrics(data);
+                ga_data.dimension7 = dimension7;
+                ga_data.nonInteraction = 1;
+                ga('send', 'event', rollStatus(data.id), 'calls-vast', ga_data);
+
+                if (data.data_ga.hasOwnProperty('video_position')) {
+                    if (ga_data.dimension4 === 'play') {
+                        ga_data.nonInteraction = 0;
+                    }
+                }
+                ga('send', 'event', rollStatus(data.id), 'starts', ga_data);
+            } else {
+                ga_data = getVideoDimensionsAndMetrics(data);
+                if (data.data_ga.hasOwnProperty('video_position')) {
+                    if (ga_data.dimension4 !== 'play') {
+                        ga_data.nonInteraction = 1;
+                    }
+                }
+                ga('send', 'event', rollStatus(data.id), 'starts', ga_data);
+            }
+        }
+    });
+
+    jQuery(document).on("video_ad_paused", function(event, data) {
+        setAdStatus(data.id, 'pause');
+        ga('send', 'event', rollStatus(data.id), 'pause', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_ad_clicked", function(event, data) {
+        ga('send', 'event', rollStatus(data.id), 'clic', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_ad_skipped", function(event, data) {
+        setAdStatus(data.id, '');
+        if (rollStatus(data.id) === 'video-postroll') {
+            setVideoPostrollDuration(data.id, 0);
+            setVideoStatus(data.id, '');
+        }
+        ga('send', 'event', rollStatus(data.id), 'skip', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_ad_completed", function(event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', rollStatus(data.id), 'finish', ga_data);
+        if (rollStatus(data.id) === 'video-postroll') {
+            setVideoPostrollDuration(data.id, 0);
+            setVideoStatus(data.id, '');
+            setPlayerLaunched(false);
+        }
+    });
+
+    jQuery(document).on("video_ad_time", function(event, data) {
+
+        
+        ga_data = getVideoDimensionsAndMetrics(data);
+        if (data.data_ga.hasOwnProperty('video_position')) {
+            if (ga_data.dimension4 !== 'play') {
+                ga_data.nonInteraction = 1;
+            }
+        }
+
+        if ((data.pub_percent === 25) && (getCurrentAdDuration(data.id) < 25)) {
+            setCurrentAdDuration(data.id, 25);
+            ga('send', 'event', rollStatus(data.id), 'play-25', ga_data);
+        } else if ((data.pub_percent === 50) && (getCurrentAdDuration(data.id) < 50)) {
+            setCurrentAdDuration(data.id, 50);
+            ga('send', 'event', rollStatus(data.id), 'play-50', ga_data);
+        } else if ((data.pub_percent === 75) && (getCurrentAdDuration(data.id) < 75)) {
+            setCurrentAdDuration(data.id, 75);
+            ga('send', 'event', rollStatus(data.id), 'play-75', ga_data);
+        }
+    });
+
+    jQuery(document).on("video_ad_crashes", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', rollStatus(data.id), 'crash', ga_data);
+        ga_data2 = getVideoDimensionsAndMetrics(data, data.pub_error_label);
+        ga_data2.nonInteraction = 1;
+        ga('send', 'event', rollStatus(data.id), 'crash-details', ga_data2);
+        setPlayerLaunched(data.id, true);
+        setVideoStatus(data.id, '');
+        setAdStatus(data.id, '');
+        setVideoDuration(data.id, 0);
+        setVideoPrerollDuration(data.id, 0);
+        setVideoPostrollDuration(data.id, 0);
+    });
+
+    
+    jQuery(document).on("video_content_starts", function (event, data) {
+
+        
+        if (getVideoStatus(data.id) !== 'playing') {
+            setVideoStatus(data.id, 'playing');
+            ga_data = getVideoDimensionsAndMetrics(data);
+            if (data.data_ga.hasOwnProperty('video_position')) {
+                if (ga_data.dimension4 !== 'play') {
+                    ga_data.nonInteraction = 1;
+                }
+            }
+            ga('send', 'event', 'video-content', 'start', ga_data);
+        }
+    });
+
+    jQuery(document).on("video_content_pause", function (event, data) {
+        if (getVideoStatus(data.id) === 'playing') {
+            setVideoStatus(data.id, 'pause');
+            ga('send', 'event', 'video-content', 'pause', getVideoDimensionsAndMetrics(data));
+        }
+    });
+
+    jQuery(document).on("video_content_seek", function (event, data) {
+        setVideoStatus(data.id, 'playing');
+        ga('send', 'event', 'video-content', 'seek', getVideoDimensionsAndMetrics(data));
+    });
+
+    jQuery(document).on("video_content_finish", function (event, data) {
+        setVideoPrerollDuration(data.id, 0);
+        setVideoDuration(data.id, 0);
+        setVideoStatus(data.id, 'completed');
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-content', 'finish', ga_data);
+    });
+
+    jQuery(document).on("video_content_time", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        if (data.data_ga.hasOwnProperty('video_position')) {
+            if (ga_data.dimension4 !== 'play') {
+                ga_data.nonInteraction = 1;
+            }
+        }
+
+        if ((data.video_percent === 25) && (getVideoDuration(data.id) < 25)) {
+            setVideoDuration(data.id, 25);
+            ga('send', 'event', 'video-content', 'play-25', ga_data);
+        } else if ((data.video_percent === 50) && (getVideoDuration(data.id) < 50)) {
+            setVideoDuration(data.id, 50);
+            ga('send', 'event', 'video-content', 'play-50', ga_data);
+        } else if ((data.video_percent === 75) && (getVideoDuration(data.id) < 75)) {
+            setVideoDuration(data.id, 75);
+            ga('send', 'event', 'video-content', 'play-75', ga_data);
+        }
+    });
+
+    jQuery(document).on("video_content_crash", function (event, data) {
+        ga_data = getVideoDimensionsAndMetrics(data);
+        ga_data.nonInteraction = 1;
+        ga('send', 'event', 'video-content', 'crash', ga_data);
+
+        ga_data2 = getVideoDimensionsAndMetrics(data, data.video_error_label);
+        ga_data2.nonInteraction = 1;
+        ga('send', 'event', 'video-content', 'crash-details', ga_data2);
+        setPlayerLaunched(data.id, true);
+        setVideoStatus(data.id, '');
+        setAdStatus(data.id, '');
+        setVideoDuration(data.id, 0);
+        setVideoPrerollDuration(data.id, 0);
+        setVideoPostrollDuration(data.id, 0);
+    });
+
+        jQuery(document).find('.registerconfirmed').filter(function() {
+        ga('send', 'event', 'register', 'registration-complete', 'email');
+    });
+    jQuery(document).find('.registeremailconfirmed').filter(function() {
+        ga('send', 'event', 'register', 'email-confirmed');
+    });
+
+            sessionStorage.setItem("loggedEventSent", "false");
+    
+    if ((typeof gaudata == 'undefined') || (gaudata.length == 0)) {
+        ga('send', 'pageview');
+    } else {
+        ga('send', 'pageview', gaudata);
+    }
+
+</script>
+    <script type="text/javascript">
+<!--
+var _eStat_Whap_loaded=0;
+//-->
+</script>
+<script type="text/javascript" src="http://w.estat.com/js/whap.js"></script>
+<script type="text/javascript">
+<!--
+if(_eStat_Whap_loaded){
+eStatWhap.serial("800000207013");
+eStatWhap.send();}
+//-->
+</script>
+
+</body>
+</html>
