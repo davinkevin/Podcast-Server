@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -15,9 +16,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 18/12/14.
@@ -37,13 +38,13 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
             page = htmlService.connectWithDefault(podcast.getUrl()).get();
         } catch (IOException e) {
             logger.error("IOException :", e);
-            return new HashSet<>();
+            return Sets.newHashSet();
         }
 
         return page.select("article")
                 .stream()
                 .map(element -> generateItemFromPage(element.select("a").first().attr("href")))
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     private Item generateItemFromPage(String videoPageUrl) {
@@ -54,7 +55,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
             page = htmlService.connectWithDefault(completeUrl).get();
         } catch (IOException e) {
             logger.error("IOException :", e);
-            return new Item();
+            return Item.DEFAULT_ITEM;
         }
 
         Elements selectedArea = page.select(".header-video");
