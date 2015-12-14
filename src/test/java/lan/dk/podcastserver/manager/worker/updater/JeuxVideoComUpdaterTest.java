@@ -61,7 +61,6 @@ public class JeuxVideoComUpdaterTest {
         assertThat(signature).isEqualTo("aSignature");
     }
 
-
     @Test
     public void should_error_during_sign() throws IOException {
         /* Given */
@@ -87,6 +86,42 @@ public class JeuxVideoComUpdaterTest {
 
         /* Then */
         assertThat(items).hasSize(42);
+    }
+
+    @Test
+    public void should_return_empty_list_if_not_found() throws IOException {
+        /* Given */
+        Connection connection = mock(Connection.class);
+        when(htmlService.connectWithDefault(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(connection);
+        doThrow(IOException.class).when(connection).get();
+
+        /* When */
+        Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
+
+        /* Then */
+        assertThat(items).isEmpty();
+    }
+
+    @Test
+    public void should_get_items_with_exception() throws IOException, URISyntaxException {
+        /* Given */
+        configureHtmlServiceWith(CHRONIQUE_VIDEO.getUrl(), "/remote/podcast/JeuxVideoCom/chroniques-video.htm");
+        configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm");
+        doThrow(IOException.class).when(htmlService).connectWithDefault(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"));
+
+        /* When */
+        Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
+
+        /* Then */
+        assertThat(items)
+                .hasSize(42)
+                .contains(Item.DEFAULT_ITEM);
+    }
+
+    @Test
+    public void should_be_of_type() {
+        assertThat(jeuxVideoComUpdater.type().key()).isEqualTo("JeuxVideoCom");
+        assertThat(jeuxVideoComUpdater.type().name()).isEqualTo("JeuxVideo.com");
     }
 
     private Answer<Document> readHtmlFromFile(String s) throws URISyntaxException {
