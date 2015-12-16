@@ -39,7 +39,7 @@ System.config({
     "css": "github:systemjs/plugin-css@0.1.20",
     "font-awesome": "github:components/font-awesome@4.5.0",
     "highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
-    "highcharts-release": "github:highcharts/highcharts-release@4.1.10",
+    "highcharts-release": "github:highcharts/highcharts-release@4.1.9",
     "ionicons": "github:driftyco/ionicons@2.0.1",
     "lodash": "github:lodash/lodash@3.10.1",
     "ng-file-upload": "github:danialfarid/ng-file-upload@9.1.2",
