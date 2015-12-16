@@ -62,8 +62,11 @@
       "animate.css": "github:daneden/animate.css@^3.4.0",
       "bootstrap-less": "github:distros/bootstrap-less@^3.3.9",
       "clipboard": "github:zenorocha/clipboard.js@^1.5.5",
+      "css": "github:systemjs/plugin-css@^0.1.19",
+      "font-awesome": "github:components/font-awesome@4.5.0",
       "highcharts-ng": "github:pablojim/highcharts-ng@^0.0.11",
       "highcharts-release": "github:highcharts/highcharts-release@^4.1.9",
+      "ionicons": "github:driftyco/ionicons@2.0.1",
       "lodash": "github:lodash/lodash@^3.10.1",
       "ng-file-upload": "github:danialfarid/ng-file-upload@^9.1.1",
       "ng-tags-input": "github:mbenford/ngTagsInput@^3.0.0",
@@ -72,16 +75,13 @@
       "sockjs-client": "github:sockjs/sockjs-client@^0.3.4",
       "stomp-websocket": "github:jmesnil/stomp-websocket@^2.3.4",
       "systemjs/plugin-text": "github:systemjs/plugin-text@^0.0.2",
+      "text": "github:systemjs/plugin-text@^0.0.2",
       "videogular": "github:videogular/bower-videogular@^1.3.2",
       "videogular-buffering": "github:videogular/bower-videogular-buffering@^1.3.2",
       "videogular-controls": "github:videogular/bower-videogular-controls@^1.3.2",
       "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@^1.3.2",
       "videogular-poster": "github:videogular/bower-videogular-poster@^1.3.2",
-      "videogular-themes-default": "github:videogular/bower-videogular-themes-default@^1.3.2",
-      "font-awesome": "github:components/font-awesome@4.5.0",
-      "ionicons": "github:driftyco/ionicons@2.0.1",
-      "css": "github:systemjs/plugin-css@^0.1.19",
-      "text": "github:systemjs/plugin-text@^0.0.2"
+      "videogular-themes-default": "github:videogular/bower-videogular-themes-default@^1.3.2"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.24",
@@ -90,6 +90,23 @@
       "core-js": "npm:core-js@^1.1.4"
     },
     "overrides": {
+      "github:chieffancypants/angular-hotkeys@1.4.5": {
+        "directories": {
+          "lib": "build"
+        },
+        "main": "hotkeys",
+        "dependencies": {
+          "angular": "^1.2.0"
+        },
+        "shim": {
+          "hotkeys": {
+            "deps": [
+              "angular",
+              "./hotkeys.css!"
+            ]
+          }
+        }
+      },
       "github:davinkevin/AngularStompDK@0.3.2": {
         "main": "dist/angular-stomp",
         "shim": {
