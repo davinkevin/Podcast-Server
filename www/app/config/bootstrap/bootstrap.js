@@ -3,3 +3,11 @@
     */
 
 import './bootstrap.css!';
+import uiBootstrap from 'angular-bootstrap';
+import {Module} from '../../decorators';
+
+@Module({
+    name : 'ps.config.bootstrap',
+    modules : [ uiBootstrap ]
+})
+export default class Bootstrap{}

@@ -1,6 +1,6 @@
 import {Module} from '../decorators';
 import AppLoadingBar from './loading.config';
-import uiBootstrap from 'angular-bootstrap';
+import Bootstrap from './bootstrap/bootstrap';
 import ngFileUpload from 'ng-file-upload';
 import PlayerInlineModule from '../common/component/player-inline/player-inline';
 import NavbarModule from '../common/component/navbar/navbar';
@@ -20,7 +20,7 @@ import './styles/styles';
     modules : [
         'ngTouch',
         'ngAnimate',
-        uiBootstrap,
+        Bootstrap,
         ngFileUpload,
         NavbarModule,
         AuthorizeNotificationModule,
