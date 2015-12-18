@@ -1,5 +1,5 @@
 import {Module} from '../decorators';
-import AppLoadingBar from './loading.config';
+import LoadingBar from './loading';
 import Bootstrap from './bootstrap/bootstrap';
 import ngFileUpload from 'ng-file-upload';
 import PlayerInlineModule from '../common/component/player-inline/player-inline';
@@ -24,7 +24,7 @@ import './styles/styles';
         ngFileUpload,
         NavbarModule,
         AuthorizeNotificationModule,
-        AppLoadingBar,
+        LoadingBar,
         PlayerInlineModule,
         UpdatingModule
     ]
