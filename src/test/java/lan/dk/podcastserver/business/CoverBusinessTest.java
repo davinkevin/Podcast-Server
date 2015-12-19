@@ -140,4 +140,19 @@ public class CoverBusinessTest {
         /* Then */
         assertThat(coverPathOf.toString()).isEqualTo("/podcast/A Podcast/cover.jpg");
     }
+
+    @Test
+    public void should_save_cover() {
+        /* Given */
+        Cover cover = new Cover().setUrl("http://anUrl.jiz/foo/bar");
+        when(coverRepository.save(eq(cover))).thenReturn(cover.setId(123));
+
+        /* When */
+        Cover savedCover = coverBusiness.save(cover);
+
+        /* Then */
+        CoverAssert.assertThat(savedCover).hasId(123);
+        assertThat(cover).isSameAs(savedCover);
+        verify(coverRepository, only()).save(eq(cover));
+    }
 }
