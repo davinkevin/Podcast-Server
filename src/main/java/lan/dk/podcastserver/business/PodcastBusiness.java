@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -119,5 +120,9 @@ public class PodcastBusiness {
         }
         
         return reatachAndSave(podcast);
+    }
+
+    public Path coverOf(Integer id) {
+        return coverBusiness.getCoverPathOf(findOne(id));
     }
 }
