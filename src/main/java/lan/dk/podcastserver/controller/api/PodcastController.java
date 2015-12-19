@@ -7,10 +7,11 @@ import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
+import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,11 +25,10 @@ import java.util.Set;
 @RequestMapping("/api/podcast")
 public class PodcastController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Resource PodcastBusiness podcastBusiness;
     @Resource FindPodcastBusiness findPodcastBusiness;
     @Resource StatsBusiness statsBusiness;
+    @Resource PodcastServerParameters podcastServerParameters;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {
@@ -66,7 +66,6 @@ public class PodcastController {
     @JsonView(Podcast.PodcastListingView.class)
     @RequestMapping(method = RequestMethod.GET)
     public List<Podcast> findAll() {
-        //TODO : Using JSONVIEW or Waiting https://jira.spring.io/browse/SPR-7156 to be solved in 1/JUL/2014
         return podcastBusiness.findAll();
                 
     }
@@ -74,6 +73,11 @@ public class PodcastController {
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable Integer id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
         return podcastBusiness.getRss(id, limit);
+    }
+
+    @RequestMapping(value="{id:[\\d]+}/cover.{ext}", method = RequestMethod.GET, produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
+    public FileSystemResource cover(@PathVariable Integer id) {
+        return new FileSystemResource(podcastBusiness.coverOf(id).toFile());
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)

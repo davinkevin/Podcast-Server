@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -279,5 +281,24 @@ public class PodcastBusinessTest {
         verify(coverBusiness, times(1)).findOne(eq(2));
         verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(retrievePodcast));
+    }
+
+    @Test
+    public void should_get_cover_of() {
+        /* Given */
+        Integer podcastId = 12;
+        Path coverPath = Paths.get("/");
+        Podcast podcast = Podcast.builder().url("http://an/url").title("Foo").id(podcastId).build();
+
+        when(podcastRepository.findOne(eq(podcastId))).thenReturn(podcast);
+        when(coverBusiness.getCoverPathOf(eq(podcast))).thenReturn(coverPath);
+
+        /* When */
+        Path path = podcastBusiness.coverOf(podcastId);
+
+        /* Then */
+        assertThat(path).isSameAs(coverPath);
+        verify(podcastRepository).findOne(eq(podcastId));
+        verify(coverBusiness).getCoverPathOf(eq(podcast));
     }
 }

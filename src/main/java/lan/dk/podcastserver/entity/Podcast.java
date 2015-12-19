@@ -44,8 +44,9 @@ public class Podcast implements Serializable {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Podcast setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     @Basic

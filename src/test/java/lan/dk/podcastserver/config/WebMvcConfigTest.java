@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceChainRegistration;
@@ -50,8 +49,7 @@ public class WebMvcConfigTest {
         webMvcConfig.addResourceHandlers(registry);
 
         /* Then */
-        /*verify(registry, times(2)).addResourceHandler(anyVararg());*/
-        verify(registry, times(2)).addResourceHandler(anyString());
+        verify(registry, times(2)).addResourceHandler(anyVararg());
         //verify(resourceHandlerRegistration, times(1)).addResourceLocations(eq(rootFolderWithProtocol));
         //verify(resourceHandlerRegistration, times(1)).setCachePeriod(eq(WebMvcConfig.CACHE_PERIOD));
     }
@@ -83,18 +81,5 @@ public class WebMvcConfigTest {
 
         /* Then */
         assertThat(converters).hasSize(2);
-    }
-
-    @Test
-    public void should_add_h2_console() {
-        /* When */
-        ServletRegistrationBean servletRegistrationBean = webMvcConfig.h2Console();
-
-        /* Then */
-        assertThat(servletRegistrationBean).isNotNull();
-        assertThat(servletRegistrationBean.getUrlMappings())
-                .hasSize(1)
-                .contains("/database/*");
-        assertThat(servletRegistrationBean.getServletName()).isEqualTo("webServlet");
     }
 }

@@ -2,11 +2,7 @@ package lan.dk.podcastserver.config;
 
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.jackson.CustomObjectMapper;
-import org.h2.server.web.WebServlet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -36,19 +32,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Value("${management.context-path:}") String actuatorPath = "";
 
     public static final int CACHE_PERIOD = 31556926;
-    public static final String PODCAST_LOCATION_RESOURCE_HANDLER = "/podcast/**";
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String rootFolderWithProtocol = podcastServerParameters.rootFolderWithProtocol();
         GzipResourceResolver gzipResourceResolver = new GzipResourceResolver();
-        logger.info("Mapping du dossier {} à {}", PODCAST_LOCATION_RESOURCE_HANDLER, rootFolderWithProtocol);
-
-        registry
-                .addResourceHandler(PODCAST_LOCATION_RESOURCE_HANDLER)
-                .addResourceLocations(rootFolderWithProtocol)
-                .setCachePeriod(CACHE_PERIOD);
 
         registry
                 .addResourceHandler(Stream.of("js", "css").flatMap(ext -> Stream.of("/*." + ext, "/*." + ext + ".map")).toArray(String[]::new))
@@ -91,12 +78,4 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         converters.add(stringHttpMessageConverter);
     }
-
-    @Bean
-    public ServletRegistrationBean h2Console() {
-        ServletRegistrationBean reg = new ServletRegistrationBean(new WebServlet(), actuatorPath + "/database/*");
-        reg.setLoadOnStartup(1);
-        return reg;
-    }
-
 }

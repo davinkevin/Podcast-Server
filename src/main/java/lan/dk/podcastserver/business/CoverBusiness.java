@@ -31,9 +31,6 @@ public class CoverBusiness {
     
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final String QUOTE_CHARACTER = "'";
-    public static final String QUOTE_HTML_REPLACEMENT = "%27";
-
     final CoverRepository coverRepository;
     final PodcastServerParameters podcastServerParameters;
     final UrlService urlService;
@@ -74,12 +71,10 @@ public class CoverBusiness {
                     fileLocation,
                     StandardCopyOption.REPLACE_EXISTING
             );
-            return UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer())
-                    .pathSegment(podcast.getTitle())
-                    .pathSegment(fileName)
+            return UriComponentsBuilder.fromUri(podcastServerParameters.serverUrl())
+                    .pathSegment("api", "podcast", podcast.getId().toString(), "cover." + FilenameUtils.getExtension(coverUrl))
                     .build()
-                    .toUriString()
-                    .replace(QUOTE_CHARACTER, QUOTE_HTML_REPLACEMENT);
+                    .toUriString();
         } catch (URISyntaxException | IOException e) {
             logger.error("Error during downloading of the cover", e);
             return "";
@@ -89,5 +84,10 @@ public class CoverBusiness {
     public Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
         return !Objects.isNull(patchPodcast.getCover()) && !Objects.isNull(podcastToUpdate.getCover()) &&
                 patchPodcast.getCover().equals(podcastToUpdate.getCover());
+    }
+
+    public Path getCoverPathOf(Podcast podcast) {
+        String fileName = podcastServerParameters.coverDefaultName() + "." + FilenameUtils.getExtension(podcast.getCover().getUrl());
+        return podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(fileName);
     }
 }

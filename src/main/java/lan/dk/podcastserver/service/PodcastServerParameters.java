@@ -86,6 +86,7 @@ public class PodcastServerParameters {
     public Path rootFolder() { return Paths.get(rootfolder); }
     public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
     public URI fileContainer() throws URISyntaxException { return new URI(fileContainer); }
+    public URI serverUrl() throws URISyntaxException { return new URI(serverUrl);}
     public Long numberOfDayToDownload() { return numberOfDayToDownload; }
     public Integer maxUpdateParallels() { return maxUpdateParallels; }
     public Integer concurrentDownload() { return concurrentDownload; }
@@ -101,6 +102,8 @@ public class PodcastServerParameters {
     public ZonedDateTime limitDownloadDate() {
         return now().minusDays(numberOfDayToDownload);
     }
+
+
 
     public static class Api {
         private String youtube;
