@@ -90,4 +90,8 @@ public class CoverBusiness {
         String fileName = podcastServerParameters.coverDefaultName() + "." + FilenameUtils.getExtension(podcast.getCover().getUrl());
         return podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(fileName);
     }
+
+    public Cover save(Cover cover) {
+        return coverRepository.save(cover);
+    }
 }

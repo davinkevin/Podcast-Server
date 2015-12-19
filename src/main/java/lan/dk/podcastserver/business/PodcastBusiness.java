@@ -115,11 +115,13 @@ public class PodcastBusiness {
     }
     
     public Podcast create(Podcast podcast) {
+        Podcast podcastSaved = reatachAndSave(podcast);
+
         if (!Objects.isNull(podcast.getCover())) {
-            podcast.getCover().setUrl(coverBusiness.download(podcast));
+            coverBusiness.save(podcast.getCover().setUrl(coverBusiness.download(podcast)));
         }
-        
-        return reatachAndSave(podcast);
+
+        return podcastSaved;
     }
 
     public Path coverOf(Integer id) {
