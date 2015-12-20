@@ -20,10 +20,10 @@
                             <li ng-repeat="item in pic.playlist">
                                 <a ng-class="{ 'currently-playing' : pic.isCurrentlyPlaying(item) }">
                                     <div class="pull-left" ng-click="pic.play(item)">
-                                        <img class="playlist-cover" ng-src="{{ item.cover.url }}" alt=""/>
+                                        <img class="playlist-cover" ng-src="{{ ::item.cover.url }}" alt=""/>
                                     </div>
                                     <span class="playlist-title" ng-click="pic.play(item)">
-                                        {{ item.title | characters:45 }}
+                                        {{ ::item.title | characters:45 }}
                                     </span>
                                     <div class="pull-right" ng-click="pic.removeFromPlaylist(item)">
                                         <i class="glyphicon glyphicon-remove"></i>
