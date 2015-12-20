@@ -14,7 +14,7 @@
                 <div class="input-group-addon"><i class="glyphicon glyphicon-download"></i></div>
                 <select class="form-control" ng-model="plc.filters.type">
                     <option value>All</option>
-                    <option ng-repeat="type in plc.types | orderBy: 'name'" value="{{type.key}}">{{ type.name }}</option>
+                    <option ng-repeat="type in ::plc.types | orderBy: 'name'" value="{{ ::type.key}}">{{ ::type.name }}</option>
                 </select>
             </div>
         </div>
