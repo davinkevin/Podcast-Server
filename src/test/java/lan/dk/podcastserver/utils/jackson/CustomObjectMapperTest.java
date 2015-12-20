@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.utils.jackson;
 
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 
 import java.util.Set;
@@ -25,7 +25,7 @@ public class CustomObjectMapperTest {
         assertThat(registeredModuleTypes)
                 .hasSize(2)
                 .contains(Hibernate4Module.class.getCanonicalName())
-                .contains(JSR310Module.class.getCanonicalName());
+                .contains(JavaTimeModule.class.getCanonicalName());
     }
 
     static class CustomObjectMapperExtended extends CustomObjectMapper {
