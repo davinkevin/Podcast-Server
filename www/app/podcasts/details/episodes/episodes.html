@@ -3,39 +3,39 @@
     <div class="media clearfix"  ng-repeat="item in pic.podcast.items | orderBy:'-pubdate' track by item.id">
         <div class="buttonList pull-right">
             <!-- Téléchargement en cours -->
-        <span ng-show="item.status == 'STARTED' || item.status == 'PAUSED'" >
-            <button ng-click="pic.toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
-            <button ng-click="pic.stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
-        </span>
+            <span ng-show="item.status == 'STARTED' || item.status == 'PAUSED'" >
+                <button ng-click="pic.toggleDownload(item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+                <button ng-click="pic.stopDownload(item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
+            </span>
 
             <!-- Lancer le téléchargement -->
             <button ng-click="item.download()" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary hidden-xs"><span class="glyphicon glyphicon-save"></span></button>
 
             <!-- Lire dans le player -->
-            <a ng-href="/podcasts/{{ item.podcastId }}/item/{{ item.id }}/play" ng-show="item.isDownloaded" type="button" class="btn btn-success hidden-xs"><span class="ionicons ion-social-youtube"></span></a>
-            
+            <a ng-href="{{ ::'/podcasts/' + item.podcastId + '/item/' + item.id + '/play' }}" ng-show="item.isDownloaded" type="button" class="btn btn-success hidden-xs"><span class="ionicons ion-social-youtube"></span></a>
+
             <!-- Supprimer l'item -->
             <button ng-click="pic.remove(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' )" type="button" class="btn btn-danger hidden-xs"><span class="glyphicon glyphicon-remove"></span></button>
 
             <!-- Menu complémentaire -->
             <item-menu class="hidden-xs"
-                    item="item"
-                    local-read="true"
-                    on-line-read="true"
-                    playlist-control="true"
-                    reset-item="true"
+                       item="item"
+                       local-read="true"
+                       on-line-read="true"
+                       playlist-control="true"
+                       reset-item="true"
             >
             </item-menu>
         </div>
 
-        <a class="pull-left" ng-href="/podcasts/{{pic.podcast.id}}/item/{{item.id}}">
-            <img ng-src="{{item.cover.url}}" width="100" height="100" style="">
+        <a class="pull-left" ng-href="{{::'/podcasts/' + pic.podcast.id + '/item/' + item.id }}">
+            <img ng-src="{{ ::item.cover.url }}" width="100" height="100" style="">
         </a>
-        
+
         <div class="media-body">
-            <h4 class="media-heading">{{ item.title }}</h4>
-            <p class="description hidden-xs hidden-sm branch-name">{{item.description | htmlToPlaintext | characters : 130 }}</p>
-            <p><strong>{{item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>
+            <h4 class="media-heading">{{ ::item.title }}</h4>
+            <p class="description hidden-xs hidden-sm branch-name">{{ ::item.description | htmlToPlaintext | characters : 130 }}</p>
+            <p><strong>{{ ::item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>
         </div>
     </div>
 
