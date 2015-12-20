@@ -21,12 +21,12 @@
             <button ng-click="dc.stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
         </div>
 
-        <a class="pull-left" ng-href="/podcasts/{{item.podcastId}}/item/{{item.id}}">
-            <img ng-src="{{item.cover.url}}" >
+        <a class="pull-left" ng-href="{{ '/podcasts/' + item.podcastId + '/item/' + item.id }}">
+            <img ng-src="{{::item.cover.url}}" >
         </a>
 
         <div class="media-body">
-            <h5 class="media-heading">{{item.title | characters:100}}</h5>
+            <h5 class="media-heading">{{ ::item.title | characters:100}}</h5>
             <br/>
             <progressbar class="progress-striped active" animate="false" value="item.progression" type="{{ dc.getTypeFromStatus(item) }}">{{item.progression}}%</progressbar>
         </div>
@@ -56,12 +56,12 @@
                     </div>
                 </div>
 
-                <a class="pull-left" ng-href="/podcasts/{{item.podcastId}}/item/{{item.id}}">
-                    <img ng-src="{{item.cover.url}}">
+                <a class="pull-left" ng-href="{{ '/podcasts/' + item.podcastId + '/item/' + item.id }}">
+                    <img ng-src="{{::item.cover.url}}">
                 </a>
 
                 <div class="media-body">
-                    <h5 class="media-heading">{{item.title | characters:100}}</h5>
+                    <h5 class="media-heading">{{::item.title | characters:100}}</h5>
                 </div>
             </div>
 
