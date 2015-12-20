@@ -2,7 +2,7 @@
  * Created by kevin on 02/11@/14 for Podcast Server
  */
 import {Module, Service, Config} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular.config';
+import RestangularConfig from '../../../config/restangular';
 
 @Module({
     name : 'ps.common.service.data.podcastService',

@@ -1,5 +1,5 @@
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular.config';
+import RestangularConfig from '../../../config/restangular';
 import AngularStompDKConfig from '../../../config/ngstomp.config';
 
 class wsDownloadManager {

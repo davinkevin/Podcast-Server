@@ -1,5 +1,5 @@
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular.config';
+import RestangularConfig from '../../../config/restangular';
 
 @Module({
     name : 'ps.common.service.data.updateService',
