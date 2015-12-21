@@ -1,6 +1,6 @@
 import {Module, Service} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular';
-import AngularStompDKConfig from '../../../config/ngstomp.config';
+import AngularStompDKConfig from '../../../config/ngstomp';
 
 class wsDownloadManager {
     /*@ngNoInject*/

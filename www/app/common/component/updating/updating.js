@@ -3,7 +3,7 @@
  */
 import angular from 'angular';
 import {Component, View, Module} from '../../../decorators';
-import AngularStompDKConfig from '../../../config/ngstomp.config';
+import AngularStompDKConfig from '../../../config/ngstomp';
 import template from './updating.html!text';
 import './updating.css!';
 
