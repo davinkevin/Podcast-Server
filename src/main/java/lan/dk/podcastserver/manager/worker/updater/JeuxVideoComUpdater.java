@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -60,16 +59,12 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
 
         Elements selectedArea = page.select(".header-video");
 
-        Item item = new Item()
+        return new Item()
                 .setTitle(selectedArea.select("meta[itemprop=name]").attr("content"))
                 .setDescription(page.select(".corps-video p").text())
                 .setUrl(selectedArea.select("meta[itemprop=contentUrl]").attr("content"))
-                .setPubdate(ZonedDateTime.of(LocalDateTime.parse(selectedArea.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")));
-
-        try { item.setCover(imageService.getCoverFromURL(new URL(selectedArea.select("meta[itemprop=thumbnailUrl]").attr("content")))); }
-        catch (IOException ignored) {}
-
-        return item;
+                .setPubdate(ZonedDateTime.of(LocalDateTime.parse(selectedArea.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")))
+                .setCover(imageService.getCoverFromURL(selectedArea.select("meta[itemprop=thumbnailUrl]").attr("content")));
     }
 
     @Override

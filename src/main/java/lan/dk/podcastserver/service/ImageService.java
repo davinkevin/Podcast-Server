@@ -2,9 +2,8 @@ package lan.dk.podcastserver.service;
 
 
 import lan.dk.podcastserver.entity.Cover;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,9 @@ import java.net.URL;
 /**
  * Created by kevin on 28/06/15 for Podcast Server
  */
+@Slf4j
 @Service
 public class ImageService {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final UrlService urlService;
 
@@ -37,7 +35,8 @@ public class ImageService {
         try {
             return getCoverFromURL(new URL(url));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Error during fetching Cover information for {}", url, e);
+            return null;
         }
     }
 
@@ -49,9 +48,8 @@ public class ImageService {
             final BufferedImage image = ImageIO.read(imageInputStream);
             cover.setWidth(image.getWidth());
             cover.setHeight(image.getHeight());
-        } catch (IOException e) {
-            logger.debug("Error during creation of inputStream for {}", cover.getUrl());
         }
+
         return cover;
     }
 }

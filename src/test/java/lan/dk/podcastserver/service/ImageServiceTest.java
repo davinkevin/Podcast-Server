@@ -60,14 +60,11 @@ public class ImageServiceTest {
     public void should_reject_input_stream() throws IOException {
         /* Given */ doThrow(new IOException()).when(urlService).getConnectionWithTimeOut(HTTP_LOCALHOST + "/img/image.png", 5000);
         /* When */  Cover cover = imageService.getCoverFromURL(HTTP_LOCALHOST + "/img/image.png");
-        /* Then */  assertThat(cover)
-                .hasWidth(0)
-                .hasHeight(0)
-                .hasUrl(HTTP_LOCALHOST + "/img/image.png");
+        /* Then */  assertThat(cover).isNull();
     }
     
-    @Test( expected = RuntimeException.class)
+    @Test
     public void should_throw_exception_if_url_not_valid() {
-        imageService.getCoverFromURL("blabla");
+        assertThat(imageService.getCoverFromURL("blabla")).isNull();
     }
 }
