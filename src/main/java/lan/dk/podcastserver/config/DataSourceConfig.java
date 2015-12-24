@@ -1,12 +1,15 @@
 package lan.dk.podcastserver.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lan.dk.podcastserver.utils.jpa.audit.AuditingDateTimeProvider;
 import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -16,6 +19,7 @@ import java.sql.SQLException;
  */
 @Configuration
 @ComponentScan("lan.dk.podcastserver.repository")
+@EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 public class DataSourceConfig {
 
     @Value("${spring.datasource.username:}")
@@ -51,4 +55,9 @@ public class DataSourceConfig {
     @Lazy
     @Bean(initMethod = "start", destroyMethod = "stop")
     public Server h2Server() throws SQLException { return Server.createTcpServer(PARAMETER_H2_SERVER); }
+
+    @Bean
+    DateTimeProvider dateTimeProvider() {
+        return new AuditingDateTimeProvider();
+    }
 }

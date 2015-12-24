@@ -1,6 +1,10 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -9,8 +13,8 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
@@ -22,18 +26,20 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 
 
-@Table(name = "item")
 @Entity
 @Indexed
+@Slf4j
+@Getter @Setter
+@Table(name = "item")
+@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@EntityListeners(AuditingEntityListener.class)
 public class Item implements Serializable {
 
     public static Path rootFolder;
     public static String fileContainer;
     public static Item DEFAULT_ITEM = new Item();
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Integer id;
     private String title;
@@ -53,10 +59,12 @@ public class Item implements Serializable {
     private ZonedDateTime downloadDate;
     private Integer numberOfTry = 0;
 
+    @CreatedDate
+    private ZonedDateTime creationDateTime;
+
     @Id
     @DocumentId
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     public Integer getId() {
         return id;
     }
@@ -113,7 +121,6 @@ public class Item implements Serializable {
     }
 
     @Column(name = "pubdate")
-    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
     @JsonView(ItemPodcastListView.class)
     public ZonedDateTime getPubdate() {
         return pubdate;
@@ -181,7 +188,6 @@ public class Item implements Serializable {
     }
 
     @Column(name = "downloadddate")
-    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
     @JsonView(ItemDetailsView.class)
     public ZonedDateTime getDownloadDate() {
         return downloadDate;
@@ -280,8 +286,7 @@ public class Item implements Serializable {
     @Transient @JsonView(ItemSearchListView.class)
     public String getLocalUrl() {
         return (fileName == null) ? null : UriComponentsBuilder.fromHttpUrl(fileContainer)
-                .pathSegment(podcast.getTitle())
-                .pathSegment(fileName)
+                .pathSegment(podcast.getTitle(), fileName)
                 .build()
                 .toString();
     }
@@ -312,7 +317,7 @@ public class Item implements Serializable {
         try {
             Files.deleteIfExists(getLocalPath());
         } catch (IOException e) {
-            logger.error("Error during deletion of {}", this, e);
+            log.error("Error during deletion of {}", this, e);
         }
     }
 

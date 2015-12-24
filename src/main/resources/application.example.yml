@@ -1,7 +1,6 @@
 ##############################
 # Database and Lucene Config #
 ##############################
-
 spring :
     datasource:
         url: jdbc:h2:exampledb
@@ -18,6 +17,9 @@ spring :
                         indexmanager: near-real-time
                         directory_provider: ram
                         indexBase: /tmp/lucene
+            jadira:
+              usertype:
+                autoRegisterUserTypes: true
 
 ##############################
 #    Application Specific    #

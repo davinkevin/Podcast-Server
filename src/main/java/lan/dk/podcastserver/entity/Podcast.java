@@ -98,7 +98,6 @@ public class Podcast implements Serializable {
     }
 
     @Column(name = "last_update")
-    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentZonedDateTime")
     @JsonView(PodcastListingView.class)
     public ZonedDateTime getLastUpdate() {
         return lastUpdate;
