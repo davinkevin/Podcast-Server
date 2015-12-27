@@ -2,7 +2,10 @@ package lan.dk.podcastserver.service;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 /**
  * Created by kevin on 07/06/15 for HackerRank problem
@@ -23,6 +26,10 @@ public class HtmlService {
 
     public Connection connect(String url) {
         return Jsoup.connect(url);
+    }
+
+    public Document get(String url) throws IOException {
+        return connectWithDefault(url).execute().parse();
     }
 
 }

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -18,6 +19,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -40,7 +42,8 @@ public class BeInSportsUpdater extends AbstractUpdater {
     private static final String PARAMETER_SEPARATOR = "?";
     private static final Pattern STREAM_720_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "url"));
     private static final Pattern POSTER_URL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url"));
-    private static final String beInSportsDomain = "http://www.beinsports.com/%s";
+    private static final String PROTOCOL = "http:";
+    private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com/%s";
     /* December 26, 2015 13:53 */
     private static final DateTimeFormatter BEINSPORTS_PARSER = DateTimeFormatter.ofPattern("MMMM d, y HH:mm", Locale.ENGLISH);
 
@@ -72,37 +75,41 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
 
     private Item getItem(Element article) {
-        String urlItemBeInSport = String.format(beInSportsDomain, article.select("a").first().attr("data-url"));
+        String urlItemBeInSport = String.format(BE_IN_SPORTS_DOMAIN, article.select("a").first().attr("data-url"));
 
         String javascriptCode;
         Document document;
 
         try {
-            document = htmlService.connectWithDefault(urlItemBeInSport).execute().parse();
-            javascriptCode = getJavascriptPart(htmlService.connectWithDefault(document.select("iframe").attr("src")).execute().parse().select("script"));
+            document = htmlService.get(urlItemBeInSport);
+            javascriptCode = getJavascriptPart(htmlService.get(PROTOCOL + document.select("iframe").attr("src")).select("script"));
         } catch (IOException | IllegalArgumentException e) {
             logger.error("Error during fetch of {}", urlItemBeInSport, e);
             return Item.DEFAULT_ITEM;
         }
 
-        Item item = new Item()
+        return new Item()
                 .setTitle(article.select("h3").first().text())
                 .setDescription(article.select("h3").first().text())
-                .setPubdate(getPubDateFromDescription(document.select("time").first()));
-
-        Matcher matcher = STREAM_720_URL_EXTRACTOR_PATTERN1.matcher(javascriptCode);
-        if (matcher.find()) {
-            item.setUrl(matcher.group(1).replace("\\", ""));
-        }
-
-        Matcher thumbnailMatcher = POSTER_URL_EXTRACTOR_PATTERN.matcher(javascriptCode);
-        if (thumbnailMatcher.find()) {
-            item.setCover(imageService.getCoverFromURL(thumbnailMatcher.group(1).replace("\\", "")));
-        }
-
-        return item;
+                .setPubdate(getPubDateFromDescription(document.select("time").first()))
+                .setUrl(getStreamUrl(javascriptCode).orElse(null))
+                .setCover(getPoster(javascriptCode).orElse(null));
     }
 
+    private Optional<Cover> getPoster(String javascriptCode) {
+        Matcher thumbnailMatcher = POSTER_URL_EXTRACTOR_PATTERN.matcher(javascriptCode);
+        if (thumbnailMatcher.find()) {
+            return Optional.of(imageService.getCoverFromURL(thumbnailMatcher.group(1).replace("\\", "")));
+        }
+        return Optional.empty();
+    }
+    private Optional<String> getStreamUrl(String javascriptCode) {
+        Matcher matcher = STREAM_720_URL_EXTRACTOR_PATTERN1.matcher(javascriptCode);
+        if (matcher.find()) {
+            return Optional.of(matcher.group(1).replace("\\", ""));
+        }
+        return Optional.empty();
+    }
     private String getJavascriptPart(Elements tagScripts) {
         return tagScripts.stream()
                 .map(Element::data)
