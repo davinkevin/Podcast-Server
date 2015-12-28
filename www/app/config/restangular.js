@@ -7,7 +7,7 @@ import 'restangular';
 })
 @Config((RestangularProvider) => { "ngInject"; RestangularProvider.setBaseUrl('/api/'); })
 @Config((RestangularProvider) => {
-    "ngInject"
+    "ngInject";
     RestangularProvider.addElementTransformer('items', false, item => {
         item.addRestangularMethod('reset', 'get', 'reset');
         item.addRestangularMethod('download', 'get', 'addtoqueue');
