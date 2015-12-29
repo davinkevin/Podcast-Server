@@ -4,7 +4,7 @@
 import _ from 'lodash';
 import {RouteConfig, View, Module} from '../decorators';
 import AngularNotification from '../common/modules/angularNotification';
-import AppRouteConfig from '../config/route.config';
+import AppRouteConfig from '../config/route';
 import DownloadManager from '../common/service/data/downloadManager';
 import template from './download.html!text';
 

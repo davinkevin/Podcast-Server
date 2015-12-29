@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import {RouteConfig, View, Module} from '../decorators';
-import AppRouteConfig from '../config/route.config';
+import AppRouteConfig from '../config/route';
 import StatsService from '../common/service/data/statsService';
 import HighCharts from '../common/modules/highCharts';
 import template from './stats.html!text';

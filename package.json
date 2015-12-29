@@ -40,7 +40,7 @@
     "require-dir": "^0.3.0",
     "run-sequence": "^1.1.4",
     "semver": "^5.0.3",
-    "url": "^0.11.0"
+    "phantomjs": "^1.9.19"
   },
   "jspm": {
     "directories": {
@@ -65,7 +65,7 @@
       "css": "github:systemjs/plugin-css@^0.1.19",
       "font-awesome": "github:components/font-awesome@4.5.0",
       "highcharts-ng": "github:pablojim/highcharts-ng@^0.0.11",
-      "highcharts-release": "github:highcharts/highcharts-release@4.1.9",
+      "highcharts-release": "github:highcharts/highcharts-dist@4.1.9",
       "ionicons": "github:driftyco/ionicons@2.0.1",
       "lodash": "github:lodash/lodash@^3.10.1",
       "ng-file-upload": "github:danialfarid/ng-file-upload@^9.1.1",

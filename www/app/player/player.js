@@ -4,7 +4,7 @@
 import _ from 'lodash';
 import {RouteConfig, View, HotKeys, Module} from '../decorators';
 import Videogular from '../common/modules/videogular/videogular';
-import AppRouteConfig from '../config/route.config';
+import AppRouteConfig from '../config/route';
 import DeviceDetectionService from '../common/service/device-detection';
 import PlaylistService from '../common/service/playlistService';
 import template from './player.html!text';

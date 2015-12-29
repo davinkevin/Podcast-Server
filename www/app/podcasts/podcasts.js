@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {RouteConfig, View, Module} from '../decorators';
-import AppRouteConfig from '../config/route.config';
+import AppRouteConfig from '../config/route';
 import PodcastService from '../common/service/data/podcastService';
 import TypeService from '../common/service/data/typeService';
 import PodcastDetailsModule from './details/details';

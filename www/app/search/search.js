@@ -7,7 +7,7 @@ import angular from 'angular';
 import {RouteConfig, View, HotKeys, Module, Constant, Service} from '../decorators';
 import NgStorage from 'ngstorage';
 import NgTagsInput from '../common/modules/ngTagsInput';
-import AppRouteConfig from '../config/route.config';
+import AppRouteConfig from '../config/route';
 import DownloadManager from '../common/service/data/downloadManager';
 import ItemService from '../common/service/data/itemService';
 import TagService from '../common/service/data/tagService';

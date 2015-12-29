@@ -3,7 +3,7 @@
  */
 import angular from 'angular';
 import {RouteConfig, View, Module, Constant} from '../../decorators';
-import AppRouteConfig from '../../config/route.config';
+import AppRouteConfig from '../../config/route';
 import NgTagsInput from '../../common/modules/ngTagsInput';
 import PodcastService from '../../common/service/data/podcastService';
 import TypeService from '../../common/service/data/typeService';

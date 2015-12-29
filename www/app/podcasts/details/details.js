@@ -3,7 +3,7 @@ import StatsModule from './stats/stats';
 import EpisodesModule from './episodes/episodes';
 import EditionModule from './edition/edition';
 import UploadModule from './upload/upload';
-import AppRouteConfig from '../../config/route.config';
+import AppRouteConfig from '../../config/route';
 import UpdateService from '../../common/service/data/updateService';
 import template from './details.html!text';
 

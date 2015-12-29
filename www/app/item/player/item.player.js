@@ -3,7 +3,7 @@
  */
 import {RouteConfig, View, Module} from '../../decorators';
 import Videogular from '../../common/modules/videogular/videogular';
-import AppRouteConfig from '../../config/route.config';
+import AppRouteConfig from '../../config/route';
 import DeviceDetectionService from '../../common/service/device-detection';
 import template from './item-player.html!text';
 
