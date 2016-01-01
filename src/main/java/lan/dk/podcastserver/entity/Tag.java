@@ -2,6 +2,9 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import javax.persistence.*;
@@ -12,53 +15,22 @@ import java.util.Set;
  * Created by kevin on 07/06/2014.
  */
 
-@Table(name = "tag")
 @Entity
+@Getter @Setter
+@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Tag {
 
-    private Integer id;
-    private String name;
-    private Set<Podcast> podcasts = new HashSet<>();
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    public Integer getId() {
-        return id;
-    }
+    private Integer id;
 
-    public Tag setId(Integer id) {
-        this.id = id;
-        return this;
-    }
+    @Column(unique = true)
+    private String name;
 
-    @Basic
-    @Column(name = "name", unique = true)
-    public String getName() {
-        return name;
-    }
-
-    public Tag setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    @ManyToMany(mappedBy = "tags")
     @JsonIgnore
-    public Set<Podcast> getPodcasts() {
-        return podcasts;
-    }
-
-    public Tag setPodcasts(Set<Podcast> podcasts) {
-        this.podcasts = podcasts;
-        return this;
-    }
-
-    public Tag addPodcast(Podcast podcast) {
-        this.podcasts.add(podcast);
-        return this;
-    }
+    @ManyToMany(mappedBy = "tags")
+    private Set<Podcast> podcasts = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

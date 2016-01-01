@@ -1,18 +1,20 @@
 package lan.dk.podcastserver.repository;
 
 import com.ninja_squad.dbsetup.operation.Operation;
+import lan.dk.podcastserver.utils.jpa.audit.AuditingDateTimeProvider;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
-
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
@@ -26,6 +28,7 @@ import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 @Configuration
 @EnableJpaRepositories(basePackages = "lan.dk.podcastserver.repository")
 @EntityScan(basePackages = "lan.dk.podcastserver.entity")
+@EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 public class DatabaseConfiguraitonTest {
 
     @Bean
@@ -39,6 +42,11 @@ public class DatabaseConfiguraitonTest {
     @Autowired
     public FullTextEntityManager fullTextEntityManager(EntityManager entityManager) {
         return getFullTextEntityManager(entityManager);
+    }
+
+    @Bean
+    DateTimeProvider dateTimeProvider() {
+        return new AuditingDateTimeProvider();
     }
 
     public static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter();

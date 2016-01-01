@@ -17,8 +17,8 @@ public class CoverTest {
     public void should_create_a_cover_with_url() {
         assertThat(new Cover(NOWHERE_URL))
                 .hasUrl(NOWHERE_URL)
-                .hasHeight(0)
-                .hasWidth(0)
+                .hasHeight(null)
+                .hasWidth(null)
                 .hasId(null);
     }
     

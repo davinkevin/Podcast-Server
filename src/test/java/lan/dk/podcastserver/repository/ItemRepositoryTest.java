@@ -153,4 +153,14 @@ public class ItemRepositoryTest {
                 .extracting("title")
                 .containsOnly("Geek INC 124", "Geek INC 123", "Appload 1");
     }
+
+    @Test
+    public void should_save_an_item() {
+        /* Given */
+        Item item = new Item().setUrl("http://an.super.url.com/a/url").setTitle("A fake Item");
+        /* When */
+        Item savedItem = itemRepository.save(item);
+        /* Then */
+        assertThat(savedItem.getCreationDate()).isNotNull();
+    }
 }

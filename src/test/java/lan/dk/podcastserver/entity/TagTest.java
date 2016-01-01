@@ -26,14 +26,11 @@ public class TagTest {
         Tag tag = new Tag()
             .setName("Humour")
             .setId(1)
-            .setPodcasts(new HashSet<>())
-            .addPodcast(PODCAST_1)
-            .addPodcast(PODCAST_2);
+            .setPodcasts(new HashSet<>());
 
         assertThat(tag)
             .hasId(1)
-            .hasName("Humour")
-            .hasOnlyPodcasts(PODCAST_1, PODCAST_2);
+            .hasName("Humour");
     }
 
     @Test
@@ -48,8 +45,6 @@ public class TagTest {
         Object notATag = new Object();
 
         /* When */
-        boolean isSame = tag.equals(tag);
-        boolean isNotEquals = tag.equals(notEquals);
         boolean notSameType = tag.equals(notATag);
 
         /* Then */
