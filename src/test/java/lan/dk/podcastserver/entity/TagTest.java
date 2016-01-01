@@ -1,9 +1,8 @@
 package lan.dk.podcastserver.entity;
 
+import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashSet;
 
 import static lan.dk.podcastserver.entity.TagAssert.assertThat;
 
@@ -26,11 +25,12 @@ public class TagTest {
         Tag tag = new Tag()
             .setName("Humour")
             .setId(1)
-            .setPodcasts(new HashSet<>());
+            .setPodcasts(Sets.newHashSet(PODCAST_1, PODCAST_2));
 
         assertThat(tag)
             .hasId(1)
-            .hasName("Humour");
+            .hasName("Humour")
+            .hasOnlyPodcasts(PODCAST_1, PODCAST_2);
     }
 
     @Test
