@@ -92,15 +92,6 @@ public class PodcastTest {
     }
 
     @Test
-    public void should_add_a_tag() {
-        Tag tagToAdd = new Tag().setName("Test");
-        /* When */
-        PODCAST.add(tagToAdd);
-        /* Then */
-        assertThat(PODCAST).hasOnlyTags(tagToAdd);
-    }
-
-    @Test
     public void should_contains_item() {
         Item itemToAdd = new Item().setId(1);
         Item itemToAdd2 = new Item().setId(2);
