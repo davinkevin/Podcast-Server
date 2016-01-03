@@ -53,7 +53,7 @@ public class ItemDslTest {
                     .values(2, "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true)
                     .build(),
             insertInto("ITEM")
-                    .columns("ID", "TITLE", "URL", "PODCAST_ID", "STATUS", "PUBDATE", "DOWNLOADDDATE")
+                    .columns("ID", "TITLE", "URL", "PODCAST_ID", "STATUS", "PUBDATE", "DOWNLOAD_DATE")
                     .values(1L, "Appload 1", "http://fakeurl.com/appload.1.mp3", 1, Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
                     .values(2L, "Appload 2", "http://fakeurl.com/appload.2.mp3", 1, null, now().minusDays(30).format(formatter), now().minusDays(30).format(formatter))
                     .values(3L, "Appload 3", "http://fakeurl.com/appload.3.mp3", 1, Status.NOT_DOWNLOADED, now().format(formatter), now().format(formatter))
@@ -64,8 +64,8 @@ public class ItemDslTest {
                 .values(1L, "French Spin")
                 .values(2L, "Studio Knowhere")
                 .build(),
-            insertInto("PODCAST_TAG")
-                .columns("PODCAST_ID", "TAG_ID")
+            insertInto("PODCAST_TAGS")
+                .columns("PODCASTS_ID", "TAGS_ID")
                 .values(1, 1)
                 .values(2, 2)
                 .build()

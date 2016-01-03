@@ -2,6 +2,7 @@ package lan.dk.podcastserver.utils.facade;
 
 import lan.dk.podcastserver.entity.Tag;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class SearchItemPageRequestWrapper extends PageRequestFacade {
     private Boolean downloaded;
 
     public SearchItemPageRequestWrapper() {
-        this.properties = "pubdate";
+        this.orders.add(new OrderFacade(Sort.Direction.DESC.toString(), "pubdate"));
         this.downloaded = Boolean.TRUE;
     }
 

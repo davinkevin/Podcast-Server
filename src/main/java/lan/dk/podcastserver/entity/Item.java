@@ -91,7 +91,6 @@ public class Item {
     @Transient
     private Integer numberOfTry = 0;
 
-    @Column(name = "downloadddate")
     @JsonView(ItemDetailsView.class)
     private ZonedDateTime downloadDate;
 

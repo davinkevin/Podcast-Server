@@ -17,7 +17,6 @@ public class SearchItemPageRequestWrapperTest {
     public void should_have_default_value() {
         SearchItemPageRequestWrapperAssert
             .assertThat(new SearchItemPageRequestWrapper())
-            .hasProperties("pubdate")
             .hasDownloaded(Boolean.TRUE);
     }
 

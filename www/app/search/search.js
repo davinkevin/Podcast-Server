@@ -50,8 +50,7 @@ import './search.css!';
         size : 12,
         term : undefined,
         tags : undefined,
-        direction : 'DESC',
-        properties : 'pubdate',
+        orders : [{ direction : 'DESC', property : 'pubdate'}],
         downloaded : "true"
     }
 })

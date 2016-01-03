@@ -1,0 +1,65 @@
+##############################
+# Database and Lucene Config #
+##############################
+spring :
+    jpa:
+        properties :
+            jadira:
+              usertype:
+                autoRegisterUserTypes: true
+
+##############################
+#    Application Specific    #
+##############################
+
+podcastserver:
+    rootfolder: /Users/kevin/Tomcat/podcast/
+    #concurrent-download: 2
+    #max-update-parallels: 3
+    #cover-default-name: cover
+    number-of-day-to-download: 1
+    #number-of-try: 10
+    #server-url: http://192.168.1.203:8080
+    #file-container: ${podcastserver.server-url}/podcast
+    #download-extention: .psdownload
+    #rss-default-number-item: 50
+    update-and-download:
+        refresh:
+            cron: 0 0 0 * * ?
+    externaltools:
+        #rtmpdump: /usr/local/bin/rtmpdump
+        #ffmpeg: /usr/bin/ffmpeg
+    api :
+      youtube :
+      #youtube :
+
+
+##############################
+#          Actuator          #
+##############################
+
+management:
+    context-path: /system
+
+endpoints:
+    health:
+        sensitive : false
+
+logging:
+    path: /private/tmp/logs/podcastserver.log
+    level:
+        lan.dk.podcastserver : DEBUG
+        #org.hibernate.type: TRACE
+        #org.springframework.orm: TRACE
+
+multipart:
+    max-file-size: 512MB
+    max-request-size: 512MB
+    location : /tmp/
+
+#server:
+#    port: 8443
+#    ssl:
+#        key-store: /private/tmp/ssl/keystore.jks
+#        key-store-password: a
+#        key-password: a

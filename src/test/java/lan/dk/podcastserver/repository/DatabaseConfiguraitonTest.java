@@ -52,6 +52,6 @@ public class DatabaseConfiguraitonTest {
     public static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter();
     public static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
     public static final Operation DELETE_ALL_ITEMS = deleteAllFrom("ITEM");
-    public static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAG"), deleteAllFrom("TAG"));
+    public static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAGS"), deleteAllFrom("TAG"));
     public static final Operation DELETE_ALL = sequenceOf(DELETE_ALL_ITEMS, DELETE_ALL_TAGS, DELETE_ALL_PODCASTS, DELETE_ALL_TAGS);
 }
