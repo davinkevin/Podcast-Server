@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
+import static java.util.concurrent.CompletableFuture.*;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
@@ -82,16 +83,19 @@ public class UpdatePodcastBusiness  {
 
         log.info("Lancement de l'update");
         log.info("Traitement de {} podcasts", podcasts.size());
-        Set<CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures = podcasts
+
+        podcasts
+                // Launch every update
                 .stream()
-                .map(podcast -> CompletableFuture
-                        .supplyAsync(() -> workerService.updaterOf(podcast))
-                        .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor))
-                .collect(toSet());
+                .map(podcast -> supplyAsync(() -> workerService.updaterOf(podcast)).thenApplyAsync(updater -> updater.update(podcast), selectedExecutor))
+                .collect(toSet()) // Terminal operation forcing evaluation of each element upper in the stream
+                // Get result of each update
+                .stream()
+                .map(this::wait)
+                .filter(tuple -> tuple != Updater.NO_MODIFICATION_TUPLE)
+                .peek((tuple) -> changeAndCommunicateUpdate(Boolean.TRUE))
+                .forEach(tuple -> podcastBusiness.save(attachNewItemsToPodcast(tuple.first(), tuple.middle(), tuple.last())));
 
-        log.info("Attente des retours");
-
-        handleUpdateTuple(futures);
 
         log.info("Fin du traitement des {} podcasts", podcasts.size());
         finishUpdate();
@@ -110,17 +114,14 @@ public class UpdatePodcastBusiness  {
         changeAndCommunicateUpdate(Boolean.TRUE);
     }
 
-    private void handleUpdateTuple(Set<CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>>> futures) {
+    private UpdateTuple<Podcast, Set<Item>, Predicate<Item>> wait(CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> future) {
         try {
-            for (Future<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> updateTupleFuture : futures) {
-                UpdateTuple<Podcast, Set<Item>, Predicate<Item>> updateTuple = updateTupleFuture.get(timeValue, timeUnit);
-                if (updateTuple != Updater.NO_MODIFICATION_TUPLE)
-                    podcastBusiness.save(attachNewItemsToPodcast(updateTuple.first(), updateTuple.middle(), updateTuple.last()));
-                changeAndCommunicateUpdate(Boolean.TRUE);
-            }
+            return future.get(timeValue, timeUnit);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             log.error("Error during update", e);
+            return Updater.NO_MODIFICATION_TUPLE;
         }
+
     }
 
     private Podcast attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {
@@ -130,17 +131,18 @@ public class UpdatePodcastBusiness  {
             return podcast.setSignature("");
         }
 
-        items.stream()
+        Set<Item> itemsToAdd = items.stream()
                 .filter(filter)
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
-                .forEach(item -> {
-                    log.debug("Add an item to {}", podcast.getTitle());
-                    podcast.getItems().add(item);
-                    podcast.lastUpdateToNow();
-                });
+                .peek(item -> log.debug("Add Item {} to Podcast {}", item.getTitle(), podcast.getTitle()))
+                .collect(toSet());
 
-        return podcast;
+        if (itemsToAdd.isEmpty())
+            return podcast;
+
+        itemsToAdd.forEach(podcast::add);
+        return podcast.lastUpdateToNow();
     }
 
     public void deleteOldEpisode() {

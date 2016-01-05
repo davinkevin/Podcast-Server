@@ -163,6 +163,37 @@ public class UpdatePodcastBusinessTest {
     }
 
     @Test
+    public void should_add_no_new_item_in_podcast_becase_every_item_already_exists() {
+        /* Given */
+        Item item1 = new Item();
+        Item item2 = new Item();
+        Item item3 = new Item();
+        Podcast podcast = new Podcast()
+                .setUrl("http://an.superb.url/")
+                    .add(item1)
+                    .add(item2)
+                    .add(item3)
+                .setTitle("a title");
+
+        Updater updater = mock(Updater.class);
+        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+        when(workerService.updaterOf(any(Podcast.class))).thenReturn(updater);
+        when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
+        when(updater.update(any(Podcast.class))).then(i -> {
+            Podcast podcastArgument = (Podcast) i.getArguments()[0];
+            return UpdateTuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
+        });
+        when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
+
+        /* When */
+        updatePodcastBusiness.updatePodcast(1);
+
+        /* Then */
+        assertThat(podcast.getLastUpdate())
+                .isNull();
+    }
+
+    @Test
     public void should_update_a_podcast() {
         /* Given */
         ZonedDateTime now = ZonedDateTime.now();
