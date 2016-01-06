@@ -20,7 +20,6 @@ public class UpdaterSelectorTest {
         updaterSelectors.add(new RssUpdaterCompatibility());
         updaterSelectors.add(new BeInSportUpdaterCompatibility());
         updaterSelectors.add(new CanalPlusUpdaterCompatibility());
-        updaterSelectors.add(new JeuxVideoFrCompatibility());
         updaterSelectors.add(new JeuxVideoComCompatibility());
         updaterSelectors.add(new ParleysCompatibility());
         updaterSelectors.add(new PluzzCompatibility());
@@ -53,14 +52,7 @@ public class UpdaterSelectorTest {
         /* When */ Class updaterClass = updaterSelector.of("http://www.canalplus.fr/show/for/dummies");
         /* Then */ assertThat(updaterClass).isEqualTo(CanalPlusUpdater.class);
     }
-    
-    @Test
-    public void should_return_a_JeuxVideoFrUpdater() {
-        /* Given */ UpdaterSelector updaterSelector = new UpdaterSelector().setUpdaterCompatibilities(updaterSelectors);
-        /* When */ Class updaterClass = updaterSelector.of("http://www.jeuxvideo.fr/show/for/dummies");
-        /* Then */ assertThat(updaterClass).isEqualTo(JeuxVideoFRUpdater.class);
-    }
-    
+
     @Test
     public void should_return_a_JeuxVideoComUpdater() {
         /* Given */ UpdaterSelector updaterSelector = new UpdaterSelector().setUpdaterCompatibilities(updaterSelectors);

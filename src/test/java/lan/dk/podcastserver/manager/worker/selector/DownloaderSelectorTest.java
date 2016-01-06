@@ -20,7 +20,6 @@ public class DownloaderSelectorTest {
         downloaderCompatibilities.add(new RTMPDownloaderCompatibility());
         downloaderCompatibilities.add(new DailyMotionCloudDownloaderCompatibility());
         downloaderCompatibilities.add(new YoutubeDownloaderCompatibility());
-        downloaderCompatibilities.add(new JeuxVideoFrDownloaderCompatibility());
         downloaderCompatibilities.add(new M3U8DownloaderCompatibility());
         downloaderCompatibilities.add(new ParleysDownloaderCompatibility());
     }
@@ -51,13 +50,6 @@ public class DownloaderSelectorTest {
         /* Given */ DownloaderSelector downloaderSelector = new DownloaderSelector().setDownloaderCompatibilities(downloaderCompatibilities);
         /* When  */ Class updaterClass = downloaderSelector.of("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata");
         /* Then  */ assertThat(updaterClass).isEqualTo(YoutubeDownloader.class);
-    }
-
-    @Test
-    public void should_return_an_JeuxVideoFrDownloader() {
-        /* Given */ DownloaderSelector downloaderSelector = new DownloaderSelector().setDownloaderCompatibilities(downloaderCompatibilities);
-        /* When  */ Class updaterClass = downloaderSelector.of("http://www.jeuxvideo.fr/jeux/resident-evil-rebirth-2/video/video-notre-video-test-460509.html");
-        /* Then  */ assertThat(updaterClass).isEqualTo(JeuxVideoFrDownloader.class);
     }
 
     @Test
