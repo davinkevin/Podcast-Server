@@ -43,7 +43,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
     private static final Pattern STREAM_720_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "url"));
     private static final Pattern POSTER_URL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url"));
     private static final String PROTOCOL = "http:";
-    private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com/%s";
+    private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
     /* December 26, 2015 13:53 */
     private static final DateTimeFormatter BEINSPORTS_PARSER = DateTimeFormatter.ofPattern("MMMM d, y HH:mm", Locale.ENGLISH);
 
@@ -53,7 +53,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
     public Set<Item> getItems(Podcast podcast) {
         Document page;
         try {
-            page = htmlService.connectWithDefault(podcast.getUrl()).execute().parse();
+            page = htmlService.get(podcast.getUrl());
         } catch (IOException e) {
             logger.error("IOException :", e);
             return Sets.newHashSet();
@@ -91,7 +91,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         return new Item()
                 .setTitle(article.select("h3").first().text())
                 .setDescription(article.select("h3").first().text())
-                .setPubdate(getPubDateFromDescription(document.select("time").first()))
+                .setPubdate(getPubDateFromDescription(document))
                 .setUrl(getStreamUrl(javascriptCode).orElse(null))
                 .setCover(getPoster(javascriptCode).orElse(null));
     }
@@ -123,16 +123,16 @@ public class BeInSportsUpdater extends AbstractUpdater {
         String listingUrl = podcast.getUrl();
         /* cluster_video */
         try {
-            Document page = htmlService.connectWithDefault(listingUrl).execute().parse();
+            Document page = htmlService.get(listingUrl);
             return signatureService.generateMD5Signature(page.select(".cluster_video").html());
         } catch (IOException e) {
             logger.error("IOException :", e);
         }
 
-        return "";
+        return StringUtils.EMPTY;
     }
 
-    public Boolean podcastContains(Podcast podcast, Item item) {
+    private Boolean podcastContains(Podcast podcast, Item item) {
         if (item.getUrl() == null)
             return false;
         
