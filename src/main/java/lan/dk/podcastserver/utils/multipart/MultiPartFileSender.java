@@ -12,7 +12,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -61,8 +60,8 @@ public class MultiPartFileSender {
     HttpServletResponse response;
     String disposition = CONTENT_DISPOSITION_INLINE;
     
-    private MultiPartFileSender() {
-    }
+    private MultiPartFileSender() {}
+
     public static MultiPartFileSender fromPath(Path path) {
         return new MultiPartFileSender().setFilepath(path);
     }
@@ -108,13 +107,7 @@ public class MultiPartFileSender {
 
         Long length = Files.size(filepath);
         String fileName = filepath.getFileName().toString();
-        FileTime lastModifiedObj = Files.getLastModifiedTime(filepath);
-
-        if (StringUtils.isEmpty(fileName) || lastModifiedObj == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-        long lastModified = LocalDateTime.ofInstant(lastModifiedObj.toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId())).toEpochSecond(ZoneOffset.UTC);
+        long lastModified = LocalDateTime.ofInstant(Files.getLastModifiedTime(filepath).toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId())).toEpochSecond(ZoneOffset.UTC);
         String contentType = MimeTypeUtils.probeContentType(filepath);
 
         // Validate request headers for caching ---------------------------------------------------
@@ -122,6 +115,7 @@ public class MultiPartFileSender {
         // If-None-Match header should contain "*" or ETag. If so, then return 304.
         String ifNoneMatch = request.getHeader(IF_NONE_MATCH);
         if (ifNoneMatch != null && HttpUtils.matches(ifNoneMatch, fileName)) {
+            logger.error("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
             response.setHeader(ETAG, fileName); // Required in 304.
             response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
             return;
@@ -131,6 +125,7 @@ public class MultiPartFileSender {
         // This header is ignored if any If-None-Match header is specified.
         long ifModifiedSince = request.getDateHeader(IF_MODIFIED_SINCE);
         if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
+            logger.error("If-Modified-Since header should be greater than LastModified. If so, then return 304.");
             response.setHeader(ETAG, fileName); // Required in 304.
             response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
             return;
@@ -141,6 +136,7 @@ public class MultiPartFileSender {
         // If-Match header should contain "*" or ETag. If not, then return 412.
         String ifMatch = request.getHeader(IF_MATCH);
         if (ifMatch != null && !HttpUtils.matches(ifMatch, fileName)) {
+            logger.error("If-Match header should contain \"*\" or ETag. If not, then return 412.");
             response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
@@ -148,6 +144,7 @@ public class MultiPartFileSender {
         // If-Unmodified-Since header should be greater than LastModified. If not, then return 412.
         long ifUnmodifiedSince = request.getDateHeader(IF_UNMODIFIED_SINCE);
         if (ifUnmodifiedSince != -1 && ifUnmodifiedSince + 1000 <= lastModified) {
+            logger.error("If-Unmodified-Since header should be greater than LastModified. If not, then return 412.");
             response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
@@ -164,6 +161,7 @@ public class MultiPartFileSender {
 
             // Range header should match format "bytes=n-n,n-n,n-n...". If not, then return 416.
             if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
+                logger.error("Range header should match format \"bytes=n-n,n-n,n-n...\". If not, then return 416.");
                 response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
                 response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                 return;
@@ -183,6 +181,7 @@ public class MultiPartFileSender {
 
             // If any valid If-Range header, then process each part of byte range.
             if (ranges.isEmpty()) {
+                logger.info("If any valid If-Range header, then process each part of byte range.");
                 for (String part : range.substring(6).split(",")) {
                     // Assuming a file with length of 100, the following examples returns bytes at:
                     // 50-80 (50 to 80), 40- (40 to length=100), -20 (length-20=80 to length=100).
@@ -198,6 +197,7 @@ public class MultiPartFileSender {
 
                     // Check if Range is syntactically valid. If not, then return 416.
                     if (start > end) {
+                        logger.info("Check if Range is syntactically valid. If not, then return 416.");
                         response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
                         response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                         return;
@@ -241,7 +241,7 @@ public class MultiPartFileSender {
             if (ranges.isEmpty() || ranges.get(0) == full) {
 
                 // Return full file.
-                logger.debug("Return full file");
+                logger.info("Return full file");
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_RANGE, String.format(BYTES_RANGE_FORMAT, full.start, full.end, full.total));
                 response.setHeader(CONTENT_LENGTH, String.valueOf(full.length));
@@ -251,7 +251,7 @@ public class MultiPartFileSender {
 
                 // Return single part of file.
                 Range r = ranges.get(0);
-                logger.debug("Return 1 part of file : from ({}) to ({})", r.start, r.end);
+                logger.info("Return 1 part of file : from ({}) to ({})", r.start, r.end);
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_RANGE, String.format(BYTES_RANGE_FORMAT, r.start, r.end, r.total));
                 response.setHeader(CONTENT_LENGTH, String.valueOf(r.length));
@@ -271,7 +271,7 @@ public class MultiPartFileSender {
 
                 // Copy multi part range.
                 for (Range r : ranges) {
-                    logger.debug("Return multi part of file : from ({}) to ({})", r.start, r.end);
+                    logger.info("Return multi part of file : from ({}) to ({})", r.start, r.end);
                     // Add multipart boundary and header fields for every range.
                     sos.println();
                     sos.println("--" + MULTIPART_BOUNDARY);
@@ -367,8 +367,7 @@ public class MultiPartFileSender {
         public static boolean matches(String matchHeader, String toMatch) {
             String[] matchValues = matchHeader.split("\\s*,\\s*");
             Arrays.sort(matchValues);
-            return Arrays.binarySearch(matchValues, toMatch) > -1
-                    || Arrays.binarySearch(matchValues, "*") > -1;
+            return Arrays.binarySearch(matchValues, toMatch) > -1 || Arrays.binarySearch(matchValues, "*") > -1;
         }
     }
 
