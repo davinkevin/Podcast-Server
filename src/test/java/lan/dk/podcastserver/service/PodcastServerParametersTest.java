@@ -19,6 +19,8 @@ public class PodcastServerParametersTest {
         String ROOT_FOLDER = "/Users/kevin/Tomcat/podcast/webapps/podcast/";
 
         PodcastServerParameters parameters = new PodcastServerParameters();
+        parameters.setApi(new PodcastServerParameters.Api().setDailymotion("DAILYMOTION_API_KEY").setYoutube("YOUTUBE_API_KEY"));
+
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
                 .hasServerUrl("http://localhost:8080")
@@ -50,6 +52,13 @@ public class PodcastServerParametersTest {
 
         assertThat(parameters.rssDefaultNumberItem())
                 .isEqualTo(50L);
+
+        assertThat(parameters.serverUrl())
+                .isEqualTo(new URI("http://localhost:8080"));
+
+        assertThat(parameters.getApi()).isNotNull();
+        assertThat(parameters.api().dailymotion()).isEqualTo("DAILYMOTION_API_KEY");
+        assertThat(parameters.api().youtube()).isEqualTo("YOUTUBE_API_KEY");
     }
     
     @Test
@@ -76,36 +85,17 @@ public class PodcastServerParametersTest {
                 .hasServerUrl("http://localhost:9191")
                 .hasDownloadExtension(".pdownload");
 
-        assertThat(parameters.rootFolder())
-                .isEqualTo(Paths.get(ROOT_FOLDER));
-
-        assertThat(parameters.rootFolderWithProtocol())
-                .isEqualTo("file://" + ROOT_FOLDER);
-
-        assertThat(parameters.fileContainer())
-                .isEqualTo(new URI("http://localhost:9191/podcast"));
-
-        assertThat(parameters.coverDefaultName())
-                .isEqualTo("default");
-
-        assertThat(parameters.maxUpdateParallels())
-                .isEqualTo(5);
-
-        assertThat(parameters.concurrentDownload())
-                .isEqualTo(5);
-
-        assertThat(parameters.numberOfTry())
-                .isEqualTo(20);
-
-        assertThat(parameters.numberOfDayToDownload())
-                .isEqualTo(5L);
-
-        assertThat(parameters.rssDefaultNumberItem())
-                .isEqualTo(25L);
-
+        assertThat(parameters.rootFolder()).isEqualTo(Paths.get(ROOT_FOLDER));
+        assertThat(parameters.rootFolderWithProtocol()).isEqualTo("file://" + ROOT_FOLDER);
+        assertThat(parameters.fileContainer()).isEqualTo(new URI("http://localhost:9191/podcast"));
+        assertThat(parameters.coverDefaultName()).isEqualTo("default");
+        assertThat(parameters.maxUpdateParallels()).isEqualTo(5);
+        assertThat(parameters.concurrentDownload()).isEqualTo(5);
+        assertThat(parameters.numberOfTry()).isEqualTo(20);
+        assertThat(parameters.numberOfDayToDownload()).isEqualTo(5L);
+        assertThat(parameters.rssDefaultNumberItem()).isEqualTo(25L);
         assertThat(parameters.limitDownloadDate())
                 .isBeforeOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()))
                 .isAfterOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()).minusMinutes(1));
     }
-
 }
