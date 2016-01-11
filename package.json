@@ -47,13 +47,13 @@
       "baseURL": "www"
     },
     "dependencies": {
-      "AngularStompDK": "github:davinkevin/AngularStompDK@^0.3.2",
+      "AngularStompDK": "github:davinkevin/AngularStompDK@^0.6.1",
       "angular": "github:angular/bower-angular@^1.4.7",
       "angular-animate": "github:angular/bower-angular-animate@^1.4.7",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@^0.14.3",
-      "angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.4.5",
+      "angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.6.0",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
-      "angular-mocks": "npm:angular-mocks@^1.4.7",
+      "angular-mocks": "github:angular/bower-angular-mocks@^1.4.7",
       "angular-notification": "github:neoziro/angular-notification@^1.1.1",
       "angular-route": "github:angular/bower-angular-route@^1.4.7",
       "angular-sanitize": "github:angular/bower-angular-sanitize@^1.4.7",
@@ -90,7 +90,7 @@
       "core-js": "npm:core-js@^1.1.4"
     },
     "overrides": {
-      "github:highcharts/highcharts-release@4.1.9": {
+      "github:highcharts/highcharts-dist@4.1.9": {
         "main": "highcharts",
         "shim": {
           "highcharts": {
@@ -101,7 +101,7 @@
           }
         }
       },
-      "github:chieffancypants/angular-hotkeys@1.4.5": {
+      "github:chieffancypants/angular-hotkeys@1.6.0": {
         "directories": {
           "lib": "build"
         },
@@ -114,17 +114,6 @@
             "deps": [
               "angular",
               "./hotkeys.css!"
-            ]
-          }
-        }
-      },
-      "github:davinkevin/AngularStompDK@0.3.2": {
-        "main": "dist/angular-stomp",
-        "shim": {
-          "dist/angular-stomp": {
-            "deps": [
-              "angular",
-              "stomp-websocket"
             ]
           }
         }
