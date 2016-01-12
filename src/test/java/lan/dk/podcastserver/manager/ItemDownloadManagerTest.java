@@ -21,7 +21,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -200,10 +202,12 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.restartAllDownload();
 
         /* Then */
-        verify(mockDownloaderItemOne, times(2)).getItem();
-        verify(mockDownloaderItemTwo, times(2)).getItem();
-        verify(mockDownloaderItemOne, times(1)).startDownload();
-        verify(mockDownloaderItemTwo, times(1)).startDownload();
+        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            verify(mockDownloaderItemOne, times(2)).getItem();
+            verify(mockDownloaderItemTwo, times(2)).getItem();
+            verify(mockDownloaderItemOne, times(1)).startDownload();
+            verify(mockDownloaderItemTwo, times(1)).startDownload();
+        });
     }
 
     @Test

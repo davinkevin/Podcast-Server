@@ -21,10 +21,9 @@ import javax.annotation.Resource;
 public class AsyncConfig implements AsyncConfigurer {
 
     @Resource PodcastServerParameters podcastServerParameters;
-    
 
-    @Bean(name = "UpdateExecutor")
     @Override
+    @Bean(name = "UpdateExecutor")
     public TaskExecutor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(podcastServerParameters.concurrentDownload());

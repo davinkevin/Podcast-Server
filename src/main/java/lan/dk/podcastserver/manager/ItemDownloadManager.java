@@ -6,8 +6,7 @@ import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.WorkerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.StreamSupport;
 
+import static java.util.concurrent.CompletableFuture.runAsync;
+
+@Slf4j
 @Service
 @Transactional
 public class ItemDownloadManager {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
     final SimpMessagingTemplate template;
@@ -128,7 +129,7 @@ public class ItemDownloadManager {
         downloadingQueue.values()
                 .stream()
                 .filter(downloader -> Status.PAUSED == downloader.getItem().getStatus())
-                .forEach(downloader -> getDownloaderByTypeAndRun(downloader.getItem()));
+                .forEach(downloader -> runAsync(() -> getDownloaderByTypeAndRun(downloader.getItem())));
     }
 
     // Change State of id identified download
@@ -148,10 +149,10 @@ public class ItemDownloadManager {
     public void toogleDownload(int id) {
         Item item = getItemInDownloadingQueue(id);
         if (Status.PAUSED == item.getStatus()) {
-            logger.debug("restart du download");
+            log.debug("restart du download");
             restartDownload(id);
         } else if (Status.STARTED == item.getStatus()) {
-            logger.debug("pause du download");
+            log.debug("pause du download");
             pauseDownload(id);
         }
     }
@@ -206,6 +207,7 @@ public class ItemDownloadManager {
 
     private void getDownloaderByTypeAndRun(Item item) {
         if (downloadingQueue.containsKey(item)) { // Cas ou le Worker se met en pause et reste en mémoire // dans la DownloadingQueue
+            log.debug("Start Item : " + item.getTitle());
             Downloader downloader = downloadingQueue.get(item);
             downloader.startDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
@@ -266,7 +268,7 @@ public class ItemDownloadManager {
                 .filter(item -> item.getId().equals(itemId)).findFirst();
 
         if (!movingItem.isPresent()) {
-            logger.error("Moving element in waiting list not authorized : Element wasn't in the list");
+            log.error("Moving element in waiting list not authorized : Element wasn't in the list");
             return;
         }
 
