@@ -1,26 +1,12 @@
 package lan.dk.podcastserver.utils.form;
 
+import lombok.Data;
+
 /**
  * Created by kevin on 30/01/15.
  */
+@Data
 public class MovingItemInQueueForm {
-    
     private Integer id;
     private Integer position;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getPosition() {
-        return position;
-    }
-
-    public void setPosition(Integer position) {
-        this.position = position;
-    }
 }
