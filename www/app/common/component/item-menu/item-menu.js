@@ -1,8 +1,6 @@
 /**
     * Created by kevin on 05/12/2015 for Podcast Server
     */
-
-import _ from 'lodash';
 import {Component, View, Module} from '../../../decorators';
 import DownloadManager from '../../service/data/downloadManager';
 import playlistService from '../../service/playlistService';
@@ -47,7 +45,7 @@ export default class ItemMenuComponent {
 
     reset(item) {
         return item.reset()
-            .then((itemReseted) => _.assign(item, itemReseted))
+            .then((itemReseted) => Object.assign(item, itemReseted))
             .then((itemInList) => this.playlistService.remove(itemInList));
     }
 

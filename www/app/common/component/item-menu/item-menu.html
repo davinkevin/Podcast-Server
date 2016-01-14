@@ -2,7 +2,7 @@
     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
     <ul uib-dropdown-menu class="dropdown-menu-right" role="menu">
         <li ng-if="::(imc.localRead)" ng-show="imc.item.isDownloaded">
-            <a target="_self" ng-href="{{ ::imc.item.proxyURL }}">
+            <a target="_self" class="with-link" ng-href="{{ ::imc.item.proxyURL }}">
                 <span class="glyphicon glyphicon-play text-success"></span> Read
             </a>
             <a ng-show="imc.item.isDownloaded" copy="{{ ::imc.item.proxyURL }}" class="pull-right">
@@ -35,7 +35,7 @@
             </a>
         </li>
         <li>
-            <a target="_self" ng-href="{{ ::imc.item.url }}">
+            <a target="_self" class="with-link" ng-href="{{ ::imc.item.url }}">
                 <span class="glyphicon glyphicon-globe text-info"></span> Read OnLine
             </a>
             <a copy="{{ ::imc.item.url }}" class="pull-right">

@@ -1,9 +1,13 @@
 item-menu {
-  .dropdown-menu > li > a {
-    display: inline-block;
-
-    &[copy] {
-      padding: 0 4px 4px 0;
+  .dropdown-menu > li {
+    a.with-link {
+      display: inline-block;
+      padding-right:8px;
+    }
+    a + a[copy] {
+      display: inline-block;
+      width: 30px;
+      padding: 3px 6px 3px 8px;
     }
   }
 }
