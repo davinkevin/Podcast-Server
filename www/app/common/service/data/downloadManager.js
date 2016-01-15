@@ -56,7 +56,7 @@ export default class DownloadManager {
         return this.baseDownloadManager.customGET("pauseAllDownload");
     }
     restartAllCurrentDownload () {
-        return this.baseDownloadManager.customGET("restartAllCurrentDownload");
+        return this.baseDownloadManager.customGET("restartAllDownload");
     }
     removeFromQueue (item) {
         return this.baseDownloadManager.customDELETE("queue/" + item.id);
