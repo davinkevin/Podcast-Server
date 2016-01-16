@@ -2,7 +2,6 @@
  * Created by kevin on 24/10/2015 for PodcastServer
  */
 
-import _ from 'lodash';
 import angular from 'angular';
 import {RouteConfig, View, HotKeys, Module, Constant, Service} from '../decorators';
 import NgStorage from 'ngstorage';
@@ -49,7 +48,7 @@ import './search.css!';
         page : 0,
         size : 12,
         term : undefined,
-        tags : undefined,
+        tags : [],
         orders : [{ direction : 'DESC', property : 'pubdate'}],
         downloaded : "true"
     }
@@ -78,7 +77,8 @@ export default class ItemSearchCtrl {
         //** WebSocket Subscription **//
         this.DownloadManager
             .ws
-            .subscribe("/topic/download", (message) => this.updateItemFromWS(message), $scope);
+            .subscribe("/topic/download", (message) => this.updateItemFromWS(message), $scope)
+            .subscribe('/topic/updating', (message) => this.updatePageWhenUpdateDone(message), {}, $scope);
 
         $scope.$on('$routeUpdate', () => {
             if (this.currentPage !== this.$location.search().page) {
@@ -94,9 +94,13 @@ export default class ItemSearchCtrl {
     updateItemFromWS(wsMessage) {
         let item = JSON.parse(wsMessage.body);
 
-        var elemToUpdate = _.find(this.items, { 'id': item.id });
+        if (item.isDownloaded) {
+            return this.changePage();
+        }
+
+        var elemToUpdate = this.items.find((elem) => elem.id === item.id);
         if (elemToUpdate)
-            _.assign(elemToUpdate, item);
+            Object.assign(elemToUpdate, item);
     }
 
     changePage() {
@@ -135,9 +139,16 @@ export default class ItemSearchCtrl {
     }
 
     resetSearch() {
+        debugger;
         this.currentPage = 1;
         this.SearchItemCache.updateSearchParam(this.searchParameters);
         return this.changePage();
+    }
+
+    updatePageWhenUpdateDone(message) {
+        if(JSON.parse(message.body) === false) {
+            this.changePage();
+        }
     }
 }
 
