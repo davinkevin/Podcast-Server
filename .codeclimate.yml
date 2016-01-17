@@ -7,9 +7,11 @@ ratings:
   - "www/app/**"
 
 exclude_paths:
+- "META-INF/**/*"
 - "src/**/*"
 - "gulp/**/*"
 - "*.js"
 - "*.json"
 - "*.md"
+- "*.xml"
 - "LICENSE"
