@@ -23,26 +23,32 @@ public interface ItemRepository extends JpaRepository<Item, Integer>, ItemReposi
     default Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
         return findAll(isInPodcast(idPodcast), pageRequest);
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findAllToDownload(ZonedDateTime date) {
         return findAllNotDownloadedAndNewerThan(date);
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findAllNotDownloadedAndNewerThan(ZonedDateTime date) {
-        return findAll(isDownloaded(Boolean.FALSE).and(isNewerThan(date)));
+        return findAll(isNewerThan(date).and(isDownloaded(Boolean.FALSE)));
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(ZonedDateTime date) {
-        return findAll(isDownloaded(Boolean.TRUE).and(hasBeenDownloadedBefore(date)).and(hasToBeDeleted(Boolean.TRUE)));
+        return findAll(hasBeenDownloadedBefore(date).and(isDownloaded(Boolean.TRUE)).and(hasToBeDeleted(Boolean.TRUE)));
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findAllToDelete(ZonedDateTime date) {
         return findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(date);
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findByTypeAndDownloadDateAfter(AbstractUpdater.Type type, ZonedDateTime dateInPast) {
         return findAll(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast)));
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findByStatus(Status... status) {
         return findAll(hasStatus(status));

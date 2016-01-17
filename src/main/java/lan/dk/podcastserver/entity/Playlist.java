@@ -1,13 +1,11 @@
 package lan.dk.podcastserver.entity;
 
+import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,9 +27,11 @@ public class Playlist {
 
     private String name;
 
-    @OneToMany
-    @OrderBy("pubdate DESC")
-    @Fetch(FetchMode.SUBSELECT)
-    private Set<Item> items = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Item> items = Sets.newHashSet();
 
+    public Playlist add(Item item) {
+        items.add(item);
+        return this;
+    }
 }

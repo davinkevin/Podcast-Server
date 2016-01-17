@@ -44,7 +44,7 @@ public class ItemRepositoryTest {
     @Autowired ItemRepository itemRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
-    public static final Operation INSERT_REFERENCE_DATA = sequenceOf(
+    public static final Operation INSERT_ITEM_DATA = sequenceOf(
             insertInto("PODCAST")
                     .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
                     .values(1, "AppLoad", null, "RSS", false)
@@ -72,7 +72,7 @@ public class ItemRepositoryTest {
 
     @Before
     public void prepare() throws Exception {
-        Operation operation = sequenceOf(DELETE_ALL, INSERT_REFERENCE_DATA);
+        Operation operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);
 
         dbSetupTracker.launchIfNecessary(dbSetup);
