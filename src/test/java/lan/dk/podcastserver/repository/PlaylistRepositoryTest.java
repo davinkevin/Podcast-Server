@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.repository;
 
+import com.google.common.collect.Sets;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.Operations;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.deleteAllFrom;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
+import static java.time.ZonedDateTime.now;
 import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -149,7 +151,16 @@ public class PlaylistRepositoryTest {
 
         /* Then */
         assertThat(fetchedPlaylist.getItems()).hasSize(1);
+    }
 
+    @Test
+    public void should_find_all_to_delete() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+        /* When */
+        Set<Item> allToDelete = Sets.newHashSet(itemRepository.findAllToDelete(now()));
+        /* Then */
+        assertThat(allToDelete).isEmpty();
     }
 
 

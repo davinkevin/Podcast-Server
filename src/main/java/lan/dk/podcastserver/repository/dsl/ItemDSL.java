@@ -94,4 +94,8 @@ public class ItemDSL {
                 isDownloaded(downloaded)
         );
     }
+
+    public static BooleanExpression isInAnyPlaylist() {
+        return Q_ITEM.playlists.isNotEmpty();
+    }
 }
