@@ -17,7 +17,8 @@ public class CustomObjectMapper extends ObjectMapper {
 
     private Hibernate4Module hibernate4Module() {
         return new Hibernate4Module()
-                .configure(Hibernate4Module.Feature.USE_TRANSIENT_ANNOTATION, false);
+                .configure(Hibernate4Module.Feature.USE_TRANSIENT_ANNOTATION, false)
+                .configure(Hibernate4Module.Feature.FORCE_LAZY_LOADING, true);
     }
 
 }
