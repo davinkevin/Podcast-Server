@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -27,7 +28,8 @@ public class Playlist {
 
     private String name;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonView(PlaylistDetailsListView.class)
     private Set<Item> items = Sets.newHashSet();
 
     public Playlist add(Item item) {
@@ -41,4 +43,6 @@ public class Playlist {
         items.remove(item);
         return this;
     }
+
+    public interface PlaylistDetailsListView{};
 }

@@ -26,6 +26,10 @@ public class PlaylistBusiness {
         this.itemRepository = itemRepository;
     }
 
+    public Playlist findOne(UUID id) {
+        return playlistRepository.findOne(id);
+    }
+
     public List<Playlist> findAll() {
         return playlistRepository.findAll();
     }
@@ -53,7 +57,7 @@ public class PlaylistBusiness {
         playlistRepository.delete(uuid);
     }
 
-    public Playlist save(Playlist entity) {
-        return playlistRepository.save(entity);
+    public Playlist save(Playlist playlist) {
+        return playlistRepository.save(playlist);
     }
 }
