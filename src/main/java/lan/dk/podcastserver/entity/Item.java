@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -100,7 +101,7 @@ public class Item {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
-    private Set<Playlist> playlists;
+    private Set<Playlist> playlists = Sets.newHashSet();
 
 
     public String getLocalUri() {
