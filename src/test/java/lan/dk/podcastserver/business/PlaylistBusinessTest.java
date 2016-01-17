@@ -154,6 +154,26 @@ public class PlaylistBusinessTest {
         verify(playlistRepository, only()).save(eq(playlist));
     }
 
+    @Test
+    public void should_find_one_by_id() {
+        /* Given */
+        Playlist playlist = Playlist
+                .builder()
+                    .id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634"))
+                    .name("First")
+                    .items(Sets.newHashSet())
+                .build();
+
+        when(playlistRepository.findOne(eq(playlist.getId()))).thenReturn(playlist);
+
+        /* When */
+        Playlist aPlaylist = playlistBusiness.findOne(playlist.getId());
+
+        /* Then */
+        assertThat(aPlaylist).isSameAs(playlist);
+        verify(playlistRepository, only()).findOne(eq(playlist.getId()));
+    }
+
     @After
     public void afterEach() {
         verifyNoMoreInteractions(playlistRepository, itemRepository);
