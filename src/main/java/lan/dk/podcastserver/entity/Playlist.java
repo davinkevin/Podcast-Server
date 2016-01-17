@@ -28,7 +28,7 @@ public class Playlist {
 
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JsonView(PlaylistDetailsListView.class)
     private Set<Item> items = Sets.newHashSet();
 
