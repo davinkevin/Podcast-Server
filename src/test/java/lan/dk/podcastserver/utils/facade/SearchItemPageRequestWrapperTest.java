@@ -46,7 +46,7 @@ public class SearchItemPageRequestWrapperTest {
         SearchItemPageRequestWrapper siWithTags = new SearchItemPageRequestWrapper().setTags(new ArrayList<>());
         SearchItemPageRequestWrapper siWithTerm = new SearchItemPageRequestWrapper().setTerm("Foo");
         SearchItemPageRequestWrapper siWithDownload = new SearchItemPageRequestWrapper();
-        SearchItemPageRequestWrapper siWithoutDownload = new SearchItemPageRequestWrapper().downloaded(null);
+        SearchItemPageRequestWrapper siWithoutDownload = new SearchItemPageRequestWrapper().setDownloaded(null);
 
         /* Then */
         assertThat(siWithTags.isSearch()).isTrue();
