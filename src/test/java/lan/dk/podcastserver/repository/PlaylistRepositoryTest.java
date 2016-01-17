@@ -2,6 +2,7 @@ package lan.dk.podcastserver.repository;
 
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
+import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.ninja_squad.dbsetup.Operations.deleteAllFrom;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
@@ -39,6 +41,7 @@ public class PlaylistRepositoryTest {
     @Autowired ItemRepository itemRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
+    public static final Operation DELETE_ALL_PLAYLIST = Operations.sequenceOf(deleteAllFrom("PLAYLIST_ITEMS"), deleteAllFrom("PLAYLIST"));
     public static final Operation INSERT_PLAYLIST_DATA = sequenceOf(
             ItemRepositoryTest.INSERT_ITEM_DATA,
             insertInto("PLAYLIST")
@@ -47,7 +50,7 @@ public class PlaylistRepositoryTest {
                     .values(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind")
                     .build(),
             insertInto("PLAYLIST_ITEMS")
-                    .columns("PLAYLIST_ID", "ITEMS_ID")
+                    .columns("PLAYLISTS_ID", "ITEMS_ID")
                     .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), 3)
                     .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), 5)
                     .values(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"), 5)
@@ -118,6 +121,35 @@ public class PlaylistRepositoryTest {
 
         /* Then */
         assertThat(fetchedPlaylist.getItems()).hasSize(2);
+    }
+
+    @Test
+    public void should_remove_item_from_playlist() {
+        /* Given */
+        Item thirdItem = itemRepository.findOne(3);
+        Playlist playlist = playlistRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+
+        /* When */
+        playlistRepository.save(playlist.remove(thirdItem));
+        playlistRepository.flush();
+        Playlist fetchedPlaylist = playlistRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+
+        /* Then */
+        assertThat(fetchedPlaylist.getItems()).hasSize(1);
+    }
+
+    @Test
+    public void should_remove_from_playlist_if_item_deleted() {
+        /* Given */
+
+        /* When */
+        itemRepository.delete(3);
+        itemRepository.flush();
+        Playlist fetchedPlaylist = playlistRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+
+        /* Then */
+        assertThat(fetchedPlaylist.getItems()).hasSize(1);
+
     }
 
 
