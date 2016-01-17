@@ -1,6 +1,14 @@
 engines:
   eslint:
       enabled: true
+
+ratings:
+  paths:
+  - "www/app/**"
+
 exclude_paths:
-- "gulpfile.babel.js"
-- "gulp/**/*.js"
+- "gulp/**/*"
+- "*.js"
+- "*.json"
+- "*.md"
+- "LICENSE"
