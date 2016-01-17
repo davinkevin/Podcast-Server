@@ -34,7 +34,7 @@
     "jasmine-core": "^2.3.4",
     "jasmine-expect": "^2.0.0-beta2",
     "jasmine-reporters": "^2.0.7",
-    "jspm": "0.16.19",
+    "jspm": "^0.16.23",
     "mkdirp": "^0.5.1",
     "proxy-middleware": "^0.15.0",
     "require-dir": "^0.3.0",
@@ -90,34 +90,6 @@
       "core-js": "npm:core-js@^1.1.4"
     },
     "overrides": {
-      "github:highcharts/highcharts-dist@4.1.9": {
-        "main": "highcharts",
-        "shim": {
-          "highcharts": {
-            "deps": [
-              "./adapters/standalone-framework"
-            ],
-            "exports": "Highcharts"
-          }
-        }
-      },
-      "github:chieffancypants/angular-hotkeys@1.6.0": {
-        "directories": {
-          "lib": "build"
-        },
-        "main": "hotkeys",
-        "dependencies": {
-          "angular": "^1.2.0"
-        },
-        "shim": {
-          "hotkeys": {
-            "deps": [
-              "angular",
-              "./hotkeys.css!"
-            ]
-          }
-        }
-      },
       "github:driftyco/ionicons@2.0.1": {
         "main": false,
         "files": [
