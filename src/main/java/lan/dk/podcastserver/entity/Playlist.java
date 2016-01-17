@@ -27,11 +27,18 @@ public class Playlist {
 
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     private Set<Item> items = Sets.newHashSet();
 
     public Playlist add(Item item) {
+        item.getPlaylists().add(this);
         items.add(item);
+        return this;
+    }
+
+    public Playlist remove(Item item) {
+        item.getPlaylists().remove(this);
+        items.remove(item);
         return this;
     }
 }
