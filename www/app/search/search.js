@@ -139,7 +139,6 @@ export default class ItemSearchCtrl {
     }
 
     resetSearch() {
-        debugger;
         this.currentPage = 1;
         this.SearchItemCache.updateSearchParam(this.searchParameters);
         return this.changePage();
