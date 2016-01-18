@@ -5,264 +5,148 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.service.UrlService;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toSet;
 
 @Component("CanalPlusUpdater")
 public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
+    public static final String FRONT_TOOLS_URL_PATTERN = "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=%d&ztid=%d&nbPlusVideos0=1";
+    public static final String XML_INFORMATION_PATTERN = "http://service.canal-plus.com/video/rest/getVideos/cplus/%d";
+    public static final Pattern ID_EXTRACTOR = Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
+    public static final String FIELD_TITRAGE = "TITRAGE";
+    public static final String FIELD_TITRE = "TITRE";
+    public static final String FIELD_PUBLICATION = "PUBLICATION";
+    public static final String FIELD_DATE = "DATE";
+    public static final String FIELD_HEURE = "HEURE";
+    public static final String FIELD_IMAGES = "IMAGES";
+    public static final String FIELD_GRAND = "GRAND";
+    public static final String FIELD_SOUS_TITRE = "SOUS_TITRE";
+    public static final String FIELD_VIDEOS = "VIDEOS";
+    public static final String FIELD_QUALITY_HLS = "HLS";
+    public static final String FIELD_QUALITY_HD = "HD";
+    public static final String SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY = "a[onclick^=loadVideoHistory]";
+    public static final String FIELD_VIDEO = "VIDEO";
+    public static final String FIELD_INFOS = "INFOS";
+    public static final String FIELD_MEDIA = "MEDIA";
+
     @Resource JdomService jdomService;
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
+    @Resource UrlService urlService;
+    public static final Pattern NB_PLUS_VIDEOS_PATTERN = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
+
 
     public Set<Item> getItems(Podcast podcast) {
-        Document page;
-
-        Set<Item> itemSet = new HashSet<>();
-
-        try {
-            page = htmlService.connectWithDefault(podcast.getUrl()).get();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
-            return itemSet;
-        }
-
-        // Si la page possède un planifier :
-        if (!page.select(".planifier .cursorPointer").isEmpty() && itemSet.isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            itemSet = this.getSetItemToPodcastFromPlanifier(podcast.getUrl());
-        }
-
-        //Si c'est une page à onglet
-        if (!page.select("#contenuOnglet .tab_content").isEmpty() && itemSet.isEmpty()) {
-            itemSet = getItemSetFromOnglet(podcast.getUrl());
-        }
-
-        // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
-        if (!podcast.getUrl().contains("front_tools") && (itemSet.isEmpty())) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            itemSet = this.getSetItemToPodcastFromFrontTools(
-                    this.getPodcastURLFromFrontTools(podcast.getUrl())
-            );
-        }
-
-        // Si l'url est une front-tools et que la liste est encore vide :
-        if (podcast.getUrl().contains("front_tools") && (itemSet.isEmpty())) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            itemSet = this.getSetItemToPodcastFromFrontTools(podcast.getUrl());
-        }
-        return itemSet;
+        return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast));
     }
 
-
-    @Override
     public String signatureOf(Podcast podcast) {
-        Document page = null;
-
-        try {
-            page = htmlService.connectWithDefault(podcast.getUrl()).get();
-        } catch (IOException e) {
-            logger.error("IOException :", e);
-        }
-
-        // Si la page possède un planifier :
-        if (page != null) {
-            if (!page.select(".planifier .cursorPointer").isEmpty()) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-                return signatureService.generateMD5Signature(page.select(".planifier .cursorPointer").html());
-            }
-        }
-
-
-        // Si pas d'autre solution, ou que l'url ne contient pas front_tools:
-        if (!podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return signatureService.generateSignatureFromURL(this.getPodcastURLFromFrontTools(podcast.getUrl()));
-        }
-
-        // Si l'url est une front-tools et que la liste est encore vide :
-        if (podcast.getUrl().contains("front_tools")) { //Si c'est un lien direct vers la page de l'emmission, et donc le 1er Update
-            return signatureService.generateSignatureFromURL(podcast.getUrl());
-        }
-        return "";
+        return signatureService.generateSignatureFromURL(getRealUrl(podcast));
     }
 
+    private String getPodcastURLOfFrontTools(String url) {
 
-    /**
-     * **** Partie spécifique au Front Tools ******
-     */
-
-    private String getPodcastURLFromFrontTools(String canalPlusDirectShowUrl) {
-        if (canalPlusDirectShowUrl.contains("front_tools"))
-            return canalPlusDirectShowUrl;
-
-        int pid = 0;
-        int ztid = 0;
-        Document page = null;
+        Document page;
         try {
-            page = htmlService.connectWithDefault(canalPlusDirectShowUrl).get();
-            Pattern p = Pattern.compile(
-                    "^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
-            //logger.debug(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
-            Matcher m = p.matcher(page.select("a[onclick^=loadVideoHistory]").first().attr("onclick"));
-
-            if (m.find()) {
-                pid = Integer.parseInt(m.group(1));
-                ztid = Integer.parseInt(m.group(2));
-            }
-            return "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=" + pid + "&ztid=" + ztid + "&nbPlusVideos0=1";
+            page = htmlService.get(url);
         } catch (IOException e) {
             logger.error("IOException :", e);
+            return "";
         }
-        return "";
+
+        Matcher m = ID_EXTRACTOR.matcher(page.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"));
+
+        if (!m.find()) {
+            return "";
+        }
+
+        return String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
     }
 
-    private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) throws MalformedURLException {
+    private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
 
-        Document page = null;
+        Matcher m = NB_PLUS_VIDEOS_PATTERN.matcher(canalPlusFrontToolsUrl);
 
-        int nbPlusVideos = 0;
-
-        Pattern p = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
-        Matcher m = p.matcher(canalPlusFrontToolsUrl);
-
-        logger.debug("Parsing de l'url pour récupérer l'identifiant du tab");
-        if (m.find()) {
-            nbPlusVideos = Integer.parseInt(m.group(1));
-            logger.debug("nbPlusVideos = " + nbPlusVideos);
-        } else {
-            throw new MalformedURLException("nbPlusVideos Introuvable pour le show " + canalPlusFrontToolsUrl);
+        if (!m.find()) {
+            logger.error("nbPlusVideos Introuvable pour le show {}", canalPlusFrontToolsUrl);
+            return new Elements();
         }
 
+        int nbPlusVideos = Integer.parseInt(m.group(1));
+        logger.debug("nbPlusVideos = " + nbPlusVideos);
+
+        Document page;
         try {
-            page = htmlService.connectWithDefault(canalPlusFrontToolsUrl).get();
+            page = htmlService.get(canalPlusFrontToolsUrl);
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
+            logger.error("Error during loading of url : {}", canalPlusFrontToolsUrl, e);
+            return new Elements();
         }
+
         return page.select("ul.features").get(nbPlusVideos).select("li");
     }
 
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
-        Set<Item> itemSet = new HashSet<>();
-        try {
-            Integer idCanalPlusEpisode;
-            for (Element episode : getHTMLListingEpisodeFromFrontTools(urlFrontTools)) {
-                idCanalPlusEpisode = Integer.valueOf(episode.select("li._thumbs").first().id().replace("video_", ""));
-                itemSet.add(getItemFromVideoId(idCanalPlusEpisode));
-            }
-            return itemSet;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("MalformedURLException :", e);
-        }
-        return itemSet;
+        return getHTMLListingEpisodeFromFrontTools(urlFrontTools)
+                .stream()
+                .map(e -> e.select("li._thumbs").first().id().replace("video_", ""))
+                .map(Integer::valueOf)
+                .map(this::getItemFromVideoId)
+                .collect(toSet());
     }
 
 
-    public Set<Item> getSetItemToPodcastFromPlanifier(String urlPodcast) {
-
-        Set<Item> itemSet = new HashSet<>();
-        Document page;
-        try {
-            page = htmlService.connectWithDefault(urlPodcast).get();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
-            return itemSet;
-        }
-        //Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
-        Pattern idDuPodcastPatern = Pattern.compile(".*\\(([0-9]*).*\\);");
-        Matcher matcher;
-        for (Element cursorPointer : page.select(".planifier .cursorPointer")) {
-            matcher = idDuPodcastPatern.matcher(cursorPointer.attr("onclick"));
-            if (matcher.find()) {
-                itemSet.add(getItemFromVideoId(Integer.valueOf(matcher.group(1))));
-            }
-        }
-        return itemSet;
-    }
-
-    /**
-     * Helper permettant de créer un item à partir d'un ID de Video Canal+
-     *
-     * @param idCanalPlusVideo
-     * @return
-     */
     private Item getItemFromVideoId(Integer idCanalPlusVideo) {
-        Item currentEpisode = new Item();
-        //currentEpisode.setTitle(episode.select("h4 a").first().text());
-        org.jdom2.Document xmlAboutCurrentEpisode = null;
+        org.jdom2.Document xmlEpisode;
         try {
-            xmlAboutCurrentEpisode = jdomService.parse("http://service.canal-plus.com/video/rest/getVideos/cplus/" + idCanalPlusVideo);
+            xmlEpisode = jdomService.parse(String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo));
         } catch (IOException | JDOMException e) {
-            logger.error("IOException | JDOMException :", e);
-            return new Item();
+            logger.error("Exception during parsing of : {}", String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo), e);
+            return Item.DEFAULT_ITEM;
         }
-        org.jdom2.Element xml_INFOS = xmlAboutCurrentEpisode.getRootElement().getChild("VIDEO").getChild("INFOS");
-        org.jdom2.Element xml_MEDIA = xmlAboutCurrentEpisode.getRootElement().getChild("VIDEO").getChild("MEDIA");
 
-        try {
-            currentEpisode.setTitle(xml_INFOS.getChild("TITRAGE").getChildText("TITRE"))
-                    .setPubdate(fromCanalPlus(xml_INFOS.getChild("PUBLICATION").getChildText("DATE"), xml_INFOS.getChild("PUBLICATION").getChildText("HEURE")))
-                    .setCover(imageService.getCoverFromURL(new URL(xml_MEDIA.getChild("IMAGES").getChildText("GRAND"))))
-                    .setDescription(xml_INFOS.getChild("TITRAGE").getChildText("SOUS_TITRE"));
+        org.jdom2.Element infos = xmlEpisode.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_INFOS);
+        org.jdom2.Element media = xmlEpisode.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_MEDIA);
 
-            if (xml_MEDIA.getChild("VIDEOS").getChildText("HLS") != null && StringUtils.isNotEmpty(xml_MEDIA.getChild("VIDEOS").getChildText("HLS"))) {
-                currentEpisode.setUrl(URLUtils.getM3U8UrlFormMultiStreamFile(xml_MEDIA.getChild("VIDEOS").getChildText("HLS")));
-            } else {
-                currentEpisode.setUrl(xml_MEDIA.getChild("VIDEOS").getChildText("HD"));
-            }
-
-            logger.debug(currentEpisode.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("MalformedURLException pour l'item d'id Canal+ {}", idCanalPlusVideo, e);
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
-        }
-        return currentEpisode;
+        return new Item()
+                .setTitle(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_TITRE))
+                .setPubdate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
+                .setCover(imageService.getCoverFromURL(media.getChild(FIELD_IMAGES).getChildText(FIELD_GRAND)))
+                .setDescription(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_SOUS_TITRE))
+                .setUrl(findUrl(media));
     }
 
-    private Set<Item> getItemSetFromOnglet(String url) {
-        Document page;
-        Set<Item> itemSet = new HashSet<>();
-        try {
-            page = htmlService.connectWithDefault(url).get();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            logger.error("IOException :", e);
-            return itemSet;
-        }
-
-        for (Element episode : page.select("#contenuOnglet li[id]")) {
-            Integer idCanalPlusEpisode = Integer.valueOf(episode.id().replace("video_", ""));
-            Item itemToAdd = getItemFromVideoId(idCanalPlusEpisode);
-            itemSet.add(itemToAdd.setTitle(itemToAdd.getDescription()));
-        }
-
-        return itemSet;
+    private String findUrl(org.jdom2.Element media) {
+        return StringUtils.isNotEmpty(media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HLS))
+                ? urlService.getM3U8UrlFormMultiStreamFile(media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HLS))
+                : media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HD);
     }
 
-    public ZonedDateTime fromCanalPlus(String date, String heure) {
+    private ZonedDateTime fromCanalPlus(String date, String heure) {
         LocalDateTime localDateTime = LocalDateTime.parse(date.concat("-").concat(heure), DateTimeFormatter.ofPattern(CANALPLUS_PATTERN));
         return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
+    }
+
+    private String getRealUrl(Podcast podcast) {
+        return podcast.getUrl().contains("front_tools") ? podcast.getUrl() : this.getPodcastURLOfFrontTools(podcast.getUrl());
     }
 
     @Override
