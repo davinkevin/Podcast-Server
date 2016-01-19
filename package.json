@@ -90,6 +90,34 @@
       "core-js": "npm:core-js@^1.1.4"
     },
     "overrides": {
+      "github:highcharts/highcharts-dist@4.1.9": {
+        "main": "highcharts",
+        "shim": {
+          "highcharts": {
+            "deps": [
+              "./adapters/standalone-framework"
+            ],
+            "exports": "Highcharts"
+          }
+        }
+      },
+      "github:chieffancypants/angular-hotkeys@1.6.0": {
+        "directories": {
+          "lib": "build"
+        },
+        "main": "hotkeys",
+        "dependencies": {
+          "angular": "^1.2.0"
+        },
+        "shim": {
+          "hotkeys": {
+            "deps": [
+              "angular",
+              "./hotkeys.css!"
+            ]
+          }
+        }
+      },
       "github:driftyco/ionicons@2.0.1": {
         "main": false,
         "files": [
