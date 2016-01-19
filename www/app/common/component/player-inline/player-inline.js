@@ -1,7 +1,6 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import _ from 'lodash';
 import {Component, View, Module} from '../../../decorators';
 import AppVideogular from '../../../common/modules/videogular/videogular';
 import Truncate from '../../../common/modules/truncate';
@@ -91,13 +90,7 @@ export default class PlayerInlineComponent {
     }
 
     reloadPlaylist() {
-        _.updateinplace(
-            this.playlist,
-            this.playlistService.playlist(),
-            function(inArray, elem) {
-                return _.findIndex(inArray, { 'id': elem.id });
-            }
-        );
+        this.playlist = this.playlistService.playlist();
     }
 
     setMedia(index) {
