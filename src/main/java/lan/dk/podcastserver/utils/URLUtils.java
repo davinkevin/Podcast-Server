@@ -13,7 +13,8 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Objects;
+
+import static java.util.Objects.isNull;
 
 /**
  * Created by kevin on 01/02/2014.
@@ -45,28 +46,34 @@ public class URLUtils {
     public static String getM3U8UrlFormMultiStreamFile(String url) {
         String urlToReturn = null;
 
-        if (url == null)
+        if (isNull(url))
             return null;
 
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+        try(BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 if (!inputLine.startsWith("#")) {
                     urlToReturn = inputLine;
                 }
             }
-            in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (Objects.nonNull(urlToReturn)) {
-            urlToReturn = StringUtils.substringBeforeLast(urlToReturn, "?");
+        if (isNull(urlToReturn))
+            return null;
+
+        urlToReturn = StringUtils.substringBeforeLast(urlToReturn, "?");
+
+        if (isRelativeUrl(urlToReturn)) {
+            urlToReturn = StringUtils.substringBeforeLast(url, "/") + "/" + urlToReturn;
         }
 
         return urlToReturn;
+    }
+
+    private static boolean isRelativeUrl(String urlToReturn) {
+        return !urlToReturn.contains("://");
     }
 
     public static String getRealURL(String url) {
