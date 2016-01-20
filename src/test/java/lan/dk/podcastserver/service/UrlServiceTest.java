@@ -49,12 +49,23 @@ public class UrlServiceTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/x-mpegURL")
-                        .withBodyFile("canalplus.lepetitjournal.20150707.m3u8")));
+                        .withBodyFile("service/urlService/canalplus.lepetitjournal.20150707.m3u8")));
 
         /* When */  String lastUrl = urlService.getM3U8UrlFormMultiStreamFile(HTTP_LOCALHOST + "/my/ressources.m3u8");
 
-        /* Then */  assertThat(lastUrl)
-                .isEqualTo("http://us-cplus-aka.canal-plus.com/i/1507/02/nip_NIP_59957_,200k,400k,800k,1500k,.mp4.csmil/segment146_3_av.ts");
+        /* Then */  assertThat(lastUrl).isEqualTo("http://us-cplus-aka.canal-plus.com/i/1507/02/nip_NIP_59957_,200k,400k,800k,1500k,.mp4.csmil/segment146_3_av.ts");
+    }
+    
+    @Test
+    public void should_handle_relative_url() {
+        /* Given */
+        stubFor(get(urlEqualTo("/my/nested/folder/ressources.m3u8"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/x-mpegURL")
+                        .withBodyFile("service/urlService/relative.m3u8")));
+        /* When */  String lastUrl = urlService.getM3U8UrlFormMultiStreamFile(HTTP_LOCALHOST + "/my/nested/folder/ressources.m3u8");
+        /* Then */  assertThat(lastUrl).isEqualTo(HTTP_LOCALHOST + "/my/nested/folder/9dce76b19072beda39720aa04aa2e47a-video=1404000-audio_AACL_fra_70000_315=70000.m3u8");
     }
     
     @Test
@@ -64,7 +75,7 @@ public class UrlServiceTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/x-mpegURL")
-                        .withBodyFile("canalplus.lepetitjournal.20150707.m3u8")));
+                        .withBodyFile("service/urlService/canalplus.lepetitjournal.20150707.m3u8")));
         /* When */  String lastUrl = urlService.getM3U8UrlFormMultiStreamFile(HTTP_LOCALHOST + "/my/ressources2.m3u8");
         /* Then */  assertThat(lastUrl).isNull();
     }
