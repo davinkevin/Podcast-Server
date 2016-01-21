@@ -1,6 +1,4 @@
 import {Module, Service} from '../../decorators';
-import _ from 'lodash';
-import angular from 'angular';
 import NgStorage from 'ngstorage';
 
 @Module({
@@ -20,16 +18,16 @@ export default class PlaylistService {
         return this.$localStorage.playlist;
     }
     add(item) {
-        this.$localStorage.playlist.push(item);
+        this.playlist().push(item);
     }
     remove (item) {
-        this.$localStorage.playlist = _.remove(this.$localStorage.playlist, function(elem) { return elem.id !== item.id; });
+        this.$localStorage.playlist = this.playlist().filter(elem => elem.id !== item.id);
     }
     contains(item) {
-        return angular.isObject(_.find(this.$localStorage.playlist, {id : item.id}));
+        return !!this.playlist().find(elem => elem.id === item.id);
     }
-    addOrRemove (item) {
-        (this.contains(item)) ? this.remove(item) : this.add(item);
+    addOrRemove(item) {
+        this.contains(item) ? this.remove(item) : this.add(item);
     }
     removeAll () {
         this.$localStorage.playlist = [];
