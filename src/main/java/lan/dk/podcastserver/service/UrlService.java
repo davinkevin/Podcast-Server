@@ -4,6 +4,7 @@ import lan.dk.podcastserver.utils.URLUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URLConnection;
@@ -47,4 +48,7 @@ public class UrlService {
         System.setProperty("http.agent", HtmlService.USER_AGENT);
     }
 
+    public BufferedReader urlAsReader(String url) throws IOException {
+        return URLUtils.urlAsReader(url);
+    }
 }

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -38,38 +37,30 @@ public class URLUtils {
         return FilenameUtils.getName(urlWithoutAllBandwith.substring(0, posLastSlash).replace(".csmil", ""));
     }
 
-    public static Reader getReaderFromURL (String url) throws IOException {
-        URL urlObject = new URL(url);
-        return new BufferedReader(new InputStreamReader(urlObject.openStream(), "UTF-8"));
+    public static BufferedReader getReaderFromURL (String url) throws IOException {
+        return urlAsReader(url); // For compatibility, To be removed
     }
 
     public static String getM3U8UrlFormMultiStreamFile(String url) {
-        String urlToReturn = null;
-
         if (isNull(url))
             return null;
 
-        try(BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                if (!inputLine.startsWith("#")) {
-                    urlToReturn = inputLine;
-                }
-            }
+        try(BufferedReader in = urlAsReader(url)) {
+            return in
+                .lines()
+                .filter(l -> !l.startsWith("#"))
+                .reduce((acc, val) -> val)
+                .map(s -> StringUtils.substringBeforeLast(s, "?"))
+                .map(s -> (isRelativeUrl(s)) ? urlWithDomain(url, s) : s)
+                .orElse(null);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        if (isNull(urlToReturn))
             return null;
-
-        urlToReturn = StringUtils.substringBeforeLast(urlToReturn, "?");
-
-        if (isRelativeUrl(urlToReturn)) {
-            urlToReturn = StringUtils.substringBeforeLast(url, "/") + "/" + urlToReturn;
         }
+    }
 
-        return urlToReturn;
+    public static BufferedReader urlAsReader(String url) throws IOException {
+        return new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
     }
 
     private static boolean isRelativeUrl(String urlToReturn) {
@@ -126,7 +117,7 @@ public class URLUtils {
     }
 
     public static String urlWithDomain(String urlWithDomain, String domaineLessUrl) {
-        if (domaineLessUrl.contains("://"))
+        if (domaineLessUrl.contains(PROTOCOL_SEPARATOR))
             return domaineLessUrl;
 
         return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + domaineLessUrl;
