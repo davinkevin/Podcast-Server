@@ -1,13 +1,15 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.service.UrlService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLConnection;
+import java.util.Optional;
+
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 28/02/15.
@@ -15,39 +17,32 @@ import java.net.URLConnection;
 @Scope("prototype")
 @Component("DailyMotionCloudDownloader")
 public class DailyMotionCloudDownloader extends M3U8Downloader {
-    
+
+    @Autowired UrlService urlService;
+
     String redirectionUrl = null;
 
     @Override
     public String getItemUrl() {
-        if (redirectionUrl == null) {
+        if (nonNull(redirectionUrl))
+            return redirectionUrl;
 
-            String hlsStreamUrl = URLUtils.getRealURL(item.getUrl());
+        Optional<String> optionalUrl = Optional.empty();
+        String url = urlService.getRealURL(item.getUrl());
 
-            BufferedReader in = null;
-            try {
-                URLConnection urlConnection = URLUtils.getConnection(hlsStreamUrl);
-                
-                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    if (inputLine.contains("audio") && inputLine.contains("video")) {
-                        redirectionUrl = inputLine;
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (in != null)
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-            redirectionUrl = URLUtils.urlWithDomain(hlsStreamUrl, redirectionUrl);
+        try(BufferedReader in = urlService.urlAsReader(url)) {
+            optionalUrl = in
+                    .lines()
+                    .filter(l -> l.contains("audio") && l.contains("video"))
+                    .reduce((u, v) -> v);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        
+
+        redirectionUrl = optionalUrl
+                .map(u -> urlService.urlWithDomain(url, u))
+                .orElse("");
+
         return redirectionUrl;
     }
 }
