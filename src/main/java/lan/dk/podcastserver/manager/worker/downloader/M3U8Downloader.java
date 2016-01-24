@@ -1,112 +1,66 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import com.google.common.io.ByteStreams;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.utils.URLUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.stream.Collectors.toList;
 
 @Scope("prototype")
 @Component("M3U8Downloader")
 public class M3U8Downloader extends AbstractDownloader {
 
-    List<String> urlList;
-    OutputStream outputStream;
-    Runnable runnableDownloader;
+    @Autowired UrlService urlService;
 
+    List<String> urlList;
+    final M3U8Watcher watcher = new M3U8Watcher(this);
 
     @Override
     public Item download() {
         logger.debug("Download");
+
+        if (watcher.hasBeenStarted().get()) {
+            synchronized (watcher) {
+                watcher.notify();
+            }
+            return item;
+        }
+
         itemDownloadManager.addACurrentDownload();
 
-        if (getItemUrl().contains("m3u8")) {
-            URL urlListFile = null;
-            try {
-                urlListFile = new URL(getItemUrl());
-                urlList = new ArrayList<>();
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlListFile.openStream()));
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    if (!inputLine.startsWith("#")) {
-                        urlList.add(URLUtils.urlWithDomain(getItemUrl(), inputLine));
-                    }
-                }
-                in.close();
-
-                // Tous les éléments sont disponibles dans urlList :
-                target = getTagetFile(item);
-
-                outputStream = new FileOutputStream(target);
-                runnableDownloader = new Runnable() {
-                    @Override
-                    public void run() {
-
-                        try {
-                            for (int cpt = 0; cpt < urlList.size(); cpt++) {
-                                String urlFragmentToDownload = urlList.get(cpt);
-
-                                logger.debug("URL : {}", urlFragmentToDownload);
-                                try {
-                                    InputStream is = new URL(urlFragmentToDownload).openStream();
-                                    int read = 0;
-                                    byte[] bytes = new byte[1024];
-
-                                    while ((read = is.read(bytes)) != -1) {
-                                        outputStream.write(bytes, 0, read);
-                                    }
-                                    item.setProgression((100*cpt)/urlList.size());
-                                    logger.debug("Progression : {}", item.getProgression());
-                                    convertAndSaveBroadcast();
-                                    is.close();
-                                } catch (FileNotFoundException e) {
-                                    logger.error("Fichier introuvable : {}", urlFragmentToDownload, e);
-                                }
-
-
-                                if (stopDownloading.get()) {
-                                    if (Status.STOPPED == item.getStatus()) {
-                                        break;
-                                    } else if (Status.PAUSED == item.getStatus()) {
-
-                                        synchronized(this)
-                                        {
-                                            this.wait();
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (Status.STARTED == item.getStatus()) {
-                                finishDownload();
-                            }
-                        } catch (IOException | InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                outputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                };
-
-                runnableDownloader.run();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
+        if (!getItemUrl().contains("m3u8")) {
             logger.debug("Traiter avec le downloader adapté à {}", getItemUrl());
             stopDownload();
+            return item;
         }
+
+        try(BufferedReader in = urlService.urlAsReader(getItemUrl())) {
+            urlList = in
+                    .lines()
+                    .filter(l -> !l.startsWith("#"))
+                    .map(l -> urlService.urlWithDomain(getItemUrl(), l))
+                    .collect(toList());
+
+            // Tous les éléments sont disponibles dans urlList :
+            target = getTagetFile(item);
+
+            watcher.run();
+        } catch (IOException e) {
+            logger.error("Error during fetching individual url of M3U8", e);
+            stopDownload();
+        }
+
         return this.item;
     }
 
@@ -149,16 +103,76 @@ public class M3U8Downloader extends AbstractDownloader {
         stopDownloading.set(false);
         this.saveSyncWithPodcast();
         convertAndSaveBroadcast();
-        if (runnableDownloader == null) {
-            this.download();
-        } else {
-            synchronized (runnableDownloader) {
-                runnableDownloader.notify();
+        download();
+    }
+
+    @Slf4j
+    static class M3U8Watcher implements Runnable {
+
+        private final M3U8Downloader downloader;;
+        private List<String> urlList;
+        private UrlService urlService;
+        private Item item;
+
+        private AtomicBoolean hasBeenStarted = new AtomicBoolean(false);
+
+        public M3U8Watcher(M3U8Downloader downloader) {
+            this.downloader = downloader;
+        }
+
+        @Override
+        public void run() {
+            start();
+            item = downloader.item;
+            urlList = downloader.urlList;
+            urlService = downloader.urlService;
+
+            try(OutputStream outputStream = new FileOutputStream(downloader.target)) {
+
+                for (int cpt = 0; cpt < urlList.size(); cpt++) {
+                    String urlFragmentToDownload = urlList.get(cpt);
+
+                    log.debug("URL : {}", urlFragmentToDownload);
+                    try(InputStream is = urlService.getConnection(urlFragmentToDownload).getInputStream()) {
+                        ByteStreams.copy(is, outputStream);
+                        broadcastProgression(cpt);
+                    }
+
+                    if (downloader.stopDownloading.get()) {
+                        if (Status.STOPPED == item.getStatus()) {
+                            break;
+                        }
+
+                        if (Status.PAUSED == item.getStatus()) {
+                            synchronized(this) {
+                                wait();
+                            }
+                        }
+                    }
+                }
+
+                if (Status.STARTED == item.getStatus()) {
+                    downloader.finishDownload();
+                }
+            } catch (IOException | InterruptedException e) {
+                log.error("Error during runner of M3U8Downloader", e);
+                downloader.stopDownload();
             }
         }
+
+        private void broadcastProgression(int cpt) {
+            item.setProgression((100*cpt)/ urlList.size());
+            log.debug("Progression : {}", item.getProgression());
+            downloader.convertAndSaveBroadcast();
+        }
+
+        public AtomicBoolean hasBeenStarted() {
+            return hasBeenStarted;
+        }
+
+        private void start() {
+            hasBeenStarted.set(true);
+        }
     }
-    
-    public Boolean hasDomain(String url) {
-        return url.contains("://");
-    }
+
 }
