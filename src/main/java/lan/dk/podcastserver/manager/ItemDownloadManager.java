@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.StreamSupport;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -118,7 +119,10 @@ public class ItemDownloadManager {
 
     // Change status of all downloads :
     public void stopAllDownload() {
-        downloadingQueue.values().forEach(Downloader::stopDownload);
+        downloadingQueue.values()
+                .stream()
+                .collect(toList())
+                .forEach(Downloader::stopDownload);
     }
 
     public void pauseAllDownload() {
