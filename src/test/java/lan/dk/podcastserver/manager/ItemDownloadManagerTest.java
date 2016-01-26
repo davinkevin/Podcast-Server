@@ -161,15 +161,25 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_stop_all_downloads() {
         /* Given */
-        final Downloader mockDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(new Item().setId(1), mockDownloader);
-        itemDownloadManager.getDownloadingQueue().put(new Item().setId(2), mockDownloader);
+        final Downloader mockDownloader1 = generateDownloaderAndRegisterIt(1);
+        final Downloader mockDownloader2 = generateDownloaderAndRegisterIt(2);
+        final Downloader mockDownloader3 = generateDownloaderAndRegisterIt(3);
 
         /* When */
         itemDownloadManager.stopAllDownload();
 
         /* Then */
-        verify(mockDownloader, times(2)).stopDownload();
+        verify(mockDownloader1, times(1)).stopDownload();
+        verify(mockDownloader2, times(1)).stopDownload();
+        verify(mockDownloader3, times(1)).stopDownload();
+    }
+
+    private Downloader generateDownloaderAndRegisterIt(int id) {
+        final Downloader mockDownloader = mock(Downloader.class);
+        Item item = new Item().setId(id);
+        when(mockDownloader.getItem()).thenReturn(item);
+        itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
+        return mockDownloader;
     }
 
     @Test
