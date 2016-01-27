@@ -7,6 +7,7 @@ import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.factory.WGetHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Objects;
 
 import static java.util.Objects.isNull;
@@ -25,6 +25,7 @@ import static java.util.Objects.nonNull;
 public class HTTPDownloader extends AbstractDownloader {
 
     @Autowired UrlService urlService;
+    @Autowired WGetHelper wGetHelper;
 
     DownloadInfo info = null;
 
@@ -36,15 +37,15 @@ public class HTTPDownloader extends AbstractDownloader {
         //int borne = randomGenerator.nextInt(100);
         try {
             // initialize url information object
-            info = new DownloadInfo(new URL(urlService.getRealURL(getItemUrl())));
+            info = wGetHelper.wDownloadInfo(urlService.getRealURL(getItemUrl()));
             // extract infromation from the web
             Runnable itemSynchronisation = new HTTPWatcher(this);
 
             info.extract(stopDownloading, itemSynchronisation);
-            target = getTagetFile(this.item);
+            target = getTagetFile(item);
 
             // create wget downloader
-            WGet w = new WGet(info, target);
+            WGet w = wGetHelper.wGet(info, target);
             // will blocks until download finishes
             w.download(stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {

@@ -5,13 +5,12 @@ import com.github.axet.wget.info.DownloadInfo;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.utils.URLUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 13/07/2014.
@@ -228,56 +230,49 @@ public class ParleysDownloader extends AbstractDownloader{
         return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
     }
 
+    @Slf4j
     static class ParleysWatcher implements Runnable {
 
-        protected final Logger logger = LoggerFactory.getLogger(this.getClass());
         private final ParleysDownloader parleysDownloader;
-        private final DownloadInfo info;
-        private final Item item;
-        private final Long totalSize;
-        private long last;
-        private Integer avancementIntermediaire;
+        private Integer avancementIntermediaire = 0;
 
         public ParleysWatcher(ParleysDownloader parleysDownloader) {
             this.parleysDownloader = parleysDownloader;
-            this.info = parleysDownloader.info;
-            this.item = parleysDownloader.item;
-            this.totalSize = parleysDownloader.totalSize;
-            this.avancementIntermediaire = 0;
         }
 
         @Override
         public void run() {
-          switch (info.getState()) {
+            Item item = parleysDownloader.item;
+            DownloadInfo info = parleysDownloader.info;
+
+            switch (info.getState()) {
                 case EXTRACTING:
                 case EXTRACTING_DONE:
-                    logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
+                    log.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState());
                     break;
                 case ERROR:
                     parleysDownloader.stopDownload();
                     break;
                 case DONE:
-                    logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - terminé");
+                    log.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " - terminé");
                     avancementIntermediaire = item.getProgression();
                     break;
                 case RETRYING:
-                    logger.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState() + " " + info.getDelay());
+                    log.debug(FilenameUtils.getName(String.valueOf(item.getUrl())) + " " + info.getState() + " " + info.getDelay());
                     break;
                 case DOWNLOADING:
-                    long now = System.currentTimeMillis();
+                    if (isNull(info.getLength()) || (nonNull(info.getLength()) && info.getLength() != 0L)) break;
 
-                    if (now - 1000 > last && info.getLength() != null && info.getLength() != 0L) {
-                        last = now;
-                        int progression = ((int) (info.getCount()*100 / (float) totalSize))+avancementIntermediaire;
-                        if (item.getProgression() < progression) {
-                            item.setProgression(progression);
-                            logger.debug("Progression de {} : {}%", item.getTitle(), progression);
-                            parleysDownloader.convertAndSaveBroadcast();
-                        }
+                    int progression = ((int) (info.getCount()*100 / (float) parleysDownloader.totalSize))+avancementIntermediaire;
+                    if (item.getProgression() < progression) {
+                        item.setProgression(progression);
+                        log.debug("Progression de {} : {}%", item.getTitle(), progression);
+                        parleysDownloader.convertAndSaveBroadcast();
                     }
+
                     break;
                 case STOP:
-                    logger.debug("Pause / Arrêt du téléchargement du téléchargement");
+                    log.debug("Pause / Arrêt du téléchargement du téléchargement");
                     break;
                 default:
                     break;

@@ -2,6 +2,8 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,8 @@ public class RTMPDownloader extends AbstractDownloader {
 
     private int pid = 0;
 
+    @Autowired ProcessBuilderFactory processBuilderFactory;
+
     @Value("${podcastserver.externaltools.rtmpdump:/usr/local/bin/rtmpdump}")
     String rtmpdump;
 
@@ -30,14 +34,12 @@ public class RTMPDownloader extends AbstractDownloader {
         if (item.getUrl().contains("rtmp://")) {
             try {
                 target = getTagetFile(item);
-                ProcessBuilder pb = new ProcessBuilder(rtmpdump,
-                        "-r",
-                        item.getUrl(),
-                        "-o",
-                        target.getAbsolutePath());
-
-                pb.directory(new File("/tmp"));
                 logger.debug("Fichier de sortie : " + target.getAbsolutePath());
+
+                ProcessBuilder pb = processBuilderFactory
+                        .newProcessBuilder(rtmpdump, "-r", getItemUrl(), "-o", target.getAbsolutePath())
+                        .directory(new File("/tmp"));
+
 
                 p  = pb.start();
                 if (p.getClass().getSimpleName().contains("UNIXProcess")) {
@@ -55,12 +57,12 @@ public class RTMPDownloader extends AbstractDownloader {
                     @Override
                     public void run() {
                         BufferedReader br = getBufferedReader(p.getErrorStream());
-                        String ligne = "";
+                        String ligne;
                         Pattern p = Pattern.compile("[^\\(]*\\(([0-9]*).*%\\)");
-                        Matcher m = null;
+                        Matcher m;
                         logger.debug("Lecture du stream d'erreur");
                         try {
-                            long time = System.currentTimeMillis();
+
                             while ((ligne = br.readLine()) != null) {
                                 //logger.debug(ligne);
                                 m = p.matcher(ligne);

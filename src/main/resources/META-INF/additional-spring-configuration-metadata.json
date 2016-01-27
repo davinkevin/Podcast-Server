@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "podcastserver.api.youtube ",
+      "type": "java.lang.String",
+      "description": "Youtube API Key"
+    }
+  ]
+}

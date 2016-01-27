@@ -94,7 +94,7 @@ public class YoutubeWatcherTest {
     public void should_retry_and_stop_download() {
         /* Given */
         YoutubeWatcher watcher = new YoutubeWatcher(YOUTUBE_DOWNLOADER);
-        watcher.MAX_WAITIN_TIME = 0;
+        watcher.MAX_WAITING_MINUTE = 0;
         when(info.getState()).thenReturn(VideoInfo.States.RETRYING);
         when(info.getDelay()).thenReturn(0);
         when(info.getException()).thenReturn(new DownloadIOCodeError(123));

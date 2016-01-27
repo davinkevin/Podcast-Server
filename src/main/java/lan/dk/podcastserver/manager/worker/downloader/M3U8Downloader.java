@@ -4,7 +4,6 @@ import com.google.common.io.ByteStreams;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.utils.URLUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +69,7 @@ public class M3U8Downloader extends AbstractDownloader {
         if (target != null)
             return target;
 
-        String fileNameFromM3U8Playlist = URLUtils.getFileNameM3U8Url(item.getUrl());
+        String fileNameFromM3U8Playlist = urlService.getFileNameM3U8Url(item.getUrl());
 
         File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + fileNameFromM3U8Playlist);
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
@@ -139,15 +138,10 @@ public class M3U8Downloader extends AbstractDownloader {
                     }
 
                     if (downloader.stopDownloading.get()) {
-                        if (Status.STOPPED == item.getStatus()) {
-                            break;
-                        }
+                        if (Status.STOPPED == item.getStatus()) break;
 
-                        if (Status.PAUSED == item.getStatus()) {
-                            synchronized(this) {
-                                wait();
-                            }
-                        }
+                        if (Status.PAUSED == item.getStatus())
+                            synchronized(this) { wait(); }
                     }
                 }
 

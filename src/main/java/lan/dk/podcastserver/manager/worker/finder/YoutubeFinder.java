@@ -40,16 +40,12 @@ public class YoutubeFinder implements Finder {
             throw new FindPodcastNotFoundException();
         }
 
-        Podcast youtubePodcst = new Podcast()
+        return new Podcast()
                 .setUrl(url)
                 .setType("Youtube")
                 .setTitle(getTitle(page))
-                .setDescription(getDescription(page));
-
-        youtubePodcst
+                .setDescription(getDescription(page))
                 .setCover(getCover(page));
-
-        return youtubePodcst;
     }
 
     private String getDescription(Document page) {
