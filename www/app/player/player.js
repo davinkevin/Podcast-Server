@@ -1,13 +1,13 @@
 /**
  * Created by kevin on 25/10/2015 for Podcast Server
  */
-import _ from 'lodash';
 import {RouteConfig, View, HotKeys, Module} from '../decorators';
 import Videogular from '../common/modules/videogular/videogular';
 import AppRouteConfig from '../config/route';
 import DeviceDetectionService from '../common/service/device-detection';
 import PlaylistService from '../common/service/playlistService';
 import template from './player.html!text';
+import './player.css!';
 
 @Module({
     name : 'ps.player',
@@ -68,7 +68,7 @@ export default class PlayerController {
     }
 
     reloadPlaylist() {
-        _.updateinplace(this.playlist, this.playlistService.playlist(), function(inArray, elem) { return _.findIndex(inArray, { 'id': elem.id });});
+        this.playlist = this.playlistService.playlist();
     }
 
     setVideo(index) {

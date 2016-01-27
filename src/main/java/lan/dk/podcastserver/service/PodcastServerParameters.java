@@ -1,6 +1,8 @@
 package lan.dk.podcastserver.service;
 
+import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -104,20 +106,11 @@ public class PodcastServerParameters {
     }
 
 
-
+    @Getter @Setter
+    @Accessors(chain = true)
     public static class Api {
         private String youtube;
         private String dailymotion;
-
-        public Api setYoutube(String youtube) {
-            this.youtube = youtube;
-            return this;
-        }
-
-        public Api setDailymotion(String dailymotion) {
-            this.dailymotion = dailymotion;
-            return this;
-        }
 
         public String youtube() {
             return youtube;

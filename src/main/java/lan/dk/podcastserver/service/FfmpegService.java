@@ -10,7 +10,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 
 /**
- * Created by kevin on 19/07/2014.
+ * Created by kevin on 19/07/2014 for Podcast Server
  */
 @Component("FfmpegService")
 public class FfmpegService {
@@ -33,7 +33,7 @@ public class FfmpegService {
                     "-f",
                     "concat",
                     "-i",
-                    listOfFileToConcat.getAbsolutePath(),
+                    "\"" + listOfFileToConcat.getAbsolutePath().replace("\'", "\\\'") + "\"",
                     "-c",
                     "copy",
                     target.getAbsolutePath());
@@ -72,7 +72,7 @@ public class FfmpegService {
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(listOfFileToConcat)));
         for (File file: files) {
-            writer.write("file '" + file.getAbsolutePath() + "'");
+            writer.write("file '" + file.getAbsolutePath().replace("\'", "\\\'") + "'");
             writer.newLine();
         }
         writer.close();
