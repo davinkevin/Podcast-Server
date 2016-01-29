@@ -7,7 +7,7 @@ import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.service.factory.WGetHelper;
+import lan.dk.podcastserver.service.factory.WGetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import static java.util.Objects.nonNull;
 public class HTTPDownloader extends AbstractDownloader {
 
     @Autowired UrlService urlService;
-    @Autowired WGetHelper wGetHelper;
+    @Autowired WGetFactory wGetFactory;
 
     DownloadInfo info = null;
 
@@ -37,7 +37,7 @@ public class HTTPDownloader extends AbstractDownloader {
         //int borne = randomGenerator.nextInt(100);
         try {
             // initialize url information object
-            info = wGetHelper.wDownloadInfo(urlService.getRealURL(getItemUrl()));
+            info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl()));
             // extract infromation from the web
             Runnable itemSynchronisation = new HTTPWatcher(this);
 
@@ -45,7 +45,7 @@ public class HTTPDownloader extends AbstractDownloader {
             target = getTagetFile(item);
 
             // create wget downloader
-            WGet w = wGetHelper.wGet(info, target);
+            WGet w = wGetFactory.newWGet(info, target);
             // will blocks until download finishes
             w.download(stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
