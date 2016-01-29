@@ -8,7 +8,7 @@ import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.service.factory.WGetHelper;
+import lan.dk.podcastserver.service.factory.WGetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -36,7 +36,7 @@ public class YoutubeDownloader extends AbstractDownloader {
     DownloadInfo downloadInfo;
     VGet v = null;
 
-    @Autowired WGetHelper wGetHelper;
+    @Autowired WGetFactory wGetFactory;
 
     @Override
     public Item download() {
@@ -46,9 +46,9 @@ public class YoutubeDownloader extends AbstractDownloader {
         YoutubeWatcher watcher = new YoutubeWatcher(this);
         try {
             // extract infromation from the web
-            VGetParser parser = wGetHelper.vParser(item.getUrl());
+            VGetParser parser = wGetFactory.parser(item.getUrl());
             info = parser.info(new URL(item.getUrl()));
-            v = wGetHelper.vGet(info);
+            v = wGetFactory.newVGet(info);
 
             // [OPTIONAL] call v.extract() only if you d like to get video title
             // before start download. or just skip it.

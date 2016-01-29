@@ -17,27 +17,27 @@ import java.net.URL;
  * Created by kevin on 15/09/15 for Podcast Server
  */
 @Component
-public class WGetHelper {
+public class WGetFactory {
 
     final UrlService urlService;
 
-    @Autowired WGetHelper(UrlService urlService) {
+    @Autowired WGetFactory(UrlService urlService) {
         this.urlService = urlService;
     }
 
-    public VGetParser vParser(String url) throws MalformedURLException {
+    public VGetParser parser(String url) throws MalformedURLException {
         return VGet.parser(new URL(url));
     }
 
-    public VGet vGet(VideoInfo videoInfo) {
+    public VGet newVGet(VideoInfo videoInfo) {
         return new VGet(videoInfo, null);
     }
 
-    public WGet wGet(DownloadInfo info, File targetFile) {
+    public WGet newWGet(DownloadInfo info, File targetFile) {
         return new WGet(info, targetFile);
     }
 
-    public DownloadInfo wDownloadInfo(String url) throws MalformedURLException {
+    public DownloadInfo newDownloadInfo(String url) throws MalformedURLException {
         return new DownloadInfo(new URL(url));
     }
 }

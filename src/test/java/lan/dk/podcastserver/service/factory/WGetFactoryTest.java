@@ -24,14 +24,14 @@ import static org.mockito.Mockito.mock;
  * Created by kevin on 22/01/2016 for Podcast Server
  */
 @RunWith(MockitoJUnitRunner.class)
-public class WGetHelperTest {
+public class WGetFactoryTest {
 
     @Mock UrlService urlService;
-    @InjectMocks WGetHelper wGetHelper;
+    @InjectMocks WGetFactory wGetFactory;
 
     @Test
     public void should_do_di() {
-        assertThat(wGetHelper.urlService).isNotNull();
+        assertThat(wGetFactory.urlService).isNotNull();
     }
 
     @Test
@@ -40,7 +40,7 @@ public class WGetHelperTest {
         String url = "http://www.youtube.com/foo/bar";
 
         /* When */
-        VGetParser vParser = wGetHelper.vParser(url);
+        VGetParser vParser = wGetFactory.parser(url);
 
         /* Then */
         assertThat(vParser).isNotNull().isInstanceOf(VGetParser.class);
@@ -52,7 +52,7 @@ public class WGetHelperTest {
         VideoInfo videoInfo = new VideoInfo(new URL("http://www.youtube.com/foo/bar"));
 
         /* When */
-        VGet vget = wGetHelper.vGet(videoInfo);
+        VGet vget = wGetFactory.newVGet(videoInfo);
 
         /* Then */
         assertThat(vget).isNotNull().isInstanceOf(VGet.class);
@@ -65,7 +65,7 @@ public class WGetHelperTest {
         Path path = Paths.get("/tmp/afile.tmp");
 
         /* When */
-        WGet wGet = wGetHelper.wGet(downloadInfo, path.toFile());
+        WGet wGet = wGetFactory.newWGet(downloadInfo, path.toFile());
 
         /* Then */
         assertThat(wGet).isNotNull().isInstanceOf(WGet.class);
@@ -77,7 +77,7 @@ public class WGetHelperTest {
         String url = "http://www.youtube.com/user/cauetofficiel";
 
         /* When */
-        DownloadInfo downloadInfo = wGetHelper.wDownloadInfo(url);
+        DownloadInfo downloadInfo = wGetFactory.newDownloadInfo(url);
 
         /* Then */
         assertThat(downloadInfo).isNotNull().isInstanceOf(DownloadInfo.class);
