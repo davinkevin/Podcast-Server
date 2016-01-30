@@ -4,17 +4,17 @@ import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.FfmpegService;
-import lan.dk.podcastserver.utils.URLUtils;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,8 +30,8 @@ import static java.util.Objects.nonNull;
 /**
  * Created by kevin on 13/07/2014.
  */
-@Component("ParleysDownloader")
 @Scope("prototype")
+@Component("ParleysDownloader")
 public class ParleysDownloader extends AbstractDownloader{
 
     public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/{ID_VIDEO}?view=true";
@@ -44,7 +44,8 @@ public class ParleysDownloader extends AbstractDownloader{
     private Long totalSize;
     private int avancementIntermediaire = 0;
 
-    @Resource FfmpegService ffmpegService;
+    @Autowired FfmpegService ffmpegService;
+    @Autowired UrlService urlService;
 
 
     @Override
@@ -165,7 +166,7 @@ public class ParleysDownloader extends AbstractDownloader{
     }
 
     private JSONObject getParseJsonObjectForItem(String url) throws IOException, ParseException {
-        return (JSONObject) new JSONParser().parse(URLUtils.getReaderFromURL(getItemUrl(getParleysId(url))));
+        return (JSONObject) new JSONParser().parse(urlService.getReaderFromURL(getItemUrl(getParleysId(url))));
     }
 
     private class ParleysAssets {
