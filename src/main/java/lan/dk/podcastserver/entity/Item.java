@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import static java.util.Objects.isNull;
 
@@ -96,6 +98,10 @@ public class Item {
 
     @CreatedDate
     private ZonedDateTime creationDate;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
+    private Set<Playlist> playlists = Sets.newHashSet();
 
 
     public String getLocalUri() {
@@ -179,6 +185,7 @@ public class Item {
     @PreRemove
     public void preRemove() {
         checkAndDelete();
+        playlists.forEach(playlist -> playlist.remove(this));
     }
 
     private void checkAndDelete() {

@@ -53,5 +53,5 @@ public class DatabaseConfiguraitonTest {
     public static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
     public static final Operation DELETE_ALL_ITEMS = deleteAllFrom("ITEM");
     public static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAGS"), deleteAllFrom("TAG"));
-    public static final Operation DELETE_ALL = sequenceOf(DELETE_ALL_ITEMS, DELETE_ALL_TAGS, DELETE_ALL_PODCASTS, DELETE_ALL_TAGS);
+    public static final Operation DELETE_ALL = sequenceOf(PlaylistRepositoryTest.DELETE_ALL_PLAYLIST, DELETE_ALL_ITEMS, DELETE_ALL_TAGS, DELETE_ALL_PODCASTS, DELETE_ALL_TAGS);
 }
