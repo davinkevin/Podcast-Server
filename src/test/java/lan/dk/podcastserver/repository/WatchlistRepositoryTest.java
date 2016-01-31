@@ -7,8 +7,8 @@ import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Playlist;
-import lan.dk.podcastserver.entity.PlaylistAssert;
+import lan.dk.podcastserver.entity.WatchList;
+import lan.dk.podcastserver.entity.WatchListAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,23 +36,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {DatabaseConfiguraitonTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
-public class PlaylistRepositoryTest {
+public class WatchListRepositoryTest {
 
     @Autowired DataSource dataSource;
-    @Autowired PlaylistRepository playlistRepository;
+    @Autowired WatchListRepository watchListRepository;
     @Autowired ItemRepository itemRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
-    public static final Operation DELETE_ALL_PLAYLIST = Operations.sequenceOf(deleteAllFrom("PLAYLIST_ITEMS"), deleteAllFrom("PLAYLIST"));
+    public static final Operation DELETE_ALL_PLAYLIST = Operations.sequenceOf(deleteAllFrom("WATCH_LIST_ITEMS"), deleteAllFrom("WATCH_LIST"));
     public static final Operation INSERT_PLAYLIST_DATA = sequenceOf(
             ItemRepositoryTest.INSERT_ITEM_DATA,
-            insertInto("PLAYLIST")
+            insertInto("WATCH_LIST")
                     .columns("ID", "NAME")
                     .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
                     .values(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind")
                     .build(),
-            insertInto("PLAYLIST_ITEMS")
-                    .columns("PLAYLISTS_ID", "ITEMS_ID")
+            insertInto("WATCH_LIST_ITEMS")
+                    .columns("WATCH_LISTS_ID", "ITEMS_ID")
                     .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), 3)
                     .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), 5)
                     .values(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"), 5)
@@ -70,13 +70,13 @@ public class PlaylistRepositoryTest {
     @Test
     public void should_save_a_playlist() {
         /* Given */
-        Playlist playlist = Playlist.builder().name("A New Playlist").build();
+        WatchList watchList = WatchList.builder().name("A New Playlist").build();
 
         /* When */
-        Playlist savedPlaylist = playlistRepository.save(playlist);
+        WatchList savedWatchList = watchListRepository.save(watchList);
 
         /* Then */
-        assertThat(savedPlaylist.getId()).isNotNull();
+        assertThat(savedWatchList.getId()).isNotNull();
     }
 
     @Test
@@ -86,13 +86,13 @@ public class PlaylistRepositoryTest {
         UUID id = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66");
 
         /* When */
-        Playlist playlist = playlistRepository.findOne(id);
+        WatchList watchList = watchListRepository.findOne(id);
 
         /* Then */
-        assertThat(playlist).isNotNull();
-        assertThat(playlist.getItems()).hasSize(2);
-        PlaylistAssert
-                .assertThat(playlist)
+        assertThat(watchList).isNotNull();
+        assertThat(watchList.getItems()).hasSize(2);
+        WatchListAssert
+                .assertThat(watchList)
                 .hasId(id)
                 .hasName("Humour Playlist");
     }
@@ -104,40 +104,40 @@ public class PlaylistRepositoryTest {
         Item item = new Item().setId(5);
 
         /* When */
-        Set<Playlist> playlists = playlistRepository.findContainsItem(item);
+        Set<WatchList> watchLists = watchListRepository.findContainsItem(item);
 
         /* Then */
-        assertThat(playlists).hasSize(2);
+        assertThat(watchLists).hasSize(2);
     }
 
     @Test
     public void should_add_a_item_to_playlist() {
         /* Given */
         Item item = itemRepository.findOne(4);
-        Playlist playlist = playlistRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
+        WatchList watchList = watchListRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
 
         /* When */
-        playlistRepository.save(playlist.add(item));
-        playlistRepository.flush();
-        Playlist fetchedPlaylist = playlistRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
+        watchListRepository.save(watchList.add(item));
+        watchListRepository.flush();
+        WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
 
         /* Then */
-        assertThat(fetchedPlaylist.getItems()).hasSize(2);
+        assertThat(fetchedWatchList.getItems()).hasSize(2);
     }
 
     @Test
     public void should_remove_item_from_playlist() {
         /* Given */
         Item thirdItem = itemRepository.findOne(3);
-        Playlist playlist = playlistRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+        WatchList watchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
 
         /* When */
-        playlistRepository.save(playlist.remove(thirdItem));
-        playlistRepository.flush();
-        Playlist fetchedPlaylist = playlistRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+        watchListRepository.save(watchList.remove(thirdItem));
+        watchListRepository.flush();
+        WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
 
         /* Then */
-        assertThat(fetchedPlaylist.getItems()).hasSize(1);
+        assertThat(fetchedWatchList.getItems()).hasSize(1);
     }
 
     @Test
@@ -147,10 +147,10 @@ public class PlaylistRepositoryTest {
         /* When */
         itemRepository.delete(3);
         itemRepository.flush();
-        Playlist fetchedPlaylist = playlistRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+        WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
 
         /* Then */
-        assertThat(fetchedPlaylist.getItems()).hasSize(1);
+        assertThat(fetchedWatchList.getItems()).hasSize(1);
     }
 
     @Test

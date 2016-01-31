@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Playlist {
+public class WatchList {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -29,20 +29,20 @@ public class Playlist {
     private String name;
 
     @ManyToMany
-    @JsonView(PlaylistDetailsListView.class)
+    @JsonView(WatchListDetailsListView.class)
     private Set<Item> items = Sets.newHashSet();
 
-    public Playlist add(Item item) {
-        item.getPlaylists().add(this);
+    public WatchList add(Item item) {
+        item.getWatchLists().add(this);
         items.add(item);
         return this;
     }
 
-    public Playlist remove(Item item) {
-        item.getPlaylists().remove(this);
+    public WatchList remove(Item item) {
+        item.getWatchLists().remove(this);
         items.remove(item);
         return this;
     }
 
-    public interface PlaylistDetailsListView{};
+    public interface WatchListDetailsListView {};
 }

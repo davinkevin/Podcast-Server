@@ -36,7 +36,7 @@ public interface ItemRepository extends JpaRepository<Item, Integer>, ItemReposi
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Iterable<Item> findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(ZonedDateTime date) {
-        return findAll(hasBeenDownloadedBefore(date).and(isDownloaded(Boolean.TRUE)).and(hasToBeDeleted(Boolean.TRUE)).and(isInAnyPlaylist().not()));
+        return findAll(hasBeenDownloadedBefore(date).and(isDownloaded(Boolean.TRUE)).and(hasToBeDeleted(Boolean.TRUE)).and(isInAnyWatchList().not()));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)

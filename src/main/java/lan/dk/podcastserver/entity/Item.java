@@ -101,7 +101,7 @@ public class Item {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
-    private Set<Playlist> playlists = Sets.newHashSet();
+    private Set<WatchList> watchLists = Sets.newHashSet();
 
 
     public String getLocalUri() {
@@ -185,7 +185,7 @@ public class Item {
     @PreRemove
     public void preRemove() {
         checkAndDelete();
-        playlists.forEach(playlist -> playlist.remove(this));
+        watchLists.forEach(watchList -> watchList.remove(this));
     }
 
     private void checkAndDelete() {

@@ -95,7 +95,7 @@ public class ItemDSL {
         );
     }
 
-    public static BooleanExpression isInAnyPlaylist() {
-        return Q_ITEM.playlists.isNotEmpty();
+    public static BooleanExpression isInAnyWatchList() {
+        return Q_ITEM.watchLists.isNotEmpty();
     }
 }

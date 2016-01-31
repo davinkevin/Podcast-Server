@@ -359,7 +359,7 @@
                     <classes>
                         <param>lan.dk.podcastserver.entity.Cover</param>
                         <param>lan.dk.podcastserver.entity.Item</param>
-                        <param>lan.dk.podcastserver.entity.Playlist</param>
+                        <param>lan.dk.podcastserver.entity.WatchList</param>
                         <param>lan.dk.podcastserver.entity.Podcast</param>
                         <param>lan.dk.podcastserver.entity.Tag</param>
                         <param>lan.dk.podcastserver.entity.Status</param>
