@@ -33,8 +33,7 @@ public class HTTPDownloader extends AbstractDownloader {
     public Item download() {
         logger.debug("Download");
         itemDownloadManager.addACurrentDownload();
-        //this.startDownload();
-        //int borne = randomGenerator.nextInt(100);
+
         try {
             // initialize url information object
             info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl()));
