@@ -18,17 +18,20 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Objects.isNull;
 
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
-    public static final String WS_TOPIC_PODCAST = "/topic/podcast/";
+    public static final String WS_TOPIC_PODCAST = "/topic/podcast/%s";
 
     protected Item item;
     protected String temporaryExtension;
@@ -54,24 +57,24 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Override
     public void run() {
         logger.debug("Run");
-        this.startDownload();
+        startDownload();
     }
 
     @Override
     public void startDownload() {
-        this.item.setStatus(Status.STARTED);
+        item.setStatus(Status.STARTED);
         stopDownloading.set(false);
-        this.saveSyncWithPodcast();
-        this.convertAndSaveBroadcast();
-        this.download();
+        saveSyncWithPodcast();
+        convertAndSaveBroadcast();
+        download();
     }
 
     @Override
     public void pauseDownload() {
-        this.item.setStatus(Status.PAUSED);
+        item.setStatus(Status.PAUSED);
         stopDownloading.set(true);
-        this.saveSyncWithPodcast();
-        this.convertAndSaveBroadcast();
+        saveSyncWithPodcast();
+        convertAndSaveBroadcast();
     }
 
     @Override
@@ -89,44 +92,38 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Transactional
     public void finishDownload() {
         itemDownloadManager.removeACurrentDownload(item);
-        if (target != null) {
-            this.item.setStatus(Status.FINISH);
-            try {
 
-                if (target.getAbsolutePath().contains(temporaryExtension)) { // Si contient l'extention temporaire.
-                    File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
-                    if (targetWithoutExtension.exists())
-                        targetWithoutExtension.delete();
-                    FileUtils.moveFile(target, targetWithoutExtension);
-                    target = targetWithoutExtension;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                logger.error("IOException :", e);
-            }
-
-            this.item.setFileName(FilenameUtils.getName(target.getAbsolutePath()));
-            this.item.setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
-            this.item.setLength(FileUtils.sizeOf(target));
-
-            try {
-                this.item.setMimeType(mimeTypeService.probeContentType(target.toPath()));
-            } catch (IOException e) {
-                e.printStackTrace();
-                this.item.setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
-            }
-
-            this.saveSyncWithPodcast();
-            this.convertAndSaveBroadcast();
-        } else {
+        if (isNull(target)) {
             resetDownload();
+            return;
         }
 
+        item.setStatus(Status.FINISH);
+        try {
 
+            if (target.getAbsolutePath().contains(temporaryExtension)) {
+                File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
+                if (targetWithoutExtension.exists()) targetWithoutExtension.delete();
+                FileUtils.moveFile(target, targetWithoutExtension);
+                target = targetWithoutExtension;
+            }
+            item
+                .setLength(Files.size(target.toPath()))
+                .setMimeType(mimeTypeService.probeContentType(target.toPath()));
+        } catch (IOException e) {
+            logger.error("IOException :", e);
+            item.setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
+        }
+
+        item.setFileName(FilenameUtils.getName(target.getAbsolutePath()));
+        item.setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
+
+        saveSyncWithPodcast();
+        convertAndSaveBroadcast();
     }
 
     public void resetDownload() {
-        this.stopDownload();
+        stopDownload();
     }
 
     @Transactional
@@ -137,7 +134,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
         File finalFile = getTempFile(item);
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
-        //logger.debug(file.getAbsolutePath());
 
         if (!finalFile.getParentFile().exists()) {
             finalFile.getParentFile().mkdirs();
@@ -169,28 +165,27 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     @Transactional
-    protected Item saveSyncWithPodcast() {
+    protected void saveSyncWithPodcast() {
         try {
-            this.item.setPodcast(podcastRepository.findOne(this.item.getPodcast().getId()));
-            return itemRepository.save(this.item);
+            item.setPodcast(podcastRepository.findOne(item.getPodcast().getId()));
+            itemRepository.save(item);
         } catch (Exception e) {
-            logger.error("Error during save and Sync of the item {}", this.item, e);
-            return new Item();
+            logger.error("Error during save and Sync of the item {}", item, e);
         }
     }
 
     @Transactional
     protected void convertAndSaveBroadcast() {
-        this.template.convertAndSend(WS_TOPIC_DOWNLOAD, this.item );
-        this.template.convertAndSend(WS_TOPIC_PODCAST.concat(String.valueOf(item.getPodcast().getId())), this.item );
+        template.convertAndSend(WS_TOPIC_DOWNLOAD, item);
+        template.convertAndSend(String.format(WS_TOPIC_PODCAST, item.getPodcast().getId()), item);
     }
 
     public String getItemUrl() {
         return item.getUrl();
     }
-    
+
     @PostConstruct
     public void postConstruct() {
-        this.temporaryExtension = podcastServerParameters.getDownloadExtension();
+        temporaryExtension = podcastServerParameters.getDownloadExtension();
     }
 }
