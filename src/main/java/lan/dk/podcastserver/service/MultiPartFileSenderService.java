@@ -13,9 +13,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -128,7 +125,7 @@ public class MultiPartFileSenderService {
 
             Long length = Files.size(filepath);
             String fileName = filepath.getFileName().toString();
-            long lastModified = LocalDateTime.ofInstant(Files.getLastModifiedTime(filepath).toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId())).toEpochSecond(ZoneOffset.UTC);
+            long lastModified = Files.getLastModifiedTime(filepath).toMillis();
             String contentType = mimeTypeService.probeContentType(filepath);
 
             // Validate request headers for caching ---------------------------------------------------
