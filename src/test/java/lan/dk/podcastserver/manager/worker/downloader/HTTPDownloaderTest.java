@@ -106,4 +106,26 @@ public class HTTPDownloaderTest {
         verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/file.mp4");
     }
+
+    @Test
+    public void should_pause_a_download() {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+
+        /* When */
+        httpDownloader.pauseDownload();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.PAUSED);
+        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(itemRepository, atLeast(1)).save(eq(item));
+        verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
+    }
+
+
+
 }
