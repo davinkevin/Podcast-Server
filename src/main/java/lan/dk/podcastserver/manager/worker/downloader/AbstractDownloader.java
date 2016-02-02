@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
@@ -79,13 +80,13 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void stopDownload() {
-        this.item.setStatus(Status.STOPPED);
+        item.setStatus(Status.STOPPED);
         stopDownloading.set(true);
-        this.saveSyncWithPodcast();
+        saveSyncWithPodcast();
         itemDownloadManager.removeACurrentDownload(item);
-        if (target != null && target.exists())
+        if (nonNull(target) && target.exists())
             target.delete();
-        this.convertAndSaveBroadcast();
+        convertAndSaveBroadcast();
     }
 
     @Override

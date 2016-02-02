@@ -2,6 +2,8 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
+import com.github.axet.wget.info.ex.DownloadMultipartError;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -30,7 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.*;
 
 /**
@@ -105,6 +110,36 @@ public class HTTPDownloaderTest {
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
         verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/file.mp4");
+    }
+
+    @Test
+    public void should_handle_multipart_download_error() throws MalformedURLException {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        DownloadInfo downloadInfo = mock(DownloadInfo.class);
+        WGet wGet = mock(WGet.class);
+        DownloadMultipartError error = mock(DownloadMultipartError.class);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+        when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
+        when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
+        when(error.getInfo()).thenReturn(downloadInfo);
+        when(downloadInfo.getParts()).thenReturn(Lists.newArrayList(mock(DownloadInfo.Part.class), mock(DownloadInfo.Part.class), mock(DownloadInfo.Part.class)));
+        doThrow(error).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
+
+        /* When */
+        httpDownloader.run();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+        verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
+        verify(itemRepository, atLeast(2)).save(eq(item));
+        verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
 
     @Test
