@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
+import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -161,6 +162,31 @@ public class HTTPDownloaderTest {
         verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
 
+    @Test
+    public void should_handle_downloadunterruptedError() throws MalformedURLException {
+        /* Given */
+        httpDownloader.setItem(item);
 
+        DownloadInfo downloadInfo = mock(DownloadInfo.class);
+        WGet wGet = mock(WGet.class);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+        when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
+        when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
+        doThrow(DownloadInterruptedError.class).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
+
+        /* When */
+        httpDownloader.run();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STARTED);
+        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(itemRepository, atLeast(1)).save(eq(item));
+        verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
+    }
 
 }
