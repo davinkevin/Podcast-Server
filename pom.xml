@@ -319,7 +319,7 @@
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>4.1.0</version>
             </plugin>
             <!-- Code Coverage : generating coverage Report -->
             <plugin>
