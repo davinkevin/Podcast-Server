@@ -26,6 +26,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -189,4 +190,30 @@ public class HTTPDownloaderTest {
         verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
 
+    @Test
+    public void should_handle_IOException() throws MalformedURLException {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        DownloadInfo downloadInfo = mock(DownloadInfo.class);
+        WGet wGet = mock(WGet.class);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+        when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
+        when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
+        doThrow(IOException.class).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
+
+        /* When */
+        httpDownloader.run();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+        verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
+        verify(itemRepository, atLeast(2)).save(eq(item));
+        verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
+    }
 }
