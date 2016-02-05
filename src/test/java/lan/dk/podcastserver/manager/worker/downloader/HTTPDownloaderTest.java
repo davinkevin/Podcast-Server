@@ -216,4 +216,35 @@ public class HTTPDownloaderTest {
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
         verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
+
+    @Test
+    public void should_save_with_same_file_already_existing() throws MalformedURLException {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        DownloadInfo downloadInfo = mock(DownloadInfo.class);
+        WGet wGet = mock(WGet.class);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+        when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
+        when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
+        doAnswer(i -> {
+            Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
+            Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4"));
+            item.setStatus(Status.FINISH);
+            httpDownloader.finishDownload();
+            return null;
+        }).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
+
+        /* When */
+        httpDownloader.run();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.FINISH);
+        assertThat(item.getFileName()).isEqualTo("file.mp4");
+        assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/file.mp4");
+    }
 }
