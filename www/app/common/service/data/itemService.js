@@ -4,17 +4,23 @@
 import angular from 'angular';
 import {Module, Service} from '../../../decorators';
 import RestangularConfig from '../../../config/restangular';
+import PlaylistService from '../playlistService';
 
 @Module({
     name : 'ps.common.service.data.itemService',
-    modules : [ RestangularConfig ]
+    modules : [ RestangularConfig, PlaylistService]
 })
 @Service('itemService')
-export default class itemService {
-    constructor(Restangular) {
+export default class ItemService {
+
+    childRoute = "items";
+
+    constructor(Restangular, $window, $location, playlistService) {
         "ngInject";
         this.Restangular = Restangular;
-        this.childRoute = "items";
+        this.$window = $window;
+        this.$location = $location;
+        this.playlistService = playlistService;
     }
 
     search(searchParameters = { page : 0, size : 12, downloaded : true} ) {
@@ -53,5 +59,21 @@ export default class itemService {
         return podcast.all(this.childRoute)
             .withHttpConfig({transformRequest: angular.identity})
             .customPOST(formData, 'upload', undefined, {'Content-Type': undefined});
+    }
+
+    play(item) {
+        if (ItemService.isVideo(item)) {
+            return this.$location.path(`/podcasts/${item.podcastId}/item/${item.id}/play`);
+        }
+
+        return this.playlistService.play(item);
+    }
+
+    static isVideo(item) {
+        return (item.mimeType) ? item.mimeType.indexOf('video') !== -1 : false;
+    }
+
+    static isAudio(item) {
+        return (item.mimeType) ? item.mimeType.indexOf('audio') !== -1 : false;
     }
 }

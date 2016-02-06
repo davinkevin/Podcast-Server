@@ -47,16 +47,16 @@ export default class PlayerInlineComponent {
             }
         };
 
-        $scope.$watch(
-            () => this.playlistService.playlist().length,
-            (newVal) => this.updateOnPlaylistChange(newVal)
+        $scope.$watchCollection(
+            () => this.playlistService.playlist().map(i => i.id),
+            () => this.updateOnPlaylistChange()
         );
         this.reloadPlaylist();
     }
 
-    updateOnPlaylistChange(newVal) {
-        this.hasToBeShown = newVal > 0;
+    updateOnPlaylistChange() {
         this.reloadPlaylist();
+        this.hasToBeShown = this.playlist.length > 0;
 
         if (!this.hasToBeShown && this.API && this.API.currentState === 'play') {
             return this.API.stop();

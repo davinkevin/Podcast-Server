@@ -1,5 +1,5 @@
 import {Module} from '../../decorators';
-import 'highcharts-release';
+import 'highcharts-dist';
 import HighChartsNg from 'highcharts-ng';
 
 @Module({

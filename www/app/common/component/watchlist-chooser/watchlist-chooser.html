@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h3 class="modal-title">Add to Watch Lists</h3>
+    <!--<h3 class="modal-title" ng-if="::wlc.isInPlayMode()">Watch Lists</h3>-->
+</div>
+<div class="modal-body">
+    <div class="list-group">
+
+        <!-- Add an item to playlist -->
+        <li class="list-group-item"
+           ng-repeat="watchlist in ::wlc.watchLists"
+           ng-class="{'disabled' : wlc.isInPlaylist(watchlist)}"
+           ng-click="wlc.isInPlaylist(watchlist) ? wlc.remove(watchlist) : wlc.select(watchlist)" > {{ ::watchlist.name }}
+            <span ng-if="!wlc.isInPlaylist(watchlist)"  class="fa fa-plus pull-right" aria-hidden="true"></span>
+            <span ng-if="wlc.isInPlaylist(watchlist)" class="fa fa-minus pull-right" aria-hidden="true"></span>
+        </li>
+    </div>
+</div>
+<div class="modal-footer">
+    <div class="input-group">
+        <input type="text" ng-model="wlc.newWatchList" class="form-control" placeholder="WatchList Name">
+        <span class="input-group-addon" ng-click="wlc.newWatchList && wlc.create(wlc.newWatchList)">Add</span>
+    </div>
+</div>

@@ -3,14 +3,16 @@
  */
 import _ from 'lodash';
 import {RouteConfig, View, Module} from '../../decorators';
+import WatchListChooser from '../../common/component/watchlist-chooser/watchlist-chooser';
 import DownloadManager from '../../common/service/data/downloadManager';
 import PlaylistService from '../../common/service/playlistService';
+import ItemService from '../../common/service/data/itemService';
 import HtmlFilters from '../../common/filter/html2plainText';
 import template from './item-details.html!text';
 
 @Module({
     name : 'ps.item.details',
-    modules : [ DownloadManager, HtmlFilters, PlaylistService ]
+    modules : [ DownloadManager, HtmlFilters, PlaylistService, ItemService, WatchListChooser ]
 })
 @RouteConfig({
     path : '/podcasts/:podcastId/item/:itemId',
@@ -25,8 +27,10 @@ import template from './item-details.html!text';
 })
 export default class ItemDetailCtrl {
 
-    constructor($scope, DonwloadManager, $location, playlistService, podcast, item){
+    constructor($scope, DonwloadManager, $location, playlistService, podcast, item, itemService, $uibModal){
         "ngInject";
+        this.$uibModal = $uibModal;
+        this.itemService = itemService;
         this.item = item;
         this.$location = $location;
         this.item.podcast = podcast;
@@ -66,4 +70,20 @@ export default class ItemDetailCtrl {
     isInPlaylist() {
         return this.playlistService.contains(this.item);
     }
+
+    play() {
+        return this.itemService.play(this.item);
+    }
+
+    isVideo() {
+        return ItemService.isVideo(this.item);
+    }
+
+    addToWatchList() {
+        return this.$uibModal.open(WatchListChooser.$UibModalConf.withResolve({
+            item : () => this.item,
+            watchListsOfItem : WatchListService => {"ngInject"; return WatchListService.findAllWithItem(this.item);}
+        }));
+    }
+
 }

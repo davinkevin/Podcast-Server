@@ -17,29 +17,29 @@ System.config({
   separateCSS: true,
 
   map: {
-    "AngularStompDK": "github:davinkevin/AngularStompDK@0.3.4",
-    "angular": "github:angular/bower-angular@1.4.8",
-    "angular-animate": "github:angular/bower-angular-animate@1.4.8",
+    "AngularStompDK": "github:davinkevin/AngularStompDK@0.6.2",
+    "angular": "github:angular/bower-angular@1.4.9",
+    "angular-animate": "github:angular/bower-angular-animate@1.4.9",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.14.3",
-    "angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.4.5",
+    "angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.6.0",
     "angular-loading-bar": "github:chieffancypants/angular-loading-bar@0.8.0",
-    "angular-mocks": "npm:angular-mocks@1.4.8",
+    "angular-mocks": "github:angular/bower-angular-mocks@1.4.9",
     "angular-notification": "github:neoziro/angular-notification@1.1.1",
-    "angular-route": "github:angular/bower-angular-route@1.4.8",
-    "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.8",
-    "angular-touch": "github:angular/bower-angular-touch@1.4.8",
+    "angular-route": "github:angular/bower-angular-route@1.4.9",
+    "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.9",
+    "angular-touch": "github:angular/bower-angular-touch@1.4.9",
     "angular-truncate": "github:sparkalow/angular-truncate@master",
-    "animate.css": "github:daneden/animate.css@3.5.0",
-    "babel": "npm:babel-core@5.8.34",
-    "babel-runtime": "npm:babel-runtime@5.8.34",
+    "animate.css": "github:daneden/animate.css@3.5.1",
+    "babel": "npm:babel-core@5.8.35",
+    "babel-runtime": "npm:babel-runtime@5.8.35",
     "bootstrap-less": "github:distros/bootstrap-less@3.3.9",
-    "clean-css": "npm:clean-css@3.4.8",
+    "clean-css": "npm:clean-css@3.4.9",
     "clipboard": "github:zenorocha/clipboard.js@1.5.5",
     "core-js": "npm:core-js@1.2.6",
     "css": "github:systemjs/plugin-css@0.1.20",
     "font-awesome": "github:components/font-awesome@4.5.0",
+    "highcharts-dist": "github:highcharts/highcharts-dist@4.1.9",
     "highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
-    "highcharts-release": "github:highcharts/highcharts-release@4.1.9",
     "ionicons": "github:driftyco/ionicons@2.0.1",
     "lodash": "github:lodash/lodash@3.10.1",
     "ng-file-upload": "github:danialfarid/ng-file-upload@9.1.2",
@@ -56,37 +56,41 @@ System.config({
     "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@1.4.0",
     "videogular-poster": "github:videogular/bower-videogular-poster@1.4.0",
     "videogular-themes-default": "github:videogular/bower-videogular-themes-default@1.4.0",
-    "github:angular/bower-angular-animate@1.4.8": {
-      "angular": "github:angular/bower-angular@1.4.8"
+    "github:angular/bower-angular-animate@1.4.9": {
+      "angular": "github:angular/bower-angular@1.4.9"
     },
-    "github:angular/bower-angular-route@1.4.8": {
-      "angular": "github:angular/bower-angular@1.4.8"
+    "github:angular/bower-angular-mocks@1.4.9": {
+      "angular": "github:angular/bower-angular@1.4.9"
     },
-    "github:angular/bower-angular-sanitize@1.4.8": {
-      "angular": "github:angular/bower-angular@1.4.8"
+    "github:angular/bower-angular-route@1.4.9": {
+      "angular": "github:angular/bower-angular@1.4.9"
     },
-    "github:angular/bower-angular-touch@1.4.8": {
-      "angular": "github:angular/bower-angular@1.4.8"
+    "github:angular/bower-angular-sanitize@1.4.9": {
+      "angular": "github:angular/bower-angular@1.4.9"
     },
-    "github:chieffancypants/angular-hotkeys@1.4.5": {
-      "angular": "github:angular/bower-angular@1.4.8"
+    "github:angular/bower-angular-touch@1.4.9": {
+      "angular": "github:angular/bower-angular@1.4.9"
+    },
+    "github:chieffancypants/angular-hotkeys@1.6.0": {
+      "angular": "github:angular/bower-angular@1.4.9"
     },
     "github:chieffancypants/angular-loading-bar@0.8.0": {
-      "angular": "github:angular/bower-angular@1.4.8",
+      "angular": "github:angular/bower-angular@1.4.9",
       "css": "github:systemjs/plugin-css@0.1.20"
     },
-    "github:davinkevin/AngularStompDK@0.3.4": {
-      "angular": "github:angular/bower-angular@1.4.8",
-      "stomp-websocket": "github:jmesnil/stomp-websocket@2.3.4"
+    "github:davinkevin/AngularStompDK@0.6.2": {
+      "angular": "github:angular/bower-angular@1.4.9",
+      "angular-mocks": "github:angular/bower-angular-mocks@1.4.9",
+      "stompjs": "github:jmesnil/stomp-websocket@2.3.4"
     },
     "github:distros/bootstrap-less@3.3.9": {
-      "jquery": "github:components/jquery@2.1.4"
+      "jquery": "github:components/jquery@2.2.0"
     },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
     "github:jspm/nodelibs-buffer@0.1.0": {
-      "buffer": "npm:buffer@3.5.5"
+      "buffer": "npm:buffer@3.6.0"
     },
     "github:jspm/nodelibs-events@0.1.1": {
       "events": "npm:events@1.0.2"
@@ -121,11 +125,11 @@ System.config({
       "util": "npm:util@0.10.3"
     },
     "github:mbenford/ngTagsInput@3.0.0": {
-      "angular": "github:angular/bower-angular@1.4.8",
+      "angular": "github:angular/bower-angular@1.4.9",
       "css": "github:systemjs/plugin-css@0.1.20"
     },
     "github:mgonto/restangular@1.5.1": {
-      "angular": "github:angular/bower-angular@1.4.8",
+      "angular": "github:angular/bower-angular@1.4.9",
       "lodash": "npm:lodash@3.10.1"
     },
     "npm:amdefine@1.0.0": {
@@ -137,10 +141,10 @@ System.config({
     "npm:assert@1.3.0": {
       "util": "npm:util@0.10.3"
     },
-    "npm:babel-runtime@5.8.34": {
+    "npm:babel-runtime@5.8.35": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:buffer@3.5.5": {
+    "npm:buffer@3.6.0": {
       "base64-js": "npm:base64-js@0.0.8",
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -148,7 +152,7 @@ System.config({
       "isarray": "npm:isarray@1.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:clean-css@3.4.8": {
+    "npm:clean-css@3.4.9": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "commander": "npm:commander@2.8.1",
       "fs": "github:jspm/nodelibs-fs@0.1.2",

@@ -12,7 +12,7 @@
             <button ng-click="item.download()" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary hidden-xs"><span class="glyphicon glyphicon-save"></span></button>
 
             <!-- Lire dans le player -->
-            <a ng-href="{{ ::'/podcasts/' + item.podcastId + '/item/' + item.id + '/play' }}" ng-show="item.isDownloaded" type="button" class="btn btn-success hidden-xs"><span class="ionicons ion-social-youtube"></span></a>
+            <a ng-click="pic.play(item)" ng-show="item.isDownloaded" type="button" class="btn btn-success hidden-xs"><span class="ionicons ion-social-youtube"></span></a>
 
             <!-- Supprimer l'item -->
             <button ng-click="pic.remove(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' )" type="button" class="btn btn-danger hidden-xs"><span class="glyphicon glyphicon-remove"></span></button>
@@ -22,7 +22,8 @@
                        item="item"
                        local-read="true"
                        on-line-read="true"
-                       playlist-control="true"
+                       playlist-control="'auto'"
+                       watchlist-control="'auto'"
                        reset-item="true"
             >
             </item-menu>

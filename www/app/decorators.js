@@ -131,6 +131,27 @@ export function Constant({ name, value}) {
     };
 }
 
+export function UibModal({animation = true, backdrop = true, bindToController = true, as = 'vm', keyboard = true, resolve, size}) {
+    return Target => {
+        let $UibModalConf = {
+            animation : animation,
+            backdrop : backdrop,
+            bindToController: bindToController,
+            controller : Target,
+            controllerAs : as,
+            keyboard : keyboard,
+            resolve : resolve,
+            size : size,
+            template : Target.$template
+        };
+
+        Target.$UibModalConf = {
+            asDefault : () => $UibModalConf,
+            withResolve : (resolve) => angular.extend({}, $UibModalConf, {resolve : angular.extend({}, $UibModalConf.resolve, resolve) })
+        };
+    };
+}
+
 function snakeCaseToCamelCase(string) {
     return string.replace( /-([a-z])/ig, (_,letter) => letter.toUpperCase());
 }

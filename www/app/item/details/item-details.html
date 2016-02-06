@@ -27,12 +27,16 @@
                         <!-- Lancer le téléchargement -->
                         <button ng-click="idc.item.download()" ng-show="(idc.item.status != 'STARTED' && idc.item.status != 'PAUSED' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
-                        <a ng-href="/podcasts/{{ idc.item.podcast.id }}/item/{{ idc.item.id }}/play" ng-show="idc.item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
+                        <a ng-click="idc.play()" ng-show="idc.item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
 
                         <!-- Add to Playlist -->
-                        <a ng-show="idc.item.isDownloaded" ng-click="idc.toggleInPlaylist()" type="button" class="btn btn-primary">
+                        <a ng-show="idc.item.isDownloaded && !idc.isVideo()" ng-click="idc.toggleInPlaylist()" type="button" class="btn btn-primary">
                             <span ng-hide="idc.isInPlaylist()" class="glyphicon glyphicon-plus"></span>
                             <span ng-show="idc.isInPlaylist()" class="glyphicon glyphicon-minus"></span>
+                        </a>
+
+                        <a ng-show="idc.item.isDownloaded && idc.isVideo()" ng-click="idc.addToWatchList()" type="button" class="btn btn-primary">
+                            <span class="fa fa-align-justify"></span>
                         </a>
 
                         <item-menu item="idc.item"

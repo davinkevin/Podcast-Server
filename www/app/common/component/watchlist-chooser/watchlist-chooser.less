@@ -1,0 +1,35 @@
+
+body.modal-open {
+  .modal-backdrop {
+    height: 1000%;
+  }
+
+  .modal-header, .modal-footer {
+    border-bottom: none;
+    border-top: none;
+  }
+
+  .modal-body {
+
+    padding: 0;
+
+    .list-group {
+
+      margin-bottom: 0;
+
+      .list-group-item {
+
+        border-radius: 0;
+
+        &.play-mode {
+          cursor: pointer;
+        }
+
+        cursor: default !important;
+        span.fa {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

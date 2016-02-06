@@ -6,31 +6,42 @@ import Videogular from '../common/modules/videogular/videogular';
 import AppRouteConfig from '../config/route';
 import DeviceDetectionService from '../common/service/device-detection';
 import PlaylistService from '../common/service/playlistService';
+import WatchListService from '../common/service/data/watchlistService';
 import template from './player.html!text';
 import './player.css!';
 
 @Module({
     name : 'ps.player',
-    modules : [ AppRouteConfig, Videogular, DeviceDetectionService, PlaylistService ]
+    modules : [ AppRouteConfig, Videogular, DeviceDetectionService, PlaylistService, WatchListService ]
 })
 @RouteConfig({
     path : '/player',
-    as : 'pc'
+    as : 'pc',
+    resolve : {
+        watchLists : WatchListService => { "ngInject"; return WatchListService.findAll();}
+    }
 })
 @HotKeys({})
 @View({
     template : template
 })
 export default class PlayerController {
-    constructor(playlistService, $timeout, deviceDetectorService) {
-        "ngInject";
-        this.playlistService = playlistService;
-        this.$timeout = $timeout;
 
-        this.playlist = [];
-        this.state = null;
-        this.API = null;
-        this.currentVideo = {};
+    state = null;
+    API = null;
+
+    currentVideo = {};
+    currentWatchList = null;
+
+    playlist = null;
+    watchLists = null;
+
+    constructor(watchLists, deviceDetectorService, WatchListService) {
+        "ngInject";
+        this.watchListService = WatchListService;
+
+        this.watchLists = watchLists;
+
         this.config = {
             autoPlay : true,
             sources: [],
@@ -42,7 +53,11 @@ export default class PlayerController {
                 poster: ''
             }
         };
-        this.reloadPlaylist();
+    }
+
+    play() {
+        if (this.hasAWatchListWithItems())
+            return this.setVideo(0);
     }
 
     onPlayerReady(API) {
@@ -52,27 +67,23 @@ export default class PlayerController {
             this.API.play();
 
         this.isCompleted = false;
-        this.setVideo(0);
+        this.play();
     }
 
     onCompleteVideo() {
         var indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
         this.isCompleted = true;
 
-        if (indexOfVideo+1 === this.playlist.length) {
-            this.currentVideo = this.playlist[0];
+        if (indexOfVideo+1 === this.currentWatchList.items.length) {
+            [this.currentVideo] = this.currentWatchList.items;
             return;
         }
 
         this.setVideo(indexOfVideo+1);
     }
 
-    reloadPlaylist() {
-        this.playlist = this.playlistService.playlist();
-    }
-
     setVideo(index) {
-        this.currentVideo = this.playlist[index];
+        this.currentVideo = this.currentWatchList.items[index];
 
         if (this.currentVideo !== null && this.currentVideo !== undefined) {
             this.API.stop();
@@ -82,19 +93,51 @@ export default class PlayerController {
     }
 
     remove(item) {
-        this.playlistService.remove(item);
-        this.reloadPlaylist();
-        if (this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL) {
-            this.setVideo(0);
-        }
+        this.watchListService
+            .removeItemFromWatchList(this.currentWatchList, item)
+            .then(() => this.currentWatchList.items.splice(this.currentWatchList.items.indexOf(item), 1))
+            .then(() => this.isCurrentlyPlaying(item) &&  this.play());
+    }
+
+    isCurrentlyPlaying(item) {
+        return this.config.sources.length > 0 && this.config.sources[0].src === item.proxyURL;
     }
 
     removeAll() {
-        this.playlistService.removeAll();
-        this.reloadPlaylist();
+        this.API.clearMedia();
+        this.$q
+            .all(this.currentWatchList.items.map(i => this.watchListService.removeItemFromWatchList(this.currentWatchList, i)))
+            .then(() => this.currentWatchList = this.watchListService.findOne(this.currentWatchList.id))
+            .then(() => this.start())
+        ;
     }
 
     getIndexOfVideoInPlaylist(item) {
-        return this.playlist.indexOf(item);
+        return this.currentWatchList.items.indexOf(item);
+    }
+
+    loadWatchList() {
+        this.watchListService.findAll()
+            .then(watchLists => this.watchLists = watchLists);
+    }
+
+    selectWatchList(watchList) {
+        return this.watchListService
+            .findOne(watchList.id)
+            .then( w => {
+                this.currentWatchList = w;
+                this.watchLists = null;
+            })
+            .then( () => this.play());
+    }
+
+    removeWatchList(watchList) {
+        return this.watchListService
+                .delete(watchList.id)
+                .then(() => this.loadWatchList());
+    }
+
+    hasAWatchListWithItems() {
+        return this.currentWatchList && this.currentWatchList.items.length > 0;
     }
 }

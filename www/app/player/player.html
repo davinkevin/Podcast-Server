@@ -26,13 +26,24 @@
     </div>
     <div class="playlist col-lg-4">
         <div class="row button-list">
-            <div class="col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center" ng-click="pc.reloadPlaylist()"><span class="ionicons ion-refresh"></span> Refresh</div>
-            <div class="col-lg-6 col-sm-6 col-xs-6 col-md-6 text-center" ng-click="pc.removeAll ()"><span class="ionicons ion-trash-b"></span> Empty</div>
+            <div class="col-lg-4 col-sm-4 col-xs-4 col-md-4 text-center" ng-click="pc.loadWatchList()"><span class="fa fa-align-justify"></span> WatchList</div>
+            <!--
+            <div class="col-lg-4 col-sm-4 col-xs-4 col-md-4 text-center" ng-click="pc.reloadPlaylist()"><span class="ionicons ion-refresh"></span> Refresh</div>
+            <div class="col-lg-4 col-sm-4 col-xs-4 col-md-4 text-center" ng-click="pc.removeAll ()"><span class="ionicons ion-trash-b"></span> Empty</div>
+            -->
         </div>
 
         <!--<div class="item-playlist">-->
 
-        <div class="media clearfix" ng-repeat="item in pc.playlist track by item.id" ng-class="{'isReading' : pc.currentVideo.id === item.id}">
+        <div class="watch-lists clearfix" ng-if="pc.watchLists" ng-repeat="watchList in pc.watchLists track by watchList.id">
+            <button ng-click="pc.removeWatchList(watchList)" type="button" class="pull-right close"><span aria-hidden="true">&times;</span></button>
+
+            <div class="watch-lists-body" ng-click="pc.selectWatchList(watchList)">
+                <p class="">{{ ::watchList.name }}</p>
+            </div>
+        </div>
+
+        <div class="media clearfix" ng-if="!pc.watchLists" ng-repeat="item in pc.currentWatchList.items track by item.id" ng-class="{'isReading' : pc.currentVideo.id === item.id}">
             <button ng-click="pc.remove(item)" type="button" class="pull-right close"><span aria-hidden="true">&times;</span></button>
 
             <a class="pull-left cover" ng-click="pc.setVideo($index)">

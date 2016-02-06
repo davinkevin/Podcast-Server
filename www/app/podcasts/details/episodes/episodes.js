@@ -4,11 +4,12 @@
 import {Component, View, Module, Constant} from '../../../decorators';
 import HtmlFilters from '../../../common/filter/html2plainText';
 import PlaylistService from '../../../common/service/playlistService';
+import ItemService from '../../../common/service/data/itemService';
 import template from './episodes.html!text';
 
 @Module({
     name : 'ps.podcasts.details.episodes',
-    modules : [ PlaylistService, HtmlFilters ]
+    modules : [ PlaylistService, HtmlFilters, ItemService ]
 })
 @Component({
     selector : 'podcast-items-list',
@@ -23,10 +24,11 @@ import template from './episodes.html!text';
 })
 export default class PodcastItemsListComponent {
 
-    constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService, hotkeys ) {
+    constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService, hotkeys, $window ) {
         "ngInject";
         /* DI */
         this.$scope = $scope;
+        this.$window = $window;
         this.DownloadManager = DonwloadManager;
         this.itemService = itemService;
         this.playlistService = playlistService;
@@ -89,5 +91,8 @@ export default class PodcastItemsListComponent {
     }
     toggleDownload(item) {
         this.DownloadManager.ws.toggle(item);
+    }
+    play(item){
+        return this.itemService.play(item);
     }
 }

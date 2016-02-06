@@ -32,25 +32,24 @@ public class WatchListController {
         return watchListBusiness.findAll();
     }
 
-    @JsonView(WatchListDetailsListView.class)
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public WatchList findOne(@PathVariable UUID id) {
         return watchListBusiness.findOne(id);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
-    public void delete(UUID uuid) {
-        watchListBusiness.delete(uuid);
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable UUID id) {
+        watchListBusiness.delete(id);
     }
 
     @JsonView(WatchListDetailsListView.class)
-    @RequestMapping(value = "{id}/add/{itemId}")
+    @RequestMapping(value = "{id}/{itemId}", method = RequestMethod.POST)
     public WatchList add(@PathVariable UUID id, @PathVariable Integer itemId) {
         return watchListBusiness.add(id, itemId);
     }
 
     @JsonView(WatchListDetailsListView.class)
-    @RequestMapping(value = "{id}/remove/{itemId}")
+    @RequestMapping(value = "{id}/{itemId}", method = RequestMethod.DELETE)
     public WatchList remove(@PathVariable UUID id, @PathVariable Integer itemId) {
         return watchListBusiness.remove(id, itemId);
     }

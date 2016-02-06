@@ -17,6 +17,13 @@ export default class PlaylistService {
     playlist() {
         return this.$localStorage.playlist;
     }
+    isEmpty() {
+        return this.playlist().length === 0;
+    }
+    play(item) {
+        this.removeAll();
+        this.add(item);
+    }
     add(item) {
         this.playlist().push(item);
     }

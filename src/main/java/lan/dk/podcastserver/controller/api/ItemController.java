@@ -2,13 +2,15 @@ package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lan.dk.podcastserver.business.ItemBusiness;
+import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.MultiPartFileSenderService;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,19 +22,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Set;
 
 /**
  * Created by kevin on 26/12/2013.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/podcast/{idPodcast}/items")
 public class ItemController {
-
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     
     @Resource ItemBusiness itemBusiness;
     @Resource ItemDownloadManager itemDownloadManager;
     @Resource MultiPartFileSenderService multiPartFileSenderService;
+    @Autowired WatchListBusiness watchListBusiness;
 
     @RequestMapping(method = RequestMethod.POST)
     @JsonView(Item.ItemPodcastListView.class)
@@ -53,6 +56,12 @@ public class ItemController {
         return itemBusiness.save(item);
     }
 
+    @RequestMapping(value="{id:[\\d]+}/watchlists", method = RequestMethod.GET)
+    @JsonView(Object.class)
+    public Set<WatchList> getWatchListOfItem(@PathVariable(value = "id") int id) {
+        return watchListBusiness.findContainsItem(id);
+    }
+
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete (@PathVariable(value = "id") int id) {
@@ -66,10 +75,10 @@ public class ItemController {
 
     @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
     public void getEpisodeFile(@PathVariable Integer id, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        logger.debug("Download du fichier d'item {}", id);
+        log.debug("Download du fichier d'item {}", id);
         Item item = itemBusiness.findOne(id);
         if (item.isDownloaded()) {
-            logger.debug("Récupération en local de l'item {} au chemin {}", id, item.getLocalUri());
+            log.debug("Récupération en local de l'item {} au chemin {}", id, item.getLocalUri());
             multiPartFileSenderService.fromPath(item.getLocalPath())
                     .with(request)
                     .with(response)

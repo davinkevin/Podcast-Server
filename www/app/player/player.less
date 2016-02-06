@@ -7,6 +7,8 @@
     .button-list {
       color: white;
       padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: thin solid #1D1D1D;
     }
 
     .player {
@@ -23,6 +25,15 @@
       width: 100%;
       height: auto;
     }
+
+    .watch-lists {
+      color : white;
+      .watch-lists-body > p {
+        border-bottom: thin solid #1D1D1D;
+        padding-bottom: 10px;
+      }
+    }
+
     .playlist {
 
       @media screen and (min-width: @screen-lg-min) {
@@ -32,7 +43,7 @@
         padding-bottom: 16px;
       }
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: visible;
       height: 500px;
       .media {
         margin-top: 0;

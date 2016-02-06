@@ -24,14 +24,19 @@
             </a>
         </li>
         <li ng-if="::(imc.readInPlayer)">
-            <a ng-href="/podcasts/{{ imc.item.podcastId }}/item/{{ imc.item.id }}/play" ng-show="imc.item.isDownloaded">
+            <a ng-show="imc.item.isDownloaded" ng-click="imc.play(imc.item)">
                 <span class="ionicons ion-social-youtube text-success"></span> Read in the player
             </a>
         </li>
-        <li ng-if="::(imc.playlistControl)" ng-show="imc.item.isDownloaded">
+        <li ng-if="::(imc.playlistControl === true || imc.playlistControl === 'auto')" ng-show="imc.item.isDownloaded && imc.hasToBeVisible('playlistControl')">
             <a ng-click="imc.addOrRemove(imc.item)">
                 <span ng-hide="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-plus text-primary"></span> Add to Playlist</span>
                 <span ng-show="imc.isInPlaylist(imc.item)"><span class="glyphicon glyphicon-minus text-primary"></span> Remove from Playlist</span>
+            </a>
+        </li>
+        <li ng-if="::(imc.watchlistControl === true || imc.watchlistControl === 'auto')" ng-show="imc.item.isDownloaded && imc.hasToBeVisible('watchlistControl')">
+            <a ng-click="imc.addToWatchList()">
+                <span class="fa fa-align-justify text-primary"></span> WatchList
             </a>
         </li>
         <li>
