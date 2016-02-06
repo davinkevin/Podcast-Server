@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Created by kevin on 18/12/14.
  */
+@Slf4j
 @Component("JeuxVideoComUpdater")
 public class JeuxVideoComUpdater extends AbstractUpdater {
 
@@ -36,7 +38,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
         try {
             page = htmlService.connectWithDefault(podcast.getUrl()).get();
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
             return Sets.newHashSet();
         }
 
@@ -53,7 +55,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
         try {
             page = htmlService.connectWithDefault(completeUrl).get();
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
             return Item.DEFAULT_ITEM;
         }
 
@@ -73,7 +75,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
             Document page = htmlService.connectWithDefault(podcast.getUrl()).get();
             return signatureService.generateMD5Signature(page.select("article").html());
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
         }
 
         return "";

@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,6 +33,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Created by kevin on 09/08/2014 for Podcast Server
  */
+@Slf4j
 @Component("PluzzUpdater")
 public class PluzzUpdater extends AbstractUpdater {
 
@@ -52,7 +54,7 @@ public class PluzzUpdater extends AbstractUpdater {
         try {
             page = htmlService.connectWithDefault(listingUrl).execute().parse();
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
             return new HashSet<>();
         }
 
@@ -102,7 +104,7 @@ public class PluzzUpdater extends AbstractUpdater {
 
             return signatureService.generateMD5Signature((listOfItem.size() == 0) ? page.html() : listOfItem.html());
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
         }
         return "";
     }
@@ -119,7 +121,7 @@ public class PluzzUpdater extends AbstractUpdater {
     private Item getPluzzItemById(String pluzzId) {
         JSONParser parser = new JSONParser();
         try {
-            logger.debug(getPluzzJsonInformation(pluzzId));
+            log.debug(getPluzzJsonInformation(pluzzId));
             JSONObject responseObject = (JSONObject) parser.parse(urlService.getReaderFromURL(getPluzzJsonInformation(pluzzId)));
 
             String season = String.valueOf(responseObject.get("saison"));
@@ -133,10 +135,10 @@ public class PluzzUpdater extends AbstractUpdater {
                     .setCover( imageService.getCoverFromURL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image"))))
                     .setUrl( getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
 
-            logger.debug(itemToReturn.toString());
+            log.debug(itemToReturn.toString());
             return itemToReturn;
         } catch (IOException | ParseException e) {
-            logger.error("Error during getPluzzItemById", e);
+            log.error("Error during getPluzzItemById", e);
         }
 
         return Item.DEFAULT_ITEM;

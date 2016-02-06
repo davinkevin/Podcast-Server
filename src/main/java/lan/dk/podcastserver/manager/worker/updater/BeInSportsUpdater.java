@@ -6,6 +6,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -34,6 +35,7 @@ import static java.util.stream.Collectors.toSet;
  * Utilisation de referrer et User-Agent : http://stackoverflow.com/questions/6581655/jsoup-useragent-how-to-set-it-right
  *
  */
+@Slf4j
 @Component("BeInSportsUpdater")
 public class BeInSportsUpdater extends AbstractUpdater {
 
@@ -55,7 +57,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         try {
             page = htmlService.get(podcast.getUrl());
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
             return Sets.newHashSet();
         }
 
@@ -84,7 +86,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
             document = htmlService.get(urlItemBeInSport);
             javascriptCode = getJavascriptPart(htmlService.get(PROTOCOL + document.select("iframe").attr("src")).select("script"));
         } catch (IOException | IllegalArgumentException e) {
-            logger.error("Error during fetch of {}", urlItemBeInSport, e);
+            log.error("Error during fetch of {}", urlItemBeInSport, e);
             return Item.DEFAULT_ITEM;
         }
 
@@ -126,7 +128,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
             Document page = htmlService.get(listingUrl);
             return signatureService.generateMD5Signature(page.select(".cluster_video").html());
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
         }
 
         return StringUtils.EMPTY;

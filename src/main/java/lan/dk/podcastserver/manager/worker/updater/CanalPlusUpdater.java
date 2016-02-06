@@ -6,6 +6,7 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.JDOMException;
 import org.jsoup.nodes.Document;
@@ -24,13 +25,16 @@ import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toSet;
 
+@Slf4j
 @Component("CanalPlusUpdater")
 public class CanalPlusUpdater extends AbstractUpdater {
 
     public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
-    public static final String FRONT_TOOLS_URL_PATTERN = "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=%d&ztid=%d&nbPlusVideos0=1";
+    public static final String FRONT_TOOLS_URL_PATTERN = "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=%d&ztid=%d&nbPlusVideos0=1%s";
     public static final String XML_INFORMATION_PATTERN = "http://service.canal-plus.com/video/rest/getVideos/cplus/%d";
     public static final Pattern ID_EXTRACTOR = Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
+    public static final Pattern NB_PLUS_VIDEOS_PATTERN = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
+    public static final Pattern TABS_EXTRACTOR = Pattern.compile(".*tab=1-([0-9]*).*");
     public static final String FIELD_TITRAGE = "TITRAGE";
     public static final String FIELD_TITRE = "TITRE";
     public static final String FIELD_PUBLICATION = "PUBLICATION";
@@ -51,7 +55,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
     @Resource UrlService urlService;
-    public static final Pattern NB_PLUS_VIDEOS_PATTERN = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
 
 
     public Set<Item> getItems(Podcast podcast) {
@@ -68,17 +71,19 @@ public class CanalPlusUpdater extends AbstractUpdater {
         try {
             page = htmlService.get(url);
         } catch (IOException e) {
-            logger.error("IOException :", e);
+            log.error("IOException :", e);
             return "";
         }
 
-        Matcher m = ID_EXTRACTOR.matcher(page.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"));
+        Matcher tabs = TABS_EXTRACTOR.matcher(url);
+        String liste = tabs.find() ? String.format("&liste=%d", Integer.parseInt(tabs.group(1))-1) : "";
 
-        if (!m.find()) {
+        Matcher ids = ID_EXTRACTOR.matcher(page.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"));
+        if (!ids.find()) {
             return "";
         }
 
-        return String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
+        return String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.group(1)), Integer.parseInt(ids.group(2)), liste);
     }
 
     private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
@@ -86,27 +91,28 @@ public class CanalPlusUpdater extends AbstractUpdater {
         Matcher m = NB_PLUS_VIDEOS_PATTERN.matcher(canalPlusFrontToolsUrl);
 
         if (!m.find()) {
-            logger.error("nbPlusVideos Introuvable pour le show {}", canalPlusFrontToolsUrl);
+            log.error("nbPlusVideos Introuvable pour le show {}", canalPlusFrontToolsUrl);
             return new Elements();
         }
 
         int nbPlusVideos = Integer.parseInt(m.group(1));
-        logger.debug("nbPlusVideos = " + nbPlusVideos);
+        log.debug("nbPlusVideos = " + nbPlusVideos);
 
         Document page;
         try {
             page = htmlService.get(canalPlusFrontToolsUrl);
         } catch (IOException e) {
-            logger.error("Error during loading of url : {}", canalPlusFrontToolsUrl, e);
+            log.error("Error during loading of url : {}", canalPlusFrontToolsUrl, e);
             return new Elements();
         }
 
-        return page.select("ul.features").get(nbPlusVideos).select("li");
+        return page.select("ul.features, ul.unit-gallery2").get(nbPlusVideos).select("li");
     }
 
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
         return getHTMLListingEpisodeFromFrontTools(urlFrontTools)
                 .stream()
+                .filter(e -> !e.hasClass("blankMS"))
                 .map(e -> e.select("li._thumbs").first().id().replace("video_", ""))
                 .map(Integer::valueOf)
                 .map(this::getItemFromVideoId)
@@ -119,7 +125,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
         try {
             xmlEpisode = jdomService.parse(String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo));
         } catch (IOException | JDOMException e) {
-            logger.error("Exception during parsing of : {}", String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo), e);
+            log.error("Exception during parsing of : {}", String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo), e);
             return Item.DEFAULT_ITEM;
         }
 

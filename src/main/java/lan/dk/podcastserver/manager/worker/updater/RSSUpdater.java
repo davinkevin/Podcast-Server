@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -21,6 +22,7 @@ import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toSet;
 
+@Slf4j
 @Component("RSSUpdater")
 public class RSSUpdater extends AbstractUpdater {
 
@@ -42,11 +44,11 @@ public class RSSUpdater extends AbstractUpdater {
         String currentCoverURL = getCoverUrl(podcastXMLSource);
 
         if (podcast.getCover() == null) {
-            logger.debug("Traitement de la cover général du podcast");
+            log.debug("Traitement de la cover général du podcast");
             podcast.setCover(imageService.getCoverFromURL(currentCoverURL));
         }
 
-        logger.debug("Traitement des Items");
+        log.debug("Traitement des Items");
         // Parcours des éléments :
         return podcastXMLSource
                 .getRootElement()
@@ -99,7 +101,7 @@ public class RSSUpdater extends AbstractUpdater {
         try {
             return ZonedDateTime.parse(item.getChildText("pubDate").replace(" PST", " +0800"), DateTimeFormatter.RFC_1123_DATE_TIME);
         } catch (Exception e) {
-            logger.error("Problem during date parsing", e);
+            log.error("Problem during date parsing", e);
             // No better idea than returning null for unparseable date
             return null;
         }

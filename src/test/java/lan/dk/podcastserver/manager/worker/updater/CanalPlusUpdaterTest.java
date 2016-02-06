@@ -155,6 +155,22 @@ public class CanalPlusUpdaterTest {
     }
 
     @Test
+    public void should_handle_podcast_in_tabs_view() throws IOException, URISyntaxException, JDOMException {
+        /* Given */
+        podcast.setUrl(podcast.getUrl() + "&tab=1-6");
+        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/page_with_tabs.html"));
+        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6130&ztid=6112&nbPlusVideos0=1&liste=5"))).then(readHtmlFromFile("/remote/podcast/canalplus/page_with_tabs_front_tools.html"));
+        doThrow(IOException.class).when(jdomService).parse(anyString());
+
+        /* When */
+        Set<Item> items = canalPlusUpdater.getItems(podcast);
+
+        /* Then */
+        assertThat(items).hasSize(1);
+        verify(jdomService, times(16)).parse(anyString());
+    }
+
+    @Test
     public void should_have_a_type() {
         assertThat(canalPlusUpdater.type().key()).isEqualTo("CanalPlus");
         assertThat(canalPlusUpdater.type().name()).isEqualTo("Canal+");

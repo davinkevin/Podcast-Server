@@ -8,6 +8,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -30,6 +31,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
+@Slf4j
 @Component("YoutubeUpdater")
 public class YoutubeUpdater extends AbstractUpdater {
 
@@ -55,7 +57,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @SuppressWarnings("unchecked")
     private Set<Item> getItemsByAPI(Podcast podcast) {
-        logger.info("Youtube Update by API");
+        log.info("Youtube Update by API");
 
         String playlistId = isPlaylist(podcast.getUrl()) ? playlistIdOf(podcast.getUrl()) : transformChannelIdToPlaylistId(channelIdOf(podcast.getUrl()));
         String url = String.format(API_PLAYLIST_URL, playlistId, podcastServerParameters.api().youtube());
@@ -63,7 +65,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         try {
             response = JSONObject.class.cast(parser.parse(urlService.getReaderFromURL(url)));
         } catch (ParseException | IOException | Error e) {
-            logger.error("Error during fetching of API Playlist {} => {}", podcast.getTitle(), url, e);
+            log.error("Error during fetching of API Playlist {} => {}", podcast.getTitle(), url, e);
             return Sets.newHashSet();
         }
 
@@ -114,12 +116,12 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     private Set<Item> getItemsByRss(Podcast podcast) {
-        logger.info("Youtube Update by RSS");
+        log.info("Youtube Update by RSS");
         Document podcastXMLSource;
         try {
             podcastXMLSource = xmlOf(podcast.getUrl());
         } catch (JDOMException | IOException e) {
-            logger.error("Error during youtube parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
+            log.error("Error during youtube parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
             return Sets.newHashSet();
         }
 
@@ -148,7 +150,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
             return signatureService.generateMD5Signature(stringToSign);
         } catch (JDOMException | IOException e) {
-            logger.error("Error during youtube signature & parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
+            log.error("Error during youtube signature & parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
             return "";
         }
 
@@ -202,7 +204,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         try {
             page = htmlService.connectWithDefault(url).get();
         } catch (IOException e) {
-            logger.error("IOException : {}", url, e);
+            log.error("IOException : {}", url, e);
             return "";
         }
 

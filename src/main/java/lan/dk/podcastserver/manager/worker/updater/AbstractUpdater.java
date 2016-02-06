@@ -6,9 +6,8 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -16,10 +15,9 @@ import javax.validation.Validator;
 import java.util.Set;
 import java.util.function.Predicate;
 
+@Slf4j
 @Transactional(noRollbackFor=Exception.class)
 public abstract class AbstractUpdater implements Updater {
-
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource PodcastServerParameters podcastServerParameters;
     @Resource SignatureService signatureService;
@@ -27,13 +25,13 @@ public abstract class AbstractUpdater implements Updater {
 
     public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
         try {
-            logger.info("Ajout du podcast \"{}\" à l'executor", podcast.getTitle());
+            log.info("Ajout du podcast \"{}\" à l'executor", podcast.getTitle());
             String signature = signatureOf(podcast);
             if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
                 podcast.setSignature(signature);
                 return UpdateTuple.of(podcast, getItems(podcast), notIn(podcast));
             } else {
-                logger.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());
+                log.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());
             }
 
         } catch (Exception e) {

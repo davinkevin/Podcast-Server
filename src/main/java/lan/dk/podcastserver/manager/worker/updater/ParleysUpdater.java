@@ -5,18 +5,19 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,10 +27,9 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Created by kevin on 12/07/2014.
  */
+@Slf4j
 @Component("ParleysUpdater")
 public class ParleysUpdater extends AbstractUpdater {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static final String PARLEYS_PATTERN = "EEE MMM dd HH:mm:ss z yyyy";
     public static final String PARLEYS_CHANNEL_API_URL = "http://api.parleys.com/api/presentations.json/%s?index=0&size=%s&text=&orderBy=date";
@@ -58,7 +58,7 @@ public class ParleysUpdater extends AbstractUpdater {
         try {
             jsonObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
         } catch (IOException | ParseException e) {
-            logger.error("Error during fetch of Parleys Podcast {}", podcast.getUrl(), e);
+            log.error("Error during fetch of Parleys Podcast {}", podcast.getUrl(), e);
             return Sets.newHashSet();
         }
 
@@ -78,7 +78,7 @@ public class ParleysUpdater extends AbstractUpdater {
         try {
             podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
         } catch (IOException | ParseException e) {
-            logger.error("Error during parsing of {}", podcast, e);
+            log.error("Error during parsing of {}", podcast, e);
             return "";
         }
 
@@ -93,7 +93,7 @@ public class ParleysUpdater extends AbstractUpdater {
         try {
             responseObject = (JSONObject) parser.parse(urlService.getReaderFromURL(getItemUrl(id)));
         } catch (IOException | ParseException e) {
-            logger.error("Error during fetching of item of id {}", id, e);
+            log.error("Error during fetching of item of id {}", id, e);
             return Item.DEFAULT_ITEM;
         }
 
