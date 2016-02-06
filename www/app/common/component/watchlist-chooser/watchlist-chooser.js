@@ -24,6 +24,7 @@ import './watchlist-chooser.css!';
 export default class WatchlistChooser {
 
     constructor(item, watchListsOfItem, watchLists, $uibModalInstance, WatchListService) {
+        "ngInject";
         this.$uibModalInstance = $uibModalInstance;
         this.watchListService = WatchListService;
 

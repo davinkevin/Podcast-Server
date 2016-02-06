@@ -18,23 +18,23 @@ System.config({
 
   map: {
     "AngularStompDK": "github:davinkevin/AngularStompDK@0.6.2",
-    "angular": "github:angular/bower-angular@1.4.9",
-    "angular-animate": "github:angular/bower-angular-animate@1.4.9",
+    "angular": "github:angular/bower-angular@1.5.0",
+    "angular-animate": "github:angular/bower-angular-animate@1.5.0",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.14.3",
     "angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.6.0",
     "angular-loading-bar": "github:chieffancypants/angular-loading-bar@0.8.0",
-    "angular-mocks": "github:angular/bower-angular-mocks@1.4.9",
+    "angular-mocks": "github:angular/bower-angular-mocks@1.5.0",
     "angular-notification": "github:neoziro/angular-notification@1.1.1",
-    "angular-route": "github:angular/bower-angular-route@1.4.9",
-    "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.9",
-    "angular-touch": "github:angular/bower-angular-touch@1.4.9",
+    "angular-route": "github:angular/bower-angular-route@1.5.0",
+    "angular-sanitize": "github:angular/bower-angular-sanitize@1.5.0",
+    "angular-touch": "github:angular/bower-angular-touch@1.5.0",
     "angular-truncate": "github:sparkalow/angular-truncate@master",
     "animate.css": "github:daneden/animate.css@3.5.1",
     "babel": "npm:babel-core@5.8.35",
     "babel-runtime": "npm:babel-runtime@5.8.35",
     "bootstrap-less": "github:distros/bootstrap-less@3.3.9",
     "clean-css": "npm:clean-css@3.4.9",
-    "clipboard": "github:zenorocha/clipboard.js@1.5.5",
+    "clipboard": "github:zenorocha/clipboard.js@1.5.8",
     "core-js": "npm:core-js@1.2.6",
     "css": "github:systemjs/plugin-css@0.1.20",
     "font-awesome": "github:components/font-awesome@4.5.0",
@@ -50,37 +50,37 @@ System.config({
     "stomp-websocket": "github:jmesnil/stomp-websocket@2.3.4",
     "systemjs/plugin-text": "github:systemjs/plugin-text@0.0.2",
     "text": "github:systemjs/plugin-text@0.0.2",
-    "videogular": "github:videogular/bower-videogular@1.4.0",
-    "videogular-buffering": "github:videogular/bower-videogular-buffering@1.4.0",
-    "videogular-controls": "github:videogular/bower-videogular-controls@1.4.0",
-    "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@1.4.0",
-    "videogular-poster": "github:videogular/bower-videogular-poster@1.4.0",
-    "videogular-themes-default": "github:videogular/bower-videogular-themes-default@1.4.0",
-    "github:angular/bower-angular-animate@1.4.9": {
-      "angular": "github:angular/bower-angular@1.4.9"
+    "videogular": "github:videogular/bower-videogular@1.4.1",
+    "videogular-buffering": "github:videogular/bower-videogular-buffering@1.4.1",
+    "videogular-controls": "github:videogular/bower-videogular-controls@1.4.1",
+    "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@1.4.1",
+    "videogular-poster": "github:videogular/bower-videogular-poster@1.4.1",
+    "videogular-themes-default": "github:videogular/bower-videogular-themes-default@1.4.1",
+    "github:angular/bower-angular-animate@1.5.0": {
+      "angular": "github:angular/bower-angular@1.5.0"
     },
-    "github:angular/bower-angular-mocks@1.4.9": {
-      "angular": "github:angular/bower-angular@1.4.9"
+    "github:angular/bower-angular-mocks@1.5.0": {
+      "angular": "github:angular/bower-angular@1.5.0"
     },
-    "github:angular/bower-angular-route@1.4.9": {
-      "angular": "github:angular/bower-angular@1.4.9"
+    "github:angular/bower-angular-route@1.5.0": {
+      "angular": "github:angular/bower-angular@1.5.0"
     },
-    "github:angular/bower-angular-sanitize@1.4.9": {
-      "angular": "github:angular/bower-angular@1.4.9"
+    "github:angular/bower-angular-sanitize@1.5.0": {
+      "angular": "github:angular/bower-angular@1.5.0"
     },
-    "github:angular/bower-angular-touch@1.4.9": {
-      "angular": "github:angular/bower-angular@1.4.9"
+    "github:angular/bower-angular-touch@1.5.0": {
+      "angular": "github:angular/bower-angular@1.5.0"
     },
     "github:chieffancypants/angular-hotkeys@1.6.0": {
-      "angular": "github:angular/bower-angular@1.4.9"
+      "angular": "github:angular/bower-angular@1.5.0"
     },
     "github:chieffancypants/angular-loading-bar@0.8.0": {
-      "angular": "github:angular/bower-angular@1.4.9",
+      "angular": "github:angular/bower-angular@1.5.0",
       "css": "github:systemjs/plugin-css@0.1.20"
     },
     "github:davinkevin/AngularStompDK@0.6.2": {
-      "angular": "github:angular/bower-angular@1.4.9",
-      "angular-mocks": "github:angular/bower-angular-mocks@1.4.9",
+      "angular": "github:angular/bower-angular@1.5.0",
+      "angular-mocks": "github:angular/bower-angular-mocks@1.5.0",
       "stompjs": "github:jmesnil/stomp-websocket@2.3.4"
     },
     "github:distros/bootstrap-less@3.3.9": {
@@ -125,11 +125,11 @@ System.config({
       "util": "npm:util@0.10.3"
     },
     "github:mbenford/ngTagsInput@3.0.0": {
-      "angular": "github:angular/bower-angular@1.4.9",
+      "angular": "github:angular/bower-angular@1.5.0",
       "css": "github:systemjs/plugin-css@0.1.20"
     },
     "github:mgonto/restangular@1.5.1": {
-      "angular": "github:angular/bower-angular@1.4.9",
+      "angular": "github:angular/bower-angular@1.5.0",
       "lodash": "npm:lodash@3.10.1"
     },
     "npm:amdefine@1.0.0": {

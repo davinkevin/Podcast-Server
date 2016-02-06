@@ -10,6 +10,7 @@ import {Module, Service} from '../../../decorators';
 export default class WatchListService {
 
     constructor($http) {
+        "ngInject";
         this.$http = $http;
     }
 
