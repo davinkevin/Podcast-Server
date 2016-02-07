@@ -38,7 +38,7 @@ System.config({
     "core-js": "npm:core-js@1.2.6",
     "css": "github:systemjs/plugin-css@0.1.20",
     "font-awesome": "github:components/font-awesome@4.5.0",
-    "highcharts-dist": "github:highcharts/highcharts-dist@4.1.9",
+    "highcharts": "github:highcharts/highcharts-dist@4.2.2",
     "highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
     "ionicons": "github:driftyco/ionicons@2.0.1",
     "lodash": "github:lodash/lodash@3.10.1",
