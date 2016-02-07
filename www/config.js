@@ -47,8 +47,6 @@ System.config({
     "ngstorage": "github:gsklee/ngStorage@0.3.10",
     "restangular": "github:mgonto/restangular@1.5.1",
     "sockjs-client": "github:sockjs/sockjs-client@0.3.4",
-    "stomp-websocket": "github:jmesnil/stomp-websocket@2.3.4",
-    "systemjs/plugin-text": "github:systemjs/plugin-text@0.0.2",
     "text": "github:systemjs/plugin-text@0.0.2",
     "videogular": "github:videogular/bower-videogular@1.4.1",
     "videogular-buffering": "github:videogular/bower-videogular-buffering@1.4.1",
