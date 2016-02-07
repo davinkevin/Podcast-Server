@@ -101,23 +101,6 @@
           }
         }
       },
-      "github:chieffancypants/angular-hotkeys@1.6.0": {
-        "directories": {
-          "lib": "build"
-        },
-        "main": "hotkeys",
-        "dependencies": {
-          "angular": "^1.2.0"
-        },
-        "shim": {
-          "hotkeys": {
-            "deps": [
-              "angular",
-              "./hotkeys.css!"
-            ]
-          }
-        }
-      },
       "github:driftyco/ionicons@2.0.1": {
         "main": false,
         "files": [
