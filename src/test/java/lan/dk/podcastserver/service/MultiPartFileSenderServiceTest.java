@@ -47,7 +47,7 @@ public class MultiPartFileSenderServiceTest {
         response = mock(HttpServletResponse.class);
         binaryPath = Paths.get(MultiPartFileSenderServiceTest.class.getResource("/__files/utils/multipart/outputfile.out").toURI());
         filePath = Paths.get(MultiPartFileSenderServiceTest.class.getResource(STRING_FILE_PATH).toURI());
-        lastModifiedDate = lastModifiedDate(filePath);
+        lastModifiedDate = Files.getLastModifiedTime(filePath).toMillis();
         length = Files.size(filePath);
         fileName = filePath.getFileName().toString();
     }
@@ -505,7 +505,7 @@ public class MultiPartFileSenderServiceTest {
         verify(response, times(1)).setHeader(eq("Content-Type"), eq("application/octet-stream"));
         verify(response, times(1)).setHeader(eq("Accept-Ranges"), eq("bytes"));
         verify(response, times(1)).setHeader(eq("ETag"), eq(binaryPath.getFileName().toString()));
-        verify(response, times(1)).setDateHeader(eq("Last-Modified"), eq(lastModifiedDate(binaryPath)));
+        verify(response, times(1)).setDateHeader(eq("Last-Modified"), eq(Files.getLastModifiedTime(binaryPath).toMillis()));
         verify(response, times(1)).setDateHeader(eq("Expires"), anyLong());
         verify(response, times(1)).setHeader(eq("Content-Disposition"), eq("inline;filename=\"" + binaryPath.getFileName().toString() + "\""));
         verify(response, times(1)).getOutputStream();
@@ -546,7 +546,7 @@ public class MultiPartFileSenderServiceTest {
         verify(response, times(1)).setHeader(eq("Content-Type"), eq(null));
         verify(response, times(1)).setHeader(eq("Accept-Ranges"), eq("bytes"));
         verify(response, times(1)).setHeader(eq("ETag"), eq(binaryPath.getFileName().toString()));
-        verify(response, times(1)).setDateHeader(eq("Last-Modified"), eq(lastModifiedDate(binaryPath)));
+        verify(response, times(1)).setDateHeader(eq("Last-Modified"), eq(Files.getLastModifiedTime(binaryPath).toMillis()));
         verify(response, times(1)).setDateHeader(eq("Expires"), anyLong());
         verify(response, times(1)).setHeader(eq("Content-Disposition"), eq("inline;filename=\"" + binaryPath.getFileName().toString() + "\""));
         verify(response, times(1)).getOutputStream();
@@ -603,9 +603,5 @@ public class MultiPartFileSenderServiceTest {
         Field field = bean.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return clazz.cast(field.get(bean));
-    }
-
-    private Long lastModifiedDate(Path path) throws IOException {
-        return LocalDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId())).toEpochSecond(ZoneOffset.UTC);
     }
 }
