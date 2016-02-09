@@ -150,6 +150,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
                 finalFile.delete();
             } catch (IOException e) {
                 logger.error("Erreur lors du renommage d'un doublon", e);
+                stopDownload();
             }
         }
 
