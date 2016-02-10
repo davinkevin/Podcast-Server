@@ -175,6 +175,26 @@ public class HTTPDownloaderTest {
     }
 
     @Test
+    public void should_handle_finish_download_without_target() {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+
+        /* When */
+        httpDownloader.finishDownload();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(itemRepository, atLeast(1)).save(eq(item));
+        verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
+        assertThat(httpDownloader.target).isNull();
+    }
+
+    @Test
     public void should_pause_a_download() {
         /* Given */
         httpDownloader.setItem(item);
@@ -221,7 +241,7 @@ public class HTTPDownloaderTest {
     }
 
     @Test
-    public void should_handle_IOException() throws MalformedURLException {
+    public void should_handle_IOException_during_download() throws MalformedURLException {
         /* Given */
         httpDownloader.setItem(item);
 

@@ -9,6 +9,7 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -133,7 +135,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         if (target != null)
             return target;
 
-        File finalFile = getTempFile(item);
+        File finalFile = getDestinationFile(item);
         logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
 
         if (!finalFile.getParentFile().exists()) {
@@ -157,13 +159,13 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
     }
 
-    private File getTempFile(Item item) {
+    private File getDestinationFile(Item item) {
         String fileName = FilenameUtils.getName(String.valueOf(getItemUrl()));
 
-        if (fileName != null && fileName.lastIndexOf("?") != -1)
+        if (StringUtils.contains(fileName, "?"))
             fileName = fileName.substring(0, fileName.lastIndexOf("?"));
 
-        return new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + fileName);
+        return  Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), fileName).toFile();
     }
 
     @Transactional
