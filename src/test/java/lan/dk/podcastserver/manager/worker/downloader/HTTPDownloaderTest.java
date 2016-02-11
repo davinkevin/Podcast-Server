@@ -326,4 +326,17 @@ public class HTTPDownloaderTest {
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
     }
+
+    @Test
+    public void should_get_the_same_target_file_each_call() throws MalformedURLException {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        /* When */
+        httpDownloader.target = httpDownloader.getTagetFile(item);
+        File target2 = httpDownloader.getTagetFile(item);
+
+        /* Then */
+        assertThat(httpDownloader.target).isSameAs(target2);
+    }
 }
