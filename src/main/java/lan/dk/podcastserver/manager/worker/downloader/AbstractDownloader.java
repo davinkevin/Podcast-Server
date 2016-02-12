@@ -144,9 +144,10 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             }
 
             logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
-            return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(getItemUrl()) + "-", "." + FilenameUtils.getExtension(getItemUrl()) + temporaryExtension).toFile();
+            String fileName = finalFile.getFileName().toString();
+            return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension).toFile();
         } catch (IOException e) {
-            logger.error("Erreur lors du renommage d'un doublon", e);
+            logger.error("Error during creation of target file", e);
             stopDownload();
             return null;
         }

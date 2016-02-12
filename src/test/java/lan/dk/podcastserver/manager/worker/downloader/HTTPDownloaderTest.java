@@ -331,6 +331,7 @@ public class HTTPDownloaderTest {
     public void should_get_the_same_target_file_each_call() throws MalformedURLException {
         /* Given */
         httpDownloader.setItem(item);
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
         httpDownloader.target = httpDownloader.getTagetFile(item);
@@ -354,5 +355,37 @@ public class HTTPDownloaderTest {
 
         /* Then */
         assertThat(targetFile).isNotEqualTo(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION).toFile());
+    }
+
+    @Test
+    public void should_handle_error_during_creation_of_temp_file() throws IOException {
+        /* Given */
+        podcast.setTitle("bin");
+        httpDownloader.setItem(item.setUrl("http://foo.bar.com/bash"));
+
+        when(itemDownloadManager.getRootfolder()).thenReturn("/");
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+
+        /* When */
+        File targetFile = httpDownloader.getTagetFile(item);
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+    }
+
+    @Test
+    public void should_save_sync_with_podcast() {
+        /* Given */
+        httpDownloader.setItem(item);
+
+        doThrow(RuntimeException.class).when(podcastRepository).findOne(anyInt());
+
+        /* When */
+        httpDownloader.saveSyncWithPodcast();
+
+        /* Then */
+        assertThat(httpDownloader.getItem()).isSameAs(item);
+        verify(itemRepository, never()).save(any(Item.class));
     }
 }
