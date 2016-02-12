@@ -339,4 +339,20 @@ public class HTTPDownloaderTest {
         /* Then */
         assertThat(httpDownloader.target).isSameAs(target2);
     }
+
+    @Test
+    public void should_handle_duplicate_on_file_name() throws IOException {
+        /* Given */
+        httpDownloader.setItem(item);
+        Files.createDirectory(Paths.get(ROOT_FOLDER, podcast.getTitle()));
+        Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
+
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+
+        /* When */
+        File targetFile = httpDownloader.getTagetFile(item);
+
+        /* Then */
+        assertThat(targetFile).isNotEqualTo(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION).toFile());
+    }
 }

@@ -7,7 +7,6 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,10 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.nio.file.*;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,6 +35,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected Item item;
     protected String temporaryExtension;
     protected File target = null;
+    protected PathMatcher hasTempExtensionMatcher;
+
 
     @Resource protected PodcastRepository podcastRepository;
     @Resource protected ItemRepository itemRepository;
@@ -103,12 +101,13 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
         item.setStatus(Status.FINISH);
         try {
+            if (hasTempExtensionMatcher.matches(target.toPath().getFileName())) {
+                Path targetWithoutExtension = target.toPath().resolveSibling(target.toPath().getFileName().toString().replace(temporaryExtension, ""));
 
-            if (target.getAbsolutePath().contains(temporaryExtension)) {
-                File targetWithoutExtension = new File(target.getAbsolutePath().replace(temporaryExtension, ""));
-                if (targetWithoutExtension.exists()) targetWithoutExtension.delete();
-                FileUtils.moveFile(target, targetWithoutExtension);
-                target = targetWithoutExtension;
+                Files.deleteIfExists(targetWithoutExtension);
+                Files.move(target.toPath(), targetWithoutExtension);
+
+                target = targetWithoutExtension.toFile();
             }
             item
                 .setLength(Files.size(target.toPath()))
@@ -118,8 +117,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             item.setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
         }
 
-        item.setFileName(FilenameUtils.getName(target.getAbsolutePath()));
-        item.setDownloadDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()));
+        item.setFileName(FilenameUtils.getName(target.toPath().getFileName().toString()));
+        item.setDownloadDate(ZonedDateTime.now());
 
         saveSyncWithPodcast();
         convertAndSaveBroadcast();
@@ -132,40 +131,30 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Transactional
     public File getTagetFile (Item item) {
 
-        if (target != null)
-            return target;
+        if (nonNull(target)) return target;
 
-        File finalFile = getDestinationFile(item);
-        logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
+        Path finalFile = getDestinationFile(item);
+        logger.debug("Creation of file : {}", finalFile.toFile().getAbsolutePath());
 
-        if (!finalFile.getParentFile().exists()) {
-            finalFile.getParentFile().mkdirs();
-        }
+        try {
+            if (Files.notExists(finalFile.getParent())) Files.createDirectory(finalFile.getParent());
 
-        if (finalFile.exists() || new File(finalFile.getAbsolutePath().concat(temporaryExtension)).exists()) {
-            logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
-            try {
-                finalFile  = File.createTempFile(
-                        FilenameUtils.getBaseName(getItemUrl()).concat("-"),
-                        ".".concat(FilenameUtils.getExtension(getItemUrl())),
-                        finalFile.getParentFile());
-                finalFile.delete();
-            } catch (IOException e) {
-                logger.error("Erreur lors du renommage d'un doublon", e);
-                stopDownload();
+            if (!(Files.exists(finalFile) || Files.exists(finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension)))) {
+                return finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension).toFile();
             }
-        }
 
-        return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
+            logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
+            return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(getItemUrl()) + "-", "." + FilenameUtils.getExtension(getItemUrl()) + temporaryExtension).toFile();
+        } catch (IOException e) {
+            logger.error("Erreur lors du renommage d'un doublon", e);
+            stopDownload();
+            return null;
+        }
     }
 
-    private File getDestinationFile(Item item) {
-        String fileName = FilenameUtils.getName(String.valueOf(getItemUrl()));
-
-        if (StringUtils.contains(fileName, "?"))
-            fileName = fileName.substring(0, fileName.lastIndexOf("?"));
-
-        return  Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), fileName).toFile();
+    private Path getDestinationFile(Item item) {
+        String fileName = FilenameUtils.getName(StringUtils.substringBefore(getItemUrl(), "?"));
+        return  Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), fileName);
     }
 
     @Transactional
@@ -191,5 +180,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @PostConstruct
     public void postConstruct() {
         temporaryExtension = podcastServerParameters.getDownloadExtension();
+        hasTempExtensionMatcher = FileSystems.getDefault().getPathMatcher("glob:*" + temporaryExtension);
     }
 }
