@@ -8,10 +8,11 @@ import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,10 +21,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-import static java.time.ZonedDateTime.*;
+import static java.time.ZonedDateTime.now;
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 14/12/2013 for Podcast Server
@@ -36,6 +41,7 @@ public class YoutubeDownloader extends AbstractDownloader {
     DownloadInfo downloadInfo;
     VGet v = null;
 
+    @Autowired UrlService urlService;
     @Autowired WGetFactory wGetFactory;
 
     @Override
@@ -45,13 +51,10 @@ public class YoutubeDownloader extends AbstractDownloader {
 
         YoutubeWatcher watcher = new YoutubeWatcher(this);
         try {
-            // extract infromation from the web
             VGetParser parser = wGetFactory.parser(item.getUrl());
             info = parser.info(new URL(item.getUrl()));
             v = wGetFactory.newVGet(info);
 
-            // [OPTIONAL] call v.extract() only if you d like to get video title
-            // before start download. or just skip it.
             v.extract(parser, stopDownloading, watcher);
             v.setTarget(getTagetFile(item, info.getTitle()));
             v.download(parser, stopDownloading, watcher);
@@ -81,30 +84,38 @@ public class YoutubeDownloader extends AbstractDownloader {
 
     private File getTagetFile(Item item, String youtubleTitle) {
 
-        if (target != null)
-            return target;
+        if (nonNull(target)) return target;
 
-       File file = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
-       if (!file.getParentFile().exists()) {
-           file.getParentFile().mkdirs();
-       }
-       target = file;
-       return target;
+        try {
+            Path file = Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), youtubleTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
+            if (!Files.exists(file.getParent())) {
+                Files.createDirectories(file.getParent());
+            }
+            target = file.toFile();
+            return target;
+        } catch (IOException e) {
+            throw new RuntimeException("Error during creation of file", e);
+        }
     }
 
     @Override
     public void finishDownload() {
-        File fileWithExtension = new File( v.getTarget().getAbsolutePath().replace(temporaryExtension, "") + "." + downloadInfo.getContentType().substring(downloadInfo.getContentType().lastIndexOf("/")+1) );
-        if (fileWithExtension.exists()) {
-            fileWithExtension.delete();
-        }
+
         try {
-            FileUtils.moveFile(v.getTarget(), fileWithExtension);
+            Path fileWithExtension = target.toPath().resolveSibling(getDefinitiveFileName());
+            Files.deleteIfExists(fileWithExtension);
+            Files.move(v.getTarget().toPath(), fileWithExtension);
+            target = fileWithExtension.toFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error during specific move", e);
+            throw new RuntimeException("Error during specific move", e);
         }
-        target = fileWithExtension;
+
         super.finishDownload();
+    }
+
+    private String getDefinitiveFileName() {
+        return target.toPath().getFileName().toString().replace(temporaryExtension, "") + "." + StringUtils.substringAfter(downloadInfo.getContentType(), "/");
     }
 
     @Slf4j
@@ -124,8 +135,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             DownloadInfo downloadInfo = attachDownloadInfo(info);
             VGet vgetDownloader = youtubeDownloader.v;
             Item item = youtubeDownloader.item;
-            // notify app or save download state
-            // you can extract information from DownloadInfo info;
+
             switch (info.getState()) {
                 case EXTRACTING:
                 case EXTRACTING_DONE:
@@ -146,7 +156,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                     if (DownloadIOCodeError.class.isInstance(info.getException())) {
                         log.debug("Cause  : " + DownloadIOCodeError.class.cast(info.getException()).getCode());
                     }
-                    // Si le reset dure trop longtemps. Stopper.
+
                     if (launchDateDownload.isBefore(now().minusMinutes(MAX_WAITING_MINUTE))) {
                         youtubeDownloader.stopDownload();
                     }
