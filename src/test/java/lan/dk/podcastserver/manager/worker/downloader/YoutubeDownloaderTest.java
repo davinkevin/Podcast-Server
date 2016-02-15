@@ -64,7 +64,6 @@ public class YoutubeDownloaderTest {
 
     @Before
     public void beforeEach() {
-
         item = new Item()
                 .setTitle("Title")
                 .setUrl("http://a.fake.url/with/file.mp4?param=1")
@@ -125,5 +124,27 @@ public class YoutubeDownloaderTest {
         assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/A_super_Name_of_Youtube-Video.mp4");
         assertThat(Files.exists(youtubeDownloader.target.toPath())).isTrue();
         assertThat(Files.exists(youtubeDownloader.target.toPath().resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void should_stop_if_get_target_throw_exception() throws MalformedURLException {
+        /* Given */
+        youtubeDownloader.setItem(item);
+
+        VGetParser vGetParser = mock(VGetParser.class);
+        VideoInfo videoInfo = mock(VideoInfo.class);
+        VGet vGet = mock(VGet.class, RETURNS_SMART_NULLS);
+        DownloadInfo info = mock(DownloadInfo.class);
+
+        when(itemDownloadManager.getRootfolder()).thenReturn("/bin/foo/");
+        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(vGet.getTarget()).then(i -> youtubeDownloader.target);
+        when(info.getContentType()).thenReturn("video/mp4");
+
+        /* When */
+        youtubeDownloader.download();
     }
 }
