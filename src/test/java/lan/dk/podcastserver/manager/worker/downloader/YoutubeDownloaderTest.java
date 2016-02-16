@@ -4,8 +4,6 @@ import com.github.axet.vget.VGet;
 import com.github.axet.vget.info.VGetParser;
 import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.wget.info.DownloadInfo;
-import com.github.axet.wget.info.ex.DownloadInterruptedError;
-import com.github.axet.wget.info.ex.DownloadMultipartError;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -146,5 +144,30 @@ public class YoutubeDownloaderTest {
 
         /* When */
         youtubeDownloader.download();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void should_handle_exception_during_finish_download() throws MalformedURLException {
+        /* Given */
+        podcast.setTitle("bin");
+        youtubeDownloader.setItem(item.setUrl("http://foo.bar.com/bash"));
+
+        VGetParser vGetParser = mock(VGetParser.class);
+        VideoInfo videoInfo = mock(VideoInfo.class);
+        VGet vGet = mock(VGet.class, RETURNS_SMART_NULLS);
+        DownloadInfo info = mock(DownloadInfo.class);
+
+        when(itemDownloadManager.getRootfolder()).thenReturn("/");
+        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
+        when(videoInfo.getTitle()).thenReturn("bash");
+        when(vGet.getTarget()).then(i -> youtubeDownloader.target);
+        when(info.getContentType()).thenReturn("video/");
+        youtubeDownloader.downloadInfo = info;
+
+        /* When */
+        youtubeDownloader.download();
+        youtubeDownloader.finishDownload();
     }
 }
