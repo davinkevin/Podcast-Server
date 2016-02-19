@@ -4,6 +4,8 @@ import com.github.axet.vget.VGet;
 import com.github.axet.vget.info.VGetParser;
 import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.wget.info.DownloadInfo;
+import com.github.axet.wget.info.ex.DownloadInterruptedError;
+import com.github.axet.wget.info.ex.DownloadMultipartError;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -103,7 +105,7 @@ public class YoutubeDownloaderTest {
             youtubeDownloader.finishDownload();
             return null;
         })
-        .when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+                .when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
         when(vGet.getTarget()).then(i -> youtubeDownloader.target);
         when(info.getContentType()).thenReturn("video/mp4");
 
@@ -169,5 +171,40 @@ public class YoutubeDownloaderTest {
         /* When */
         youtubeDownloader.download();
         youtubeDownloader.finishDownload();
+    }
+
+    @Test
+    public void should_handle_multipart_error() throws MalformedURLException {
+        /* Given */
+        youtubeDownloader.setItem(item);
+
+        VGetParser vGetParser = mock(VGetParser.class);
+        VideoInfo videoInfo = mock(VideoInfo.class);
+        VGet vGet = mock(VGet.class, RETURNS_SMART_NULLS);
+        DownloadInfo info = mock(DownloadInfo.class);
+
+        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        doThrow(new DownloadMultipartError(info)).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+
+        /* When */
+        youtubeDownloader.download();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(itemRepository, atLeast(1)).save(eq(item));
+        verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
+        verify(vGet, times(1)).extract(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+        verify(vGet, times(1)).setTarget(any(File.class));
+        verify(vGet, times(1)).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+        assertThat(Files.exists(youtubeDownloader.target.toPath())).isFalse();
+        assertThat(Files.exists(youtubeDownloader.target.toPath().resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }
 }
