@@ -239,4 +239,38 @@ public class YoutubeDownloaderTest {
         assertThat(Files.exists(youtubeDownloader.target.toPath())).isFalse();
         assertThat(Files.exists(youtubeDownloader.target.toPath().resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }
+
+    @Test
+    public void should_reset_download_if_exception_happen() throws MalformedURLException {
+        /* Given */
+        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+
+        VGetParser vGetParser = mock(VGetParser.class);
+        VideoInfo videoInfo = mock(VideoInfo.class);
+        VGet vGet = mock(VGet.class, RETURNS_SMART_NULLS);
+
+        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(itemDownloadManager.canBeReseted(eq(item))).thenReturn(true);
+        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        doThrow(StringIndexOutOfBoundsException.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+
+        /* When */
+        youtubeDownloader.download();
+
+        /* Then */
+        assertThat(item.getStatus()).isEqualTo(Status.STARTED);
+        verify(podcastRepository, never()).findOne(eq(podcast.getId()));
+        verify(itemRepository, never()).save(eq(item));
+        verify(template, never()).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
+        verify(template, never()).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
+        verify(itemDownloadManager, times(1)).resetDownload(eq(item));
+        verify(vGet, times(1)).extract(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+        verify(vGet, times(1)).setTarget(any(File.class));
+        verify(vGet, times(1)).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
+        assertThat(Files.exists(youtubeDownloader.target.toPath())).isFalse();
+        assertThat(Files.exists(youtubeDownloader.target.toPath().resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
+    }
 }
