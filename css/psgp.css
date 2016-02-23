@@ -45,7 +45,8 @@ nav.affix .navbar-nav li {
   padding-left: 15px;
 }
 .thumbnail img {
-  height: 100px;
+  height: 128px;
+  width: 128px;
 }
 .media {
   padding-bottom: 30px;
@@ -70,4 +71,7 @@ nav.affix .navbar-nav li {
 div[id] {
   padding-top: 40px;
   margin-top: -40px;
+}
+#compatibility .support .thumbnail {
+  min-height: 306px;
 }

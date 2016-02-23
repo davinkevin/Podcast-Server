@@ -3,7 +3,7 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Podcast Server</title>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/psgp.css" />
     <!--
     <link rel="stylesheet/less" type="text/css" href="css/psgp.less" />
@@ -18,15 +18,11 @@
 
     <carousel interval="myInterval">
         <slide ng-repeat="slide in psgp.slides" active="slide.active">
-            <img ng-src="{{slide.image}}" style="margin:auto; max-width: 700px; max-height: 400px; height: 400px">
+            <img ng-src="{{ ::slide.image }}" style="margin:auto; max-width: 700px; max-height: 400px; height: 400px">
+            <p>{{ ::slide.text }}</p>
         </slide>
     </carousel>
 
-    <!--
-    <div>
-        <img src="img/Desktop.png" width="600px" height="480px" ></img>
-        <img src="img/Phone.png" height="440px"></img>
-    </div>-->
 </div>
 <nav data-spy="affix" data-offset-top="638" data-offset-bottom="0" class="navbar navbar-inverse" role="navigation">
     <div class="container-fluid">
@@ -130,11 +126,39 @@ spring :
         driver-class-name: org.h2.Driver
         ...</pre>
     </div>
+
     <div id="compatibility">
         <h1 class="page-header">Compatibility</h1>
         <p>This application used a concept of "Worker". A worker is a module whose can update and download podcast from different sources. RSS is the standard sources for Podcast, but you can use Youtube Channel or Canal+ replay TV as podcast.</p>
 
+        <!--<div class="media" ng-repeat="support in psgp.supports">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" width="96" height="96" ng-src="{{ ::support.image }}">
+                </a>
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">{{ ::support.title }}</h4>
+                <p>{{ ::support.description }}</p>
+            </div>
+        </div>-->
+
         <div class="row text-center">
+
+            <div class="col-sm-4 col-md-3 support" ng-repeat="support in psgp.supports">
+                <div class="thumbnail">
+                    <img width="64" height="64" ng-src="{{ ::support.image }}">
+                    <div class="caption">
+                        <h3>{{ ::support.title }}</h3>
+                        <p>{{ ::support.description }}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--<div class="row text-center">
 
             <div class="col-sm-4 col-md-3">
                 <div class="thumbnail">
@@ -220,7 +244,7 @@ spring :
                 </div>
             </div>
 
-        </div>
+        </div>-->
     </div>
 
     <div id="framework" class="clearfix">
@@ -301,16 +325,32 @@ spring :
 
                 vm.myInterval = 5000;
                 vm.slides = [
-                    {image : "img/slider/01_Home.png" },
-                    {image : "img/slider/02_Download.png" },
-                    {image : "img/slider/03_PodcastList.mobile.png" },
-                    {image : "img/slider/04_PodcastDetails.png" },
-                    {image : "img/slider/05_ItemSearch.mobile.png" },
-                    {image : "img/slider/06_ItemDetails.png" },
-                    {image : "img/slider/07_ItemPlayer.png" },
-                    {image : "img/slider/08_Playlist.png" },
-                    {image : "img/slider/09_PlayList.mobile.png" },
-                    {image : "img/slider/10_Stats_of_podcast.png" }
+                    {image : "img/slider/01_Home.png", text : 'Listing all available items' },
+                    {image : "img/slider/02_Download.png", text : 'Show current downloading item and progression'},
+                    {image : "img/slider/03_PodcastList.mobile.png", text: 'Adaptive interface for mobile' },
+                    {image : "img/slider/03_PodcastList.png", text :'Show all podcast registered'},
+                    {image : "img/slider/04_PodcastDetails.png", text:'Details of a podcast, with all its items' },
+                    {image : "img/slider/05_ItemSearch.png", text:'Search items by keyword, Tags and others...' },
+                    {image : "img/slider/06_ItemDetails.png", text:'Details of an item' },
+                    {image : "img/slider/07_ItemPlayer.png", text:'Launch video directly inside your browser' },
+                    {image : "img/slider/08_Playlist.png", text:'You can handle playlist and use a global player' },
+                    {image : "img/slider/09_PlayList.mobile.png", text:'Playlist and player also compatibile on mobile' },
+                    {image : "img/slider/10_Stats_of_podcast.png", text:'See podcast stats on update frequency' },
+                    {image : "img/slider/11_Stats_global.png", text:'See stats by provider' },
+                    {image : "img/slider/12_player_inline.png", text:'Listen audio item while navigating on the application' }
+                ];
+
+                vm.supports = [
+                    { title : "RSS", description : "The standard Really Simple Syndication Worker, compatible with RSS / ATOM and iTunes Podcast", image : "img/worker/rss.png"},
+                    { title : "Youtube", description : "You can transform your favorite Channels or Playlist into a Podcast. Developpement based on Axet/vget", image : "img/worker/youtube.png"},
+                    { title : "Dailymotion", description : "A worker dedicated to the Dailymotion Website", image : "img/worker/dailymotion.png"},
+                    { title : "Canal+", description : "A worker dedicated to the Canal+ Website, working on the Show URL", image : "img/worker/canalplus.png"},
+                    { title : "Pluzz", description : "All the public replay platform (France 2, France 3, France 4, France 5, France Ô, 1er", image : "img/worker/pluzz.png"},
+                    { title : "BeInSport", description : "A worker dedicated to the show available on the BeInSport France Channel. A little part of the show is now compatible", image : "img/worker/beinsport.png"},
+                    { title : "Parleys", description : "A worker to download video from the famous conference site Parleys", image : "img/worker/parleys.png"},
+                    { title : "JeuxVideo.com", description : "A special worker for catching the video from the video game website JeuxVideo.com", image : "img/worker/jeuxvideocom.jpg"},
+                    { title : "Jeux Video FR", description : "A special worker for catching the video from the video game website JeuxVideo.fr", image : "img/worker/jeuxvideofr.jpg"},
+                    { title : "Upload", description : "If you create your own podcast (by ripping some Radio Stream for example), your can upload episodes directly on your Podcast Server.", image : "img/worker/upload.png"}
                 ];
 
             });
