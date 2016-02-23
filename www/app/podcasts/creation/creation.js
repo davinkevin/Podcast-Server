@@ -65,6 +65,8 @@ export default class PodcastCreationController {
             this.podcast.type = "Pluzz";
         } else if (/youtube\.com/i.test(this.podcast.url)) {
             this.podcast.type = "Youtube";
+        } else if (/dailymotion\.com/i.test(this.podcast.url)) {
+            this.podcast.type = "Dailymotion";
         } else if (this.podcast.url.length > 0) {
             this.podcast.type = "RSS";
         } else {

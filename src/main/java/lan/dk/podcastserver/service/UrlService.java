@@ -2,17 +2,17 @@ package lan.dk.podcastserver.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -26,6 +26,7 @@ public class UrlService {
     private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 10000;
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
+    public final JSONParser parser = new JSONParser();
 
     public Reader getReaderFromURL (String url) throws IOException {
         return urlAsReader(url); // For compatibility, To be removed
@@ -129,5 +130,13 @@ public class UrlService {
         return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP
                 || status == HttpURLConnection.HTTP_MOVED_PERM
                 || status == HttpURLConnection.HTTP_SEE_OTHER);
+    }
+
+    public Optional<String> getPageFromURL(String url) {
+        try (InputStream in = new URL(url).openStream()) {
+            return Optional.of(IOUtils.toString(in));
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 }

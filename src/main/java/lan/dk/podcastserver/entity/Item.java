@@ -2,8 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -31,9 +30,11 @@ import static java.util.Objects.isNull;
 @Entity
 @Indexed
 @Slf4j
+@Builder
 @Getter @Setter
 @Table(name = "item")
 @Accessors(chain = true)
+@NoArgsConstructor @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset" })
 @EntityListeners(AuditingEntityListener.class)
 public class Item {

@@ -23,6 +23,7 @@ public class UpdaterSelectorTest {
         updaterSelectors.add(new JeuxVideoComCompatibility());
         updaterSelectors.add(new ParleysCompatibility());
         updaterSelectors.add(new PluzzCompatibility());
+        updaterSelectors.add(new DailymotionCompatibility());
     }
     
     @Test
@@ -72,6 +73,13 @@ public class UpdaterSelectorTest {
         /* Given */ UpdaterSelector updaterSelector = new UpdaterSelector().setUpdaterCompatibilities(updaterSelectors);
         /* When */ Class updaterClass = updaterSelector.of("http://www.pluzz.francetv.fr/show/for/dummies");
         /* Then */ assertThat(updaterClass).isEqualTo(PluzzUpdater.class);
+    }
+
+    @Test
+    public void should_return_a_DailymotionUpdater() {
+        /* Given */ UpdaterSelector updaterSelector = new UpdaterSelector().setUpdaterCompatibilities(updaterSelectors);
+        /* When */ Class updaterClass = updaterSelector.of("http://www.dailymotion.com/showname");
+        /* Then */ assertThat(updaterClass).isEqualTo(DailymotionUpdater.class);
     }
 
     @Test(expected = RuntimeException.class)

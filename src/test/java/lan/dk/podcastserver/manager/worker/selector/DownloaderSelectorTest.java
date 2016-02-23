@@ -22,6 +22,7 @@ public class DownloaderSelectorTest {
         downloaderCompatibilities.add(new YoutubeDownloaderCompatibility());
         downloaderCompatibilities.add(new M3U8DownloaderCompatibility());
         downloaderCompatibilities.add(new ParleysDownloaderCompatibility());
+        downloaderCompatibilities.add(new DailymotionDownloaderCompatibility());
     }
 
     @Test
@@ -64,6 +65,13 @@ public class DownloaderSelectorTest {
         /* Given */ DownloaderSelector downloaderSelector = new DownloaderSelector().setDownloaderCompatibilities(downloaderCompatibilities);
         /* When  */ Class updaterClass = downloaderSelector.of("http://www.parleys.com/play/54d78f6de4b0767f26dffb67");
         /* Then  */ assertThat(updaterClass).isEqualTo(ParleysDownloader.class);
+    }
+
+    @Test
+    public void should_return_a_DailymotionDownloader() {
+        /* Given */ DownloaderSelector downloaderSelector = new DownloaderSelector().setDownloaderCompatibilities(downloaderCompatibilities);
+        /* When  */ Class updaterClass = downloaderSelector.of("http://www.dailymotion.com/video/xLif1aca");
+        /* Then  */ assertThat(updaterClass).isEqualTo(DailymotionDownloader.class);
     }
 
     @Test(expected = RuntimeException.class)
