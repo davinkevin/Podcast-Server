@@ -16,7 +16,7 @@
     <h1>Podcast Server</h1>
     <p>All your podcasts available in one place... <strong>Your place !</strong></p>
 
-    <carousel interval="myInterval">
+    <carousel interval="psgp.interval">
         <slide ng-repeat="slide in psgp.slides" active="slide.active">
             <img ng-src="{{ ::slide.image }}" style="margin:auto; max-width: 700px; max-height: 400px; height: 400px">
             <p>{{ ::slide.text }}</p>
@@ -323,7 +323,7 @@ spring :
                     return $sce.trustAsHtml(text);
                 };
 
-                vm.myInterval = 5000;
+                vm.interval = 5000;
                 vm.slides = [
                     {image : "img/slider/01_Home.png", text : 'Listing all available items' },
                     {image : "img/slider/02_Download.png", text : 'Show current downloading item and progression'},
