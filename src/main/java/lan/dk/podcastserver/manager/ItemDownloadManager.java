@@ -215,7 +215,7 @@ public class ItemDownloadManager {
             Downloader downloader = downloadingQueue.get(item);
             downloader.startDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
-            Downloader worker = workerService.getDownloaderByType(item);
+            Downloader worker = workerService.downloaderOf(item);
 
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
@@ -227,7 +227,7 @@ public class ItemDownloadManager {
     public void resetDownload(Item item) {
         if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
             item.addATry();
-            Downloader worker = workerService.getDownloaderByType(item);
+            Downloader worker = workerService.downloaderOf(item);
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
                 new Thread(worker).start();

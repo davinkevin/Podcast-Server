@@ -4,9 +4,8 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
-import lan.dk.podcastserver.manager.worker.finder.RSSFinder;
-import lan.dk.podcastserver.manager.worker.finder.YoutubeFinder;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
+import lan.dk.podcastserver.manager.worker.selector.FinderSelector;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.*;
 import org.junit.Before;
@@ -33,6 +32,7 @@ public class WorkerServiceTest {
     @Mock UpdaterSelector updaterSelector;
     @Mock DownloaderSelector downloaderSelector;
     @Mock ApplicationContext context;
+    @Mock FinderSelector finderSelector;
     List<Updater> updaters;
     WorkerService workerService;
 
@@ -40,7 +40,7 @@ public class WorkerServiceTest {
     public void beforeEach() {
         updaters = Arrays.asList(new BeInSportsUpdater(), new CanalPlusUpdater(), new YoutubeUpdater());
 
-        workerService = new WorkerService(updaterSelector, downloaderSelector, updaters);
+        workerService = new WorkerService(updaterSelector, downloaderSelector, finderSelector, updaters);
         workerService.setApplicationContext(context);
     }
 
@@ -82,7 +82,7 @@ public class WorkerServiceTest {
         Item item = new Item().setUrl("http://fake.url/");
 
         /* When */
-        Downloader downloaderSelected = workerService.getDownloaderByType(item);
+        Downloader downloaderSelected = workerService.downloaderOf(item);
 
         /* Then */
         assertThat(downloaderSelected).isSameAs(downloader);
@@ -92,25 +92,19 @@ public class WorkerServiceTest {
     }
 
     @Test
-    public void should_return_null_if_url_empty() {
-        assertThat(workerService.finderOf("")).isNull();
-    }
+    public void should_get_finder_by_type_from_context() {
+        /* Given */
+        Class clazz = WorkerServiceTest.class;
+        Finder finder = mock(Finder.class);
+        when(finderSelector.of(any())).thenReturn(clazz);
+        when(context.getBean(any(String.class))).thenReturn(finder);
 
-    @Test
-    public void should_return_RSS_finder() {
-        /* Given */
-        RSSFinder rssFinder = mock(RSSFinder.class);
-        when(context.getBean(eq("RSSFinder"), eq(Finder.class))).thenReturn(rssFinder);
-        /* When */  Finder finder = workerService.finderOf("http://my.pretty.url/rss.xml");
-        /* Then */  assertThat(finder).isEqualTo(rssFinder);
-    }
-    
-    @Test
-    public void should_return_youtube_finder() {
-        /* Given */
-        YoutubeFinder youtubeFinder = mock(YoutubeFinder.class);
-        when(context.getBean(eq("YoutubeFinder"), eq(Finder.class))).thenReturn(youtubeFinder);
-        /* When */  Finder finder = workerService.finderOf("http://youtube.com/channel/achennel.xml");
-        /* Then */  assertThat(finder).isEqualTo(youtubeFinder);
+        /* When */
+        Finder finderSelected = workerService.finderOf("http://an.url.com/foo");
+
+        /* Then */
+        assertThat(finderSelected).isSameAs(finder);
+        verify(finderSelector, times(1)).of(eq("http://an.url.com/foo"));
+        verify(context, times(1)).getBean(eq(clazz.getSimpleName()));
     }
 }

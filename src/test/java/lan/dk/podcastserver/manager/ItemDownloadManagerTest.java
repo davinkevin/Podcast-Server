@@ -124,7 +124,7 @@ public class ItemDownloadManagerTest {
         /* Given */
         final List<Item> itemList = Arrays.asList(new Item().setId(1).setStatus(Status.NOT_DOWNLOADED), new Item().setId(2).setStatus(Status.NOT_DOWNLOADED), new Item().setId(3).setStatus(Status.NOT_DOWNLOADED), new Item().setId(4).setStatus(Status.NOT_DOWNLOADED));
         when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
-        when(workerService.getDownloaderByType(any(Item.class))).thenReturn(mock(Downloader.class));
+        when(workerService.downloaderOf(any(Item.class))).thenReturn(mock(Downloader.class));
         mockPodcastParametersForPostConstruct();
         /* When */
         itemDownloadManager.postConstruct();
@@ -133,7 +133,7 @@ public class ItemDownloadManagerTest {
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
         verifyPodcastParametersForPostConstruct();
-        verify(workerService, times(3)).getDownloaderByType(itemArgumentCaptor.capture());
+        verify(workerService, times(3)).downloaderOf(itemArgumentCaptor.capture());
         assertThat(itemArgumentCaptor.getAllValues()).contains(itemList.get(0), itemList.get(1), itemList.get(2));
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
@@ -441,7 +441,7 @@ public class ItemDownloadManagerTest {
         /* Given */ mockPodcastParametersForPostConstruct();
         when(podcastServerParameters.numberOfTry()).thenReturn(3);
         Downloader downloaderMock = mock(Downloader.class);
-        when(workerService.getDownloaderByType(any())).thenReturn(downloaderMock);
+        when(workerService.downloaderOf(any())).thenReturn(downloaderMock);
         final Downloader calledDownloader = mock(Downloader.class);
         Item item = new Item().setId(1).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
@@ -450,7 +450,7 @@ public class ItemDownloadManagerTest {
         /* Then */
         assertThat(item.getNumberOfTry()).isEqualTo(1);
         verify(podcastServerParameters, times(1)).numberOfTry();
-        verify(workerService, times(1)).getDownloaderByType(itemArgumentCaptor.capture());
+        verify(workerService, times(1)).downloaderOf(itemArgumentCaptor.capture());
         assertThat(itemArgumentCaptor.getValue()).isSameAs(item);
     }
 
