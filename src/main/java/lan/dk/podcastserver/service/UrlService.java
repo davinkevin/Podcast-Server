@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -26,7 +25,6 @@ public class UrlService {
     private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 10000;
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
-    public final JSONParser parser = new JSONParser();
 
     public Reader getReaderFromURL (String url) throws IOException {
         return urlAsReader(url); // For compatibility, To be removed

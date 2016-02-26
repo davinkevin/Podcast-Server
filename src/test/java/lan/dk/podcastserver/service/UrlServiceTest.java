@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URLConnection;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,7 +83,7 @@ public class UrlServiceTest {
 
     @Test
     public void should_return_null_if_url_is_null() {
-        /* Given */ String url = null;
+        /* Given */
         /* When */  String lastUrl = urlService.getM3U8UrlFormMultiStreamFile(null);
         /* Then */  assertThat(lastUrl).isNull();
     }
@@ -167,6 +168,29 @@ public class UrlServiceTest {
         assertThat(urlConnection.getReadTimeout()).isEqualTo(10000);
     }
 
+    @Test
+    public void should_extract_URL_in_string() {
+        /* Given */
+        String resource_path = "/my/resource";
+        exposeUrl(resource_path);
+
+        /* When */
+        Optional<String> page = urlService.getPageFromURL(HTTP_LOCALHOST + resource_path);
+
+        /* Then */
+        assertThat(page).isPresent();
+        assertThat(page.get()).isEqualTo("12345678");
+    }
+
+    @Test
+    public void should_handle_error_when_extract_url_in_string() {
+        /* Given */
+        /* When */
+        Optional<String> page = urlService.getPageFromURL("/my/resource");
+
+        /* Then */
+        assertThat(page).isEmpty();
+    }
 
     @Test
     public void should_get_filename_from_canal_url() {
@@ -201,5 +225,7 @@ public class UrlServiceTest {
         /* When */ urlService.postConstruct();
         /* Then */ assertThat(System.getProperty("http.agent")).isEqualTo(HtmlService.USER_AGENT);
     }
+
+
 
 }
