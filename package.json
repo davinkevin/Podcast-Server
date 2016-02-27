@@ -63,7 +63,7 @@
       "bootstrap-less": "github:distros/bootstrap-less@^3.3.9",
       "clipboard": "github:zenorocha/clipboard.js@^1.5.5",
       "font-awesome": "github:components/font-awesome@4.5.0",
-      "highcharts": "github:highcharts/highcharts-dist@4.2.2",
+      "highcharts": "github:highcharts/highcharts-dist@4.2.3",
       "highcharts-ng": "github:pablojim/highcharts-ng@^0.0.11",
       "ionicons": "github:driftyco/ionicons@2.0.1",
       "lodash": "github:lodash/lodash@^3.10.1",
