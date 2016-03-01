@@ -22,7 +22,8 @@
                     <vg-volume-bar></vg-volume-bar>
                 </vg-volume>
                 <vg-fullscreen-button ng-show="ipc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreen-button>
-                <div class='btn-video-share'><a target="_self" ng-href="{{ ipc.item.proxyURL }}" class="ionicons ion-android-share"></a></div>
+                <vg-link url="ipc.item.proxyURL"></vg-link>
+                <vg-copy url="ipc.item.proxyURL"></vg-copy>
             </vg-controls>
 
             <vg-overlay-play></vg-overlay-play>

@@ -2,14 +2,13 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {RouteConfig, View, Module} from '../../decorators';
-import Videogular from '../../common/modules/videogular/videogular';
+import Videogular from '../../common/component/videogular/videogular';
 import AppRouteConfig from '../../config/route';
-import DeviceDetectionService from '../../common/service/device-detection';
 import template from './item-player.html!text';
 
 @Module({
     name : 'ps.item.player',
-    modules : [ AppRouteConfig, Videogular, DeviceDetectionService ]
+    modules : [ AppRouteConfig, Videogular ]
 })
 @RouteConfig({
     path : '/podcasts/:podcastId/item/:itemId/play',
@@ -24,24 +23,14 @@ import template from './item-player.html!text';
 })
 export default class ItemPlayerController {
 
-    constructor(podcast, item, $timeout, deviceDetectorService) {
+    constructor(podcast, item, VideogularService) {
         "ngInject";
         this.item = item;
         this.item.podcast = podcast;
-        this.$timeout = $timeout;
 
-        this.config = {
-            autoPlay: true,
-            sources: [
-                { src : this.item.proxyURL, type : this.item.mimeType }
-            ],
-            plugins: {
-                controls: {
-                    autoHide: !deviceDetectorService.isTouchedDevice(),
-                    autoHideTime: 2000
-                },
-                poster: this.item.cover.url
-            }
-        };
+        this.config = VideogularService
+            .builder()
+            .withItem(this.item)
+            .build();
     }
 }

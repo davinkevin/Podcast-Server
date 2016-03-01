@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {Component, View, Module} from '../../../decorators';
-import AppVideogular from '../../../common/modules/videogular/videogular';
+import AppVideogular from '../../../common/component/videogular/videogular';
 import Truncate from '../../../common/modules/truncate';
 import PlaylistService from '../../../common/service/playlistService';
 import template from './player-inline.html!text';

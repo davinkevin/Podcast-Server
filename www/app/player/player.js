@@ -1,8 +1,8 @@
 /**
  * Created by kevin on 25/10/2015 for Podcast Server
  */
-import {RouteConfig, View, HotKeys, Module} from '../decorators';
-import Videogular from '../common/modules/videogular/videogular';
+import {RouteConfig, View, Module} from '../decorators';
+import VideogularModule from '../common/component/videogular/videogular';
 import AppRouteConfig from '../config/route';
 import DeviceDetectionService from '../common/service/device-detection';
 import PlaylistService from '../common/service/playlistService';
@@ -12,7 +12,7 @@ import './player.css!';
 
 @Module({
     name : 'ps.player',
-    modules : [ AppRouteConfig, Videogular, DeviceDetectionService, PlaylistService, WatchListService ]
+    modules : [ AppRouteConfig, VideogularModule, DeviceDetectionService, PlaylistService, WatchListService ]
 })
 @RouteConfig({
     path : '/player',
@@ -21,7 +21,6 @@ import './player.css!';
         watchLists : WatchListService => { "ngInject"; return WatchListService.findAll();}
     }
 })
-@HotKeys({})
 @View({
     template : template
 })
@@ -36,23 +35,12 @@ export default class PlayerController {
     playlist = null;
     watchLists = null;
 
-    constructor(watchLists, deviceDetectorService, WatchListService) {
+    constructor(watchLists, VideogularService, WatchListService) {
         "ngInject";
         this.watchListService = WatchListService;
-
         this.watchLists = watchLists;
 
-        this.config = {
-            autoPlay : true,
-            sources: [],
-            plugins: {
-                controls: {
-                    autoHide : !deviceDetectorService.isTouchedDevice(),
-                    autoHideTime: 2000
-                },
-                poster: ''
-            }
-        };
+        this.config = VideogularService.builder().build();
     }
 
     play() {
