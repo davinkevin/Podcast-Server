@@ -1,19 +1,17 @@
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
 
 @Module({
-    name : 'ps.common.service.data.updateService',
-    modules : [ RestangularConfig ]
+    name : 'ps.common.service.data.updateService'
 })
 @Service('UpdateService')
 export default class UpdateService {
-    constructor(Restangular) {
+    constructor($http) {
         "ngInject";
-        this.baseTask = Restangular.one("task");
+        this.$http = $http;
     }
 
     forceUpdatePodcast(idPodcast) {
-        return this.baseTask.customPOST(idPodcast, "updateManager/updatePodcast/force");
+        return this.$http.post('/api/task/updateManager/updatePodcast/force', idPodcast);
     }
 }
 
