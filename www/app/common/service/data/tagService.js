@@ -2,26 +2,20 @@
  * Created by kevin on 01/11/14 for Podcast Server
  */
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
 
 @Module({
-    name : 'ps.common.service.data.tagService',
-    modules : [ RestangularConfig ]
+    name : 'ps.common.service.data.tagService'
 })
 @Service('tagService')
 export default class tagService {
 
-    constructor(Restangular) {
+    constructor($http) {
         "ngInject";
-        this.baseAll = Restangular.all('tag');
-    }
-
-    getAll() {
-        return this.baseAll.get();
+        this.$http = $http;
     }
 
     search(query) {
-        return this.baseAll.post(null, {name : query});
+        return this.$http.post('/api/tag', null, { params : {name : query} });
     }
 
 }
