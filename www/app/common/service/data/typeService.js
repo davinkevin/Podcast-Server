@@ -2,21 +2,19 @@
 * Created by kevin on 01/11/14 for Podcast Server
 */
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
 
 @Module({
-    name : 'ps.common.service.data.typeService',
-    modules : [ RestangularConfig ]
+    name : 'ps.common.service.data.typeService'
 })
 @Service('typeService')
 export default class typeService {
 
-    constructor(Restangular) {
+    constructor($http) {
         "ngInject";
-        this.baseAll = Restangular.all('types');
+        this.$http = $http;
     }
 
     findAll() {
-        return this.baseAll.getList();
+        return this.$http.get('/api/types').then(r => r.data);
     }
 }
