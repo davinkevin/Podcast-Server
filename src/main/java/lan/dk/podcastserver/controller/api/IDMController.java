@@ -24,111 +24,111 @@ public class IDMController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping(value="/queue", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/queue", method = RequestMethod.GET)
     public Queue<Item> getDownloadList () {
         return IDM.getWaitingQueue();
     }
 
-    @RequestMapping(value="/downloading", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/downloading", method = RequestMethod.GET)
     public Set<Item> getDownloadingList () {
         return IDM.getDownloadingQueue().keySet();
     }
 
-    @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.GET)
     public Item getDownloadingList (@PathVariable int id) {
         return IDM.getItemInDownloadingQueue(id);
     }
 
-    @RequestMapping(value="/current", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/current", method = RequestMethod.GET)
     public int getNumberOfCurrentDownload () {
         return IDM.getNumberOfCurrentDownload();
     }
 
-    @RequestMapping(value="/limit", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/limit", method = RequestMethod.GET)
     public int setLimitParallelDownload () {
         return IDM.getLimitParallelDownload();
     }
 
-    @RequestMapping(value="/limit", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/limit", method = RequestMethod.POST)
     public void setLimitParallelDownload (@RequestBody int setLimitParallelDownload) {
         IDM.changeLimitParallelsDownload(setLimitParallelDownload);
     }
 
-    @RequestMapping(value="/launch", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/launch", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void launchDownload() {
 
         IDM.launchDownload();
     }
 
-    @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.POST)
     public void changeStatusDownload (@RequestBody String status, @PathVariable(value = "id") int id) {
         logger.debug("id : " + id + "; status : " + status);
     }
 
     // Action on ALL download :
-    @RequestMapping(value="/stopAllDownload", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/stopAllDownload", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void stopAllCurrentDownload() {
         IDM.stopAllDownload();
     }
 
-    @RequestMapping(value="/pauseAllDownload", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/pauseAllDownload", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void pauseAllCurrentDownload() {
         IDM.pauseAllDownload();
     }
 
-    @RequestMapping(value="/restartAllDownload", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/restartAllDownload", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void restartAllCurrentDownload() {
         IDM.restartAllDownload();
     }
 
     // Action on id identified download :
-    @RequestMapping(value="/stopDownload", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/stopDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void stopCurrentDownload(@RequestBody int id) {
         IDM.stopDownload(id);
     }
 
-    @RequestMapping(value="/pauseDownload", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/pauseDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void pauseCurrentDownload(@RequestBody int id) {
         IDM.pauseDownload(id);
     }
 
-    @RequestMapping(value="/restartDownload", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/restartDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void restartCurrentDownload(@RequestBody int id) {
         IDM.restartDownload(id);
     }
 
-    @RequestMapping(value="/toogleDownload", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/toogleDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void toggleCurrentDownload(@RequestBody int id) {
         IDM.toogleDownload(id);
     }
 
-    @RequestMapping(value="/queue/add", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/queue/add", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void addItemToQueue(@RequestBody int id) {
         IDM.addItemToQueue(id);
     }
 
-    @RequestMapping(value="/queue/{id:[\\d]+}", method = RequestMethod.DELETE, produces = "application/json")
+    @RequestMapping(value="/queue/{id:[\\d]+}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeItemFromQueue(@PathVariable int id) {
         IDM.removeItemFromQueue(id, false);
     }
 
-    @RequestMapping(value="/queue/{id:[\\d]+}/andstop", method = RequestMethod.DELETE, produces = "application/json")
+    @RequestMapping(value="/queue/{id:[\\d]+}/andstop", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeItemFromQueueAndStopped(@PathVariable int id) {
         IDM.removeItemFromQueue(id, true);
     }
 
-    @RequestMapping(value="/queue", method = RequestMethod.DELETE, produces = "application/json")
+    @RequestMapping(value="/queue", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void emptyQueue() {
         IDM.getWaitingQueue().clear();

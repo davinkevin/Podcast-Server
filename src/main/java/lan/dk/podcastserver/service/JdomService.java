@@ -15,9 +15,11 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -37,7 +39,7 @@ public class JdomService {
     private static final String AUTHOR = "author";
     private static final String CATEGORY = "category";
     private static final String IMAGE = "image";
-    private static final String URL = "url";
+    private static final String URL_STRING = "url";
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
     private static final String ITEM = "item";
@@ -69,20 +71,14 @@ public class JdomService {
         this.urlService = urlService;
     }
 
-    public Document parse(String urlasString) throws JDOMException, IOException {
-        Document doc;
+    public Optional<Document> parse(URL url) {
         try {
-            log.debug("Begin Parsing of {}", urlasString);
-            doc = new SAXBuilder().build(urlService.getConnection(urlasString).getInputStream(), urlasString);
-            log.debug("End Parsing of {}", urlasString);
+            return Optional.of(new SAXBuilder().build(url));
         } catch (JDOMException | IOException e) {
-            log.error("Error during parsing of {}", urlasString, e);
-            throw e;
+            log.error("Error during parsing of {}", url.toString(), e);
+            return Optional.empty();
         }
-
-        return doc;
     }
-
 
     public String podcastToXMLGeneric (Podcast podcast, Boolean limit) throws IOException {
         return podcastToXMLGeneric( podcast, withNumberOfItem(podcast, limit));
@@ -148,7 +144,7 @@ public class JdomService {
         Element itunesImage = new Element(IMAGE, ITUNES_NAMESPACE);
         if (podcast.getCover() != null) {
             Element image = new Element(IMAGE);
-            Element image_url = new Element(URL);
+            Element image_url = new Element(URL_STRING);
             Element image_width = new Element(WIDTH);
             Element image_height = new Element(HEIGHT);
 
@@ -183,7 +179,7 @@ public class JdomService {
 
             Element item_enclosure = new Element(ENCLOSURE);
 
-            item_enclosure.setAttribute(URL, podcastServerParameters.getServerUrl()
+            item_enclosure.setAttribute(URL_STRING, podcastServerParameters.getServerUrl()
                     .concat(item.getProxyURLWithoutExtention())
                     .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
 
@@ -221,7 +217,7 @@ public class JdomService {
             xmlItem.addContent(itunesItemThumbnail);
 
             Element thumbnail = new Element(THUMBNAIL, MEDIA_NAMESPACE);
-            thumbnail.setAttribute(URL, item.getCoverOfItemOrPodcast().getUrl());
+            thumbnail.setAttribute(URL_STRING, item.getCoverOfItemOrPodcast().getUrl());
             xmlItem.addContent(thumbnail);
 
             channel.addContent(xmlItem);

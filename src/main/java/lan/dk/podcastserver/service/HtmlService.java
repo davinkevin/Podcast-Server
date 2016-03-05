@@ -1,15 +1,18 @@
 package lan.dk.podcastserver.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Created by kevin on 07/06/15 for HackerRank problem
  */
+@Slf4j
 @Service
 public class HtmlService {
 
@@ -24,12 +27,17 @@ public class HtmlService {
                 .referrer(REFERRER);
     }
 
-    public Connection connect(String url) {
+    private Connection connect(String url) {
         return Jsoup.connect(url);
     }
 
-    public Document get(String url) throws IOException {
-        return connectWithDefault(url).execute().parse();
+    public Optional<Document> get(String url) {
+        try {
+            return Optional.of(connectWithDefault(url).execute().parse());
+        } catch (IOException e) {
+            log.error("Error during HTML Fetching of {}", url, e);
+            return Optional.empty();
+        }
     }
 
 }

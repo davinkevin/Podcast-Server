@@ -11,7 +11,6 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -33,52 +32,45 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
-        Document page;
+        return htmlService
+                .get(podcast.getUrl())
+                .map(p -> p.select("article"))
+                .map(this::htmlToItems)
+                .orElse(Sets.newHashSet());
+    }
 
-        try {
-            page = htmlService.connectWithDefault(podcast.getUrl()).get();
-        } catch (IOException e) {
-            log.error("IOException :", e);
-            return Sets.newHashSet();
-        }
-
-        return page.select("article")
+    private Set<Item> htmlToItems(Elements elements) {
+        return elements
                 .stream()
                 .map(element -> generateItemFromPage(element.select("a").first().attr("href")))
                 .collect(toSet());
     }
 
     private Item generateItemFromPage(String videoPageUrl) {
-        String completeUrl = JEUXVIDEOCOM_HOST.concat(videoPageUrl);
-        Document page;
+        return htmlService
+                .get(JEUXVIDEOCOM_HOST.concat(videoPageUrl))
+                .map(this::htmlToItem)
+                .orElse(Item.DEFAULT_ITEM);
+    }
 
-        try {
-            page = htmlService.connectWithDefault(completeUrl).get();
-        } catch (IOException e) {
-            log.error("IOException :", e);
-            return Item.DEFAULT_ITEM;
-        }
-
-        Elements selectedArea = page.select(".header-video");
-
-        return new Item()
-                .setTitle(selectedArea.select("meta[itemprop=name]").attr("content"))
-                .setDescription(page.select(".corps-video p").text())
-                .setUrl(selectedArea.select("meta[itemprop=contentUrl]").attr("content"))
-                .setPubdate(ZonedDateTime.of(LocalDateTime.parse(selectedArea.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")))
-                .setCover(imageService.getCoverFromURL(selectedArea.select("meta[itemprop=thumbnailUrl]").attr("content")));
+    private Item htmlToItem(Document page) {
+        Elements headerVideo = page.select(".header-video");
+        return Item.builder()
+                .title(headerVideo.select("meta[itemprop=name]").attr("content"))
+                .description(page.select(".corps-video p").text())
+                .url(headerVideo.select("meta[itemprop=contentUrl]").attr("content"))
+                .pubdate(ZonedDateTime.of(LocalDateTime.parse(headerVideo.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")))
+                .cover(imageService.getCoverFromURL(headerVideo.select("meta[itemprop=thumbnailUrl]").attr("content")))
+            .build();
     }
 
     @Override
     public String signatureOf(Podcast podcast) {
-        try {
-            Document page = htmlService.connectWithDefault(podcast.getUrl()).get();
-            return signatureService.generateMD5Signature(page.select("article").html());
-        } catch (IOException e) {
-            log.error("IOException :", e);
-        }
-
-        return "";
+        return htmlService
+                .get(podcast.getUrl())
+                .map(p -> p.select("article").html())
+                .map(signatureService::generateMD5Signature)
+                .orElse("");
     }
 
     @Override

@@ -67,7 +67,7 @@ public class DailymotionDownloaderTest {
                 .add(item);
 
         dailymotionDownloader.item = item;
-        when(jsonService.parse(anyString())).then(i -> Optional.of(new JSONParser().parse((String) i.getArguments()[0])));
+        when(jsonService.from(anyString())).then(i -> Optional.of(new JSONParser().parse((String) i.getArguments()[0])));
     }
 
     @Test

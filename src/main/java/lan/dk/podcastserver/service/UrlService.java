@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Optional;
@@ -25,6 +26,15 @@ public class UrlService {
     private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 10000;
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
+
+    public Optional<URL> newURL(String url) {
+        try {
+            return Optional.of(new URL(url));
+        } catch (MalformedURLException e) {
+            log.error("Error during creation of URL {}", url, e);
+            return Optional.empty();
+        }
+    }
 
     public Reader getReaderFromURL (String url) throws IOException {
         return urlAsReader(url); // For compatibility, To be removed
@@ -79,13 +89,12 @@ public class UrlService {
         return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + domaineLessUrl;
     }
 
-    @PostConstruct
-    public void postConstruct() {
-        System.setProperty("http.agent", HtmlService.USER_AGENT);
+    public BufferedReader urlAsReader(String url) throws IOException {
+        return urlAsReader(new URL(url));
     }
 
-    public BufferedReader urlAsReader(String url) throws IOException {
-        return new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
+    public BufferedReader urlAsReader(URL url) throws IOException {
+        return new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
     }
 
     private static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
@@ -136,5 +145,10 @@ public class UrlService {
         } catch (IOException e) {
             return Optional.empty();
         }
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        System.setProperty("http.agent", HtmlService.USER_AGENT);
     }
 }

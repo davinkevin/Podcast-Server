@@ -5,23 +5,25 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jsoup.Connection;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +43,7 @@ public class YoutubeUpdaterTest {
     @Mock SignatureService signatureService;
     @Mock Validator validator;
     @Mock JdomService jdomService;
+    @Mock JsonService jsonService;
     @Mock HtmlService htmlService;
     @Mock UrlService urlService;
     @InjectMocks YoutubeUpdater youtubeUpdater;
@@ -49,6 +52,7 @@ public class YoutubeUpdaterTest {
     public void beforeEach() {
         API.setYoutube("");
         when(podcastServerParameters.api()).thenReturn(API);
+        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(((String) i.getArguments()[0]))));
     }
 
     @Test
@@ -68,26 +72,18 @@ public class YoutubeUpdaterTest {
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
-
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        Element theFirstElement = mock(Element.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        when(elements.first()).thenReturn(theFirstElement);
-        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
-        when(jdomService.parse(anyString())).then(parseFromFile("/remote/podcast/youtube.androiddevelopers.xml"));
+        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
+        when(jdomService.parse(any(URL.class))).then(invocationOnMock -> Optional.of(parseXml("/remote/podcast/youtube.androiddevelopers.xml")));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(15);
-        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg"));
-        verify(htmlService, only()).connectWithDefault(eq("https://www.youtube.com/user/androiddevelopers"));
+        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")));
+        verify(htmlService, only()).get(eq("https://www.youtube.com/user/androiddevelopers"));
     }
+
 
     @Test
     public void should_get_items_for_playlist() throws IOException, JDOMException, URISyntaxException {
@@ -96,14 +92,14 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/playlist?list=PLAD454F0807B6CB80")
                 .build();
 
-        when(jdomService.parse(anyString())).then(parseFromFile("/remote/podcast/youtube/joueurdugrenier.playlist.xml"));
+        when(jdomService.parse(any(URL.class))).thenReturn(Optional.of(parseXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml")));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(15);
-        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80"));
+        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")));
     }
 
     @Test
@@ -113,16 +109,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        Element theFirstElement = mock(Element.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        when(elements.first()).thenReturn(theFirstElement);
-        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
-        when(jdomService.parse(anyString())).then(parseFromFile("/remote/podcast/youtube.androiddevelopers.xml"));
+        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
+        when(jdomService.parse(any(URL.class))).thenReturn(Optional.of(parseXml("/remote/podcast/youtube.androiddevelopers.xml")));
         when(signatureService.generateMD5Signature(anyString())).thenReturn("Signature");
 
         /* When */
@@ -130,8 +118,8 @@ public class YoutubeUpdaterTest {
 
         /* Then */
         assertThat(signature).isEqualTo("Signature");
-        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg"));
-        verify(htmlService, only()).connectWithDefault(eq("https://www.youtube.com/user/androiddevelopers"));
+        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")));
+        verify(htmlService, only()).get(eq("https://www.youtube.com/user/androiddevelopers"));
     }
 
     @Test
@@ -140,16 +128,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        Element theFirstElement = mock(Element.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        when(elements.first()).thenReturn(theFirstElement);
-        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
-        doThrow(JDOMException.class).when(jdomService).parse(anyString());
+        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
+        when(jdomService.parse(any(URL.class))).thenReturn(Optional.empty());
 
 
         /* When */
@@ -166,16 +146,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D")
                 .build();
 
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        Element theFirstElement = mock(Element.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        when(elements.first()).thenReturn(theFirstElement);
-        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
-        doThrow(JDOMException.class).when(jdomService).parse(anyString());
+        when(htmlService.get(any(String.class))).thenReturn(Optional.empty());
+        when(jdomService.parse(any(URL.class))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -191,8 +163,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        doThrow(IOException.class).when(htmlService).connectWithDefault(any(String.class));
-        doThrow(IOException.class).when(jdomService).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
+        when(htmlService.get(any(String.class))).thenReturn(Optional.empty());
+        when(jdomService.parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=")))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -208,39 +180,25 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        doThrow(IOException.class).when(jdomService).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
+        when(htmlService.get(any(String.class))).thenReturn(Optional.empty());
+        when(jdomService.parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=")))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(0);
-        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
-        verify(htmlService, only()).connectWithDefault(eq("https://www.youtube.com/user/androiddevelopers"));
+        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=")));
+        verify(htmlService, only()).get(eq("https://www.youtube.com/user/androiddevelopers"));
     }
 
     @Test
-    public void should_get_items_with_API_from_channel() throws IOException {
+    public void should_get_items_with_API_from_channel() throws IOException, URISyntaxException, ParseException {
         /* Given */
         API.setYoutube("FOO");
         Podcast podcast = Podcast.builder().url("http://www.youtube.com/user/joueurdugrenier").build();
-
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        Element theFirstElement = mock(Element.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        when(elements.first()).thenReturn(theFirstElement);
-        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
-        when(urlService.getReaderFromURL(anyString())).then(readerFrom("/remote/podcast/youtube/joueurdugrenier.json"));
+        when(jsonService.from(any(URL.class))).thenReturn(Optional.of(parseJson("/remote/podcast/youtube/joueurdugrenier.json")));
+        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/joueurdugrenier.html")));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -248,25 +206,18 @@ public class YoutubeUpdaterTest {
         /* Then */
         assertThat(items).hasSize(50);
     }
-    
+
+
     @Test
-    public void should_failed_during_fetch_API() throws JDOMException, IOException {
+    public void should_failed_during_fetch_API() throws JDOMException, IOException, URISyntaxException, ParseException {
         /* Given */
         API.setYoutube("FOO");
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        Connection connection = mock(Connection.class);
-        Document document = mock(Document.class);
-        Elements elements = mock(Elements.class);
-        Element theFirstElement = mock(Element.class);
-        when(htmlService.connectWithDefault(any(String.class))).thenReturn(connection);
-        when(connection.get()).thenReturn(document);
-        when(document.select(anyString())).thenReturn(elements);
-        when(elements.first()).thenReturn(theFirstElement);
-        when(theFirstElement.attr(anyString())).thenReturn("UCVHFbqXqoYvEWM1Ddxl0QDg");
-        doThrow(IOException.class).when(urlService).getReaderFromURL(anyString());
+        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
+        when(jsonService.from(any(URL.class))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -275,12 +226,19 @@ public class YoutubeUpdaterTest {
         assertThat(items).hasSize(0);
     }
 
-    private Answer<Object> readerFrom(String url) {
-        return i -> Files.newBufferedReader(Paths.get(YoutubeUpdater.class.getResource(url).toURI()));
+    private Document parseHtml(String url) throws URISyntaxException, IOException {
+        return Jsoup.parse(
+                Paths.get(YoutubeUpdaterTest.class.getResource(url).toURI()).toFile(),
+                "UTF-8",
+                "http://www.youtube.com/");
     }
 
-    private Answer<Object> parseFromFile(String file) throws JDOMException, IOException, URISyntaxException {
-        return invocationOnMock -> new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(file).toURI()).toFile());
+    private JSONObject parseJson(String url) throws IOException, URISyntaxException, ParseException {
+        return JSONObject.class.cast(new JSONParser().parse(Files.newBufferedReader(Paths.get(YoutubeUpdater.class.getResource(url).toURI()))));
+    }
+
+    private org.jdom2.Document parseXml(String name) throws JDOMException, IOException, URISyntaxException {
+        return new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(name).toURI()).toFile());
     }
 
 }

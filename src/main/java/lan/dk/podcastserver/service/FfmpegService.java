@@ -1,8 +1,10 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
 import lan.dk.podcastserver.utils.ThreadUtils.OutputLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,8 @@ public class FfmpegService {
     @Value("${podcastserver.externaltools.ffmpeg:/usr/bin/ffmpeg}")
     public String ffmpeg;
 
+    @Autowired ProcessBuilderFactory processBuilderFactory;
+
     public void concatDemux (File target, File... files) {
         File listOfFileToConcat = null;
         if (target.exists() && target.isFile())
@@ -29,7 +33,7 @@ public class FfmpegService {
 
             listOfFileToConcat = getListingFile(target, files);
 
-            ProcessBuilder pb = new ProcessBuilder(ffmpeg,
+            ProcessBuilder pb = processBuilderFactory.newProcessBuilder(ffmpeg,
                     "-f",
                     "concat",
                     "-i",
@@ -42,12 +46,16 @@ public class FfmpegService {
             logger.debug(String.valueOf(pb.command()));
             Process p = pb.start();
 
-            OutputLogger fluxSortie = new OutputLogger(p.getInputStream());
-            OutputLogger fluxErreur = new OutputLogger(p.getErrorStream());
-            new Thread(fluxSortie).start();
-            new Thread(fluxErreur).start();
+            Thread output = new Thread(new OutputLogger(p.getInputStream()));
+            Thread error = new Thread(new OutputLogger(p.getErrorStream()));
+
+            output.start();
+            error.start();
+
             p.waitFor();
 
+            output.interrupt();
+            error.interrupt();
 
             if (p.getClass().getSimpleName().contains("UNIXProcess")) {
                 Field pidField = p.getClass().getDeclaredField("pid");

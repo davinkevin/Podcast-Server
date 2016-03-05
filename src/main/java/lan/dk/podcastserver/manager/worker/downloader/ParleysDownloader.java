@@ -1,16 +1,20 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
+import com.google.common.collect.Lists;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.FfmpegService;
+import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.factory.WGetFactory;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,23 +22,26 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 
 /**
- * Created by kevin on 13/07/2014.
+ * Created by kevin on 13/07/2014 for Podcast Server
  */
 @Scope("prototype")
 @Component("ParleysDownloader")
 public class ParleysDownloader extends AbstractDownloader{
 
-    public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/{ID_VIDEO}?view=true";
+    public static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/%s?view=true";
+    private static final String STREAM_TOKEN = "STREAM";
 
     /* Patter to extract value from URL */
     // --> http://www.parleys.com/play/535a2846e4b03397a8eee892
@@ -42,11 +49,11 @@ public class ParleysDownloader extends AbstractDownloader{
 
     protected DownloadInfo info = null;
     private Long totalSize;
-    private int avancementIntermediaire = 0;
 
     @Autowired FfmpegService ffmpegService;
     @Autowired UrlService urlService;
-
+    @Autowired WGetFactory wGetFactory;
+    @Autowired JsonService jsonService;
 
     @Override
     public Item download() {
@@ -61,13 +68,14 @@ public class ParleysDownloader extends AbstractDownloader{
 
         for(ParleysAssets parleysAssets : listOfAssets) {
             try {
-                URL url = new URL(parleysAssets.getUrl());
-                // initialize url information object
-                info = new DownloadInfo(url);
+                info = wGetFactory.newDownloadInfo(parleysAssets.getUrl());
                 info.extract(stopDownloading, itemSynchronisation);
+
                 parleysAssets.setFile(getTagetFile(parleysAssets.getUrl()));
-                WGet w = new WGet(info, parleysAssets.getFile());
-                w.download(stopDownloading, itemSynchronisation);
+
+                wGetFactory
+                        .newWGet(info, parleysAssets.getFile())
+                        .download(stopDownloading, itemSynchronisation);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -81,9 +89,7 @@ public class ParleysDownloader extends AbstractDownloader{
         logger.info("Concatenation des vidéos");
         ffmpegService.concatDemux(target, listOfFilesToConcat.toArray(new File[listOfFilesToConcat.size()]));
 
-        for(File partFile : listOfFilesToConcat) {
-            partFile.delete();
-        }
+        listOfFilesToConcat.forEach(File::delete);
 
         finishDownload();
         itemDownloadManager.removeACurrentDownload(item);
@@ -92,114 +98,69 @@ public class ParleysDownloader extends AbstractDownloader{
     }
 
     private List<File> getListOfFiles(List<ParleysAssets> listOfAssets) {
-        List<File> listOfFilesToConcat = new ArrayList<>();
-        for (ParleysAssets parleysAssets : listOfAssets) {
-            listOfFilesToConcat.add(parleysAssets.getFile());
-        }
-        return listOfFilesToConcat;
+        return listOfAssets.stream().map(ParleysAssets::getFile).collect(toList());
     }
 
     private Long getTotalSize(List<ParleysAssets> listOfAssets) {
-        Long total = 0L;
-        for(ParleysAssets parleysAssets : listOfAssets) {
-            total += parleysAssets.getSize();
-        }
-        return total;
+        return listOfAssets.stream().mapToLong(ParleysAssets::getSize).sum();
     }
 
     private List<ParleysAssets> getUrlForParleysItem(Item item) {
-        List<ParleysAssets> listOfAssets = new ArrayList<>();
-
-        try {
-            JSONObject itemJsonObject = getParseJsonObjectForItem(item.getUrl());
-            JSONArray arrayOfAssets = (JSONArray) itemJsonObject.get("assets");
-
-            for (Object assetObject : arrayOfAssets) {
-                JSONObject asset = (JSONObject) assetObject;
-
-
-                if ("STREAM".equals(asset.get("target"))) {
-                    ParleysAssets parleysAssets = getParleysAssets("MP4", (JSONArray) asset.get("files"));
-                    if (parleysAssets != null) {
-                        listOfAssets.add(parleysAssets);
-                    }
-
-                }
-            }
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-
-
-        return listOfAssets;
+        return getParseJsonObjectForItem(item.getUrl())
+                .map(o -> JSONArray.class.cast(o.get("assets")))
+                .map(formJsonArrayToList())
+                .orElse(Lists.newArrayList());
     }
 
+    @SuppressWarnings("unchecked")
+    private Function<JSONArray, List<ParleysAssets>> formJsonArrayToList() {
+        return array -> ((List<JSONObject>) array)
+                .stream()
+                .filter(i -> STREAM_TOKEN.equals(i.get("target")))
+                .map(i -> getParleysAssets("MP4", (JSONArray) i.get("files")))
+                .filter(Objects::nonNull)
+                .collect(toList());
+    }
+
+    @SuppressWarnings("unchecked")
     private ParleysAssets getParleysAssets(String type, JSONArray arrayOfParleysFiles) {
-
-        for (Object fileObject : arrayOfParleysFiles) {
-            JSONObject file = (JSONObject) fileObject;
-
-            if (type.equals(file.get("format"))) {
-                return new ParleysAssets()
-                        .setUrl((String) file.get("httpDownloadURL"))
-                        .setSize((Long) file.get("fileSize"));
-            }
-
-        }
-
-        return null;
+        return ((List<JSONObject>) arrayOfParleysFiles)
+                .stream()
+                .filter(f -> type.equals(f.get("format")))
+                .map(i -> ParleysAssets.builder().url((String) i.get("httpDownloadURL")).size((Long) i.get("fileSize")).build())
+                .findFirst()
+                .get();
     }
 
 
     private String getItemUrl(String id) {
-        return PARLEYS_ITEM_API_URL.replace("{ID_VIDEO}", id);
+        return String.format(PARLEYS_ITEM_API_URL, id);
     }
 
-    private String getParleysId(String url) {
+    private Optional<String> getParleysId(String url) {
         // Extraction de l'id de l'emission :
         Matcher m = ID_PARLEYS_PATTERN.matcher(url);
         if (m.find()) {
-            return m.group(1);
+            return Optional.of(m.group(1));
         }
-        return "";
+        return Optional.empty();
     }
 
-    private JSONObject getParseJsonObjectForItem(String url) throws IOException, ParseException {
-        return (JSONObject) new JSONParser().parse(urlService.getReaderFromURL(getItemUrl(getParleysId(url))));
+    private Optional<JSONObject> getParseJsonObjectForItem(String url) {
+        return getParleysId(url)
+                .map(this::getItemUrl)
+                .flatMap(urlService::newURL)
+                .flatMap(jsonService::from);
     }
 
-    private class ParleysAssets {
-        private String url;
-        private Long size;
-        private File file;
 
-        public File getFile() {
-            return file;
-        }
-
-        public ParleysAssets setFile(File file) {
-            this.file = file;
-            return this;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public ParleysAssets setUrl(String url) {
-            this.url = url;
-            return this;
-        }
-
-        public Long getSize() {
-            return size;
-        }
-
-        public ParleysAssets setSize(Long size) {
-            this.size = size;
-            return this;
-        }
+    @Builder
+    @Getter @Setter
+    @Accessors(chain = true)
+    private static class ParleysAssets {
+        String url;
+        Long size;
+        File file;
     }
 
     public File getTagetFile (String url) {

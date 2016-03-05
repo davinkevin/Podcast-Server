@@ -8,7 +8,6 @@ import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.SignatureService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
@@ -23,12 +22,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by kevin on 10/12/2015 for Podcast Server
@@ -64,9 +64,7 @@ public class JeuxVideoComUpdaterTest {
     @Test
     public void should_error_during_sign() throws IOException {
         /* Given */
-        Connection connection = mock(Connection.class);
-        when(htmlService.connectWithDefault(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(connection);
-        doThrow(IOException.class).when(connection).get();
+        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Optional.empty());
 
         /* When */
         String signature = jeuxVideoComUpdater.signatureOf(CHRONIQUE_VIDEO);
@@ -91,9 +89,7 @@ public class JeuxVideoComUpdaterTest {
     @Test
     public void should_return_empty_list_if_not_found() throws IOException {
         /* Given */
-        Connection connection = mock(Connection.class);
-        when(htmlService.connectWithDefault(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(connection);
-        doThrow(IOException.class).when(connection).get();
+        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
@@ -107,7 +103,7 @@ public class JeuxVideoComUpdaterTest {
         /* Given */
         configureHtmlServiceWith(CHRONIQUE_VIDEO.getUrl(), "/remote/podcast/JeuxVideoCom/chroniques-video.htm");
         configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm");
-        doThrow(IOException.class).when(htmlService).connectWithDefault(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"));
+        when(htmlService.get(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
@@ -129,10 +125,13 @@ public class JeuxVideoComUpdaterTest {
         return i -> Jsoup.parse(path.toFile(), "UTF-8", "http://www.jeuxvideo.com/");
     }
 
+    private Answer<Optional<Document>> readHtmlFromFileOptional(String s) throws URISyntaxException {
+        Path path = Paths.get(JeuxVideoComUpdaterTest.class.getResource(s).toURI());
+        return i -> Optional.of(Jsoup.parse(path.toFile(), "UTF-8", "http://www.jeuxvideo.com/"));
+    }
+
     private void configureHtmlServiceWith(String url, String file) throws IOException, URISyntaxException {
-        Connection connection = mock(Connection.class);
-        when(htmlService.connectWithDefault(eq(url))).thenReturn(connection);
-        when(connection.get()).then(readHtmlFromFile(file));
+        when(htmlService.get(eq(url))).then(readHtmlFromFileOptional(file));
     }
 
     private void configureForAllPage(String file) throws URISyntaxException, IOException {

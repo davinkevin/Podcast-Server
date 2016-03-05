@@ -7,23 +7,21 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,10 +42,9 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final String API_PLAYLIST_URL = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=%s&key=%s";
 
     @Resource JdomService jdomService;
+    @Resource JsonService jsonService;
     @Resource HtmlService htmlService;
     @Resource UrlService urlService;
-    private JSONParser parser = new JSONParser();
-
 
     public Set<Item> getItems(Podcast podcast) {
         return Strings.isNullOrEmpty(podcastServerParameters.api().youtube())
@@ -61,15 +58,17 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         String playlistId = isPlaylist(podcast.getUrl()) ? playlistIdOf(podcast.getUrl()) : transformChannelIdToPlaylistId(channelIdOf(podcast.getUrl()));
         String url = String.format(API_PLAYLIST_URL, playlistId, podcastServerParameters.api().youtube());
-        JSONObject response;
-        try {
-            response = JSONObject.class.cast(parser.parse(urlService.getReaderFromURL(url)));
-        } catch (ParseException | IOException | Error e) {
-            log.error("Error during fetching of API Playlist {} => {}", podcast.getTitle(), url, e);
-            return Sets.newHashSet();
-        }
 
-        return ((List<JSONObject>) response.get("items"))
+        return urlService
+                .newURL(url)
+                .flatMap(jsonService::from)
+                .map(r -> (List<JSONObject>) r.get("items"))
+                .map(this::jsonArrayToItems)
+                .orElse(Sets.newHashSet());
+    }
+
+    private Set<Item> jsonArrayToItems(List<JSONObject> jsonObjects) {
+        return jsonObjects
                 .stream()
                 .map(this::generateItemFromJson)
                 .collect(toSet());
@@ -82,12 +81,13 @@ public class YoutubeUpdater extends AbstractUpdater {
     private Item generateItemFromJson(JSONObject item) {
         JSONObject snippet = JSONObject.class.cast(item.get("snippet"));
         JSONObject resourceId = JSONObject.class.cast(snippet.get("resourceId"));
-        return new Item()
-                .setTitle(snippet.get("title").toString())
-                .setDescription(snippet.get("description").toString())
-                .setPubdate(pubdateOf(snippet.get("publishedAt").toString()))
-                .setUrl(String.format(URL_PAGE_BASE, resourceId.get("videoId")))
-                .setCover(coverFromJson(((JSONObject) snippet.get("thumbnails"))));
+        return Item.builder()
+                .title(snippet.get("title").toString())
+                .description(snippet.get("description").toString())
+                .pubdate(pubdateOf(snippet.get("publishedAt").toString()))
+                .url(String.format(URL_PAGE_BASE, resourceId.get("videoId")))
+                .cover(coverFromJson(((JSONObject) snippet.get("thumbnails"))))
+                .build();
     }
 
     private Cover coverFromJson(JSONObject thumbnails) {
@@ -117,19 +117,17 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     private Set<Item> getItemsByRss(Podcast podcast) {
         log.info("Youtube Update by RSS");
-        Document podcastXMLSource;
-        try {
-            podcastXMLSource = xmlOf(podcast.getUrl());
-        } catch (JDOMException | IOException e) {
-            log.error("Error during youtube parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
-            return Sets.newHashSet();
-        }
 
-        Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
+        Optional<Element> element = xmlOf(podcast.getUrl()).map(Document::getRootElement);
 
-        return podcastXMLSource
-                .getRootElement()
-                .getChildren("entry", defaultNamespace)
+        return element
+            .map(d -> d.getChildren("entry", d.getNamespace()))
+            .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).get()))
+            .orElse(Sets.newHashSet());
+    }
+
+    private Set<Item> xmlToItems(List<Element> entry, Namespace defaultNamespace) {
+        return entry
                 .stream()
                 .map(elem -> generateItemFromElement(elem, defaultNamespace))
                 .collect(toSet());
@@ -137,23 +135,14 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        try {
-            Document podcastXMLSource = xmlOf(podcast.getUrl());
+        Optional<Element> element = xmlOf(podcast.getUrl())
+                .map(Document::getRootElement);
 
-            Namespace defaultNamespace = podcastXMLSource.getRootElement().getNamespace();
-            String stringToSign = podcastXMLSource
-                    .getRootElement()
-                    .getChildren("entry", defaultNamespace)
-                    .stream()
-                    .map(elem -> elem.getChildText("id", defaultNamespace))
-                    .collect(joining());
-
-            return signatureService.generateMD5Signature(stringToSign);
-        } catch (JDOMException | IOException e) {
-            log.error("Error during youtube signature & parsing {} => {}", podcast.getTitle(), podcast.getUrl(), e);
-            return "";
-        }
-
+        return element
+                .map(d -> d.getChildren("entry", d.getNamespace()))
+                .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).get())).collect(joining()))
+                .map(signatureService::generateMD5Signature)
+                .orElse("");
     }
 
     private Item generateItemFromElement(Element entry, Namespace defaultNamespace) {
@@ -181,12 +170,10 @@ public class YoutubeUpdater extends AbstractUpdater {
         return String.format(URL_PAGE_BASE, idVideo);
     }
 
-    private Document xmlOf(String url) throws JDOMException, IOException {
-        if (isPlaylist(url)) {
-            return jdomService.parse(String.format(PLAYLIST_RSS_BASE, playlistIdOf(url)));
-        }
-
-        return jdomService.parse(String.format(CHANNEL_RSS_BASE, channelIdOf(url)));
+    private Optional<Document> xmlOf(String url) {
+        return urlService
+                    .newURL(isPlaylist(url) ? String.format(PLAYLIST_RSS_BASE, playlistIdOf(url)) : String.format(CHANNEL_RSS_BASE, channelIdOf(url)))
+                    .flatMap(jdomService::parse);
     }
 
     private String playlistIdOf(String url) {
@@ -199,21 +186,12 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
     private String channelIdOf(String url) {
-        org.jsoup.nodes.Document page;
-
-        try {
-            page = htmlService.connectWithDefault(url).get();
-        } catch (IOException e) {
-            log.error("IOException : {}", url, e);
-            return "";
-        }
-
-        org.jsoup.nodes.Element elementWithExternalId = page.select("[data-channel-external-id]").first();
-        if (elementWithExternalId != null) {
-            return elementWithExternalId.attr("data-channel-external-id");
-        }
-
-        return "";
+        return htmlService
+            .get(url)
+            .map(p -> p.select("[data-channel-external-id]").first())
+            .filter(Objects::nonNull)
+            .map(e -> e.attr("data-channel-external-id"))
+            .orElse("");
     }
 
     @Override

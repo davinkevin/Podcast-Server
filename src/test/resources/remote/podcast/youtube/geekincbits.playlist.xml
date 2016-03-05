@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D"/>
+ <id>yt:playlist:PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D</id>
+ <yt:playlistId>PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D</yt:playlistId>
+ <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+ <title>Geek Inc Bits</title>
+ <author>
+  <name>Geek Inc</name>
+  <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+ </author>
+ <published>2015-07-01T22:30:39+00:00</published>
+ <entry>
+  <id>yt:video:WZsYES35zsU</id>
+  <yt:videoId>WZsYES35zsU</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 018 : Impression 3D</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=WZsYES35zsU"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2016-02-13T21:21:12+00:00</published>
+  <updated>2016-02-25T19:50:18+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 018 : Impression 3D</media:title>
+   <media:content url="https://www.youtube.com/v/WZsYES35zsU?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/WZsYES35zsU/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News
+
+- Hangouts passe au P2P 
+- RIP Twitter 
+- La Poste Wifi 
+- Gmail et la sécurité 
+- Tesla model 3 
+- Google ne veut plus de pub en flash 
+- BitTorrent et le live P2P 
+- Freebox OS 3.3
+
+On aime ou pas
+
+L'impression 3D
+
+Lien vers l'offre Dagoma / Bits : http://bit.ly/1Q8oEv2
+Et le code promo : GEEKINCBITSDAGO</media:description>
+   <media:community>
+    <media:starRating count="27" average="4.70" min="1" max="5"/>
+    <media:statistics views="1418"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:gpKqKYwc1u0</id>
+  <yt:videoId>gpKqKYwc1u0</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 017 : Identité Numérique</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=gpKqKYwc1u0"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2016-02-07T20:46:29+00:00</published>
+  <updated>2016-03-01T14:36:15+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 017 : Identité Numérique</media:title>
+   <media:content url="https://www.youtube.com/v/gpKqKYwc1u0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/gpKqKYwc1u0/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News
+
+- Android Marshmallow 
+- Microsoft Natick 
+- Batteries domestiques 
+- Google Alphabet et la capitalisation boursière 
+- Microsoft rachète swiftkey 
+- LDLC rachète Materiel.net 
+- Chrome veut vous éviter des déceptions 
+- Bbox Miami passe sous Android TV 
+- Apple music et les micro SD 
+- VAIO Phone sous Windows 10 mobile
+
+On aime ou pas
+
+L'identité numérique, quels acteurs et pour en faire quoi?</media:description>
+   <media:community>
+    <media:starRating count="33" average="4.88" min="1" max="5"/>
+    <media:statistics views="1474"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:3vE4Zdkq_a8</id>
+  <yt:videoId>3vE4Zdkq_a8</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 016 :  Un clavier &quot;AVERTI&quot; en vaut deux !</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=3vE4Zdkq_a8"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2016-01-22T19:07:33+00:00</published>
+  <updated>2016-02-29T15:39:07+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 016 :  Un clavier &quot;AVERTI&quot; en vaut deux !</media:title>
+   <media:content url="https://www.youtube.com/v/3vE4Zdkq_a8?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/3vE4Zdkq_a8/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News
+
+- Korben lance B0unty Factory
+- Le combat des Hyperloop : HTT vs HT
+- Netflix versus les VPN
+- Le spermbot
+- Le ministère de la culture veut nous changer le clavier azerty 
+- Microsoft : Désactiver des PC à distance pour la sécurité de l'internet.
+- Seul Windows 10 supportera pleinement les nouveaux processeurs dès Skylake
+- Crave le book boyfriend
+- Le navigateur Brave</media:description>
+   <media:community>
+    <media:starRating count="64" average="4.88" min="1" max="5"/>
+    <media:statistics views="2388"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:jCxD_x0nm0w</id>
+  <yt:videoId>jCxD_x0nm0w</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 015 : CES 2016</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=jCxD_x0nm0w"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2016-01-08T00:34:32+00:00</published>
+  <updated>2016-02-29T13:58:26+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 015 : CES 2016</media:title>
+   <media:content url="https://www.youtube.com/v/jCxD_x0nm0w?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jCxD_x0nm0w/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News
+
+TV/Ecran
+
+L’année du HDR et du 8K pour les TV 
+Pour les écrans PC : la mode est à l’USB-C 
+Son 5.1.4 dolby atmos chez samsung
+
+Electro
+
+Le frigo connecté avec un écran par Samsung 
+Samsung et le add wash 
+Netatmo presence
+
+Voiture/Scooter
+
+Ford passe à AndroidAuto/CarPlay 
+Fiat/Chrysler aussi 
+La voiture/avion Faraday : FFZERO1 
+Nvidia Drive PX 2 
+Gogoro annonce le chargeur pour la maison 
+Garmin a trouvé une utilité aux Google Glass 
+Le drone chinois transport de personnes 
+Volkswagen Budd-E
+
+Téléphonie/Tablette
+
+Acer lance un Windows Phone compatible avec continuum
+
+Autres
+
+Lego WeDo 
+WiFi HaLow 
+Parrot drone Disco 
+DJI Phantom 4K : 999$ 
+Aipoly 
+Alcatel CareTime 
+Le thermomètre Withings 
+Razer et son PC Portable avec CG Externe 
+Asus s’y met aussi avec son ROG XG2 
+Cota charge sans fils</media:description>
+   <media:community>
+    <media:starRating count="52" average="4.85" min="1" max="5"/>
+    <media:statistics views="2368"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:Q6dUNOQTltA</id>
+  <yt:videoId>Q6dUNOQTltA</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 014 : Noël dans le retro...</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=Q6dUNOQTltA"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-12-18T09:01:54+00:00</published>
+  <updated>2016-02-26T09:55:25+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 014 : Noël dans le retro...</media:title>
+   <media:content url="https://www.youtube.com/v/Q6dUNOQTltA?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/Q6dUNOQTltA/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News
+
+1 - Philips Hue et le ZigBee
+2 - Netflix
+3 - Pebble Health
+4 - CAST by Genii
+5 - Apple Music et Sonos
+6 - Nuance MIX
+7 - Youtube et les webcams
+8 - Faille antivirus
+9 - Zodianet Zi end
+10 - Google On Tap en France
+11 - Asustor Kodi 16
+12 - Geohot et sa voiture autonome
+
+
+On aime ou pas :
+
+Recalbox</media:description>
+   <media:community>
+    <media:starRating count="40" average="4.80" min="1" max="5"/>
+    <media:statistics views="2035"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:HV_vkH1Lt2c</id>
+  <yt:videoId>HV_vkH1Lt2c</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 013 : Je suis moche mais de luxe !</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=HV_vkH1Lt2c"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-12-11T10:04:41+00:00</published>
+  <updated>2016-02-15T10:50:53+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 013 : Je suis moche mais de luxe !</media:title>
+   <media:content url="https://www.youtube.com/v/HV_vkH1Lt2c?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/HV_vkH1Lt2c/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News
+
+1 - Dropbox lache Mailbox 
+2 - Porsche Mission E 
+3 - Yokohama et les podomètres en réseau 
+4 - Microsoft va ouvrir Chakra 
+5 - Epson recycle le papier 
+6 - La coque moche Apple 
+7 - Renault (Zoé) et Nissan (Leaf) utiliser la voiture comme batterie pour la maison 
+8 - Les Pays-Bas votent un financement du chiffrement 
+9 - GoPro lance Karma 
+10 - Google Agenda peut maintenant servir de pense-bête 
+11 - Qwant ouvre une version Junior 
+12 - Cortana sur Android, mais surtout sur CyanogenOS 
+13 - Speedtest mais sans adblock 
+14 - Olly, une alternative à Jibo
+
+On aime ou pas :
+
+Spark</media:description>
+   <media:community>
+    <media:starRating count="43" average="4.81" min="1" max="5"/>
+    <media:statistics views="1831"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:NzyagaS_Ukg</id>
+  <yt:videoId>NzyagaS_Ukg</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 012 : Libéré, délivré !</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=NzyagaS_Ukg"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-12-09T12:50:09+00:00</published>
+  <updated>2016-01-11T13:26:01+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 012 : Libéré, délivré !</media:title>
+   <media:content url="https://www.youtube.com/v/NzyagaS_Ukg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/NzyagaS_Ukg/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Batterie Sodium
+2 - Drones Amazon
+3 - ImperiHome
+4 - Gélule connectée
+5 - Spencer
+6 - ROBORACE
+7 - Auto Pilote Tesla
+8 - Mozilla lache Thunderbirds
+9 - Linky
+10 - Google supprime le centre de notifications Chrome
+11 - Piratage contenu 4K  Amazon et Netflix
+12 - Timbre Star Wars
+13 - Swift Open source
+
+On aime ou pas :
+
+Test Asus T100HA</media:description>
+   <media:community>
+    <media:starRating count="26" average="4.85" min="1" max="5"/>
+    <media:statistics views="1427"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:Vksg0Q6twyQ</id>
+  <yt:videoId>Vksg0Q6twyQ</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 011 : Pour une poignée de PI Zero</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=Vksg0Q6twyQ"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-12-02T17:47:01+00:00</published>
+  <updated>2016-02-26T09:56:18+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 011 : Pour une poignée de PI Zero</media:title>
+   <media:content url="https://www.youtube.com/v/Vksg0Q6twyQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/Vksg0Q6twyQ/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Raspberry PI Zero
+
+2 - One Plus USB type C gate
+
+3 - eDellRoot
+
+4 - Riffstation
+
+5 - Blue Origin
+
+6 - Neural Talk
+
+7 - Plex Media Optimizer
+
+8 - Yahoo et les ad block
+
+9 - Zatas VS ISIS
+
+10 - Rappel Tesla Model S
+
+11 - Microbot App Comparison Tool pour Android
+
+
+J'aime ou pas :
+
+Home Assistant</media:description>
+   <media:community>
+    <media:starRating count="38" average="5.00" min="1" max="5"/>
+    <media:statistics views="1936"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:i006yVeqtqs</id>
+  <yt:videoId>i006yVeqtqs</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 010 : La boucle infinie</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=i006yVeqtqs"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-11-15T13:44:54+00:00</published>
+  <updated>2016-01-02T16:25:01+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 010 : La boucle infinie</media:title>
+   <media:content url="https://www.youtube.com/v/i006yVeqtqs?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/i006yVeqtqs/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Nec ArmKeyPad
+
+2 - 25% des sites Web sous wordpress
+
+3 - Mozilla rachète des brevets pour les open sourcer
+
+4 - Firefox dispo sur iOS
+
+5 - Apple Music dispo en beta sur android
+
+6 - The Infinite Jukebox http://static.echonest.com/labs/
+
+7 - SFR Zive
+
+8 - Tag Heuer Connected
+
+9 - Youtube VR
+
+10 - Samsung a diffusé un match de foot sur Gear VR
+
+11 - Microbot push
+
+12 - Bluetooth Evolue
+
+13 - CarPostal Suisse et ses bus autonomes
+
+14 - Lumia 950XL et les offres de lancement
+
+15 - Tingbot
+
+16 - InMoov
+
+17 - Windows 10 Threshold
+
+18 - YouTube Music</media:description>
+   <media:community>
+    <media:starRating count="35" average="4.77" min="1" max="5"/>
+    <media:statistics views="2243"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:X4gfV35iw_M</id>
+  <yt:videoId>X4gfV35iw_M</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 009 : Interdire la Robophilie ? Pour ou contre ?</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=X4gfV35iw_M"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-11-08T14:20:16+00:00</published>
+  <updated>2016-01-11T14:03:10+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 009 : Interdire la Robophilie ? Pour ou contre ?</media:title>
+   <media:content url="https://www.youtube.com/v/X4gfV35iw_M?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/X4gfV35iw_M/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Free lance Festival 4K
+
+2 - Tesla bloque l'autopilot
+
+3 - Chronos
+
+4 - Twitter like
+
+5 - Facebook vidéo bullshit
+
+6 - Inbox répond
+
+7 - Tor messenger
+
+8 - Firefox 42 en 64 bits
+
+9 - Microsoft fixe la retraite commerciale de Windows 7 et 8
+
+10 - Beta de Cortana sur iOS
+
+11 - Microbot push
+
+12 - Kodi 16
+
+13 - Projet Pixelio
+
+14 - Plex sur Apple TV
+
+J'aime ou pas :
+
+Interdire la robophilie. Pour ou contre?</media:description>
+   <media:community>
+    <media:starRating count="28" average="4.71" min="1" max="5"/>
+    <media:statistics views="1918"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:96PFvf0akqE</id>
+  <yt:videoId>96PFvf0akqE</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 008 : SmartThings en détails...</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=96PFvf0akqE"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-11-03T20:45:53+00:00</published>
+  <updated>2016-01-31T16:24:01+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 008 : SmartThings en détails...</media:title>
+   <media:content url="https://www.youtube.com/v/96PFvf0akqE?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/96PFvf0akqE/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Tesla Model X
+
+2 - Microsoft Arrow
+
+3 - Hudway
+
+4 - Fini les invitations Facebook relou
+
+5 - Google Music Play ajoute des podcasts
+
+6 - Samsung annonce des batteries flexibles
+
+7 - Asus sur un Nexus?
+
+8 - LG va mal
+
+9 - Nissa IDS et Teatro
+
+10 - Kirobo mini
+
+11 - Project Loon
+
+12 - OnHub Asus
+
+J'aime ou pas :
+
+Smartthings</media:description>
+   <media:community>
+    <media:starRating count="47" average="4.83" min="1" max="5"/>
+    <media:statistics views="2229"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:wF6Ca1aLwls</id>
+  <yt:videoId>wF6Ca1aLwls</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits Event 003 : Microsoft Hardware Event</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=wF6Ca1aLwls"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-10-06T18:33:02+00:00</published>
+  <updated>2016-01-06T06:52:18+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits Event 003 : Microsoft Hardware Event</media:title>
+   <media:content url="https://www.youtube.com/v/wF6Ca1aLwls?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/wF6Ca1aLwls/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="42" average="4.71" min="1" max="5"/>
+    <media:statistics views="2214"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:jpFecMetpLM</id>
+  <yt:videoId>jpFecMetpLM</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits Event 002 : Google Nexus</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=jpFecMetpLM"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-29T18:27:06+00:00</published>
+  <updated>2015-12-27T20:43:33+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits Event 002 : Google Nexus</media:title>
+   <media:content url="https://www.youtube.com/v/jpFecMetpLM?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jpFecMetpLM/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="26" average="5.00" min="1" max="5"/>
+    <media:statistics views="1480"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:05A4YJxx2AM</id>
+  <yt:videoId>05A4YJxx2AM</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 007 : Le logiciel pour sauver le diesel...</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=05A4YJxx2AM"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-24T14:57:29+00:00</published>
+  <updated>2016-01-07T10:55:56+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 007 : Le logiciel pour sauver le diesel...</media:title>
+   <media:content url="https://www.youtube.com/v/05A4YJxx2AM?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/05A4YJxx2AM/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - 2 lives Bits à suivre
+
+2 - Pebble Round
+
+3 - Nouvelle AppleTV démontable
+
+4 - WatchOS 2 dispo
+
+5 - XCodeGhost
+
+6 - Google Science Fair
+
+7 - Volkswagen et le diesel
+
+8 - Samsung Serif
+
+9 - Microsoft Band 2
+
+10 - Quirky en faillite
+
+11 - Nexus 5X et 6P</media:description>
+   <media:community>
+    <media:starRating count="25" average="5.00" min="1" max="5"/>
+    <media:statistics views="1540"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:ZgEsJUQnX3Q</id>
+  <yt:videoId>ZgEsJUQnX3Q</yt:videoId>
+  <yt:channelId>UCFbEiu1VrlNSVwV9MFgltWg</yt:channelId>
+  <title>Geek Inc Bits 006 : Windows 10, l'aimer ou le détester?</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=ZgEsJUQnX3Q"/>
+  <author>
+   <name>Geek Inc</name>
+   <uri>http://www.youtube.com/channel/UCFbEiu1VrlNSVwV9MFgltWg</uri>
+  </author>
+  <published>2015-09-18T14:03:49+00:00</published>
+  <updated>2016-01-06T07:20:38+00:00</updated>
+  <media:group>
+   <media:title>Geek Inc Bits 006 : Windows 10, l'aimer ou le détester?</media:title>
+   <media:content url="https://www.youtube.com/v/ZgEsJUQnX3Q?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/ZgEsJUQnX3Q/hqdefault.jpg" width="480" height="360"/>
+   <media:description>News :
+
+1 - Nest 3ème génération
+
+2 - Batterie Li Ion transparente
+
+3 - Robot Interact Centaur
+
+4 - Xperia Z5 premium
+
+5 - Intel core m
+
+6 - Honor
+
+7 - Logo Google
+
+8 - Moto 360 2
+
+9 - VP10 vs H.265
+
+10 - Asus RT-AC5300
+
+11 - Acer Revo Build
+
+12 - HTC Vive
+
+13 - Philips Hue homekit
+
+14 - iOS9
+
+15 - Amazon fire
+
+On aime ou pas
+
+Windows 10 : L'aimer ou le détester</media:description>
+   <media:community>
+    <media:starRating count="30" average="4.87" min="1" max="5"/>
+    <media:statistics views="2524"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>

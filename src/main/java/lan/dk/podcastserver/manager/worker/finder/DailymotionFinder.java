@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,14 @@ public class DailymotionFinder implements Finder {
 
     final JsonService jsonService;
     final ImageService imageService;
+    final UrlService urlService;
 
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
         return usernameOf(url)
-                .flatMap(u -> jsonService.asJson(String.format(API_URL, u)))
+                .map(username -> String.format(API_URL, username))
+                .flatMap(urlService::newURL)
+                .flatMap(jsonService::from)
                 .map(o -> Podcast.builder()
                         .cover(imageService.getCoverFromURL((String) o.get("avatar_720_url")))
                         .url(url)

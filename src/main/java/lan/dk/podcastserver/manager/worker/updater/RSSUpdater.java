@@ -1,25 +1,26 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
@@ -29,72 +30,70 @@ public class RSSUpdater extends AbstractUpdater {
     public static final Namespace MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     public static final Namespace FEEDBURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
 
+    @Resource UrlService urlService;
     @Resource JdomService jdomService;
     @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
-        Document podcastXMLSource;
-        try {
-            podcastXMLSource = jdomService.parse(podcast.getUrl());
-        } catch (JDOMException | IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return new HashSet<>();
-        }
-
-        String currentCoverURL = getCoverUrl(podcastXMLSource);
-
-        if (podcast.getCover() == null) {
-            log.debug("Traitement de la cover général du podcast");
-            podcast.setCover(imageService.getCoverFromURL(currentCoverURL));
-        }
-
         log.debug("Traitement des Items");
-        // Parcours des éléments :
-        return podcastXMLSource
-                .getRootElement()
-                .getChild("channel")
-                .getChildren("item")
+        return urlService
+                .newURL(podcast.getUrl())
+                .flatMap(jdomService::parse)
+                .map(p -> p.getRootElement().getChild("channel").getChildren("item"))
+                .map(this::elementsToItems)
+                .orElse(Sets.newHashSet());
+    }
+
+    private Set<Item> elementsToItems(List<Element> elements) {
+        return elements
                 .stream()
-                .filter(hasEnclosure())
+                .filter(this::hasEnclosure)
                 .map(this::extractItem)
                 .collect(toSet());
     }
 
-    private Predicate<Element> hasEnclosure() {
-        return item -> item.getChild("enclosure") != null || item.getChild("origEnclosureLink", FEEDBURNER) != null;
+    private Boolean hasEnclosure(Element item) {
+        return item.getChild("enclosure") != null || item.getChild("origEnclosureLink", FEEDBURNER) != null;
     }
 
     private Item extractItem(Element item) {
-        Item podcastItem = new Item()
-                .setTitle(item.getChildText("title"))
-                .setPubdate(getPubDate(item))
-                .setDescription(item.getChildText("description"))
-                .setMimeType(item.getChild("enclosure").getAttributeValue("type"))
-                .setLength((StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
-                        ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
-                        : 0L);
-
-        if ((item.getChild("thumbnail", MEDIA) != null)) {
-            if (item.getChild("thumbnail", MEDIA).getAttributeValue("url") != null) {
-                podcastItem.setCover(imageService.getCoverFromURL(item.getChild("thumbnail", MEDIA).getAttributeValue("url")));
-            } else {
-                podcastItem.setCover(imageService.getCoverFromURL(item.getChild("thumbnail", MEDIA).getText()));
-            }
-        }
         // Gestion des cas pour l'url :
-        if (item.getChild("origEnclosureLink", FEEDBURNER) != null) {
-            podcastItem.setUrl(item.getChildText("origEnclosureLink", FEEDBURNER));
-        } else if (item.getChild("enclosure") != null) {
-            podcastItem.setUrl(item.getChild("enclosure").getAttributeValue("url"));
-        }
-
-        return podcastItem;
+        return Item.builder()
+                .title(item.getChildText("title"))
+                .pubdate(getPubDate(item))
+                .description(item.getChildText("description"))
+                .mimeType(item.getChild("enclosure").getAttributeValue("type"))
+                .length(lengthOf(item))
+                .cover(coverOf(item))
+                .url(urlOf(item))
+                .build();
     }
 
-    private String getCoverUrl(Document podcastXMLSource) {
-        return (podcastXMLSource.getRootElement().getChild("channel").getChild("image") != null)
-                ? podcastXMLSource.getRootElement().getChild("channel").getChild("image").getChildText("url")
-                : null;
+    private long lengthOf(Element item) {
+        return (StringUtils.isNotEmpty(item.getChild("enclosure").getAttributeValue("length")))
+                ? Long.parseLong(item.getChild("enclosure").getAttributeValue("length"))
+                : 0L;
+    }
+
+    private String urlOf(Element element) {
+        if (nonNull(element.getChild("origEnclosureLink", FEEDBURNER))) {
+            return element.getChildText("origEnclosureLink", FEEDBURNER);
+        }
+
+        return element.getChild("enclosure").getAttributeValue("url");
+    }
+
+    private Cover coverOf(Element element) {
+        Element thumbnail = element.getChild("thumbnail", MEDIA);
+        if (isNull(thumbnail)) {
+            return null;
+        }
+
+        if (nonNull(thumbnail.getAttributeValue("url"))) {
+            return imageService.getCoverFromURL(thumbnail.getAttributeValue("url"));
+        }
+
+        return imageService.getCoverFromURL(thumbnail.getText());
     }
 
     private ZonedDateTime getPubDate(Element item) {

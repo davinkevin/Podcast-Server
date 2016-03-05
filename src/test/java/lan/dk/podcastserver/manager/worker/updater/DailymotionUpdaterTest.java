@@ -2,10 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Before;
@@ -13,11 +10,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import javax.validation.Validator;
-
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -38,6 +37,7 @@ public class DailymotionUpdaterTest {
     @Mock Validator validator;
     @Mock JsonService jsonService;
     @Mock ImageService imageService;
+    @Spy UrlService urlService;
     @InjectMocks DailymotionUpdater dailymotionUpdater;
 
     Podcast podcast;
@@ -65,9 +65,10 @@ public class DailymotionUpdaterTest {
     }
 
     @Test
-    public void should_get_items() {
+    public void should_get_items() throws MalformedURLException {
         /* Given */
-        when(jsonService.asJson(eq(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache")))).then(asJson("user.karimdebbache.json"));
+        URL karimdebbache = new URL(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache"));
+        when(jsonService.from(eq(karimdebbache))).then(asJson("user.karimdebbache.json"));
 
         /* When */
         Set<Item> items = dailymotionUpdater.getItems(podcast);
@@ -77,9 +78,10 @@ public class DailymotionUpdaterTest {
     }
 
     @Test
-    public void should_get_empty_list_if_error_during_fetching() {
+    public void should_get_empty_list_if_error_during_fetching() throws MalformedURLException {
         /* Given */
-        when(jsonService.asJson(eq(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache")))).thenReturn(Optional.empty());
+        URL karimdebbache = new URL(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache"));
+        when(jsonService.from(eq(karimdebbache))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = dailymotionUpdater.getItems(podcast);

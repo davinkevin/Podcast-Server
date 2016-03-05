@@ -1,8 +1,6 @@
 package lan.dk.podcastserver.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -14,8 +12,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
+@Builder
 @Setter @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Accessors(chain = true)
 public class Cover {
 

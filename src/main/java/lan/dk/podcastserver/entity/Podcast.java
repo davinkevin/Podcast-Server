@@ -24,6 +24,8 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"signature", "items", "contains", "add", "lastUpdateToNow" })
 public class Podcast implements Serializable {
 
+    public static final Podcast DEFAULT_PODCAST = new Podcast();
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;

@@ -1,18 +1,14 @@
 package lan.dk.podcastserver.utils.ThreadUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Created by kevin on 19/07/2014.
  */
+@Slf4j
 public class OutputLogger implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final InputStream inputStream;
 
     public OutputLogger(InputStream inputStream) {
@@ -25,13 +21,9 @@ public class OutputLogger implements Runnable {
 
     @Override
     public void run() {
-        BufferedReader br = getBufferedReader(inputStream);
-        String ligne = "";
-        try {
-            while ((ligne = br.readLine()) != null) {
-                logger.info(ligne);
-            }
-        } catch (IOException e) {
+        try(BufferedReader br = getBufferedReader(inputStream)) {
+            br.lines().forEach(log::info);
+        } catch (IOException | UncheckedIOException e) {
             e.printStackTrace();
         }
     }

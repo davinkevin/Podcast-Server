@@ -1,9 +1,10 @@
 package lan.dk.podcastserver.service;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import lan.dk.podcastserver.entity.*;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -11,21 +12,20 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
-import java.nio.file.Files;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -39,39 +39,72 @@ public class JdomServiceTest {
     @Mock UrlService urlService;
     @InjectMocks JdomService jdomService;
 
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(); // No-args constructor defaults to port 8080
+
     @Before
     public void beforeEach() {
         Item.fileContainer = "http://localhost:8080/podcast";
     }
 
     @Test
-    public void should_parse_by_url() throws IOException, JDOMException, URISyntaxException {
+    public void should_parse() throws MalformedURLException {
         /* Given */
-        URLConnection urlConnection = mock(URLConnection.class);
-        when(urlService.getConnection(anyString())).thenReturn(urlConnection);
-        /*doThrow(IOException.class).when(urlConnection).getInputStream();*/
-        when(urlConnection.getInputStream()).thenReturn(Files.newInputStream(Paths.get(JdomServiceTest.class.getResource("/remote/podcast/rss.lesGrandesGueules.xml").toURI())));
+        stubFor(get(urlEqualTo("/a/valid.xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBodyFile("service/jdomService/valid.xml")));
 
         /* When */
-        Document document = jdomService.parse("aUrl");
+        Optional<Document> document = jdomService.parse(new URL("http://localhost:8080/a/valid.xml"));
 
         /* Then */
+        assertThat(document).isPresent();
+    }
+
+    @Test
+    public void should_do_error_during_parse() throws MalformedURLException {
+        /* Given */
+        stubFor(get(urlEqualTo("/a/invalid.xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBodyFile("service/jdomService/invalid.xml")));
+
+        /* When */
+        Optional<Document> document = jdomService.parse(new URL("http://localhost:8080/a/invalid.xml"));
+
+        /* Then */
+        assertThat(document).isEmpty();
+    }
+    
+    /*@Test
+    public void should_parse_by_url() throws IOException, JDOMException, URISyntaxException {
+        *//* Given *//*
+        URLConnection urlConnection = mock(URLConnection.class);
+        when(urlService.getConnection(anyString())).thenReturn(urlConnection);
+        *//*doThrow(IOException.class).when(urlConnection).getInputStream();*//*
+        when(urlConnection.getInputStream()).thenReturn(Files.newInputStream(Paths.get(JdomServiceTest.class.getResource("/remote/podcast/rss.lesGrandesGueules.xml").toURI())));
+
+        *//* When *//*
+        Document document = jdomService.parse("aUrl");
+
+        *//* Then *//*
         assertThat(document)
                 .isInstanceOf(Document.class);
         assertThat(document.getRootElement().getName())
                 .isEqualTo("rss");
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void should_reject_parsing() throws IOException, JDOMException, URISyntaxException {
-        /* Given */
+        *//* Given *//*
         URLConnection urlConnection = mock(URLConnection.class);
         when(urlService.getConnection(anyString())).thenReturn(urlConnection);
         doThrow(IOException.class).when(urlConnection).getInputStream();
 
-        /* When */
+        *//* When *//*
         jdomService.parse("aUrl");
-    }
+    }*/
 
     @Test
     public void should_generate_xml_from_podcast_with_only_50_items() throws URISyntaxException, IOException {

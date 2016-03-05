@@ -31,7 +31,7 @@ public class DailymotionDownloader extends HTTPDownloader {
         url = urlService
                 .getPageFromURL(item.getUrl())
                 .flatMap(DailymotionDownloader::getPlayerConfig)
-                .flatMap(jsonService::parse)
+                .flatMap(jsonService::from)
                 .map(config -> ((JSONObject) ((JSONObject) config.get("metadata")).get("qualities")))
                 .map(DailymotionDownloader::getMaxQuality)
                 .orElse(null);

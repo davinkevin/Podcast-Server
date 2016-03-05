@@ -14,7 +14,6 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -53,18 +52,15 @@ public class BeInSportsUpdater extends AbstractUpdater {
     @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
-        Document page;
-        try {
-            page = htmlService.get(podcast.getUrl());
-        } catch (IOException e) {
-            log.error("IOException :", e);
-            return Sets.newHashSet();
-        }
+        return htmlService
+                .get(podcast.getUrl())
+                .map(p -> p.select("article"))
+                .map(this::convertHtmlToItems)
+                .orElse(Sets.newHashSet());
+    }
 
-        return page.select("article")
-                .stream()
-                .map(this::getItem)
-                .collect(toSet());
+    private Set<Item> convertHtmlToItems(Elements htmlItems) {
+        return htmlItems.stream().map(this::getItem).collect(toSet());
     }
 
     private ZonedDateTime getPubDateFromDescription(Element article) {
@@ -78,24 +74,25 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     private Item getItem(Element article) {
         String urlItemBeInSport = String.format(BE_IN_SPORTS_DOMAIN, article.select("a").first().attr("data-url"));
+        Optional<Document> document = htmlService.get(urlItemBeInSport);
 
-        String javascriptCode;
-        Document document;
+        return document
+                .map(d -> PROTOCOL + d.select("iframe").attr("src"))
+                .flatMap(htmlService::get)
+                .map(d -> d.select("script"))
+                .map(this::getJavascriptPart)
+                .map(html -> this.convertHtmlToItem(article, html, document.get()))
+                .orElse(Item.DEFAULT_ITEM);
+    }
 
-        try {
-            document = htmlService.get(urlItemBeInSport);
-            javascriptCode = getJavascriptPart(htmlService.get(PROTOCOL + document.select("iframe").attr("src")).select("script"));
-        } catch (IOException | IllegalArgumentException e) {
-            log.error("Error during fetch of {}", urlItemBeInSport, e);
-            return Item.DEFAULT_ITEM;
-        }
-
-        return new Item()
-                .setTitle(article.select("h3").first().text())
-                .setDescription(article.select("h3").first().text())
-                .setPubdate(getPubDateFromDescription(document))
-                .setUrl(getStreamUrl(javascriptCode).orElse(null))
-                .setCover(getPoster(javascriptCode).orElse(null));
+    private Item convertHtmlToItem(Element article, String javascriptCode, Document document) {
+        return Item.builder()
+                .title(article.select("h3").first().text())
+                .description(article.select("h3").first().text())
+                .pubdate(getPubDateFromDescription(document))
+                .url(getStreamUrl(javascriptCode).orElse(null))
+                .cover(getPoster(javascriptCode).orElse(null))
+                .build();
     }
 
     private Optional<Cover> getPoster(String javascriptCode) {
@@ -122,16 +119,12 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        String listingUrl = podcast.getUrl();
         /* cluster_video */
-        try {
-            Document page = htmlService.get(listingUrl);
-            return signatureService.generateMD5Signature(page.select(".cluster_video").html());
-        } catch (IOException e) {
-            log.error("IOException :", e);
-        }
-
-        return StringUtils.EMPTY;
+        return htmlService
+                .get(podcast.getUrl())
+                .map(p -> p.select(".cluster_video").html())
+                .map(signatureService::generateMD5Signature)
+                .orElse(StringUtils.EMPTY);
     }
 
     private Boolean podcastContains(Podcast podcast, Item item) {

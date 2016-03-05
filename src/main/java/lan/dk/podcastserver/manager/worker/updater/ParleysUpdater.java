@@ -4,19 +4,18 @@ import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,19 +50,17 @@ public class ParleysUpdater extends AbstractUpdater {
 
     @Resource ImageService imageService;
     @Resource UrlService urlService;
-    private JSONParser parser = new JSONParser();
+    @Resource JsonService jsonService;
 
     public Set<Item> getItems(Podcast podcast) {
-        JSONObject jsonObject;
-        try {
-            jsonObject = getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()));
-        } catch (IOException | ParseException e) {
-            log.error("Error during fetch of Parleys Podcast {}", podcast.getUrl(), e);
-            return Sets.newHashSet();
-        }
+        return getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()))
+            .map(this::getParleysPresentationResultsArray)
+            .map(this::fromJsonArrayToItems)
+            .orElse(Sets.newHashSet());
+    }
 
-        return getParleysPresentationResultsArray(jsonObject)
-                .stream()
+    private Set<Item> fromJsonArrayToItems(List<JSONObject> jsonObjects) {
+        return jsonObjects.stream()
                 .filter(this::isFree)
                 .map(elem -> elem.get(FIELD_ID))
                 .map(String::valueOf)
@@ -74,39 +71,38 @@ public class ParleysUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        JSONObject podcastRepresentation;
-        try {
-            podcastRepresentation = getParseJsonObject(podcast.getUrl(), null);
-        } catch (IOException | ParseException e) {
-            log.error("Error during parsing of {}", podcast, e);
-            return "";
-        }
-
-        podcastRepresentation.remove(FIELD_COMPLETED_IN);
-        podcastRepresentation.remove(FIELD_RESULTS);
-        return signatureService.generateMD5Signature(podcastRepresentation.toJSONString());
-
+        return getParseJsonObject(podcast.getUrl(), null)
+                .map(p -> {
+                    p.remove(FIELD_COMPLETED_IN);
+                    p.remove(FIELD_RESULTS);
+                    return p;
+                })
+                .map(p -> signatureService.generateMD5Signature(p.toJSONString()))
+                .orElse("");
     }
 
     private Item getParleysItem(String id) {
-        JSONObject responseObject;
-        try {
-            responseObject = (JSONObject) parser.parse(urlService.getReaderFromURL(getItemUrl(id)));
-        } catch (IOException | ParseException e) {
-            log.error("Error during fetching of item of id {}", id, e);
-            return Item.DEFAULT_ITEM;
-        }
-
-        return new Item()
-                .setTitle((String) responseObject.get(FIELD_TITLE))
-                .setDescription((String) responseObject.get(FIELD_DESCRIPTION))
-                .setPubdate(fromParleys((String) responseObject.get(FIELD_PUBLISHED_ON)))
-                .setCover(imageService.getCoverFromURL(((String) responseObject.get(FIELD_BASE_PATH)).concat((String) responseObject.get(FIELD_THUMBNAIL))))
-                .setUrl(String.format(PARLEYS_ITEM_URL, id));
+        return urlService
+                .newURL(getItemUrl(id))
+                .flatMap(jsonService::from)
+                .map(jsonObject -> fromJsonToItem(jsonObject, id))
+                .orElse(Item.DEFAULT_ITEM);
     }
 
-    private JSONObject getParseJsonObject(String url, Integer numberOfItem) throws IOException, ParseException {
-        return (JSONObject) parser.parse(urlService.getReaderFromURL(getParleysPresentationUrl(url, numberOfItem)));
+    private Item fromJsonToItem(JSONObject responseObject, String id) {
+        return Item.builder()
+                .title((String) responseObject.get(FIELD_TITLE))
+                .description((String) responseObject.get(FIELD_DESCRIPTION))
+                .pubdate(fromParleys((String) responseObject.get(FIELD_PUBLISHED_ON)))
+                .cover(imageService.getCoverFromURL(((String) responseObject.get(FIELD_BASE_PATH)).concat((String) responseObject.get(FIELD_THUMBNAIL))))
+                .url(String.format(PARLEYS_ITEM_URL, id))
+                .build();
+    }
+
+    private Optional<JSONObject> getParseJsonObject(String url, Integer numberOfItem) {
+        return urlService
+                .newURL(getParleysPresentationUrl(url, numberOfItem))
+                .flatMap(jsonService::from);
     }
 
     @SuppressWarnings("unchecked")
@@ -131,9 +127,10 @@ public class ParleysUpdater extends AbstractUpdater {
         return "";
     }
 
-    private Integer getNumberOfItem(String url) throws IOException, ParseException {
-        JSONObject responseObject = getParseJsonObject(url, 1);
-        return nonNull(responseObject.get(FIELD_COUNT)) ? ((Long) responseObject.get(FIELD_COUNT)).intValue() : 100;
+    private Integer getNumberOfItem(String url) {
+        return getParseJsonObject(url, 1)
+            .map(r -> nonNull(r.get(FIELD_COUNT)) ? ((Long) r.get(FIELD_COUNT)).intValue() : 100)
+            .orElse(100);
     }
 
     private Boolean isFree(JSONObject currentObject) {

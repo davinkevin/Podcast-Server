@@ -10,12 +10,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -31,10 +32,10 @@ public class JsonServiceTest {
     @Test
     public void should_read_json_from_files() throws URISyntaxException, IOException {
         /* Given */
-        when(urlService.urlAsReader(anyString())).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
+        when(urlService.urlAsReader(any(URL.class))).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
 
         /* When */
-        Optional<JSONObject> aFakeUrl = jsonService.asJson("aFakeUrl");
+        Optional<JSONObject> aFakeUrl = jsonService.from(new URL("http://foo.com/"));
 
         /* Then */
         assertThat(aFakeUrl).isPresent();
@@ -43,10 +44,10 @@ public class JsonServiceTest {
     @Test
     public void should_return_empty_if_error_during_parsing() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(urlService).urlAsReader(anyString());
+        doThrow(IOException.class).when(urlService).urlAsReader(any(URL.class));
 
         /* When */
-        Optional<JSONObject> aFakeUrl = jsonService.asJson("aFakeUrl");
+        Optional<JSONObject> aFakeUrl = jsonService.from(new URL("http://foo.com/"));
 
         /* Then */
         assertThat(aFakeUrl).isEmpty();
@@ -57,7 +58,7 @@ public class JsonServiceTest {
         /* Given */
         String object = "{}";
         /* When */
-        Optional<JSONObject> parse = jsonService.parse(object);
+        Optional<JSONObject> parse = jsonService.from(object);
 
         /* Then */
         assertThat(parse).isPresent();
@@ -69,7 +70,7 @@ public class JsonServiceTest {
         String object = "}{{{";
 
         /* When */
-        Optional<JSONObject> parse = jsonService.parse(object);
+        Optional<JSONObject> parse = jsonService.from(object);
 
         /* Then */
         assertThat(parse).isEmpty();

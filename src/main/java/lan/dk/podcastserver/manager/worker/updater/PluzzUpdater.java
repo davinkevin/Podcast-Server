@@ -1,34 +1,33 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 09/08/2014 for Podcast Server
@@ -47,32 +46,25 @@ public class PluzzUpdater extends AbstractUpdater {
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
     @Resource UrlService urlService;
+    @Resource JsonService jsonService;
 
     public Set<Item> getItems(Podcast podcast) {
-        Document page;
-        String listingUrl = podcast.getUrl();
-        try {
-            page = htmlService.connectWithDefault(listingUrl).execute().parse();
-        } catch (IOException e) {
-            log.error("IOException :", e);
-            return new HashSet<>();
-        }
+        Optional<Document> page = htmlService.get(podcast.getUrl());
 
-        //get from current page, for the first of the panel
-        Set<Item> items = new HashSet<>();
-        items.add(getCurrentPlayedItem(page));
+        return page
+            .map(p -> p.select(JSOUP_ITEM_SELECTOR).select("a.row"))
+            .map(this::htmlToItems)
+            .map(s -> {
+                s.add(getCurrentPlayedItem(page.get()));
+                return s;
+            })
+            .orElse(Sets.newHashSet());
+    }
 
-        // get from right panel
-        Elements listOfEpisodes = page.select(JSOUP_ITEM_SELECTOR);
-        List<Item> itemList = listOfEpisodes.select("a.row")
-                .stream()
+    private Set<Item> htmlToItems(Elements elements) {
+        return elements.stream()
                 .map(element -> getPluzzItemByUrl(element.attr("href")))
-                .collect(toList());
-        items.addAll(
-                itemList
-        );
-
-        return items;
+                .collect(toSet());
     }
 
     private ZonedDateTime fromPluzz(JSONObject responseObject){
@@ -96,17 +88,13 @@ public class PluzzUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        Document page;
-        String listingUrl = podcast.getUrl();
-        try {
-            page = htmlService.connectWithDefault(listingUrl).execute().parse();
-            Elements listOfItem = page.select(JSOUP_ITEM_SELECTOR);
+        Optional<Document> page = htmlService.get(podcast.getUrl());
 
-            return signatureService.generateMD5Signature((listOfItem.size() == 0) ? page.html() : listOfItem.html());
-        } catch (IOException e) {
-            log.error("IOException :", e);
-        }
-        return "";
+        return page
+            .map(p -> p.select(JSOUP_ITEM_SELECTOR))
+            .map(l -> (l.size() == 0) ? page.get().html() : l.html())
+            .map(signatureService::generateMD5Signature)
+            .orElse(StringUtils.EMPTY);
     }
 
     private Item getPluzzItemByUrl(String url) {
@@ -119,29 +107,26 @@ public class PluzzUpdater extends AbstractUpdater {
     }
 
     private Item getPluzzItemById(String pluzzId) {
-        JSONParser parser = new JSONParser();
-        try {
-            log.debug(getPluzzJsonInformation(pluzzId));
-            JSONObject responseObject = (JSONObject) parser.parse(urlService.getReaderFromURL(getPluzzJsonInformation(pluzzId)));
+        return urlService
+                .newURL(getPluzzJsonInformation(pluzzId))
+                .flatMap(jsonService::from)
+                .map(this::jsonToItem)
+                .orElse(Item.DEFAULT_ITEM);
+    }
 
-            String season = String.valueOf(responseObject.get("saison"));
-            String episode = String.valueOf(responseObject.get("episode"));
-            String seasonEpisode = !"null".equals(season) && !"null".equals(episode) ? " - S".concat(season).concat("E").concat(episode).concat(" - ") : " - ";
+    private Item jsonToItem(JSONObject responseObject) {
 
-            Item itemToReturn = new Item()
-                    .setTitle( StringUtils.join(responseObject.get("titre").toString(), seasonEpisode,responseObject.get("sous_titre").toString()) )
-                    .setDescription( String.valueOf(responseObject.get("synopsis")))
-                    .setPubdate( fromPluzz(responseObject) )
-                    .setCover( imageService.getCoverFromURL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image"))))
-                    .setUrl( getPluzzM38uUrl((JSONArray) responseObject.get("videos")));
+        String season = String.valueOf(responseObject.get("saison"));
+        String episode = String.valueOf(responseObject.get("episode"));
+        String seasonEpisode = !"null".equals(season) && !"null".equals(episode) ? " - S".concat(season).concat("E").concat(episode).concat(" - ") : " - ";
 
-            log.debug(itemToReturn.toString());
-            return itemToReturn;
-        } catch (IOException | ParseException e) {
-            log.error("Error during getPluzzItemById", e);
-        }
-
-        return Item.DEFAULT_ITEM;
+        return Item.builder()
+                    .title( StringUtils.join(responseObject.get("titre").toString(), seasonEpisode,responseObject.get("sous_titre").toString()) )
+                    .description( String.valueOf(responseObject.get("synopsis")))
+                    .pubdate( fromPluzz(responseObject) )
+                    .cover( imageService.getCoverFromURL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image"))))
+                    .url( getPluzzM38uUrl((JSONArray) responseObject.get("videos")))
+                .build();
     }
 
     @SuppressWarnings("unchecked")

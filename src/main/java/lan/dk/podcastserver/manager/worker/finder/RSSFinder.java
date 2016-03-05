@@ -4,82 +4,66 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import org.jdom2.Document;
+import lan.dk.podcastserver.service.UrlService;
+import lombok.RequiredArgsConstructor;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.Objects;
+
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 22/02/15.
  */
 @Service("RSSFinder")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class RSSFinder implements Finder {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
-    JdomService jdomService;
-    ImageService imageService;
+    public static final String CHANNEL = "channel";
+    public static final String TITLE = "title";
+    public static final String DESCRIPTION = "description";
+    public static final String IMAGE = "image";
+    public static final String URL = "url";
+    public static final String HREF = "href";
 
-    @Autowired
-    public RSSFinder(JdomService jdomService, ImageService imageService) {
-        this.jdomService = jdomService;
-        this.imageService = imageService;
-    }
+    final UrlService urlService;
+    final JdomService jdomService;
+    final ImageService imageService;
 
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
-        Podcast podcast = new Podcast();
-        podcast.setType("RSS");
-        podcast.setUrl(url);
-        
-        Document podcastXML;
-        Element channel; 
-        // Get information about podcast
-        try {
-            podcastXML = jdomService.parse(podcast.getUrl());
-            channel = podcastXML.getRootElement().getChild("channel");
-        } catch (JDOMException | IOException e) {
-            logger.error("Error during parsing of podcast", e);
-            throw new FindPodcastNotFoundException();
-        }
-
-        if (channel == null) {
-            logger.error("Podcast has no channel");
-            throw new FindPodcastNotFoundException();
-        }
-        
-        
-        podcast
-                .setTitle(channel.getChildText("title"))
-                .setDescription(channel.getChildText("description"))
-                .setCover(imageService.getCoverFromURL(getPodcastCover(channel)));
-
-
-        return podcast;
+        return urlService
+                .newURL(url)
+                .flatMap(jdomService::parse)
+                .map(x -> x.getRootElement().getChild(CHANNEL))
+                .filter(Objects::nonNull)
+                .map(e -> this.xmlToPodcast(e, url))
+                .orElse(Podcast.DEFAULT_PODCAST);
     }
 
-    private String getPodcastCover(Element channelElement) {
-        String cover;
-        Element rssImage = channelElement.getChild("image");
-        if (rssImage == null) {
-            cover = null;
-        } else {
-            cover = rssImage.getChildText("url");
+    private Podcast xmlToPodcast(Element element, String url) {
+        return Podcast.builder()
+                .type("RSS")
+                .url(url)
+                .title(element.getChildText(TITLE))
+                .description(element.getChildText(DESCRIPTION))
+                .cover(imageService.getCoverFromURL(coverUrlOf(element)))
+            .build();
+    }
+
+    private String coverUrlOf(Element channelElement) {
+        Element rssImage = channelElement.getChild(IMAGE);
+        if (nonNull(rssImage)) {
+            return rssImage.getChildText(URL);
         }
 
-        if (cover != null)
-            return cover;
+        Element itunesImage = channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE);
+        if (nonNull(itunesImage))
+            return itunesImage.getAttributeValue(HREF);
 
-        Element itunesImage = channelElement.getChild("image", JdomService.ITUNES_NAMESPACE);
-        if (itunesImage == null)
-            return null;
-
-        return itunesImage.getAttributeValue("href");
+        return null;
     }
 
 }

@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,15 @@ public class DailymotionUpdater extends AbstractUpdater {
 
     @Autowired JsonService jsonService;
     @Autowired ImageService imageService;
+    @Autowired UrlService urlService;
 
     @Override
     @SuppressWarnings("unchecked")
     public Set<Item> getItems(Podcast podcast) {
         return usernameOf(podcast.getUrl())
-                .flatMap(u -> jsonService.asJson(String.format(API_LIST_OF_ITEMS, u)))
+                .map(username -> String.format(API_LIST_OF_ITEMS, username))
+                .flatMap(urlService::newURL)
+                .flatMap(jsonService::from)
                 .map(o -> ((List<JSONObject>) o.get("list")))
                 .map(this::asSet)
                 .orElse(Sets.newHashSet());

@@ -7,6 +7,8 @@ import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.Optional;
 
@@ -184,12 +186,25 @@ public class UrlServiceTest {
 
     @Test
     public void should_handle_error_when_extract_url_in_string() {
-        /* Given */
         /* When */
         Optional<String> page = urlService.getPageFromURL("/my/resource");
 
         /* Then */
         assertThat(page).isEmpty();
+    }
+
+    @Test
+    public void should_generate_url() throws MalformedURLException {
+        /* Given */ String urlAsString = "http://foo.bar.com/sub/folder";
+        /* When */  Optional<URL> url = urlService.newURL(urlAsString);
+        /* Then */  assertThat(url).isPresent().contains(new URL(urlAsString));
+    }
+
+    @Test
+    public void should_generate_empty_if_url_not_correct() throws MalformedURLException {
+        /* Given */ String urlAsString = "a:/oo.bar.com";
+        /* When */  Optional<URL> url = urlService.newURL(urlAsString);
+        /* Then */  assertThat(url).isEmpty();
     }
 
     @Test

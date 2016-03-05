@@ -4,22 +4,20 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 22/02/15.
  */
+@Slf4j
 @Service("YoutubeFinder")
 public class YoutubeFinder implements Finder {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private HtmlService htmlService;
 
@@ -30,22 +28,21 @@ public class YoutubeFinder implements Finder {
 
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
+        return htmlService
+                .get(url)
+                .map(p -> podcastFromHtml(url, p))
+                .orElse(Podcast.DEFAULT_PODCAST);
+    }
 
-        Document page;
-
-        try {
-            page = htmlService.connectWithDefault(url).get();
-        } catch (IOException e) {
-            logger.error("IOException :", e);
-            throw new FindPodcastNotFoundException();
-        }
-
-        return new Podcast()
-                .setUrl(url)
-                .setType("Youtube")
-                .setTitle(getTitle(page))
-                .setDescription(getDescription(page))
-                .setCover(getCover(page));
+    private Podcast podcastFromHtml(String url, Document p) {
+        return Podcast
+                .builder()
+                    .url(url)
+                    .type("Youtube")
+                    .title(getTitle(p))
+                    .description(getDescription(p))
+                    .cover(getCover(p))
+                .build();
     }
 
     private String getDescription(Document page) {
@@ -68,8 +65,13 @@ public class YoutubeFinder implements Finder {
 
     private Cover getCover(Document page) {
         Element elementWithExternalId = page.select("img.channel-header-profile-image").first();
-        if (elementWithExternalId != null) {
-            return new Cover(elementWithExternalId.attr("src"), 200, 200);
+        if (nonNull(elementWithExternalId)) {
+            return Cover
+                    .builder()
+                        .url(elementWithExternalId.attr("src"))
+                        .height(200)
+                        .width(200)
+                    .build();
         }
 
         return new Cover();

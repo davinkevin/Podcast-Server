@@ -7,16 +7,17 @@ import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import lan.dk.podcastserver.service.UrlService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by kevin on 15/09/15 for Podcast Server
  */
-@Component
+@Service
 public class WGetFactory {
 
     final UrlService urlService;
@@ -38,6 +39,27 @@ public class WGetFactory {
     }
 
     public DownloadInfo newDownloadInfo(String url) throws MalformedURLException {
+        //return new DownloadInfo(new URL(url));
         return new DownloadInfo(new URL(url));
+    }
+
+    public static class DownloadInfoBuilder {
+
+        final URL url;
+
+        DownloadInfoBuilder(String url) throws MalformedURLException {
+            this.url = new URL(url);
+        }
+
+        public DownloadInfo get() {
+            return new DownloadInfo(url);
+        }
+
+        public DownloadInfo extract(final AtomicBoolean stop, final Runnable notify) {
+            DownloadInfo downloadInfo = this.get();
+            downloadInfo.extract(stop, notify);
+            return downloadInfo;
+        }
+
     }
 }

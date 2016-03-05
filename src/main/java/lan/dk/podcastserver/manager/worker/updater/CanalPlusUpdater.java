@@ -8,17 +8,16 @@ import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jdom2.JDOMException;
-import org.jsoup.nodes.Document;
+import org.jdom2.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,47 +65,24 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     private String getPodcastURLOfFrontTools(String url) {
-
-        Document page;
-        try {
-            page = htmlService.get(url);
-        } catch (IOException e) {
-            log.error("IOException :", e);
-            return "";
-        }
-
         Matcher tabs = TABS_EXTRACTOR.matcher(url);
         String liste = tabs.find() ? String.format("&liste=%d", Integer.parseInt(tabs.group(1))-1) : "";
 
-        Matcher ids = ID_EXTRACTOR.matcher(page.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"));
-        if (!ids.find()) {
-            return "";
-        }
-
-        return String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.group(1)), Integer.parseInt(ids.group(2)), liste);
+        return htmlService
+                .get(url)
+                .map(p -> p.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"))
+                .flatMap(s -> patternMatcher(s, ID_EXTRACTOR))
+                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.group(1)), Integer.parseInt(ids.group(2)), liste))
+                .orElse("");
     }
 
     private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
-
-        Matcher m = NB_PLUS_VIDEOS_PATTERN.matcher(canalPlusFrontToolsUrl);
-
-        if (!m.find()) {
-            log.error("nbPlusVideos Introuvable pour le show {}", canalPlusFrontToolsUrl);
-            return new Elements();
-        }
-
-        int nbPlusVideos = Integer.parseInt(m.group(1));
-        log.debug("nbPlusVideos = " + nbPlusVideos);
-
-        Document page;
-        try {
-            page = htmlService.get(canalPlusFrontToolsUrl);
-        } catch (IOException e) {
-            log.error("Error during loading of url : {}", canalPlusFrontToolsUrl, e);
-            return new Elements();
-        }
-
-        return page.select("ul.features, ul.unit-gallery2").get(nbPlusVideos).select("li");
+        Optional<Matcher> matcher = patternMatcher(canalPlusFrontToolsUrl, NB_PLUS_VIDEOS_PATTERN);
+        return matcher
+            .flatMap(id -> htmlService.get(canalPlusFrontToolsUrl))
+            .map(p -> p.select("ul.features, ul.unit-gallery2"))
+            .map(e -> e.get(Integer.parseInt(matcher.map(m -> m.group(1)).get())).select("li"))
+            .orElse(new Elements());
     }
 
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
@@ -121,23 +97,24 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
 
     private Item getItemFromVideoId(Integer idCanalPlusVideo) {
-        org.jdom2.Document xmlEpisode;
-        try {
-            xmlEpisode = jdomService.parse(String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo));
-        } catch (IOException | JDOMException e) {
-            log.error("Exception during parsing of : {}", String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo), e);
-            return Item.DEFAULT_ITEM;
-        }
+        return urlService
+                .newURL(String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo))
+                .flatMap(jdomService::parse)
+                .map(this::itemFromXml)
+                .orElse(Item.DEFAULT_ITEM);
+    }
 
-        org.jdom2.Element infos = xmlEpisode.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_INFOS);
-        org.jdom2.Element media = xmlEpisode.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_MEDIA);
+    private Item itemFromXml(Document x) {
+        org.jdom2.Element infos = x.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_INFOS);
+        org.jdom2.Element media = x.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_MEDIA);
 
-        return new Item()
-                .setTitle(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_TITRE))
-                .setPubdate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
-                .setCover(imageService.getCoverFromURL(media.getChild(FIELD_IMAGES).getChildText(FIELD_GRAND)))
-                .setDescription(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_SOUS_TITRE))
-                .setUrl(findUrl(media));
+        return Item.builder()
+                .title(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_TITRE))
+                .pubdate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
+                .cover(imageService.getCoverFromURL(media.getChild(FIELD_IMAGES).getChildText(FIELD_GRAND)))
+                .description(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_SOUS_TITRE))
+                .url(findUrl(media))
+                .build();
     }
 
     private String findUrl(org.jdom2.Element media) {
@@ -153,6 +130,15 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     private String getRealUrl(Podcast podcast) {
         return podcast.getUrl().contains("front_tools") ? podcast.getUrl() : this.getPodcastURLOfFrontTools(podcast.getUrl());
+    }
+
+
+    private Optional<Matcher> patternMatcher(String s, Pattern pattern) {
+        Matcher matcher = pattern.matcher(s);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+        return Optional.of(matcher);
     }
 
     @Override

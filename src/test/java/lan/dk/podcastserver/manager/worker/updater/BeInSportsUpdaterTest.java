@@ -24,13 +24,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -76,7 +76,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_do_reject_is_signature_fail() throws IOException, URISyntaxException {
         /* Given */
-        doThrow(IOException.class).when(htmlService).get(anyString());
+        when(htmlService.get(anyString())).thenReturn(Optional.empty());
 
         /* When */
         String signature = beInSportsUpdater.signatureOf(podcast);
@@ -88,7 +88,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_return_empty_item_list_if_error() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(htmlService).get(anyString());
+        when(htmlService.get(anyString())).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = beInSportsUpdater.getItems(podcast);
@@ -135,7 +135,7 @@ public class BeInSportsUpdaterTest {
     public void should_return_default_item_if_exception() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
-        doThrow(IOException.class).when(htmlService).get(not(eq(podcast.getUrl())));
+        when(htmlService.get(not(eq(podcast.getUrl())))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = beInSportsUpdater.getItems(podcast);
@@ -202,13 +202,13 @@ public class BeInSportsUpdaterTest {
         }
     }*/
 
-    private Answer<Document> readHtmlFromFile(String s) throws URISyntaxException {
+    private Answer<Optional<Document>> readHtmlFromFile(String s) throws URISyntaxException {
         Path path = Paths.get(BeInSportsUpdaterTest.class.getResource(s).toURI());
-        return i -> Jsoup.parse(path.toFile(), "UTF-8", "http://www.beinsports.com/");
+        return i -> Optional.of(Jsoup.parse(path.toFile(), "UTF-8", "http://www.beinsports.com/"));
     }
 
-    private Answer<Document> readHtmlFromFile(Path s) throws URISyntaxException {
-        return i -> Jsoup.parse(s.toFile(), "UTF-8", "http://www.beinsports.com/");
+    private Answer<Optional<Document>> readHtmlFromFile(Path s) throws URISyntaxException {
+        return i -> Optional.of(Jsoup.parse(s.toFile(), "UTF-8", "http://www.beinsports.com/"));
     }
 
     private void configureHtmlServiceWith(String url, String file) throws IOException, URISyntaxException {

@@ -4,9 +4,12 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Connection;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,18 +18,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.validation.Validator;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,19 +45,20 @@ public class PluzzUpdaterTest {
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
     @Mock UrlService urlService;
+    @Mock JsonService jsonService;
     @InjectMocks PluzzUpdater pluzzUpdater;
     public static final Podcast PODCAST = Podcast.builder().url(PLUZZ_URL).build();
+
+    @Before
+    public void beforeEach() {
+        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(((String) i.getArguments()[0]))));
+    }
 
     @Test
     public void should_sign_the_podcast() throws IOException, URISyntaxException {
         /* Given */
-        Connection connection = mock(Connection.class);
-        Connection.Response response = mock(Connection.Response.class);
-        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
-        when(connection.execute()).thenReturn(response);
-        when(response.parse()).thenReturn(parse("/remote/podcast/pluzz.commentcavabien.html"));
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.of(parse("/remote/podcast/pluzz.commentcavabien.html")));
         when(signatureService.generateMD5Signature(anyString())).thenReturn("1234567889azerty");
-
 
         /* When */
         String signature = pluzzUpdater.signatureOf(PODCAST);
@@ -69,68 +72,56 @@ public class PluzzUpdaterTest {
     @Test
     public void should_return_empty_string_if_signature_fails() throws IOException {
          /* Given */
-        Connection connection = mock(Connection.class);
-        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
-        doThrow(IOException.class).when(connection).execute();
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.empty());
 
         /* When */
         String signature = pluzzUpdater.signatureOf(PODCAST);
 
         /* Then */
-        assertThat(signature)
-                .isEmpty();
+        assertThat(signature).isEmpty();
     }
 
     @Test
     public void should_get_items() throws IOException, URISyntaxException {
         /* Given */
-        Connection connection = mock(Connection.class);
-        Connection.Response response = mock(Connection.Response.class);
-        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
-        when(connection.execute()).thenReturn(response);
-        when(response.parse()).thenReturn(parse("/remote/podcast/pluzz.commentcavabien.html"));
-        doThrow(IOException.class).when(urlService).getReaderFromURL(contains("129003962"));
-        when(urlService.getReaderFromURL(not(contains("129003962")))).then(invocation -> loadEpisode(StringUtils.substringBetween(String.valueOf(invocation.getArguments()[0]), "?idDiffusion=", "&catalogue")));
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.of(parse("/remote/podcast/pluzz.commentcavabien.html")));
+        when(jsonService.from(any(URL.class))).then(i -> {
+            URL url = URL.class.cast(i.getArguments()[0]);
+            if (url.toString().contains("129003962"))
+                return Optional.empty();
+            return Optional.of(loadEpisode(StringUtils.substringBetween(url.toString(), "?idDiffusion=", "&catalogue")));
+        });
 
         /* When */
         Set<Item> items = pluzzUpdater.getItems(PODCAST);
 
         /* Then */
-        assertThat(items)
-                .hasSize(5);
+        assertThat(items).hasSize(5);
     }
 
     @Test
     public void should_get_empty_list_of_item_if_connection_failed() throws IOException, URISyntaxException {
         /* Given */
-        Connection connection = mock(Connection.class);
-        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
-        doThrow(IOException.class).when(connection).execute();
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = pluzzUpdater.getItems(PODCAST);
 
         /* Then */
-        assertThat(items)
-                .isEmpty();
+        assertThat(items).isEmpty();
     }
 
     @Test
     public void should_get_items_if_no_played_item() throws IOException, URISyntaxException {
         /* Given */
-        Connection connection = mock(Connection.class);
-        Connection.Response response = mock(Connection.Response.class);
-        when(htmlService.connectWithDefault(PLUZZ_URL)).thenReturn(connection);
-        when(connection.execute()).thenReturn(response);
-        when(response.parse()).thenReturn(parse("/remote/podcast/pluzz.commentcavabien.noplayeditem.html"));
-        when(urlService.getReaderFromURL(anyString())).then(invocation -> loadEpisode(StringUtils.substringBetween(String.valueOf(invocation.getArguments()[0]), "?idDiffusion=", "&catalogue")));
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.of(parse("/remote/podcast/pluzz.commentcavabien.noplayeditem.html")));
+        when(jsonService.from(any(URL.class))).then(i -> Optional.of(loadEpisode(StringUtils.substringBetween(URL.class.cast(i.getArguments()[0]).toString(), "?idDiffusion=", "&catalogue"))));
 
         /* When */
         Set<Item> items = pluzzUpdater.getItems(PODCAST);
 
         /* Then */
-        assertThat(items)
-                .hasSize(5);
+        assertThat(items).hasSize(5);
     }
 
     @Test
@@ -139,8 +130,8 @@ public class PluzzUpdaterTest {
         assertThat(pluzzUpdater.type().name()).isEqualTo("Pluzz");
     }
 
-    private Reader loadEpisode(String id) throws URISyntaxException, IOException {
-        return Files.newBufferedReader(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI()));
+    private JSONObject loadEpisode(String id) throws URISyntaxException, IOException, ParseException {
+        return (JSONObject) new JSONParser().parse(Files.newBufferedReader(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI())));
     }
 
     private Document parse(String file) throws URISyntaxException, IOException {

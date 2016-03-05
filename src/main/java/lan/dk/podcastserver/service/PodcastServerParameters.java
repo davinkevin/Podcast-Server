@@ -69,6 +69,12 @@ public class PodcastServerParameters {
      */
     Api api;
 
+    /**
+     * Path to external tools used by Podcast-Server
+     * @return
+     */
+    ExternalTools externalTools;
+
     //** GETTER OF THE PARAMETERS **//
     public String getRootfolder() {
         return rootfolder;
@@ -115,9 +121,18 @@ public class PodcastServerParameters {
         public String youtube() {
             return youtube;
         }
-
         public String dailymotion() {
             return dailymotion;
         }
+    }
+
+    @Getter @Setter
+    @Accessors(chain = true)
+    public static class ExternalTools {
+        private String ffmpeg;
+        private String rtmpdump;
+
+        public String ffmpeg(){return ffmpeg;}
+        public String rtmpdump(){return rtmpdump;}
     }
 }
