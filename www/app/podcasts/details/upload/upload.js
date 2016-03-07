@@ -32,9 +32,9 @@ export default class PodcastUploadComponent{
     }
 
     onFileSelect($files) {
-        angular.forEach($files, (file) => {
+        angular.forEach($files, file => {
             this.itemService.upload(this.podcast, file)
-                .then((item) => {
+                .then(item => {
                     this.$scope.$emit("podcastEdition:upload");
                     this.$notification('Upload effectué', {
                         body: item.title,

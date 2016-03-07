@@ -32,17 +32,18 @@ export default class PodcastCreationController {
         this.podcastService = podcastService;
         this.$location = $location;
         this.tagService = tagService;
-        this.podcast = angular.extend(this.podcastService.getNewPodcast(), defaultPodcast );
+        this.podcast = angular.extend({}, defaultPodcast);
         this.types = types;
     }
 
     findInfo() {
-        return this.podcastService.findInfo(this.podcast.url)
-            .then((podcastFetched) => {
+        return this.podcastService
+            .findInfo(this.podcast.url)
+            .then(podcastFetched => {
                 this.podcast.title = podcastFetched.title;
                 this.podcast.description = podcastFetched.description;
                 this.podcast.type = podcastFetched.type;
-                this.podcast.cover.url = podcastFetched.cover.url;
+                this.podcast.cover = podcastFetched.cover;
             });
     }
 
@@ -67,7 +68,7 @@ export default class PodcastCreationController {
             this.podcast.type = "Youtube";
         } else if (/dailymotion\.com/i.test(this.podcast.url)) {
             this.podcast.type = "Dailymotion";
-        } else if (this.podcast.url.length > 0) {
+        } else if (this.podcast.url && this.podcast.url.length > 0) {
             this.podcast.type = "RSS";
         } else {
             this.podcast.type = "Send";
@@ -75,8 +76,9 @@ export default class PodcastCreationController {
     }
 
     save() {
-        this.podcastService.save(this.podcast)
-            .then((podcast) => this.$location.path('/podcasts/' + podcast.id));
+        this.podcastService
+            .save(this.podcast)
+            .then(podcast => this.$location.path('/podcasts/' + podcast.id));
     }
 }
 

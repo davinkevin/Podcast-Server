@@ -8,7 +8,6 @@ import AuthorizeNotificationModule from '../common/component/authorize-notificat
 import UpdatingModule from '../common/component/updating/updating';
 import 'angular-touch';
 import 'angular-animate';
-import '../common/mixins.js';
 import './bootstrap/bootstrap';
 import './font-awesome/font-awesome';
 import './ionicons/ionicons';

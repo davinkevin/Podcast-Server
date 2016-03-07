@@ -9,7 +9,7 @@
             </span>
 
             <!-- Lancer le téléchargement -->
-            <button ng-click="item.download()" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary hidden-xs"><span class="glyphicon glyphicon-save"></span></button>
+            <button ng-click="pic.download(item)" ng-show="(item.status != 'STARTED' && item.status != 'PAUSED' ) && !item.isDownloaded" type="button" class="btn btn-primary hidden-xs"><span class="glyphicon glyphicon-save"></span></button>
 
             <!-- Lire dans le player -->
             <a ng-click="pic.play(item)" ng-show="item.isDownloaded" type="button" class="btn btn-success hidden-xs"><span class="ionicons ion-social-youtube"></span></a>

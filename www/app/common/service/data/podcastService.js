@@ -1,66 +1,52 @@
 /**
  * Created by kevin on 02/11@/14 for Podcast Server
  */
-import {Module, Service, Config} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
+import {Module, Service} from '../../../decorators';
 
 @Module({
-    name : 'ps.common.service.data.podcastService',
-    modules : [ RestangularConfig ]
+    name : 'ps.common.service.data.podcastService'
 })
 @Service('podcastService')
-@Config((RestangularProvider) => {
-    "ngInject";
-    RestangularProvider.addElementTransformer('podcast', false, (podcast) => {
-        podcast.addRestangularMethod('findInfo', 'post', 'fetch', undefined, {'Content-Type': 'text/plain'});
-        return podcast;
-    });
-})
 export default class PodcastService  {
 
-    constructor(Restangular) {
+    constructor($http) {
         "ngInject";
-        this.Restangular = Restangular;
-        this.route = 'podcast';
+        this.$http = $http;
     }
 
-    findById(podcastId) {
-        return this.Restangular.one(this.route, podcastId).get();
+    findById(id) {
+        return this.$http.get(`/api/podcast/${id}`).then(r => r.data);
     }
 
     findAll() {
-        return this.Restangular.all(this.route).getList();
+        return this.$http.get(`/api/podcast`).then(r => r.data);
     }
 
     save(podcast) {
-        return podcast.save();
+        if (podcast.id) {
+            return this.$http.put(`/api/podcast/${podcast.id}`, podcast).then(r => r.data);
+        }
+        return this.$http.post(`/api/podcast`, podcast).then(r => r.data);
     }
 
-    getNewPodcast() {
-        return this.Restangular.one(this.route);
+    patch(podcast) {
+        return this.$http.put(`/api/podcast/${podcast.id}`, podcast).then(r => r.data);
     }
 
-    patch(item) {
-        return item.patch();
-    }
-
-    deletePodcast(item) {
-        return item.remove();
+    delete(podcast) {
+        return this.$http.delete(`/api/podcast/${podcast.id}`);
     }
 
     findInfo(url) {
-        return this.getNewPodcast().findInfo(url);
+        let headers = {'Content-Type': 'text/plain'};
+        return this.$http.post(`/api/podcast/fetch`, url, { headers }).then(r => r.data);
     }
 
     statsByPubdate(id, numberOfMonth = 6) {
-        return this.statsOf(id).all('byPubdate').post(numberOfMonth);
+        return this.$http.post(`/api/podcast/${id}/stats/byPubdate`, numberOfMonth).then(r => r.data);
     }
 
     statsByByDownloaddate(id, numberOfMonth = 6) {
-        return this.statsOf(id).all('byDownloaddate').post(numberOfMonth);
-    }
-
-    statsOf(id) {
-        return this.Restangular.one(this.route, id).one('stats');
+        return this.$http.post(`/api/podcast/${id}/stats/byDownloaddate`, numberOfMonth).then(r => r.data);
     }
 }

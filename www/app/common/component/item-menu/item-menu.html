@@ -19,7 +19,7 @@
             </a>
         </li>
         <li ng-if="::(imc.downloadControl)" ng-show="(imc.item.status != 'STARTED' && imc.item.status != 'PAUSED' ) && !imc.item.isDownloaded">
-            <a ng-click="imc.item.download()">
+            <a ng-click="imc.download(item)">
                 <span class="glyphicon glyphicon-save text-primary"></span> Download
             </a>
         </li>

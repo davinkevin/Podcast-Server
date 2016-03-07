@@ -1,5 +1,4 @@
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
 import AngularStompDKConfig from '../../../config/ngstomp';
 
 class wsDownloadManager {
@@ -25,55 +24,44 @@ class wsDownloadManager {
 
 @Module({
     name : 'ps.common.service.data.downloadManager',
-    modules : [ RestangularConfig, AngularStompDKConfig ]
+    modules : [ AngularStompDKConfig ]
 })
 @Service('DonwloadManager')
 export default class DownloadManager {
 
-    constructor(Restangular, ngstomp) {
-        "ngInject";
-        this.Restangular = Restangular;
-        this.baseTask = this.Restangular.one("task");
-        this.baseDownloadManager = this.baseTask.one('downloadManager');
-        this.WS_DOWNLOAD_BASE = '/app/download';
+    WS_DOWNLOAD_BASE = '/app/download';
 
+    constructor(ngstomp, $http) {
+        "ngInject";
+        this.$http = $http;
         this.ws = new wsDownloadManager(this.WS_DOWNLOAD_BASE, ngstomp);
     }
 
     download(item) {
-        return this.Restangular.one("item").customGET(item.id + "/addtoqueue");
-    }
-    stopDownload (item) {
-        return this.baseDownloadManager.customPOST(item.id, "stopDownload");
-    }
-    toggleDownload (item) {
-        return this.baseDownloadManager.customPOST(item.id, "toogleDownload");
+        return this.$http.get(`/api/item/${item.id}/addtoqueue`);
     }
     stopAllDownload () {
-        return this.baseDownloadManager.customGET("stopAllDownload");
+        return this.$http.get(`/api/task/downloadManager/stopAllDownload`);
     }
     pauseAllDownload () {
-        return this.baseDownloadManager.customGET("pauseAllDownload");
+        return this.$http.get(`/api/task/downloadManager/pauseAllDownload`);
     }
-    restartAllCurrentDownload () {
-        return this.baseDownloadManager.customGET("restartAllDownload");
+    restartAllDownload() {
+        return this.$http.get(`/api/task/downloadManager/restartAllDownload`);
     }
     removeFromQueue (item) {
-        return this.baseDownloadManager.customDELETE("queue/" + item.id);
+        return this.$http.delete(`/api/task/downloadManager/queue/${item.id}`);
     }
-    updateNumberOfSimDl (number) {
-        return this.baseDownloadManager.customPOST(number, "limit");
+    updateNumberOfSimDl(number) {
+        return this.$http.post(`/api/task/downloadManager/limit`, number);
     }
     dontDonwload (item) {
-        return this.baseDownloadManager.customDELETE("queue/" + item.id + "/andstop");
+        return this.$http.delete(`/api/task/downloadManager/queue/${item.id}/andstop`);
     }
-    getDownloading () {
-        return this.baseTask.all("downloadManager/downloading").getList();
+    getNumberOfSimDl() {
+        return this.$http.get(`/api/task/downloadManager/limit`).then(r => r.data);
     }
-    getNumberOfSimDl () {
-        return this.baseDownloadManager.one("limit").get();
-    }
-    moveInWaitingList  (item, position) {
-        this.baseDownloadManager.customPOST({id : item.id, position : position } , 'move');
+    moveInWaitingList(item, position) {
+        return this.$http.post(`/api/task/downloadManager/move`, {id : item.id, position });
     }
 }

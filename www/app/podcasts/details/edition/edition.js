@@ -1,7 +1,6 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import _ from 'lodash';
 import {Component, View, Module} from '../../../decorators';
 import PodcastService from '../../../common/service/data/podcastService';
 import TagService from '../../../common/service/data/tagService';
@@ -36,18 +35,18 @@ export default class PodcastEditionCtrl {
     }
 
     save() {
-        var podcastToUpdate = _.cloneDeep(this.podcast);
+        var podcastToUpdate = Object.assign({}, this.podcast);
         podcastToUpdate.items = null;
 
         return this.podcastService
             .patch(podcastToUpdate)
-            .then((patchedPodcast) => _.assign(this.podcast, patchedPodcast))
+            .then((patchedPodcast) => Object.assign(this.podcast, patchedPodcast))
             .then(() => this.$scope.$emit('podcastEdition:save'));
     }
 
     deletePodcast() {
         return this.podcastService
-            .deletePodcast(this.podcast)
+            .delete(this.podcast)
             .then(() => this.$location.path('/podcasts'));
     }
 }

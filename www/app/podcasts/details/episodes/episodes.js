@@ -62,20 +62,19 @@ export default class PodcastItemsListComponent {
 
     loadPage() {
         this.currentPage = (this.currentPage < 1) ? 1 : (this.currentPage > Math.ceil(this.totalItems / this.itemPerPage)) ? Math.ceil(this.totalItems / this.itemPerPage) : this.currentPage;
-        return this.itemService
-            .getItemForPodcastWithPagination(this.podcast, {
+        return this.itemService.getItemForPodcastWithPagination(this.podcast, {
                 size: this.itemPerPage,
                 page : this.currentPage - 1,
                 orders : [{ direction : 'DESC', property : 'pubdate'}]
             })
-            .then((itemsResponse) => {
-                this.podcast.items = this.itemService.restangularizePodcastItem(this.podcast, itemsResponse.content);
+            .then(itemsResponse => {
+                this.podcast.items = itemsResponse.content;
                 this.podcast.totalItems = itemsResponse.totalElements;
             });
     }
 
     remove(item) {
-        item.remove()
+        this.itemService.delete(item)
             .then(() => this.podcast.items = this.podcast.items.filter(elem => elem.id === item.id))
             .then(() => this.playlistService.remove(item))
             .then(() => this.loadPage());
@@ -84,6 +83,10 @@ export default class PodcastItemsListComponent {
     swipePage(val) {
         this.currentPage += val;
         this.loadPage();
+    }
+
+    download(item) {
+        return this.itemService.download(item);
     }
 
     stopDownload(item) {

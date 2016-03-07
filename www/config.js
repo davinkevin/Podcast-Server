@@ -33,27 +33,25 @@ System.config({
     "babel": "npm:babel-core@5.8.35",
     "babel-runtime": "npm:babel-runtime@5.8.35",
     "bootstrap-less": "github:distros/bootstrap-less@3.3.9",
-    "clean-css": "npm:clean-css@3.4.9",
-    "clipboard": "github:zenorocha/clipboard.js@1.5.8",
+    "clean-css": "npm:clean-css@3.4.10",
+    "clipboard": "github:zenorocha/clipboard.js@1.5.9",
     "core-js": "npm:core-js@1.2.6",
     "css": "github:systemjs/plugin-css@0.1.20",
     "font-awesome": "github:components/font-awesome@4.5.0",
-    "highcharts": "github:highcharts/highcharts-dist@4.2.2",
+    "highcharts": "github:highcharts/highcharts-dist@4.2.3",
     "highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
     "ionicons": "github:driftyco/ionicons@2.0.1",
-    "lodash": "github:lodash/lodash@3.10.1",
     "ng-file-upload": "github:danialfarid/ng-file-upload@9.1.2",
     "ng-tags-input": "github:mbenford/ngTagsInput@3.0.0",
     "ngstorage": "github:gsklee/ngStorage@0.3.10",
-    "restangular": "github:mgonto/restangular@1.5.1",
     "sockjs-client": "github:sockjs/sockjs-client@0.3.4",
     "text": "github:systemjs/plugin-text@0.0.2",
-    "videogular": "github:videogular/bower-videogular@1.4.1",
-    "videogular-buffering": "github:videogular/bower-videogular-buffering@1.4.1",
-    "videogular-controls": "github:videogular/bower-videogular-controls@1.4.1",
-    "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@1.4.1",
-    "videogular-poster": "github:videogular/bower-videogular-poster@1.4.1",
-    "videogular-themes-default": "github:videogular/bower-videogular-themes-default@1.4.1",
+    "videogular": "github:videogular/bower-videogular@1.4.2",
+    "videogular-buffering": "github:videogular/bower-videogular-buffering@1.4.2",
+    "videogular-controls": "github:videogular/bower-videogular-controls@1.4.2",
+    "videogular-overlay-play": "github:videogular/bower-videogular-overlay-play@1.4.2",
+    "videogular-poster": "github:videogular/bower-videogular-poster@1.4.2",
+    "videogular-themes-default": "github:videogular/bower-videogular-themes-default@1.4.2",
     "github:angular/bower-angular-animate@1.5.0": {
       "angular": "github:angular/bower-angular@1.5.0"
     },
@@ -82,7 +80,7 @@ System.config({
       "stompjs": "github:jmesnil/stomp-websocket@2.3.4"
     },
     "github:distros/bootstrap-less@3.3.9": {
-      "jquery": "github:components/jquery@2.2.0"
+      "jquery": "github:components/jquery@2.2.1"
     },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
@@ -126,10 +124,6 @@ System.config({
       "angular": "github:angular/bower-angular@1.5.0",
       "css": "github:systemjs/plugin-css@0.1.20"
     },
-    "github:mgonto/restangular@1.5.1": {
-      "angular": "github:angular/bower-angular@1.5.0",
-      "lodash": "npm:lodash@3.10.1"
-    },
     "npm:amdefine@1.0.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "module": "github:jspm/nodelibs-module@0.1.0",
@@ -150,7 +144,7 @@ System.config({
       "isarray": "npm:isarray@1.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:clean-css@3.4.9": {
+    "npm:clean-css@3.4.10": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "commander": "npm:commander@2.8.1",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -188,9 +182,6 @@ System.config({
     },
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"
-    },
-    "npm:lodash@3.10.1": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:os-browserify@0.1.2": {
       "os": "github:jspm/nodelibs-os@0.1.0"

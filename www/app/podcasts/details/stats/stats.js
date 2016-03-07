@@ -40,7 +40,7 @@ export default class PodcastDetailsStatsComponent {
     }
 
     generateChartData() {
-        this.statService.resetChart(this.chartSeries);
+        this.chartSeries = [];
 
         return this.$q.all([
                 this.podcastService.statsByByDownloaddate(this.podcast.id, this.month),

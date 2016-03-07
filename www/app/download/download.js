@@ -1,7 +1,6 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import _ from 'lodash';
 import {RouteConfig, View, Module} from '../decorators';
 import AngularNotification from '../common/modules/angularNotification';
 import AppRouteConfig from '../config/route';
@@ -53,12 +52,12 @@ export default class DownloadCtrl {
     }
     onDownloadUpdate(message) {
         let item = JSON.parse(message.body);
-        let elemToUpdate = _.find(this.items, { 'id': item.id });
+        let [elemToUpdate] = this.items.filter(i => i.id === item.id);
         switch (item.status) {
             case 'STARTED' :
             case 'PAUSED' :
                 if (elemToUpdate)
-                    _.assign(elemToUpdate, item);
+                    Object.assign(elemToUpdate, item);
                 else
                     this.items.push(item);
                 break;
@@ -78,15 +77,12 @@ export default class DownloadCtrl {
 
     onStoppedFromWS(elemToUpdate) {
         if (elemToUpdate) {
-            _.remove(this.items, function (item) {
-                return item.id === elemToUpdate.id;
-            });
+            this.items = this.items.filter(i => i.id !== elemToUpdate.id);
         }
     }
 
     onWaitingUpdate(message) {
-        let remoteWaitingItems = JSON.parse(message.body);
-        _.updateinplace(this.waitingitems, remoteWaitingItems, (inArray, elem) => _.findIndex(inArray, { 'id': elem.id }), true);
+        this.waitingitems = JSON.parse(message.body);
     }
 
     getTypeFromStatus(item) {
@@ -116,8 +112,8 @@ export default class DownloadCtrl {
     pauseAllDownload(){
         this.DonwloadManager.pauseAllDownload();
     }
-    restartAllCurrentDownload(){
-        this.DonwloadManager.restartAllCurrentDownload();
+    restartAllDownload(){
+        this.DonwloadManager.restartAllDownload();
     }
     removeFromQueue(item){
         this.DonwloadManager.removeFromQueue(item);

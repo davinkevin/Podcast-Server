@@ -1,45 +1,40 @@
 /**
 * Created by kevin on 01/11/14 for Podcast Server
 */
-import _ from 'lodash';
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
 
 @Module({
-    name : 'ps.common.service.data.statsService',
-    modules : [ RestangularConfig ]
+    name : 'ps.common.service.data.statsService'
 })
 @Service('statService')
 export default class StatService {
 
-    constructor(Restangular) {
+    constructor($http) {
         "ngInject";
-        this.Restangular = Restangular;
-        this.base = this.Restangular.one('stats');
+        this.$http = $http;
     }
 
     statsByType(numberOfMonth = 1) {
-        return this.base.all('byType').post(numberOfMonth);
-    }
-
-    resetChart(chartSeries) {
-        _.updateinplace(chartSeries, []);
+        return this.$http.post('/api/stats/byType', numberOfMonth).then(r => r.data);
     }
 
     dateMapper() {
-        return (value) => { return { date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems }; };
+        return value => ({ date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems });
     }
 
     highChartsMapper() {
-        return (value) => [value.date, value.numberOfItems];
+        return value => [value.date, value.numberOfItems];
+    }
+
+    sortByDate() {
+        return (a, b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0;
     }
 
     mapToHighCharts(values) {
-        return _(values)
+        return values
             .map(this.dateMapper())
-            .sortBy("date")
-            .map(this.highChartsMapper())
-            .value();
+            .sort(this.sortByDate())
+            .map(this.highChartsMapper());
     }
 
     highChartsConfig(chartSeries) {

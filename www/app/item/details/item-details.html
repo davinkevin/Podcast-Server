@@ -25,7 +25,7 @@
                         </span>
 
                         <!-- Lancer le téléchargement -->
-                        <button ng-click="idc.item.download()" ng-show="(idc.item.status != 'STARTED' && idc.item.status != 'PAUSED' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <button ng-click="idc.download()" ng-show="(idc.item.status != 'STARTED' && idc.item.status != 'PAUSED' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
                         <a ng-click="idc.play()" ng-show="idc.item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
 

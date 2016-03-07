@@ -1,7 +1,6 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import _ from 'lodash';
 import {RouteConfig, View, Module} from '../../decorators';
 import WatchListChooser from '../../common/component/watchlist-chooser/watchlist-chooser';
 import DownloadManager from '../../common/service/data/downloadManager';
@@ -45,10 +44,14 @@ export default class ItemDetailCtrl {
             .subscribe(webSockedUrl, (message) => {
                 let itemFromWS = JSON.parse(message.body);
                 if (itemFromWS.id == this.item.id) {
-                    _.assign(this.item, itemFromWS);
+                    Object.assign(this.item, itemFromWS);
                 }
             }, $scope);
 
+    }
+
+    download() {
+        return this.itemService.download(this.item);
     }
 
     stopDownload(item) {

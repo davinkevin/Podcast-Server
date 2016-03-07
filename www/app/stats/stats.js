@@ -9,11 +9,7 @@ import template from './stats.html!text';
 
 @Module({
     name : 'ps.stats',
-    modules : [
-        AppRouteConfig,
-        HighCharts,
-        StatsService
-    ]
+    modules : [ AppRouteConfig, HighCharts, StatsService ]
 })
 @RouteConfig({
     path : '/stats',

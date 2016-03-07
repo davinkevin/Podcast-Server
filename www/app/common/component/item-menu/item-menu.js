@@ -49,15 +49,21 @@ export default class ItemMenuComponent {
     }
 
     remove(item) {
-        return item.remove()
+        return this.itemService
+            .delete(item)
             .then(() => this.playlistService.remove(item))
             .then(() => this.onDeleteItem());
     }
 
     reset(item) {
-        return item.reset()
+        return this.itemService
+            .reset(item)
             .then((itemReseted) => Object.assign(item, itemReseted))
             .then((itemInList) => this.playlistService.remove(itemInList));
+    }
+
+    download(item) {
+        return this.itemService.download(item);
     }
 
     stopDownload(item) {

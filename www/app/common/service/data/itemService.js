@@ -3,62 +3,59 @@
  */
 import angular from 'angular';
 import {Module, Service} from '../../../decorators';
-import RestangularConfig from '../../../config/restangular';
 import PlaylistService from '../playlistService';
 
 @Module({
     name : 'ps.common.service.data.itemService',
-    modules : [ RestangularConfig, PlaylistService]
+    modules : [ PlaylistService]
 })
 @Service('itemService')
 export default class ItemService {
 
-    childRoute = "items";
-
-    constructor(Restangular, $window, $location, playlistService) {
+    constructor($window, $location, playlistService, $http) {
         "ngInject";
-        this.Restangular = Restangular;
+        this.$http = $http;
         this.$window = $window;
         this.$location = $location;
         this.playlistService = playlistService;
     }
 
     search(searchParameters = { page : 0, size : 12, downloaded : true} ) {
-        return this.Restangular.one("item/search")
-            .post(null, searchParameters)
-            .then((responseFromServer) => {
-                responseFromServer.content = this.restangularizedItems(responseFromServer.content);
-                return responseFromServer;
-            });
+        return this.$http.post(`/api/item/search`, searchParameters).then(r => r.data);
     }
 
     findById(podcastId, itemId) {
-        return this.Restangular.one("podcast", podcastId).one(this.childRoute, itemId).get();
+        return this.$http.get(`/api/podcast/${podcastId}/items/${itemId}`).then(r => r.data);
     }
 
     getItemForPodcastWithPagination(podcast, pageParemeters) {
-        return podcast.one("items").post(null, pageParemeters);
+        return this.$http.post(`/api/podcast/${podcast.id}/items`, pageParemeters).then(r => r.data);
     }
 
-    restangularizePodcastItem (podcast, items) {
-        return this.Restangular.restangularizeCollection(podcast, items, this.childRoute);
+    delete(item) {
+        return this.$http.delete(`/api/podcast/${item.podcastId}/items/${item.id}`);
     }
 
-    restangularizedItems(itemList) {
-        var restangularList = [];
+    reset(item) {
+        return this.$http.get(`/api/podcast/${item.podcastId}/items/${item.id}/reset`).then(r => r.data);
+    }
 
-        angular.forEach(itemList, (value) => {
-            restangularList.push(this.Restangular.restangularizeElement(this.Restangular.one('podcast', value.podcastId), value, this.childRoute));
-        });
-        return restangularList;
+    download(item) {
+        return this.$http.get(`/api/podcast/${item.podcastId}/items/${item.id}/addtoqueue`).then(r => r.data);
     }
 
     upload(podcast, file) {
         var formData = new FormData();
         formData.append('file', file);
-        return podcast.all(this.childRoute)
-            .withHttpConfig({transformRequest: angular.identity})
-            .customPOST(formData, 'upload', undefined, {'Content-Type': undefined});
+
+        let config = {
+            transformRequest: angular.identity,
+            headers : {'Content-Type': undefined}
+        };
+
+        return this.$http
+            .post(`/api/podcast/${podcast.id}/items/upload`, formData, config)
+            .then(r => r.data);
     }
 
     play(item) {
