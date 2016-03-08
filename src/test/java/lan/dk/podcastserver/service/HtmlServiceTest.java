@@ -2,10 +2,14 @@ package lan.dk.podcastserver.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.jsoup.helper.HttpConnection;
+import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Optional;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,6 +39,32 @@ public class HtmlServiceTest {
             assertThat(connection.request().header(USER_AGENT)).isEqualTo(HtmlService.USER_AGENT);
             assertThat(connection.request().header(REFERER)).isEqualTo("http://www.google.fr");
             assertThat(connection.request().timeout()).isEqualTo(5000);
+    }
+
+    @Test
+    public void should_get_page() {
+        /* Given */
+        stubFor(get(urlEqualTo("/page/file.html"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBodyFile("service/htmlService/jsoup.html")));
+
+        /* When */
+        Optional<Document> document = htmlService.get("http://localhost:8089/page/file.html");
+
+        /* Then */
+        assertThat(document).isPresent();
+        assertThat(document.get().head().select("title").text()).isEqualTo("JSOUP Example");
+    }
+
+    @Test
+    public void should_reject_get_with_empty() {
+        /* Given */
+        /* When */
+        Optional<Document> document = htmlService.get("http://localhost:8089/page/foo.html");
+
+        /* Then */
+        assertThat(document).isEmpty();
     }
 
 }
