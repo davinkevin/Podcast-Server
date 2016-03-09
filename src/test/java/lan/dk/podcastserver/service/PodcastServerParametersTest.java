@@ -16,7 +16,7 @@ public class PodcastServerParametersTest {
 
     @Test
     public void should_have_default_value() throws URISyntaxException {
-        String ROOT_FOLDER = "/Users/kevin/Tomcat/podcast/webapps/podcast/";
+        String ROOT_FOLDER = "/tmp/";
 
         PodcastServerParameters parameters = new PodcastServerParameters();
         parameters.setApi(new PodcastServerParameters.Api().setDailymotion("DAILYMOTION_API_KEY").setYoutube("YOUTUBE_API_KEY"));
