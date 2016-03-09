@@ -98,4 +98,35 @@ public class PodcastServerParametersTest {
                 .isBeforeOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()))
                 .isAfterOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()).minusMinutes(1));
     }
+
+    @Test
+    public void should_have_api() {
+        /* Given */
+        /* When */
+        PodcastServerParameters.Api api = new PodcastServerParameters.Api()
+                .setYoutube("Foo")
+                .setDailymotion("Bar");
+
+        /* Then */
+        assertThat(api.youtube()).isEqualTo("Foo");
+        assertThat(api.dailymotion()).isEqualTo("Bar");
+        assertThat(api.getYoutube()).isEqualTo("Foo");
+        assertThat(api.getDailymotion()).isEqualTo("Bar");
+    }
+
+    @Test
+    public void should_have_external_tools() {
+        /* Given */
+        /* When */
+        PodcastServerParameters.ExternalTools externalTools = new PodcastServerParameters.ExternalTools()
+                .setFfmpeg("Foo")
+                .setRtmpdump("Bar");
+
+        /* Then */
+        assertThat(externalTools.ffmpeg()).isEqualTo("Foo");
+        assertThat(externalTools.rtmpdump()).isEqualTo("Bar");
+        assertThat(externalTools.getFfmpeg()).isEqualTo("Foo");
+        assertThat(externalTools.getRtmpdump()).isEqualTo("Bar");
+    }
+
 }
