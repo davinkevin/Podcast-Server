@@ -28,7 +28,7 @@ spring :
 ##############################
 
 podcastserver:
-    rootfolder: /Users/kevin/Tomcat/podcast/
+    rootfolder: /tmp
     #concurrent-download: 2
     #max-update-parallels: 3
     #cover-default-name: cover

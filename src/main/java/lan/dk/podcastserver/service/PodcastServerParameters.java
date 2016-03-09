@@ -25,7 +25,7 @@ public class PodcastServerParameters {
     /**
      * Location of Podcasts
      */
-    String rootfolder = "/Users/kevin/Tomcat/podcast/webapps/podcast/";
+    String rootfolder = "/tmp/";
     /**
      * Url of the Server
      */
