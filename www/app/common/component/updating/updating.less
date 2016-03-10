@@ -1,23 +1,20 @@
 .ps {
-  @-webkit-keyframes rotate {
-    from {
-      -webkit-transform: rotate(0deg);
-    }
-    to {
-      -webkit-transform: rotate(360deg);
-    }
-  }
-
   update-status {
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     .notUpdating {
       visibility: hidden;
     }
 
     i.updating {
-      -webkit-animation-name: rotate;
-      -webkit-animation-duration: 1s;
-      -webkit-animation-iteration-count: infinite;
-      -webkit-animation-timing-function: linear;
+      animation-name: rotate;
+      animation-duration: 1s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
     }
   }
 }
