@@ -36,10 +36,6 @@ public class UrlService {
         }
     }
 
-    public Reader getReaderFromURL (String url) throws IOException {
-        return urlAsReader(url); // For compatibility, To be removed
-    }
-
     public String getM3U8UrlFormMultiStreamFile(String url) {
         if (isNull(url))
             return null;

@@ -36,7 +36,7 @@ public class UrlServiceTest {
         exposeUrl(resource_path);
 
         /* When */
-        Reader readerFromURL = urlService.getReaderFromURL(HTTP_LOCALHOST + resource_path);
+        Reader readerFromURL = urlService.urlAsReader(HTTP_LOCALHOST + resource_path);
 
         /* Then */
         assertThat(readerFromURL).isOfAnyClassIn(BufferedReader.class);
