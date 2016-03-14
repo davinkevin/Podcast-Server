@@ -5,10 +5,10 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.assertj.core.api.Condition;
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class UpdatePodcastBusinessTest {
 
     @Mock PodcastBusiness podcastBusiness;
     @Mock ItemRepository itemRepository;
-    @Mock WorkerService workerService;
+    @Mock UpdaterSelector updaterSelector;
     @Mock SimpMessagingTemplate template;
     @Mock PodcastServerParameters podcastServerParameters;
     @Spy TaskExecutor updateExecutor = new SyncTaskExecutor();
@@ -68,7 +68,7 @@ public class UpdatePodcastBusinessTest {
     public void should_do_di() {
         assertThat(updatePodcastBusiness.podcastBusiness).isNotNull();
         assertThat(updatePodcastBusiness.itemRepository).isNotNull();
-        assertThat(updatePodcastBusiness.workerService).isNotNull();
+        assertThat(updatePodcastBusiness.updaterSelector).isNotNull();
         assertThat(updatePodcastBusiness.template).isNotNull();
         assertThat(updatePodcastBusiness.updateExecutor).isNotNull();
         assertThat(updatePodcastBusiness.manualExecutor).isNotNull();
@@ -128,7 +128,7 @@ public class UpdatePodcastBusinessTest {
         Updater updater = mock(Updater.class);
         List<Podcast> podcasts = Arrays.asList(podcast1, podcast2, podcast3);
         when(podcastBusiness.findByUrlIsNotNull()).thenReturn(podcasts);
-        when(workerService.updaterOf(any(Podcast.class))).thenReturn(updater);
+        when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
             return (Predicate<Item>) item -> !podcast.contains(item);
@@ -177,7 +177,7 @@ public class UpdatePodcastBusinessTest {
 
         Updater updater = mock(Updater.class);
         when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
-        when(workerService.updaterOf(any(Podcast.class))).thenReturn(updater);
+        when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
@@ -200,7 +200,7 @@ public class UpdatePodcastBusinessTest {
         Podcast podcast = new Podcast().setTitle("podcast1");
         Updater updater = mock(Updater.class);
         when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
-        when(workerService.updaterOf(any(Podcast.class))).thenReturn(updater);
+        when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
             return (Predicate<Item>) item -> !podcastArgument.contains(item);
@@ -227,14 +227,14 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_not_handle_too_long_update() {
         /* Given */
-        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, workerService, template, podcastServerParameters, updateExecutor, new SimpleAsyncTaskExecutor("test-update"), validator);
+        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, new SimpleAsyncTaskExecutor("test-update"), validator);
         updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS);
 
         Podcast podcast1 = new Podcast().setTitle("podcast1");
         podcast1.setId(1);
         Updater updater = mock(Updater.class);
         when(podcastBusiness.findOne(anyInt())).thenReturn(podcast1);
-        when(workerService.updaterOf(any(Podcast.class))).thenReturn(updater);
+        when(updaterSelector.of(anyString())).thenReturn(updater);
         when(podcastBusiness.save(any(Podcast.class))).thenReturn(podcast1);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];

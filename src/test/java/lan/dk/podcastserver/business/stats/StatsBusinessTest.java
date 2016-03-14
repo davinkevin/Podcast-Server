@@ -1,11 +1,12 @@
 package lan.dk.podcastserver.business.stats;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class StatsBusinessTest {
 
     @Mock ItemRepository itemRepository;
     @Mock PodcastBusiness podcastBusiness;
-    @Mock WorkerService workerService;
+    @Mock UpdaterSelector updaterSelector;
     @InjectMocks StatsBusiness statsBusiness;
 
     @Test
@@ -42,7 +43,7 @@ public class StatsBusinessTest {
         AbstractUpdater.Type beInSport = new AbstractUpdater.Type("BeInSport", "BeInSport");
         AbstractUpdater.Type canalPlus = new AbstractUpdater.Type("CanalPlus", "CanalPlus");
         AbstractUpdater.Type youtube = new AbstractUpdater.Type("Youtube", "Youtube");
-        when(workerService.types()).thenReturn(new HashSet<>(Arrays.asList(rss, beInSport, canalPlus, youtube)));
+        when(updaterSelector.types()).thenReturn(Sets.newHashSet(rss, beInSport, canalPlus, youtube));
 
         when(itemRepository.findByTypeAndDownloadDateAfter(eq(rss), any(ZonedDateTime.class))).thenReturn(generateItems(5));
         when(itemRepository.findByTypeAndDownloadDateAfter(eq(beInSport), any(ZonedDateTime.class))).thenReturn(new ArrayList<>());

@@ -3,9 +3,9 @@ package lan.dk.podcastserver.manager;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.WorkerService;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,13 +38,14 @@ public class ItemDownloadManagerTest {
 
     @Captor ArgumentCaptor<String> stringArgumentCaptor;
     @Captor ArgumentCaptor<Queue<Item>> queueArgumentCaptor;
+    @Captor ArgumentCaptor<String> itemUrlArgumentCaptor;
     @Captor ArgumentCaptor<Item> itemArgumentCaptor;
     @Captor ArgumentCaptor<Integer> integerArgumentCaptor;
 
     @Mock SimpMessagingTemplate template;
     @Mock ItemRepository itemRepository;
     @Mock PodcastServerParameters podcastServerParameters;
-    @Mock WorkerService workerService;
+    @Mock DownloaderSelector downloaderSelector;
 
     @InjectMocks ItemDownloadManager itemDownloadManager;
     public static final Item ITEM_1 = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 1).setPubdate(ZonedDateTime.now());
@@ -122,9 +123,9 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_list_of_item_larger_than_download_limit() throws URISyntaxException {
         /* Given */
-        final List<Item> itemList = Arrays.asList(new Item().setId(1).setStatus(Status.NOT_DOWNLOADED), new Item().setId(2).setStatus(Status.NOT_DOWNLOADED), new Item().setId(3).setStatus(Status.NOT_DOWNLOADED), new Item().setId(4).setStatus(Status.NOT_DOWNLOADED));
+        final List<Item> itemList = Arrays.asList(new Item().setId(1).setUrl("1").setStatus(Status.NOT_DOWNLOADED), new Item().setId(2).setUrl("2").setStatus(Status.NOT_DOWNLOADED), new Item().setId(3).setUrl("3").setStatus(Status.NOT_DOWNLOADED), new Item().setId(4).setUrl("4").setStatus(Status.NOT_DOWNLOADED));
         when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
-        when(workerService.downloaderOf(any(Item.class))).thenReturn(mock(Downloader.class));
+        when(downloaderSelector.of(anyString())).thenReturn(mock(Downloader.class));
         mockPodcastParametersForPostConstruct();
         /* When */
         itemDownloadManager.postConstruct();
@@ -133,8 +134,8 @@ public class ItemDownloadManagerTest {
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
         verifyPodcastParametersForPostConstruct();
-        verify(workerService, times(3)).downloaderOf(itemArgumentCaptor.capture());
-        assertThat(itemArgumentCaptor.getAllValues()).contains(itemList.get(0), itemList.get(1), itemList.get(2));
+        verify(downloaderSelector, times(3)).of(itemUrlArgumentCaptor.capture());
+        assertThat(itemUrlArgumentCaptor.getAllValues()).contains(itemList.get(0).getUrl(), itemList.get(1).getUrl(), itemList.get(2).getUrl());
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
     }
@@ -258,8 +259,7 @@ public class ItemDownloadManagerTest {
         /* Then */
         verify(itemRepository, times(1)).findOne(integerArgumentCaptor.capture());
         assertThat(integerArgumentCaptor.getValue()).isEqualTo(item.getId());
-        verify(itemRepository, times(1)).save(itemArgumentCaptor.capture());
-        assertThat(itemArgumentCaptor.getValue()).isSameAs(item);
+        verify(itemRepository, times(1)).save(eq(item));
         verifyConvertAndSave();
     }
 
@@ -368,11 +368,13 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
         itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
         itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+        when(calledDownloader.getItem()).thenReturn(ITEM_2);
 
         /* When */ itemDownloadManager.toogleDownload(2);
 
         /* Then */
         verify(calledDownloader, times(1)).pauseDownload();
+        verify(calledDownloader, times(1)).getItem();
         verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
     }
 
@@ -389,8 +391,8 @@ public class ItemDownloadManagerTest {
         /* When */ itemDownloadManager.toogleDownload(3);
 
         /* Then */
+        verify(calledDownloader, times(2)).getItem();
         verify(calledDownloader, times(1)).startDownload();
-        verify(calledDownloader, times(1)).getItem();
         verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
     }
 
@@ -441,17 +443,16 @@ public class ItemDownloadManagerTest {
         /* Given */ mockPodcastParametersForPostConstruct();
         when(podcastServerParameters.numberOfTry()).thenReturn(3);
         Downloader downloaderMock = mock(Downloader.class);
-        when(workerService.downloaderOf(any())).thenReturn(downloaderMock);
+        when(downloaderSelector.of(anyString())).thenReturn(downloaderMock);
         final Downloader calledDownloader = mock(Downloader.class);
-        Item item = new Item().setId(1).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        Item item = new Item().setId(1).setUrl("1").setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
 
         /* When */ itemDownloadManager.resetDownload(item);
         /* Then */
         assertThat(item.getNumberOfTry()).isEqualTo(1);
         verify(podcastServerParameters, times(1)).numberOfTry();
-        verify(workerService, times(1)).downloaderOf(itemArgumentCaptor.capture());
-        assertThat(itemArgumentCaptor.getValue()).isSameAs(item);
+        verify(downloaderSelector, times(1)).of(eq(item.getUrl()));
     }
 
     @Test
@@ -501,7 +502,7 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
 
-        /* When */ Set<Item> items = itemDownloadManager.getItemInDownloadingQueue();
+        /* When */ Set<Item> items = itemDownloadManager.getItemsInDownloadingQueue();
 
         /* Then */
         assertThat(items).contains(item1, item2, item3);
@@ -509,7 +510,7 @@ public class ItemDownloadManagerTest {
 
     @After
     public void afterEach() {
-        verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, workerService);
+        verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, downloaderSelector);
     }
 
 }

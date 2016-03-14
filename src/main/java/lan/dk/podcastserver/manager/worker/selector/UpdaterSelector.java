@@ -1,36 +1,44 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import lan.dk.podcastserver.manager.worker.selector.update.UpdaterCompatibility;
+import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Updater;
+import lombok.Setter;
 import org.jadira.usertype.spi.utils.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 06/03/15.
  */
 @Service
+//@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class UpdaterSelector {
+
+    public static final NoOpUpdater NO_OP_UPDATER = new NoOpUpdater();
+
+    @Setter(onMethod = @__(@Autowired))
+    private Set<Updater> updaters;
     
-    Set<UpdaterCompatibility> updaterCompatibilities;
-    
-    public Class of(String url) {
+    public Updater of(String url) {
         if (StringUtils.isEmpty(url)) {
-            throw new RuntimeException();
+            return NO_OP_UPDATER;
         }
         
-        return updaterCompatibilities
+        return updaters
                 .stream()
                 .min(Comparator.comparing(updater -> updater.compatibility(url)))
-                .get()
-                .updater();
+                .orElse(NO_OP_UPDATER);
     }
 
-    @Resource
-    public UpdaterSelector setUpdaterCompatibilities(Set<UpdaterCompatibility> updaterCompatibilities) {
-        this.updaterCompatibilities = updaterCompatibilities;
-        return this;
+    public Set<AbstractUpdater.Type> types() {
+        return updaters.stream().map(Updater::type).collect(toSet());
     }
+
+
 }

@@ -16,4 +16,6 @@ public interface Downloader extends Runnable{
     void finishDownload();
     void resetDownload();
 
+    Integer compatibility(String url);
+
 }

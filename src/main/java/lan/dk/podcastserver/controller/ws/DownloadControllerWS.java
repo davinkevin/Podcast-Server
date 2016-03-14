@@ -25,7 +25,7 @@ public class DownloadControllerWS {
     
     @SubscribeMapping("/download")
     private Collection<Item> downloadList() {
-        return IDM.getItemInDownloadingQueue();
+        return IDM.getItemsInDownloadingQueue();
     }
     
     @MessageMapping("/download/start")

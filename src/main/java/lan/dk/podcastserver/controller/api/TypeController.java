@@ -1,7 +1,8 @@
 package lan.dk.podcastserver.controller.api;
 
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
-import lan.dk.podcastserver.service.WorkerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,16 +15,13 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/api/types")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TypeController {
 
-    final WorkerService workerService;
-
-    @Autowired TypeController(WorkerService workerService) {
-        this.workerService = workerService;
-    }
+    final UpdaterSelector updaterSelector;
 
     @RequestMapping(method = RequestMethod.GET)
     public Set<AbstractUpdater.Type> types() {
-        return workerService.types();
+        return updaterSelector.types();
     }
 }

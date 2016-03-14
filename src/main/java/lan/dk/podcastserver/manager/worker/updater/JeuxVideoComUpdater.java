@@ -6,6 +6,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -76,5 +77,12 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
     @Override
     public Type type() {
         return new Type("JeuxVideoCom", "JeuxVideo.com");
+    }
+
+    @Override
+    public Integer compatibility(String url) {
+        return StringUtils.contains(url, "jeuxvideo.com")
+                ? 1
+                : Integer.MAX_VALUE;
     }
 }

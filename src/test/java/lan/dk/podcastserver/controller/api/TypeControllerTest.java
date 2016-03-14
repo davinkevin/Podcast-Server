@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
-import lan.dk.podcastserver.service.WorkerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,14 +20,14 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TypeControllerTest {
 
-    @Mock WorkerService workerService;
+    @Mock UpdaterSelector updaterSelector;
     @InjectMocks TypeController typeController;
 
     @Test
     public void should_return_all_abstract_type() throws NoSuchMethodException {
         /* Given */
         Set<AbstractUpdater.Type> types = new HashSet<>();
-        when(workerService.types()).thenReturn(types);
+        when(updaterSelector.types()).thenReturn(types);
 
         /* When */
         Set<AbstractUpdater.Type> returnTypes = typeController.types();

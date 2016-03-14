@@ -115,4 +115,9 @@ public class RSSUpdater extends AbstractUpdater {
     public Type type() {
         return new Type("RSS", "RSS");
     }
+
+    @Override
+    public Integer compatibility(String url) {
+        return Integer.MAX_VALUE-1;
+    }
 }

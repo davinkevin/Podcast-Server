@@ -20,10 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
@@ -192,6 +189,15 @@ public class YoutubeUpdater extends AbstractUpdater {
             .filter(Objects::nonNull)
             .map(e -> e.attr("data-channel-external-id"))
             .orElse("");
+    }
+
+    @Override
+    public Integer compatibility(String url) {
+        return Arrays
+                .asList("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
+                .stream().anyMatch(url::contains)
+                ? 1
+                : Integer.MAX_VALUE;
     }
 
     @Override

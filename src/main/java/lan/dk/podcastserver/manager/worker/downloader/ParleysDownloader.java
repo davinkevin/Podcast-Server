@@ -97,6 +97,11 @@ public class ParleysDownloader extends AbstractDownloader{
         return null;
     }
 
+    @Override
+    public Integer compatibility(String url) {
+        return url.contains("parleys") ? 1 : Integer.MAX_VALUE;
+    }
+
     private List<File> getListOfFiles(List<ParleysAssets> listOfAssets) {
         return listOfAssets.stream().map(ParleysAssets::getFile).collect(toList());
     }

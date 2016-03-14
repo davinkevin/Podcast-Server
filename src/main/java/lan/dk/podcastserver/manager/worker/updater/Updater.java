@@ -23,4 +23,6 @@ public interface Updater {
     }
 
     AbstractUpdater.Type type();
+
+    Integer compatibility(String url);
 }

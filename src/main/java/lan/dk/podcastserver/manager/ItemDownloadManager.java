@@ -3,9 +3,10 @@ package lan.dk.podcastserver.manager;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.WorkerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -32,24 +33,16 @@ public class ItemDownloadManager {
 
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
-    final SimpMessagingTemplate template;
-    final ItemRepository itemRepository;
-    final PodcastServerParameters podcastServerParameters;
-    final WorkerService workerService;
-
-    @Autowired
-    public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, WorkerService workerService) {
-        this.template = template;
-        this.itemRepository = itemRepository;
-        this.podcastServerParameters = podcastServerParameters;
-        this.workerService = workerService;
-    }
+    @Autowired SimpMessagingTemplate template;
+    @Autowired ItemRepository itemRepository;
+    @Autowired PodcastServerParameters podcastServerParameters;
+    @Autowired DownloaderSelector downloaderSelector;
 
     private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<>();
     private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<>();
     private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
     private AtomicBoolean isRunning = new AtomicBoolean(false);
-    private Integer limitParallelDownload;
+    private Integer limitParallelDownload = 3;
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
@@ -120,8 +113,7 @@ public class ItemDownloadManager {
     // Change status of all downloads :
     public void stopAllDownload() {
         downloadingQueue.values()
-                .stream()
-                .collect(toList())
+                .stream().collect(toList())
                 .forEach(Downloader::stopDownload);
     }
 
@@ -138,20 +130,33 @@ public class ItemDownloadManager {
 
     // Change State of id identified download
     public void stopDownload(int id) {
-        downloadingQueue.get(getItemInDownloadingQueue(id)).stopDownload();
+        getDownloaderOfItemWithId(id).ifPresent(Downloader::stopDownload);
     }
 
     public void pauseDownload(int id) {
-        Item item = getItemInDownloadingQueue(id);
-        downloadingQueue.get(item).pauseDownload();
+        getDownloaderOfItemWithId(id).ifPresent(Downloader::pauseDownload);
+    }
+
+    private Optional<Downloader> getDownloaderOfItemWithId(int id) {
+        return downloadingQueue
+                .entrySet()
+                .stream()
+                .filter(es -> Objects.equals(es.getKey().getId(), id))
+                .map(Map.Entry::getValue)
+                .findFirst();
     }
 
     public void restartDownload(int id) {
-        getDownloaderByTypeAndRun(downloadingQueue.get(getItemInDownloadingQueue(id)).getItem());
+        getDownloaderOfItemWithId(id)
+                .map(Downloader::getItem)
+                .ifPresent(this::getDownloaderByTypeAndRun);
     }
 
     public void toogleDownload(int id) {
-        Item item = getItemInDownloadingQueue(id);
+        Item item = getDownloaderOfItemWithId(id)
+                .map(Downloader::getItem)
+                .orElse(Item.DEFAULT_ITEM);
+
         if (Status.PAUSED == item.getStatus()) {
             log.debug("restart du download");
             restartDownload(id);
@@ -202,11 +207,9 @@ public class ItemDownloadManager {
     }
 
     public Item getItemInDownloadingQueue(int id) {
-        return downloadingQueue.keySet()
-                .stream()
-                .filter(item -> Objects.equals(item.getId(), id))
-                .findFirst()
-                .get();
+        return getDownloaderOfItemWithId(id)
+                .map(Downloader::getItem)
+                .orElse(null);
     }
 
     private void getDownloaderByTypeAndRun(Item item) {
@@ -215,7 +218,7 @@ public class ItemDownloadManager {
             Downloader downloader = downloadingQueue.get(item);
             downloader.startDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
-            Downloader worker = workerService.downloaderOf(item);
+            Downloader worker = downloaderSelector.of(item.getUrl());
 
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
@@ -227,7 +230,7 @@ public class ItemDownloadManager {
     public void resetDownload(Item item) {
         if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
             item.addATry();
-            Downloader worker = workerService.downloaderOf(item);
+            Downloader worker = downloaderSelector.of(item.getUrl());
             if (worker != null) {
                 this.getDownloadingQueue().put(item, worker);
                 new Thread(worker).start();
@@ -258,7 +261,7 @@ public class ItemDownloadManager {
         return downloadingQueue.containsKey(item);
     }
 
-    public Set<Item> getItemInDownloadingQueue() {
+    public Set<Item> getItemsInDownloadingQueue() {
         return downloadingQueue.keySet();
     }
 

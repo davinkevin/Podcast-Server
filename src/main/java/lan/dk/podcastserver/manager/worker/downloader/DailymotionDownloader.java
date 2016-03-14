@@ -67,4 +67,10 @@ public class DailymotionDownloader extends HTTPDownloader {
         int end = page.indexOf("});", begin);
         return Optional.of(page.substring(begin+"buildPlayer({".length()-1, end+1));
     }
+
+    @Override
+    public Integer compatibility(String url) {
+        return url.contains("dailymotion.com/video") ? 1 : Integer.MAX_VALUE;
+    }
+
 }

@@ -4,10 +4,10 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
-import static java.util.concurrent.CompletableFuture.*;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
@@ -42,7 +42,7 @@ public class UpdatePodcastBusiness  {
 
     final PodcastBusiness podcastBusiness;
     final ItemRepository itemRepository;
-    final WorkerService workerService;
+    final UpdaterSelector updaterSelector;
     final SimpMessagingTemplate template;
     final PodcastServerParameters podcastServerParameters;
 
@@ -50,19 +50,19 @@ public class UpdatePodcastBusiness  {
     final TaskExecutor manualExecutor;
     final Validator validator;
 
+    private AtomicBoolean isUpdating = new AtomicBoolean(false);
+
     @Autowired
-    public UpdatePodcastBusiness(PodcastBusiness podcastBusiness, ItemRepository itemRepository, WorkerService workerService, SimpMessagingTemplate template, PodcastServerParameters podcastServerParameters, @Qualifier("UpdateExecutor") TaskExecutor updateExecutor, @Qualifier("ManualUpdater") TaskExecutor manualExecutor, @Qualifier("Validator") Validator validator) {
+    public UpdatePodcastBusiness(PodcastBusiness podcastBusiness, ItemRepository itemRepository, UpdaterSelector updaterSelector, SimpMessagingTemplate template, PodcastServerParameters podcastServerParameters, @Qualifier("UpdateExecutor") TaskExecutor updateExecutor, @Qualifier("ManualUpdater") TaskExecutor manualExecutor, @Qualifier("Validator") Validator validator) {
         this.podcastBusiness = podcastBusiness;
         this.itemRepository = itemRepository;
-        this.workerService = workerService;
+        this.updaterSelector = updaterSelector;
         this.template = template;
         this.podcastServerParameters = podcastServerParameters;
         this.updateExecutor = updateExecutor;
         this.manualExecutor = manualExecutor;
         this.validator = validator;
     }
-
-    private AtomicBoolean isUpdating = new AtomicBoolean(false);
 
     public void updatePodcast() {
         updatePodcast(podcastBusiness.findByUrlIsNotNull(), updateExecutor);
@@ -87,7 +87,8 @@ public class UpdatePodcastBusiness  {
         podcasts
                 // Launch every update
                 .stream()
-                .map(podcast -> supplyAsync(() -> workerService.updaterOf(podcast)).thenApplyAsync(updater -> updater.update(podcast), selectedExecutor))
+                .map(podcast -> supplyAsync(() -> updaterSelector.of(podcast.getUrl()))
+                        .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor))
                 .collect(toSet()) // Terminal operation forcing evaluation of each element upper in the stream
                 // Get result of each update
                 .stream()

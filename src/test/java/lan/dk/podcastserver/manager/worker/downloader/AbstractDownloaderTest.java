@@ -235,6 +235,18 @@ public class AbstractDownloaderTest {
         assertThat(simpleDownloader.getItem()).isSameAs(item);
         verify(itemRepository, never()).save(any(Item.class));
     }
+    
+    @Test
+    public void should_get_item_standard() {
+        /* Given */
+        simpleDownloader.setItem(item);
+
+        /* When */
+        Item itemOfDownloader = simpleDownloader.getItem();
+
+        /* Then */
+        assertThat(item).isSameAs(itemOfDownloader);
+    }
 
     static class SimpleDownloader extends AbstractDownloader {
 
@@ -248,6 +260,11 @@ public class AbstractDownloaderTest {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return null;
+        }
+
+        @Override
+        public Integer compatibility(String url) {
             return null;
         }
     }

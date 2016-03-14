@@ -154,4 +154,9 @@ public class RTMPDownloader extends AbstractDownloader {
 
     }
 
+    @Override
+    public Integer compatibility(String url) {
+        return url.startsWith("rtmp") ? 1 : Integer.MAX_VALUE;
+    }
+
 }

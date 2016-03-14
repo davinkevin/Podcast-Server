@@ -105,6 +105,11 @@ public class M3U8Downloader extends AbstractDownloader {
         download();
     }
 
+    @Override
+    public Integer compatibility(String url) {
+        return url.contains("m3u8") ? 10 : Integer.MAX_VALUE;
+    }
+
     @Slf4j
     static class M3U8Watcher implements Runnable {
 
@@ -140,8 +145,12 @@ public class M3U8Downloader extends AbstractDownloader {
                     if (downloader.stopDownloading.get()) {
                         if (Status.STOPPED == item.getStatus()) break;
 
-                        if (Status.PAUSED == item.getStatus())
-                            synchronized(this) { wait(); }
+                        if (Status.PAUSED == item.getStatus()) {
+                            synchronized (this) {
+                                wait();
+                                item.setStatus(Status.STARTED);
+                            }
+                        }
                     }
                 }
 

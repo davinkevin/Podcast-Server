@@ -2,11 +2,12 @@ package lan.dk.podcastserver.business.stats;
 
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.WorkerService;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,18 +26,12 @@ import static java.util.stream.Collectors.*;
  */
 @Component
 @Transactional(readOnly = true)
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class StatsBusiness {
 
     final ItemRepository itemRepository;
     final PodcastBusiness podcastBusiness;
-    final WorkerService workerService;
-
-    @Autowired
-    public StatsBusiness(ItemRepository itemRepository, PodcastBusiness podcastBusiness, WorkerService workerService) {
-        this.itemRepository = itemRepository;
-        this.podcastBusiness = podcastBusiness;
-        this.workerService = workerService;
-    }
+    final UpdaterSelector updaterSelector;
 
     private StatsPodcastType generateForType(AbstractUpdater.Type type, Integer numberOfMonth) {
         ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(numberOfMonth);
@@ -57,7 +52,7 @@ public class StatsBusiness {
     }
 
     public List<StatsPodcastType> allStatsByType(Integer numberOfMonth) {
-        return workerService
+        return updaterSelector
                 .types()
                 .stream()
                 .map(type -> generateForType(type, numberOfMonth))

@@ -37,7 +37,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected File target = null;
     protected PathMatcher hasTempExtensionMatcher;
 
-
     @Resource protected PodcastRepository podcastRepository;
     @Resource protected ItemRepository itemRepository;
     @Resource protected ItemDownloadManager itemDownloadManager;

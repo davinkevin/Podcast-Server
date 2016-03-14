@@ -114,6 +114,11 @@ public class YoutubeDownloader extends AbstractDownloader {
         super.finishDownload();
     }
 
+    @Override
+    public Integer compatibility(String url) {
+        return url.contains("www.youtube.com") ? 1 : Integer.MAX_VALUE;
+    }
+
     private String getDefinitiveFileName() {
         return target.toPath().getFileName().toString().replace(temporaryExtension, "") + "." + StringUtils.substringAfter(downloadInfo.getContentType(), "/");
     }

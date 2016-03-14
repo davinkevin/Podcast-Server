@@ -2,26 +2,21 @@ package lan.dk.podcastserver.business.find;
 
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
-import lan.dk.podcastserver.manager.worker.finder.Finder;
-import lan.dk.podcastserver.service.WorkerService;
+import lan.dk.podcastserver.manager.worker.selector.FinderSelector;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * Created by kevin on 22/02/15 for Podcast Server
  */
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class FindPodcastBusiness {
 
-    @Resource WorkerService workerService;
+    final FinderSelector finderSelector;
     
     public Podcast fetchPodcastInfoByUrl(String url) throws FindPodcastNotFoundException {
-        Finder specificFinder = workerService.finderOf(url);
-        if (specificFinder == null) {
-            return null;
-        }
-
-        return specificFinder.find(url);
+        return finderSelector.of(url).find(url);
     }
 }

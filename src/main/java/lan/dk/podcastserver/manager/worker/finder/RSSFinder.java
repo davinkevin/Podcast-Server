@@ -6,6 +6,7 @@ import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.jdom2.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,10 @@ public class RSSFinder implements Finder {
             return itunesImage.getAttributeValue(HREF);
 
         return null;
+    }
+
+    public Integer compatibility(@NotEmpty String url) {
+        return Integer.MAX_VALUE-1;
     }
 
 }

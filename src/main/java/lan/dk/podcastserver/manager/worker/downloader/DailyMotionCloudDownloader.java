@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import lan.dk.podcastserver.service.UrlService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +16,6 @@ import static java.util.Objects.nonNull;
 @Scope("prototype")
 @Component("DailyMotionCloudDownloader")
 public class DailyMotionCloudDownloader extends M3U8Downloader {
-
-    @Autowired UrlService urlService;
 
     String redirectionUrl = null;
 
@@ -44,5 +41,10 @@ public class DailyMotionCloudDownloader extends M3U8Downloader {
                 .orElse("");
 
         return redirectionUrl;
+    }
+
+    @Override
+    public Integer compatibility(@NotEmpty String url) {
+        return url.contains("cdn.dmcloud") ? 1 : Integer.MAX_VALUE;
     }
 }

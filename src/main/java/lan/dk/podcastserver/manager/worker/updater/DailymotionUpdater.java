@@ -7,6 +7,7 @@ import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -72,6 +73,11 @@ public class DailymotionUpdater extends AbstractUpdater {
     @Override
     public Type type() {
         return new AbstractUpdater.Type("Dailymotion", "Dailymotion");
+    }
+
+    @Override
+    public Integer compatibility(String url) {
+        return StringUtils.contains(url, "www.dailymotion.com") ? 1 : Integer.MAX_VALUE;
     }
 
     private Optional<String> usernameOf(String url) {

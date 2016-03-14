@@ -2,7 +2,7 @@ package lan.dk.podcastserver.business.find;
 
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
-import lan.dk.podcastserver.service.WorkerService;
+import lan.dk.podcastserver.manager.worker.selector.FinderSelector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,19 +20,19 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class FindPodcastBusinessTest {
 
-    @Mock WorkerService workerService;
+    @Mock FinderSelector finderSelector;
     @InjectMocks FindPodcastBusiness findPodcastBusiness;
 
     @Test
     public void should_not_find_any_finder() {
         /* Given */
         String fakeUrl = "http://any.fake.url/";
-        when(workerService.finderOf(anyString())).thenReturn(null);
+        when(finderSelector.of(anyString())).thenReturn(FinderSelector.NO_OP_FINDER);
         /* When */
         Podcast podcast = findPodcastBusiness.fetchPodcastInfoByUrl(fakeUrl);
         /* Then */
-        assertThat(podcast).isNull();
-        verify(workerService, times(1)).finderOf(eq(fakeUrl));
+        assertThat(podcast).isSameAs(Podcast.DEFAULT_PODCAST);
+        verify(finderSelector, times(1)).of(eq(fakeUrl));
     }
 
     @Test
@@ -40,7 +40,7 @@ public class FindPodcastBusinessTest {
          /* Given */
         String fakeUrl = "http://any.fake.url/";
         Finder finder = mock(Finder.class);
-        when(workerService.finderOf(anyString())).thenReturn(finder);
+        when(finderSelector.of(anyString())).thenReturn(finder);
         when(finder.find(anyString())).thenReturn(new Podcast());
 
         /* When */
@@ -48,7 +48,7 @@ public class FindPodcastBusinessTest {
 
         /* Then */
         assertThat(podcast).isNotNull().isEqualTo(new Podcast());
-        verify(workerService, times(1)).finderOf(eq(fakeUrl));
+        verify(finderSelector, times(1)).of(eq(fakeUrl));
         verify(finder, times(1)).find(eq(fakeUrl));
     }
 }

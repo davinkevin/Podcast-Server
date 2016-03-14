@@ -119,5 +119,10 @@ public class AbstractUpdaterTest {
         public Type type() {
             return null;
         }
+
+        @Override
+        public Integer compatibility(String url) {
+            return -1;
+        }
     }
 }

@@ -5,10 +5,13 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 
@@ -75,5 +78,14 @@ public class YoutubeFinder implements Finder {
         }
 
         return new Cover();
+    }
+
+
+    public Integer compatibility(@NotEmpty String url) {
+        return isYoutubeUrl(url) ? 1 : Integer.MAX_VALUE;
+    }
+
+    private Boolean isYoutubeUrl(String url) {
+        return Stream.of("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/").anyMatch(url::contains);
     }
 }

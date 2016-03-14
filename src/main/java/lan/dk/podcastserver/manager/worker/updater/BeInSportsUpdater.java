@@ -148,4 +148,9 @@ public class BeInSportsUpdater extends AbstractUpdater {
     public Type type() {
         return new Type("BeInSports", "Be In Sports");
     }
+
+    @Override
+    public Integer compatibility(String url) {
+        return StringUtils.contains(url, "beinsports.com") ? 1 : Integer.MAX_VALUE;
+    }
 }

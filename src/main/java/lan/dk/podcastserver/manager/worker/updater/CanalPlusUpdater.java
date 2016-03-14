@@ -145,4 +145,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
     public Type type() {
         return new Type("CanalPlus", "Canal+");
     }
+
+    @Override
+    public Integer compatibility(String url) {
+        return StringUtils.contains(url, "canalplus.fr") ? 1 : Integer.MAX_VALUE;
+    }
 }

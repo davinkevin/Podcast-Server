@@ -160,4 +160,11 @@ public class PluzzUpdater extends AbstractUpdater {
     public Type type() {
         return new Type("Pluzz", "Pluzz");
     }
+
+    @Override
+    public Integer compatibility(String url) {
+        return StringUtils.contains(url, "pluzz.francetv.fr")
+                ? 1
+                : Integer.MAX_VALUE;
+    }
 }

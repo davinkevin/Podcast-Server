@@ -7,12 +7,15 @@ import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 23/02/2016 for Podcast Server
@@ -51,6 +54,10 @@ public class DailymotionFinder implements Finder {
             return Optional.of(matcher.group(1));
 
         return Optional.empty();
+    }
+
+    public Integer compatibility(@NotEmpty String url) {
+        return nonNull(url) && url.contains("www.dailymotion.com") ? 1 : Integer.MAX_VALUE;
     }
 
 }

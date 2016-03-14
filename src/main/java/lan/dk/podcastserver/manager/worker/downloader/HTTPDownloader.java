@@ -64,6 +64,11 @@ public class HTTPDownloader extends AbstractDownloader {
         return item;
     }
 
+    @Override
+    public Integer compatibility(String url) {
+        return url.startsWith("http") ? Integer.MAX_VALUE-1 : Integer.MAX_VALUE;
+    }
+
     @Slf4j
     static class HTTPWatcher implements Runnable {
 

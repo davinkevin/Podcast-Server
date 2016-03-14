@@ -1,7 +1,8 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import lan.dk.podcastserver.manager.worker.selector.find.FinderCompatibility;
-import lombok.RequiredArgsConstructor;
+import lan.dk.podcastserver.manager.worker.finder.Finder;
+import lan.dk.podcastserver.manager.worker.finder.NoOpFinder;
+import lombok.Setter;
 import org.jadira.usertype.spi.utils.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,20 +14,22 @@ import java.util.Set;
  * Created by kevin on 23/02/2016 for Podcast Server
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+//@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class FinderSelector {
 
-    final Set<FinderCompatibility> finderCompatibilities;
+    public static final NoOpFinder NO_OP_FINDER = new NoOpFinder();
 
-    public Class of(String url) {
+    @Setter(onMethod = @__(@Autowired))
+    private Set<Finder> finders;
+
+    public Finder of(String url) {
         if (StringUtils.isEmpty(url)) {
-            throw new RuntimeException();
+            return NO_OP_FINDER;
         }
 
-        return finderCompatibilities
+        return finders
                 .stream()
                 .min(Comparator.comparing(updater -> updater.compatibility(url)))
-                .get()
-                .finder();
+                .orElse(NO_OP_FINDER);
     }
 }
