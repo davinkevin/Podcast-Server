@@ -8,6 +8,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -38,8 +40,18 @@ public class UpdaterSelectorTest {
         when(pluzzUpdater.compatibility(anyString())).thenCallRealMethod();
         when(dailymotionUpdater.compatibility(anyString())).thenCallRealMethod();
 
-        updaterSelector = new UpdaterSelector();
-        updaterSelector.setUpdaters(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, parleysUpdater, pluzzUpdater, dailymotionUpdater));
+        when(youtubeUpdater.type()).thenCallRealMethod();
+        when(rssUpdater.type()).thenCallRealMethod();
+        when(beInSportsUpdater.type()).thenCallRealMethod();
+        when(canalPlusUpdater.type()).thenCallRealMethod();
+        when(jeuxVideoComUpdater.type()).thenCallRealMethod();
+        when(parleysUpdater.type()).thenCallRealMethod();
+        when(pluzzUpdater.type()).thenCallRealMethod();
+        when(dailymotionUpdater.type()).thenCallRealMethod();
+
+        //updaterSelector = new UpdaterSelector();
+        //updaterSelector.setUpdaters(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, parleysUpdater, pluzzUpdater, dailymotionUpdater));
+        updaterSelector = new UpdaterSelector(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, parleysUpdater, pluzzUpdater, dailymotionUpdater));
     }
     
     @Test
@@ -94,6 +106,15 @@ public class UpdaterSelectorTest {
     public void should_reject_empty_url() {
         /* When */
         assertThat(updaterSelector.of("")).isEqualTo(UpdaterSelector.NO_OP_UPDATER);
+    }
+
+    @Test
+    public void should_serve_types() {
+        /* When */
+        Set<AbstractUpdater.Type> types = updaterSelector.types();
+
+        /* Then */
+        assertThat(types).isNotEmpty().hasSize(8);
     }
 
 }
