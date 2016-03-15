@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.selector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import org.jadira.usertype.spi.utils.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,12 @@ import static java.util.stream.Collectors.toSet;
  * Created by kevin on 06/03/15.
  */
 @Service
-//@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class UpdaterSelector {
 
     public static final NoOpUpdater NO_OP_UPDATER = new NoOpUpdater();
 
-    @Setter(onMethod = @__(@Autowired))
-    private Set<Updater> updaters;
+    final private Set<Updater> updaters;
     
     public Updater of(String url) {
         if (StringUtils.isEmpty(url)) {
