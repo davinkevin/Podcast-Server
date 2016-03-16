@@ -6,6 +6,7 @@ import lan.dk.podcastserver.entity.Item;
  * Created by kevin on 10/03/2016 for Podcast Server
  */
 public class NoOpDownloader implements Downloader {
+
     @Override
     public Item download() {
         return null;
@@ -13,7 +14,7 @@ public class NoOpDownloader implements Downloader {
 
     @Override
     public Downloader setItem(Item item) {
-        return null;
+        return this;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class NoOpDownloader implements Downloader {
 
     @Override
     public Integer compatibility(String url) {
-        return null;
+        return -1;
     }
 
     @Override
