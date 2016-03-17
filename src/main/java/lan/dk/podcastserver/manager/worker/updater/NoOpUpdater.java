@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
@@ -13,16 +14,16 @@ import java.util.function.Predicate;
 public class NoOpUpdater implements Updater {
 
     @Override
-    public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) { return null; }
+    public UpdateTuple<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) { return Updater.NO_MODIFICATION_TUPLE; }
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
-        return podcast.getItems();
+        return Sets.newHashSet();
     }
 
     @Override
     public String signatureOf(Podcast podcast) {
-        return "";
+        return null;
     }
 
     @Override
