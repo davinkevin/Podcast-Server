@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloader.WS_TOPIC_DOWNLOAD;
 import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloader.WS_TOPIC_PODCAST;
-import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloaderTest.ROOT_FOLDER;
-import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloaderTest.TEMPORARY_EXTENSION;
+import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.ROOT_FOLDER;
+import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.TEMPORARY_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
