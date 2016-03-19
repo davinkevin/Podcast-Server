@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
  * Created by kevin on 22/06/15 for Podcast Server
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractUpdaterTest {
+public class UpdaterTest {
 
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
