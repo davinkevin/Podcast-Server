@@ -6,7 +6,6 @@ import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.PodcastServerParameters;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -207,8 +206,11 @@ public class ItemDownloadManager {
     }
 
     public Item getItemInDownloadingQueue(int id) {
-        return getDownloaderOfItemWithId(id)
-                .map(Downloader::getItem)
+        return this.downloadingQueue
+                .keySet()
+                .stream()
+                .filter(i -> Objects.equals(i.getId(), id))
+                .findFirst()
                 .orElse(null);
     }
 
@@ -221,7 +223,7 @@ public class ItemDownloadManager {
             Downloader worker = downloaderSelector.of(item.getUrl());
 
             if (worker != null) {
-                this.getDownloadingQueue().put(item, worker);
+                this.getDownloadingQueue().put(item, worker.setItem(item));
                 new Thread(worker).start();
             }
         }

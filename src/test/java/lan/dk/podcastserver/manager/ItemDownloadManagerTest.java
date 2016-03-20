@@ -508,6 +508,42 @@ public class ItemDownloadManagerTest {
         assertThat(items).contains(item1, item2, item3);
     }
 
+    @Test
+    public void should_find_item_in_downloading_queue() {
+        /* Given */
+        final Downloader mockDownloader = mock(Downloader.class);
+        Item item1 = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
+        Item item2 = new Item().setId(2).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
+        Item item3 = new Item().setId(3).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
+        itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
+        itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
+
+        /* When */
+        Item item = itemDownloadManager.getItemInDownloadingQueue(2);
+
+        /* Then */
+        assertThat(item).isSameAs(item2);
+    }
+
+    @Test
+    public void should_return_null_if_item_not_found_in_downloading_queue() {
+        /* Given */
+        final Downloader mockDownloader = mock(Downloader.class);
+        Item item1 = new Item().setId(1).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
+        Item item2 = new Item().setId(2).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
+        Item item3 = new Item().setId(3).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
+        itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
+        itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
+
+        /* When */
+        Item item = itemDownloadManager.getItemInDownloadingQueue(6);
+
+        /* Then */
+        assertThat(item).isNull();
+    }
+
     @After
     public void afterEach() {
         verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, downloaderSelector);
