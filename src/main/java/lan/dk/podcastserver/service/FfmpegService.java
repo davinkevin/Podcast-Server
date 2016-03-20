@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.google.common.collect.Lists;
 import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
 import lan.dk.podcastserver.utils.ThreadUtils.OutputLogger;
 import org.slf4j.Logger;
@@ -8,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.lang.reflect.Field;
+import java.io.File;
+import java.io.IOException;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * Created by kevin on 19/07/2014 for Podcast Server
@@ -25,24 +28,23 @@ public class FfmpegService {
     @Autowired ProcessBuilderFactory processBuilderFactory;
 
     public void concatDemux (File target, File... files) {
-        File listOfFileToConcat = null;
         if (target.exists() && target.isFile())
             target.delete();
 
         try {
-
-            listOfFileToConcat = getListingFile(target, files);
+            String filesStrings = Lists.newArrayList(files)
+                    .stream()
+                    .map(File::getAbsolutePath)
+                    .collect(joining("|"));
 
             ProcessBuilder pb = processBuilderFactory.newProcessBuilder(ffmpeg,
-                    "-f",
-                    "concat",
-                    "-i",
-                    "\"" + listOfFileToConcat.getAbsolutePath().replace("\'", "\\\'") + "\"",
-                    "-c",
-                    "copy",
-                    target.getAbsolutePath());
+                    /*"-v", "verbose",*/
+                    "-i", "concat:" + filesStrings,
+                    "-c", "copy", target.getAbsolutePath()
+            )
+                    .directory(new File("/tmp"))
+                    /*.inheritIO()*/;
 
-            pb.directory(new File("/tmp"));
             logger.debug(String.valueOf(pb.command()));
             Process p = pb.start();
 
@@ -51,41 +53,13 @@ public class FfmpegService {
 
             output.start();
             error.start();
-
             p.waitFor();
 
             output.interrupt();
             error.interrupt();
-
-            if (p.getClass().getSimpleName().contains("UNIXProcess")) {
-                Field pidField = p.getClass().getDeclaredField("pid");
-                pidField.setAccessible(true);
-                int pid = pidField.getInt(p);
-                logger.debug("PID du process : " + pid);
-            }
-
-
-        } catch (IOException | IllegalAccessException | NoSuchFieldException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-        } finally {
-            if (listOfFileToConcat != null)
-                listOfFileToConcat.delete();
         }
-
-
-    }
-
-    private File getListingFile(File target, File... files) throws IOException {
-        File listOfFileToConcat = File.createTempFile("Ffmpeg-listing", ".txt", target.getParentFile());
-
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(listOfFileToConcat)));
-        for (File file: files) {
-            writer.write("file '" + file.getAbsolutePath().replace("\'", "\\\'") + "'");
-            writer.newLine();
-        }
-        writer.close();
-
-        return listOfFileToConcat;
     }
 
 }
