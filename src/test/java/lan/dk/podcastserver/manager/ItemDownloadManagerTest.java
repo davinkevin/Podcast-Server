@@ -125,7 +125,9 @@ public class ItemDownloadManagerTest {
         /* Given */
         final List<Item> itemList = Arrays.asList(new Item().setId(1).setUrl("1").setStatus(Status.NOT_DOWNLOADED), new Item().setId(2).setUrl("2").setStatus(Status.NOT_DOWNLOADED), new Item().setId(3).setUrl("3").setStatus(Status.NOT_DOWNLOADED), new Item().setId(4).setUrl("4").setStatus(Status.NOT_DOWNLOADED));
         when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
-        when(downloaderSelector.of(anyString())).thenReturn(mock(Downloader.class));
+        Downloader downloader = mock(Downloader.class);
+        when(downloaderSelector.of(anyString())).thenReturn(downloader);
+        when(downloader.setItem(any())).thenReturn(downloader);
         mockPodcastParametersForPostConstruct();
         /* When */
         itemDownloadManager.postConstruct();
