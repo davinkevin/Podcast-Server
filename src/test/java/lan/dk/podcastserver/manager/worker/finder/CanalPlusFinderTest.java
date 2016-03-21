@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +50,16 @@ public class CanalPlusFinderTest {
                 .hasType("CanalPlus")
                 .hasCover(cover)
                 .hasDescription("Yann Barthes présente le petit journal à 20h10 -  CANALPLUS.FR");
+    }
+
+    @Test
+    public void should_be_compatible() {
+        assertThat(canalPlusFinder.compatibility("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html")).isEqualTo(1);
+    }
+
+    @Test
+    public void should_not_be_compatible() {
+        assertThat(canalPlusFinder.compatibility("http://www.foo.fr/bar/to.html")).isGreaterThan(1);
     }
 
     public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
