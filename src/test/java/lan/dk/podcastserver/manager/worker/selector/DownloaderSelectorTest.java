@@ -2,14 +2,20 @@ package lan.dk.podcastserver.manager.worker.selector;
 
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.manager.worker.downloader.*;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+import org.springframework.context.ApplicationContext;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -24,6 +30,8 @@ public class DownloaderSelectorTest {
     @Mock ParleysDownloader parleysDownloader;
     @Mock RTMPDownloader rtmpDownloader;
     @Mock YoutubeDownloader youtubeDownloader;
+    @Mock ApplicationContext applicationContext;
+    private Set<Downloader> downloaders;
 
     @Before
     public void setUp() throws Exception {
@@ -34,9 +42,20 @@ public class DownloaderSelectorTest {
         when(parleysDownloader.compatibility(anyString())).thenCallRealMethod();
         when(rtmpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
+        when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
         downloaderSelector = new DownloaderSelector();
-        downloaderSelector.setDownloaders(Sets.newHashSet(dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, parleysDownloader, rtmpDownloader, youtubeDownloader ));
+        downloaders = Sets.newHashSet(dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, parleysDownloader, rtmpDownloader, youtubeDownloader);
+        downloaderSelector.setDownloaders(downloaders);
+        downloaderSelector.setApplicationContext(applicationContext);
+    }
+
+    private Answer<Downloader> findBean() {
+        return i -> downloaders
+                .stream()
+                .filter(d -> StringUtils.equals(((String) i.getArguments()[0]), d.getClass().getSimpleName()))
+                .findFirst()
+                .orElse(DownloaderSelector.NO_OP_DOWNLOADER);
     }
 
     @Test

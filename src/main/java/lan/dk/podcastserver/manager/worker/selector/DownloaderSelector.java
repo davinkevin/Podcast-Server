@@ -4,7 +4,9 @@ import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.downloader.NoOpDownloader;
 import lombok.Setter;
 import org.jadira.usertype.spi.utils.lang.StringUtils;
+import org.springframework.aop.TargetClassAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -20,6 +22,9 @@ public class DownloaderSelector {
     public static final NoOpDownloader NO_OP_DOWNLOADER = new NoOpDownloader();
 
     @Setter(onMethod = @__(@Autowired))
+    private ApplicationContext applicationContext;
+
+    @Setter(onMethod = @__(@Autowired))
     private Set<Downloader> downloaders;
 
     public Downloader of(String url) {
@@ -30,6 +35,9 @@ public class DownloaderSelector {
         return downloaders
                 .stream()
                 .min(Comparator.comparing(downloader -> downloader.compatibility(url)))
+                .map(d -> TargetClassAware.class.isInstance(d) ? TargetClassAware.class.cast(d).getTargetClass() : d.getClass())
+                .map(Class::getSimpleName)
+                .map(clazz -> applicationContext.getBean(clazz, Downloader.class))
                 .orElse(NO_OP_DOWNLOADER);
     }
 }
