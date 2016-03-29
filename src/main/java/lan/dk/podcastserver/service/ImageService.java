@@ -2,6 +2,7 @@ package lan.dk.podcastserver.service;
 
 
 import lan.dk.podcastserver.entity.Cover;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,10 @@ import java.net.URL;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ImageService {
 
-    private final UrlService urlService;
-
-    @Autowired
-    public ImageService(UrlService urlService) {
-        this.urlService = urlService;
-    }
+    final UrlService urlService;
 
     public Cover getCoverFromURL(String url) {
         if (StringUtils.isEmpty(url))
