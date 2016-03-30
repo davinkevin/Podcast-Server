@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import static java.time.ZonedDateTime.now;
  */
 @Service
 @Setter
+@Accessors(chain = true)
 @ConfigurationProperties(value = "podcastserver"/*, ignoreUnknownFields = false*/)
 public class PodcastServerParameters {
 
@@ -75,6 +77,11 @@ public class PodcastServerParameters {
      */
     ExternalTools externalTools;
 
+    /**
+     * Parameters specific of backup system
+     */
+    Backup backup;
+
     //** GETTER OF THE PARAMETERS **//
     public String getRootfolder() {
         return rootfolder;
@@ -91,6 +98,7 @@ public class PodcastServerParameters {
     public Api api() {
         return api;
     }
+    public Backup getBackup(){ return backup;}
     public Path rootFolder() { return Paths.get(rootfolder); }
     public String rootFolderWithProtocol() { return "file://".concat(rootfolder); }
     public URI fileContainer() throws URISyntaxException { return new URI(fileContainer); }
@@ -103,12 +111,16 @@ public class PodcastServerParameters {
     public Long rssDefaultNumberItem() {
         return rssDefaultNumberItem;
     }
-
+    public Backup backup() {return backup;}
 
 
     /* Utils on attributes */
     public ZonedDateTime limitDownloadDate() {
         return now().minusDays(numberOfDayToDownload);
+    }
+
+    public String rtmpDump() {
+        return this.externalTools.rtmpdump();
     }
 
 
@@ -130,9 +142,19 @@ public class PodcastServerParameters {
     @Accessors(chain = true)
     public static class ExternalTools {
         private String ffmpeg;
-        private String rtmpdump;
+        private String rtmpdump = "/usr/local/bin/rtmpdump";
 
         public String ffmpeg(){return ffmpeg;}
         public String rtmpdump(){return rtmpdump;}
+    }
+
+    @Getter @Setter
+    @Accessors(chain = true)
+    public static class Backup {
+        private File location;
+        private Boolean binary = false;
+        private String cron = "0 0 4 * * *";
+
+        public Path location() { return location.toPath();}
     }
 }

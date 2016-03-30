@@ -122,11 +122,14 @@ public class PodcastServerParametersTest {
                 .setFfmpeg("Foo")
                 .setRtmpdump("Bar");
 
+        PodcastServerParameters podcastServerParameters = new PodcastServerParameters().setExternalTools(externalTools);
+
         /* Then */
         assertThat(externalTools.ffmpeg()).isEqualTo("Foo");
         assertThat(externalTools.rtmpdump()).isEqualTo("Bar");
         assertThat(externalTools.getFfmpeg()).isEqualTo("Foo");
         assertThat(externalTools.getRtmpdump()).isEqualTo("Bar");
+        assertThat(podcastServerParameters.rtmpDump()).isEqualTo("Bar");
     }
 
 }
