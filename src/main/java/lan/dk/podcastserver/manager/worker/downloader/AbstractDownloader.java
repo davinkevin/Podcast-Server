@@ -44,7 +44,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Resource protected SimpMessagingTemplate template;
     @Resource protected MimeTypeService mimeTypeService;
 
-    protected AtomicBoolean stopDownloading = new AtomicBoolean(false);
+    AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
     public Item getItem() {
         return item;

@@ -3,26 +3,25 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.nonNull;
 
 @Component("RTMPDownloader")
 @Scope("prototype")
 public class RTMPDownloader extends AbstractDownloader {
 
-    private int pid = 0;
+    int pid = 0;
 
     @Autowired ProcessBuilderFactory processBuilderFactory;
-
-    @Value("${podcastserver.externaltools.rtmpdump:/usr/local/bin/rtmpdump}")
-    String rtmpdump;
 
     Process p = null;
 
@@ -31,114 +30,46 @@ public class RTMPDownloader extends AbstractDownloader {
         logger.debug("Download");
         itemDownloadManager.addACurrentDownload();
 
-        if (item.getUrl().contains("rtmp://")) {
-            try {
-                target = getTagetFile(item);
-                logger.debug("Fichier de sortie : " + target.getAbsolutePath());
+        try {
+            target = getTagetFile(item);
+            logger.debug("Fichier de sortie : " + target.getAbsolutePath());
 
-                ProcessBuilder pb = processBuilderFactory
-                        .newProcessBuilder(rtmpdump, "-r", getItemUrl(), "-o", target.getAbsolutePath())
-                        .directory(new File("/tmp"));
+            p  = processBuilderFactory
+                    .newProcessBuilder(podcastServerParameters.rtmpDump(), "-r", getItemUrl(), "-o", target.getAbsolutePath())
+                    .directory(new File("/tmp"))
+                    .redirectErrorStream(true)
+                    .start();
 
+            pid = processBuilderFactory.pidOf(p);
 
-                p  = pb.start();
-                if (p.getClass().getSimpleName().contains("UNIXProcess")) {
-                    Field pidField = p.getClass().getDeclaredField("pid");
-                    pidField.setAccessible(true);
-                    pid = pidField.getInt(p);
-                    logger.debug("PID du process : " + pid);
-                }
+            new RTMPWatcher(this).run();
 
-                Runnable itemErrorSynchronisation = new Runnable() {
-                    private BufferedReader getBufferedReader(InputStream is) {
-                        return new BufferedReader(new InputStreamReader(is));
-                    }
-
-                    @Override
-                    public void run() {
-                        BufferedReader br = getBufferedReader(p.getErrorStream());
-                        String ligne;
-                        Pattern p = Pattern.compile("[^\\(]*\\(([0-9]*).*%\\)");
-                        Matcher m;
-                        logger.debug("Lecture du stream d'erreur");
-                        try {
-
-                            while ((ligne = br.readLine()) != null) {
-                                //logger.debug(ligne);
-                                m = p.matcher(ligne);
-                                // Si le dernier traitement date de plus d'une seconde :
-                                if (m.matches() && Integer.parseInt(m.group(1)) > item.getProgression()) {
-                                    item.setProgression(Integer.parseInt(m.group(1)));
-                                    logger.debug("Item Progression : " + item.getProgression());
-                                    convertAndSaveBroadcast();
-                                } else if (ligne.toLowerCase().contains("download complete")) {
-                                    logger.info("Fin du téléchargement");
-                                    finishDownload();
-                                    break;
-                                }
-                                if (pid == 0) {
-                                    break;
-                                }
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            logger.error("IOException :", e);
-                        }
-                        if (Status.FINISH != item.getStatus() && !stopDownloading.get()) {
-                            logger.debug("Terminaison innatendu, reset du downloader");
-                            resetDownload();
-                        }
-                    }
-                };
-                itemErrorSynchronisation.run();
-                p.waitFor();
-                pid = 0;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                logger.error("IOException :", e);
-                stopDownload();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                logger.error("InterruptedException :", e);
-                stopDownload();
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                logger.error("NoSuchFieldException :", e);
-                stopDownload();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                logger.error("IllegalAccessException :", e);
-                stopDownload();
-            }
-        } else {
-            logger.debug("Traiter avec un téléchargeur HTTP");
+            p.waitFor();
+            pid = 0;
+        } catch (IOException | InterruptedException e) {
+            logger.error("IOException | InterruptedException :", e);
             stopDownload();
         }
-        return this.item;
+        return item;
     }
+
     @Override
     public void startDownload() {
-        stopDownloading.set(false);
-        this.item.setStatus(Status.STARTED);
-        this.saveSyncWithPodcast();
-        if (pid != 0 && p != null) { //Relancement du process UNIX
+        if (pid != 0 && nonNull(p)) { //Relancement du process UNIX
             //ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
-            logger.debug("Reprise du téléchargement");
+            logger.debug("Relaunch download");
             p.destroy();
-        } else { // Lancement du process simple
-            this.download();
         }
+        super.startDownload();
     }
 
     @Override
     public void pauseDownload() {
-        ProcessBuilder pb = new ProcessBuilder("kill", "-STOP", "" + pid);
+        ProcessBuilder stopProcess = processBuilderFactory.newProcessBuilder("kill", "-STOP", "" + pid);
         try {
-            pb.start();
+            stopProcess.start();
             super.pauseDownload();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             logger.error("IOException :", e);
             this.stopDownload();
         }
@@ -146,17 +77,69 @@ public class RTMPDownloader extends AbstractDownloader {
 
     @Override
     public void stopDownload() {
-        try {
+        if (nonNull(p)) {
             p.destroy();
-        } finally {
-            super.stopDownload();
         }
-
+        super.stopDownload();
     }
 
     @Override
     public Integer compatibility(String url) {
-        return url.startsWith("rtmp") ? 1 : Integer.MAX_VALUE;
+        return url.startsWith("rtmp://") ? 1 : Integer.MAX_VALUE;
     }
 
+    @Slf4j
+    @RequiredArgsConstructor
+    static class RTMPWatcher implements Runnable {
+
+        static final String DOWNLOAD_COMPLETE = "download complete";
+        static final Pattern RTMPDUMP_PROGRESSION_PATTERN_EXTRACTOR = Pattern.compile("[^\\(]*\\(([0-9]*).*%\\)");
+        final RTMPDownloader rtmpDownloader;
+
+        private BufferedReader getBufferedReader(InputStream is) {
+            return new BufferedReader(new InputStreamReader(is));
+        }
+
+        @Override
+        public void run() {
+            Process p = rtmpDownloader.p;
+            Item item = rtmpDownloader.item;
+            Integer pid = rtmpDownloader.pid;
+
+            BufferedReader br = getBufferedReader(p.getInputStream());
+            String line;
+            log.debug("Reading output of RTMPDump");
+            try {
+                while ((line = br.readLine()) != null) {
+                    log.debug(line);
+                    Matcher m = RTMPDUMP_PROGRESSION_PATTERN_EXTRACTOR.matcher(line);
+                    if (progressionHasChange(item, m)) {
+                        item.setProgression(Integer.parseInt(m.group(1)));
+                        rtmpDownloader.convertAndSaveBroadcast();
+                    } else if (isDownloadComplete(line)) {
+                        log.info("End of download");
+                        rtmpDownloader.finishDownload();
+                        break;
+                    }
+                    if (pid == 0) {
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                log.error("IOException :", e);
+            }
+            if (Status.FINISH != item.getStatus() && !rtmpDownloader.stopDownloading.get()) {
+                log.debug("Unexpected ending, reset of downloader");
+                rtmpDownloader.resetDownload();
+            }
+        }
+
+        private boolean isDownloadComplete(String ligne) {
+            return ligne.toLowerCase().contains(DOWNLOAD_COMPLETE);
+        }
+
+        private boolean progressionHasChange(Item item, Matcher m) {
+            return m.matches() && Integer.parseInt(m.group(1)) > item.getProgression();
+        }
+    }
 }
