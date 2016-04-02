@@ -128,15 +128,15 @@ public class ItemDownloadManager {
     }
 
     // Change State of id identified download
-    public void stopDownload(int id) {
+    public void stopDownload(UUID id) {
         getDownloaderOfItemWithId(id).ifPresent(Downloader::stopDownload);
     }
 
-    public void pauseDownload(int id) {
+    public void pauseDownload(UUID id) {
         getDownloaderOfItemWithId(id).ifPresent(Downloader::pauseDownload);
     }
 
-    private Optional<Downloader> getDownloaderOfItemWithId(int id) {
+    private Optional<Downloader> getDownloaderOfItemWithId(UUID id) {
         return downloadingQueue
                 .entrySet()
                 .stream()
@@ -145,13 +145,13 @@ public class ItemDownloadManager {
                 .findFirst();
     }
 
-    public void restartDownload(int id) {
+    public void restartDownload(UUID id) {
         getDownloaderOfItemWithId(id)
                 .map(Downloader::getItem)
                 .ifPresent(this::getDownloaderByTypeAndRun);
     }
 
-    public void toogleDownload(int id) {
+    public void toogleDownload(UUID id) {
         Item item = getDownloaderOfItemWithId(id)
                 .map(Downloader::getItem)
                 .orElse(Item.DEFAULT_ITEM);
@@ -165,7 +165,7 @@ public class ItemDownloadManager {
         }
     }
 
-    public void addItemToQueue(int id) {
+    public void addItemToQueue(UUID id) {
         this.addItemToQueue(itemRepository.findOne(id));
     }
 
@@ -178,7 +178,7 @@ public class ItemDownloadManager {
         manageDownload();
     }
 
-    public void removeItemFromQueue(int id, Boolean stopItem) {
+    public void removeItemFromQueue(UUID id, Boolean stopItem) {
         Item item = itemRepository.findOne(id);
         this.removeItemFromQueue(item);
 
@@ -205,7 +205,7 @@ public class ItemDownloadManager {
             manageDownload();
     }
 
-    public Item getItemInDownloadingQueue(int id) {
+    public Item getItemInDownloadingQueue(UUID id) {
         return this.downloadingQueue
                 .keySet()
                 .stream()
@@ -267,7 +267,7 @@ public class ItemDownloadManager {
         return downloadingQueue.keySet();
     }
 
-    public void moveItemInQueue(Integer itemId, Integer position) {
+    public void moveItemInQueue(UUID itemId, Integer position) {
         List<Item> copyOfWaitingList = Arrays.asList(waitingQueue.toArray(new Item[waitingQueue.size()]));
         List<Item> aItemList = new ArrayList<>();
 

@@ -53,9 +53,9 @@ public class WatchListRepositoryTest {
                     .build(),
             insertInto("WATCH_LIST_ITEMS")
                     .columns("WATCH_LISTS_ID", "ITEMS_ID")
-                    .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), 3)
-                    .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), 5)
-                    .values(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"), 5)
+                    .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"))
+                    .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
+                    .values(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"), UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
                     .build()
     );
 
@@ -101,7 +101,7 @@ public class WatchListRepositoryTest {
     public void should_find_playlist_having_item() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        Item item = new Item().setId(5);
+        Item item = new Item().setId(UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"));
 
         /* When */
         Set<WatchList> watchLists = watchListRepository.findContainsItem(item);
@@ -113,7 +113,7 @@ public class WatchListRepositoryTest {
     @Test
     public void should_add_a_item_to_playlist() {
         /* Given */
-        Item item = itemRepository.findOne(4);
+        Item item = itemRepository.findOne(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
         WatchList watchList = watchListRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
 
         /* When */
@@ -128,7 +128,7 @@ public class WatchListRepositoryTest {
     @Test
     public void should_remove_item_from_playlist() {
         /* Given */
-        Item thirdItem = itemRepository.findOne(3);
+        Item thirdItem = itemRepository.findOne(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"));
         WatchList watchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
 
         /* When */
@@ -145,7 +145,7 @@ public class WatchListRepositoryTest {
         /* Given */
 
         /* When */
-        itemRepository.delete(3);
+        itemRepository.delete(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"));
         itemRepository.flush();
         WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
 

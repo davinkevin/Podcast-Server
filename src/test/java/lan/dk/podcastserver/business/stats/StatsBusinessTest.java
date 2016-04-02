@@ -64,7 +64,7 @@ public class StatsBusinessTest {
         return IntStream.rangeClosed(1, numberOfItem)
                 // FlatMap To object to avoid repartion 1 per date
                 .mapToObj(i -> new Item()
-                        .setId(i)
+                        .setId(UUID.randomUUID())
                         .setPubdate(ZonedDateTime.now().minusDays(i))
                         .setDownloadDate(ZonedDateTime.now().minusDays(i)))
                 .collect(toList());
@@ -75,10 +75,10 @@ public class StatsBusinessTest {
         /* Given */
         Podcast podcast = new Podcast();
         podcast.setItems(new HashSet<>(generateItems(356)));
-        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
 
         /* When */
-        Set<NumberOfItemByDateWrapper> numberOfItemByDateWrappers = statsBusiness.statsByDownloadDate(123, 6L);
+        Set<NumberOfItemByDateWrapper> numberOfItemByDateWrappers = statsBusiness.statsByDownloadDate(UUID.randomUUID(), 6L);
 
         /* Then */
         Long days = DAYS.between(LocalDate.now().minusMonths(6), LocalDate.now())-1;
@@ -92,10 +92,10 @@ public class StatsBusinessTest {
         /* Given */
         Podcast podcast = new Podcast();
         podcast.setItems(new HashSet<>(generateItems(356)));
-        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
 
         /* When */
-        Set<NumberOfItemByDateWrapper> numberOfItemByDateWrappers = statsBusiness.statByPubDate(6, 2L);
+        Set<NumberOfItemByDateWrapper> numberOfItemByDateWrappers = statsBusiness.statByPubDate(UUID.randomUUID(), 2L);
 
         /* Then */
         Long days = DAYS.between(LocalDate.now().minusMonths(2), LocalDate.now())-1;

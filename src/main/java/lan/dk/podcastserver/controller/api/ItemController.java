@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -39,42 +40,42 @@ public class ItemController {
 
     @RequestMapping(method = RequestMethod.POST)
     @JsonView(Item.ItemPodcastListView.class)
-    public Page<Item> findAll(@PathVariable Integer idPodcast, @RequestBody PageRequestFacade pageRequestFacade) {
+    public Page<Item> findAll(@PathVariable UUID idPodcast, @RequestBody PageRequestFacade pageRequestFacade) {
         return itemBusiness.findByPodcast(idPodcast, pageRequestFacade.toPageRequest());
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
     @JsonView(Item.ItemDetailsView.class)
-    public Item findById(@PathVariable int id) {
+    public Item findById(@PathVariable UUID id) {
         return itemBusiness.findOne(id);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT)
     @JsonView(Item.ItemDetailsView.class)
-    public Item update(@RequestBody Item item, @PathVariable(value = "id") int id) {
+    public Item update(@RequestBody Item item, @PathVariable("id") UUID id) {
         item.setId(id);
         return itemBusiness.save(item);
     }
 
     @RequestMapping(value="{id:[\\d]+}/watchlists", method = RequestMethod.GET)
     @JsonView(Object.class)
-    public Set<WatchList> getWatchListOfItem(@PathVariable(value = "id") int id) {
+    public Set<WatchList> getWatchListOfItem(@PathVariable("id") UUID id) {
         return watchListBusiness.findContainsItem(id);
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void delete (@PathVariable(value = "id") int id) {
+    public void delete (@PathVariable(value = "id") UUID id) {
         itemBusiness.delete(id);
     }
 
     @RequestMapping(value="{id:[\\d]+}/addtoqueue", method = RequestMethod.GET)
-    public void addToDownloadList(@PathVariable(value = "id") int id) {
+    public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
     }
 
     @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
-    public void getEpisodeFile(@PathVariable Integer id, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void getEpisodeFile(@PathVariable UUID id, HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.debug("Download du fichier d'item {}", id);
         Item item = itemBusiness.findOne(id);
         if (item.isDownloaded()) {
@@ -90,13 +91,13 @@ public class ItemController {
 
     @RequestMapping(value = "{id:[\\d]+}/reset", method = RequestMethod.GET)
     @JsonView(Item.ItemDetailsView.class)
-    public Item reset(@PathVariable Integer id) {
+    public Item reset(@PathVariable UUID id) {
         return itemBusiness.reset(id);
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @JsonView(Item.ItemDetailsView.class)
-    public Item uploadFile(@PathVariable Integer idPodcast, @RequestPart("file") MultipartFile file) throws PodcastNotFoundException, IOException, ParseException, URISyntaxException {
+    public Item uploadFile(@PathVariable UUID idPodcast, @RequestPart("file") MultipartFile file) throws PodcastNotFoundException, IOException, ParseException, URISyntaxException {
         return itemBusiness.addItemByUpload(idPodcast, file);
     }
 }

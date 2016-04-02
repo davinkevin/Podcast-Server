@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.repository.dsl;
 
+import com.google.common.collect.Lists;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -25,10 +26,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
+import static lan.dk.podcastserver.entity.Status.NOT_DOWNLOADED;
 import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
 import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.formatter;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
@@ -49,25 +52,25 @@ public class ItemDslTest {
     public static final Operation INSERT_REFERENCE_DATA = sequenceOf(
             insertInto("PODCAST")
                     .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
-                    .values(1, "AppLoad", null, "RSS", false)
-                    .values(2, "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true)
+                    .values(UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false)
+                    .values(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true)
                     .build(),
             insertInto("ITEM")
                     .columns("ID", "TITLE", "URL", "PODCAST_ID", "STATUS", "PUBDATE", "DOWNLOAD_DATE")
-                    .values(1L, "Appload 1", "http://fakeurl.com/appload.1.mp3", 1, Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
-                    .values(2L, "Appload 2", "http://fakeurl.com/appload.2.mp3", 1, null, now().minusDays(30).format(formatter), now().minusDays(30).format(formatter))
-                    .values(3L, "Appload 3", "http://fakeurl.com/appload.3.mp3", 1, Status.NOT_DOWNLOADED, now().format(formatter), now().format(formatter))
-                    .values(4L, "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", 2, Status.DELETED, now().minusYears(1).format(formatter), now().format(formatter))
+                    .values(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), "Appload 1", "http://fakeurl.com/appload.1.mp3", UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
+                    .values(UUID.fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), "Appload 2", "http://fakeurl.com/appload.2.mp3", UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), null, now().minusDays(30).format(formatter), now().minusDays(30).format(formatter))
+                    .values(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), "Appload 3", "http://fakeurl.com/appload.3.mp3", UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), Status.NOT_DOWNLOADED, now().format(formatter), now().format(formatter))
+                    .values(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.DELETED, now().minusYears(1).format(formatter), now().format(formatter))
                     .build(),
             insertInto("TAG")
                 .columns("ID", "NAME")
-                .values(1L, "French Spin")
-                .values(2L, "Studio Knowhere")
+                .values(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "French Spin")
+                .values(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "Studio Knowhere")
                 .build(),
             insertInto("PODCAST_TAGS")
                 .columns("PODCASTS_ID", "TAGS_ID")
-                .values(1, 1)
-                .values(2, 2)
+                .values(UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                .values(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
                 .build()
     );
 
@@ -176,7 +179,7 @@ public class ItemDslTest {
     public void should_be_in_id_list() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<Integer> listOfId = Arrays.asList(3, 4);
+        List<UUID> listOfId = Arrays.asList(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(isInId(listOfId));
@@ -192,7 +195,7 @@ public class ItemDslTest {
     public void should_find_in_tag() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        Tag tag = new Tag().setId(1).setName("French Spin");
+        Tag tag = new Tag().setId(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08")).setName("French Spin");
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(isInTags(tag));
@@ -210,7 +213,7 @@ public class ItemDslTest {
         dbSetupTracker.skipNextLaunch();
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(isInPodcast(1));
+        Iterable<Item> items = itemRepository.findAll(isInPodcast(UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561")));
 
         /* Then */
         assertThat(items)
@@ -223,8 +226,8 @@ public class ItemDslTest {
     public void should_result_with_search() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<Integer> ids = Arrays.asList(1, 4);
-        List<Tag> tags = Collections.singletonList(new Tag().setId(2).setName("Tag1"));
+        List<UUID> ids = Lists.newArrayList(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
+        List<Tag> tags = Collections.singletonList(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
@@ -240,8 +243,8 @@ public class ItemDslTest {
     public void should_result_with_search_without_ids() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<Integer> ids = null;
-        List<Tag> tags = Collections.singletonList(new Tag().setId(2).setName("Tag1"));
+        List<UUID> ids = null;
+        List<Tag> tags = Collections.singletonList(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));

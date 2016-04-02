@@ -21,8 +21,8 @@ public class TagBusiness {
         return tagRepository.findAll();
     }
 
-    public Tag findOne(Integer integer) {
-        return tagRepository.findOne(integer);
+    public Tag findOne(UUID id) {
+        return tagRepository.findOne(id);
     }
 
     public List<Tag> findByNameLike(String name) {

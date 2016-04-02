@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by kevin on 08/06/2014 for Podcast-Server
@@ -28,7 +29,7 @@ import java.util.Objects;
 @Component
 @Transactional
 public class CoverBusiness {
-    
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     final CoverRepository coverRepository;
@@ -42,8 +43,8 @@ public class CoverBusiness {
         this.urlService = urlService;
     }
 
-    public Cover findOne(Integer integer) {
-        return coverRepository.findOne(integer);
+    public Cover findOne(UUID id) {
+        return coverRepository.findOne(id);
     }
 
     public String download(Podcast podcast) {

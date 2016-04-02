@@ -2,6 +2,8 @@ package lan.dk.podcastserver.utils.form;
 
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 
 /**
@@ -13,14 +15,15 @@ public class MovingItemInQueueFormTest {
     public void should_generate_object() {
         /* Given */
         MovingItemInQueueForm movingItemInQueueForm = new MovingItemInQueueForm();
+        UUID id = UUID.randomUUID();
 
         /* When */
-        movingItemInQueueForm.setId(1);
+        movingItemInQueueForm.setId(id);
         movingItemInQueueForm.setPosition(2);
 
         /* Then */
         assertThat(movingItemInQueueForm)
-                .hasId(1)
+                .hasId(id)
                 .hasPosition(2);
     }
 

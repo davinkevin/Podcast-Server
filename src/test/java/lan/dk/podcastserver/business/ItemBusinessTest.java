@@ -25,10 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -88,9 +85,9 @@ public class ItemBusinessTest {
     @Test
     public void should_find_by_id() {
         /* Given */
-        Integer idOfItem = 33;
+        UUID idOfItem = UUID.randomUUID();
         Item item = new Item();
-        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
         /* When */
         Item savedItem = itemBusiness.findOne(idOfItem);
         /* Then */
@@ -103,14 +100,14 @@ public class ItemBusinessTest {
     @Test
     public void should_delete() {
         /* Given */
-        Integer idOfItem = 33;
+        UUID idOfItem = UUID.randomUUID();
         Podcast podcast = new Podcast();
         podcast.setItems(new HashSet<>());
         Item item = new Item();
         item.setPodcast(podcast);
         podcast.getItems().add(item);
 
-        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
 
         /* When */
         itemBusiness.delete(idOfItem);
@@ -134,10 +131,10 @@ public class ItemBusinessTest {
     @Test
     public void should_reset_item() {
         /* Given */
-        Integer itemId = 33;
+        UUID itemId = UUID.randomUUID();
         Item item = mock(Item.class);
         when(item.reset()).thenReturn(item);
-        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
         when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(false);
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
@@ -156,10 +153,10 @@ public class ItemBusinessTest {
     @Test
     public void should_reset_a_downloading_item() {
         /* Given */
-        Integer itemId = 33;
+        UUID itemId = UUID.randomUUID();
         Item item = mock(Item.class);
         when(item.reset()).thenReturn(item);
-        when(itemRepository.findOne(anyInt())).thenReturn(item);
+        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
         when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(true);
 
         /* When */
@@ -174,28 +171,28 @@ public class ItemBusinessTest {
     @Test
     public void should_find_page_in_podcast() {
         /* Given */
-        Integer idPodcast = 25;
+        UUID idPodcast = UUID.randomUUID();
         PageRequest pageRequest = new PageRequest(0, 20);
         PageImpl<Item> pageOfItem = new PageImpl<>(new ArrayList<>());
-        when(itemRepository.findByPodcast(anyInt(), any(PageRequest.class))).thenReturn(pageOfItem);
+        when(itemRepository.findByPodcast(any(UUID.class), any(PageRequest.class))).thenReturn(pageOfItem);
 
         /* When */
         Page<Item> pageOfPodcast = itemBusiness.findByPodcast(idPodcast, pageRequest);
 
         /* Then */
         assertThat(pageOfPodcast.getContent()).isEqualTo(new ArrayList<>());
-        verify(itemRepository, times(1)).findByPodcast(eq(25), eq(pageRequest));
+        verify(itemRepository, times(1)).findByPodcast(eq(idPodcast), eq(pageRequest));
     }
 
     @Test(expected = PodcastNotFoundException.class)
     public void should_reject_because_no_podcast_found() throws IOException, URISyntaxException {
-        itemBusiness.addItemByUpload(25, mock(MultipartFile.class));
+        itemBusiness.addItemByUpload(UUID.randomUUID(), mock(MultipartFile.class));
     }
 
     @Test
     public void should_add_item_by_upload() throws IOException, URISyntaxException {
         /* Given */
-        Integer idPodcast = 25;
+        UUID idPodcast = UUID.randomUUID();
         MultipartFile uploadedFile = mock(MultipartFile.class);
         Podcast podcast = new Podcast()
                 .setDescription("aDescription");
@@ -249,7 +246,7 @@ public class ItemBusinessTest {
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
-        when(itemRepository.fullTextSearch(eq(term))).thenReturn(Arrays.asList(1, 2, 3));
+        when(itemRepository.fullTextSearch(eq(term))).thenReturn(Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
 
         /* When */
@@ -289,10 +286,10 @@ public class ItemBusinessTest {
         List<Tag> tags = Arrays.asList(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("ASC"), "pertinence");
         List<Item> itemsFrom1To20 = IntStream.range(1, 20)
-                .mapToObj(id -> new Item().setId(id))
+                .mapToObj(id -> new Item().setId(UUID.randomUUID()))
                 .collect(toList());
 
-        when(itemRepository.fullTextSearch(eq(term))).thenReturn(IntStream.range(1, 20).boxed().collect(toList()));
+        when(itemRepository.fullTextSearch(eq(term))).thenReturn(itemsFrom1To20.stream().map(Item::getId).collect(toList()));
         when(itemRepository.findAll(any(Predicate.class))).thenReturn(itemsFrom1To20);
 
         /* When */
@@ -300,7 +297,7 @@ public class ItemBusinessTest {
 
         /* Then */
         assertThat(pageOfItem.getContent())
-                .contains(new Item().setId(16), new Item().setId(15), new Item().setId(14));
+                .contains(itemsFrom1To20.get(15),itemsFrom1To20.get(14),itemsFrom1To20.get(13));
 
         verify(itemRepository, times(1)).fullTextSearch(eq(term));
         verify(itemRepository, times(1)).findAll(any(Predicate.class));

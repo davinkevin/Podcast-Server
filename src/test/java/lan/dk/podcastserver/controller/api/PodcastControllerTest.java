@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -50,28 +51,30 @@ public class PodcastControllerTest {
     public void should_find_by_id() {
         /* Given */
         Podcast podcast = new Podcast();
-        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
+        UUID id = UUID.randomUUID();
 
         /* When */
-        Podcast podcastById = podcastController.findById(1);
+        Podcast podcastById = podcastController.findById(id);
 
         /* Then */
         PodcastAssert.assertThat(podcastById).isSameAs(podcast);
-        verify(podcastBusiness, only()).findOne(eq(1));
+        verify(podcastBusiness, only()).findOne(eq(id));
     }
 
     @Test
     public void should_update() {
         Podcast podcast = new Podcast();
         when(podcastBusiness.reatachAndSave(any(Podcast.class))).thenReturn(podcast);
+        UUID id = UUID.randomUUID();
 
         /* When */
-        Podcast podcastUpdated = podcastController.update(podcast, 1);
+        Podcast podcastUpdated = podcastController.update(podcast, id);
 
         /* Then */
         PodcastAssert.assertThat(podcastUpdated)
                 .isInstanceOf(Podcast.class)
-                .hasId(1);
+                .hasId(id);
         verify(podcastBusiness, only()).reatachAndSave(same(podcast));
     }
 
@@ -79,22 +82,23 @@ public class PodcastControllerTest {
     public void should_patch_update() {
         /* Given */
         Podcast podcast = new Podcast();
+        UUID id = UUID.randomUUID();
         when(podcastBusiness.patchUpdate(any(Podcast.class))).thenReturn(podcast);
 
         /* When */
-        Podcast podcastUpdated = podcastController.patchUpdate(podcast, 1);
+        Podcast podcastUpdated = podcastController.patchUpdate(podcast, id);
 
         /* Then */
         PodcastAssert.assertThat(podcastUpdated)
                 .isInstanceOf(Podcast.class)
-                .hasId(1);
+                .hasId(id);
         verify(podcastBusiness, only()).patchUpdate(same(podcast));
     }
 
     @Test
     public void should_delete() {
         /* Given */
-        Integer id = 123;
+        UUID id = UUID.randomUUID();
 
         /* When */
         podcastController.delete(id);
@@ -119,9 +123,9 @@ public class PodcastControllerTest {
     @Test
     public void should_get_rss() {
         /* Given */
-        Integer id = 123;
+        UUID id = UUID.randomUUID();
         Boolean limit = Boolean.TRUE;
-        when(podcastBusiness.getRss(anyInt(), anyBoolean())).thenReturn("Foo");
+        when(podcastBusiness.getRss(any(UUID.class), anyBoolean())).thenReturn("Foo");
 
         /* When */
         String rss = podcastController.getRss(id, limit);

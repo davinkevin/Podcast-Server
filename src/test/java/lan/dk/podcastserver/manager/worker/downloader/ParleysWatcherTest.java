@@ -17,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 import static lan.dk.podcastserver.manager.worker.downloader.ParleysDownloader.ParleysWatcher;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +41,7 @@ public class ParleysWatcherTest {
     @Mock JsonService jsonService;
     @Mock DownloadInfo info;
     ParleysDownloader parleysDownloader;
-    Podcast podcast = Podcast.builder().id(123).title("aPodcast").build();
+    Podcast podcast = Podcast.builder().id(UUID.randomUUID()).title("aPodcast").build();
     Item item;
     private ParleysWatcher watcher;
 

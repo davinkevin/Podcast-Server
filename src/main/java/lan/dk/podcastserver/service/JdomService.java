@@ -57,7 +57,7 @@ public class JdomService {
     public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
     // URL Format
-    private static final String LINK_FORMAT = "%s/api/podcast/%d/rss";
+    private static final String LINK_FORMAT = "%s/api/podcast/%s/rss";
     public static final Comparator<Item> PUBDATE_COMPARATOR = (one, another) -> one.getPubdate().isAfter(another.getPubdate()) ? -1 : 1;
 
     final PodcastServerParameters podcastServerParameters;

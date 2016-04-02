@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -39,12 +40,12 @@ public class PodcastBusiness {
         return podcastRepository.save(entity);
     }
 
-    public Podcast findOne(Integer integer) {
-        return podcastRepository.findOne(integer);
+    public Podcast findOne(UUID id) {
+        return podcastRepository.findOne(id);
     }
 
-    public void delete(Integer integer) {
-        podcastRepository.delete(integer);
+    public void delete(UUID id) {
+        podcastRepository.delete(id);
         //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
@@ -96,7 +97,7 @@ public class PodcastBusiness {
     }
 
     @Transactional(readOnly = true)
-    public String getRss(Integer id, Boolean limit) {
+    public String getRss(UUID id, Boolean limit) {
         try {
             return jdomService.podcastToXMLGeneric(findOne(id), limit);
         } catch (IOException e) {
@@ -105,7 +106,7 @@ public class PodcastBusiness {
         }
     }
 
-    public Set<Item> getItems(Integer id){
+    public Set<Item> getItems(UUID id){
         return podcastRepository.findOne(id).getItems();
     }
 
@@ -124,7 +125,7 @@ public class PodcastBusiness {
         return podcastSaved;
     }
 
-    public Path coverOf(Integer id) {
+    public Path coverOf(UUID id) {
         return coverBusiness.getCoverPathOf(findOne(id));
     }
 }

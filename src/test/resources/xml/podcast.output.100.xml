@@ -2,14 +2,14 @@
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
     <channel>
         <pubDate>Tue, 8 Sep 2015 07:00:00 +0200</pubDate>
-        <link>http://localhost/api/podcast/1234/rss</link>
+        <link>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/rss</link>
         <title>FakePodcast</title>
         <description>Loren ipsum</description>
         <itunes:subtitle>Loren ipsum</itunes:subtitle>
         <itunes:summary>Loren ipsum</itunes:summary>
         <language>fr-fr</language>
-        <itunes:author />
-        <itunes:category />
+        <itunes:author/>
+        <itunes:category/>
         <image>
             <height>200</height>
             <url>http://fake.url/1234/cover.png</url>
@@ -19,1202 +19,1202 @@
         <item>
             <title>name0</title>
             <description>0 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/0/download.mp4" length="0" type="video/mp4" />
+            <enclosure length="0" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/789cec3a-72cb-970a-264a-d5b4bf953183/download.mp4"/>
             <pubDate>Tue, 8 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name0</itunes:subtitle>
             <itunes:summary>0 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/0/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/0/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/0/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/789cec3a-72cb-970a-264a-d5b4bf953183/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/789CEC3A-72CB-970A-264A-D5B4BF953183/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/789CEC3A-72CB-970A-264A-D5B4BF953183/cover.png"/>
         </item>
         <item>
             <title>name1</title>
             <description>1 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/1/download.mp4" length="1024" type="video/mp4" />
+            <enclosure length="1024" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/374ea8c6-2390-eab6-51d4-d3f5a8f5e7b7/download.mp4"/>
             <pubDate>Mon, 7 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name1</itunes:subtitle>
             <itunes:summary>1 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/1/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/1/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/1/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/374ea8c6-2390-eab6-51d4-d3f5a8f5e7b7/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/374EA8C6-2390-EAB6-51D4-D3F5A8F5E7B7/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/374EA8C6-2390-EAB6-51D4-D3F5A8F5E7B7/cover.png"/>
         </item>
         <item>
             <title>name2</title>
             <description>2 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/2/download.mp4" length="2048" type="video/mp4" />
+            <enclosure length="2048" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5f6cda11-24e1-1fc9-8494-17bc9140bc52/download.mp4"/>
             <pubDate>Sun, 6 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name2</itunes:subtitle>
             <itunes:summary>2 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/2/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/2/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/2/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5f6cda11-24e1-1fc9-8494-17bc9140bc52/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/5F6CDA11-24E1-1FC9-8494-17BC9140BC52/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/5F6CDA11-24E1-1FC9-8494-17BC9140BC52/cover.png"/>
         </item>
         <item>
             <title>name3</title>
             <description>3 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/3/download.mp4" length="3072" type="video/mp4" />
+            <enclosure length="3072" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/19508a7e-3588-8999-baf4-bad1215e3905/download.mp4"/>
             <pubDate>Sat, 5 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name3</itunes:subtitle>
             <itunes:summary>3 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/3/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/3/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/3/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/19508a7e-3588-8999-baf4-bad1215e3905/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/19508A7E-3588-8999-BAF4-BAD1215E3905/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/19508A7E-3588-8999-BAF4-BAD1215E3905/cover.png"/>
         </item>
         <item>
             <title>name4</title>
             <description>4 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/4/download.mp4" length="4096" type="video/mp4" />
+            <enclosure length="4096" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ba7aae7e-eded-b7a0-578f-87e40cc39946/download.mp4"/>
             <pubDate>Fri, 4 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name4</itunes:subtitle>
             <itunes:summary>4 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/4/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/4/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/4/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ba7aae7e-eded-b7a0-578f-87e40cc39946/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/BA7AAE7E-EDED-B7A0-578F-87E40CC39946/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/BA7AAE7E-EDED-B7A0-578F-87E40CC39946/cover.png"/>
         </item>
         <item>
             <title>name5</title>
             <description>5 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/5/download.mp4" length="5120" type="video/mp4" />
+            <enclosure length="5120" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8c352463-83f7-c2ad-355d-5d5741b359d4/download.mp4"/>
             <pubDate>Thu, 3 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name5</itunes:subtitle>
             <itunes:summary>5 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/5/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/5/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/5/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8c352463-83f7-c2ad-355d-5d5741b359d4/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/8C352463-83F7-C2AD-355D-5D5741B359D4/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/8C352463-83F7-C2AD-355D-5D5741B359D4/cover.png"/>
         </item>
         <item>
             <title>name6</title>
             <description>6 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/6/download.mp4" length="6144" type="video/mp4" />
+            <enclosure length="6144" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/0fadeb67-3024-9eb3-4db5-8231b80fda0f/download.mp4"/>
             <pubDate>Wed, 2 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name6</itunes:subtitle>
             <itunes:summary>6 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/6/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/6/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/6/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/0fadeb67-3024-9eb3-4db5-8231b80fda0f/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/0FADEB67-3024-9EB3-4DB5-8231B80FDA0F/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/0FADEB67-3024-9EB3-4DB5-8231B80FDA0F/cover.png"/>
         </item>
         <item>
             <title>name7</title>
             <description>7 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/7/download.mp4" length="7168" type="video/mp4" />
+            <enclosure length="7168" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/7cd43954-67e6-50c1-bc3c-fe84a01eb007/download.mp4"/>
             <pubDate>Tue, 1 Sep 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name7</itunes:subtitle>
             <itunes:summary>7 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/7/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/7/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/7/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/7cd43954-67e6-50c1-bc3c-fe84a01eb007/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/7CD43954-67E6-50C1-BC3C-FE84A01EB007/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/7CD43954-67E6-50C1-BC3C-FE84A01EB007/cover.png"/>
         </item>
         <item>
             <title>name8</title>
             <description>8 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/8/download.mp4" length="8192" type="video/mp4" />
+            <enclosure length="8192" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c175e97c-83d9-e4e5-7c2d-8db98f5624eb/download.mp4"/>
             <pubDate>Mon, 31 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name8</itunes:subtitle>
             <itunes:summary>8 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/8/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/8/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/8/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c175e97c-83d9-e4e5-7c2d-8db98f5624eb/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C175E97C-83D9-E4E5-7C2D-8DB98F5624EB/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C175E97C-83D9-E4E5-7C2D-8DB98F5624EB/cover.png"/>
         </item>
         <item>
             <title>name9</title>
             <description>9 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/9/download.mp4" length="9216" type="video/mp4" />
+            <enclosure length="9216" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/37e4db3c-e1d2-7a40-b438-63de026c7108/download.mp4"/>
             <pubDate>Sun, 30 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name9</itunes:subtitle>
             <itunes:summary>9 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/9/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/9/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/9/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/37e4db3c-e1d2-7a40-b438-63de026c7108/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/37E4DB3C-E1D2-7A40-B438-63DE026C7108/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/37E4DB3C-E1D2-7A40-B438-63DE026C7108/cover.png"/>
         </item>
         <item>
             <title>name10</title>
             <description>10 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/10/download.mp4" length="10240" type="video/mp4" />
+            <enclosure length="10240" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/28606eb1-da7f-6ba2-20a3-6aad64c6ca9d/download.mp4"/>
             <pubDate>Sat, 29 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name10</itunes:subtitle>
             <itunes:summary>10 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/10/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/10/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/10/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/28606eb1-da7f-6ba2-20a3-6aad64c6ca9d/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/28606EB1-DA7F-6BA2-20A3-6AAD64C6CA9D/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/28606EB1-DA7F-6BA2-20A3-6AAD64C6CA9D/cover.png"/>
         </item>
         <item>
             <title>name11</title>
             <description>11 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/11/download.mp4" length="11264" type="video/mp4" />
+            <enclosure length="11264" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c24b4dd3-dbe6-76b2-22aa-580d2515184c/download.mp4"/>
             <pubDate>Fri, 28 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name11</itunes:subtitle>
             <itunes:summary>11 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/11/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/11/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/11/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c24b4dd3-dbe6-76b2-22aa-580d2515184c/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C24B4DD3-DBE6-76B2-22AA-580D2515184C/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C24B4DD3-DBE6-76B2-22AA-580D2515184C/cover.png"/>
         </item>
         <item>
             <title>name12</title>
             <description>12 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/12/download.mp4" length="12288" type="video/mp4" />
+            <enclosure length="12288" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/6866c5ce-2daf-f618-ebd4-18efe49f7f83/download.mp4"/>
             <pubDate>Thu, 27 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name12</itunes:subtitle>
             <itunes:summary>12 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/12/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/12/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/12/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/6866c5ce-2daf-f618-ebd4-18efe49f7f83/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/6866C5CE-2DAF-F618-EBD4-18EFE49F7F83/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/6866C5CE-2DAF-F618-EBD4-18EFE49F7F83/cover.png"/>
         </item>
         <item>
             <title>name13</title>
             <description>13 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/13/download.mp4" length="13312" type="video/mp4" />
+            <enclosure length="13312" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/d935b07e-34a9-ecff-7105-9b0e07804593/download.mp4"/>
             <pubDate>Wed, 26 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name13</itunes:subtitle>
             <itunes:summary>13 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/13/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/13/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/13/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/d935b07e-34a9-ecff-7105-9b0e07804593/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/D935B07E-34A9-ECFF-7105-9B0E07804593/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/D935B07E-34A9-ECFF-7105-9B0E07804593/cover.png"/>
         </item>
         <item>
             <title>name14</title>
             <description>14 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/14/download.mp4" length="14336" type="video/mp4" />
+            <enclosure length="14336" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8f717fab-f672-a7d5-22ad-d961797b1571/download.mp4"/>
             <pubDate>Tue, 25 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name14</itunes:subtitle>
             <itunes:summary>14 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/14/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/14/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/14/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8f717fab-f672-a7d5-22ad-d961797b1571/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/8F717FAB-F672-A7D5-22AD-D961797B1571/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/8F717FAB-F672-A7D5-22AD-D961797B1571/cover.png"/>
         </item>
         <item>
             <title>name15</title>
             <description>15 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/15/download.mp4" length="15360" type="video/mp4" />
+            <enclosure length="15360" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/05f62dd4-e345-3eeb-3e31-5a8a50a85175/download.mp4"/>
             <pubDate>Mon, 24 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name15</itunes:subtitle>
             <itunes:summary>15 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/15/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/15/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/15/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/05f62dd4-e345-3eeb-3e31-5a8a50a85175/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/05F62DD4-E345-3EEB-3E31-5A8A50A85175/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/05F62DD4-E345-3EEB-3E31-5A8A50A85175/cover.png"/>
         </item>
         <item>
             <title>name16</title>
             <description>16 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/16/download.mp4" length="16384" type="video/mp4" />
+            <enclosure length="16384" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/a60cce2c-1f9c-47be-b06b-04065d96f551/download.mp4"/>
             <pubDate>Sun, 23 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name16</itunes:subtitle>
             <itunes:summary>16 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/16/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/16/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/16/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/a60cce2c-1f9c-47be-b06b-04065d96f551/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/A60CCE2C-1F9C-47BE-B06B-04065D96F551/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/A60CCE2C-1F9C-47BE-B06B-04065D96F551/cover.png"/>
         </item>
         <item>
             <title>name17</title>
             <description>17 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/17/download.mp4" length="17408" type="video/mp4" />
+            <enclosure length="17408" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/655e53db-0123-76d7-eb46-24a11a20fab9/download.mp4"/>
             <pubDate>Sat, 22 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name17</itunes:subtitle>
             <itunes:summary>17 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/17/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/17/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/17/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/655e53db-0123-76d7-eb46-24a11a20fab9/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/655E53DB-0123-76D7-EB46-24A11A20FAB9/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/655E53DB-0123-76D7-EB46-24A11A20FAB9/cover.png"/>
         </item>
         <item>
             <title>name18</title>
             <description>18 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/18/download.mp4" length="18432" type="video/mp4" />
+            <enclosure length="18432" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5642ad48-db22-0c7e-32ca-865e83d58e48/download.mp4"/>
             <pubDate>Fri, 21 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name18</itunes:subtitle>
             <itunes:summary>18 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/18/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/18/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/18/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5642ad48-db22-0c7e-32ca-865e83d58e48/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/5642AD48-DB22-0C7E-32CA-865E83D58E48/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/5642AD48-DB22-0C7E-32CA-865E83D58E48/cover.png"/>
         </item>
         <item>
             <title>name19</title>
             <description>19 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/19/download.mp4" length="19456" type="video/mp4" />
+            <enclosure length="19456" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/2c2c2ad9-5a84-807b-81af-55378b534b71/download.mp4"/>
             <pubDate>Thu, 20 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name19</itunes:subtitle>
             <itunes:summary>19 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/19/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/19/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/19/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/2c2c2ad9-5a84-807b-81af-55378b534b71/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/2C2C2AD9-5A84-807B-81AF-55378B534B71/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/2C2C2AD9-5A84-807B-81AF-55378B534B71/cover.png"/>
         </item>
         <item>
             <title>name20</title>
             <description>20 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/20/download.mp4" length="20480" type="video/mp4" />
+            <enclosure length="20480" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/31b8dc7e-2776-ea51-337f-c1d6cc834d3c/download.mp4"/>
             <pubDate>Wed, 19 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name20</itunes:subtitle>
             <itunes:summary>20 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/20/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/20/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/20/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/31b8dc7e-2776-ea51-337f-c1d6cc834d3c/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/31B8DC7E-2776-EA51-337F-C1D6CC834D3C/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/31B8DC7E-2776-EA51-337F-C1D6CC834D3C/cover.png"/>
         </item>
         <item>
             <title>name21</title>
             <description>21 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/21/download.mp4" length="21504" type="video/mp4" />
+            <enclosure length="21504" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c61ced6b-b4b0-9dc4-8250-b2fc970c2347/download.mp4"/>
             <pubDate>Tue, 18 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name21</itunes:subtitle>
             <itunes:summary>21 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/21/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/21/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/21/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c61ced6b-b4b0-9dc4-8250-b2fc970c2347/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C61CED6B-B4B0-9DC4-8250-B2FC970C2347/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C61CED6B-B4B0-9DC4-8250-B2FC970C2347/cover.png"/>
         </item>
         <item>
             <title>name22</title>
             <description>22 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/22/download.mp4" length="22528" type="video/mp4" />
+            <enclosure length="22528" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/16965687-7681-a69f-e63f-d10caba71289/download.mp4"/>
             <pubDate>Mon, 17 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name22</itunes:subtitle>
             <itunes:summary>22 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/22/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/22/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/22/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/16965687-7681-a69f-e63f-d10caba71289/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/16965687-7681-A69F-E63F-D10CABA71289/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/16965687-7681-A69F-E63F-D10CABA71289/cover.png"/>
         </item>
         <item>
             <title>name23</title>
             <description>23 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/23/download.mp4" length="23552" type="video/mp4" />
+            <enclosure length="23552" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/bf6d3efa-249f-318f-daed-c98b4691374f/download.mp4"/>
             <pubDate>Sun, 16 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name23</itunes:subtitle>
             <itunes:summary>23 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/23/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/23/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/23/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/bf6d3efa-249f-318f-daed-c98b4691374f/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/BF6D3EFA-249F-318F-DAED-C98B4691374F/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/BF6D3EFA-249F-318F-DAED-C98B4691374F/cover.png"/>
         </item>
         <item>
             <title>name24</title>
             <description>24 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/24/download.mp4" length="24576" type="video/mp4" />
+            <enclosure length="24576" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8921f70b-076c-c3a1-c4f9-575c4002b46c/download.mp4"/>
             <pubDate>Sat, 15 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name24</itunes:subtitle>
             <itunes:summary>24 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/24/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/24/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/24/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8921f70b-076c-c3a1-c4f9-575c4002b46c/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/8921F70B-076C-C3A1-C4F9-575C4002B46C/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/8921F70B-076C-C3A1-C4F9-575C4002B46C/cover.png"/>
         </item>
         <item>
             <title>name25</title>
             <description>25 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/25/download.mp4" length="25600" type="video/mp4" />
+            <enclosure length="25600" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/eaaf0622-7666-7c56-3900-397f7c28f9a3/download.mp4"/>
             <pubDate>Fri, 14 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name25</itunes:subtitle>
             <itunes:summary>25 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/25/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/25/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/25/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/eaaf0622-7666-7c56-3900-397f7c28f9a3/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/EAAF0622-7666-7C56-3900-397F7C28F9A3/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/EAAF0622-7666-7C56-3900-397F7C28F9A3/cover.png"/>
         </item>
         <item>
             <title>name26</title>
             <description>26 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/26/download.mp4" length="26624" type="video/mp4" />
+            <enclosure length="26624" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/81b81969-9ee0-2096-7caf-351cae861fb2/download.mp4"/>
             <pubDate>Thu, 13 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name26</itunes:subtitle>
             <itunes:summary>26 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/26/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/26/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/26/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/81b81969-9ee0-2096-7caf-351cae861fb2/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/81B81969-9EE0-2096-7CAF-351CAE861FB2/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/81B81969-9EE0-2096-7CAF-351CAE861FB2/cover.png"/>
         </item>
         <item>
             <title>name27</title>
             <description>27 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/27/download.mp4" length="27648" type="video/mp4" />
+            <enclosure length="27648" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/1274a1dc-2fbc-0f23-1a74-04acfeb0a1c4/download.mp4"/>
             <pubDate>Wed, 12 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name27</itunes:subtitle>
             <itunes:summary>27 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/27/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/27/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/27/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/1274a1dc-2fbc-0f23-1a74-04acfeb0a1c4/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/1274A1DC-2FBC-0F23-1A74-04ACFEB0A1C4/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/1274A1DC-2FBC-0F23-1A74-04ACFEB0A1C4/cover.png"/>
         </item>
         <item>
             <title>name28</title>
             <description>28 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/28/download.mp4" length="28672" type="video/mp4" />
+            <enclosure length="28672" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/0e6a7771-43a6-3ad8-0d32-cf310b51fc99/download.mp4"/>
             <pubDate>Tue, 11 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name28</itunes:subtitle>
             <itunes:summary>28 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/28/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/28/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/28/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/0e6a7771-43a6-3ad8-0d32-cf310b51fc99/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/0E6A7771-43A6-3AD8-0D32-CF310B51FC99/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/0E6A7771-43A6-3AD8-0D32-CF310B51FC99/cover.png"/>
         </item>
         <item>
             <title>name29</title>
             <description>29 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/29/download.mp4" length="29696" type="video/mp4" />
+            <enclosure length="29696" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/49b6cd3e-b753-54a9-f8aa-2328b2ccc5ee/download.mp4"/>
             <pubDate>Mon, 10 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name29</itunes:subtitle>
             <itunes:summary>29 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/29/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/29/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/29/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/49b6cd3e-b753-54a9-f8aa-2328b2ccc5ee/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/49B6CD3E-B753-54A9-F8AA-2328B2CCC5EE/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/49B6CD3E-B753-54A9-F8AA-2328B2CCC5EE/cover.png"/>
         </item>
         <item>
             <title>name30</title>
             <description>30 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/30/download.mp4" length="30720" type="video/mp4" />
+            <enclosure length="30720" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b6a65d53-481a-2fa0-224a-1d2180e6a44b/download.mp4"/>
             <pubDate>Sun, 9 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name30</itunes:subtitle>
             <itunes:summary>30 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/30/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/30/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/30/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b6a65d53-481a-2fa0-224a-1d2180e6a44b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/B6A65D53-481A-2FA0-224A-1D2180E6A44B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/B6A65D53-481A-2FA0-224A-1D2180E6A44B/cover.png"/>
         </item>
         <item>
             <title>name31</title>
             <description>31 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/31/download.mp4" length="31744" type="video/mp4" />
+            <enclosure length="31744" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/80f5216a-523f-f44c-1aaf-05e691b129a9/download.mp4"/>
             <pubDate>Sat, 8 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name31</itunes:subtitle>
             <itunes:summary>31 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/31/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/31/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/31/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/80f5216a-523f-f44c-1aaf-05e691b129a9/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/80F5216A-523F-F44C-1AAF-05E691B129A9/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/80F5216A-523F-F44C-1AAF-05E691B129A9/cover.png"/>
         </item>
         <item>
             <title>name32</title>
             <description>32 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/32/download.mp4" length="32768" type="video/mp4" />
+            <enclosure length="32768" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/f6ee0a71-4e72-145a-118b-cd50bb4f20e6/download.mp4"/>
             <pubDate>Fri, 7 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name32</itunes:subtitle>
             <itunes:summary>32 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/32/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/32/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/32/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/f6ee0a71-4e72-145a-118b-cd50bb4f20e6/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/F6EE0A71-4E72-145A-118B-CD50BB4F20E6/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/F6EE0A71-4E72-145A-118B-CD50BB4F20E6/cover.png"/>
         </item>
         <item>
             <title>name33</title>
             <description>33 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/33/download.mp4" length="33792" type="video/mp4" />
+            <enclosure length="33792" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/f0815cd5-8bae-f606-7a21-1d8d78a24890/download.mp4"/>
             <pubDate>Thu, 6 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name33</itunes:subtitle>
             <itunes:summary>33 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/33/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/33/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/33/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/f0815cd5-8bae-f606-7a21-1d8d78a24890/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/F0815CD5-8BAE-F606-7A21-1D8D78A24890/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/F0815CD5-8BAE-F606-7A21-1D8D78A24890/cover.png"/>
         </item>
         <item>
             <title>name34</title>
             <description>34 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/34/download.mp4" length="34816" type="video/mp4" />
+            <enclosure length="34816" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/770ffb9c-b574-71e0-9a45-6d28c13ea6b3/download.mp4"/>
             <pubDate>Wed, 5 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name34</itunes:subtitle>
             <itunes:summary>34 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/34/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/34/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/34/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/770ffb9c-b574-71e0-9a45-6d28c13ea6b3/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/770FFB9C-B574-71E0-9A45-6D28C13EA6B3/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/770FFB9C-B574-71E0-9A45-6D28C13EA6B3/cover.png"/>
         </item>
         <item>
             <title>name35</title>
             <description>35 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/35/download.mp4" length="35840" type="video/mp4" />
+            <enclosure length="35840" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/a3a854ad-14f7-4af0-c8db-f87b1b907bd1/download.mp4"/>
             <pubDate>Tue, 4 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name35</itunes:subtitle>
             <itunes:summary>35 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/35/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/35/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/35/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/a3a854ad-14f7-4af0-c8db-f87b1b907bd1/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/A3A854AD-14F7-4AF0-C8DB-F87B1B907BD1/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/A3A854AD-14F7-4AF0-C8DB-F87B1B907BD1/cover.png"/>
         </item>
         <item>
             <title>name36</title>
             <description>36 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/36/download.mp4" length="36864" type="video/mp4" />
+            <enclosure length="36864" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/eded32e2-1873-a6df-abf5-a807f4b952ef/download.mp4"/>
             <pubDate>Mon, 3 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name36</itunes:subtitle>
             <itunes:summary>36 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/36/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/36/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/36/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/eded32e2-1873-a6df-abf5-a807f4b952ef/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/EDED32E2-1873-A6DF-ABF5-A807F4B952EF/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/EDED32E2-1873-A6DF-ABF5-A807F4B952EF/cover.png"/>
         </item>
         <item>
             <title>name37</title>
             <description>37 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/37/download.mp4" length="37888" type="video/mp4" />
+            <enclosure length="37888" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5a685870-5983-6eb3-c4be-3e6c9a060344/download.mp4"/>
             <pubDate>Sun, 2 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name37</itunes:subtitle>
             <itunes:summary>37 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/37/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/37/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/37/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5a685870-5983-6eb3-c4be-3e6c9a060344/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/5A685870-5983-6EB3-C4BE-3E6C9A060344/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/5A685870-5983-6EB3-C4BE-3E6C9A060344/cover.png"/>
         </item>
         <item>
             <title>name38</title>
             <description>38 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/38/download.mp4" length="38912" type="video/mp4" />
+            <enclosure length="38912" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/45c729ea-d07c-d432-903d-ba960f2c0138/download.mp4"/>
             <pubDate>Sat, 1 Aug 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name38</itunes:subtitle>
             <itunes:summary>38 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/38/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/38/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/38/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/45c729ea-d07c-d432-903d-ba960f2c0138/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/45C729EA-D07C-D432-903D-BA960F2C0138/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/45C729EA-D07C-D432-903D-BA960F2C0138/cover.png"/>
         </item>
         <item>
             <title>name39</title>
             <description>39 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/39/download.mp4" length="39936" type="video/mp4" />
+            <enclosure length="39936" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/4e678f7a-8bdd-eddb-d2f4-9889e8812e31/download.mp4"/>
             <pubDate>Fri, 31 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name39</itunes:subtitle>
             <itunes:summary>39 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/39/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/39/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/39/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/4e678f7a-8bdd-eddb-d2f4-9889e8812e31/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/4E678F7A-8BDD-EDDB-D2F4-9889E8812E31/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/4E678F7A-8BDD-EDDB-D2F4-9889E8812E31/cover.png"/>
         </item>
         <item>
             <title>name40</title>
             <description>40 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/40/download.mp4" length="40960" type="video/mp4" />
+            <enclosure length="40960" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8ca49df0-74cf-46ea-ae40-31dcacc8343b/download.mp4"/>
             <pubDate>Thu, 30 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name40</itunes:subtitle>
             <itunes:summary>40 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/40/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/40/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/40/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/8ca49df0-74cf-46ea-ae40-31dcacc8343b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/8CA49DF0-74CF-46EA-AE40-31DCACC8343B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/8CA49DF0-74CF-46EA-AE40-31DCACC8343B/cover.png"/>
         </item>
         <item>
             <title>name41</title>
             <description>41 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/41/download.mp4" length="41984" type="video/mp4" />
+            <enclosure length="41984" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/baf6400a-86b7-26a3-0d15-3f4114fb6480/download.mp4"/>
             <pubDate>Wed, 29 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name41</itunes:subtitle>
             <itunes:summary>41 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/41/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/41/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/41/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/baf6400a-86b7-26a3-0d15-3f4114fb6480/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/BAF6400A-86B7-26A3-0D15-3F4114FB6480/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/BAF6400A-86B7-26A3-0D15-3F4114FB6480/cover.png"/>
         </item>
         <item>
             <title>name42</title>
             <description>42 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/42/download.mp4" length="43008" type="video/mp4" />
+            <enclosure length="43008" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5f7fbd82-6193-c4a4-be0c-a80d183ef71b/download.mp4"/>
             <pubDate>Tue, 28 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name42</itunes:subtitle>
             <itunes:summary>42 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/42/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/42/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/42/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/5f7fbd82-6193-c4a4-be0c-a80d183ef71b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/5F7FBD82-6193-C4A4-BE0C-A80D183EF71B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/5F7FBD82-6193-C4A4-BE0C-A80D183EF71B/cover.png"/>
         </item>
         <item>
             <title>name43</title>
             <description>43 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/43/download.mp4" length="44032" type="video/mp4" />
+            <enclosure length="44032" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e89dd657-e0e7-22c1-182a-15c08e27cf2a/download.mp4"/>
             <pubDate>Mon, 27 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name43</itunes:subtitle>
             <itunes:summary>43 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/43/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/43/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/43/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e89dd657-e0e7-22c1-182a-15c08e27cf2a/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/E89DD657-E0E7-22C1-182A-15C08E27CF2A/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/E89DD657-E0E7-22C1-182A-15C08E27CF2A/cover.png"/>
         </item>
         <item>
             <title>name44</title>
             <description>44 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/44/download.mp4" length="45056" type="video/mp4" />
+            <enclosure length="45056" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3ada3d16-2532-23c0-a759-d40536971c84/download.mp4"/>
             <pubDate>Sun, 26 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name44</itunes:subtitle>
             <itunes:summary>44 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/44/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/44/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/44/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3ada3d16-2532-23c0-a759-d40536971c84/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/3ADA3D16-2532-23C0-A759-D40536971C84/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/3ADA3D16-2532-23C0-A759-D40536971C84/cover.png"/>
         </item>
         <item>
             <title>name45</title>
             <description>45 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/45/download.mp4" length="46080" type="video/mp4" />
+            <enclosure length="46080" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/76e6e670-db1b-ebfa-00af-c265fe190d2f/download.mp4"/>
             <pubDate>Sat, 25 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name45</itunes:subtitle>
             <itunes:summary>45 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/45/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/45/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/45/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/76e6e670-db1b-ebfa-00af-c265fe190d2f/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/76E6E670-DB1B-EBFA-00AF-C265FE190D2F/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/76E6E670-DB1B-EBFA-00AF-C265FE190D2F/cover.png"/>
         </item>
         <item>
             <title>name46</title>
             <description>46 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/46/download.mp4" length="47104" type="video/mp4" />
+            <enclosure length="47104" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/d4b4486d-9922-0803-9fd4-cecdfdadb404/download.mp4"/>
             <pubDate>Fri, 24 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name46</itunes:subtitle>
             <itunes:summary>46 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/46/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/46/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/46/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/d4b4486d-9922-0803-9fd4-cecdfdadb404/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/D4B4486D-9922-0803-9FD4-CECDFDADB404/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/D4B4486D-9922-0803-9FD4-CECDFDADB404/cover.png"/>
         </item>
         <item>
             <title>name47</title>
             <description>47 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/47/download.mp4" length="48128" type="video/mp4" />
+            <enclosure length="48128" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/233015a5-5dc0-5f27-833b-443fdee78814/download.mp4"/>
             <pubDate>Thu, 23 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name47</itunes:subtitle>
             <itunes:summary>47 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/47/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/47/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/47/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/233015a5-5dc0-5f27-833b-443fdee78814/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/233015A5-5DC0-5F27-833B-443FDEE78814/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/233015A5-5DC0-5F27-833B-443FDEE78814/cover.png"/>
         </item>
         <item>
             <title>name48</title>
             <description>48 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/48/download.mp4" length="49152" type="video/mp4" />
+            <enclosure length="49152" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/29e10de5-7923-38f7-f344-d18ea3098e35/download.mp4"/>
             <pubDate>Wed, 22 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name48</itunes:subtitle>
             <itunes:summary>48 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/48/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/48/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/48/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/29e10de5-7923-38f7-f344-d18ea3098e35/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/29E10DE5-7923-38F7-F344-D18EA3098E35/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/29E10DE5-7923-38F7-F344-D18EA3098E35/cover.png"/>
         </item>
         <item>
             <title>name49</title>
             <description>49 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/49/download.mp4" length="50176" type="video/mp4" />
+            <enclosure length="50176" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/d5a8b94e-f3f8-3139-aa01-1ee1b87c994b/download.mp4"/>
             <pubDate>Tue, 21 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name49</itunes:subtitle>
             <itunes:summary>49 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/49/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/49/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/49/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/d5a8b94e-f3f8-3139-aa01-1ee1b87c994b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/D5A8B94E-F3F8-3139-AA01-1EE1B87C994B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/D5A8B94E-F3F8-3139-AA01-1EE1B87C994B/cover.png"/>
         </item>
         <item>
             <title>name50</title>
             <description>50 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/50/download.mp4" length="51200" type="video/mp4" />
+            <enclosure length="51200" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/4e39ff2e-c38a-73e7-c149-80ce8fd04c30/download.mp4"/>
             <pubDate>Mon, 20 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name50</itunes:subtitle>
             <itunes:summary>50 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/50/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/50/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/50/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/4e39ff2e-c38a-73e7-c149-80ce8fd04c30/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/4E39FF2E-C38A-73E7-C149-80CE8FD04C30/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/4E39FF2E-C38A-73E7-C149-80CE8FD04C30/cover.png"/>
         </item>
         <item>
             <title>name51</title>
             <description>51 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/51/download.mp4" length="52224" type="video/mp4" />
+            <enclosure length="52224" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/eb2d2d61-b866-6f1e-38fb-dc7b7765ac9b/download.mp4"/>
             <pubDate>Sun, 19 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name51</itunes:subtitle>
             <itunes:summary>51 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/51/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/51/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/51/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/eb2d2d61-b866-6f1e-38fb-dc7b7765ac9b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/EB2D2D61-B866-6F1E-38FB-DC7B7765AC9B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/EB2D2D61-B866-6F1E-38FB-DC7B7765AC9B/cover.png"/>
         </item>
         <item>
             <title>name52</title>
             <description>52 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/52/download.mp4" length="53248" type="video/mp4" />
+            <enclosure length="53248" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/7a55e4c6-1292-7b88-7f5b-c298c122c080/download.mp4"/>
             <pubDate>Sat, 18 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name52</itunes:subtitle>
             <itunes:summary>52 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/52/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/52/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/52/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/7a55e4c6-1292-7b88-7f5b-c298c122c080/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/7A55E4C6-1292-7B88-7F5B-C298C122C080/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/7A55E4C6-1292-7B88-7F5B-C298C122C080/cover.png"/>
         </item>
         <item>
             <title>name53</title>
             <description>53 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/53/download.mp4" length="54272" type="video/mp4" />
+            <enclosure length="54272" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c0226b7c-5dcf-cadc-1a57-a587bfb6a01d/download.mp4"/>
             <pubDate>Fri, 17 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name53</itunes:subtitle>
             <itunes:summary>53 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/53/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/53/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/53/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c0226b7c-5dcf-cadc-1a57-a587bfb6a01d/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C0226B7C-5DCF-CADC-1A57-A587BFB6A01D/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C0226B7C-5DCF-CADC-1A57-A587BFB6A01D/cover.png"/>
         </item>
         <item>
             <title>name54</title>
             <description>54 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/54/download.mp4" length="55296" type="video/mp4" />
+            <enclosure length="55296" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e467acea-49b3-b1fd-e896-e36e9edc0b27/download.mp4"/>
             <pubDate>Thu, 16 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name54</itunes:subtitle>
             <itunes:summary>54 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/54/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/54/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/54/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e467acea-49b3-b1fd-e896-e36e9edc0b27/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/E467ACEA-49B3-B1FD-E896-E36E9EDC0B27/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/E467ACEA-49B3-B1FD-E896-E36E9EDC0B27/cover.png"/>
         </item>
         <item>
             <title>name55</title>
             <description>55 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/55/download.mp4" length="56320" type="video/mp4" />
+            <enclosure length="56320" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e79fd812-cc75-f6e4-fe28-662c7d5dd2ab/download.mp4"/>
             <pubDate>Wed, 15 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name55</itunes:subtitle>
             <itunes:summary>55 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/55/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/55/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/55/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e79fd812-cc75-f6e4-fe28-662c7d5dd2ab/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/E79FD812-CC75-F6E4-FE28-662C7D5DD2AB/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/E79FD812-CC75-F6E4-FE28-662C7D5DD2AB/cover.png"/>
         </item>
         <item>
             <title>name56</title>
             <description>56 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/56/download.mp4" length="57344" type="video/mp4" />
+            <enclosure length="57344" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ab018ac3-7ad1-2ce5-b2ed-2c1d31d5f81d/download.mp4"/>
             <pubDate>Tue, 14 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name56</itunes:subtitle>
             <itunes:summary>56 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/56/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/56/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/56/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ab018ac3-7ad1-2ce5-b2ed-2c1d31d5f81d/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/AB018AC3-7AD1-2CE5-B2ED-2C1D31D5F81D/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/AB018AC3-7AD1-2CE5-B2ED-2C1D31D5F81D/cover.png"/>
         </item>
         <item>
             <title>name57</title>
             <description>57 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/57/download.mp4" length="58368" type="video/mp4" />
+            <enclosure length="58368" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/af733dbb-a729-2249-ead2-6d54d19a6649/download.mp4"/>
             <pubDate>Mon, 13 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name57</itunes:subtitle>
             <itunes:summary>57 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/57/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/57/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/57/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/af733dbb-a729-2249-ead2-6d54d19a6649/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/AF733DBB-A729-2249-EAD2-6D54D19A6649/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/AF733DBB-A729-2249-EAD2-6D54D19A6649/cover.png"/>
         </item>
         <item>
             <title>name58</title>
             <description>58 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/58/download.mp4" length="59392" type="video/mp4" />
+            <enclosure length="59392" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/33c6f564-4381-9a7f-90a4-af170fb6c48b/download.mp4"/>
             <pubDate>Sun, 12 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name58</itunes:subtitle>
             <itunes:summary>58 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/58/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/58/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/58/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/33c6f564-4381-9a7f-90a4-af170fb6c48b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/33C6F564-4381-9A7F-90A4-AF170FB6C48B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/33C6F564-4381-9A7F-90A4-AF170FB6C48B/cover.png"/>
         </item>
         <item>
             <title>name59</title>
             <description>59 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/59/download.mp4" length="60416" type="video/mp4" />
+            <enclosure length="60416" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/7892b60c-3853-bd01-523f-771c035dca2b/download.mp4"/>
             <pubDate>Sat, 11 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name59</itunes:subtitle>
             <itunes:summary>59 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/59/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/59/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/59/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/7892b60c-3853-bd01-523f-771c035dca2b/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/7892B60C-3853-BD01-523F-771C035DCA2B/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/7892B60C-3853-BD01-523F-771C035DCA2B/cover.png"/>
         </item>
         <item>
             <title>name60</title>
             <description>60 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/60/download.mp4" length="61440" type="video/mp4" />
+            <enclosure length="61440" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/f60f9886-493a-1bbc-8309-d4c2059a7f16/download.mp4"/>
             <pubDate>Fri, 10 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name60</itunes:subtitle>
             <itunes:summary>60 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/60/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/60/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/60/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/f60f9886-493a-1bbc-8309-d4c2059a7f16/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/F60F9886-493A-1BBC-8309-D4C2059A7F16/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/F60F9886-493A-1BBC-8309-D4C2059A7F16/cover.png"/>
         </item>
         <item>
             <title>name61</title>
             <description>61 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/61/download.mp4" length="62464" type="video/mp4" />
+            <enclosure length="62464" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/61dc083f-72df-2ba7-617f-eb0836b9a2fd/download.mp4"/>
             <pubDate>Thu, 9 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name61</itunes:subtitle>
             <itunes:summary>61 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/61/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/61/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/61/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/61dc083f-72df-2ba7-617f-eb0836b9a2fd/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/61DC083F-72DF-2BA7-617F-EB0836B9A2FD/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/61DC083F-72DF-2BA7-617F-EB0836B9A2FD/cover.png"/>
         </item>
         <item>
             <title>name62</title>
             <description>62 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/62/download.mp4" length="63488" type="video/mp4" />
+            <enclosure length="63488" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/154b9a56-4837-47a8-bd9f-95460762ca2a/download.mp4"/>
             <pubDate>Wed, 8 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name62</itunes:subtitle>
             <itunes:summary>62 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/62/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/62/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/62/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/154b9a56-4837-47a8-bd9f-95460762ca2a/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/154B9A56-4837-47A8-BD9F-95460762CA2A/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/154B9A56-4837-47A8-BD9F-95460762CA2A/cover.png"/>
         </item>
         <item>
             <title>name63</title>
             <description>63 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/63/download.mp4" length="64512" type="video/mp4" />
+            <enclosure length="64512" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b7429e88-9daa-7414-70dd-401c80a91277/download.mp4"/>
             <pubDate>Tue, 7 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name63</itunes:subtitle>
             <itunes:summary>63 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/63/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/63/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/63/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b7429e88-9daa-7414-70dd-401c80a91277/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/B7429E88-9DAA-7414-70DD-401C80A91277/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/B7429E88-9DAA-7414-70DD-401C80A91277/cover.png"/>
         </item>
         <item>
             <title>name64</title>
             <description>64 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/64/download.mp4" length="65536" type="video/mp4" />
+            <enclosure length="65536" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/1dd0fe7e-d68e-337a-ccf5-a0ea91b92dbb/download.mp4"/>
             <pubDate>Mon, 6 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name64</itunes:subtitle>
             <itunes:summary>64 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/64/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/64/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/64/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/1dd0fe7e-d68e-337a-ccf5-a0ea91b92dbb/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/1DD0FE7E-D68E-337A-CCF5-A0EA91B92DBB/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/1DD0FE7E-D68E-337A-CCF5-A0EA91B92DBB/cover.png"/>
         </item>
         <item>
             <title>name65</title>
             <description>65 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/65/download.mp4" length="66560" type="video/mp4" />
+            <enclosure length="66560" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/acc012b1-52ef-3c3c-79c3-a8158fe91956/download.mp4"/>
             <pubDate>Sun, 5 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name65</itunes:subtitle>
             <itunes:summary>65 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/65/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/65/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/65/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/acc012b1-52ef-3c3c-79c3-a8158fe91956/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/ACC012B1-52EF-3C3C-79C3-A8158FE91956/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/ACC012B1-52EF-3C3C-79C3-A8158FE91956/cover.png"/>
         </item>
         <item>
             <title>name66</title>
             <description>66 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/66/download.mp4" length="67584" type="video/mp4" />
+            <enclosure length="67584" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3a661f7e-6b60-5c5e-fbfe-dbfc3a6db929/download.mp4"/>
             <pubDate>Sat, 4 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name66</itunes:subtitle>
             <itunes:summary>66 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/66/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/66/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/66/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3a661f7e-6b60-5c5e-fbfe-dbfc3a6db929/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/3A661F7E-6B60-5C5E-FBFE-DBFC3A6DB929/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/3A661F7E-6B60-5C5E-FBFE-DBFC3A6DB929/cover.png"/>
         </item>
         <item>
             <title>name67</title>
             <description>67 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/67/download.mp4" length="68608" type="video/mp4" />
+            <enclosure length="68608" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ceff6a05-bb29-b6ea-fd72-91c4fdaa80c6/download.mp4"/>
             <pubDate>Fri, 3 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name67</itunes:subtitle>
             <itunes:summary>67 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/67/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/67/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/67/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ceff6a05-bb29-b6ea-fd72-91c4fdaa80c6/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/CEFF6A05-BB29-B6EA-FD72-91C4FDAA80C6/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/CEFF6A05-BB29-B6EA-FD72-91C4FDAA80C6/cover.png"/>
         </item>
         <item>
             <title>name68</title>
             <description>68 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/68/download.mp4" length="69632" type="video/mp4" />
+            <enclosure length="69632" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c3ea327b-9b18-f6c3-2957-5a2c59dbaf7c/download.mp4"/>
             <pubDate>Thu, 2 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name68</itunes:subtitle>
             <itunes:summary>68 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/68/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/68/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/68/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c3ea327b-9b18-f6c3-2957-5a2c59dbaf7c/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C3EA327B-9B18-F6C3-2957-5A2C59DBAF7C/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C3EA327B-9B18-F6C3-2957-5A2C59DBAF7C/cover.png"/>
         </item>
         <item>
             <title>name69</title>
             <description>69 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/69/download.mp4" length="70656" type="video/mp4" />
+            <enclosure length="70656" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c096fc76-2e2e-91b3-68c1-fcc0c3695103/download.mp4"/>
             <pubDate>Wed, 1 Jul 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name69</itunes:subtitle>
             <itunes:summary>69 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/69/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/69/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/69/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c096fc76-2e2e-91b3-68c1-fcc0c3695103/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C096FC76-2E2E-91B3-68C1-FCC0C3695103/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C096FC76-2E2E-91B3-68C1-FCC0C3695103/cover.png"/>
         </item>
         <item>
             <title>name70</title>
             <description>70 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/70/download.mp4" length="71680" type="video/mp4" />
+            <enclosure length="71680" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e73f450a-3e8a-b1d8-66f2-aac2fd11f554/download.mp4"/>
             <pubDate>Tue, 30 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name70</itunes:subtitle>
             <itunes:summary>70 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/70/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/70/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/70/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e73f450a-3e8a-b1d8-66f2-aac2fd11f554/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/E73F450A-3E8A-B1D8-66F2-AAC2FD11F554/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/E73F450A-3E8A-B1D8-66F2-AAC2FD11F554/cover.png"/>
         </item>
         <item>
             <title>name71</title>
             <description>71 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/71/download.mp4" length="72704" type="video/mp4" />
+            <enclosure length="72704" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ef03abae-71f6-5bdc-925b-fc133400ef83/download.mp4"/>
             <pubDate>Mon, 29 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name71</itunes:subtitle>
             <itunes:summary>71 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/71/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/71/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/71/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ef03abae-71f6-5bdc-925b-fc133400ef83/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/EF03ABAE-71F6-5BDC-925B-FC133400EF83/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/EF03ABAE-71F6-5BDC-925B-FC133400EF83/cover.png"/>
         </item>
         <item>
             <title>name72</title>
             <description>72 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/72/download.mp4" length="73728" type="video/mp4" />
+            <enclosure length="73728" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/104d571b-b51e-a8ed-b467-3fa12799f2a8/download.mp4"/>
             <pubDate>Sun, 28 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name72</itunes:subtitle>
             <itunes:summary>72 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/72/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/72/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/72/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/104d571b-b51e-a8ed-b467-3fa12799f2a8/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/104D571B-B51E-A8ED-B467-3FA12799F2A8/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/104D571B-B51E-A8ED-B467-3FA12799F2A8/cover.png"/>
         </item>
         <item>
             <title>name73</title>
             <description>73 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/73/download.mp4" length="74752" type="video/mp4" />
+            <enclosure length="74752" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3fb96ad3-a7d9-d507-bc8b-7dcbcfc70276/download.mp4"/>
             <pubDate>Sat, 27 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name73</itunes:subtitle>
             <itunes:summary>73 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/73/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/73/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/73/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3fb96ad3-a7d9-d507-bc8b-7dcbcfc70276/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/3FB96AD3-A7D9-D507-BC8B-7DCBCFC70276/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/3FB96AD3-A7D9-D507-BC8B-7DCBCFC70276/cover.png"/>
         </item>
         <item>
             <title>name74</title>
             <description>74 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/74/download.mp4" length="75776" type="video/mp4" />
+            <enclosure length="75776" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/1f05e6a7-c7ab-b4d1-2eab-4d96196e869c/download.mp4"/>
             <pubDate>Fri, 26 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name74</itunes:subtitle>
             <itunes:summary>74 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/74/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/74/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/74/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/1f05e6a7-c7ab-b4d1-2eab-4d96196e869c/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/1F05E6A7-C7AB-B4D1-2EAB-4D96196E869C/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/1F05E6A7-C7AB-B4D1-2EAB-4D96196E869C/cover.png"/>
         </item>
         <item>
             <title>name75</title>
             <description>75 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/75/download.mp4" length="76800" type="video/mp4" />
+            <enclosure length="76800" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c435d004-1cad-0593-3d9a-e68f84973a59/download.mp4"/>
             <pubDate>Thu, 25 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name75</itunes:subtitle>
             <itunes:summary>75 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/75/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/75/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/75/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c435d004-1cad-0593-3d9a-e68f84973a59/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C435D004-1CAD-0593-3D9A-E68F84973A59/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C435D004-1CAD-0593-3D9A-E68F84973A59/cover.png"/>
         </item>
         <item>
             <title>name76</title>
             <description>76 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/76/download.mp4" length="77824" type="video/mp4" />
+            <enclosure length="77824" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/9201e321-a8f7-4bd2-0681-fe2c63870e46/download.mp4"/>
             <pubDate>Wed, 24 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name76</itunes:subtitle>
             <itunes:summary>76 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/76/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/76/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/76/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/9201e321-a8f7-4bd2-0681-fe2c63870e46/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/9201E321-A8F7-4BD2-0681-FE2C63870E46/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/9201E321-A8F7-4BD2-0681-FE2C63870E46/cover.png"/>
         </item>
         <item>
             <title>name77</title>
             <description>77 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/77/download.mp4" length="78848" type="video/mp4" />
+            <enclosure length="78848" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/09e90274-403c-5c90-1254-229620d3401c/download.mp4"/>
             <pubDate>Tue, 23 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name77</itunes:subtitle>
             <itunes:summary>77 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/77/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/77/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/77/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/09e90274-403c-5c90-1254-229620d3401c/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/09E90274-403C-5C90-1254-229620D3401C/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/09E90274-403C-5C90-1254-229620D3401C/cover.png"/>
         </item>
         <item>
             <title>name78</title>
             <description>78 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/78/download.mp4" length="79872" type="video/mp4" />
+            <enclosure length="79872" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b20eaadc-b340-164c-bbff-aa86106aa437/download.mp4"/>
             <pubDate>Mon, 22 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name78</itunes:subtitle>
             <itunes:summary>78 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/78/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/78/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/78/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b20eaadc-b340-164c-bbff-aa86106aa437/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/B20EAADC-B340-164C-BBFF-AA86106AA437/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/B20EAADC-B340-164C-BBFF-AA86106AA437/cover.png"/>
         </item>
         <item>
             <title>name79</title>
             <description>79 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/79/download.mp4" length="80896" type="video/mp4" />
+            <enclosure length="80896" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c3303127-5051-7343-6611-8c2b46197a08/download.mp4"/>
             <pubDate>Sun, 21 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name79</itunes:subtitle>
             <itunes:summary>79 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/79/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/79/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/79/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c3303127-5051-7343-6611-8c2b46197a08/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C3303127-5051-7343-6611-8C2B46197A08/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C3303127-5051-7343-6611-8C2B46197A08/cover.png"/>
         </item>
         <item>
             <title>name80</title>
             <description>80 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/80/download.mp4" length="81920" type="video/mp4" />
+            <enclosure length="81920" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c9f2b71e-c55c-3c39-796a-a839990a3391/download.mp4"/>
             <pubDate>Sat, 20 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name80</itunes:subtitle>
             <itunes:summary>80 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/80/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/80/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/80/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c9f2b71e-c55c-3c39-796a-a839990a3391/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C9F2B71E-C55C-3C39-796A-A839990A3391/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C9F2B71E-C55C-3C39-796A-A839990A3391/cover.png"/>
         </item>
         <item>
             <title>name81</title>
             <description>81 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/81/download.mp4" length="82944" type="video/mp4" />
+            <enclosure length="82944" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/41607b69-36ae-8219-2849-8012214a51fd/download.mp4"/>
             <pubDate>Fri, 19 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name81</itunes:subtitle>
             <itunes:summary>81 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/81/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/81/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/81/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/41607b69-36ae-8219-2849-8012214a51fd/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/41607B69-36AE-8219-2849-8012214A51FD/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/41607B69-36AE-8219-2849-8012214A51FD/cover.png"/>
         </item>
         <item>
             <title>name82</title>
             <description>82 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/82/download.mp4" length="83968" type="video/mp4" />
+            <enclosure length="83968" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e05ab24e-3fbb-d34a-8ee7-e1bc4c72f773/download.mp4"/>
             <pubDate>Thu, 18 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name82</itunes:subtitle>
             <itunes:summary>82 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/82/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/82/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/82/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e05ab24e-3fbb-d34a-8ee7-e1bc4c72f773/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/E05AB24E-3FBB-D34A-8EE7-E1BC4C72F773/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/E05AB24E-3FBB-D34A-8EE7-E1BC4C72F773/cover.png"/>
         </item>
         <item>
             <title>name83</title>
             <description>83 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/83/download.mp4" length="84992" type="video/mp4" />
+            <enclosure length="84992" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/fb887c66-3dc0-494d-c098-be92539d50fa/download.mp4"/>
             <pubDate>Wed, 17 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name83</itunes:subtitle>
             <itunes:summary>83 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/83/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/83/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/83/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/fb887c66-3dc0-494d-c098-be92539d50fa/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/FB887C66-3DC0-494D-C098-BE92539D50FA/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/FB887C66-3DC0-494D-C098-BE92539D50FA/cover.png"/>
         </item>
         <item>
             <title>name84</title>
             <description>84 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/84/download.mp4" length="86016" type="video/mp4" />
+            <enclosure length="86016" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/65c633ae-9c92-96bf-f934-9b14cd7d179f/download.mp4"/>
             <pubDate>Tue, 16 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name84</itunes:subtitle>
             <itunes:summary>84 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/84/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/84/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/84/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/65c633ae-9c92-96bf-f934-9b14cd7d179f/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/65C633AE-9C92-96BF-F934-9B14CD7D179F/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/65C633AE-9C92-96BF-F934-9B14CD7D179F/cover.png"/>
         </item>
         <item>
             <title>name85</title>
             <description>85 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/85/download.mp4" length="87040" type="video/mp4" />
+            <enclosure length="87040" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/2a7fa7c4-44b4-6f78-7caf-a95107bcd426/download.mp4"/>
             <pubDate>Mon, 15 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name85</itunes:subtitle>
             <itunes:summary>85 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/85/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/85/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/85/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/2a7fa7c4-44b4-6f78-7caf-a95107bcd426/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/2A7FA7C4-44B4-6F78-7CAF-A95107BCD426/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/2A7FA7C4-44B4-6F78-7CAF-A95107BCD426/cover.png"/>
         </item>
         <item>
             <title>name86</title>
             <description>86 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/86/download.mp4" length="88064" type="video/mp4" />
+            <enclosure length="88064" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c7791472-f0f0-a856-7517-22f410131d8e/download.mp4"/>
             <pubDate>Sun, 14 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name86</itunes:subtitle>
             <itunes:summary>86 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/86/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/86/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/86/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/c7791472-f0f0-a856-7517-22f410131d8e/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/C7791472-F0F0-A856-7517-22F410131D8E/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/C7791472-F0F0-A856-7517-22F410131D8E/cover.png"/>
         </item>
         <item>
             <title>name87</title>
             <description>87 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/87/download.mp4" length="89088" type="video/mp4" />
+            <enclosure length="89088" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e5fee21a-b7d2-8d72-75b1-e2bcd07d17d5/download.mp4"/>
             <pubDate>Sat, 13 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name87</itunes:subtitle>
             <itunes:summary>87 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/87/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/87/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/87/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/e5fee21a-b7d2-8d72-75b1-e2bcd07d17d5/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/E5FEE21A-B7D2-8D72-75B1-E2BCD07D17D5/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/E5FEE21A-B7D2-8D72-75B1-E2BCD07D17D5/cover.png"/>
         </item>
         <item>
             <title>name88</title>
             <description>88 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/88/download.mp4" length="90112" type="video/mp4" />
+            <enclosure length="90112" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b974a2cf-1faa-e6a0-106c-759cdaaf7e0f/download.mp4"/>
             <pubDate>Fri, 12 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name88</itunes:subtitle>
             <itunes:summary>88 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/88/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/88/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/88/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/b974a2cf-1faa-e6a0-106c-759cdaaf7e0f/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/B974A2CF-1FAA-E6A0-106C-759CDAAF7E0F/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/B974A2CF-1FAA-E6A0-106C-759CDAAF7E0F/cover.png"/>
         </item>
         <item>
             <title>name89</title>
             <description>89 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/89/download.mp4" length="91136" type="video/mp4" />
+            <enclosure length="91136" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/65feb3e5-3927-d930-c9b7-f3675a985ee6/download.mp4"/>
             <pubDate>Thu, 11 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name89</itunes:subtitle>
             <itunes:summary>89 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/89/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/89/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/89/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/65feb3e5-3927-d930-c9b7-f3675a985ee6/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/65FEB3E5-3927-D930-C9B7-F3675A985EE6/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/65FEB3E5-3927-D930-C9B7-F3675A985EE6/cover.png"/>
         </item>
         <item>
             <title>name90</title>
             <description>90 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/90/download.mp4" length="92160" type="video/mp4" />
+            <enclosure length="92160" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/55f7de3f-d43b-cc07-6a59-5bcbb71ae693/download.mp4"/>
             <pubDate>Wed, 10 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name90</itunes:subtitle>
             <itunes:summary>90 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/90/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/90/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/90/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/55f7de3f-d43b-cc07-6a59-5bcbb71ae693/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/55F7DE3F-D43B-CC07-6A59-5BCBB71AE693/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/55F7DE3F-D43B-CC07-6A59-5BCBB71AE693/cover.png"/>
         </item>
         <item>
             <title>name91</title>
             <description>91 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/91/download.mp4" length="93184" type="video/mp4" />
+            <enclosure length="93184" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/372a81e1-1c7d-0b1f-cf23-e19e4c7b56f8/download.mp4"/>
             <pubDate>Tue, 9 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name91</itunes:subtitle>
             <itunes:summary>91 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/91/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/91/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/91/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/372a81e1-1c7d-0b1f-cf23-e19e4c7b56f8/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/372A81E1-1C7D-0B1F-CF23-E19E4C7B56F8/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/372A81E1-1C7D-0B1F-CF23-E19E4C7B56F8/cover.png"/>
         </item>
         <item>
             <title>name92</title>
             <description>92 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/92/download.mp4" length="94208" type="video/mp4" />
+            <enclosure length="94208" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/24f51d1f-1696-e68e-40c1-84034c2238f2/download.mp4"/>
             <pubDate>Mon, 8 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name92</itunes:subtitle>
             <itunes:summary>92 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/92/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/92/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/92/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/24f51d1f-1696-e68e-40c1-84034c2238f2/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/24F51D1F-1696-E68E-40C1-84034C2238F2/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/24F51D1F-1696-E68E-40C1-84034C2238F2/cover.png"/>
         </item>
         <item>
             <title>name93</title>
             <description>93 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/93/download.mp4" length="95232" type="video/mp4" />
+            <enclosure length="95232" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/af22d788-b903-09ec-699c-ceb963535b26/download.mp4"/>
             <pubDate>Sun, 7 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name93</itunes:subtitle>
             <itunes:summary>93 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/93/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/93/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/93/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/af22d788-b903-09ec-699c-ceb963535b26/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/AF22D788-B903-09EC-699C-CEB963535B26/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/AF22D788-B903-09EC-699C-CEB963535B26/cover.png"/>
         </item>
         <item>
             <title>name94</title>
             <description>94 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/94/download.mp4" length="96256" type="video/mp4" />
+            <enclosure length="96256" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/162dc965-3c11-1528-6dd0-5216cc8a8b29/download.mp4"/>
             <pubDate>Sat, 6 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name94</itunes:subtitle>
             <itunes:summary>94 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/94/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/94/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/94/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/162dc965-3c11-1528-6dd0-5216cc8a8b29/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/162DC965-3C11-1528-6DD0-5216CC8A8B29/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/162DC965-3C11-1528-6DD0-5216CC8A8B29/cover.png"/>
         </item>
         <item>
             <title>name95</title>
             <description>95 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/95/download.mp4" length="97280" type="video/mp4" />
+            <enclosure length="97280" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/46e45cf6-e978-1f13-5d67-7358e1000a0e/download.mp4"/>
             <pubDate>Fri, 5 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name95</itunes:subtitle>
             <itunes:summary>95 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/95/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/95/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/95/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/46e45cf6-e978-1f13-5d67-7358e1000a0e/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/46E45CF6-E978-1F13-5D67-7358E1000A0E/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/46E45CF6-E978-1F13-5D67-7358E1000A0E/cover.png"/>
         </item>
         <item>
             <title>name96</title>
             <description>96 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/96/download.mp4" length="98304" type="video/mp4" />
+            <enclosure length="98304" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3b82bee4-7abe-6272-6861-8f26be670055/download.mp4"/>
             <pubDate>Thu, 4 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name96</itunes:subtitle>
             <itunes:summary>96 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/96/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/96/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/96/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/3b82bee4-7abe-6272-6861-8f26be670055/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/3B82BEE4-7ABE-6272-6861-8F26BE670055/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/3B82BEE4-7ABE-6272-6861-8F26BE670055/cover.png"/>
         </item>
         <item>
             <title>name97</title>
             <description>97 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/97/download.mp4" length="99328" type="video/mp4" />
+            <enclosure length="99328" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ca3b7e39-58fd-fe7d-524a-3d743ab1469d/download.mp4"/>
             <pubDate>Wed, 3 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name97</itunes:subtitle>
             <itunes:summary>97 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/97/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/97/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/97/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/ca3b7e39-58fd-fe7d-524a-3d743ab1469d/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/CA3B7E39-58FD-FE7D-524A-3D743AB1469D/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/CA3B7E39-58FD-FE7D-524A-3D743AB1469D/cover.png"/>
         </item>
         <item>
             <title>name98</title>
             <description>98 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/98/download.mp4" length="100352" type="video/mp4" />
+            <enclosure length="100352" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/edb9627b-f120-ee05-cae6-1ba28f437d55/download.mp4"/>
             <pubDate>Tue, 2 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name98</itunes:subtitle>
             <itunes:summary>98 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/98/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/98/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/98/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/edb9627b-f120-ee05-cae6-1ba28f437d55/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/EDB9627B-F120-EE05-CAE6-1BA28F437D55/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/EDB9627B-F120-EE05-CAE6-1BA28F437D55/cover.png"/>
         </item>
         <item>
             <title>name99</title>
             <description>99 Loren Ipsum</description>
-            <enclosure url="http://localhost/api/podcast/1234/items/99/download.mp4" length="101376" type="video/mp4" />
+            <enclosure length="101376" type="video/mp4" url="http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/62927825-88e7-b99b-338e-4847d8b4142f/download.mp4"/>
             <pubDate>Mon, 1 Jun 2015 07:00:00 +0200</pubDate>
             <itunes:explicit>No</itunes:explicit>
             <itunes:subtitle>name99</itunes:subtitle>
             <itunes:summary>99 Loren Ipsum</itunes:summary>
-            <guid>http://localhost/api/podcast/1234/items/99/download.mp4</guid>
-            <itunes:image>http://fake.url/1234/items/99/cover.png</itunes:image>
-            <media:thumbnail url="http://fake.url/1234/items/99/cover.png" />
+            <guid>http://localhost/api/podcast/214be5e3-a9e0-4814-8ee1-c9b7986bac82/items/62927825-88e7-b99b-338e-4847d8b4142f/download.mp4</guid>
+            <itunes:image>http://fake.url/1234/items/62927825-88E7-B99B-338E-4847D8B4142F/cover.png</itunes:image>
+            <media:thumbnail url="http://fake.url/1234/items/62927825-88E7-B99B-338E-4847D8B4142F/cover.png"/>
         </item>
     </channel>
 </rss>

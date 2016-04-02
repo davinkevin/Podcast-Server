@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloader.WS_TOPIC_DOWNLOAD;
@@ -69,7 +70,7 @@ public class YoutubeDownloaderTest {
                 .setUrl("http://a.fake.url/with/file.mp4?param=1")
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
-                .id(12345)
+                .id(UUID.randomUUID())
                 .title("A Fake Podcast")
                 .items(Sets.newHashSet())
                 .build()

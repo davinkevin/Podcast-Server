@@ -48,7 +48,7 @@ public class WatchListBusinessTest {
     @Test
     public void should_find_all_playlist_with_specified_item() {
         /* Given */
-        Integer id = 1;
+        UUID id = UUID.randomUUID();
         Item item = new Item().setId(id);
         WatchList p1 = WatchList.builder().id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")).name("First").build();
         WatchList p2 = WatchList.builder().id(UUID.fromString("86faa982-f462-400a-bc9b-91eb299910b6")).name("Second").build();
@@ -69,7 +69,7 @@ public class WatchListBusinessTest {
     @Test
     public void should_add_item_to_playlist() {
         /* Given */
-        Integer id = 1;
+        UUID id = UUID.randomUUID();
         Item item = new Item().setId(id).setWatchLists(Sets.newHashSet());
         WatchList watchList = WatchList
                 .builder()
@@ -98,7 +98,7 @@ public class WatchListBusinessTest {
     @Test
     public void should_remove_item_to_playlist() {
         /* Given */
-        Integer id = 1;
+        UUID id = UUID.randomUUID();
         Item item = new Item().setId(id).setWatchLists(Sets.newHashSet());
         WatchList watchList = WatchList
                 .builder()

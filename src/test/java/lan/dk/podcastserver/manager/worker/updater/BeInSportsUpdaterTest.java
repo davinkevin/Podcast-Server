@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
@@ -53,7 +54,7 @@ public class BeInSportsUpdaterTest {
     public void beforeEach() {
         podcast = Podcast
                 .builder()
-                .id(1)
+                .id(UUID.randomUUID())
                 .url("http://be.in.sports.com/url/fake")
                 .title("aBeInSportPodcast")
                 .items(Sets.newHashSet())

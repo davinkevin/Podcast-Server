@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloader.WS_TOPIC_DOWNLOAD;
 import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloader.WS_TOPIC_PODCAST;
@@ -60,7 +61,7 @@ public class DownloaderTest {
                 .setUrl("http://a.fake.url/with/file.mp4?param=1")
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
-                .id(12345)
+                .id(UUID.randomUUID())
                 .title("A Fake Podcast")
                 .items(Sets.newHashSet())
                 .build()
@@ -226,7 +227,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setItem(item);
 
-        doThrow(RuntimeException.class).when(podcastRepository).findOne(anyInt());
+        doThrow(RuntimeException.class).when(podcastRepository).findOne(any(UUID.class));
 
         /* When */
         simpleDownloader.saveSyncWithPodcast();

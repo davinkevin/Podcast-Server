@@ -21,9 +21,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -51,8 +51,8 @@ public class CoverBusinessTest {
     @Test
     public void should_find_one() {
         /* Given */
-        when(coverRepository.findOne(anyInt())).then(invocation -> new Cover().setId((Integer) invocation.getArguments()[0]));
-        Integer id = 123;
+        when(coverRepository.findOne(any(UUID.class))).then(invocation -> new Cover().setId((UUID) invocation.getArguments()[0]));
+        UUID id = UUID.randomUUID();
         /* When */
         Cover cover = coverBusiness.findOne(id);
         /* Then */  CoverAssert.assertThat(cover).hasId(id);
@@ -95,7 +95,7 @@ public class CoverBusinessTest {
         String imageExtension = "png";
         String defaultCoverValue = "cover";
         String serverUrl = "http://localhost:8080/";
-        Podcast podcast = new Podcast().setTitle(podcastTitle).setId(1234);
+        Podcast podcast = new Podcast().setTitle(podcastTitle).setId(UUID.randomUUID());
         podcast.setCover(new Cover("http://localhost:8089/img/image." + imageExtension));
         when(podcastServerParameters.coverDefaultName()).thenReturn(defaultCoverValue);
         when(podcastServerParameters.rootFolder()).thenReturn(Paths.get(ROOT_FOLDER));
@@ -126,7 +126,7 @@ public class CoverBusinessTest {
     public void should_generate_path_cover_of_podcast() {
         /* Given */
         Podcast podcast = Podcast.builder()
-                .id(123)
+                .id(UUID.randomUUID())
                 .title("A Podcast")
                 .cover(new Cover("http://podcast.dk.lan/podcast/Google/aCover.jpg"))
                 .build();
@@ -145,13 +145,14 @@ public class CoverBusinessTest {
     public void should_save_cover() {
         /* Given */
         Cover cover = new Cover().setUrl("http://anUrl.jiz/foo/bar");
-        when(coverRepository.save(eq(cover))).thenReturn(cover.setId(123));
+        UUID createdId = UUID.randomUUID();
+        when(coverRepository.save(eq(cover))).thenReturn(cover.setId(createdId));
 
         /* When */
         Cover savedCover = coverBusiness.save(cover);
 
         /* Then */
-        CoverAssert.assertThat(savedCover).hasId(123);
+        CoverAssert.assertThat(savedCover).hasId(createdId);
         assertThat(cover).isSameAs(savedCover);
         verify(coverRepository, only()).save(eq(cover));
     }

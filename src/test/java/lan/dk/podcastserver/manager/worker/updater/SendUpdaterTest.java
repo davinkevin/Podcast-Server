@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -15,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class SendUpdaterTest {
 
-    public static final Item ITEM_1 = new Item().setId(1);
-    public static final Item ITEM_2 = new Item().setId(2);
-    public static final Item ITEM_3 = new Item().setId(3);
+    public static final Item ITEM_1 = new Item().setId(UUID.randomUUID());
+    public static final Item ITEM_2 = new Item().setId(UUID.randomUUID());
+    public static final Item ITEM_3 = new Item().setId(UUID.randomUUID());
 
     SendUpdater sendUpdater = new SendUpdater();
 

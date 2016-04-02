@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -23,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 import static java.util.Objects.isNull;
 
@@ -46,8 +48,9 @@ public class Item {
 
     @Id
     @DocumentId
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID id;
 
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
     private Cover cover;
@@ -230,7 +233,7 @@ public class Item {
     }
 
     @JsonProperty("podcastId") @JsonView(ItemSearchListView.class)
-    public Integer getPodcastId() { return isNull(podcast) ? null : podcast.getId();}
+    public UUID getPodcastId() { return isNull(podcast) ? null : podcast.getId();}
         
     @AssertTrue
     public boolean hasValidURL() {

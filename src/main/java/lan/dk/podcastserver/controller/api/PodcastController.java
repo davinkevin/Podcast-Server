@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -37,20 +38,20 @@ public class PodcastController {
 
     @JsonView(Podcast.PodcastDetailsView.class)
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
-    public Podcast findById(@PathVariable Integer id) {
+    public Podcast findById(@PathVariable UUID id) {
         return podcastBusiness.findOne(id);
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT)
-    public Podcast update(@RequestBody Podcast podcast, @PathVariable(value = "id") Integer id) {
+    public Podcast update(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
         podcast.setId(id);
         return podcastBusiness.reatachAndSave(podcast);
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH)
-    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable(value = "id") Integer id) throws PodcastNotFoundException {
+    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) throws PodcastNotFoundException {
         podcast.setId(id);
         Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
         patchedPodcast.setItems(null);
@@ -59,7 +60,7 @@ public class PodcastController {
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void delete (@PathVariable Integer id) {
+    public void delete (@PathVariable UUID id) {
         podcastBusiness.delete(id);
     }
 
@@ -71,12 +72,12 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
-    public String getRss(@PathVariable Integer id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
+    public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
         return podcastBusiness.getRss(id, limit);
     }
 
     @RequestMapping(value="{id:[\\d]+}/cover.{ext}", method = RequestMethod.GET, produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
-    public FileSystemResource cover(@PathVariable Integer id) {
+    public FileSystemResource cover(@PathVariable UUID id) {
         return new FileSystemResource(podcastBusiness.coverOf(id).toFile());
     }
 
@@ -87,12 +88,12 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id:[\\d]+}/stats/byPubdate", method = RequestMethod.POST)
-    public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
+    public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statByPubDate(id, numberOfMonth);
     }
 
     @RequestMapping(value="{id:[\\d]+}/stats/byDownloaddate", method = RequestMethod.POST)
-    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable Integer id, @RequestBody Long numberOfMonth) {
+    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByDownloadDate(id, numberOfMonth);
     }
 }

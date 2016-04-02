@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
@@ -45,7 +46,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Integer> fullTextSearch(String term) {
+    public List<UUID> fullTextSearch(String term) {
         if (StringUtils.isEmpty(term))
             return new ArrayList<>();
 
@@ -57,10 +58,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .map(subTerm -> qbDsl.keyword().onFields(SEARCH_FIELDS).matching(subTerm).createQuery())
                 .forEach(query::must);
 
-        List<Integer> results = fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
+        List<UUID> results = fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
                 .setProjection("id")
                 .setResultTransformer(RESULT_TRANSFORMER)
-                .<Integer>getResultList();
+                .<UUID>getResultList();
 
         if (results == null) {
             return new ArrayList<>();

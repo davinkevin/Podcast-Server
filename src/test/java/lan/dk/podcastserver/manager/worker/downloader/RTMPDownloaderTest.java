@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -53,7 +54,7 @@ public class RTMPDownloaderTest {
     @Before
     public void beforeEach() {
         Podcast podcast = Podcast.builder()
-                .id(1234)
+                .id(UUID.randomUUID())
                 .title("RTMP Podcast")
                 .build();
         item = Item

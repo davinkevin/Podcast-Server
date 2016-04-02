@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.PodcastServerParameters;
@@ -13,9 +14,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.validation.Validator;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toSet;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @RunWith(MockitoJUnitRunner.class)
 public class UpdaterTest {
 
+    public static final UUID ERROR_UUID = UUID.randomUUID();
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
     @Mock Validator validator;
@@ -37,7 +39,7 @@ public class UpdaterTest {
     public void should_not_update_because_of_same_signature() {
         /* Given */
         Podcast podcast = new Podcast();
-        podcast.setId(1);
+        podcast.setId(UUID.randomUUID());
         podcast.setSignature("123456789");
 
         /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> no_change_result = simpleUpdater.update(podcast);
@@ -48,7 +50,7 @@ public class UpdaterTest {
     public void should_update_the_podcast() {
         /* Given */
         Podcast podcast = new Podcast();
-        podcast.setId(1);
+        podcast.setId(UUID.randomUUID());
         podcast.setSignature("XYZ");
 
         /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
@@ -64,9 +66,7 @@ public class UpdaterTest {
     @Test
     public void should_handle_exception_during_update() {
         /* Given */
-        Podcast podcast = new Podcast();
-        podcast.setId(99);
-        podcast.setSignature("XYZ");
+        Podcast podcast = Podcast.builder().id(ERROR_UUID).signature("XYZ").build();
 
         /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
         /* Then */ assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
@@ -76,11 +76,11 @@ public class UpdaterTest {
     public void should_filter_with_default_predicate() {
         /* Given */
         Podcast podcast = Podcast.builder()
-                    .id(123)
+                    .id(UUID.randomUUID())
                     .url("http://a.fake.url/rss.xml")
-                    .items(new HashSet<>())
+                    .items(Sets.newHashSet())
                 .build();
-        podcast.add(new Item().setId(2));
+        podcast.add(new Item().setId(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")));
 
 
         /* When */
@@ -104,12 +104,16 @@ public class UpdaterTest {
 
         @Override
         public Set<Item> getItems(Podcast podcast) {
-            return new HashSet<>(Arrays.asList(new Item().setId(1), new Item().setId(2), new Item().setId(3)));
+            return Sets.newHashSet(
+                    new Item().setId(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")),
+                    new Item().setId(UUID.randomUUID()),
+                    new Item().setId(UUID.randomUUID())
+            );
         }
 
         @Override
         public String signatureOf(Podcast podcast) {
-            if (podcast.getId() == 99) {
+            if (podcast.getId() == ERROR_UUID) {
                 throw new RuntimeException();
             }
             return "123456789";

@@ -11,6 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -28,7 +29,7 @@ public class TagControllerTest {
     @Test
     public void should_find_tag_by_id() {
         /* Given */
-        Integer id = 1;
+        UUID id = UUID.randomUUID();
         Tag value = new Tag();
         when(tagBusiness.findOne(eq(id))).thenReturn(value);
 

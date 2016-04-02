@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.time.ZonedDateTime.now;
@@ -71,7 +72,7 @@ public class ItemBusiness {
 
     private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
         // List with the order of pertinence of search result :
-        List<Integer> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
+        List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 
         // Reverse if order is ASC
         if ("ASC".equals(page.getSort().getOrderFor("pertinence").getDirection().toString())) {
@@ -101,11 +102,11 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Item findOne(Integer integer) {
-        return itemRepository.findOne(integer);
+    public Item findOne(UUID id) {
+        return itemRepository.findOne(id);
     }
 
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Item itemToDelete = findOne(id);
 
         //* Si le téléchargement est en cours ou en attente : *//
@@ -117,7 +118,7 @@ public class ItemBusiness {
     //****************************//
 
     @Transactional(readOnly = true)
-    public Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
+    public Page<Item> findByPodcast(UUID idPodcast, PageRequest pageRequest) {
         return itemRepository.findByPodcast(idPodcast, pageRequest);
     }
 
@@ -125,7 +126,7 @@ public class ItemBusiness {
         itemRepository.reindex();
     }
 
-    public Item reset(Integer id) {
+    public Item reset(UUID id) {
         Item itemToReset = findOne(id);
 
         if (itemDownloadManager.isInDownloadingQueue(itemToReset))
@@ -134,7 +135,7 @@ public class ItemBusiness {
         return save(itemToReset.reset());
     }
 
-    public Item addItemByUpload(Integer podcastId, MultipartFile uploadedFile) throws IOException, URISyntaxException {
+    public Item addItemByUpload(UUID podcastId, MultipartFile uploadedFile) throws IOException, URISyntaxException {
         Podcast podcast = podcastBusiness.findOne(podcastId);
         if (podcast == null) {
             throw new PodcastNotFoundException();

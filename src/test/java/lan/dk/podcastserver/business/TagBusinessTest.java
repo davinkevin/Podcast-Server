@@ -8,17 +8,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.*;
 
 /**
@@ -47,7 +43,7 @@ public class TagBusinessTest {
     @Test
     public void should_find_one() {
         /* Given */
-        Integer tagId = 1;
+        UUID tagId = UUID.randomUUID();
         Tag tag = new Tag().setId(tagId);
         when(tagRepository.findOne(any())).thenReturn(tag);
 
@@ -78,14 +74,16 @@ public class TagBusinessTest {
     public void should_get_tag_by_name_in_set() {
         /* Given */
         Set<Tag> tags = new HashSet<>();
-        tags.add(new Tag().setId(1).setName("tag1"));
-        tags.add(new Tag().setId(2).setName("tag2"));
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        tags.add(new Tag().setId(id1).setName("tag" + id1));
+        tags.add(new Tag().setId(id2).setName("tag" + id2));
         tags.add(new Tag().setName("Foo"));
         tags.add(new Tag().setName("Bar"));
 
-        when(tagRepository.findOne(anyInt()))
+        when(tagRepository.findOne(any(UUID.class)))
                 .then(invocation -> new Tag()
-                        .setId((Integer) invocation.getArguments()[0])
+                        .setId((UUID) invocation.getArguments()[0])
                         .setName("tag" + invocation.getArguments()[0])
                 );
 
@@ -93,9 +91,8 @@ public class TagBusinessTest {
         Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);
 
         /* Then */
-        assertThat(tagListByName)
-                .containsAll(tags);
+        assertThat(tagListByName).containsAll(tags);
 
-        verify(tagRepository, times(2)).findOne(or(eq(1), eq(2)));
+        verify(tagRepository, times(2)).findOne(or(eq(id1), eq(id2)));
     }
 }

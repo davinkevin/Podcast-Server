@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.repository.impl;
 
+import com.google.common.collect.Lists;
 import lan.dk.podcastserver.entity.Item;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;
@@ -16,8 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.or;
@@ -66,6 +67,7 @@ public class ItemRepositoryImplTest {
     @SuppressWarnings("unchecked")
     public void should_search_fulltext() {
         /* Given */
+        List<UUID> results = Lists.newArrayList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
         SearchFactory searchFactory = mock(SearchFactory.class);
         QueryContextBuilder queryContextBuilder = mock(QueryContextBuilder.class);
         EntityContext entityContext = mock(EntityContext.class);
@@ -90,14 +92,14 @@ public class ItemRepositoryImplTest {
         when(booleanJunction.createQuery()).thenReturn(mock(Query.class));
         when(fullTextQuery.setProjection(anyString())).thenReturn(fullTextQuery);
         when(fullTextQuery.setResultTransformer(any(ResultTransformer.class))).thenReturn(fullTextQuery);
-        when(fullTextQuery.getResultList()).thenReturn(Arrays.asList(1, 2, 3, 4));
+        when(fullTextQuery.getResultList()).thenReturn(results);
 
         /* When */
-        List<Integer> list = itemRepositoryImpl.fullTextSearch("A super query");
+        List<UUID> list = itemRepositoryImpl.fullTextSearch("A super query");
 
         /* Then */
         assertThat(list)
-                .containsOnly(1, 2, 3, 4);
+                .containsExactlyElementsOf(results);
 
         verify(termMatchingContext, times(3)).matching(or(or(eq("A"), eq("super")), eq("query")));
         verify(booleanJunction, times(3)).must(any());
@@ -134,11 +136,10 @@ public class ItemRepositoryImplTest {
         when(fullTextQuery.getResultList()).thenReturn(null);
 
         /* When */
-        List<Integer> list = itemRepositoryImpl.fullTextSearch("A super query");
+        List<UUID> list = itemRepositoryImpl.fullTextSearch("A super query");
 
         /* Then */
-        assertThat(list)
-                .hasSize(0);
+        assertThat(list).hasSize(0);
     }
 
 }

@@ -44,13 +44,13 @@ public class WatchListController {
 
     @JsonView(WatchListDetailsListView.class)
     @RequestMapping(value = "{id}/{itemId}", method = RequestMethod.POST)
-    public WatchList add(@PathVariable UUID id, @PathVariable Integer itemId) {
+    public WatchList add(@PathVariable UUID id, @PathVariable UUID itemId) {
         return watchListBusiness.add(id, itemId);
     }
 
     @JsonView(WatchListDetailsListView.class)
     @RequestMapping(value = "{id}/{itemId}", method = RequestMethod.DELETE)
-    public WatchList remove(@PathVariable UUID id, @PathVariable Integer itemId) {
+    public WatchList remove(@PathVariable UUID id, @PathVariable UUID itemId) {
         return watchListBusiness.remove(id, itemId);
     }
 }

@@ -2,7 +2,10 @@ package lan.dk.podcastserver.entity;
 
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static lan.dk.podcastserver.entity.CoverAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -43,8 +46,10 @@ public class CoverTest {
     @Test
     public void should_interact_with_id() {
         /* Given */ Cover cover = new Cover();
-        /* When */  cover.setId(123);
-        /* Then */  assertThat(cover).hasId(123);
+        /* When */
+        UUID id = UUID.randomUUID();
+        cover.setId(id);
+        /* Then */  assertThat(cover).hasId(id);
     }
 
     @Test
@@ -60,8 +65,7 @@ public class CoverTest {
         assertThat(cover).isEqualTo(coverWithSameUrl);
         assertThat(cover).isNotEqualTo(notCover);
         assertThat(cover).isNotEqualTo(coverWithDiffUrl);
-        org.assertj.core.api.Assertions.
-                assertThat(cover.hashCode()).isEqualTo(coverWithSameUrl.hashCode());
+        assertThat(cover.hashCode()).isEqualTo(coverWithSameUrl.hashCode());
 
     }
 }

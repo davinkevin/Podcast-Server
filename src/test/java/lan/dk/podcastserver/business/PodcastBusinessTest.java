@@ -15,10 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -70,10 +67,10 @@ public class PodcastBusinessTest {
     @Test
     public void should_find_one() {
         /* Given */
-        Integer podcastId = 1;
+        UUID podcastId = UUID.randomUUID();
         Podcast podcast = new Podcast();
-        when(podcastRepository.findOne(anyInt())).then(i -> {
-            podcast.setId((Integer) i.getArguments()[0]);
+        when(podcastRepository.findOne(any(UUID.class))).then(i -> {
+            podcast.setId((UUID) i.getArguments()[0]);
             return podcast;
         });
 
@@ -81,7 +78,8 @@ public class PodcastBusinessTest {
         Podcast aPodcast = podcastBusiness.findOne(podcastId);
 
         /* Then */
-        PodcastAssert.assertThat(aPodcast)
+        PodcastAssert
+                .assertThat(aPodcast)
                 .hasId(podcastId)
                 .isSameAs(podcast);
         verify(podcastRepository, times(1)).findOne(eq(podcastId));
@@ -89,7 +87,7 @@ public class PodcastBusinessTest {
 
     @Test
     public void should_delete() {
-        /* Given */ Integer podcastId = 1;
+        /* Given */ UUID podcastId = UUID.randomUUID();
         /* When */  podcastBusiness.delete(podcastId);
         /* Then */  verify(podcastRepository, times(1)).delete(eq(podcastId));
     }
@@ -118,10 +116,10 @@ public class PodcastBusinessTest {
     @Test
     public void should_get_items() {
        /* Given */
-        Integer idPodcast = 2;
+        UUID idPodcast = UUID.randomUUID();
         Podcast podcast = new Podcast();
         podcast.setItems(new HashSet<>());
-        when(podcastRepository.findOne(anyInt())).thenReturn(podcast);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
 
        /* When */
         Set<Item> items = podcastBusiness.getItems(idPodcast);
@@ -187,15 +185,16 @@ public class PodcastBusinessTest {
         /* Given */
         Podcast podcast = new Podcast();
         String response = "Success";
-        when(podcastRepository.findOne(any(Integer.class))).thenReturn(podcast);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
         when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean())).thenReturn(response);
+        UUID id = UUID.randomUUID();
 
         /* When */
-        String rssReturn = podcastBusiness.getRss(1, true);
+        String rssReturn = podcastBusiness.getRss(id, true);
 
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
-        verify(podcastRepository, times(1)).findOne(eq(1));
+        verify(podcastRepository, times(1)).findOne(eq(id));
         verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(true));
     }
 
@@ -204,15 +203,16 @@ public class PodcastBusinessTest {
         /* Given */
         Podcast podcast = new Podcast();
         String response = "Success";
-        when(podcastRepository.findOne(any(Integer.class))).thenReturn(podcast);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
         when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean())).thenReturn(response);
+        UUID id = UUID.randomUUID();
 
         /* When */
-        String rssReturn = podcastBusiness.getRss(1, false);
+        String rssReturn = podcastBusiness.getRss(id, false);
 
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
-        verify(podcastRepository, times(1)).findOne(eq(1));
+        verify(podcastRepository, times(1)).findOne(eq(id));
         verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(false));
     }
     
@@ -222,7 +222,7 @@ public class PodcastBusinessTest {
         doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean());
 
         /* When */
-        String rssReturn = podcastBusiness.getRss(1, false);
+        String rssReturn = podcastBusiness.getRss(UUID.randomUUID(), false);
 
         /* Then */
         assertThat(rssReturn).isEqualTo("");
@@ -236,6 +236,7 @@ public class PodcastBusinessTest {
     @Test
     public void should_patch_podcast() {
         /* Given */
+        UUID id = UUID.randomUUID();
         Set<Tag> tags = new HashSet<>();
         tags.add(new Tag().setName("Tag1"));
         tags.add(new Tag().setName("Tag2"));
@@ -244,20 +245,21 @@ public class PodcastBusinessTest {
                 patchPodcast = new Podcast();
 
         retrievePodcast.setCover(new Cover("http://fake.url/image2.png"));
-        retrievePodcast.setId(1);
+        retrievePodcast.setId(id);
 
-        patchPodcast.setId(1);
+        patchPodcast.setId(id);
         patchPodcast.setTitle("Toto");
         patchPodcast.setUrl("http://fake.url/podcast.rss");
         patchPodcast.setType("RSS");
-        patchPodcast.setCover(new Cover("http://fake.url/image.png").setId(2));
+        UUID idCover = UUID.randomUUID();
+        patchPodcast.setCover(new Cover("http://fake.url/image.png").setId(idCover));
         patchPodcast.setDescription("Description");
         patchPodcast.setHasToBeDeleted(true);
         patchPodcast.setTags(tags);
 
         when(podcastRepository.findOne(eq(patchPodcast.getId()))).thenReturn(retrievePodcast);
         when(coverBusiness.hasSameCoverURL(any(Podcast.class), any(Podcast.class))).thenReturn(false);
-        when(coverBusiness.findOne(anyInt())).then(i -> new Cover().setId((Integer) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
+        when(coverBusiness.findOne(any(UUID.class))).then(i -> new Cover().setId((UUID) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
         when(tagBusiness.getTagListByName(anySetOf(Tag.class))).then(i -> i.getArguments()[0]);
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
 
@@ -276,9 +278,9 @@ public class PodcastBusinessTest {
                 .hasHasToBeDeleted(patchPodcast.getHasToBeDeleted())
                 .hasTags(tags.toArray(new Tag[tags.size()]));
 
-        verify(podcastRepository, times(1)).findOne(eq(1));
+        verify(podcastRepository, times(1)).findOne(eq(id));
         verify(coverBusiness, times(1)).hasSameCoverURL(eq(patchPodcast), eq(retrievePodcast));
-        verify(coverBusiness, times(1)).findOne(eq(2));
+        verify(coverBusiness, times(1)).findOne(eq(idCover));
         verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(retrievePodcast));
     }
@@ -286,7 +288,7 @@ public class PodcastBusinessTest {
     @Test
     public void should_get_cover_of() {
         /* Given */
-        Integer podcastId = 12;
+        UUID podcastId = UUID.randomUUID();
         Path coverPath = Paths.get("/");
         Podcast podcast = Podcast.builder().url("http://an/url").title("Foo").id(podcastId).build();
 

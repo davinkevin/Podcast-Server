@@ -24,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
@@ -47,26 +48,26 @@ public class ItemRepositoryTest {
     public static final Operation INSERT_ITEM_DATA = sequenceOf(
             insertInto("PODCAST")
                     .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
-                    .values(1, "AppLoad", null, "RSS", false)
-                    .values(2, "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true)
+                    .values(UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false)
+                    .values(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true)
                     .build(),
             insertInto("ITEM")
                     .columns("ID", "TITLE", "URL", "PODCAST_ID", "STATUS", "PUBDATE", "DOWNLOAD_DATE")
-                    .values(1L, "Appload 1", "http://fakeurl.com/appload.1.mp3", 1, Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
-                    .values(2L, "Appload 2", "http://fakeurl.com/appload.2.mp3", 1, null, now().minusDays(30).format(formatter), null)
-                    .values(3L, "Appload 3", "http://fakeurl.com/appload.3.mp3", 1, Status.NOT_DOWNLOADED, now().format(formatter), null)
-                    .values(4L, "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", 2, Status.DELETED, now().minusYears(1).format(formatter), now().format(formatter))
-                    .values(5L, "Geek INC 124", "http://fakeurl.com/geekinc.124.mp3", 2, Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
+                    .values(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), "Appload 1", "http://fakeurl.com/appload.1.mp3", UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
+                    .values(UUID.fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), "Appload 2", "http://fakeurl.com/appload.2.mp3", UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), null, now().minusDays(30).format(formatter), null)
+                    .values(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), "Appload 3", "http://fakeurl.com/appload.3.mp3", UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), Status.NOT_DOWNLOADED, now().format(formatter), null)
+                    .values(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.DELETED, now().minusYears(1).format(formatter), now().format(formatter))
+                    .values(UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 124", "http://fakeurl.com/geekinc.124.mp3", UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.FINISH, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter))
                     .build(),
             insertInto("TAG")
                     .columns("ID", "NAME")
-                    .values(1L, "French Spin")
-                    .values(2L, "Studio Knowhere")
+                    .values(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "French Spin")
+                    .values(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "Studio Knowhere")
                     .build(),
             insertInto("PODCAST_TAGS")
                     .columns("PODCASTS_ID", "TAGS_ID")
-                    .values(1, 1)
-                    .values(2, 2)
+                    .values(UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                    .values(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
                     .build()
     );
 
@@ -82,7 +83,7 @@ public class ItemRepositoryTest {
     public void should_find_by_podcast_and_page() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        Integer podcastId = 1;
+        UUID podcastId = UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561");
         PageRequest pageRequest = new PageRequest(1, 1, Sort.Direction.ASC, "id");
 
         /* When */

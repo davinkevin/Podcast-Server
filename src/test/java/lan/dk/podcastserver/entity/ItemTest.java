@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,24 +18,28 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ItemTest {
 
+    public static final UUID PODCAST_ID = UUID.randomUUID();
     public static Item ITEM = new Item();
-    public static final Podcast PODCAST = new Podcast();
+    public static Podcast PODCAST = new Podcast();
     public static final ZonedDateTime NOW = ZonedDateTime.now();
     public static final Cover COVER = new Cover("http://fakeItem.com/cover");
     public static final Cover PODCAST_COVER = new Cover("PodcastCover");
+    public static final UUID ID = UUID.randomUUID();
 
     @Before
     public void beforeEach() throws IOException {
         /* Given */
-        PODCAST.setTitle("Fake Podcast");
-        PODCAST.setId(1);
-        PODCAST.setType("Youtube");
-        PODCAST.setCover(PODCAST_COVER);
-        PODCAST.setHasToBeDeleted(Boolean.TRUE);
+        PODCAST = Podcast.builder()
+                .title("Fake Podcast")
+                .id(PODCAST_ID)
+                .type("Youtube")
+                .cover(PODCAST_COVER)
+                .hasToBeDeleted(Boolean.TRUE)
+                .build();
 
 
         ITEM = new Item()
-                .setId(1)
+                .setId(ID)
                 .setTitle("Fake Item")
                 .setUrl("http://fakeItem.com")
                 .setPodcast(PODCAST)
@@ -58,7 +63,7 @@ public class ItemTest {
         /* When */
         /* Then */
         ItemAssert.assertThat(ITEM)
-                .hasId(1)
+                .hasId(ID)
                 .hasTitle("Fake Item")
                 .hasUrl("http://fakeItem.com")
                 .hasPodcast(PODCAST)
@@ -143,10 +148,10 @@ public class ItemTest {
     @Test
     public void should_expose_the_API_url() {
         assertThat(ITEM.getProxyURLWithoutExtention())
-                    .isEqualTo("/api/podcast/1/items/1/download");
+                    .isEqualTo(String.format("/api/podcast/%s/items/%s/download", PODCAST_ID, ID));
 
         assertThat(ITEM.getProxyURL())
-                    .isEqualTo("/api/podcast/1/items/1/download.mp4");
+                    .isEqualTo(String.format("/api/podcast/%s/items/%s/download.mp4", PODCAST_ID, ID));
     }
 
     @Test
@@ -192,18 +197,20 @@ public class ItemTest {
     public void should_equals_and_hashcode() {
         /* Given */
         Object anObject = new Object();
-        Item withSameId = new Item().setId(1);
+        Item withSameId = new Item().setId(ID);
         Item withSameUrl = new Item().setUrl(ITEM.getUrl());
         Item withSameName = new Item().setUrl("http://test.domain.com/toto/fakeItem.com");
         Item withSameLocalUri = new Item().setPodcast(PODCAST).setFileName("fakeItem.mp4");
 
         /* Then */
-        ItemAssert.assertThat(ITEM).isEqualTo(ITEM);
-        ItemAssert.assertThat(ITEM).isNotEqualTo(anObject);
-        ItemAssert.assertThat(ITEM).isEqualTo(withSameId);
-        ItemAssert.assertThat(ITEM).isEqualTo(withSameUrl);
-        ItemAssert.assertThat(ITEM).isEqualTo(withSameName);
-        ItemAssert.assertThat(ITEM).isEqualTo(withSameLocalUri);
+        ItemAssert
+                .assertThat(ITEM)
+                .isEqualTo(ITEM)
+                .isNotEqualTo(anObject)
+                .isEqualTo(withSameId)
+                .isEqualTo(withSameUrl)
+                .isEqualTo(withSameName)
+                .isEqualTo(withSameLocalUri);
 
         assertThat(ITEM.hashCode()).isEqualTo(new Item().setUrl(ITEM.getUrl()).setPubdate(NOW).hashCode());
 
@@ -212,7 +219,7 @@ public class ItemTest {
     @Test
     public void should_toString() {
         assertThat(ITEM.toString())
-                    .isEqualTo("Item{id=1, title='Fake Item', url='http://fakeItem.com', pubdate="+ NOW +", description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id=1, title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}");
+                    .isEqualTo("Item{id="+ ID +", title='Fake Item', url='http://fakeItem.com', pubdate="+ NOW +", description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id="+PODCAST_ID+", title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}");
 
     }
 

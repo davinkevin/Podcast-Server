@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
@@ -61,16 +62,16 @@ public class StatsBusiness {
                 .collect(toList());
     }
 
-    public Set<NumberOfItemByDateWrapper> statByPubDate(Integer podcastId, Long numberOfMonth) {
+    public Set<NumberOfItemByDateWrapper> statByPubDate(UUID podcastId, Long numberOfMonth) {
         return statOf(podcastId, Item::getPubdate, numberOfMonth);
     }
 
-    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(Integer id, Long numberOfMonth) {
+    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(UUID id, Long numberOfMonth) {
         return statOf(id, Item::getDownloadDate, numberOfMonth);
     }
 
     @SuppressWarnings("unchecked")
-    private Set<NumberOfItemByDateWrapper> statOf(Integer podcastId, Function<? extends Item, ? extends ZonedDateTime> mapper, long numberOfMonth) {
+    private Set<NumberOfItemByDateWrapper> statOf(UUID podcastId, Function<? extends Item, ? extends ZonedDateTime> mapper, long numberOfMonth) {
         LocalDate dateInPast = LocalDate.now().minusMonths(numberOfMonth);
         return podcastBusiness.findOne(podcastId)
                 .getItems()

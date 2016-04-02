@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -51,7 +52,7 @@ public class CanalPlusUpdaterTest {
     public void beforeEach() {
         podcast = Podcast
                 .builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .url("http://www.canalplus.com/url/fake")
                     .title("A Canal Plus Podcast")
                     .items(Sets.newHashSet())

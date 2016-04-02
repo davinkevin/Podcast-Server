@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,8 +28,8 @@ public class SearchItemPageRequestWrapperTest {
         SearchItemPageRequestWrapper searchItemPageRequestWrapper = new SearchItemPageRequestWrapper();
 
         /* When */
-        Tag tag1 = new Tag().setId(1);
-        Tag tag2 = new Tag().setId(2);
+        Tag tag1 = new Tag().setId(UUID.randomUUID());
+        Tag tag2 = new Tag().setId(UUID.randomUUID());
         searchItemPageRequestWrapper
                 .setTerm("A Term to Find")
                 .setTags(Arrays.asList(tag1, tag2));

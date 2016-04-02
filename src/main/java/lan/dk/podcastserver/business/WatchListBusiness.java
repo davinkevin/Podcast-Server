@@ -34,19 +34,19 @@ public class WatchListBusiness {
         return watchListRepository.findAll();
     }
 
-    public Set<WatchList> findContainsItem(Integer itemId) {
+    public Set<WatchList> findContainsItem(UUID itemId) {
         Item item = itemRepository.findOne(itemId);
         return watchListRepository.findContainsItem(item);
     }
 
-    public WatchList add(UUID watchListId, Integer itemId) {
+    public WatchList add(UUID watchListId, UUID itemId) {
         WatchList watchList = watchListRepository.findOne(watchListId);
         Item item = itemRepository.findOne(itemId);
 
         return watchListRepository.save(watchList.add(item));
     }
 
-    public WatchList remove(UUID watchListId, Integer itemId) {
+    public WatchList remove(UUID watchListId, UUID itemId) {
         WatchList watchList = watchListRepository.findOne(watchListId);
         Item item = itemRepository.findOne(itemId);
 

@@ -1,10 +1,11 @@
 package lan.dk.podcastserver.entity;
 
+import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
+import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 
@@ -16,13 +17,15 @@ public class PodcastTest {
     public static final ZonedDateTime NOW = ZonedDateTime.now();
     public static final Cover COVER = new Cover("ACover");
     public static final Podcast PODCAST = new Podcast();
-    public static final String PODCAST_TOSTRING = "Podcast{id=1, title='PodcastDeTest', url='http://nowhere.com', signature='ae4b93a7e8249d6be591649c936dbe7d', type='Youtube', lastUpdate=%s}";
+    public static String PODCAST_TOSTRING;
+    UUID id;
 
 
     @Before
     public void init() {
         /* Given */
-        PODCAST.setId(1);
+        id = UUID.randomUUID();
+        PODCAST.setId(id);
         PODCAST.setTitle("PodcastDeTest");
         PODCAST.setUrl("http://nowhere.com");
         PODCAST.setSignature("ae4b93a7e8249d6be591649c936dbe7d");
@@ -31,15 +34,17 @@ public class PodcastTest {
         PODCAST.setCover(COVER);
         PODCAST.setDescription("A long Description");
         PODCAST.setHasToBeDeleted(true);
-        PODCAST.setItems(new HashSet<>());
-        PODCAST.setTags(new HashSet<>());
+        PODCAST.setItems(Sets.newHashSet());
+        PODCAST.setTags(Sets.newHashSet());
+
+        PODCAST_TOSTRING = "Podcast{id="+ id +", title='PodcastDeTest', url='http://nowhere.com', signature='ae4b93a7e8249d6be591649c936dbe7d', type='Youtube', lastUpdate=%s}";
     }
 
     @Test
     public void should_have_all_setters_and_getters_working() {
         /* Then */
         assertThat(PODCAST)
-                .hasId(1)
+                .hasId(id)
                 .hasTitle("PodcastDeTest")
                 .hasUrl("http://nowhere.com")
                 .hasSignature("ae4b93a7e8249d6be591649c936dbe7d")
@@ -63,7 +68,7 @@ public class PodcastTest {
     public void should_have_hashcode_and_equals() {
         /* Given */
         Podcast samePodcast = new Podcast();
-        samePodcast.setId(1);
+        samePodcast.setId(id);
         samePodcast.setLastUpdate(NOW);
         samePodcast.setSignature("ae4b93a7e8249d6be591649c936dbe7d");
         samePodcast.setTitle("PodcastDeTest");
@@ -93,8 +98,8 @@ public class PodcastTest {
 
     @Test
     public void should_contains_item() {
-        Item itemToAdd = new Item().setId(1);
-        Item itemToAdd2 = new Item().setId(2);
+        Item itemToAdd = new Item().setId(UUID.randomUUID());
+        Item itemToAdd2 = new Item().setId(UUID.randomUUID());
         PODCAST.add(itemToAdd);
 
         org.assertj.core.api.Assertions.

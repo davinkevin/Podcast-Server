@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static lan.dk.podcastserver.entity.TagAssert.assertThat;
 
 /**
@@ -16,19 +18,20 @@ public class TagTest {
 
     @Before
     public void init() {
-        PODCAST_1.setId(1);
-        PODCAST_2.setId(2);
+        PODCAST_1.setId(UUID.randomUUID());
+        PODCAST_2.setId(UUID.randomUUID());
     }
 
     @Test
     public void should_create_a_tag() {
+        UUID id = UUID.randomUUID();
         Tag tag = new Tag()
             .setName("Humour")
-            .setId(1)
+            .setId(id)
             .setPodcasts(Sets.newHashSet(PODCAST_1, PODCAST_2));
 
         assertThat(tag)
-            .hasId(1)
+            .hasId(id)
             .hasName("Humour")
             .hasOnlyPodcasts(PODCAST_1, PODCAST_2);
     }
@@ -38,10 +41,10 @@ public class TagTest {
         /* Given */
         Tag tag = new Tag()
                 .setName("Humour")
-                .setId(1);
+                .setId(UUID.randomUUID());
         Tag notEquals = new Tag()
                     .setName("Conférence")
-                    .setId(2);
+                    .setId(UUID.randomUUID());
         Object notATag = new Object();
 
         /* When */

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by kevin on 07/06/2014 for Podcast Server
@@ -21,7 +22,7 @@ public class TagController {
     }
 
     @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
-    public Tag findById(@PathVariable Integer id) {
+    public Tag findById(@PathVariable UUID id) {
         return tagBusiness.findOne(id);
     }
 

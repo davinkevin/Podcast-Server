@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Queue;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -35,7 +36,7 @@ public class IDMController {
     }
 
     @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.GET)
-    public Item getDownloadingList (@PathVariable int id) {
+    public Item getDownloadingList (@PathVariable UUID id) {
         return IDM.getItemInDownloadingQueue(id);
     }
 
@@ -88,43 +89,43 @@ public class IDMController {
     // Action on id identified download :
     @RequestMapping(value="/stopDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void stopCurrentDownload(@RequestBody int id) {
+    public void stopCurrentDownload(@RequestBody UUID id) {
         IDM.stopDownload(id);
     }
 
     @RequestMapping(value="/pauseDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void pauseCurrentDownload(@RequestBody int id) {
+    public void pauseCurrentDownload(@RequestBody UUID id) {
         IDM.pauseDownload(id);
     }
 
     @RequestMapping(value="/restartDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void restartCurrentDownload(@RequestBody int id) {
+    public void restartCurrentDownload(@RequestBody UUID id) {
         IDM.restartDownload(id);
     }
 
     @RequestMapping(value="/toogleDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void toggleCurrentDownload(@RequestBody int id) {
+    public void toggleCurrentDownload(@RequestBody UUID id) {
         IDM.toogleDownload(id);
     }
 
     @RequestMapping(value="/queue/add", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void addItemToQueue(@RequestBody int id) {
+    public void addItemToQueue(@RequestBody UUID id) {
         IDM.addItemToQueue(id);
     }
 
     @RequestMapping(value="/queue/{id:[\\d]+}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeItemFromQueue(@PathVariable int id) {
+    public void removeItemFromQueue(@PathVariable UUID id) {
         IDM.removeItemFromQueue(id, false);
     }
 
     @RequestMapping(value="/queue/{id:[\\d]+}/andstop", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeItemFromQueueAndStopped(@PathVariable int id) {
+    public void removeItemFromQueueAndStopped(@PathVariable UUID id) {
         IDM.removeItemFromQueue(id, true);
     }
 

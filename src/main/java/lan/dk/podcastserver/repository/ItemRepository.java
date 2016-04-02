@@ -13,14 +13,15 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, Integer>, ItemRepositoryCustom, QueryDslPredicateExecutor<Item> {
+public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositoryCustom, QueryDslPredicateExecutor<Item> {
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Page<Item> findByPodcast(Integer idPodcast, PageRequest pageRequest) {
+    default Page<Item> findByPodcast(UUID idPodcast, PageRequest pageRequest) {
         return findAll(isInPodcast(idPodcast), pageRequest);
     }
 

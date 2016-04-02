@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -60,7 +61,7 @@ public class DailymotionDownloaderTest {
                 .setUrl("http://a.fake.url/with/file.mp4?param=1")
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
-                .id(12345)
+                .id(UUID.randomUUID())
                 .title("A Fake Podcast")
                 .items(Sets.newHashSet())
                 .build()

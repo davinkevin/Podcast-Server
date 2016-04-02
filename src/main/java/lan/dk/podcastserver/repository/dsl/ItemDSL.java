@@ -9,6 +9,7 @@ import lan.dk.podcastserver.entity.Tag;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -57,7 +58,7 @@ public class ItemDSL {
 
     }
 
-    public static BooleanExpression isInId(final List<Integer> ids){
+    public static BooleanExpression isInId(final List<UUID> ids){
         return Q_ITEM.id.in(ids);
     }
 
@@ -83,11 +84,11 @@ public class ItemDSL {
         );
     }
 
-    public static BooleanExpression isInPodcast(Integer podcastId) {
+    public static BooleanExpression isInPodcast(UUID podcastId) {
         return Q_ITEM.podcast.id.eq(podcastId);
     }
 
-    public static Predicate getSearchSpecifications(List<Integer> ids, List<Tag> tags, Boolean downloaded) {
+    public static Predicate getSearchSpecifications(List<UUID> ids, List<Tag> tags, Boolean downloaded) {
         return BooleanExpression.allOf(
                 nonNull(ids) ? isInId(ids) : null,
                 isInTags(tags),

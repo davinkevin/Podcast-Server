@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
@@ -37,8 +38,8 @@ public class PodcastRepositoryTest {
     public static final Operation INSERT_REFERENCE_DATA = sequenceOf(
                     insertInto("PODCAST")
                             .columns("ID", "TITLE", "URL")
-                            .values(1, "AppLoad", null)
-                            .values(2, "Geek Inc HD", "http://fake.url.com/rss")
+                            .values(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", null)
+                            .values(UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/rss")
                             .build()
                     );
 

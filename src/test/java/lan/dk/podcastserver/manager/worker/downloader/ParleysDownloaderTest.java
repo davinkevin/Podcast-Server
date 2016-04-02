@@ -29,6 +29,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
@@ -68,11 +69,11 @@ public class ParleysDownloaderTest {
     @Before
     public void beforeEach() {
         podcast = Podcast.builder()
-                .id(1234)
+                .id(UUID.randomUUID())
                 .title("ParleysPodcast")
                 .build();
         item = Item.builder()
-                    .id(1)
+                    .id(UUID.randomUUID())
                     .podcast(podcast)
                     .url("http://www.parleys.com/play/5534a6b4e4b056a82338229d")
                 .build();

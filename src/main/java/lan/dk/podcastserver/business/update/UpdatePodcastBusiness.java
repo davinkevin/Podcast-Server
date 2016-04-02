@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -67,9 +68,9 @@ public class UpdatePodcastBusiness  {
     public void updatePodcast() {
         updatePodcast(podcastBusiness.findByUrlIsNotNull(), updateExecutor);
     }
-    public void updatePodcast(Integer id) { updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), manualExecutor); }
+    public void updatePodcast(UUID id) { updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), manualExecutor); }
 
-    public void forceUpdatePodcast (Integer id){
+    public void forceUpdatePodcast (UUID id){
         log.info("Lancement de l'update forcé");
         Podcast podcast = podcastBusiness.findOne(id);
         podcast.setSignature("");

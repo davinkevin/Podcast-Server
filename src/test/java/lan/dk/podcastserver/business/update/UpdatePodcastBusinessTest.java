@@ -25,10 +25,7 @@ import javax.validation.Validator;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -87,7 +84,7 @@ public class UpdatePodcastBusinessTest {
     private List<Item> generateItemsOfPodcast(Integer numberOfItem, Podcast podcast) {
         return IntStream
                 .rangeClosed(1, numberOfItem)
-                .mapToObj(i -> new Item().setPodcast(podcast).setId(i).setFileName(i + ".mp3"))
+                .mapToObj(i -> new Item().setPodcast(podcast).setId(UUID.randomUUID()).setFileName(i + ".mp3"))
                 .collect(toList());
     }
 
@@ -176,7 +173,7 @@ public class UpdatePodcastBusinessTest {
                 .setTitle("a title");
 
         Updater updater = mock(Updater.class);
-        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
@@ -186,7 +183,7 @@ public class UpdatePodcastBusinessTest {
         when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
 
         /* When */
-        updatePodcastBusiness.updatePodcast(1);
+        updatePodcastBusiness.updatePodcast(UUID.randomUUID());
 
         /* Then */
         assertThat(podcast.getLastUpdate())
@@ -199,7 +196,7 @@ public class UpdatePodcastBusinessTest {
         ZonedDateTime now = ZonedDateTime.now();
         Podcast podcast = new Podcast().setTitle("podcast1");
         Updater updater = mock(Updater.class);
-        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast);
+        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
@@ -213,7 +210,7 @@ public class UpdatePodcastBusinessTest {
 
 
         /* When */
-        updatePodcastBusiness.updatePodcast(1);
+        updatePodcastBusiness.updatePodcast(UUID.randomUUID());
 
         /* Then */
         assertThat(podcast.getLastUpdate())
@@ -231,9 +228,9 @@ public class UpdatePodcastBusinessTest {
         updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS);
 
         Podcast podcast1 = new Podcast().setTitle("podcast1");
-        podcast1.setId(1);
+        podcast1.setId(UUID.randomUUID());
         Updater updater = mock(Updater.class);
-        when(podcastBusiness.findOne(anyInt())).thenReturn(podcast1);
+        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast1);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(podcastBusiness.save(any(Podcast.class))).thenReturn(podcast1);
         when(updater.notIn(any(Podcast.class))).then(i -> {
@@ -247,14 +244,14 @@ public class UpdatePodcastBusinessTest {
         });
 
         /* When */
-        updatePodcastBusiness.forceUpdatePodcast(1);
+        updatePodcastBusiness.forceUpdatePodcast(UUID.randomUUID());
 
         /* Then */
         PodcastAssert
                 .assertThat(podcast1)
                 .hasLastUpdate(null);
 
-        verify(podcastBusiness, times(2)).findOne(anyInt());
+        verify(podcastBusiness, times(2)).findOne(any(UUID.class));
         verify(podcastBusiness, times(1)).save(any(Podcast.class));
     }
 
@@ -262,7 +259,7 @@ public class UpdatePodcastBusinessTest {
     private Set<Item> generateSetOfItem(Integer numberOfItem, Podcast podcast) {
         return IntStream
                 .rangeClosed(1, numberOfItem)
-                .mapToObj(i -> new Item().setPodcast(podcast).setId(i).setFileName(i + ".mp3"))
+                .mapToObj(i -> new Item().setPodcast(podcast).setId(UUID.randomUUID()).setFileName(i + ".mp3"))
                 .collect(toSet());
     }
 }
