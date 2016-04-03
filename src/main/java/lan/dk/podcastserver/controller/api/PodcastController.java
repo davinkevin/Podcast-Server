@@ -37,20 +37,20 @@ public class PodcastController {
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
+    @RequestMapping(value="{id}", method = RequestMethod.GET)
     public Podcast findById(@PathVariable UUID id) {
         return podcastBusiness.findOne(id);
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT)
+    @RequestMapping(value="{id}", method = RequestMethod.PUT)
     public Podcast update(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
         podcast.setId(id);
         return podcastBusiness.reatachAndSave(podcast);
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PATCH)
+    @RequestMapping(value="{id}", method = RequestMethod.PATCH)
     public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) throws PodcastNotFoundException {
         podcast.setId(id);
         Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
@@ -58,7 +58,7 @@ public class PodcastController {
         return patchedPodcast;
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value="{id}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete (@PathVariable UUID id) {
         podcastBusiness.delete(id);
@@ -71,12 +71,12 @@ public class PodcastController {
                 
     }
 
-    @RequestMapping(value="{id:[\\d]+}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
+    @RequestMapping(value="{id}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
         return podcastBusiness.getRss(id, limit);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/cover.{ext}", method = RequestMethod.GET, produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
+    @RequestMapping(value="{id}/cover.{ext}", method = RequestMethod.GET, produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
     public FileSystemResource cover(@PathVariable UUID id) {
         return new FileSystemResource(podcastBusiness.coverOf(id).toFile());
     }
@@ -87,12 +87,12 @@ public class PodcastController {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/stats/byPubdate", method = RequestMethod.POST)
+    @RequestMapping(value="{id}/stats/byPubdate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statByPubDate(id, numberOfMonth);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/stats/byDownloaddate", method = RequestMethod.POST)
+    @RequestMapping(value="{id}/stats/byDownloaddate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByDownloadDate(id, numberOfMonth);
     }

@@ -71,7 +71,7 @@ public class Item {
     private ZonedDateTime pubdate;
 
     @Field
-    @Column(length = 65535)
+    @Column(length = 2147483647)
     @JsonView(ItemPodcastListView.class)
     private String description;
 

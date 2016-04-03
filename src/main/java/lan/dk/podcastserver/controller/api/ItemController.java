@@ -44,37 +44,37 @@ public class ItemController {
         return itemBusiness.findByPodcast(idPodcast, pageRequestFacade.toPageRequest());
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
+    @RequestMapping(value="{id}", method = RequestMethod.GET)
     @JsonView(Item.ItemDetailsView.class)
     public Item findById(@PathVariable UUID id) {
         return itemBusiness.findOne(id);
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.PUT)
+    @RequestMapping(value="{id}", method = RequestMethod.PUT)
     @JsonView(Item.ItemDetailsView.class)
     public Item update(@RequestBody Item item, @PathVariable("id") UUID id) {
         item.setId(id);
         return itemBusiness.save(item);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/watchlists", method = RequestMethod.GET)
+    @RequestMapping(value="{id}/watchlists", method = RequestMethod.GET)
     @JsonView(Object.class)
     public Set<WatchList> getWatchListOfItem(@PathVariable("id") UUID id) {
         return watchListBusiness.findContainsItem(id);
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value="{id}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete (@PathVariable(value = "id") UUID id) {
         itemBusiness.delete(id);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/addtoqueue", method = RequestMethod.GET)
+    @RequestMapping(value="{id}/addtoqueue", method = RequestMethod.GET)
     public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
     }
 
-    @RequestMapping(value="{id:[\\d]+}/download{ext}", method = RequestMethod.GET)
+    @RequestMapping(value="{id}/download{ext}", method = RequestMethod.GET)
     public void getEpisodeFile(@PathVariable UUID id, HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.debug("Download du fichier d'item {}", id);
         Item item = itemBusiness.findOne(id);
@@ -89,7 +89,7 @@ public class ItemController {
         }
     }
 
-    @RequestMapping(value = "{id:[\\d]+}/reset", method = RequestMethod.GET)
+    @RequestMapping(value = "{id}/reset", method = RequestMethod.GET)
     @JsonView(Item.ItemDetailsView.class)
     public Item reset(@PathVariable UUID id) {
         return itemBusiness.reset(id);

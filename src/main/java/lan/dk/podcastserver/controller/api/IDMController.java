@@ -35,7 +35,7 @@ public class IDMController {
         return IDM.getDownloadingQueue().keySet();
     }
 
-    @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.GET)
+    @RequestMapping(value="/downloading/{id}", method = RequestMethod.GET)
     public Item getDownloadingList (@PathVariable UUID id) {
         return IDM.getItemInDownloadingQueue(id);
     }
@@ -62,7 +62,7 @@ public class IDMController {
         IDM.launchDownload();
     }
 
-    @RequestMapping(value="/downloading/{id:[\\d]+}", method = RequestMethod.POST)
+    @RequestMapping(value="/downloading/{id}", method = RequestMethod.POST)
     public void changeStatusDownload (@RequestBody String status, @PathVariable(value = "id") int id) {
         logger.debug("id : " + id + "; status : " + status);
     }
@@ -117,13 +117,13 @@ public class IDMController {
         IDM.addItemToQueue(id);
     }
 
-    @RequestMapping(value="/queue/{id:[\\d]+}", method = RequestMethod.DELETE)
+    @RequestMapping(value="/queue/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeItemFromQueue(@PathVariable UUID id) {
         IDM.removeItemFromQueue(id, false);
     }
 
-    @RequestMapping(value="/queue/{id:[\\d]+}/andstop", method = RequestMethod.DELETE)
+    @RequestMapping(value="/queue/{id}/andstop", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeItemFromQueueAndStopped(@PathVariable UUID id) {
         IDM.removeItemFromQueue(id, true);

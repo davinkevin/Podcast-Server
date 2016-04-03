@@ -32,7 +32,7 @@ public class ImageService {
         try {
             return getCoverFromURL(new URL(url));
         } catch (IOException e) {
-            log.error("Error during fetching Cover information for {}", url, e);
+            log.error("Error during fetching Cover information for {}", url);
             return null;
         }
     }

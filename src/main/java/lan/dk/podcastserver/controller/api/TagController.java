@@ -21,7 +21,7 @@ public class TagController {
         this.tagBusiness = tagBusiness;
     }
 
-    @RequestMapping(value="{id:[\\d]+}", method = RequestMethod.GET)
+    @RequestMapping(value="{id}", method = RequestMethod.GET)
     public Tag findById(@PathVariable UUID id) {
         return tagBusiness.findOne(id);
     }
