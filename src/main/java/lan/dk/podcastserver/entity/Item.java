@@ -63,7 +63,7 @@ public class Item {
     @JsonView(ItemSearchListView.class)
     private String title;
 
-    @Column(length = 65535, unique = true)
+    @Column(length = 65535)
     @JsonView(ItemSearchListView.class)
     private String url;
 
