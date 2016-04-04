@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -29,17 +30,17 @@ public class BeInSportsFinderTest {
 
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
-    @InjectMocks BeInSportsFinder canalPlusFinder;
+    @InjectMocks BeInSportsFinder beInSportsFinder;
 
     @Test
     public void should_find_podcast() throws IOException, URISyntaxException {
         /* Given */
         Cover cover = new Cover("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG", 200, 200);
         when(imageService.getCoverFromURL(eq("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG"))).thenReturn(cover);
-        when(htmlService.get(eq("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html"))).thenReturn(readFile("/remote/podcast/beinsports/lexpresso.html"));
+        when(htmlService.get(eq("http://www.beinsports.com/france/replay/lexpresso"))).thenReturn(readFile("/remote/podcast/beinsports/lexpresso.html"));
 
         /* When */
-        Podcast podcast = canalPlusFinder.find("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html");
+        Podcast podcast = beInSportsFinder.find("http://www.beinsports.com/france/replay/lexpresso");
 
         /* Then */
         PodcastAssert
@@ -50,6 +51,16 @@ public class BeInSportsFinderTest {
                 .hasCover(cover);
     }
 
+    @Test
+    public void should_be_compatible() {
+        assertThat(beInSportsFinder.compatibility("http://www.beinsports.com/france/replay/lexpresso")).isEqualTo(1);
+    }
+
+    @Test
+    public void should_not_be_compatible() {
+        assertThat(beInSportsFinder.compatibility("http://www.foo.com/bar/folder")).isGreaterThan(1);
+    }
+    
     public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
         return Optional.of(Jsoup.parse(Paths.get(YoutubeFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
     }
