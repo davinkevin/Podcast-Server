@@ -2,8 +2,10 @@ package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Maps;
 import lan.dk.podcastserver.entity.Item;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,11 +20,12 @@ import java.util.Optional;
 @Service
 public class MimeTypeService {
 
-    private final Tika tika;
     private final Map<String, String> mimeMap;
+    private final TikaProbeContentType tikaProbeContentType;
 
-    public MimeTypeService() {
-        tika = new Tika();
+    @Autowired
+    public MimeTypeService(TikaProbeContentType tikaProbeContentType) {
+        this.tikaProbeContentType = tikaProbeContentType;
         mimeMap = Maps.newHashMap();
         mimeMap.put("mp4", "video/mp4");
         mimeMap.put("mp3", "audio/mp3");
@@ -57,7 +60,7 @@ public class MimeTypeService {
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public String probeContentType(Path file) {
         return filesProbeContentType(file)
-                .orElseGet(() -> tikaProbeContentType(file)
+                .orElseGet(() -> tikaProbeContentType.probeContentType(file)
                 .orElseGet(() -> getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())))));
     }
 
@@ -69,11 +72,17 @@ public class MimeTypeService {
         return Optional.ofNullable(mimeType);
     }
 
-    private Optional<String> tikaProbeContentType(Path file) {
-        try {
-            return Optional.of(tika.detect(file.toFile()));
-        } catch (IOException ignored) {
-            return Optional.empty();
+    @RequiredArgsConstructor
+    public static class TikaProbeContentType {
+
+        private final Tika tika;
+
+        Optional<String> probeContentType(Path file) {
+            try {
+                return Optional.of(tika.detect(file.toFile()));
+            } catch (IOException ignored) {
+                return Optional.empty();
+            }
         }
     }
 }

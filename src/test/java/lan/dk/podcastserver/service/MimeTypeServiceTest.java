@@ -2,27 +2,31 @@ package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
+import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server
  */
+@RunWith(MockitoJUnitRunner.class)
 public class MimeTypeServiceTest {
 
-    MimeTypeService mimeTypeService;
-
-    @Before
-    public void beforeEach() {
-        mimeTypeService = new MimeTypeService();
-    }
+    @Mock TikaProbeContentType tikaProbeContentType;
+    @InjectMocks MimeTypeService mimeTypeService;
 
     @Test
     public void should_get_mimeType_if_no_extension() {
@@ -75,15 +79,27 @@ public class MimeTypeServiceTest {
     public void should_get_mimeType_with_probeContentType() throws URISyntaxException, IOException {
         /* Given */
         Path path = Paths.get(MimeTypeServiceTest.class.getResource("/remote/podcast/plain.text.txt").toURI());
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Optional.of("text/plain"));
 
         /* When */ String type = mimeTypeService.probeContentType(path);
         /* Then */ assertThat(type).isEqualTo("text/plain");
     }
-    
+
+    @Test
+    public void should_get_mimeType_with_tika() throws URISyntaxException, IOException {
+        /* Given */
+        Path file = Paths.get("/", "tmp", "foo");
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Optional.of("Foo/bar"));
+
+        /* When */ String type = mimeTypeService.probeContentType(file);
+        /* Then */ assertThat(type).isEqualTo("Foo/bar");
+    }
+
     @Test
     public void should_find_mimeType_from_inline_map() throws IOException {
         /* Given */
         Path file = Paths.get("/", "tmp", "foo");
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Optional.empty());
 
         /* When */
         String contentType = mimeTypeService.probeContentType(file);

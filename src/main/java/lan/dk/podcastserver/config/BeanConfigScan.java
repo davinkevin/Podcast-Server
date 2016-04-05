@@ -1,9 +1,12 @@
 package lan.dk.podcastserver.config;
 
+import org.apache.tika.Tika;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -17,4 +20,9 @@ public class BeanConfigScan {
         return new LocalValidatorFactoryBean();
     }
 
+
+    @Bean
+    public TikaProbeContentType tikaProbeContentType() {
+        return new TikaProbeContentType(new Tika());
+    }
 }
