@@ -284,7 +284,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>0.0.25</version>
+                <version>0.0.29</version>
 
                 <executions>
                     <execution>
@@ -294,8 +294,8 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <nodeVersion>v0.12.4</nodeVersion>
-                            <npmVersion>2.11.3</npmVersion>
+                            <nodeVersion>v5.10.0</nodeVersion>
+                            <npmVersion>3.8.5</npmVersion>
                         </configuration>
                     </execution>
                     <execution>
