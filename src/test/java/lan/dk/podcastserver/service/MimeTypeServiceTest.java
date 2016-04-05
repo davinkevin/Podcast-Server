@@ -81,9 +81,9 @@ public class MimeTypeServiceTest {
     }
     
     @Test
-    public void should_find_mimeType_from_inline_map() {
+    public void should_find_mimeType_from_inline_map() throws IOException {
         /* Given */
-        Path file = Paths.get("/", "root", "foo");
+        Path file = Paths.get("/", "tmp", "foo");
 
         /* When */
         String contentType = mimeTypeService.probeContentType(file);
