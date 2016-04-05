@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server
@@ -17,10 +18,11 @@ import java.util.Map;
 @Service
 public class MimeTypeService {
 
-    Tika tika = new Tika();
-    Map<String, String> MimeMap;
+    private final Tika tika;
+    private final Map<String, String> MimeMap;
 
     public MimeTypeService() {
+        tika = new Tika();
         MimeMap = Maps.newHashMap();
         MimeMap.put("mp4", "video/mp4");
         MimeMap.put("mp3", "audio/mp3");
@@ -53,15 +55,25 @@ public class MimeTypeService {
     }
 
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
-    public String probeContentType(Path file) throws IOException {
-        String mimetype = Files.probeContentType(file);
-        if (mimetype != null)
-            return mimetype;
+    public String probeContentType(Path file) {
+        return filesProbeContentType(file)
+                .orElseGet(() -> tikaProbeContentType(file)
+                .orElseGet(() -> getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())))));
+    }
 
-        mimetype = tika.detect(file.toFile());
-        if (mimetype != null)
-            return mimetype;
+    private Optional<String> filesProbeContentType(Path file) {
+        try {
+            return Optional.ofNullable(Files.probeContentType(file));
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
 
-        return getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
+    private Optional<String> tikaProbeContentType(Path file) {
+        try {
+            return Optional.of(tika.detect(file.toFile()));
+        } catch (IOException ignored) {
+            return Optional.empty();
+        }
     }
 }

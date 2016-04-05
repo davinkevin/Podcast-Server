@@ -111,10 +111,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             item
                 .setLength(Files.size(target.toPath()))
                 .setMimeType(mimeTypeService.probeContentType(target.toPath()));
-        } catch (IOException e) {
-            logger.error("IOException :", e);
-            item.setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(target.getAbsolutePath())));
-        }
+        } catch (IOException ignored) {}
 
         item.setFileName(FilenameUtils.getName(target.toPath().getFileName().toString()));
         item.setDownloadDate(ZonedDateTime.now());
