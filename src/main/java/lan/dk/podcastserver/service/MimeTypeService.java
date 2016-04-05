@@ -19,24 +19,24 @@ import java.util.Optional;
 public class MimeTypeService {
 
     private final Tika tika;
-    private final Map<String, String> MimeMap;
+    private final Map<String, String> mimeMap;
 
     public MimeTypeService() {
         tika = new Tika();
-        MimeMap = Maps.newHashMap();
-        MimeMap.put("mp4", "video/mp4");
-        MimeMap.put("mp3", "audio/mp3");
-        MimeMap.put("flv", "video/flv");
-        MimeMap.put("webm", "video/webm");
-        MimeMap.put("", "video/mp4");
+        mimeMap = Maps.newHashMap();
+        mimeMap.put("mp4", "video/mp4");
+        mimeMap.put("mp3", "audio/mp3");
+        mimeMap.put("flv", "video/flv");
+        mimeMap.put("webm", "video/webm");
+        mimeMap.put("", "video/mp4");
     }
 
     public String getMimeType(String extension) {
         if (extension.isEmpty())
             return "application/octet-stream";
 
-        if (MimeMap.containsKey(extension)) {
-            return MimeMap.get(extension);
+        if (mimeMap.containsKey(extension)) {
+            return mimeMap.get(extension);
         } else {
             return "unknown/" + extension;
         }
@@ -62,11 +62,11 @@ public class MimeTypeService {
     }
 
     private Optional<String> filesProbeContentType(Path file) {
-        try {
-            return Optional.ofNullable(Files.probeContentType(file));
-        } catch (IOException e) {
-            return Optional.empty();
-        }
+        String mimeType = null;
+
+        try { mimeType = Files.probeContentType(file); } catch (IOException ignored) {}
+
+        return Optional.ofNullable(mimeType);
     }
 
     private Optional<String> tikaProbeContentType(Path file) {
