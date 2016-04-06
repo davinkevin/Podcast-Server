@@ -154,7 +154,7 @@ public class ItemBusiness {
         uploadedFile.transferTo(fileToSave.toFile());
 
         item.setTitle(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
-                .setPubdate(fromFileName(originalFilename.split(" - ")[1]))
+                .setPubDate(fromFileName(originalFilename.split(" - ")[1]))
                 .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(originalFilename).build().toUriString())
                 .setLength(uploadedFile.getSize())
                 .setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(originalFilename)))

@@ -220,7 +220,7 @@ public class ItemBusinessTest {
         ItemAssert
                 .assertThat(item)
                 .hasTitle("aTitle")
-                .hasPubdate(ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(title.split(" - ")[1], DateTimeFormatter.ofPattern("yyyy-MM-dd")), LocalTime.of(0, 0)), ZoneId.systemDefault()))
+                .hasPubDate(ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(title.split(" - ")[1], DateTimeFormatter.ofPattern("yyyy-MM-dd")), LocalTime.of(0, 0)), ZoneId.systemDefault()))
                 .hasUrl("http://localhost:8080/podcast/aPodcast/" + title)
                 .hasLength(length)
                 .hasMimeType(aMimeType)

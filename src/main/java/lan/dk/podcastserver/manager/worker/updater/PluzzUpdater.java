@@ -123,7 +123,7 @@ public class PluzzUpdater extends AbstractUpdater {
         return Item.builder()
                     .title( StringUtils.join(responseObject.get("titre").toString(), seasonEpisode,responseObject.get("sous_titre").toString()) )
                     .description( String.valueOf(responseObject.get("synopsis")))
-                    .pubdate( fromPluzz(responseObject) )
+                    .pubDate( fromPluzz(responseObject) )
                     .cover( imageService.getCoverFromURL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image"))))
                     .url( getPluzzM38uUrl((JSONArray) responseObject.get("videos")))
                 .build();

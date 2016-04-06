@@ -24,7 +24,7 @@ public class SearchItemPageRequestWrapper extends PageRequestFacade {
     private Boolean downloaded;
 
     public SearchItemPageRequestWrapper() {
-        this.orders.add(new OrderFacade(Sort.Direction.DESC.toString(), "pubdate"));
+        this.orders.add(new OrderFacade(Sort.Direction.DESC.toString(), "pubDate"));
         this.downloaded = Boolean.TRUE;
     }
 

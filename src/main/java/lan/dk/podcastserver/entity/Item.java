@@ -68,14 +68,13 @@ public class Item {
     private String url;
 
     @JsonView(ItemPodcastListView.class)
-    private ZonedDateTime pubdate;
+    private ZonedDateTime pubDate;
 
     @Field
     @Column(length = 2147483647)
     @JsonView(ItemPodcastListView.class)
     private String description;
 
-    @Column(name = "mimetype")
     @JsonView(ItemSearchListView.class)
     private String mimeType;
 
@@ -144,7 +143,7 @@ public class Item {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(url)
-                .append((pubdate != null) ? pubdate.toInstant() : null)
+                .append((pubDate != null) ? pubDate.toInstant() : null)
                 .toHashCode();
     }
 
@@ -154,7 +153,7 @@ public class Item {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", url='" + url + '\'' +
-                ", pubdate=" + pubdate +
+                ", pubDate=" + pubDate +
                 ", description='" + description + '\'' +
                 ", mimeType='" + mimeType + '\'' +
                 ", length=" + length +

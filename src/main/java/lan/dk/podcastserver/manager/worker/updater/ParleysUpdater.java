@@ -94,7 +94,7 @@ public class ParleysUpdater extends AbstractUpdater {
         return Item.builder()
                 .title((String) responseObject.get(FIELD_TITLE))
                 .description((String) responseObject.get(FIELD_DESCRIPTION))
-                .pubdate(fromParleys((String) responseObject.get(FIELD_PUBLISHED_ON)))
+                .pubDate(fromParleys((String) responseObject.get(FIELD_PUBLISHED_ON)))
                 .cover(imageService.getCoverFromURL(((String) responseObject.get(FIELD_BASE_PATH)).concat((String) responseObject.get(FIELD_THUMBNAIL))))
                 .url(String.format(PARLEYS_ITEM_URL, id))
                 .build();

@@ -19,7 +19,7 @@ import static java.util.Objects.nonNull;
  */
 public class ItemDSL {
 
-    public static final QItem Q_ITEM = QItem.item;
+    private static final QItem Q_ITEM = QItem.item;
 
     private ItemDSL() {
         throw new AssertionError();
@@ -33,7 +33,7 @@ public class ItemDSL {
     }
 
     public static BooleanExpression isNewerThan(ZonedDateTime dateTime){
-        return Q_ITEM.pubdate.gt(dateTime);
+        return Q_ITEM.pubDate.gt(dateTime);
     }
 
     public static BooleanExpression hasBeenDownloadedBefore(ZonedDateTime dateTime) {

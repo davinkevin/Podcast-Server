@@ -65,7 +65,7 @@ public class StatsBusinessTest {
                 // FlatMap To object to avoid repartion 1 per date
                 .mapToObj(i -> new Item()
                         .setId(UUID.randomUUID())
-                        .setPubdate(ZonedDateTime.now().minusDays(i))
+                        .setPubDate(ZonedDateTime.now().minusDays(i))
                         .setDownloadDate(ZonedDateTime.now().minusDays(i)))
                 .collect(toList());
     }

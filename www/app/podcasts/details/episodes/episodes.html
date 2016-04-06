@@ -1,6 +1,6 @@
 <br/>
 <div ng-swipe-right="pic.swipePage(-1)" ng-swipe-left="pic.swipePage(1)">
-    <div class="media clearfix"  ng-repeat="item in pic.podcast.items | orderBy:'-pubdate' track by item.id">
+    <div class="media clearfix"  ng-repeat="item in pic.podcast.items | orderBy:'-pubDate' track by item.id">
         <div class="buttonList pull-right">
             <!-- Téléchargement en cours -->
             <span ng-show="item.status == 'STARTED' || item.status == 'PAUSED'" >
@@ -36,7 +36,7 @@
         <div class="media-body">
             <h4 class="media-heading">{{ ::item.title }}</h4>
             <p class="description hidden-xs hidden-sm branch-name">{{ ::item.description | htmlToPlaintext | characters : 130 }}</p>
-            <p><strong>{{ ::item.pubdate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>
+            <p><strong>{{ ::item.pubDate | date : 'dd/MM/yyyy à HH:mm' }}</strong></p>
         </div>
     </div>
 

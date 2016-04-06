@@ -81,7 +81,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         return Item.builder()
                 .title(snippet.get("title").toString())
                 .description(snippet.get("description").toString())
-                .pubdate(pubdateOf(snippet.get("publishedAt").toString()))
+                .pubDate(pubdateOf(snippet.get("publishedAt").toString()))
                 .url(String.format(URL_PAGE_BASE, resourceId.get("videoId")))
                 .cover(coverFromJson(((JSONObject) snippet.get("thumbnails"))))
                 .build();
@@ -147,7 +147,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         return new Item()
                 .setTitle(entry.getChildText("title", defaultNamespace))
                 .setDescription(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
-                .setPubdate(pubdateOf(entry.getChildText("published", defaultNamespace)))
+                .setPubDate(pubdateOf(entry.getChildText("published", defaultNamespace)))
                 .setUrl(urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")))
                 .setCover(coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)));
     }

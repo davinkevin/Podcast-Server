@@ -48,9 +48,9 @@ public class ItemDownloadManagerTest {
     @Mock DownloaderSelector downloaderSelector;
 
     @InjectMocks ItemDownloadManager itemDownloadManager;
-    public static final Item ITEM_1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 1).setPubdate(ZonedDateTime.now());
-    public static final Item ITEM_2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 2).setPubdate(ZonedDateTime.now()).setStatus(Status.STARTED);
-    public static final Item ITEM_3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 3).setPubdate(ZonedDateTime.now()).setStatus(Status.PAUSED);
+    public static final Item ITEM_1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 1).setPubDate(ZonedDateTime.now());
+    public static final Item ITEM_2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 2).setPubDate(ZonedDateTime.now()).setStatus(Status.STARTED);
+    public static final Item ITEM_3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 3).setPubDate(ZonedDateTime.now()).setStatus(Status.PAUSED);
 
     @Test
     public void should_get_limit_of_download () {
@@ -403,7 +403,7 @@ public class ItemDownloadManagerTest {
         /* Given */
         mockPodcastParametersForPostConstruct();
         final Downloader calledDownloader = mock(Downloader.class);
-        Item item = new Item().setId(UUID.randomUUID()).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        Item item = new Item().setId(UUID.randomUUID()).setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
         /* When */
         itemDownloadManager.postConstruct();
@@ -447,7 +447,7 @@ public class ItemDownloadManagerTest {
         Downloader downloaderMock = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloaderMock);
         final Downloader calledDownloader = mock(Downloader.class);
-        Item item = new Item().setId(UUID.randomUUID()).setUrl("1").setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        Item item = new Item().setId(UUID.randomUUID()).setUrl("1").setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
 
         /* When */ itemDownloadManager.resetDownload(item);
@@ -461,8 +461,8 @@ public class ItemDownloadManagerTest {
     public void should_remove_from_both_queue() {
         /* Given */
         final Downloader calledDownloader = mock(Downloader.class);
-        Item itemWaiting = new Item().setId(UUID.randomUUID()).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
-        Item itemDownloading = new Item().setId(UUID.randomUUID()).setPubdate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        Item itemWaiting = new Item().setId(UUID.randomUUID()).setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
+        Item itemDownloading = new Item().setId(UUID.randomUUID()).setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(itemDownloading, calledDownloader);
         itemDownloadManager.getWaitingQueue().add(itemWaiting);
         /* When */
@@ -481,7 +481,7 @@ public class ItemDownloadManagerTest {
     public void should_detect_if_is_in_downloading_queue() {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        final Item item = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/").setPubdate(ZonedDateTime.now());
+        final Item item = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/").setPubDate(ZonedDateTime.now());
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
                 
         /* When */
@@ -497,9 +497,9 @@ public class ItemDownloadManagerTest {
     public void should_get_downloading_item_list() {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
-        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
-        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubDate(ZonedDateTime.now());
+        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubDate(ZonedDateTime.now());
+        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubDate(ZonedDateTime.now());
         itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
@@ -514,9 +514,9 @@ public class ItemDownloadManagerTest {
     public void should_find_item_in_downloading_queue() {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
-        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
-        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubDate(ZonedDateTime.now());
+        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubDate(ZonedDateTime.now());
+        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubDate(ZonedDateTime.now());
         itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
@@ -532,9 +532,9 @@ public class ItemDownloadManagerTest {
     public void should_return_null_if_item_not_found_in_downloading_queue() {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubdate(ZonedDateTime.now());
-        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubdate(ZonedDateTime.now());
-        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubdate(ZonedDateTime.now());
+        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubDate(ZonedDateTime.now());
+        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubDate(ZonedDateTime.now());
+        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubDate(ZonedDateTime.now());
         itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
         itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);

@@ -89,7 +89,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         return Item.builder()
                 .title(article.select("h3").first().text())
                 .description(article.select("h3").first().text())
-                .pubdate(getPubDateFromDescription(document))
+                .pubDate(getPubDateFromDescription(document))
                 .url(getStreamUrl(javascriptCode).orElse(null))
                 .cover(getPoster(javascriptCode).orElse(null))
                 .build();

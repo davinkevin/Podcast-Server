@@ -110,7 +110,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         return Item.builder()
                 .title(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_TITRE))
-                .pubdate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
+                .pubDate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
                 .cover(imageService.getCoverFromURL(media.getChild(FIELD_IMAGES).getChildText(FIELD_GRAND)))
                 .description(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_SOUS_TITRE))
                 .url(findUrl(media))

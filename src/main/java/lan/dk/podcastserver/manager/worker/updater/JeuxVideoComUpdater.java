@@ -60,7 +60,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
                 .title(headerVideo.select("meta[itemprop=name]").attr("content"))
                 .description(page.select(".corps-video p").text())
                 .url(headerVideo.select("meta[itemprop=contentUrl]").attr("content"))
-                .pubdate(ZonedDateTime.of(LocalDateTime.parse(headerVideo.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")))
+                .pubDate(ZonedDateTime.of(LocalDateTime.parse(headerVideo.select(".date-comm time").attr("datetime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME), ZoneId.of("Europe/Paris")))
                 .cover(imageService.getCoverFromURL(headerVideo.select("meta[itemprop=thumbnailUrl]").attr("content")))
             .build();
     }

@@ -63,7 +63,7 @@ public class StatsBusiness {
     }
 
     public Set<NumberOfItemByDateWrapper> statByPubDate(UUID podcastId, Long numberOfMonth) {
-        return statOf(podcastId, Item::getPubdate, numberOfMonth);
+        return statOf(podcastId, Item::getPubDate, numberOfMonth);
     }
 
     public Set<NumberOfItemByDateWrapper> statsByDownloadDate(UUID id, Long numberOfMonth) {

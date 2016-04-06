@@ -56,7 +56,7 @@ public class DailymotionUpdater extends AbstractUpdater {
                         .url(String.format(ITEM_URL, i.get("id")))
                         .cover(imageService.getCoverFromURL(((String) i.get("thumbnail_720_url"))))
                         .title((String) i.get("title"))
-                        .pubdate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.valueOf(i.get("created_time").toString())), ZoneId.of("Europe/Paris")))
+                        .pubDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.valueOf(i.get("created_time").toString())), ZoneId.of("Europe/Paris")))
                         .description(((String) i.get("description")))
                         .build()
                 )

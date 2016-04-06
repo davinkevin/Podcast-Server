@@ -275,7 +275,7 @@ public class JdomServiceTest {
                         .setLocalUri("http://fake.url/1234/items/" + itemId.get(i) + "/item.mp4")
                         .setMimeType("video/mp4")
                         .setPodcast(podcast)
-                        .setPubdate(ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris")).minusDays(i))
+                        .setPubDate(ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris")).minusDays(i))
                         .setStatus(Status.FINISH))
                 .collect(toSet());
     }

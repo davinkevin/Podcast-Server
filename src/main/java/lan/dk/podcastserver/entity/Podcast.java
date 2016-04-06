@@ -48,7 +48,7 @@ public class Podcast implements Serializable {
     private ZonedDateTime lastUpdate;
 
     @OneToMany(mappedBy = "podcast", fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
-    @OrderBy("pubdate DESC")
+    @OrderBy("PUB_DATE DESC")
     @Fetch(FetchMode.SUBSELECT)
     private Set<Item> items = new HashSet<>();
 

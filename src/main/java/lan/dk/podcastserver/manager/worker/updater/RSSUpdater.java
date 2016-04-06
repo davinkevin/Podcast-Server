@@ -60,7 +60,7 @@ public class RSSUpdater extends AbstractUpdater {
         // Gestion des cas pour l'url :
         return Item.builder()
                 .title(item.getChildText("title"))
-                .pubdate(getPubDate(item))
+                .pubDate(getPubDate(item))
                 .description(item.getChildText("description"))
                 .mimeType(item.getChild("enclosure").getAttributeValue("type"))
                 .length(lengthOf(item))

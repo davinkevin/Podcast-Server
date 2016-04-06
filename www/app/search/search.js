@@ -49,7 +49,7 @@ import './search.css!';
         size : 12,
         term : undefined,
         tags : [],
-        orders : [{ direction : 'DESC', property : 'pubdate'}],
+        orders : [{ direction : 'DESC', property : 'pubDate'}],
         downloaded : "true"
     }
 })

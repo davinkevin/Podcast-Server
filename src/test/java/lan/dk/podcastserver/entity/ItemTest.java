@@ -43,7 +43,7 @@ public class ItemTest {
                 .setTitle("Fake Item")
                 .setUrl("http://fakeItem.com")
                 .setPodcast(PODCAST)
-                .setPubdate(NOW)
+                .setPubDate(NOW)
                 .setDescription("Fake item description")
                 .setMimeType("video/mp4")
                 .setLength(123456L)
@@ -67,7 +67,7 @@ public class ItemTest {
                 .hasTitle("Fake Item")
                 .hasUrl("http://fakeItem.com")
                 .hasPodcast(PODCAST)
-                .hasPubdate(NOW)
+                .hasPubDate(NOW)
                 .hasDescription("Fake item description")
                 .hasMimeType("video/mp4")
                 .hasLength(123456L)
@@ -212,14 +212,14 @@ public class ItemTest {
                 .isEqualTo(withSameName)
                 .isEqualTo(withSameLocalUri);
 
-        assertThat(ITEM.hashCode()).isEqualTo(new Item().setUrl(ITEM.getUrl()).setPubdate(NOW).hashCode());
+        assertThat(ITEM.hashCode()).isEqualTo(new Item().setUrl(ITEM.getUrl()).setPubDate(NOW).hashCode());
 
     }
 
     @Test
     public void should_toString() {
         assertThat(ITEM.toString())
-                    .isEqualTo("Item{id="+ ID +", title='Fake Item', url='http://fakeItem.com', pubdate="+ NOW +", description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id="+PODCAST_ID+", title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}");
+                    .isEqualTo("Item{id="+ ID +", title='Fake Item', url='http://fakeItem.com', pubDate="+ NOW +", description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id="+PODCAST_ID+", title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}");
 
     }
 
