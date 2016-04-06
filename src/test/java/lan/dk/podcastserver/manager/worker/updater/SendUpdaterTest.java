@@ -56,4 +56,9 @@ public class SendUpdaterTest {
         assertThat(type.key()).isEqualTo("send");
         assertThat(type.name()).isEqualTo("Send");
     }
+
+    @Test
+    public void should_not_be_compatible() {
+        assertThat(sendUpdater.compatibility("http://foo/bar")).isEqualTo(Integer.MAX_VALUE);
+    }
 }
