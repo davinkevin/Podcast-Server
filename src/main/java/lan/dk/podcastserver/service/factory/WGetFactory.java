@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by kevin on 15/09/15 for Podcast Server
@@ -43,7 +42,7 @@ public class WGetFactory {
         return new DownloadInfo(new URL(url));
     }
 
-    public static class DownloadInfoBuilder {
+    /*public static class DownloadInfoBuilder {
 
         final URL url;
 
@@ -61,5 +60,5 @@ public class WGetFactory {
             return downloadInfo;
         }
 
-    }
+    }*/
 }
