@@ -4,17 +4,19 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
+import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,12 +26,14 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/podcast")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PodcastController {
 
-    @Resource PodcastBusiness podcastBusiness;
-    @Resource FindPodcastBusiness findPodcastBusiness;
-    @Resource StatsBusiness statsBusiness;
-    @Resource PodcastServerParameters podcastServerParameters;
+    final PodcastBusiness podcastBusiness;
+    final FindPodcastBusiness findPodcastBusiness;
+    final StatsBusiness statsBusiness;
+    final PodcastServerParameters podcastServerParameters;
+    final UpdatePodcastBusiness updatePodcastBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {
@@ -68,7 +72,7 @@ public class PodcastController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Podcast> findAll() {
         return podcastBusiness.findAll();
-                
+
     }
 
     @RequestMapping(value="{id}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
@@ -95,5 +99,17 @@ public class PodcastController {
     @RequestMapping(value="{id}/stats/byDownloaddate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByDownloadDate(id, numberOfMonth);
+    }
+
+    @RequestMapping(value = "{id}/update", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    private void updatePodcast (@PathVariable UUID id) {
+        updatePodcastBusiness.updatePodcast(id);
+    }
+
+    @RequestMapping(value = "{id}/update/force", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    private void updatePodcastForced (@PathVariable UUID id) {
+        updatePodcastBusiness.forceUpdatePodcast(id);
     }
 }

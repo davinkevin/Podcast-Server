@@ -3,10 +3,12 @@ package lan.dk.podcastserver.controller.task;
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.UUID;
 
 
 @RestController
@@ -20,18 +22,6 @@ public class UpdatePodcastController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     private void updatePodcast () {
         updatePodcastBusiness.updatePodcast();
-    }
-
-    @RequestMapping(value = "/updatePodcast", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void updatePodcast (@RequestBody UUID id) {
-        updatePodcastBusiness.updatePodcast(id);
-    }
-
-    @RequestMapping(value = "/updatePodcast/force", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void updatePodcastForced (@RequestBody UUID id) {
-        updatePodcastBusiness.forceUpdatePodcast(id);
     }
 
     @RequestMapping(value = "/updateAndDownloadPodcast", method = RequestMethod.GET)

@@ -5,6 +5,7 @@ import EditionModule from './edition/edition';
 import UploadModule from './upload/upload';
 import AppRouteConfig from '../../config/route';
 import UpdateService from '../../common/service/data/updateService';
+import PodcastService from '../../common/service/data/podcastService';
 import template from './details.html!text';
 
 
@@ -16,7 +17,8 @@ import template from './details.html!text';
         EpisodesModule,
         EditionModule,
         UploadModule,
-        UpdateService
+        UpdateService,
+        PodcastService
     ]
 })
 @RouteConfig({
@@ -32,10 +34,10 @@ import template from './details.html!text';
 })
 export default class PodcastDetailCtrl {
 
-    constructor($scope, podcast, UpdateService, $timeout){
+    constructor($scope, podcast, podcastService, $timeout){
         "ngInject";
         this.$scope = $scope;
-        this.UpdateService = UpdateService;
+        this.podcastService = podcastService;
         this.podcast = podcast;
         this.$timeout = $timeout;
 
@@ -58,8 +60,8 @@ export default class PodcastDetailCtrl {
     }
 
     refresh() {
-        this.UpdateService
-            .forceUpdatePodcast(this.podcast.id)
+        this.podcastService
+            .forceRefresh(this.podcast.id)
             .then(() => this.refreshItems());
     }
 

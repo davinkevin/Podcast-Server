@@ -49,4 +49,12 @@ export default class PodcastService  {
     statsByByDownloaddate(id, numberOfMonth = 6) {
         return this.$http.post(`/api/podcast/${id}/stats/byDownloaddate`, numberOfMonth).then(r => r.data);
     }
+
+    refresh(id) {
+        return this.$http.get(`/api/podcast/${id}/update`);
+    }
+
+    forceRefresh(id) {
+        return this.$http.get(`/api/podcast/${id}/update/force`);
+    }
 }
