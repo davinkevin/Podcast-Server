@@ -50,6 +50,7 @@ public class Item {
     @DocumentId
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(columnDefinition = "UUID")
     private UUID id;
 
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)

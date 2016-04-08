@@ -26,6 +26,7 @@ public class Tag {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(columnDefinition = "UUID")
     private UUID id;
 
     @Column(unique = true)
