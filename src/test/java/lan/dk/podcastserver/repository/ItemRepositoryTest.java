@@ -99,7 +99,7 @@ public class ItemRepositoryTest {
 
         ItemAssert
                 .assertThat(itemByPodcast.getContent().get(0))
-                .hasTitle("Appload 2");
+                .hasTitle("Appload 1");
     }
 
     @Test
