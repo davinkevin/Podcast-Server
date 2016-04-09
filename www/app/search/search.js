@@ -78,7 +78,7 @@ export default class ItemSearchCtrl {
         this.DownloadManager
             .ws
             .subscribe("/topic/download", (message) => this.updateItemFromWS(message), $scope)
-            .subscribe('/topic/updating', (message) => this.updatePageWhenUpdateDone(message), {}, $scope);
+            .subscribe('/topic/updating', (message) => this.updatePageWhenUpdateDone(message), $scope);
 
         $scope.$on('$routeUpdate', () => {
             if (this.currentPage !== this.$location.search().page) {
@@ -146,6 +146,7 @@ export default class ItemSearchCtrl {
 
     updatePageWhenUpdateDone(message) {
         if(JSON.parse(message.body) === false) {
+            console.log("Update page");
             this.changePage();
         }
     }
