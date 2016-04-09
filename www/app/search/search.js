@@ -146,7 +146,6 @@ export default class ItemSearchCtrl {
 
     updatePageWhenUpdateDone(message) {
         if(JSON.parse(message.body) === false) {
-            console.log("Update page");
             this.changePage();
         }
     }
