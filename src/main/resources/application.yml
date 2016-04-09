@@ -46,6 +46,10 @@ podcastserver:
     update-and-download:
         refresh:
             cron: 0 0 0 * * ?
+    backup :
+        location: /tmp/
+        cron: 0 30 4 * * ?
+        binary: false
     externaltools:
         #rtmpdump: /usr/local/bin/rtmpdump
         #ffmpeg: /usr/local/bin/ffmpeg
