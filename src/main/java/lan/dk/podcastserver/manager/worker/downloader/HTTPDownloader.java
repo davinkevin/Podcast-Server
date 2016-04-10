@@ -36,7 +36,7 @@ public class HTTPDownloader extends AbstractDownloader {
 
         try {
             // initialize url information object
-            info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl()));
+            info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl(item)));
             // extract infromation from the web
             Runnable itemSynchronisation = new HTTPWatcher(this);
 
@@ -74,7 +74,7 @@ public class HTTPDownloader extends AbstractDownloader {
 
         final HTTPDownloader httpDownloader;
 
-        public HTTPWatcher(HTTPDownloader httpDownloader) {
+        HTTPWatcher(HTTPDownloader httpDownloader) {
             this.httpDownloader = httpDownloader;
         }
 
@@ -88,18 +88,18 @@ public class HTTPDownloader extends AbstractDownloader {
             switch (info.getState()) {
                 case EXTRACTING:
                 case EXTRACTING_DONE:
-                    log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl())) + " " + info.getState());
+                    log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl(item))) + " " + info.getState());
                     break;
                 case ERROR:
                     httpDownloader.stopDownload();
                     break;
                 case DONE:
-                    log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl())) + " - Téléchargement terminé");
+                    log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl(item))) + " - Téléchargement terminé");
                     httpDownloader.finishDownload();
                     itemDownloadManager.removeACurrentDownload(item);
                     break;
                 case RETRYING:
-                    log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl())) + " " + info.getState() + " " + info.getDelay());
+                    log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl(item))) + " " + info.getState() + " " + info.getDelay());
                     break;
                 case DOWNLOADING:
                     if (isNull(info.getLength()) || (nonNull(info.getLength()) && info.getLength() == 0L)) break;

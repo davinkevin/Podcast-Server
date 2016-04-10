@@ -32,7 +32,7 @@ public class HTTPWatcherTest {
         downloader.itemDownloadManager = itemDownloadManager;
         downloader.info = info;
 
-        when(downloader.getItemUrl()).thenReturn(downloader.item.getUrl());
+        when(downloader.getItemUrl(downloader.item)).thenReturn(downloader.item.getUrl());
 
         httpWatcher = new HTTPWatcher(downloader);
     }

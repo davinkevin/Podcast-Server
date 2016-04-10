@@ -78,6 +78,7 @@ public class ParleysDownloaderTest {
                     .url("http://www.parleys.com/play/5534a6b4e4b056a82338229d")
                 .build();
 
+
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
@@ -89,6 +90,7 @@ public class ParleysDownloaderTest {
 
         parleysDownloader.postConstruct();
         parleysDownloader.setItem(item);
+        parleysDownloader.setItemDownloadManager(itemDownloadManager);
 
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER, podcast.getTitle()).toFile());
     }

@@ -12,7 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
@@ -34,7 +33,6 @@ public class M3U8WatcherTest {
 
     @Mock UrlService urlService;
     @Mock M3U8Downloader downloader;
-    @Mock URLConnection urlConnection;
 
     @Before
     public void beforeEach() throws IOException {
@@ -51,8 +49,7 @@ public class M3U8WatcherTest {
         M3U8Watcher m3U8Watcher = new M3U8Watcher(downloader);
         InputStream is = mock(InputStream.class);
 
-        when(urlService.getConnection(startsWith("www.url.in"))).thenReturn(urlConnection);
-        when(urlConnection.getInputStream()).thenReturn(is);
+        when(urlService.asStream(startsWith("www.url.in"))).thenReturn(is);
         when(is.read(any())).thenReturn(-1);
 
         /* When */
@@ -66,7 +63,7 @@ public class M3U8WatcherTest {
     public void should_handle_error_on_input() throws IOException {
         /* Given */
         M3U8Watcher m3U8Watcher = new M3U8Watcher(downloader);
-        doThrow(IOException.class).when(urlService).getConnection(startsWith("www.url.in"));
+        doThrow(IOException.class).when(urlService).asStream(startsWith("www.url.in"));
 
         /* When */
         m3U8Watcher.run();
@@ -81,8 +78,7 @@ public class M3U8WatcherTest {
         M3U8Watcher m3U8Watcher = new M3U8Watcher(downloader);
         InputStream is = mock(InputStream.class);
 
-        when(urlService.getConnection(startsWith("www.url.in"))).thenReturn(urlConnection);
-        when(urlConnection.getInputStream()).thenReturn(is);
+        when(urlService.asStream(startsWith("www.url.in"))).thenReturn(is);
         when(is.read(any())).thenReturn(-1);
         downloader.item.setStatus(Status.STOPPED);
         downloader.stopDownloading.set(true);
@@ -100,8 +96,7 @@ public class M3U8WatcherTest {
         M3U8Watcher m3U8Watcher = new M3U8Watcher(downloader);
         InputStream is = mock(InputStream.class);
 
-        when(urlService.getConnection(startsWith("www.url.in"))).thenReturn(urlConnection);
-        when(urlConnection.getInputStream()).thenReturn(is);
+        when(urlService.asStream(startsWith("www.url.in"))).thenReturn(is);
         when(is.read(any())).thenReturn(-1);
         downloader.stopDownloading.set(true);
         downloader.item.setStatus(Status.PAUSED);

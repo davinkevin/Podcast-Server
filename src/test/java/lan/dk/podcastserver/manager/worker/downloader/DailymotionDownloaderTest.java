@@ -42,8 +42,8 @@ public class DailymotionDownloaderTest {
 
     @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
-    @Mock ItemDownloadManager itemDownloadManager;
     @Mock PodcastServerParameters podcastServerParameters;
+    @Mock ItemDownloadManager itemDownloadManager;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
     @Mock UrlService urlService;
@@ -67,7 +67,8 @@ public class DailymotionDownloaderTest {
                 .build()
                 .add(item);
 
-        dailymotionDownloader.item = item;
+        dailymotionDownloader.setItem(item);
+        dailymotionDownloader.setItemDownloadManager(itemDownloadManager);
         when(jsonService.from(anyString())).then(i -> Optional.of(new JSONParser().parse((String) i.getArguments()[0])));
     }
 
@@ -77,8 +78,8 @@ public class DailymotionDownloaderTest {
         when(urlService.getPageFromURL(eq(item.getUrl()))).thenReturn(Optional.of(getPageAsString()));
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl();
-        String anotherItemUrl = dailymotionDownloader.getItemUrl();
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
+        String anotherItemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-1280x720/video/x3cl49c.mp4?auth=1456335408-2562-lag9r5i4-9c4793582fdae442e91e60ba6a5c05b1");
@@ -92,7 +93,7 @@ public class DailymotionDownloaderTest {
                 .thenReturn(Optional.of(getPageAsString().replace("720", "721")));
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl();
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-848x480/video/x3cl49c.mp4?auth=1456335408-2562-rnn6dm9f-f6ed38b9ff15e210f8a98b2ed86d08d4");
@@ -105,7 +106,7 @@ public class DailymotionDownloaderTest {
                 .thenReturn(Optional.of(getPageAsString().replace("720", "721").replace("480", "481")));
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl();
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-512x384/video/x3cl49c.mp4?auth=1456335408-2562-w5klv6d7-80315d34ee0cd211d2a2dd7257da8090");
@@ -121,7 +122,7 @@ public class DailymotionDownloaderTest {
                         .replace("380", "381")));
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl();
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-320x240/video/x3cl49c.mp4?auth=1456335408-2562-uzisfuko-32bfda979a0b15ba7f35c7454bf8a04a");
@@ -139,7 +140,7 @@ public class DailymotionDownloaderTest {
                 ));
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl();
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/manifest/video/x3cl49c.m3u8?auth=1456335408-2562-6j7oefiw-f726b6030784120d73ff8561049d8000");

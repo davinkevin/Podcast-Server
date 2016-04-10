@@ -76,6 +76,7 @@ public class HTTPDownloaderTest {
                 .build()
                 .add(item);
 
+        httpDownloader.setItemDownloadManager(itemDownloadManager);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         httpDownloader.postConstruct();
 

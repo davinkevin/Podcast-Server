@@ -35,7 +35,7 @@ public class RTMPDownloader extends AbstractDownloader {
             logger.debug("Fichier de sortie : " + target.getAbsolutePath());
 
             p  = processBuilderFactory
-                    .newProcessBuilder(podcastServerParameters.rtmpDump(), "-r", getItemUrl(), "-o", target.getAbsolutePath())
+                    .newProcessBuilder(podcastServerParameters.rtmpDump(), "-r", getItemUrl(item), "-o", target.getAbsolutePath())
                     .directory(new File("/tmp"))
                     .redirectErrorStream(true)
                     .start();

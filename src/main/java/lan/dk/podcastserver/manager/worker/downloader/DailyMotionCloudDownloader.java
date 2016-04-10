@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import lan.dk.podcastserver.entity.Item;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class DailyMotionCloudDownloader extends M3U8Downloader {
     String redirectionUrl = null;
 
     @Override
-    public String getItemUrl() {
+    public String getItemUrl(Item item) {
         if (nonNull(redirectionUrl))
             return redirectionUrl;
 

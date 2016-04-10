@@ -128,6 +128,7 @@ public class ItemDownloadManagerTest {
         Downloader downloader = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloader);
         when(downloader.setItem(any())).thenReturn(downloader);
+        when(downloader.setItemDownloadManager(any())).thenReturn(downloader);
         mockPodcastParametersForPostConstruct();
         /* When */
         itemDownloadManager.postConstruct();

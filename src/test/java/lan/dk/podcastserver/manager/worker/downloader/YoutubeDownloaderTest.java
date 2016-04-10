@@ -77,7 +77,9 @@ public class YoutubeDownloaderTest {
                 .add(item);
 
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
+
         youtubeDownloader.postConstruct();
+        youtubeDownloader.setItemDownloadManager(itemDownloadManager);
 
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER, podcast.getTitle()).toFile());
     }

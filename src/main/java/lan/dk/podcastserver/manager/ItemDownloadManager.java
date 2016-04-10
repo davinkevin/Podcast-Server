@@ -223,7 +223,7 @@ public class ItemDownloadManager {
             Downloader worker = downloaderSelector.of(item.getUrl());
 
             if (worker != null) {
-                this.getDownloadingQueue().put(item, worker.setItem(item));
+                this.getDownloadingQueue().put(item, worker.setItem(item).setItemDownloadManager(this));
                 new Thread(worker).start();
             }
         }

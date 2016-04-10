@@ -4,7 +4,7 @@
 spring :
     h2.console.enabled : true
     datasource:
-        url: jdbc:h2:tcp://localhost:9999/~/Library/H2Database/minidb
+        url: jdbc:h2:db
         username: sa
         driver-class-name: org.h2.Driver
     jpa:
@@ -22,6 +22,11 @@ spring :
             jadira:
               usertype:
                 autoRegisterUserTypes: true
+
+server:
+  compression:
+    enabled : true
+    mime-types : application/json,application/xml,text/html,text/xml,text/plain
 
 ##############################
 #    Application Specific    #
@@ -43,7 +48,11 @@ podcastserver:
             cron: 0 0 0 * * ?
     externaltools:
         #rtmpdump: /usr/local/bin/rtmpdump
-        #ffmpeg: /usr/bin/ffmpeg
+        #ffmpeg: /usr/local/bin/ffmpeg
+    backup :
+      location: /tmp/
+      cron: 0 0 0 * * ?
+      binary: false
     api :
       youtube :
       #youtube :

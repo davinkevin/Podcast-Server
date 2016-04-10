@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.ItemDownloadManager;
 
 /**
  * Created by kevin on 10/03/2016 for Podcast Server
@@ -18,12 +19,17 @@ public class NoOpDownloader implements Downloader {
     }
 
     @Override
+    public Downloader setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
+        return this;
+    }
+
+    @Override
     public Item getItem() {
         return null;
     }
 
     @Override
-    public String getItemUrl() {
+    public String getItemUrl(Item item) {
         return null;
     }
 

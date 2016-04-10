@@ -45,11 +45,12 @@ public class DownloaderTest {
 
     @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
-    @Mock ItemDownloadManager itemDownloadManager;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
+    @Mock ItemDownloadManager itemDownloadManager;
     @InjectMocks SimpleDownloader simpleDownloader;
+
 
     Podcast podcast;
     Item item;
@@ -67,6 +68,7 @@ public class DownloaderTest {
                 .build()
                 .add(item);
 
+        simpleDownloader.setItemDownloadManager(itemDownloadManager);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         simpleDownloader.postConstruct();
 

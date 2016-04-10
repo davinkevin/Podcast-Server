@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.JsonService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,7 +23,7 @@ public class DailymotionDownloader extends HTTPDownloader {
 
     @Autowired JsonService jsonService;
 
-    public String getItemUrl() {
+    public String getItemUrl(Item item) {
 
         if (nonNull(url)) {
             return url;

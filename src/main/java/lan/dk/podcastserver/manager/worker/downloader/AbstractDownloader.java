@@ -7,6 +7,9 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,30 +32,26 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
-    public static final String WS_TOPIC_PODCAST = "/topic/podcast/%s";
+    static final String WS_TOPIC_DOWNLOAD = "/topic/download";
+    static final String WS_TOPIC_PODCAST = "/topic/podcast/%s";
 
+    @Getter @Setter @Accessors(chain = true)
     protected Item item;
-    protected String temporaryExtension;
-    protected File target = null;
-    protected PathMatcher hasTempExtensionMatcher;
 
-    @Resource protected PodcastRepository podcastRepository;
+    String temporaryExtension;
+    protected File target = null;
+    private PathMatcher hasTempExtensionMatcher;
+
     @Resource protected ItemRepository itemRepository;
-    @Resource protected ItemDownloadManager itemDownloadManager;
+    @Resource protected PodcastRepository podcastRepository;
     @Resource protected PodcastServerParameters podcastServerParameters;
     @Resource protected SimpMessagingTemplate template;
     @Resource protected MimeTypeService mimeTypeService;
 
-    AtomicBoolean stopDownloading = new AtomicBoolean(false);
+    @Setter @Accessors(chain = true)
+    protected ItemDownloadManager itemDownloadManager;
 
-    public Item getItem() {
-        return item;
-    }
-    public Downloader setItem(Item item) {
-        this.item = item;
-        return this;
-    }
+    AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
     @Override
     public void run() {
@@ -150,7 +149,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     private Path getDestinationFile(Item item) {
-        String fileName = FilenameUtils.getName(StringUtils.substringBefore(getItemUrl(), "?"));
+        String fileName = FilenameUtils.getName(StringUtils.substringBefore(getItemUrl(item), "?"));
         return  Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), fileName);
     }
 
@@ -170,7 +169,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         template.convertAndSend(String.format(WS_TOPIC_PODCAST, item.getPodcast().getId()), item);
     }
 
-    public String getItemUrl() {
+    public String getItemUrl(Item item) {
         return item.getUrl();
     }
 

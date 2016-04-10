@@ -70,6 +70,10 @@ public class UrlService {
         return getConnectionWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
     }
 
+    public InputStream asStream(String stringUrl) throws IOException {
+        return getConnection(stringUrl).getInputStream();
+    }
+
     public String getFileNameM3U8Url(String url) {
         if (StringUtils.contains(url, "canal-plus") || StringUtils.contains(url, "cplus"))
             return getFileNameFromCanalPlusM3U8Url(url);

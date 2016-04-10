@@ -5,7 +5,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -14,6 +13,7 @@ import java.io.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 @Scope("prototype")
@@ -38,20 +38,13 @@ public class M3U8Downloader extends AbstractDownloader {
 
         itemDownloadManager.addACurrentDownload();
 
-        if (!getItemUrl().contains("m3u8")) {
-            logger.debug("Traiter avec le downloader adapté à {}", getItemUrl());
-            stopDownload();
-            return item;
-        }
-
-        try(BufferedReader in = urlService.urlAsReader(getItemUrl())) {
+        try(BufferedReader in = urlService.urlAsReader(getItemUrl(item))) {
             urlList = in
                     .lines()
                     .filter(l -> !l.startsWith("#"))
-                    .map(l -> urlService.urlWithDomain(getItemUrl(), l))
+                    .map(l -> urlService.urlWithDomain(getItemUrl(item), l))
                     .collect(toList());
 
-            // Tous les éléments sont disponibles dans urlList :
             target = getTagetFile(item);
 
             watcher.run();
@@ -60,49 +53,20 @@ public class M3U8Downloader extends AbstractDownloader {
             stopDownload();
         }
 
-        return this.item;
+        return item;
     }
 
     @Override
     public File getTagetFile (Item item) {
 
-        if (target != null)
-            return target;
+        if (nonNull(target)) return target;
 
-        String fileNameFromM3U8Playlist = urlService.getFileNameM3U8Url(item.getUrl());
+        Item m3u8Item = Item.builder()
+                    .podcast(item.getPodcast())
+                    .url(urlService.getFileNameM3U8Url(getItemUrl(item)))
+                .build();
 
-        File finalFile = new File(itemDownloadManager.getRootfolder() + File.separator + item.getPodcast().getTitle() + File.separator + fileNameFromM3U8Playlist);
-        logger.debug("Création du fichier : {}", finalFile.getAbsolutePath());
-        //logger.debug(file.getAbsolutePath());
-
-        if (!finalFile.getParentFile().exists()) {
-            finalFile.getParentFile().mkdirs();
-        }
-
-        if (finalFile.exists() || new File(finalFile.getAbsolutePath().concat(temporaryExtension)).exists()) {
-            logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
-            try {
-                finalFile  = File.createTempFile(
-                        FilenameUtils.getBaseName(fileNameFromM3U8Playlist).concat("-"),
-                        ".".concat(FilenameUtils.getExtension(fileNameFromM3U8Playlist)),
-                        finalFile.getParentFile());
-                finalFile.delete();
-            } catch (IOException e) {
-                logger.error("Erreur lors du renommage d'un doublon", e);
-            }
-        }
-
-        return new File(finalFile.getAbsolutePath() + temporaryExtension) ;
-
-    }
-
-    @Override
-    public void startDownload() {
-        this.item.setStatus(Status.STARTED);
-        stopDownloading.set(false);
-        this.saveSyncWithPodcast();
-        convertAndSaveBroadcast();
-        download();
+        return super.getTagetFile(m3u8Item);
     }
 
     @Override
@@ -120,7 +84,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
         private AtomicBoolean hasBeenStarted = new AtomicBoolean(false);
 
-        public M3U8Watcher(M3U8Downloader downloader) {
+        M3U8Watcher(M3U8Downloader downloader) {
             this.downloader = downloader;
         }
 
@@ -137,7 +101,7 @@ public class M3U8Downloader extends AbstractDownloader {
                     String urlFragmentToDownload = urlList.get(cpt);
 
                     log.debug("URL : {}", urlFragmentToDownload);
-                    try(InputStream is = urlService.getConnection(urlFragmentToDownload).getInputStream()) {
+                    try(InputStream is = urlService.asStream(urlFragmentToDownload)) {
                         ByteStreams.copy(is, outputStream);
                         broadcastProgression(cpt);
                     }
@@ -169,7 +133,7 @@ public class M3U8Downloader extends AbstractDownloader {
             downloader.convertAndSaveBroadcast();
         }
 
-        public AtomicBoolean hasBeenStarted() {
+        AtomicBoolean hasBeenStarted() {
             return hasBeenStarted;
         }
 

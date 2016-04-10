@@ -70,6 +70,8 @@ public class RTMPDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
 
         rtmpDownloader.setItem(item);
+        rtmpDownloader.setItemDownloadManager(itemDownloadManager);
+
         rtmpDownloader.postConstruct();
         FileSystemUtils.deleteRecursively(Paths.get("/tmp", podcast.getTitle()).toFile());
     }

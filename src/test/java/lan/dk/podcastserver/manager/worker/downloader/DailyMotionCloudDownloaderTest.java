@@ -7,6 +7,7 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -34,12 +35,18 @@ public class DailyMotionCloudDownloaderTest {
 
     @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
-    @Mock ItemDownloadManager itemDownloadManager;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
     @Mock UrlService urlService;
+    @Mock ItemDownloadManager itemDownloadManager;
     @InjectMocks DailyMotionCloudDownloader dailyMotionCloudDownloader;
+
+
+    @Before
+    public void beforeEach() {
+        dailyMotionCloudDownloader.setItemDownloadManager(this.itemDownloadManager);
+    }
 
     @Test
     public void should_get_real_url_for_an_item() throws IOException, URISyntaxException {
@@ -52,7 +59,7 @@ public class DailyMotionCloudDownloaderTest {
         dailyMotionCloudDownloader.item = item;
 
         /* When */
-        String resolvedUrl = dailyMotionCloudDownloader.getItemUrl();
+        String resolvedUrl = dailyMotionCloudDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(resolvedUrl).isEqualTo(realUrl);
@@ -67,7 +74,7 @@ public class DailyMotionCloudDownloaderTest {
         dailyMotionCloudDownloader.item = item;
 
         /* When */
-        String resolvedUrl = dailyMotionCloudDownloader.getItemUrl();
+        String resolvedUrl = dailyMotionCloudDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(resolvedUrl).isEqualTo("");
@@ -79,7 +86,7 @@ public class DailyMotionCloudDownloaderTest {
         dailyMotionCloudDownloader.redirectionUrl = "alreadyExistingUrl";
 
         /* When */
-        String itemUrl = dailyMotionCloudDownloader.getItemUrl();
+        String itemUrl = dailyMotionCloudDownloader.getItemUrl(null);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("alreadyExistingUrl");
