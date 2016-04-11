@@ -2,11 +2,13 @@ package lan.dk.podcastserver.service;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import static java.time.ZonedDateTime.now;
+import static lan.dk.podcastserver.service.PodcastServerParameters.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -17,9 +19,11 @@ public class PodcastServerParametersTest {
     @Test
     public void should_have_default_value() throws URISyntaxException {
         String ROOT_FOLDER = "/tmp/";
+        Backup backup = new Backup().setBinary(true).setCron("0 0 0 * * *").setLocation(Paths.get("/tmp").toFile());
 
         PodcastServerParameters parameters = new PodcastServerParameters();
-        parameters.setApi(new PodcastServerParameters.Api().setDailymotion("DAILYMOTION_API_KEY").setYoutube("YOUTUBE_API_KEY"));
+        parameters.setApi(new Api().setDailymotion("DAILYMOTION_API_KEY").setYoutube("YOUTUBE_API_KEY"));
+        parameters.setBackup(backup);
 
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
@@ -59,6 +63,8 @@ public class PodcastServerParametersTest {
         assertThat(parameters.getApi()).isNotNull();
         assertThat(parameters.api().dailymotion()).isEqualTo("DAILYMOTION_API_KEY");
         assertThat(parameters.api().youtube()).isEqualTo("YOUTUBE_API_KEY");
+        assertThat(parameters.backup()).isInstanceOf(Backup.class).isEqualTo(backup);
+        assertThat(parameters.getBackup()).isInstanceOf(Backup.class).isEqualTo(backup);
     }
     
     @Test
@@ -103,7 +109,7 @@ public class PodcastServerParametersTest {
     public void should_have_api() {
         /* Given */
         /* When */
-        PodcastServerParameters.Api api = new PodcastServerParameters.Api()
+        Api api = new Api()
                 .setYoutube("Foo")
                 .setDailymotion("Bar");
 
@@ -118,7 +124,7 @@ public class PodcastServerParametersTest {
     public void should_have_external_tools() {
         /* Given */
         /* When */
-        PodcastServerParameters.ExternalTools externalTools = new PodcastServerParameters.ExternalTools()
+        ExternalTools externalTools = new ExternalTools()
                 .setFfmpeg("Foo")
                 .setRtmpdump("Bar");
 
@@ -130,6 +136,24 @@ public class PodcastServerParametersTest {
         assertThat(externalTools.getFfmpeg()).isEqualTo("Foo");
         assertThat(externalTools.getRtmpdump()).isEqualTo("Bar");
         assertThat(podcastServerParameters.rtmpDump()).isEqualTo("Bar");
+    }
+
+    @Test
+    public void should_have_backup_parameters() {
+        /* Given */
+        File location = Paths.get("/tmp").toFile();
+
+        Backup backup = new Backup()
+        /* When */
+                .setBinary(true)
+                .setCron("0 0 0 * * *")
+                .setLocation(location);
+
+        /* Then */
+        assertThat(backup.getLocation()).isEqualTo(location);
+        assertThat(backup.getBinary()).isTrue();
+        assertThat(backup.getCron()).isEqualTo("0 0 0 * * *");
+        assertThat(backup.location()).isEqualTo(Paths.get("/tmp"));
     }
 
 }
