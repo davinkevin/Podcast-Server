@@ -6,8 +6,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +28,8 @@ public class UrlService {
     private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 10000;
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final String PROTOCOL_SEPARATOR = "://";
+
+    public UrlService() { System.setProperty("http.agent", HtmlService.USER_AGENT); }
 
     public Optional<URL> newURL(String url) {
         try {
@@ -60,18 +64,30 @@ public class UrlService {
 
     public URLConnection getConnectionWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
         URL url = new URL(stringUrl);
+        return getConnectionWithTimeOut(url, timeOutInMilli);
+    }
+
+    private URLConnection getConnectionWithTimeOut(URL url, Integer timeOutInMilli) throws IOException {
         URLConnection urlConnection = url.openConnection();
         urlConnection.setReadTimeout(timeOutInMilli);
         urlConnection.setConnectTimeout(timeOutInMilli);
         return urlConnection;
     }
 
-    public URLConnection getConnection(String stringUrl) throws IOException {
+    URLConnection getConnection(String stringUrl) throws IOException {
         return getConnectionWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
     }
 
+    private URLConnection getConnection(URL url) throws IOException {
+        return getConnectionWithTimeOut(url, DEFAULT_TIME_OUT_IN_MILLI);
+    }
+
     public InputStream asStream(String stringUrl) throws IOException {
-        return getConnection(stringUrl).getInputStream();
+        return asStream(new URL(stringUrl));
+    }
+
+    private InputStream asStream(URL url) throws IOException {
+        return getConnection(url).getInputStream();
     }
 
     public String getFileNameM3U8Url(String url) {
@@ -94,7 +110,7 @@ public class UrlService {
     }
 
     public BufferedReader urlAsReader(URL url) throws IOException {
-        return new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+        return new BufferedReader(new InputStreamReader(asStream(url), "UTF-8"));
     }
 
     private static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
@@ -134,9 +150,10 @@ public class UrlService {
     }
 
     private Boolean isARedirection(int status) {
-        return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP
-                || status == HttpURLConnection.HTTP_MOVED_PERM
-                || status == HttpURLConnection.HTTP_SEE_OTHER);
+        return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP ||
+                status == HttpURLConnection.HTTP_MOVED_PERM ||
+                status == HttpURLConnection.HTTP_SEE_OTHER
+        );
     }
 
     public Optional<String> getPageFromURL(String url) {
@@ -147,8 +164,8 @@ public class UrlService {
         }
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void postConstruct() {
         System.setProperty("http.agent", HtmlService.USER_AGENT);
-    }
+    }*/
 }

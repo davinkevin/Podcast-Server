@@ -6,11 +6,13 @@ import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -236,9 +238,35 @@ public class UrlServiceTest {
     }
 
     @Test
-    public void should_define_user_agent_on_construct() {
-        /* When */ urlService.postConstruct();
+    public void should_have_defined_user_agent() {
+        /* When */ /*urlService.postConstruct();*/
         /* Then */ assertThat(System.getProperty("http.agent")).isEqualTo(HtmlService.USER_AGENT);
+    }
+    
+    @Test
+    public void should_create_input_stream_from_url_string() throws IOException {
+        /* Given */
+        stubFor(get(urlEqualTo("/my/ressources.m3u8"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/x-mpegURL")
+                        .withBodyFile("service/urlService/canalplus.lepetitjournal.20150707.m3u8")));
+        String fileReadFromInputStream;
+
+        /* When */
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(urlService.asStream(HTTP_LOCALHOST + "/my/ressources.m3u8")))) {
+            fileReadFromInputStream = buffer.lines().collect(Collectors.joining("\n"));
+        }
+
+        /* Then */
+        assertThat(fileReadFromInputStream)
+                .isNotEmpty()
+                .contains(
+                        "#EXTM3U",
+                        "#EXT-X-TARGETDURATION:10",
+                        "http://us-cplus-aka.canal-plus.com/i/1507/02/nip_NIP_59957_,200k,400k,800k,1500k,.mp4.csmil/segment1_3_av.ts",
+                        "#EXT-X-ENDLIST"
+                );
     }
 
 
