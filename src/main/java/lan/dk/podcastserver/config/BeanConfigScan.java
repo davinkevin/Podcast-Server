@@ -1,12 +1,7 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.service.PodcastServerParameters;
-import lan.dk.podcastserver.service.properties.Api;
-import lan.dk.podcastserver.service.properties.Backup;
-import lan.dk.podcastserver.service.properties.ExternalTools;
 import org.apache.tika.Tika;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -25,7 +20,6 @@ import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
  */
 @EnableCaching
 @Configuration
-@EnableConfigurationProperties({PodcastServerParameters.class, Api.class, Backup.class, ExternalTools.class})
 @ComponentScan(basePackages = { "lan.dk.podcastserver.utils", "lan.dk.podcastserver.service", "lan.dk.podcastserver.business"})
 public class BeanConfigScan {
 
