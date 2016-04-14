@@ -1,8 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.jackson.CustomObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +13,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.resource.GzipResourceResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import javax.annotation.Resource;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,9 +24,6 @@ import java.util.stream.Stream;
 @Configuration
 @ComponentScan("lan.dk.podcastserver.controller")
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
-
-    @Resource PodcastServerParameters podcastServerParameters;
-    @Value("${management.context-path:}") String actuatorPath = "";
 
     public static final int CACHE_PERIOD = 31556926;
 

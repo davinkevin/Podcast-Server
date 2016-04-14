@@ -1,10 +1,8 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.service.PodcastServerParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
@@ -26,7 +24,6 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class WebMvcConfigTest {
 
-    @Mock PodcastServerParameters podcastServerParameters;
     @InjectMocks WebMvcConfig webMvcConfig;
 
     @Test
@@ -35,9 +32,7 @@ public class WebMvcConfigTest {
         ResourceHandlerRegistry registry = mock(ResourceHandlerRegistry.class);
         ResourceHandlerRegistration resourceHandlerRegistration = mock(ResourceHandlerRegistration.class);
         ResourceChainRegistration resourceChainRegistration = mock(ResourceChainRegistration.class);
-        String rootFolderWithProtocol = "file:///tmp/podcast";
 
-        when(podcastServerParameters.rootFolderWithProtocol()).thenReturn(rootFolderWithProtocol);
         when(registry.addResourceHandler(anyString())).thenReturn(resourceHandlerRegistration);
         when(registry.addResourceHandler(anyVararg())).thenReturn(resourceHandlerRegistration);
         when(resourceHandlerRegistration.addResourceLocations(anyString())).thenReturn(resourceHandlerRegistration);
