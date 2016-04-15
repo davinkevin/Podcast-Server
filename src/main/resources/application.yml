@@ -4,7 +4,7 @@
 spring :
     h2.console.enabled : true
     datasource:
-        url: jdbc:h2:db
+        url: jdbc:h2:~/.podcast-server/db
         username: sa
         driver-class-name: org.h2.Driver
     jpa:
@@ -24,6 +24,7 @@ spring :
                 autoRegisterUserTypes: true
 
 server:
+  port : 8080
   compression:
     enabled : true
     mime-types : application/json,application/xml,text/html,text/xml,text/plain
@@ -33,13 +34,13 @@ server:
 ##############################
 
 podcastserver:
-    rootfolder: /tmp
+    rootfolder: /tmp/
     #concurrent-download: 2
     #max-update-parallels: 3
     #cover-default-name: cover
     number-of-day-to-download: 1
     #number-of-try: 10
-    #server-url: http://192.168.1.203:8080
+    server-url: http://localhost:${server.port}
     #file-container: ${podcastserver.server-url}/podcast
     #download-extention: .psdownload
     #rss-default-number-item: 50
