@@ -37,17 +37,15 @@ export default class ItemDetailCtrl {
         this.DonwloadManager = DonwloadManager;
 
         //** WebSocket Inscription **//
-        let webSockedUrl = "/topic/podcast/".concat(this.item.podcast.id);
-
         this.DonwloadManager
-            .ws
-            .subscribe(webSockedUrl, (message) => {
-                let itemFromWS = JSON.parse(message.body);
-                if (itemFromWS.id == this.item.id) {
-                    Object.assign(this.item, itemFromWS);
-                }
-            }, $scope);
+            .ngstomp
+                .subscribeTo(`/topic/podcast/${this.item.podcast.id}`).withBodyInJson().bindTo($scope)
+                .callback(m => this.attachNewDataToItem(m.body))
+            .connect();
+    }
 
+    attachNewDataToItem(item) {
+        if (item.id == this.item.id) { Object.assign(this.item, item); }
     }
 
     download() {
@@ -55,11 +53,11 @@ export default class ItemDetailCtrl {
     }
 
     stopDownload(item) {
-        this.DonwloadManager.ws.stop(item);
+        this.DonwloadManager.stop(item);
     }
 
     toggleDownload(item) {
-        this.DonwloadManager.ws.toggle(item);
+        this.DonwloadManager.toggle(item);
     }
 
     redirect() {

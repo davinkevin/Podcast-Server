@@ -47,7 +47,7 @@
       "baseURL": "www"
     },
     "dependencies": {
-      "AngularStompDK": "github:davinkevin/AngularStompDK@^0.6.1",
+      "AngularStompDK": "github:davinkevin/AngularStompDK@^0.8.2",
       "angular": "github:angular/bower-angular@^1.5.0",
       "angular-animate": "github:angular/bower-angular-animate@^1.5.0",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@^0.14.3",

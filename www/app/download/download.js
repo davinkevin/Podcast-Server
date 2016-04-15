@@ -28,31 +28,31 @@ export default class DownloadCtrl {
         "ngInject";
         this.DonwloadManager = DonwloadManager;
         this.$notification = $notification;
-        this.items =[];
+        this.items = [];
         this.waitingitems = [];
         this.numberOfSimDl = 0;
 
-        this.DonwloadManager.getNumberOfSimDl().then((value) => {
-            this.numberOfSimDl = parseInt(value);
-        });
+        this.DonwloadManager.getNumberOfSimDl().then(v => { this.numberOfSimDl = parseInt(v); });
 
         /** Websocket Connection */
-        this.DonwloadManager.ws
-            .subscribe("/app/download", (message) => this.onSubscribeDownload(message), $scope)
-            .subscribe("/app/waiting", (message) => this.onSubscribeWaiting(message), $scope)
-            .subscribe("/topic/download", (message) => this.onDownloadUpdate(message), $scope)
-            .subscribe("/topic/waiting", (message) => this.onWaitingUpdate(message), $scope);
+        this.DonwloadManager
+            .ngstomp
+                .subscribeTo('/app/download').withBodyInJson().bindTo($scope)
+                .callback(m => this.items = m.body)
+            .and()
+                .subscribeTo('/app/waiting').withBodyInJson().bindTo($scope)
+                .callback(m => this.waitingitems = m.body)
+            .and()
+                .subscribeTo('/topic/download').withBodyInJson().bindTo($scope)
+                .callback(m => this.onDownloadUpdate(m.body))
+            .and()
+                .subscribeTo('/topic/waiting').withBodyInJson().bindTo($scope)
+                .callback(m => this.waitingitems = m.body)
+            .connect();
     }
 
-    onSubscribeDownload(message) {
-        this.items = JSON.parse(message.body);
-    }
-    onSubscribeWaiting(message) {
-        this.waitingitems = JSON.parse(message.body);
-    }
-    onDownloadUpdate(message) {
-        let item = JSON.parse(message.body);
-        let [elemToUpdate] = this.items.filter(i => i.id === item.id);
+    onDownloadUpdate(item) {
+        let elemToUpdate = this.items.find(i => i.id === item.id);
         switch (item.status) {
             case 'STARTED' :
             case 'PAUSED' :
@@ -76,18 +76,11 @@ export default class DownloadCtrl {
     }
 
     onStoppedFromWS(elemToUpdate) {
-        if (elemToUpdate) {
-            this.items = this.items.filter(i => i.id !== elemToUpdate.id);
-        }
-    }
-
-    onWaitingUpdate(message) {
-        this.waitingitems = JSON.parse(message.body);
+        if (elemToUpdate) { this.items = this.items.filter(i => i.id !== elemToUpdate.id); }
     }
 
     getTypeFromStatus(item) {
-        if (item.status === "PAUSED")
-            return "warning";
+        if (item.status === "PAUSED") return "warning";
         return "info";
     }
     updateNumberOfSimDl(number) {
@@ -99,10 +92,10 @@ export default class DownloadCtrl {
         this.DonwloadManager.download(item);
     }
     stopDownload(item){
-        this.DonwloadManager.ws.stop(item);
+        this.DonwloadManager.stop(item);
     }
     toggleDownload(item){
-        this.DonwloadManager.ws.toggle(item);
+        this.DonwloadManager.toggle(item);
     }
 
     /** Global **/

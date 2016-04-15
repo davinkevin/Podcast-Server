@@ -67,11 +67,11 @@ export default class ItemMenuComponent {
     }
 
     stopDownload(item) {
-        this.DownloadManager.ws.stop(item);
+        this.DownloadManager.stop(item);
     }
 
     toggleDownload(item){
-        return this.DownloadManager.ws.toggle(item);
+        return this.DownloadManager.toggle(item);
     }
 
     addOrRemove(item) {

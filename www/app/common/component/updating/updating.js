@@ -27,12 +27,20 @@ export default class UpdatingStatusComponent {
         this.$scope = $scope;
 
         this.ngstomp
-            .subscribe('/app/updating', (message) => this.updateStatus(message), {}, $scope)
-            .subscribe('/topic/updating', (message) => this.updateStatus(message), {}, $scope);
+                .subscribeTo('/app/updating')
+                .callback((message) => this.updateStatus(message))
+                .withBodyInJson()
+                .bindTo($scope)
+            .and()
+                .subscribeTo('/topic/updating')
+                .callback((message) => this.updateStatus(message))
+                .withBodyInJson()
+                .bindTo($scope)
+            .connect();
     }
 
     updateStatus(message) {
-        this.isUpdating = JSON.parse(message.body);
+        this.isUpdating = message.body;
     }
 
     static link(scope, element) {

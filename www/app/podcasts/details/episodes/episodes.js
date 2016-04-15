@@ -47,16 +47,14 @@ export default class PodcastItemsListComponent {
             .add({ combo: 'right', description: 'Next page', callback: () => this.swipePage(1) })
             .add({ combo: 'left', description: 'Previous page', callback: () => this.swipePage(-1) });
 
-        this.DownloadManager
-            .ws
-            .subscribe( "/topic/podcast/".concat(this.podcast.id),
-                (message) => this.onMessageFromWS(message),
-                $scope);
+        this.DownloadManager.ngstomp
+                .subscribeTo(`/topic/podcast/${this.podcast.id}`).withBodyInJson().bindTo($scope)
+                .callback(m => this.onMessageFromWS(m.body))
+            .connect();
     }
 
-    onMessageFromWS(message) {
-        var item = JSON.parse(message.body);
-        var elemToUpdate = this.podcast.items.find(elem => elem.id === item.id);
+    onMessageFromWS(item) {
+        let elemToUpdate = this.podcast.items.find(elem => elem.id === item.id);
         Object.assign(elemToUpdate, item);
     }
 
@@ -67,10 +65,7 @@ export default class PodcastItemsListComponent {
                 page : this.currentPage - 1,
                 orders : [{ direction : 'DESC', property : 'pubDate'}]
             })
-            .then(itemsResponse => {
-                this.podcast.items = itemsResponse.content;
-                this.podcast.totalItems = itemsResponse.totalElements;
-            });
+            .then(itemsResponse => { this.podcast.items = itemsResponse.content; this.podcast.totalItems = itemsResponse.totalElements; });
     }
 
     remove(item) {
@@ -90,11 +85,13 @@ export default class PodcastItemsListComponent {
     }
 
     stopDownload(item) {
-        this.DownloadManager.ws.stop(item);
+        this.DownloadManager.stop(item);
     }
+
     toggleDownload(item) {
-        this.DownloadManager.ws.toggle(item);
+        this.DownloadManager.toggle(item);
     }
+
     play(item){
         return this.itemService.play(item);
     }

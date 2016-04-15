@@ -76,9 +76,13 @@ export default class ItemSearchCtrl {
 
         //** WebSocket Subscription **//
         this.DownloadManager
-            .ws
-            .subscribe("/topic/download", (message) => this.updateItemFromWS(message), $scope)
-            .subscribe('/topic/updating', (message) => this.updatePageWhenUpdateDone(message), $scope);
+            .ngstomp
+                .subscribeTo('/topic/download').withBodyInJson().bindTo($scope)
+                .callback(m => this.updateItemFromWS(m.body))
+            .and()
+                .subscribeTo('/topic/updating').withBodyInJson().bindTo($scope)
+                .callback(m => this.updatePageWhenUpdateDone(m.body))
+            .connect();
 
         $scope.$on('$routeUpdate', () => {
             if (this.currentPage !== this.$location.search().page) {
@@ -91,9 +95,7 @@ export default class ItemSearchCtrl {
         this.attachResponse(items);
     }
 
-    updateItemFromWS(wsMessage) {
-        let item = JSON.parse(wsMessage.body);
-
+    updateItemFromWS(item) {
         if (item.isDownloaded) {
             return this.changePage();
         }
@@ -144,10 +146,8 @@ export default class ItemSearchCtrl {
         return this.changePage();
     }
 
-    updatePageWhenUpdateDone(message) {
-        if(JSON.parse(message.body) === false) {
-            this.changePage();
-        }
+    updatePageWhenUpdateDone(isInUpdate) {
+        if(isInUpdate === false) { this.changePage(); }
     }
 }
 
