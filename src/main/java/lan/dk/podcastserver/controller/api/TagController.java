@@ -2,6 +2,7 @@ package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +14,10 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/tag")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TagController {
 
     final TagBusiness tagBusiness;
-
-    @Autowired TagController(TagBusiness tagBusiness) {
-        this.tagBusiness = tagBusiness;
-    }
 
     @RequestMapping(value="{id}", method = RequestMethod.GET)
     public Tag findById(@PathVariable UUID id) {
