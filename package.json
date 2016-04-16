@@ -1,13 +1,12 @@
 {
   "name": "Podcast_Server",
-  "version": "1.0.0",
+  "version": "1.0.27",
   "description": "Podcast Server",
   "devDependencies": {
     "babel": "^5.8.23",
     "babel-eslint": "^4.1.4",
     "browser-sync": "^2.9.11",
     "connect-modrewrite": "^0.8.2",
-    "conventional-changelog": "^0.0.11",
     "del": "^2.0.2",
     "gulp": "^3.9.0",
     "gulp-bump": "^1.0.0",
@@ -36,11 +35,12 @@
     "jasmine-reporters": "^2.0.7",
     "jspm": "0.16.32",
     "mkdirp": "^0.5.1",
+    "node-jsxml": "^0.7.0",
+    "phantomjs": "^1.9.19",
     "proxy-middleware": "^0.15.0",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.1.4",
-    "semver": "^5.0.3",
-    "phantomjs": "^1.9.19"
+    "semver": "^5.0.3"
   },
   "jspm": {
     "directories": {
@@ -108,7 +108,8 @@
   "scripts": {
     "prebuild": "npm install",
     "postinstall": "jspm install && gulp less",
-    "build": "gulp build"
+    "build": "gulp build",
+    "release": "gulp release --type $(type)"
   },
   "bugs": {
     "url": "https://github.com/davinkevin/Podcast-Server/issues"

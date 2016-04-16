@@ -6,6 +6,7 @@ import conventionalChangelog from 'gulp-conventional-changelog';
 import bump from 'gulp-bump';
 import git from 'gulp-git';
 import runSequence from 'run-sequence';
+import mavenUpdate from './maven';
 
 import pkg from '../../package.json';
 
@@ -24,6 +25,9 @@ gulp.task('bump', (cb) => {
     }
 
     pkg.version = semver.inc(pkg.version, argv.type);
+
+    mavenUpdate(pkg.version);
+    
     gulp.src([paths.packageJson])
         .pipe(bump({ version: pkg.version }))
         .pipe(gulp.dest('./'))
@@ -38,7 +42,7 @@ gulp.task('changelog', (cb) => {
 });
 
 gulp.task('commit-changelog', (cb) => {
-    let sources = [ `${paths.root}/CHANGELOG.md`, `${paths.root}/package.json` ];
+    let sources = [ `${paths.root}/CHANGELOG.md`, `${paths.root}/package.json`, `${paths.root}/pom.xml` ];
     gulp.src(sources)
         .pipe(git.add())
         .pipe(git.commit(`chore(release): ${pkg.version}`))

@@ -13,6 +13,7 @@ export default {
   root : root,
   systemConfigJs : `${root}/system.config.js`,
   packageJson : `${root}/package.json`,
+  pomXml : `${root}/pom.xml`,
   changeLog : `${root}/CHANGELOG.md`,
   srcDir: `${root}/${srcDirName}`,
   releaseDir: `${root}/${releaseDirName}`,
