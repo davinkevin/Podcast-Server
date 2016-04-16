@@ -2,7 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import angular from 'angular';
-import {RouteConfig, View, Module, Constant} from '../../decorators';
+import {Component, Module, Constant} from '../../decorators';
 import AppRouteConfig from '../../config/route';
 import NgTagsInput from '../../common/modules/ngTagsInput';
 import PodcastService from '../../common/service/data/podcastService';
@@ -14,26 +14,23 @@ import template from './creation.html!text';
     name : 'ps.podcasts.creation',
     modules : [ AppRouteConfig, NgTagsInput, PodcastService, TypeService, TagService ]
 })
-@RouteConfig({
-    path : '/podcast-creation',
+@Component({
+    selector : 'podcast-creation',
     as : 'pac',
-    resolve : {
-        types : typeService => {"ngInject"; return typeService.findAll();}
-    }
+    template : template,
+
+    path : '/podcast-creation',
+    resolve : { types: typeService => {"ngInject"; return typeService.findAll();}}
 })
 @Constant({ name : 'defaultPodcast', value : { hasToBeDeleted : true, cover : { height: 200, width: 200 }} })
-@View({
-    template : template
-})
 export default class PodcastCreationController {
 
-    constructor($location, defaultPodcast, tagService, podcastService, types) {
+    constructor($location, defaultPodcast, tagService, podcastService) {
         "ngInject";
         this.podcastService = podcastService;
         this.$location = $location;
         this.tagService = tagService;
         this.podcast = angular.extend({}, defaultPodcast);
-        this.types = types;
     }
 
     findInfo() {

@@ -1,5 +1,3 @@
 import 'angular-notification';
 
-export default {
-    name : 'notification'
-};
+export default { name : 'notification' };

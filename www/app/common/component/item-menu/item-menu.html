@@ -39,7 +39,7 @@
                 <span class="fa fa-align-justify text-primary"></span> WatchList
             </a>
         </li>
-        <li>
+        <li ng-if="::imc.item.url">
             <a target="_self" class="with-link" ng-href="{{ ::imc.item.url }}">
                 <span class="glyphicon glyphicon-globe text-info"></span> Read OnLine
             </a>

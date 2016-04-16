@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {RouteConfig, View, Module} from '../decorators';
+import {Component, Module} from '../decorators';
 import AppRouteConfig from '../config/route';
 import PodcastService from '../common/service/data/podcastService';
 import TypeService from '../common/service/data/typeService';
@@ -20,22 +20,19 @@ import './podcasts.css!';
         TypeService
     ]
 })
-@RouteConfig({
-    path : '/podcasts',
+@Component({
+    selector : 'podcasts',
     as : 'plc',
+    template : template,
+
+    path : '/podcasts',
     resolve: {
         podcasts: (podcastService) => {"ngInject"; return podcastService.findAll(); },
         types: typeService => {"ngInject"; return typeService.findAll(); }
     }
 })
-@View({
-    template : template
-})
 export default class PodcastsListCtrl {
-    constructor(podcasts, types) {
-        "ngInject";
-        this.podcasts = podcasts;
-        this.types = types;
-        this.filters = { title : '', type : '' };
-    }
+
+    constructor() { this.filters = { title : '', type : '' }; }
+
 }

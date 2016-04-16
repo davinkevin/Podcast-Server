@@ -1,4 +1,4 @@
-import {Component, View, Module} from '../../../decorators';
+import {Component, Module} from '../../../decorators';
 import HighCharts from '../../../common/modules/highCharts';
 import PodcastDataService from '../../../common/service/data/podcastService';
 import StatsDataService from '../../../common/service/data/statsService';
@@ -10,12 +10,8 @@ import template from './stats.html!text';
 })
 @Component({
     selector : 'podcast-stats',
-    bindToController : {
-        podcast : '='
-    },
-    as : 'pdsc'
-})
-@View({
+    as : 'pdsc',
+    bindings : { podcast : '='},
     template : template
 })
 export default class PodcastDetailsStatsComponent {

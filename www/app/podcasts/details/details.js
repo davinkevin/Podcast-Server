@@ -1,4 +1,4 @@
-import {RouteConfig, View, HotKeys, Module} from '../../decorators';
+import {Component, Module} from '../../decorators';
 import StatsModule from './stats/stats';
 import EpisodesModule from './episodes/episodes';
 import EditionModule from './edition/edition';
@@ -11,35 +11,31 @@ import template from './details.html!text';
 
 @Module({
     name : 'ps.podcasts.details',
-    modules : [
-        AppRouteConfig,
-        StatsModule,
-        EpisodesModule,
-        EditionModule,
-        UploadModule,
-        UpdateService,
-        PodcastService
-    ]
+    modules : [AppRouteConfig, StatsModule, EpisodesModule, EditionModule, UploadModule, UpdateService, PodcastService]
 })
-@RouteConfig({
-    path : '/podcasts/:podcastId',
+@Component({
+    selector : 'podcasts-detail',
+    template : template,
     as : 'pdc',
+
+    path : '/podcasts/:podcastId',
     resolve : {
         podcast: (podcastService, $route) => {"ngInject"; return podcastService.findById($route.current.params.podcastId);}
     }
 })
-@HotKeys({})
-@View({
-    template : template
-})
 export default class PodcastDetailCtrl {
 
-    constructor($scope, podcast, podcastService, $timeout){
+    constructor($scope, podcastService, $timeout){
         "ngInject";
         this.$scope = $scope;
         this.podcastService = podcastService;
-        this.podcast = podcast;
         this.$timeout = $timeout;
+    }
+
+    $onInit() {
+
+        this.$scope.$on("podcastEdition:save", () => this.refreshItems());
+        this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
 
         this.podcastTabs = [
             { heading : 'Episodes', active : true},
@@ -47,12 +43,8 @@ export default class PodcastDetailCtrl {
             { heading : 'Upload', disabled : this.podcast.type !== 'send'},
             { heading : 'Stats', active : false }
         ];
-        this.$scope.$on("podcastEdition:save", () => this.refreshItems());
-        this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
 
-        this.podcast.isUpdatable = function() {
-            return this.type !== 'send';
-        };
+        this.podcast.isUpdatable = () => this.type !== 'send';
     }
 
     refreshItems() {
@@ -70,9 +62,7 @@ export default class PodcastDetailCtrl {
     }
 
     chartReflow() {
-        this.$timeout(() => {
-            this.$scope.$broadcast('highchartsng.reflow');
-        }, 10);
+        this.$timeout(() => { this.$scope.$broadcast('highchartsng.reflow'); }, 10);
     }
 
     isUpdatable() {

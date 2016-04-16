@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {Component, View, Module} from '../../../decorators';
+import {Component, Module} from '../../../decorators';
 import PodcastService from '../../../common/service/data/podcastService';
 import TagService from '../../../common/service/data/tagService';
 import NgTagsInput from '../../../common/modules/ngTagsInput';
@@ -13,12 +13,8 @@ import template from './edition.html!text';
 })
 @Component({
     selector : 'podcast-edition',
-    bindToController : {
-        podcast : '='
-    },
-    as : 'pec'
-})
-@View({
+    as : 'pec',
+    bindings : { podcast : '='},
     template : template
 })
 export default class PodcastEditionCtrl {

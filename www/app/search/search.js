@@ -3,7 +3,7 @@
  */
 
 import angular from 'angular';
-import {RouteConfig, View, HotKeys, Module, Constant, Service} from '../decorators';
+import {Component, Module, Constant, Service} from '../decorators';
 import NgStorage from 'ngstorage';
 import NgTagsInput from '../common/modules/ngTagsInput';
 import AppRouteConfig from '../config/route';
@@ -17,82 +17,65 @@ import './search.css!';
 
 @Module({
     name : 'ps.search',
-    modules : [
-        ItemMenu,
-        NgTagsInput,
-        NgStorage,
-        AppRouteConfig,
-        DownloadManager,
-        ItemService,
-        TagService,
-        PlaylistService
-    ]
+    modules : [ItemMenu, NgTagsInput, NgStorage, AppRouteConfig, DownloadManager, ItemService, TagService, PlaylistService]
 })
-@RouteConfig({
-    path : '/items',
+@Component({
+    selector : 'search',
     as : 'isc',
+    template : template,
+
+    path : '/items',
     reloadOnSearch : false,
-    resolve : {
-        items : (itemService, SearchItemCache) => {"ngInject"; return itemService.search(SearchItemCache.parameters);}
-    }
-})
-@HotKeys({
-    hotKeys : [
-        ['right', 'Next page', 'isc.swipePage(1)'],
-        ['left', 'Previous page', 'isc.swipePage(-1)']
-    ]
+    resolve : { page : (itemService, SearchItemCache) => {"ngInject"; return itemService.search(SearchItemCache.parameters);}}
 })
 @Constant({
     name : 'DefaultItemSearchParameters',
-    value : {
-        page : 0,
-        size : 12,
-        term : undefined,
-        tags : [],
-        orders : [{ direction : 'DESC', property : 'pubDate'}],
-        downloaded : "true"
-    }
-})
-@View({
-    template : template
+    value : { page: 0, size: 12, term: undefined, tags: [], orders: [{ direction : 'DESC', property : 'pubDate'}], downloaded : "true"}
 })
 export default class ItemSearchCtrl {
 
-    constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, items) {
+    totalItems = Number.MAX_VALUE;
+    maxSize = 10;
+
+    constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, hotkeys) {
         "ngInject";
-        /* DI */
+        this.$scope = $scope;
+        this.SearchItemCache = SearchItemCache;
         this.$location = $location;
         this.itemService = itemService;
         this.tagService = tagService;
         this.DownloadManager = DonwloadManager;
         this.playlistService = playlistService;
-        this.SearchItemCache = SearchItemCache;
+        this.hotkeys = hotkeys;
+    }
 
-        /* Constructor Init */
-        this.totalItems = Number.MAX_VALUE;
-        this.maxSize = 10;
+    $onInit() {
         this.currentPage = this.SearchItemCache.page + 1;
         this.searchParameters = this.SearchItemCache.parameters;
+
+        this.hotkeys
+            .bindTo(this.$scope)
+            .add({ combo: 'right', description: 'Next page', callback: () => this.swipePage(1) })
+            .add({ combo: 'left', description: 'Previous page', callback: () => this.swipePage(-1) });
+
+        this.attachResponse(this.page);
 
         //** WebSocket Subscription **//
         this.DownloadManager
             .ngstomp
-                .subscribeTo('/topic/download').withBodyInJson().bindTo($scope)
+                .subscribeTo('/topic/download').withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.updateItemFromWS(m.body))
             .and()
-                .subscribeTo('/topic/updating').withBodyInJson().bindTo($scope)
+                .subscribeTo('/topic/updating').withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.updatePageWhenUpdateDone(m.body))
             .connect();
 
-        $scope.$on('$routeUpdate', () => {
+        this.$scope.$on('$routeUpdate', () => {
             if (this.currentPage !== this.$location.search().page) {
                 this.currentPage = this.$location.search().page || 1;
                 this.changePage();
             }
         });
-
-        /*this.changePage();*/
-        this.attachResponse(items);
     }
 
     updateItemFromWS(item) {

@@ -12,8 +12,9 @@ export function Module({name, inject, modules = []}) {
 
         Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModuleName)) : extractAngularModule(inject);
 
-        if (Target.component) Target.$angularModule.directive(Target.$componentName, Target.component);
-        if (Target.routeConfig) Target.$angularModule.config(Target.routeConfig);
+        if (Target.component) Target.$angularModule.component(Target.$componentName, Target.component);
+        if (Target.directive) Target.$angularModule.directive(Target.$directiveName, Target.directive);
+        if (Target.routeConfig) Target.$angularModule.config(($routeProvider) => { "ngInject"; $routeProvider.when(...Target.routeConfig); });
         if (Target.$serviceName) Target.$angularModule.service(Target.$serviceName, Target);
 
         for (let config of Target.$config || []) {
@@ -31,47 +32,63 @@ export function Module({name, inject, modules = []}) {
     };
 }
 
-export function RouteConfig({ path, as = 'vm', reloadOnSearch = true, resolve = {}}) {
+export function RouteConfig({ path, as = 'vm', reloadOnSearch = true, resolve = {}, template = ''}) {
     return Target => {
-        if (!Target.$template) throw new TypeError("Template should be defined");
         if (!path) throw new TypeError("Path should be Defined");
 
-        Target.routeConfig = ($routeProvider) => {
-            "ngInject";
-
-            let parameters = {
-                template: Target.$template,
-                controller: Target,
-                controllerAs : as,
-                reloadOnSearch : reloadOnSearch,
-                resolve : resolve
-            };
-
-            Target.$hotKeys && (parameters.hotkeys = Target.$hotKeys);
-
-            $routeProvider.when(path, parameters);
+        var parameters = {
+            template: template,
+            controller: Target,
+            controllerAs : as,
+            reloadOnSearch : reloadOnSearch,
+            resolve : resolve
         };
+
+        Target.$hotKeys && (parameters.hotkeys = Target.$hotKeys);
+
+        Target.routeConfig = [path, parameters];
     };
 }
 
-export function HotKeys({hotKeys = []}) {
-    return Target =>  {
-        Target.$hotKeys = hotKeys;
-    };
+function bindingsForRouteComponent(resolve) {
+    let bindings = {};
+
+    if (resolve == {} || resolve == undefined || resolve == null) { return bindings; }
+
+    Object.keys(resolve).forEach(v => bindings[v] = '<');
+
+    return bindings;
 }
 
-export function Component({restrict = 'E', scope = true, as = 'vm', bindToController = true, replace = false, transclude = false, selector}) {
+export function Component({as = '$ctrl', bindings = {}, selector, template = '', transclude = false, path, resolve, reloadOnSearch}) {
     return Target => {
-        if (!Target.$template && restrict.indexOf('E') !== -1 ) throw new TypeError("A Template should be defined with the annotation @View for Element Component (restrict : E)");
         if (!selector) throw new TypeError("A selector should be defined in the current annotation @Component");
 
-        Target.$componentName = snakeCaseToCamelCase(selector);
-        Target.component = () => {
+        Target.$componentName = snakeCaseToKebabCase(selector);
+        Target.component = {
+            transclude : transclude,
+            template: template,
+            controller : Target,
+            controllerAs : as,
+            bindings : bindings
+        };
+
+        if (path) {
+            RouteConfig({path, resolve, reloadOnSearch : reloadOnSearch, template : templateForRouteComponent(selector, resolve)})(Target);
+            Target.component.bindings = bindingsForRouteComponent(resolve);
+        }
+    };
+}
+
+export function Directive({scope = true, as = 'vm', bindToController = true, selector, require = ''}) {
+    return Target => {
+        if (!selector) throw new TypeError("A selector should be defined in the current annotation @Component");
+
+        Target.$directiveName = snakeCaseToKebabCase(selector);
+        Target.directive = () => {
             let ddo = {
-                restrict : restrict,
-                transclude : transclude,
-                replace : replace,
-                template: Target.$template,
+                restrict : 'A',
+                require : require,
                 scope : scope,
                 controller : Target,
                 controllerAs : as,
@@ -79,7 +96,6 @@ export function Component({restrict = 'E', scope = true, as = 'vm', bindToContro
             };
 
             Target.link && (ddo.link = Target.link);
-
             return ddo;
         };
     };
@@ -131,7 +147,7 @@ export function Constant({ name, value}) {
     };
 }
 
-export function UibModal({animation = true, backdrop = true, bindToController = true, as = 'vm', keyboard = true, resolve, size}) {
+export function UibModal({animation = true, backdrop = true, bindToController = true, as = 'vm', keyboard = true, resolve, size, template = ''}) {
     return Target => {
         let $UibModalConf = {
             animation : animation,
@@ -142,7 +158,7 @@ export function UibModal({animation = true, backdrop = true, bindToController = 
             keyboard : keyboard,
             resolve : resolve,
             size : size,
-            template : Target.$template
+            template : template
         };
 
         Target.$UibModalConf = {
@@ -152,8 +168,19 @@ export function UibModal({animation = true, backdrop = true, bindToController = 
     };
 }
 
-function snakeCaseToCamelCase(string) {
+function templateForRouteComponent($componentName, resolve) {
+    if (resolve == {} || resolve == undefined || resolve == null) { return `<${$componentName}></${$componentName}>`; }
+
+    let attributes = Object.keys(resolve).map(k => `${kebabToSnakeCase(k)}="$resolve.${k}" `).join("");
+    return `<${$componentName} ${attributes}></${$componentName}>`;
+}
+
+function snakeCaseToKebabCase(string) {
     return string.replace( /-([a-z])/ig, (_,letter) => letter.toUpperCase());
+}
+
+function kebabToSnakeCase(string) {
+    return string.replace(/(.)([A-Z]+)/g, (m, previous, uppers) => previous + '-' + uppers.toLowerCase().split('').join('-'));
 }
 
 function extractAngularModuleName(clazz) {

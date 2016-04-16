@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {Component, View, Module} from '../../../decorators';
+import {Component, Module} from '../../../decorators';
 import AppVideogular from '../../../common/component/videogular/videogular';
 import Truncate from '../../../common/modules/truncate';
 import PlaylistService from '../../../common/service/playlistService';
@@ -14,43 +14,40 @@ import './player-inline.css!';
 })
 @Component({
     selector : 'player-inline',
+    as : 'pic',
     replace : true,
-    bindToController : {
-        podcast : '='
-    },
-    as : 'pic'
-})
-@View({
+    bindings : { podcast : '='},
     template : template
 })
 export default class PlayerInlineComponent {
 
+    isReading = true;
+    hasToBeShown = false;
+    state = null;
+    API = null;
+    currentVideo = {};
+    playlist = [];
+    config = {
+        autoPlay : true,
+        sources: [],
+        plugins: { controls: { autoHide: null, autoHideTime: 2000}, poster: ''}
+    };
+
     constructor(playlistService, $timeout, deviceDetectorService, $scope) {
         "ngInject";
-        this.isReading = true;
         this.playlistService = playlistService;
         this.$timeout = $timeout;
-        this.hasToBeShown = false;
-        this.playlist = [];
-        this.state = null;
-        this.API = null;
-        this.currentVideo = {};
-        this.config = {
-            autoPlay : true,
-            sources: [],
-            plugins: {
-                controls: {
-                    autoHide : !deviceDetectorService.isTouchedDevice(),
-                    autoHideTime: 2000
-                },
-                poster: ''
-            }
-        };
+        this.deviceDetectorService = deviceDetectorService;
+        this.$scope = $scope;
+    }
 
-        $scope.$watchCollection(
-            () => this.playlistService.playlist().map(i => i.id),
-            () => this.updateOnPlaylistChange()
+    $onInit() {
+        this.config.plugins.controls.autoHide = !this.deviceDetectorService.isTouchedDevice();
+
+        this.$scope.$watchCollection(
+            () => this.playlistService.playlist().map(i => i.id), () => this.updateOnPlaylistChange()
         );
+
         this.reloadPlaylist();
     }
 

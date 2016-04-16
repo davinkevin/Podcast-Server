@@ -1,8 +1,7 @@
 /**
     * Created by kevin on 20/02/2016 for Podcast Server
     */
-import {Component, View, Module} from '../../../../decorators';
-import template from './vg-copy.html!text';
+import {Component, Module} from '../../../../decorators';
 import './vg-copy.css!';
 
 @Module({
@@ -11,12 +10,8 @@ import './vg-copy.css!';
 @Component({
     selector : 'vg-copy',
     as : 'vgcopy',
-    bindToController : {
-        url : '='
-    }
-})
-@View({
-    template : template
+    bindings : { url: '='},
+    template : `<div><a copy="{{ vgcopy.url }}" class="fa fa-files-o"></a></div>`
 })
 export default class VgCopy {}
 

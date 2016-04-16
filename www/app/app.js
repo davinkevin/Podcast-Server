@@ -8,14 +8,9 @@ import StatsModule from './stats/stats';
 import ConfigModule from './config/config';
 
 @Boot({ element : document })
-@Module({name : 'podcastApp', modules : [
-    SearchModule,
-    PodcastsModule,
-    ItemModule,
-    DownloadModule,
-    PlayerModule,
-    StatsModule,
-    ConfigModule
-]})
+@Module({
+    name : 'podcastApp', 
+    modules : [ SearchModule, PodcastsModule, ItemModule, DownloadModule, PlayerModule, StatsModule, ConfigModule ]
+})
 export default class App {}
 

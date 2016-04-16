@@ -7,9 +7,6 @@ import ItemPlayer from './player/item.player';
 
 @Module({
     name : 'ps.item',
-    modules : [
-        ItemDetailsModule,
-        ItemPlayer
-    ]
+    modules : [ItemDetailsModule, ItemPlayer]
 })
 export default class Item{}

@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 05/12/2015 for Podcast Server
  */
-import {Component, View, Module} from '../../../decorators';
+import {Component, Module} from '../../../decorators';
 import DownloadManager from '../../service/data/downloadManager';
 import playlistService from '../../service/playlistService';
 import ItemServiceModule from '../../service/data/itemService';
@@ -17,7 +17,7 @@ import './item-menu.css!';
 @Component({
     selector : 'item-menu',
     as : 'imc',
-    bindToController : {
+    bindings : {
         item : '=',
         localRead : '=',
         onLineRead : '=',
@@ -28,9 +28,7 @@ import './item-menu.css!';
         deleteItem : '=',
         onDeleteItem : '&',
         resetItem : '='
-    }
-})
-@View({
+    },
     template : template
 })
 export default class ItemMenuComponent {

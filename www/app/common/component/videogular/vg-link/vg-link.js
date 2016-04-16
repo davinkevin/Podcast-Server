@@ -1,8 +1,7 @@
 /**
     * Created by kevin on 20/02/2016 for Podcast Server
     */
-import {Component, View, Module} from '../../../../decorators';
-import template from './vg-link.html!text';
+import {Component, Module} from '../../../../decorators';
 import './vg-link.css!';
 
 @Module({
@@ -11,12 +10,8 @@ import './vg-link.css!';
 @Component({
     selector : 'vg-link',
     as : 'vglink',
-    bindToController : {
-        url : '='
-    }
-})
-@View({
-    template : template
+    bindings : { url: '='},
+    template : `<div class="btn-video-share"><a target="_self" ng-href="{{ vglink.url }}" class="ionicons ion-android-share"></a></div>`
 })
 export default class VgLink {}
 

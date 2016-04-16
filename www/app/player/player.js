@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for Podcast Server
  */
-import {RouteConfig, View, Module} from '../decorators';
+import {Component, Module} from '../decorators';
 import VideogularModule from '../common/component/videogular/videogular';
 import AppRouteConfig from '../config/route';
 import DeviceDetectionService from '../common/service/device-detection';
@@ -14,15 +14,13 @@ import './player.css!';
     name : 'ps.player',
     modules : [ AppRouteConfig, VideogularModule, DeviceDetectionService, PlaylistService, WatchListService ]
 })
-@RouteConfig({
-    path : '/player',
+@Component({
+    selector : 'player',
     as : 'pc',
-    resolve : {
-        watchLists : WatchListService => { "ngInject"; return WatchListService.findAll();}
-    }
-})
-@View({
-    template : template
+    template : template,
+    
+    path : '/player',
+    resolve : { watchLists : WatchListService => { "ngInject"; return WatchListService.findAll();}}
 })
 export default class PlayerController {
 
@@ -35,12 +33,14 @@ export default class PlayerController {
     playlist = null;
     watchLists = null;
 
-    constructor(watchLists, VideogularService, WatchListService) {
+    constructor(VideogularService, WatchListService) {
         "ngInject";
         this.watchListService = WatchListService;
-        this.watchLists = watchLists;
+        this.VideogularService = VideogularService;
+    }
 
-        this.config = VideogularService.builder().build();
+    $onInit() {
+        this.config = this.VideogularService.builder().build();
     }
 
     play() {

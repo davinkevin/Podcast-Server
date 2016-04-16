@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {Component, View, Module} from '../../../decorators';
+import {Component, Module} from '../../../decorators';
 import template from './navbar.html!text';
 import './navbar.css!';
 
@@ -10,19 +10,15 @@ import './navbar.css!';
 })
 @Component({
     selector : 'navbar',
-    transclude : true,
+    as : 'navbar',
     replace : true,
-    as : 'navbar'
-})
-@View({
-    template : template
+    template : template,
+    transclude : true
 })
 export default class NavbarComponent {
-    constructor() {
+    constructor($element) {
+        "ngInject";
         this.navCollapsed = true;
-    }
-
-    static link(_, element) {
-        element.removeClass('hidden');
+        $element.removeClass('hidden');
     }
 }

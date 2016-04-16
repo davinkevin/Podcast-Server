@@ -4,6 +4,4 @@
 
 import 'ng-tags-input';
 
-export default {
-    name : 'ngTagsInput'
-};
+export default { name : 'ngTagsInput' };

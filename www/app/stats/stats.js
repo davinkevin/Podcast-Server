@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {RouteConfig, View, Module} from '../decorators';
+import {Component, Module} from '../decorators';
 import AppRouteConfig from '../config/route';
 import StatsService from '../common/service/data/statsService';
 import HighCharts from '../common/modules/highCharts';
@@ -11,24 +11,27 @@ import template from './stats.html!text';
     name : 'ps.stats',
     modules : [ AppRouteConfig, HighCharts, StatsService ]
 })
-@RouteConfig({
-    path : '/stats',
+@Component({
+    selector : 'stats',
     as : 'sc',
+    template : template,
+
+    path : '/stats',
     resolve : {
         stats : statService => {"ngInject"; return statService.statsByType();}
     }
-})
-@View({
-    template : template
 })
 export default class StatsController {
 
     month = 1;
 
-    constructor(statService, stats) {
+    constructor(statService) {
         "ngInject";
         this.statService = statService;
-        this.transform(stats);
+    }
+
+    $onInit() {
+        this.transform(this.stats);
     }
 
     transform(stats) {

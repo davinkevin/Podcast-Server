@@ -1,7 +1,7 @@
 /**
 * Created by kevin on 31/01/2016 for PodcastServer
 */
-import {Module, View, UibModal} from '../../../decorators';
+import {Module, UibModal} from '../../../decorators';
 import WatchListServiceModule from '../../service/data/watchlistService';
 import template from './watchlist-chooser.html!text';
 import './watchlist-chooser.css!';
@@ -14,11 +14,7 @@ import './watchlist-chooser.css!';
     as : 'wlc',
     size : 'sm',
     backdrop : true,
-    resolve : {
-        watchLists : WatchListService => {"ngInject"; return WatchListService.findAll();}
-    }
-})
-@View({
+    resolve : { watchLists : WatchListService => {"ngInject"; return WatchListService.findAll();}},
     template : template
 })
 export default class WatchlistChooser {

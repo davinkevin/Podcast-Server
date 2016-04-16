@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {Component, View, Module, Constant} from '../../../decorators';
+import {Component, Module, Constant} from '../../../decorators';
 import HtmlFilters from '../../../common/filter/html2plainText';
 import PlaylistService from '../../../common/service/playlistService';
 import ItemService from '../../../common/service/data/itemService';
@@ -13,44 +13,40 @@ import template from './episodes.html!text';
 })
 @Component({
     selector : 'podcast-items-list',
-    bindToController : {
-        podcast : '='
-    },
-    as : 'pic'
-})
-@Constant({ name : 'PodcastItemPerPage', value : 10 })
-@View({
+    as : 'pic',
+    bindings : { podcast : '='},
     template : template
 })
+@Constant({ name : 'PodcastItemPerPage', value : 10 })
 export default class PodcastItemsListComponent {
 
-    constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService, hotkeys, $window ) {
+    currentPage = 1;
+
+    constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService, hotkeys) {
         "ngInject";
         /* DI */
         this.$scope = $scope;
-        this.$window = $window;
         this.DownloadManager = DonwloadManager;
+        this.itemPerPage = PodcastItemPerPage;
         this.itemService = itemService;
         this.playlistService = playlistService;
+        this.hotkeys = hotkeys;
+    }
 
-        this.currentPage = 1;
-        this.itemPerPage = PodcastItemPerPage;
+    $onInit() {
         this.loadPage();
 
-        this.$scope.$on("podcastItems:refresh", () => {
-            this.currentPage = 1;
-            this.loadPage();
-        });
+        this.$scope.$on("podcastItems:refresh", () => { this.currentPage = 1; this.loadPage(); });
 
-        hotkeys
-            .bindTo($scope)
+        this.hotkeys
+            .bindTo(this.$scope)
             .add({ combo: 'right', description: 'Next page', callback: () => this.swipePage(1) })
             .add({ combo: 'left', description: 'Previous page', callback: () => this.swipePage(-1) });
 
         this.DownloadManager.ngstomp
-                .subscribeTo(`/topic/podcast/${this.podcast.id}`).withBodyInJson().bindTo($scope)
-                .callback(m => this.onMessageFromWS(m.body))
-            .connect();
+            .subscribeTo(`/topic/podcast/${this.podcast.id}`).withBodyInJson().bindTo(this.$scope)
+            .callback(m => this.onMessageFromWS(m.body))
+        .connect();
     }
 
     onMessageFromWS(item) {

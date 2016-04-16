@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {RouteConfig, View, Module} from '../../decorators';
+import {Component, Module} from '../../decorators';
 import WatchListChooser from '../../common/component/watchlist-chooser/watchlist-chooser';
 import DownloadManager from '../../common/service/data/downloadManager';
 import PlaylistService from '../../common/service/playlistService';
@@ -13,33 +13,36 @@ import template from './item-details.html!text';
     name : 'ps.item.details',
     modules : [ DownloadManager, HtmlFilters, PlaylistService, ItemService, WatchListChooser ]
 })
-@RouteConfig({
-    path : '/podcasts/:podcastId/item/:itemId',
+@Component({
+    selector : 'item-detail',
     as : 'idc',
+    template : template,
+
+    path : '/podcasts/:podcastId/item/:itemId',
     resolve : {
         item : (itemService, $route) => { "ngInject"; return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);},
         podcast : (podcastService, $route) => { "ngInject"; return podcastService.findById($route.current.params.podcastId);}
     }
-})
-@View({
-    template : template
+    
 })
 export default class ItemDetailCtrl {
 
-    constructor($scope, DonwloadManager, $location, playlistService, podcast, item, itemService, $uibModal){
+    constructor($scope, DonwloadManager, $location, playlistService, itemService, $uibModal){
         "ngInject";
         this.$uibModal = $uibModal;
         this.itemService = itemService;
-        this.item = item;
         this.$location = $location;
-        this.item.podcast = podcast;
         this.playlistService = playlistService;
         this.DonwloadManager = DonwloadManager;
+        this.$scope = $scope;
+    }
 
-        //** WebSocket Inscription **//
+    $onInit() {
+        this.item.podcast = this.podcast;
+
         this.DonwloadManager
             .ngstomp
-                .subscribeTo(`/topic/podcast/${this.item.podcast.id}`).withBodyInJson().bindTo($scope)
+                .subscribeTo(`/topic/podcast/${this.item.podcast.id}`).withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.attachNewDataToItem(m.body))
             .connect();
     }

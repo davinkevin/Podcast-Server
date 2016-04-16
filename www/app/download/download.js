@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 25/10/2015 for PodcastServer
  */
-import {RouteConfig, View, Module} from '../decorators';
+import {Component, Module} from '../decorators';
 import AngularNotification from '../common/modules/angularNotification';
 import AppRouteConfig from '../config/route';
 import DownloadManager from '../common/service/data/downloadManager';
@@ -9,44 +9,44 @@ import template from './download.html!text';
 
 @Module({
     name : 'ps.download',
-    modules : [
-        AngularNotification,
-        AppRouteConfig,
-        DownloadManager
-    ]
+    modules : [AngularNotification, AppRouteConfig, DownloadManager]
 })
-@RouteConfig({
-    path : '/download',
-    as : 'dc'
-})
-@View({
-    template : template
+@Component({
+    selector : 'download',
+    as : 'dc',
+    template : template,
+
+    path : '/download'
 })
 export default class DownloadCtrl {
 
+    waitingitems = [];
+    numberOfSimDl = 0;
+    items = [];
+
     constructor($scope, DonwloadManager, $notification) {
         "ngInject";
+        this.$scope = $scope;
         this.DonwloadManager = DonwloadManager;
         this.$notification = $notification;
-        this.items = [];
-        this.waitingitems = [];
-        this.numberOfSimDl = 0;
+    }
 
+    $onInit() {
         this.DonwloadManager.getNumberOfSimDl().then(v => { this.numberOfSimDl = parseInt(v); });
 
         /** Websocket Connection */
         this.DonwloadManager
             .ngstomp
-                .subscribeTo('/app/download').withBodyInJson().bindTo($scope)
+                .subscribeTo('/app/download').withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.items = m.body)
             .and()
-                .subscribeTo('/app/waiting').withBodyInJson().bindTo($scope)
+                .subscribeTo('/app/waiting').withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.waitingitems = m.body)
             .and()
-                .subscribeTo('/topic/download').withBodyInJson().bindTo($scope)
+                .subscribeTo('/topic/download').withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.onDownloadUpdate(m.body))
             .and()
-                .subscribeTo('/topic/waiting').withBodyInJson().bindTo($scope)
+                .subscribeTo('/topic/waiting').withBodyInJson().bindTo(this.$scope)
                 .callback(m => this.waitingitems = m.body)
             .connect();
     }
@@ -80,8 +80,7 @@ export default class DownloadCtrl {
     }
 
     getTypeFromStatus(item) {
-        if (item.status === "PAUSED") return "warning";
-        return "info";
+        return (item.status === "PAUSED") ? "warning" : "info";
     }
     updateNumberOfSimDl(number) {
         this.DonwloadManager.updateNumberOfSimDl(number);

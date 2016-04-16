@@ -2,18 +2,15 @@
     * Created by kevin on 12/12/2015 for Podcast Server
     */
 
-import {Component, Module} from '../../../decorators';
+import {Directive, Module} from '../../../decorators';
 import Clipboard from 'clipboard';
 
 @Module({
     name : 'ps.common.component.copy'
 })
-@Component({
+@Directive({
     selector : 'copy',
-    restrict : 'A',
-    bindToController : {
-        copy : '@'
-    },
+    bindToController : { copy: '@'},
     as : 'c'
 })
 export default class Copy {
@@ -24,14 +21,12 @@ export default class Copy {
     }
 
     get url() {
+        console.log(this.copy);
         return this.copy.substring(0, 1) === '/' ? this.baseUrl + this.copy : this.copy;
     }
 
     static link(scope, element, _, ctrl) {
-        let clipboard = new Clipboard(element[0], {
-            text: () => ctrl.url
-        });
-
+        let clipboard = new Clipboard(element[0], { text: () => ctrl.url});
         scope.$on('destroy', () => clipboard.destroy());
     }
 }
