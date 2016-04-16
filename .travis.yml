@@ -23,7 +23,7 @@ deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: YUVOX4hNRL7YRuf6ouzq1u2w/KQxB6N/f4Mvkjj46umXIZH0/K7A71lM9fWbt578EZluym3V9ZrKk9Y4CsFabl2wXrk6OPfJ8UTirWv7s+pOrg2tNpi+M/gfoVAlCcc/vsQbJmnR7D+J19qXQQ7BsK+z3gQL+O53xWnsL8GEsroL9yrt5whcMKxrBRoSpabqIYvY/C0LpczGDm5AuGQmdWvuajlChn/Q/iFxva/NvhTRWBHJMuohddM3wIPLR2+gjZS4DVLPiB2YgUJG+DjVI4Tjo0e6mjClKQf8NMOiZJa7+IwUV8OtebZBsVW5E6/hNGT5NrSkRlagZQM90LkLTsQdEIW72dlFizFJsR2Ew9vxV44Orws2yW4It4JGoG0pChoCRvvtX2SZRaOUjqNwFiZ+sD16cKdx5zaUxi3eXVOP68rWkNcUp9s0XfqZcNRt2iyDEw/Lvb0YxLARdyiPJi4RyUPRJqe0Eq1RuCOLxE5cg66xOOAL5owHq7O6mkS//0/qSD2xlUj1xioQI/iKC9DAjtzyz/ItVws10SCk0GEYgLNEuolbwmWWJa3sbTyu9LqQBeCpQyKGxE8b9ODix0LqHVkn1POd0t7gW4FFN3lOG810ntENtDnFPZh02BAB81MSVTYCv65Sz6BmTvNXmB+upU1NYOHb/x88SGtnOiE=
+    secure: X9W0MGueni+7ly75mS+NtEAWzJWaD1CZxOtf2OBYQ0wDVABzTO2gztSQjSwgttThrwEVWeAKS7TUE8WUHSpqGoD5pkfKwOMgyiX2angPWuvtWvBgguzuxdNAiQxMVVC+0KOVcXdeuvSMt69HjoVQVa0IKOqkRDwle6U2bQXSrOk=
   file: target/Podcast-Server.jar
   on:
     repo: davinkevin/Podcast-Server
@@ -35,9 +35,7 @@ after_deploy:
 - docker push davinkevin/podcast-server
 
 env:
-  global: # First three element are Docker specific value
+  global:
   - secure: knWjqJ3qz9AYfKgBqBTcgpzEe/XMDpG0Bpi/VsUFgdsi151Ob6z1mnfhGEuJ0CoSH6U1GGvCtBLvma0bAXhOyWYDh1ka9EjwdSQKqwLxcjhYSkKui88fPwvIl1s9KWcjr2yd2Yptoz2Up4TnXOJjj+m8b4jFBmkwW6t3GjDT6W4=
   - secure: IrOb+0Y6TYtOmKR80vQIu3SOlaLm2CHu/h4NpXJDJnSLXv3hKF/HJbvS7S/MALWG/gFFbAcD6zaZzsJgrmBHVMFKdNwDIIVlj4lxK5fjFY16uGCboQSijE4hXtCgZNwuqgsmzoe8rhehrju5yeBooPZvecj62AUXVkkHwv0f3IA=
   - secure: CS+sdLkKk+ZGy8HsBoSBbhy5exqfWRU3Q4c/W0S0UB8QBFKhguhLZg4XD/L3J39tPdpBZDHbRDmGb3cz4oKdk0xYfD6WEFgCIf2xcVhaD66W3qXaOSNglZvSJpjQKgCBAACZG2WBDsTHJuTayOfgMu8cfbVvfYstbkCcv08JCoo=
-
-
