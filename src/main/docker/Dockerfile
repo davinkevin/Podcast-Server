@@ -1,5 +1,5 @@
 FROM frolvlad/alpine-oraclejdk8:slim
-MAINTAINER Kevin DAVIN
+MAINTAINER Kevin DAVIN  <https://github.com/davinkevin/Podcast-Server/issues>
 
 RUN apk add --update rtmpdump
 
