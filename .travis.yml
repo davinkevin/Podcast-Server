@@ -19,6 +19,9 @@ script: mvn test jacoco:report
 after_success:
 - mvn coveralls:report
 
+before_deploy:
+- mvn package -DskipTests=true
+
 deploy:
   provider: releases
   skip_cleanup: true
