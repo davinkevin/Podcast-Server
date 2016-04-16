@@ -7,9 +7,13 @@ Back-end : [![Coverage Status](https://coveralls.io/repos/davinkevin/Podcast-Ser
 
 Front-end : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
 
-Application design to be your Podcast local proxy in your lan network.
-It also work on many sources like youtube or CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
+Docker : [![Image Layer IO](https://badge.imagelayers.io/davinkevin/podcast-server:latest.svg)](https://imagelayers.io/?images=davinkevin/podcast-server:latest 'Get your own badge on imagelayers.io')
 
+Application design to be your Podcast local proxy in your lan network.
+
+It also works on many sources like Youtube, Dailymotion, CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
+
+The application is available in [fat-jar](https://github.com/davinkevin/Podcast-Server/releases) format or in [docker images](https://hub.docker.com/r/davinkevin/podcast-server/) 
 
 ## License
 
