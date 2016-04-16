@@ -9,17 +9,12 @@ spring :
         driver-class-name: org.h2.Driver
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
-        hibernate :
-            ddl-auto: update
         properties :
             hibernate:
                 search.default:
                         indexmanager: near-real-time
                         directory_provider: ram
                         indexBase: /tmp/lucene
-            jadira:
-              usertype:
-                autoRegisterUserTypes: true
 
 ##############################
 #    Application Specific    #
@@ -30,10 +25,9 @@ podcastserver:
     concurrent-download: 3
     max-update-parallels: 3
     cover-default-name: cover
-    number-of-day-to-download: 1
+    number-of-day-to-download: 30
     number-of-try: 10
-    #server-url: http://192.168.1.203:8080
-    #file-container: ${podcastserver.server-url}/podcast
+    server-url: http://localhost:${server.port}
     #download-extension: .psdownload
     #rss-default-number-item: 50
     update-and-download:
@@ -41,7 +35,7 @@ podcastserver:
             cron: 0 0 0 * * ?
     backup :
       location: /tmp/
-      cron: 0 0 0 * * ?
+      cron: 0 30 4 * * ?
       binary: false
     externaltools:
         #rtmpdump: /usr/local/bin/rtmpdump
