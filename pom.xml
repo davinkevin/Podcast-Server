@@ -371,7 +371,11 @@
         <artifactId>docker-maven-plugin</artifactId>
         <version>0.4.3</version>
         <configuration>
-          <imageName>davinkevin/podcast-server:v${project.version}</imageName>
+          <imageName>davinkevin/podcast-server</imageName>
+          <imageTags>
+            <imageTag>v${project.version}</imageTag>
+            <imageTag>latest</imageTag>
+          </imageTags>
           <dockerDirectory>src/main/docker</dockerDirectory>
           <resources>
             <resource>
