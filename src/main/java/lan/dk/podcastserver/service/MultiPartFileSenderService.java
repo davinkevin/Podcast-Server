@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import static java.util.Objects.nonNull;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MultiPartFileSenderService {
 
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
@@ -55,10 +57,6 @@ public class MultiPartFileSenderService {
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
 
     final MimeTypeService mimeTypeService;
-
-    @Autowired MultiPartFileSenderService(MimeTypeService mimeTypeService) {
-        this.mimeTypeService = mimeTypeService;
-    }
 
     public MultiPartFileSenderImpl fromPath(Path path) {
         return new MultiPartFileSenderImpl(mimeTypeService).setFilepath(path);
@@ -327,7 +325,7 @@ public class MultiPartFileSenderService {
             this.total = total;
         }
 
-        public static long sublong(String value, int beginIndex, int endIndex) {
+        static long sublong(String value, int beginIndex, int endIndex) {
             String substring = value.substring(beginIndex, endIndex);
             return (substring.length() > 0) ? Long.parseLong(substring) : -1;
         }
