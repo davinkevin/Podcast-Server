@@ -18,28 +18,97 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FinderSelectorTest {
 
+    @Mock BeInSportsFinder beInSportsFinder;
+    @Mock CanalPlusFinder canalPlusFinder;
+    @Mock DailymotionFinder dailymotionFinder;
+    @Mock JeuxVideoComFinder jeuxVideoComFinder;
+    @Mock PluzzFinder pluzzFinder;
     @Mock RSSFinder rssFinder;
     @Mock YoutubeFinder youtubeFinder;
-    @Mock DailymotionFinder dailymotionFinder;
-    @Mock PluzzFinder pluzzFinder;
-    FinderSelector finderSelector;
+
+    private FinderSelector finderSelector;
 
     @Before
     public void beforeEach() {
+        when(beInSportsFinder.compatibility(anyString())).thenCallRealMethod();
+        when(canalPlusFinder.compatibility(anyString())).thenCallRealMethod();
+        when(dailymotionFinder.compatibility(anyString())).thenCallRealMethod();
+        when(jeuxVideoComFinder.compatibility(anyString())).thenCallRealMethod();
+        when(pluzzFinder.compatibility(anyString())).thenCallRealMethod();
         when(rssFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
-        when(dailymotionFinder.compatibility(anyString())).thenCallRealMethod();
-        when(pluzzFinder.compatibility(anyString())).thenCallRealMethod();
+
         finderSelector = new FinderSelector();
 
-        finderSelector.setFinders(Sets.newHashSet(rssFinder, youtubeFinder, dailymotionFinder, pluzzFinder));
+        finderSelector.setFinders(Sets.newHashSet(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, pluzzFinder, rssFinder, youtubeFinder));
     }
 
     @Test
     public void should_reject_if_url_empty() {
         assertThat(finderSelector.of(null)).isEqualTo(FinderSelector.NO_OP_FINDER);
     }
-    
+
+
+    @Test
+    public void should_find_beinsports() {
+        /* Given */
+        String url = "http://www.beinsports.com/france/replay/lexpresso";
+
+        /* When */
+        Finder finder = finderSelector.of(url);
+
+        /* Then */
+        assertThat(finder).isSameAs(beInSportsFinder);
+    }
+
+    @Test
+    public void should_find_canalplus() {
+        /* Given */
+        String url = "http://www.canalplus.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html";
+
+        /* When */
+        Finder finder = finderSelector.of(url);
+
+        /* Then */
+        assertThat(finder).isSameAs(canalPlusFinder);
+    }
+
+    @Test
+    public void should_find_dailymotion() {
+        /* Given */
+        String url = "http://www.dailymotion.com/foo/bar";
+
+        /* When */
+        Finder finder = finderSelector.of(url);
+
+        /* Then */
+        assertThat(finder).isSameAs(dailymotionFinder);
+    }
+
+    @Test
+    public void should_find_jeuxvideocom() {
+        /* Given */
+        String url = "http://www.jeuxvideo.com/chroniques-video.htm";
+
+        /* When */
+        Finder finder = finderSelector.of(url);
+
+        /* Then */
+        assertThat(finder).isSameAs(jeuxVideoComFinder);
+    }
+
+    @Test
+    public void should_find_pluzz() {
+        /* Given */
+        String url = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
+
+        /* When */
+        Finder finder = finderSelector.of(url);
+
+        /* Then */
+        assertThat(finder).isSameAs(pluzzFinder);
+    }
+
     @Test
     public void should_find_RSS() {
         /* Given */
@@ -62,29 +131,5 @@ public class FinderSelectorTest {
 
         /* Then */
         assertThat(finder).isSameAs(youtubeFinder);
-    }
-
-    @Test
-    public void should_find_dailymotion() {
-        /* Given */
-        String url = "http://www.dailymotion.com/foo/bar";
-
-        /* When */
-        Finder finder = finderSelector.of(url);
-
-        /* Then */
-        assertThat(finder).isSameAs(dailymotionFinder);
-    }
-
-    @Test
-    public void should_find_pluzz() {
-        /* Given */
-        String url = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
-
-        /* When */
-        Finder finder = finderSelector.of(url);
-
-        /* Then */
-        assertThat(finder).isSameAs(pluzzFinder);
     }
 }
