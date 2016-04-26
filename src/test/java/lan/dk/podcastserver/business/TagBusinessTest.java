@@ -11,7 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.AdditionalMatchers.or;
+import static org.mockito.AdditionalMatchers.and;
+import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -76,23 +77,26 @@ public class TagBusinessTest {
         Set<Tag> tags = new HashSet<>();
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        tags.add(new Tag().setId(id1).setName("tag" + id1));
-        tags.add(new Tag().setId(id2).setName("tag" + id2));
-        tags.add(new Tag().setName("Foo"));
-        tags.add(new Tag().setName("Bar"));
+        Tag tag1 = new Tag().setId(id1).setName("tag" + id1);
+        Tag tag2 = new Tag().setId(id2).setName("tag" + id2);
+        Tag tag3 = new Tag().setName("Foo");
+        Tag tag4 = new Tag().setName("Bar");
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        tags.add(tag4);
 
-        when(tagRepository.findOne(any(UUID.class)))
-                .then(invocation -> new Tag()
-                        .setId((UUID) invocation.getArguments()[0])
-                        .setName("tag" + invocation.getArguments()[0])
-                );
+
+        when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Optional.of(tag1));
+        when(tagRepository.findByNameIgnoreCase(eq(tag2.getName()))).thenReturn(Optional.of(tag2));
+        when(tagRepository.findByNameIgnoreCase(and(not(eq(tag1.getName())), not(eq(tag1.getName()))))).thenReturn(Optional.empty());
+
+        when(tagRepository.save(any(Tag.class))).then(t -> t.getArgumentAt(0, Tag.class).setId(UUID.randomUUID()));
 
         /* When */
         Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);
 
         /* Then */
-        assertThat(tagListByName).containsAll(tags);
-
-        verify(tagRepository, times(2)).findOne(or(eq(id1), eq(id2)));
+        assertThat(tagListByName).extracting("name", String.class).contains(tag1.getName(), tag2.getName(), tag3.getName(), tag4.getName());
     }
 }

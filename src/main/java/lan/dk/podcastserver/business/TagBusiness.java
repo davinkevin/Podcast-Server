@@ -2,20 +2,28 @@ package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.TagRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 07/06/2014.
  */
+@Slf4j
 @Component
 @Transactional
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TagBusiness {
 
-    @Resource TagRepository tagRepository;
+    final TagRepository tagRepository;
 
     public List<Tag> findAll() {
         return tagRepository.findAll();
@@ -29,18 +37,14 @@ public class TagBusiness {
         return tagRepository.findByNameContainsIgnoreCase(name);
     }
 
-    public Set<Tag> getTagListByName(Set<Tag> tagList) {
-        Set<Tag> tagResult = new HashSet<>();
+    Set<Tag> getTagListByName(Set<Tag> tagList) {
+        return tagList
+                .stream()
+                .map(t -> findByName(t.getName()))
+                .collect(toSet());
+    }
 
-        for(Tag tag : tagList) {
-            if (tag.getId() != null) {
-                Tag tmpTag = tagRepository.findOne(tag.getId());
-                tagResult.add(tmpTag);
-            } else {
-                tagResult.add(tag);
-            }
-        }
-
-        return tagResult;
+    private Tag findByName(String name) {
+        return tagRepository.findByNameIgnoreCase(name).orElseGet(() -> tagRepository.save(new Tag().setName(name)));
     }
 }
