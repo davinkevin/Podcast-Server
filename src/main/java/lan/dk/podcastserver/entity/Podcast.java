@@ -64,9 +64,9 @@ public class Podcast implements Serializable {
     @JsonView(PodcastDetailsView.class)
     private Boolean hasToBeDeleted;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
     @JsonView(PodcastDetailsView.class)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER) @Fetch(FetchMode.SUBSELECT)
+    @JoinTable(name = "PODCAST_TAGS", joinColumns = @JoinColumn(name = "PODCASTS_ID"), inverseJoinColumns = @JoinColumn(name = "TAGS_ID"))
     private Set<Tag> tags = new HashSet<>();
 
     @Override

@@ -1,7 +1,9 @@
 package lan.dk.podcastserver.utils.facade;
 
+import com.google.common.collect.Lists;
 import lan.dk.podcastserver.entity.Tag;
 import org.junit.Test;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +56,35 @@ public class SearchItemPageRequestWrapperTest {
         assertThat(siWithTerm.isSearch()).isTrue();
         assertThat(siWithDownload.isSearch()).isTrue();
         assertThat(siWithoutDownload.isSearch()).isFalse();
+    }
+
+    @Test
+    public void should_be_equals() {
+        /* Given */
+        Tag foo = Tag.builder().id(UUID.randomUUID()).name("Foo").build();
+        Tag bar = Tag.builder().id(UUID.randomUUID()).name("Bar").build();
+
+        PageRequestFacade prf1 = new SearchItemPageRequestWrapper()
+                .setDownloaded(Boolean.TRUE)
+                .setTags(Lists.newArrayList(foo, bar))
+                .setTerm("Search")
+                .setPage(1)
+                .setSize(12)
+                .setOrders(Lists.newArrayList(new PageRequestFacade.OrderFacade(Sort.Direction.ASC.toString(), "downloadedDate")));
+
+        PageRequestFacade prf2 = new SearchItemPageRequestWrapper()
+                .setDownloaded(Boolean.TRUE)
+                .setTags(Lists.newArrayList(foo, bar))
+                .setTerm("Search")
+                .setPage(1)
+                .setSize(12)
+                .setOrders(Lists.newArrayList(new PageRequestFacade.OrderFacade(Sort.Direction.ASC.toString(), "downloadedDate")));
+
+
+        /* When */
+
+        /* Then */
+        assertThat(prf1).isEqualTo(prf2);
     }
 
 

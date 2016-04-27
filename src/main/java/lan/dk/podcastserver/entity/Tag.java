@@ -1,23 +1,24 @@
 package lan.dk.podcastserver.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.UUID;
 
 /**
  * Created by kevin on 07/06/2014.
  */
-
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter @Setter
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,10 +32,6 @@ public class Tag {
 
     @Column(unique = true)
     private String name;
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "tags")
-    private Set<Podcast> podcasts = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

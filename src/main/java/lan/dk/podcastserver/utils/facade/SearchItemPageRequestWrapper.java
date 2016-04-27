@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.utils.facade;
 
 import lan.dk.podcastserver.entity.Tag;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -15,6 +16,7 @@ import static java.util.Objects.nonNull;
 /**
  * Created by kevin on 08/06/2014 for Podcast Server
  */
+@EqualsAndHashCode(callSuper = true)
 @Getter @Setter
 @Accessors(chain = true)
 public class SearchItemPageRequestWrapper extends PageRequestFacade {

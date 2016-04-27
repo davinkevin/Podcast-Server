@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.entity;
 
-import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,13 +26,11 @@ public class TagTest {
         UUID id = UUID.randomUUID();
         Tag tag = new Tag()
             .setName("Humour")
-            .setId(id)
-            .setPodcasts(Sets.newHashSet(PODCAST_1, PODCAST_2));
+            .setId(id);
 
         assertThat(tag)
             .hasId(id)
-            .hasName("Humour")
-            .hasOnlyPodcasts(PODCAST_1, PODCAST_2);
+            .hasName("Humour");
     }
 
     @Test
