@@ -16,13 +16,17 @@ import template from './download.html!text';
     as : 'dc',
     template : template,
 
-    path : '/download'
+    path : '/download',
+    resolve : {
+        waitingItems : DonwloadManager => {"ngInject"; return DonwloadManager.queue();},
+        items : DonwloadManager => {"ngInject"; return DonwloadManager.downloading();}
+    }
 })
 export default class DownloadCtrl {
 
-    waitingitems = [];
+    //waitingItems = [];
     numberOfSimDl = 0;
-    items = [];
+    //items = [];
 
     constructor($scope, DonwloadManager, $notification) {
         "ngInject";
@@ -34,21 +38,21 @@ export default class DownloadCtrl {
     $onInit() {
         this.DonwloadManager.getNumberOfSimDl().then(v => { this.numberOfSimDl = parseInt(v); });
 
-        /** Websocket Connection */
-        this.DonwloadManager
-            .ngstomp
-                .subscribeTo('/app/download').withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.items = m.body)
-            .and()
-                .subscribeTo('/app/waiting').withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.waitingitems = m.body)
-            .and()
-                .subscribeTo('/topic/download').withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.onDownloadUpdate(m.body))
-            .and()
-                .subscribeTo('/topic/waiting').withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.waitingitems = m.body)
-            .connect();
+        this.DonwloadManager.waiting$.onNext(this.waitingItems);
+
+        this.downloadSub = this.DonwloadManager
+            .download$
+            .subscribe(m => this.$scope.$evalAsync(() => this.onDownloadUpdate(m)));
+
+        this.waitingSub = this.DonwloadManager
+            .waiting$
+            .filter(v => v)
+            .subscribe(m => this.$scope.$evalAsync(() => this.waitingItems = m));
+    }
+
+    $onDestroy() {
+        this.downloadSub.dispose();
+        this.waitingSub.dispose();
     }
 
     onDownloadUpdate(item) {

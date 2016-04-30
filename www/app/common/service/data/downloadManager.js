@@ -1,5 +1,6 @@
 import {Module, Service} from '../../../decorators';
 import AngularStompDKConfig from '../../../config/ngstomp';
+import Rx from 'rx';
 
 @Module({
     name : 'ps.common.service.data.downloadManager',
@@ -9,11 +10,32 @@ import AngularStompDKConfig from '../../../config/ngstomp';
 export default class DownloadManager {
 
     WS_DOWNLOAD_BASE = '/app/download';
-
+    download$ = new Rx.BehaviorSubject({});
+    waiting$ = new Rx.BehaviorSubject();
+    updating$ = new Rx.BehaviorSubject(null);
+    
     constructor(ngstomp, $http) {
         "ngInject";
         this.$http = $http;
         this.ngstomp = ngstomp;
+
+        this.ngstomp.subscribeTo('/topic/download').withBodyInJson()
+                .callback(m => this.download$.onNext(m.body))
+            .and()
+                .subscribeTo('/topic/waiting').withBodyInJson()
+                .callback(m => this.waiting$.onNext(m.body))
+            .and()
+                .subscribeTo('/topic/updating').withBodyInJson()
+                .callback(m => this.updating$.onNext(m.body))
+            .connect();
+    }
+
+    downloading() {
+        return this.$http.get(`/api/task/downloadManager/downloading`).then(r => r.data);
+    }
+
+    queue() {
+        return this.$http.get(`/api/task/downloadManager/queue`).then(r => r.data);
     }
 
     download(item) {

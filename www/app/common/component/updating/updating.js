@@ -3,13 +3,13 @@
  */
 import angular from 'angular';
 import {Component, Module} from '../../../decorators';
-import AngularStompDKConfig from '../../../config/ngstomp';
+import DownloadManager from '../../../common/service/data/downloadManager';
 import template from './updating.html!text';
 import './updating.css!';
 
 @Module({
     name : 'ps.common.component.updating',
-    modules : [ AngularStompDKConfig ]
+    modules : [ DownloadManager ]
 })
 @Component({
     selector : 'update-status',
@@ -20,23 +20,17 @@ export default class UpdatingStatusComponent {
 
     isUpdating = false;
 
-    constructor(ngstomp, $scope, $element) {
+    constructor(DonwloadManager, $scope, $element) {
         "ngInject";
-        this.ngstomp = ngstomp;
+        this.DownloadManager = DonwloadManager;
         this.$scope = $scope;
         this.$element = $element;
     }
 
     $onInit(){
-        this.ngstomp
-            .subscribeTo('/app/updating')
-                .callback(message => this.updateStatus(message))
-                .withBodyInJson().bindTo(this.$scope)
-            .and()
-            .subscribeTo('/topic/updating')
-                .callback(message => this.updateStatus(message))
-                .withBodyInJson().bindTo(this.$scope)
-            .connect();
+        this.isUpdatingSub = this.DownloadManager
+            .updating$
+            .subscribe(isUpdating => this.$scope.$evalAsync(() => this.isUpdating = isUpdating));
 
         let liParent = this.$element.parent().parent()[0];
 
@@ -47,6 +41,10 @@ export default class UpdatingStatusComponent {
                 newValue => (newValue) ? liElement.removeClass('hidden') : liElement.addClass('hidden')
             );
         }
+    }
+
+    $onDestroy() {
+        this.isUpdatingSub.dispose();
     }
 
     updateStatus(message) {

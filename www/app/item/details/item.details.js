@@ -40,15 +40,14 @@ export default class ItemDetailCtrl {
     $onInit() {
         this.item.podcast = this.podcast;
 
-        this.DonwloadManager
-            .ngstomp
-                .subscribeTo(`/topic/podcast/${this.item.podcast.id}`).withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.attachNewDataToItem(m.body))
-            .connect();
+        this.subscription = this.DonwloadManager
+            .download$
+            .filter(item => item.id === this.item.id)
+            .subscribe(item => this.$scope.$evalAsync(() => Object.assign(this.item, item)));
     }
-
-    attachNewDataToItem(item) {
-        if (item.id == this.item.id) { Object.assign(this.item, item); }
+    
+    $onDestroy() {
+        this.subscription.dispose();
     }
 
     download() {

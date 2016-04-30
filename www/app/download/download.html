@@ -35,23 +35,23 @@
 
     <br/>
 
-    <uib-accordion close-others="true" ng-show="dc.waitingitems.length > 0">
+    <uib-accordion close-others="true" ng-show="dc.waitingItems.length > 0">
         <uib-accordion-group is-open="true">
             <uib-accordion-heading>
-                Waiting list <span class="pull-right badge">{{ dc.waitingitems.length }}</span>
+                Waiting list <span class="pull-right badge">{{ dc.waitingItems.length }}</span>
             </uib-accordion-heading>
-            <div class="media item-in-waiting-list clearfix"  ng-repeat="item in dc.waitingitems track by item.id"  >
+            <div class="media item-in-waiting-list clearfix"  ng-repeat="item in dc.waitingItems track by item.id"  >
                 <div class="pull-right">
                     <br/>
                     <button ng-click="dc.removeFromQueue(item)" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-minus"></i></button>
                     <button ng-click="dc.dontDonwload(item)" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-stop"></i></button>
-                    <div class="btn-group" uib-dropdown is-open="isopen" ng-show="dc.waitingitems.length > 1">
+                    <div class="btn-group" uib-dropdown is-open="isopen" ng-show="dc.waitingItems.length > 1">
                         <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle><i class="glyphicon glyphicon-option-vertical"></i></button>
                         <ul class="uib-dropdown-menu" role="menu">
                             <li ng-hide="$first"><a ng-click="dc.moveInWaitingList(item, 0)"><span class="fa fa-angle-double-up"></span> First</a></li>
                             <li><a ng-hide="$first || $index === 1" ng-click="dc.moveInWaitingList(item, $index-1)"><span class="fa fa-angle-up"></span> Move-up</a></li>
-                            <li><a ng-hide="$last || $index === dc.waitingitems.length-2" ng-click="dc.moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Move-down</a></li>
-                            <li><a ng-hide="$last" ng-click="dc.moveInWaitingList(item, dc.waitingitems.length-1   )"><span class="fa fa-angle-double-down"></span> Last</a></li>
+                            <li><a ng-hide="$last || $index === dc.waitingItems.length-2" ng-click="dc.moveInWaitingList(item, $index+1)"><span class="fa fa-angle-down"></span> Move-down</a></li>
+                            <li><a ng-hide="$last" ng-click="dc.moveInWaitingList(item, dc.waitingItems.length-1   )"><span class="fa fa-angle-double-down"></span> Last</a></li>
                         </ul>
                     </div>
                 </div>

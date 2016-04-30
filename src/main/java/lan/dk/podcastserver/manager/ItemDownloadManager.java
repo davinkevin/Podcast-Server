@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
-@Transactional
+
 public class ItemDownloadManager {
 
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
@@ -178,6 +178,7 @@ public class ItemDownloadManager {
         manageDownload();
     }
 
+    @Transactional
     public void removeItemFromQueue(UUID id, Boolean stopItem) {
         Item item = itemRepository.findOne(id);
         this.removeItemFromQueue(item);
@@ -188,7 +189,7 @@ public class ItemDownloadManager {
         this.convertAndSendWaitingQueue();
     }
 
-    public void removeItemFromQueue(Item item) {
+    private void removeItemFromQueue(Item item) {
         waitingQueue.remove(item);
     }
 

@@ -34,7 +34,13 @@ export default class PodcastItemsListComponent {
     }
 
     $onInit() {
+        this.podcast.items = [];
         this.loadPage();
+
+        this.subscription = this.DownloadManager
+            .download$
+            .filter(item => this.podcast.items.some(elem => elem.id === item.id))
+            .subscribe(item => this.$scope.$evalAsync(() => Object.assign(this.podcast.items.find(elem => elem.id === item.id), item)));
 
         this.$scope.$on("podcastItems:refresh", () => { this.currentPage = 1; this.loadPage(); });
 
@@ -42,16 +48,10 @@ export default class PodcastItemsListComponent {
             .bindTo(this.$scope)
             .add({ combo: 'right', description: 'Next page', callback: () => this.swipePage(1) })
             .add({ combo: 'left', description: 'Previous page', callback: () => this.swipePage(-1) });
-
-        this.DownloadManager.ngstomp
-            .subscribeTo(`/topic/podcast/${this.podcast.id}`).withBodyInJson().bindTo(this.$scope)
-            .callback(m => this.onMessageFromWS(m.body))
-        .connect();
     }
 
-    onMessageFromWS(item) {
-        let elemToUpdate = this.podcast.items.find(elem => elem.id === item.id);
-        Object.assign(elemToUpdate, item);
+    $onDestroy() {
+        this.subscription.dispose();
     }
 
     loadPage() {

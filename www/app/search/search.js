@@ -60,22 +60,33 @@ export default class ItemSearchCtrl {
 
         this.attachResponse(this.page);
 
-        //** WebSocket Subscription **//
-        this.DownloadManager
-            .ngstomp
-                .subscribeTo('/topic/download').withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.updateItemFromWS(m.body))
-            .and()
-                .subscribeTo('/topic/updating').withBodyInJson().bindTo(this.$scope)
-                .callback(m => this.updatePageWhenUpdateDone(m.body))
-            .connect();
+        this.elemInPageSub = this.DownloadManager
+            .download$
+            .filter(item => this.items.some(elem => elem.id === item.id))
+            .subscribe(item => this.$scope.$evalAsync(() => Object.assign(this.items.find(elem => elem.id === item.id), item)));
+
+        this.isNewDownloadedSub = this.DownloadManager
+            .download$
+            .filter(item => item.isDownloaded)
+            .subscribe(() => this.$scope.$evalAsync(() => this.changePage()));
+
+        this.isUpdatingSub = this.DownloadManager
+            .updating$
+            .filter(isUpdating => isUpdating === false)
+            .subscribe(() => this.$scope.$evalAsync(() => this.changePage()));
 
         this.$scope.$on('$routeUpdate', () => {
             if (this.currentPage !== this.$location.search().page) {
                 this.currentPage = this.$location.search().page || 1;
                 this.changePage();
             }
-        });
+        });                   
+    }
+
+    $onDestroy() {
+        this.elemInPageSub.dispose();
+        this.isNewDownloadedSub.dispose();
+        this.isUpdatingSub.dispose();
     }
 
     updateItemFromWS(item) {
