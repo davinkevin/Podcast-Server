@@ -21,7 +21,6 @@ export default class Copy {
     }
 
     get url() {
-        console.log(this.copy);
         return this.copy.substring(0, 1) === '/' ? this.baseUrl + this.copy : this.copy;
     }
 
