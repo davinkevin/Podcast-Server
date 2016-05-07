@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
-
 public class ItemDownloadManager {
 
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";

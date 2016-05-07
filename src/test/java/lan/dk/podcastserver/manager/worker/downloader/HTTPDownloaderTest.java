@@ -112,7 +112,6 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/file.mp4");
     }
 
@@ -142,7 +141,6 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         assertThat(httpDownloader.target.toString()).isEqualTo(String.format("/tmp/A Fake Podcast/file.mp4%s", TEMPORARY_EXTENSION));
     }
 
@@ -173,7 +171,6 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(2)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
 
     @Test
@@ -200,7 +197,6 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
 
     @Test
@@ -227,7 +223,6 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(2)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
     }
 
 }

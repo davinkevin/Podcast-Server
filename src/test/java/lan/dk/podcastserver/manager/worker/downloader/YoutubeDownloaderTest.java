@@ -120,7 +120,6 @@ public class YoutubeDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         verify(vGet, times(1)).extract(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
         verify(vGet, times(1)).setTarget(any(File.class));
         verify(vGet, times(1)).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
@@ -203,7 +202,6 @@ public class YoutubeDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         verify(vGet, times(1)).extract(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
         verify(vGet, times(1)).setTarget(any(File.class));
         verify(vGet, times(1)).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
@@ -304,7 +302,6 @@ public class YoutubeDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        verify(template, atLeast(1)).convertAndSend(eq(String.format(WS_TOPIC_PODCAST, podcast.getId())), same(item));
         verify(vGet, times(1)).extract(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
         verify(vGet, times(1)).setTarget(any(File.class));
         verify(vGet, times(1)).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
