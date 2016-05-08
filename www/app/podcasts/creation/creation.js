@@ -25,12 +25,13 @@ import template from './creation.html!text';
 @Constant({ name : 'defaultPodcast', value : { hasToBeDeleted : true, cover : { height: 200, width: 200 }} })
 export default class PodcastCreationController {
 
-    constructor($location, defaultPodcast, tagService, podcastService) {
+    constructor($location, TitleService, defaultPodcast, tagService, podcastService) {
         "ngInject";
         this.podcastService = podcastService;
         this.$location = $location;
         this.tagService = tagService;
         this.podcast = angular.extend({}, defaultPodcast);
+        TitleService.title = 'Creation';
     }
 
     findInfo() {

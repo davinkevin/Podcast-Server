@@ -2,6 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {Component, Module} from '../../decorators';
+import {TitleService} from '../../common/service/title.service';
 import WatchListChooser from '../../common/component/watchlist-chooser/watchlist-chooser';
 import DownloadManager from '../../common/service/data/downloadManager';
 import PlaylistService from '../../common/service/playlistService';
@@ -11,7 +12,7 @@ import template from './item-details.html!text';
 
 @Module({
     name : 'ps.item.details',
-    modules : [ DownloadManager, HtmlFilters, PlaylistService, ItemService, WatchListChooser ]
+    modules : [ DownloadManager, HtmlFilters, PlaylistService, ItemService, WatchListChooser, TitleService ]
 })
 @Component({
     selector : 'item-detail',
@@ -27,7 +28,7 @@ import template from './item-details.html!text';
 })
 export default class ItemDetailCtrl {
 
-    constructor($scope, DonwloadManager, $location, playlistService, itemService, $uibModal){
+    constructor($scope, DonwloadManager, $location, playlistService, itemService, $uibModal, TitleService){
         "ngInject";
         this.$uibModal = $uibModal;
         this.itemService = itemService;
@@ -35,9 +36,12 @@ export default class ItemDetailCtrl {
         this.playlistService = playlistService;
         this.DonwloadManager = DonwloadManager;
         this.$scope = $scope;
+        this.TitleService = TitleService;
     }
 
     $onInit() {
+        this.TitleService.title = this.item.title;
+
         this.item.podcast = this.podcast;
 
         this.subscription = this.DonwloadManager

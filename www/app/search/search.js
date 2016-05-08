@@ -4,6 +4,7 @@
 
 import angular from 'angular';
 import {Component, Module, Constant, Service} from '../decorators';
+import {TitleService} from '../common/service/title.service';
 import NgStorage from 'ngstorage';
 import NgTagsInput from '../common/modules/ngTagsInput';
 import AppRouteConfig from '../config/route';
@@ -17,7 +18,7 @@ import './search.css!';
 
 @Module({
     name : 'ps.search',
-    modules : [ItemMenu, NgTagsInput, NgStorage, AppRouteConfig, DownloadManager, ItemService, TagService, PlaylistService]
+    modules : [ItemMenu, NgTagsInput, NgStorage, AppRouteConfig, DownloadManager, ItemService, TagService, PlaylistService, TitleService]
 })
 @Component({
     selector : 'search',
@@ -37,7 +38,7 @@ export default class ItemSearchCtrl {
     totalItems = Number.MAX_VALUE;
     maxSize = 10;
 
-    constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, hotkeys) {
+    constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, hotkeys, TitleService) {
         "ngInject";
         this.$scope = $scope;
         this.SearchItemCache = SearchItemCache;
@@ -47,11 +48,13 @@ export default class ItemSearchCtrl {
         this.DownloadManager = DonwloadManager;
         this.playlistService = playlistService;
         this.hotkeys = hotkeys;
+        this.TitleService = TitleService;
     }
 
     $onInit() {
         this.currentPage = this.SearchItemCache.page + 1;
         this.searchParameters = this.SearchItemCache.parameters;
+        this.TitleService.title = 'Search';
 
         this.hotkeys
             .bindTo(this.$scope)

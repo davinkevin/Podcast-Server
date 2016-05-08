@@ -1,4 +1,5 @@
 import {Component, Module} from '../../decorators';
+import {TitleService} from '../../common/service/title.service';
 import StatsModule from './stats/stats';
 import EpisodesModule from './episodes/episodes';
 import EditionModule from './edition/edition';
@@ -11,7 +12,7 @@ import template from './details.html!text';
 
 @Module({
     name : 'ps.podcasts.details',
-    modules : [AppRouteConfig, StatsModule, EpisodesModule, EditionModule, UploadModule, UpdateService, PodcastService]
+    modules : [AppRouteConfig, StatsModule, EpisodesModule, EditionModule, UploadModule, UpdateService, PodcastService, TitleService]
 })
 @Component({
     selector : 'podcasts-detail',
@@ -25,11 +26,12 @@ import template from './details.html!text';
 })
 export default class PodcastDetailCtrl {
 
-    constructor($scope, podcastService, $timeout){
+    constructor($scope, podcastService, $timeout, TitleService){
         "ngInject";
         this.$scope = $scope;
         this.podcastService = podcastService;
         this.$timeout = $timeout;
+        this.TitleService = TitleService;
     }
 
     $onInit() {
@@ -45,6 +47,8 @@ export default class PodcastDetailCtrl {
         ];
 
         this.podcast.isUpdatable = () => this.type !== 'send';
+
+        this.TitleService.title = this.podcast.title;
     }
 
     refreshItems() {

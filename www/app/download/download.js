@@ -2,6 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {Component, Module} from '../decorators';
+import {TitleService} from '../common/service/title.service';
 import AngularNotification from '../common/modules/angularNotification';
 import AppRouteConfig from '../config/route';
 import DownloadManager from '../common/service/data/downloadManager';
@@ -9,7 +10,7 @@ import template from './download.html!text';
 
 @Module({
     name : 'ps.download',
-    modules : [AngularNotification, AppRouteConfig, DownloadManager]
+    modules : [AngularNotification, AppRouteConfig, DownloadManager, TitleService]
 })
 @Component({
     selector : 'download',
@@ -28,14 +29,17 @@ export default class DownloadCtrl {
     numberOfSimDl = 0;
     //items = [];
 
-    constructor($scope, DonwloadManager, $notification) {
+    constructor($scope, DonwloadManager, $notification, TitleService) {
         "ngInject";
         this.$scope = $scope;
         this.DonwloadManager = DonwloadManager;
         this.$notification = $notification;
+        this.TitleService = TitleService;
     }
 
     $onInit() {
+        this.TitleService.title = 'Download';
+
         this.DonwloadManager.getNumberOfSimDl().then(v => { this.numberOfSimDl = parseInt(v); });
 
         this.DonwloadManager.waiting$.onNext(this.waitingItems);

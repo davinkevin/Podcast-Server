@@ -2,6 +2,7 @@
  * Created by kevin on 25/10/2015 for PodcastServer
  */
 import {Component, Module} from '../decorators';
+import {TitleService} from '../common/service/title.service';
 import AppRouteConfig from '../config/route';
 import PodcastService from '../common/service/data/podcastService';
 import TypeService from '../common/service/data/typeService';
@@ -12,13 +13,7 @@ import './podcasts.css!';
 
 @Module({
     name : 'ps.podcasts',
-    modules : [
-        PodcastDetailsModule,
-        PodcastCreationModule,
-        PodcastService,
-        AppRouteConfig,
-        TypeService
-    ]
+    modules : [PodcastDetailsModule, PodcastCreationModule, PodcastService, AppRouteConfig, TypeService, TitleService]
 })
 @Component({
     selector : 'podcasts',
@@ -33,6 +28,10 @@ import './podcasts.css!';
 })
 export default class PodcastsListCtrl {
 
-    constructor() { this.filters = { title : '', type : '' }; }
+    constructor(TitleService) {
+        "ngInject";
+        this.filters = { title : '', type : '' };
+        TitleService.title = 'Podcasts';
+    }
 
 }

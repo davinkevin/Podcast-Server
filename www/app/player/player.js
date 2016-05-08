@@ -2,6 +2,7 @@
  * Created by kevin on 25/10/2015 for Podcast Server
  */
 import {Component, Module} from '../decorators';
+import {TitleService} from '../common/service/title.service';
 import VideogularModule from '../common/component/videogular/videogular';
 import AppRouteConfig from '../config/route';
 import DeviceDetectionService from '../common/service/device-detection';
@@ -12,7 +13,7 @@ import './player.css!';
 
 @Module({
     name : 'ps.player',
-    modules : [ AppRouteConfig, VideogularModule, DeviceDetectionService, PlaylistService, WatchListService ]
+    modules : [ AppRouteConfig, VideogularModule, DeviceDetectionService, PlaylistService, WatchListService, TitleService ]
 })
 @Component({
     selector : 'player',
@@ -33,13 +34,15 @@ export default class PlayerController {
     playlist = null;
     watchLists = null;
 
-    constructor(VideogularService, WatchListService) {
+    constructor(VideogularService, WatchListService, TitleService) {
         "ngInject";
         this.watchListService = WatchListService;
         this.VideogularService = VideogularService;
+        this.TitleService = TitleService;
     }
 
     $onInit() {
+        this.TitleService.title = 'Player';
         this.config = this.VideogularService.builder().build();
     }
 
