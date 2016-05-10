@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
@@ -53,15 +54,33 @@ public class YoutubeUpdater extends AbstractUpdater {
     private Set<Item> getItemsByAPI(Podcast podcast) {
         log.info("Youtube Update by API");
 
+        String nextPageToken = null;
         String playlistId = isPlaylist(podcast.getUrl()) ? playlistIdOf(podcast.getUrl()) : transformChannelIdToPlaylistId(channelIdOf(podcast.getUrl()));
-        String url = String.format(API_PLAYLIST_URL, playlistId, podcastServerParameters.api().youtube());
 
-        return urlService
-                .newURL(url)
-                .flatMap(jsonService::from)
-                .map(r -> (List<JSONObject>) r.get("items"))
-                .map(this::jsonArrayToItems)
-                .orElse(Sets.newHashSet());
+        Set<Item> items = Sets.newHashSet();
+
+        do {
+            Optional<JSONObject> jsonResponse = urlService
+                    .newURL(asApiPlaylistUrl(playlistId, nextPageToken))
+                    .flatMap(jsonService::from);
+
+            jsonResponse.map(r -> (List<JSONObject>) r.get("items"))
+                    .map(this::jsonArrayToItems)
+                    .orElse(Sets.newHashSet())
+                    .forEach(items::add);
+
+            nextPageToken = jsonResponse.map(r -> String.class.cast(r.get("nextPageToken"))).orElse("");
+
+        } while(!podcast.getItems().containsAll(items) && StringUtils.isNotEmpty(nextPageToken));
+
+        return items;
+    }
+
+
+
+    private String asApiPlaylistUrl(String playlistId, String pageToken) {
+        String url = String.format(API_PLAYLIST_URL, playlistId, podcastServerParameters.api().getYoutube());
+        return isNull(pageToken) ? url : url.concat("&pageToken=" + pageToken);
     }
 
     private Set<Item> jsonArrayToItems(List<JSONObject> jsonObjects) {

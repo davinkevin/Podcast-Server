@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
@@ -195,16 +196,20 @@ public class YoutubeUpdaterTest {
     @Test
     public void should_get_items_with_API_from_channel() throws IOException, URISyntaxException, ParseException {
         /* Given */
+        URL PAGE_1 = new URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO");
+        URL PAGE_2 = new URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA");
+        Podcast podcast = Podcast.builder().url("https://www.youtube.com/user/joueurdugrenier").items(Sets.newHashSet()).build();
         API.setYoutube("FOO");
-        Podcast podcast = Podcast.builder().url("http://www.youtube.com/user/joueurdugrenier").build();
-        when(jsonService.from(any(URL.class))).thenReturn(Optional.of(parseJson("/remote/podcast/youtube/joueurdugrenier.json")));
-        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/joueurdugrenier.html")));
+        when(jsonService.from(eq(PAGE_1))).thenReturn(Optional.of(parseJson("/remote/podcast/youtube/joueurdugrenier.json")));
+        when(jsonService.from(eq(PAGE_2))).thenReturn(Optional.of(parseJson("/remote/podcast/youtube/joueurdugrenier.2.json")));
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/joueurdugrenier.html")));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
-        assertThat(items).hasSize(50);
+        assertThat(items).hasSize(87);
+
     }
 
 
@@ -214,6 +219,7 @@ public class YoutubeUpdaterTest {
         API.setYoutube("FOO");
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
+                .items(Sets.newHashSet())
                 .build();
 
         when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
