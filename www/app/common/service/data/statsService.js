@@ -40,34 +40,19 @@ export default class StatService {
     highChartsConfig(chartSeries) {
         return {
             options: {
-                chart: {
-                    type: 'spline'
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            enabled: true
-                        }
-                    }
+                chart: { type: 'spline'},
+                plotOptions: { spline: { marker: { enabled: true}}
                 },
                 xAxis: {
                     type: 'datetime',
-                    dateTimeLabelFormats: { // don't display the dummy year
-                        month: '%e. %b',
-                        year: '%b'
-                    },
-                    title: {
-                        text: 'Date'
-                    }
-                }
+                    dateTimeLabelFormats: { month: '%e. %b', year: '%b'},
+                    title: { text: 'Date'}
+                },
+                yAxis : { title : { text : '# of items' } }
             },
             series: chartSeries,
-            title : {
-                text : ''
-            },
-            credits: {
-                enabled: false
-            },
+            title : { text: ''},
+            credits: { enabled: false},
             loading: false
         };
     }
