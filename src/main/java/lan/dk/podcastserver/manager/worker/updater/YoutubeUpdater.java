@@ -54,24 +54,27 @@ public class YoutubeUpdater extends AbstractUpdater {
     private Set<Item> getItemsByAPI(Podcast podcast) {
         log.info("Youtube Update by API");
 
-        String nextPageToken = null;
         String playlistId = isPlaylist(podcast.getUrl()) ? playlistIdOf(podcast.getUrl()) : transformChannelIdToPlaylistId(channelIdOf(podcast.getUrl()));
 
-        Set<Item> items = Sets.newHashSet();
+        String nextPageToken = null;
+        Set<Item> items = Sets.newHashSet(), pageItems = Sets.newHashSet();
 
         do {
+            items.addAll(pageItems);
+
             Optional<JSONObject> jsonResponse = urlService
                     .newURL(asApiPlaylistUrl(playlistId, nextPageToken))
                     .flatMap(jsonService::from);
 
-            jsonResponse.map(r -> (List<JSONObject>) r.get("items"))
+            pageItems = jsonResponse.map(r -> (List<JSONObject>) r.get("items"))
                     .map(this::jsonArrayToItems)
-                    .orElse(Sets.newHashSet())
-                    .forEach(items::add);
+                    .orElse(Sets.newHashSet());
 
             nextPageToken = jsonResponse.map(r -> String.class.cast(r.get("nextPageToken"))).orElse("");
 
-        } while(!podcast.getItems().containsAll(items) && StringUtils.isNotEmpty(nextPageToken));
+        } while(!podcast.getItems().containsAll(pageItems) && StringUtils.isNotEmpty(nextPageToken));
+
+        if (StringUtils.isEmpty(nextPageToken)) items.addAll(pageItems);
 
         return items;
     }
