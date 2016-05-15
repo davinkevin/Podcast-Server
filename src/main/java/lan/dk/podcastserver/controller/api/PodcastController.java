@@ -70,10 +70,7 @@ public class PodcastController {
 
     @JsonView(Podcast.PodcastListingView.class)
     @RequestMapping(method = RequestMethod.GET)
-    public List<Podcast> findAll() {
-        return podcastBusiness.findAll();
-
-    }
+    public List<Podcast> findAll() { return podcastBusiness.findAll(); }
 
     @RequestMapping(value="{id}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit) {
@@ -91,14 +88,19 @@ public class PodcastController {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 
-    @RequestMapping(value="{id}/stats/byPubdate", method = RequestMethod.POST)
+    @RequestMapping(value="{id}/stats/byPubDate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
-        return statsBusiness.statByPubDate(id, numberOfMonth);
+        return statsBusiness.statsByPubDate(id, numberOfMonth);
     }
 
-    @RequestMapping(value="{id}/stats/byDownloaddate", method = RequestMethod.POST)
+    @RequestMapping(value="{id}/stats/byDownloadDate", method = RequestMethod.POST)
     public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByDownloadDate(id, numberOfMonth);
+    }
+
+    @RequestMapping(value="{id}/stats/byCreationDate", method = RequestMethod.POST)
+    public Set<NumberOfItemByDateWrapper> statsByCreationDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
+        return statsBusiness.statsByCreationDate(id, numberOfMonth);
     }
 
     @RequestMapping(value = "{id}/update", method = RequestMethod.GET)

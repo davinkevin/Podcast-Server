@@ -8,6 +8,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.repository.dsl.ItemDSL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -134,7 +135,7 @@ public class ItemRepositoryTest {
         ZonedDateTime date = now().minusDays(60);
 
         /* When */
-        Iterable<Item> itemByTypeAndDownloadAfter = itemRepository.findByTypeAndDownloadDateAfter(type, date);
+        Iterable<Item> itemByTypeAndDownloadAfter = itemRepository.findByTypeAndExpression(type, ItemDSL.hasBeenDownloadedAfter(date));
 
         /* Then */
         assertThat(itemByTypeAndDownloadAfter)

@@ -39,12 +39,14 @@ export default class PodcastDetailsStatsComponent {
         this.chartSeries = [];
 
         return this.$q.all([
-                this.podcastService.statsByByDownloaddate(this.podcast.id, this.month),
-                this.podcastService.statsByPubdate(this.podcast.id, this.month)
+                this.podcastService.statsByByDownloadDate(this.podcast.id, this.month),
+                this.podcastService.statsByPubDate(this.podcast.id, this.month),
+                this.podcastService.statsByCreationDate(this.podcast.id, this.month)
             ])
             .then((arrayResult) => {
                 this.chartSeries.push({"name": "Download Date", "data": this.statService.mapToHighCharts(arrayResult[0])});
                 this.chartSeries.push({"name": "Publication Date", "data": this.statService.mapToHighCharts(arrayResult[1])});
+                this.chartSeries.push({"name": "Creation Date", "data": this.statService.mapToHighCharts(arrayResult[2])});
                 return this.chartSeries;
             });
     }

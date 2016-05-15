@@ -1,6 +1,6 @@
 /**
-* Created by kevin on 01/11/14 for Podcast Server
-*/
+ * Created by kevin on 01/11/14 for Podcast Server
+ */
 import {Module, Service} from '../../../decorators';
 
 @Module({
@@ -14,8 +14,16 @@ export default class StatService {
         this.$http = $http;
     }
 
-    statsByType(numberOfMonth = 1) {
-        return this.$http.post('/api/stats/byType', numberOfMonth).then(r => r.data);
+    byDownloadDate(numberOfMonth = 1) {
+        return this.$http.post('/api/stats/byDownloadDate', numberOfMonth).then(r => r.data);
+    }
+
+    byCreationDate(numberOfMonth = 1) {
+        return this.$http.post('/api/stats/byCreationDate', numberOfMonth).then(r => r.data);
+    }
+
+    byPubDate(numberOfMonth = 1) {
+        return this.$http.post('/api/stats/byPubDate', numberOfMonth).then(r => r.data);
     }
 
     dateMapper() {

@@ -40,9 +40,8 @@ public class ItemDSL {
         return Q_ITEM.downloadDate.lt(dateTime);
     }
 
-    public static BooleanExpression hasBeendDownloadedAfter(ZonedDateTime dateTime) {
-        return Q_ITEM.downloadDate.gt(dateTime);
-    }
+    public static BooleanExpression hasBeenDownloadedAfter(ZonedDateTime dateTime) { return Q_ITEM.downloadDate.gt(dateTime); }
+    public static BooleanExpression hasBeenCreatedAfter(ZonedDateTime dateTime) { return Q_ITEM.creationDate.gt(dateTime); }
 
     public static BooleanExpression isOfType(String type) {
         return Q_ITEM.podcast.type.eq(type);
@@ -78,9 +77,9 @@ public class ItemDSL {
     public static BooleanExpression hasStatus(final Status... statuses) {
         return BooleanExpression.anyOf(
                 Arrays
-                    .stream(statuses)
-                    .map(Q_ITEM.status::eq)
-                    .toArray(BooleanExpression[]::new)
+                        .stream(statuses)
+                        .map(Q_ITEM.status::eq)
+                        .toArray(BooleanExpression[]::new)
         );
     }
 

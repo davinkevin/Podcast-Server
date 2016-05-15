@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StatsControllerTest {
 
-    @Mock StatsBusiness itemStatsBusiness;
+    @Mock StatsBusiness statsBusiness;
     @InjectMocks StatsController statsController;
 
     @Test
@@ -31,14 +31,14 @@ public class StatsControllerTest {
         /* Given */
         Integer numberOfMonth = 6;
         List<StatsPodcastType> statsPodcastTypes = new ArrayList<>();
-        when(itemStatsBusiness.allStatsByType(eq(6))).thenReturn(statsPodcastTypes);
+        when(statsBusiness.allStatsByTypeAndDownloadDate(eq(6))).thenReturn(statsPodcastTypes);
 
         /* When */
-        List<StatsPodcastType> statsByType = statsController.statsByType(numberOfMonth);
+        List<StatsPodcastType> statsByType = statsController.byDownloadDate(numberOfMonth);
 
         /* Then */
         assertThat(statsPodcastTypes).isSameAs(statsByType);
-        verify(itemStatsBusiness, only()).allStatsByType(eq(numberOfMonth));
+        verify(statsBusiness, only()).allStatsByTypeAndDownloadDate(eq(numberOfMonth));
     }
 
 }

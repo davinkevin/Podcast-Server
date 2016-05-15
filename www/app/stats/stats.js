@@ -19,12 +19,19 @@ import template from './stats.html!text';
 
     path : '/stats',
     resolve : {
-        stats : statService => {"ngInject"; return statService.statsByType();}
+        stats : statService => {"ngInject"; return statService.byDownloadDate();}
     }
 })
 export default class StatsController {
 
     month = 1;
+    statsChoice = 'byDownloadDate';
+
+    statsType = [
+        { title : 'Download Date', method : 'byDownloadDate'},
+        { title : 'Creation Date', method : 'byCreationDate'},
+        { title : 'Publication Date', method : 'byPubDate'}
+    ];
 
     constructor(statService, TitleService) {
         "ngInject";
@@ -48,9 +55,7 @@ export default class StatsController {
     }
 
     generateChartData() {
-        return this.statService
-            .statsByType(this.month)
-            .then(statsByType => this.transform(statsByType));
+        return this.statService[this.statsChoice](this.month).then(statsByType => this.transform(statsByType));
     }
 }
 

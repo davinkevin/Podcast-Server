@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.repository;
 
+import com.google.common.collect.Sets;
+import com.mysema.query.types.expr.BooleanExpression;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
@@ -46,8 +49,8 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Iterable<Item> findByTypeAndDownloadDateAfter(AbstractUpdater.Type type, ZonedDateTime dateInPast) {
-        return findAll(isOfType(type.key()).and(hasBeendDownloadedAfter(dateInPast)));
+    default Set<Item> findByTypeAndExpression(AbstractUpdater.Type type, BooleanExpression filter) {
+        return Sets.newHashSet(findAll(isOfType(type.key()).and(filter)));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)

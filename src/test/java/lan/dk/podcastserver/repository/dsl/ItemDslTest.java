@@ -135,7 +135,7 @@ public class ItemDslTest {
         dbSetupTracker.skipNextLaunch();
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(hasBeendDownloadedAfter(now().minusDays(16)));
+        Iterable<Item> items = itemRepository.findAll(hasBeenDownloadedAfter(now().minusDays(16)));
 
         /* Then */
         assertThat(items)
