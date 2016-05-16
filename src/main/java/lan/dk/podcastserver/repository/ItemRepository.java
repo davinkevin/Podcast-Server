@@ -6,6 +6,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +23,12 @@ import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositoryCustom, QueryDslPredicateExecutor<Item> {
+
+    @CacheEvict(value = {"search", "stats"}, allEntries = true)
+    Item save(Item item);
+
+    @CacheEvict(value = {"search", "stats"}, allEntries = true)
+    void delete(Item item);
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Page<Item> findByPodcast(UUID idPodcast, PageRequest pageRequest) {

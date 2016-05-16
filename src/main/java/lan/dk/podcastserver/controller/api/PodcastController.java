@@ -11,7 +11,9 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +26,7 @@ import java.util.UUID;
 /**
  * Created by kevin on 26/12/2013.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/podcast")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -68,6 +71,7 @@ public class PodcastController {
         podcastBusiness.delete(id);
     }
 
+    @Cacheable("podcasts")
     @JsonView(Podcast.PodcastListingView.class)
     @RequestMapping(method = RequestMethod.GET)
     public List<Podcast> findAll() { return podcastBusiness.findAll(); }
@@ -105,13 +109,13 @@ public class PodcastController {
 
     @RequestMapping(value = "{id}/update", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void updatePodcast (@PathVariable UUID id) {
+    public void updatePodcast (@PathVariable UUID id) {
         updatePodcastBusiness.updatePodcast(id);
     }
 
     @RequestMapping(value = "{id}/update/force", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void updatePodcastForced (@PathVariable UUID id) {
+    public void updatePodcastForced (@PathVariable UUID id) {
         updatePodcastBusiness.forceUpdatePodcast(id);
     }
 }

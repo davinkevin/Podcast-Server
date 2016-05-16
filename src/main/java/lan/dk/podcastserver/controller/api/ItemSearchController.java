@@ -8,6 +8,7 @@ import lan.dk.podcastserver.utils.facade.SearchItemPageRequestWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class ItemSearchController {
         return itemBusiness.findAll(pageRequestFacade.toPageRequest());
     }
 
+    @Cacheable("search")
     @RequestMapping(value= "search", method = RequestMethod.POST )
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
