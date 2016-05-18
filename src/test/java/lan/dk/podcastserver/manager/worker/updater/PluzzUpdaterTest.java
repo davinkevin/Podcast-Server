@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -37,7 +38,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class PluzzUpdaterTest {
 
-    public static final String PLUZZ_URL = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
+    private static final String PLUZZ_URL = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
+    private static final Podcast PODCAST = Podcast.builder().url(PLUZZ_URL).build();
 
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
@@ -47,7 +49,6 @@ public class PluzzUpdaterTest {
     @Mock UrlService urlService;
     @Mock JsonService jsonService;
     @InjectMocks PluzzUpdater pluzzUpdater;
-    public static final Podcast PODCAST = Podcast.builder().url(PLUZZ_URL).build();
 
     @Before
     public void beforeEach() {
@@ -91,6 +92,7 @@ public class PluzzUpdaterTest {
                 return Optional.empty();
             return Optional.of(loadEpisode(StringUtils.substringBetween(url.toString(), "?idDiffusion=", "&catalogue")));
         });
+        when(urlService.getM3U8UrlFormMultiStreamFile(any())).then(i -> "/fake/url" + UUID.randomUUID());
 
         /* When */
         Set<Item> items = pluzzUpdater.getItems(PODCAST);
@@ -116,6 +118,7 @@ public class PluzzUpdaterTest {
         /* Given */
         when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.of(parse("/remote/podcast/pluzz.commentcavabien.noplayeditem.html")));
         when(jsonService.from(any(URL.class))).then(i -> Optional.of(loadEpisode(StringUtils.substringBetween(URL.class.cast(i.getArguments()[0]).toString(), "?idDiffusion=", "&catalogue"))));
+        when(urlService.getM3U8UrlFormMultiStreamFile(any())).then(i -> "/fake/url" + UUID.randomUUID());
 
         /* When */
         Set<Item> items = pluzzUpdater.getItems(PODCAST);

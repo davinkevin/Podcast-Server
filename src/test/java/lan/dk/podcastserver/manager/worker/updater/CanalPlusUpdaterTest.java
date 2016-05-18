@@ -52,10 +52,10 @@ public class CanalPlusUpdaterTest {
     public void beforeEach() {
         podcast = Podcast
                 .builder()
-                    .id(UUID.randomUUID())
-                    .url("http://www.canalplus.com/url/fake")
-                    .title("A Canal Plus Podcast")
-                    .items(Sets.newHashSet())
+                .id(UUID.randomUUID())
+                .url("http://www.canalplus.com/url/fake")
+                .title("A Canal Plus Podcast")
+                .items(Sets.newHashSet())
                 .build();
         when(urlService.newURL(anyString())).then(i -> Optional.of(new URL((String) i.getArguments()[0])));
     }
@@ -119,14 +119,14 @@ public class CanalPlusUpdaterTest {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal.html"));
         when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal.front_tools.html"));
+        when(urlService.getM3U8UrlFormMultiStreamFile(any())).then(i -> "/a/fake/url/with/custom/" + UUID.randomUUID());
         prepareXmlBackend();
 
         /* When */
         Set<Item> items = canalPlusUpdater.getItems(podcast);
 
         /* Then */
-        assertThat(items).hasSize(16)
-            .contains(Item.DEFAULT_ITEM);
+        assertThat(items).hasSize(16).contains(Item.DEFAULT_ITEM);
     }
 
     @Test

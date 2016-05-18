@@ -34,7 +34,7 @@ import static java.util.Objects.isNull;
 @Slf4j
 @Builder
 @Getter @Setter
-@Table(name = "item")
+@Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
 @Accessors(chain = true)
 @NoArgsConstructor @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset" })
@@ -144,7 +144,6 @@ public class Item {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(url)
-                .append((pubDate != null) ? pubDate.toInstant() : null)
                 .toHashCode();
     }
 
