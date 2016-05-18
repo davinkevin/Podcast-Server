@@ -32,6 +32,7 @@ import static java.util.stream.Collectors.toSet;
 public class YoutubeUpdater extends AbstractUpdater {
 
     private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+    private static final Integer MAX_PAGE = 10;
 
     private static final String CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
     private static final String PLAYLIST_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?playlist_id=%s";
@@ -58,7 +59,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         String nextPageToken = null;
         Set<Item> items = Sets.newHashSet(), pageItems = Sets.newHashSet();
-
+        Integer page = 0;
         do {
             items.addAll(pageItems);
 
@@ -72,13 +73,14 @@ public class YoutubeUpdater extends AbstractUpdater {
 
             nextPageToken = jsonResponse.map(r -> String.class.cast(r.get("nextPageToken"))).orElse("");
 
-        } while(!podcast.getItems().containsAll(pageItems) && StringUtils.isNotEmpty(nextPageToken));
+        } while(page++ < MAX_PAGE && StringUtils.isNotEmpty(nextPageToken));
+        // Can't Access the podcast item here due thread-safe JPA / Hibernate problem
+        // So, I choose to limit to 500 item / 10 Page of Youtube
 
         if (StringUtils.isEmpty(nextPageToken)) items.addAll(pageItems);
 
         return items;
     }
-
 
 
     private String asApiPlaylistUrl(String playlistId, String pageToken) {
