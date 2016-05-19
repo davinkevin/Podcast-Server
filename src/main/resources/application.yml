@@ -4,7 +4,7 @@
 spring :
     h2.console.enabled : true
     datasource:
-        url: jdbc:h2:~/Library/H2Database/podcast-server/debug-2016-05-14
+        url: jdbc:h2:exampledb
         username: sa
         driver-class-name: org.h2.Driver
     jpa:
@@ -34,13 +34,12 @@ server:
 ##############################
 
 podcastserver:
-    rootfolder: /Users/kevin/.podcast-server/podcasts/
+    rootfolder: /tmp/
     #concurrent-download: 2
     #max-update-parallels: 3
     #cover-default-name: cover
     number-of-day-to-download: 30
     #number-of-try: 10
-    server-url: http://localhost:${server.port}
     #download-extention: .psdownload
     #rss-default-number-item: 50
     update-and-download:
@@ -73,17 +72,8 @@ logging:
     path: /private/tmp/logs/podcastserver.log
     level:
         lan.dk.podcastserver : DEBUG
-        #org.hibernate.type: TRACE
-        #org.springframework.web: TRACE
 
 multipart:
     max-file-size: 512MB
     max-request-size: 512MB
     location : /tmp/
-
-#server:
-#    port: 8443
-#    ssl:
-#        key-store: /private/tmp/ssl/keystore.jks
-#        key-store-password: a
-#        key-password: a

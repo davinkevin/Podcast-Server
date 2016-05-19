@@ -16,6 +16,12 @@ spring :
                         directory_provider: ram
                         indexBase: /tmp/lucene
 
+server:
+  port : 8080
+  compression:
+    enabled : true
+    mime-types : application/json,application/xml,text/html,text/xml,text/plain
+
 ##############################
 #    Application Specific    #
 ##############################
@@ -27,7 +33,6 @@ podcastserver:
     cover-default-name: cover
     number-of-day-to-download: 30
     number-of-try: 10
-    server-url: http://localhost:${server.port}
     #download-extension: .psdownload
     #rss-default-number-item: 50
     update-and-download:
@@ -58,18 +63,9 @@ endpoints:
 logging:
     path: /tmp/podcastserver.log
     level:
-        #lan.dk.podcastserver : DEBUG
-        #org.hibernate.type: TRACE
-        #org.springframework.web.socket: TRACE
+        lan.dk.podcastserver : DEBUG
 
 multipart:
     max-file-size: 512MB
     max-request-size: 512MB
     location : /tmp/
-
-#server:
-#    port: 8443
-#    ssl:
-#        key-store: /private/tmp/ssl/keystore.jks
-#        key-store-password: a
-#        key-password: a

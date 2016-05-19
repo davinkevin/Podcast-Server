@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,8 +16,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 public class ItemDownloadManagerTest {
 
     private static final Integer NUMBER_OF_DOWNLOAD = 3;
-    private static final String ROOT_FOLDER = "/tmp/ps";
+    private static final Path ROOT_FOLDER = Paths.get("/tmp/ps");
 
     @Captor ArgumentCaptor<String> stringArgumentCaptor;
     @Captor ArgumentCaptor<Queue<Item>> queueArgumentCaptor;
@@ -54,26 +54,26 @@ public class ItemDownloadManagerTest {
 
     @Test
     public void should_get_limit_of_download () {
-        /* Given */ when(podcastServerParameters.concurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
+        /* Given */ when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
         /* When */  Integer nbOfDownload = itemDownloadManager.getLimitParallelDownload();
         /* Then */
-        verify(podcastServerParameters, times(1)).concurrentDownload();
+        verify(podcastServerParameters, times(1)).getConcurrentDownload();
         assertThat(nbOfDownload).isEqualTo(NUMBER_OF_DOWNLOAD);
     }
 
     @Test
     public void should_change_limit_of_download_sup () {
-        /* Given */ when(podcastServerParameters.concurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
+        /* Given */ when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
         /* When */ itemDownloadManager.changeLimitParallelsDownload(NUMBER_OF_DOWNLOAD + 1);
-        /* Then */ verify(podcastServerParameters, times(1)).concurrentDownload();
+        /* Then */ verify(podcastServerParameters, times(1)).getConcurrentDownload();
     }
 
     @Test
     public void should_change_limit_of_download_less () {
-        /* Given */ when(podcastServerParameters.concurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
+        /* Given */ when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
         /* When */  itemDownloadManager.changeLimitParallelsDownload(NUMBER_OF_DOWNLOAD - 1);
         /* Then */
-        verify(podcastServerParameters, times(1)).concurrentDownload();
+        verify(podcastServerParameters, times(1)).getConcurrentDownload();
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
         assertThat(queueArgumentCaptor.getValue()).isNotNull().isEmpty();
@@ -101,9 +101,9 @@ public class ItemDownloadManagerTest {
         /* When */ String rootfolder = itemDownloadManager.getRootfolder();
         /* Then */
         verify(podcastServerParameters, times(1)).getRootfolder();
-        assertThat(rootfolder).isSameAs(ROOT_FOLDER);
+        assertThat(rootfolder).isSameAs(ROOT_FOLDER.toString());
     }
-    
+
     @Test
     public void should_init_download_with_empty_list() throws URISyntaxException {
         /* Given */
@@ -251,7 +251,7 @@ public class ItemDownloadManagerTest {
 
         /* When */ itemDownloadManager.addItemToQueue(item);
     }
-    
+
     @Test
     public void should_remove_from_queue() {
         /* Given */
@@ -270,15 +270,15 @@ public class ItemDownloadManagerTest {
     public void should_increment_the_number_of_concurrent_download() {
         /* Given */
         Integer numberOfCurrentDownload = itemDownloadManager.getNumberOfCurrentDownload();
-                
+
         /* When */
         itemDownloadManager.addACurrentDownload();
-        
+
         /* Then */
         assertThat(itemDownloadManager.getNumberOfCurrentDownload()).isEqualTo(numberOfCurrentDownload + 1);
-        
+
     }
-    
+
 
     private void verifyConvertAndSave() {
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
@@ -287,20 +287,18 @@ public class ItemDownloadManagerTest {
     }
 
     private void mockPodcastParametersForPostConstruct() throws URISyntaxException {
-        when(podcastServerParameters.concurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
-        when(podcastServerParameters.fileContainer()).thenReturn(new URI("http://localhost:8080/podcast"));
-        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get("/Users/kevin/Tomcat/podcast/webapps/podcast/"));
+        when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/Users/kevin/Tomcat/podcast/webapps/podcast/"));
     }
 
     private void verifyPodcastParametersForPostConstruct() throws URISyntaxException {
-        verify(podcastServerParameters, times(1)).fileContainer();
-        verify(podcastServerParameters, times(1)).concurrentDownload();
-        verify(podcastServerParameters, times(1)).rootFolder();
+        verify(podcastServerParameters, times(1)).getConcurrentDownload();
+        verify(podcastServerParameters, times(1)).getRootfolder();
     }
-    
+
     @Test
     public void should_check_if_can_be_reseted () {
-        /* Given */ when(podcastServerParameters.numberOfTry()).thenReturn(3);
+        /* Given */ when(podcastServerParameters.getNumberOfTry()).thenReturn(3);
         /* When */
         Boolean isResetable = itemDownloadManager.canBeReseted(new Item().setNumberOfTry(2));
         Boolean isNotResetable = itemDownloadManager.canBeReseted(new Item().setNumberOfTry(4));
@@ -308,7 +306,7 @@ public class ItemDownloadManagerTest {
         /* Then */
         assertThat(isResetable).isTrue();
         assertThat(isNotResetable).isFalse();
-        verify(podcastServerParameters, times(2)).numberOfTry();
+        verify(podcastServerParameters, times(2)).getNumberOfTry();
 
     }
 
@@ -414,8 +412,8 @@ public class ItemDownloadManagerTest {
         verifyPodcastParametersForPostConstruct();
         verifyConvertAndSave();
     }
-    
-    
+
+
     @Test
     public void should_move_item_in_queue() {
         /* Given */
@@ -444,17 +442,19 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_reset_current_download() throws URISyntaxException {
         /* Given */ mockPodcastParametersForPostConstruct();
-        when(podcastServerParameters.numberOfTry()).thenReturn(3);
+        when(podcastServerParameters.getNumberOfTry()).thenReturn(3);
         Downloader downloaderMock = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloaderMock);
         final Downloader calledDownloader = mock(Downloader.class);
+        when(downloaderMock.setItem(any())).thenReturn(downloaderMock);
+        when(downloaderMock.setItemDownloadManager(any())).thenReturn(downloaderMock);
         Item item = new Item().setId(UUID.randomUUID()).setUrl("1").setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
 
         /* When */ itemDownloadManager.resetDownload(item);
         /* Then */
         assertThat(item.getNumberOfTry()).isEqualTo(1);
-        verify(podcastServerParameters, times(1)).numberOfTry();
+        verify(podcastServerParameters, times(1)).getNumberOfTry();
         verify(downloaderSelector, times(1)).of(eq(item.getUrl()));
     }
 
@@ -477,7 +477,7 @@ public class ItemDownloadManagerTest {
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
         assertThat(queueArgumentCaptor.getValue()).isSameAs(itemDownloadManager.getWaitingQueue());
     }
-    
+
     @Test
     public void should_detect_if_is_in_downloading_queue() {
         /* Given */

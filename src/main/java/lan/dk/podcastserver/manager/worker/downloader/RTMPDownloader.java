@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import lan.dk.podcastserver.service.properties.ExternalTools;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class RTMPDownloader extends AbstractDownloader {
     int pid = 0;
 
     @Autowired ProcessBuilderFactory processBuilderFactory;
+    @Autowired ExternalTools externalTools;
 
     Process p = null;
 
@@ -35,7 +37,7 @@ public class RTMPDownloader extends AbstractDownloader {
             logger.debug("Fichier de sortie : " + target.getAbsolutePath());
 
             p  = processBuilderFactory
-                    .newProcessBuilder(podcastServerParameters.rtmpDump(), "-r", getItemUrl(item), "-o", target.getAbsolutePath())
+                    .newProcessBuilder(externalTools.getRtmpdump(), "-r", getItemUrl(item), "-o", target.getAbsolutePath())
                     .directory(new File("/tmp"))
                     .redirectErrorStream(true)
                     .start();

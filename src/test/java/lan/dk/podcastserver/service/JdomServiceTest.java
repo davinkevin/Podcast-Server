@@ -3,8 +3,8 @@ package lan.dk.podcastserver.service;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.Lists;
 import lan.dk.podcastserver.entity.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.jdom2.Document;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ public class JdomServiceTest {
     @Mock UrlService urlService;
     @InjectMocks JdomService jdomService;
 
-    List<String> itemId = Lists.newArrayList(
+    private List<String> itemId = Lists.newArrayList(
             "789CEC3A-72CB-970A-264A-D5B4BF953183",
             "374EA8C6-2390-EAB6-51D4-D3F5A8F5E7B7",
             "5F6CDA11-24E1-1FC9-8494-17BC9140BC52",
@@ -142,12 +142,7 @@ public class JdomServiceTest {
     );
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(); // No-args constructor defaults to port 8080
-
-    @Before
-    public void beforeEach() {
-        Item.fileContainer = "http://localhost:8080/podcast";
-    }
+    public WireMockRule wireMockRule = new WireMockRule(8181); // No-args constructor defaults to port 8181
 
     @Test
     public void should_parse() throws MalformedURLException {
@@ -158,7 +153,7 @@ public class JdomServiceTest {
                         .withBodyFile("service/jdomService/valid.xml")));
 
         /* When */
-        Optional<Document> document = jdomService.parse(new URL("http://localhost:8080/a/valid.xml"));
+        Optional<Document> document = jdomService.parse(new URL("http://localhost:8181/a/valid.xml"));
 
         /* Then */
         assertThat(document).isPresent();
@@ -173,53 +168,23 @@ public class JdomServiceTest {
                         .withBodyFile("service/jdomService/invalid.xml")));
 
         /* When */
-        Optional<Document> document = jdomService.parse(new URL("http://localhost:8080/a/invalid.xml"));
+        Optional<Document> document = jdomService.parse(new URL("http://localhost:8181/a/invalid.xml"));
 
         /* Then */
         assertThat(document).isEmpty();
     }
-    
-    /*@Test
-    public void should_parse_by_url() throws IOException, JDOMException, URISyntaxException {
-        *//* Given *//*
-        URLConnection urlConnection = mock(URLConnection.class);
-        when(urlService.getConnection(anyString())).thenReturn(urlConnection);
-        *//*doThrow(IOException.class).when(urlConnection).getInputStream();*//*
-        when(urlConnection.getInputStream()).thenReturn(Files.newInputStream(Paths.get(JdomServiceTest.class.getResource("/remote/podcast/rss.lesGrandesGueules.xml").toURI())));
-
-        *//* When *//*
-        Document document = jdomService.parse("aUrl");
-
-        *//* Then *//*
-        assertThat(document)
-                .isInstanceOf(Document.class);
-        assertThat(document.getRootElement().getName())
-                .isEqualTo("rss");
-    }
-
-    @Test
-    public void should_reject_parsing() throws IOException, JDOMException, URISyntaxException {
-        *//* Given *//*
-        URLConnection urlConnection = mock(URLConnection.class);
-        when(urlService.getConnection(anyString())).thenReturn(urlConnection);
-        doThrow(IOException.class).when(urlConnection).getInputStream();
-
-        *//* When *//*
-        jdomService.parse("aUrl");
-    }*/
 
     @Test
     public void should_generate_xml_from_podcast_with_only_50_items() throws URISyntaxException, IOException {
         /* Given */
-        when(podcastServerParameters.getServerUrl()).thenReturn("http://localhost");
-        when(podcastServerParameters.rssDefaultNumberItem()).thenReturn(50L);
+        when(podcastServerParameters.getRssDefaultNumberItem()).thenReturn(50L);
 
         Podcast podcast = Podcast.builder()
                 .id(UUID.fromString("029d7820-b7e1-4c0f-a94f-235584ffb570"))
                 .title("FakePodcast")
                 .description("Loren ipsum")
                 .hasToBeDeleted(true)
-                .cover(new Cover().setHeight(200).setWidth(200).setUrl("http://fake.url/1234/cover.png"))
+                .cover(Cover.builder().height(200).width(200).url("http://fake.url/1234/cover.png").build())
                 .tags(Collections.singleton(new Tag().setName("Open-Source")))
                 .signature("123456789")
                 .lastUpdate(ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris")))
@@ -229,7 +194,7 @@ public class JdomServiceTest {
                 .setItems(generateItems(podcast, 100));
 
         /* When */
-        String xml = jdomService.podcastToXMLGeneric(podcast, true);
+        String xml = jdomService.podcastToXMLGeneric(podcast, true, "http://localhost");
 
         /* Then */
         assertThat(xml).isXmlEqualToContentOf(Paths.get(JdomService.class.getResource("/xml/podcast.output.50.xml").toURI()).toFile());
@@ -238,14 +203,12 @@ public class JdomServiceTest {
     @Test
     public void should_generate_xml_from_podcast_with_only_all_items() throws URISyntaxException, IOException {
         /* Given */
-        when(podcastServerParameters.getServerUrl()).thenReturn("http://localhost");
-
         Podcast podcast = Podcast.builder()
                 .id(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
                 .title("FakePodcast")
                 .description("Loren ipsum")
                 .hasToBeDeleted(true)
-                .cover(new Cover().setHeight(200).setWidth(200).setUrl("http://fake.url/1234/cover.png"))
+                .cover(new Cover().setHeight(200).setWidth(200).setUrl("/1234/cover.png"))
                 .tags(Collections.singleton(new Tag().setName("Open-Source")))
                 .signature("123456789")
                 .lastUpdate(ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris")))
@@ -255,7 +218,7 @@ public class JdomServiceTest {
                 .setItems(generateItems(podcast, 100));
 
         /* When */
-        String xml = jdomService.podcastToXMLGeneric(podcast, false);
+        String xml = jdomService.podcastToXMLGeneric(podcast, false, "http://localhost");
 
         /* Then */
         assertThat(xml).isXmlEqualToContentOf(Paths.get(JdomService.class.getResource("/xml/podcast.output.100.xml").toURI()).toFile());

@@ -12,10 +12,10 @@
         <itunes:category/>
         <image>
             <height>200</height>
-            <url>http://fake.url/1234/cover.png</url>
+            <url>http://localhost/1234/cover.png</url>
             <width>200</width>
         </image>
-        <itunes:image>http://fake.url/1234/cover.png</itunes:image>
+        <itunes:image>http://localhost/1234/cover.png</itunes:image>
         <item>
             <title>name0</title>
             <description>0 Loren Ipsum</description>

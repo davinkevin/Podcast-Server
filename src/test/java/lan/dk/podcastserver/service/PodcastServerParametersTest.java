@@ -1,14 +1,12 @@
-package lan.dk.podcastserver.service;
+package lan.dk.podcastserver.service.properties;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static java.time.ZonedDateTime.now;
-import static lan.dk.podcastserver.service.PodcastServerParameters.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -18,65 +16,38 @@ public class PodcastServerParametersTest {
 
     @Test
     public void should_have_default_value() throws URISyntaxException {
-        String ROOT_FOLDER = "/tmp/";
-        Backup backup = new Backup().setBinary(true).setCron("0 0 0 * * *").setLocation(Paths.get("/tmp").toFile());
+        Path ROOT_FOLDER = Paths.get("/tmp/");
 
         PodcastServerParameters parameters = new PodcastServerParameters();
-        parameters.setApi(new Api().setDailymotion("DAILYMOTION_API_KEY").setYoutube("YOUTUBE_API_KEY"));
-        parameters.setBackup(backup);
 
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
-                .hasServerUrl("http://localhost:8080")
                 .hasDownloadExtension(".psdownload");
 
-        assertThat(parameters.rootFolder())
-                .isEqualTo(Paths.get(ROOT_FOLDER));
+        assertThat(parameters.getRootfolder())
+                .isEqualTo(ROOT_FOLDER);
 
-        assertThat(parameters.rootFolderWithProtocol())
-                .isEqualTo("file://" + ROOT_FOLDER);
-
-        assertThat(parameters.fileContainer())
-                .isEqualTo(new URI(parameters.fileContainer));
-
-        assertThat(parameters.coverDefaultName())
+        assertThat(parameters.getCoverDefaultName())
                 .isEqualTo("cover");
 
-        assertThat(parameters.maxUpdateParallels())
+        assertThat(parameters.getConcurrentDownload())
                 .isEqualTo(3);
 
-        assertThat(parameters.concurrentDownload())
-                .isEqualTo(3);
-
-        assertThat(parameters.numberOfTry())
+        assertThat(parameters.getNumberOfTry())
                 .isEqualTo(10);
 
-        assertThat(parameters.numberOfDayToDownload())
-                .isEqualTo(30L);
-
-        assertThat(parameters.rssDefaultNumberItem())
+        assertThat(parameters.getRssDefaultNumberItem())
                 .isEqualTo(50L);
-
-        assertThat(parameters.serverUrl())
-                .isEqualTo(new URI("http://localhost:8080"));
-
-        assertThat(parameters.getApi()).isNotNull();
-        assertThat(parameters.api().dailymotion()).isEqualTo("DAILYMOTION_API_KEY");
-        assertThat(parameters.api().youtube()).isEqualTo("YOUTUBE_API_KEY");
-        assertThat(parameters.backup()).isInstanceOf(Backup.class).isEqualTo(backup);
-        assertThat(parameters.getBackup()).isInstanceOf(Backup.class).isEqualTo(backup);
     }
-    
+
     @Test
     public void should_have_mdificated_values() throws URISyntaxException {
         /* Given */
-        String ROOT_FOLDER = "/tmp";
+        Path ROOT_FOLDER = Paths.get("/tmp");
         PodcastServerParameters parameters = new PodcastServerParameters();
 
         /* When */
         parameters.setRootfolder(ROOT_FOLDER);
-        parameters.setServerUrl("http://localhost:9191");
-        parameters.setFileContainer("http://localhost:9191/podcast");
         parameters.setCoverDefaultName("default");
         parameters.setDownloadExtension(".pdownload");
         parameters.setMaxUpdateParallels(5);
@@ -88,72 +59,18 @@ public class PodcastServerParametersTest {
         /* Then */
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
-                .hasServerUrl("http://localhost:9191")
                 .hasDownloadExtension(".pdownload");
 
-        assertThat(parameters.rootFolder()).isEqualTo(Paths.get(ROOT_FOLDER));
-        assertThat(parameters.rootFolderWithProtocol()).isEqualTo("file://" + ROOT_FOLDER);
-        assertThat(parameters.fileContainer()).isEqualTo(new URI("http://localhost:9191/podcast"));
-        assertThat(parameters.coverDefaultName()).isEqualTo("default");
-        assertThat(parameters.maxUpdateParallels()).isEqualTo(5);
-        assertThat(parameters.concurrentDownload()).isEqualTo(5);
-        assertThat(parameters.numberOfTry()).isEqualTo(20);
-        assertThat(parameters.numberOfDayToDownload()).isEqualTo(5L);
-        assertThat(parameters.rssDefaultNumberItem()).isEqualTo(25L);
+        assertThat(parameters.getRootfolder()).isEqualTo(ROOT_FOLDER);
+        assertThat(parameters.getCoverDefaultName()).isEqualTo("default");
+
+        assertThat(parameters.getConcurrentDownload()).isEqualTo(5);
+        assertThat(parameters.getNumberOfTry()).isEqualTo(20);
+
+        assertThat(parameters.getRssDefaultNumberItem()).isEqualTo(25L);
         assertThat(parameters.limitDownloadDate())
-                .isBeforeOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()))
-                .isAfterOrEqualTo(now().minusDays(parameters.numberOfDayToDownload()).minusMinutes(1));
-    }
-
-    @Test
-    public void should_have_api() {
-        /* Given */
-        /* When */
-        Api api = new Api()
-                .setYoutube("Foo")
-                .setDailymotion("Bar");
-
-        /* Then */
-        assertThat(api.youtube()).isEqualTo("Foo");
-        assertThat(api.dailymotion()).isEqualTo("Bar");
-        assertThat(api.getYoutube()).isEqualTo("Foo");
-        assertThat(api.getDailymotion()).isEqualTo("Bar");
-    }
-
-    @Test
-    public void should_have_external_tools() {
-        /* Given */
-        /* When */
-        ExternalTools externalTools = new ExternalTools()
-                .setFfmpeg("Foo")
-                .setRtmpdump("Bar");
-
-        PodcastServerParameters podcastServerParameters = new PodcastServerParameters().setExternalTools(externalTools);
-
-        /* Then */
-        assertThat(externalTools.ffmpeg()).isEqualTo("Foo");
-        assertThat(externalTools.rtmpdump()).isEqualTo("Bar");
-        assertThat(externalTools.getFfmpeg()).isEqualTo("Foo");
-        assertThat(externalTools.getRtmpdump()).isEqualTo("Bar");
-        assertThat(podcastServerParameters.rtmpDump()).isEqualTo("Bar");
-    }
-
-    @Test
-    public void should_have_backup_parameters() {
-        /* Given */
-        File location = Paths.get("/tmp").toFile();
-
-        Backup backup = new Backup()
-        /* When */
-                .setBinary(true)
-                .setCron("0 0 0 * * *")
-                .setLocation(location);
-
-        /* Then */
-        assertThat(backup.getLocation()).isEqualTo(location);
-        assertThat(backup.getBinary()).isTrue();
-        assertThat(backup.getCron()).isEqualTo("0 0 0 * * *");
-        assertThat(backup.location()).isEqualTo(Paths.get("/tmp"));
+                .isBeforeOrEqualTo(now().minusDays(parameters.getNumberOfDayToDownload()))
+                .isAfterOrEqualTo(now().minusDays(parameters.getNumberOfDayToDownload()).minusMinutes(1));
     }
 
 }

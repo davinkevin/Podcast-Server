@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.Api;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.json.simple.JSONObject;
@@ -39,7 +41,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class YoutubeUpdaterTest {
 
-    public static final PodcastServerParameters.Api API = new PodcastServerParameters.Api();
+    @Mock Api api;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
     @Mock Validator validator;
@@ -51,8 +53,7 @@ public class YoutubeUpdaterTest {
 
     @Before
     public void beforeEach() {
-        API.setYoutube("");
-        when(podcastServerParameters.api()).thenReturn(API);
+        when(api.getYoutube()).thenReturn("");
         when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(((String) i.getArguments()[0]))));
     }
 
@@ -198,8 +199,8 @@ public class YoutubeUpdaterTest {
         /* Given */
         URL PAGE_1 = new URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO");
         URL PAGE_2 = new URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA");
+        when(api.getYoutube()).thenReturn("FOO");
         Podcast podcast = Podcast.builder().url("https://www.youtube.com/user/joueurdugrenier").items(Sets.newHashSet()).build();
-        API.setYoutube("FOO");
         when(jsonService.from(eq(PAGE_1))).thenReturn(Optional.of(parseJson("/remote/podcast/youtube/joueurdugrenier.json")));
         when(jsonService.from(eq(PAGE_2))).thenReturn(Optional.of(parseJson("/remote/podcast/youtube/joueurdugrenier.2.json")));
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/joueurdugrenier.html")));
@@ -209,14 +210,13 @@ public class YoutubeUpdaterTest {
 
         /* Then */
         assertThat(items).hasSize(87);
-
     }
 
 
     @Test
     public void should_failed_during_fetch_API() throws JDOMException, IOException, URISyntaxException, ParseException {
         /* Given */
-        API.setYoutube("FOO");
+        when(api.getYoutube()).thenReturn("FOO");
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .items(Sets.newHashSet())

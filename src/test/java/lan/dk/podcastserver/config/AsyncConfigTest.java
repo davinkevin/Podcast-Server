@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ public class AsyncConfigTest {
     @Test
     public void should_generate_multi_thread_executor() {
         /* Given */
-        when(podcastServerParameters.concurrentDownload()).thenReturn(10);
+        when(podcastServerParameters.getConcurrentDownload()).thenReturn(10);
 
         /* When */
         TaskExecutor asyncExecutor = asyncConfig.getAsyncExecutor();
@@ -58,7 +58,7 @@ public class AsyncConfigTest {
         assertThat(((ThreadPoolTaskExecutor) asyncExecutor).getThreadNamePrefix())
                 .contains("Manual");
     }
-    
+
     @Test
     public void should_generate_exception_handler() {
         assertThat(asyncConfig.getAsyncUncaughtExceptionHandler()).isNull();

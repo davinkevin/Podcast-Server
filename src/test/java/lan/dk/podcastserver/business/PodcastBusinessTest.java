@@ -5,7 +5,7 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -186,16 +186,16 @@ public class PodcastBusinessTest {
         Podcast podcast = new Podcast();
         String response = "Success";
         when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
-        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean())).thenReturn(response);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean(), anyString())).thenReturn(response);
         UUID id = UUID.randomUUID();
 
         /* When */
-        String rssReturn = podcastBusiness.getRss(id, true);
+        String rssReturn = podcastBusiness.getRss(id, true, "http://localhost");
 
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
         verify(podcastRepository, times(1)).findOne(eq(id));
-        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(true));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(true), eq("http://localhost"));
     }
 
     @Test
@@ -204,25 +204,25 @@ public class PodcastBusinessTest {
         Podcast podcast = new Podcast();
         String response = "Success";
         when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
-        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean())).thenReturn(response);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean(), anyString())).thenReturn(response);
         UUID id = UUID.randomUUID();
 
         /* When */
-        String rssReturn = podcastBusiness.getRss(id, false);
+        String rssReturn = podcastBusiness.getRss(id, false, "http://localhost");
 
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
         verify(podcastRepository, times(1)).findOne(eq(id));
-        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(false));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(false), eq("http://localhost"));
     }
-    
+
     @Test
     public void should_return_empty_string_for_exception() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean());
+        doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean(), anyString());
 
         /* When */
-        String rssReturn = podcastBusiness.getRss(UUID.randomUUID(), false);
+        String rssReturn = podcastBusiness.getRss(UUID.randomUUID(), false, "http://localhost");
 
         /* Then */
         assertThat(rssReturn).isEqualTo("");

@@ -6,12 +6,13 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -22,14 +23,15 @@ import java.util.UUID;
 @Slf4j
 @Component
 @Transactional
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PodcastBusiness {
 
-    @Resource PodcastServerParameters podcastServerParameters;
-    @Resource JdomService jdomService;
-    @Resource PodcastRepository podcastRepository;
-    @Resource TagBusiness tagBusiness;
-    @Resource CoverBusiness coverBusiness;
-    @Resource MimeTypeService mimeTypeService;
+    final PodcastServerParameters podcastServerParameters;
+    final JdomService jdomService;
+    final PodcastRepository podcastRepository;
+    final TagBusiness tagBusiness;
+    final CoverBusiness coverBusiness;
+    final MimeTypeService mimeTypeService;
 
     //** Delegate du Repository **//
     public List<Podcast> findAll() {
@@ -97,9 +99,9 @@ public class PodcastBusiness {
     }
 
     @Transactional(readOnly = true)
-    public String getRss(UUID id, Boolean limit) {
+    public String getRss(UUID id, Boolean limit, String domainName) {
         try {
-            return jdomService.podcastToXMLGeneric(findOne(id), limit);
+            return jdomService.podcastToXMLGeneric(findOne(id), limit, domainName);
         } catch (IOException e) {
             log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e);
             return "";

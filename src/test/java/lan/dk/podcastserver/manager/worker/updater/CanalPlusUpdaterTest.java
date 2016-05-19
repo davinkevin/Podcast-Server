@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;

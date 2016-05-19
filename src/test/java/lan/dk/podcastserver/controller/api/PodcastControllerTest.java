@@ -5,21 +5,25 @@ import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
+import lan.dk.podcastserver.service.UrlService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -28,10 +32,16 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class PodcastControllerTest {
 
+    @Mock UrlService urlService;
     @Mock PodcastBusiness podcastBusiness;
     @Mock FindPodcastBusiness findPodcastBusiness;
     @Mock StatsBusiness statsBusiness;
     @InjectMocks PodcastController podcastController;
+
+    @Before
+    public void beforeEach() {
+        when(urlService.getDomainFromRequest(any(HttpServletRequest.class))).thenReturn("http://localhost");
+    }
 
     @Test
     public void should_create_podcast() {
@@ -125,14 +135,14 @@ public class PodcastControllerTest {
         /* Given */
         UUID id = UUID.randomUUID();
         Boolean limit = Boolean.TRUE;
-        when(podcastBusiness.getRss(any(UUID.class), anyBoolean())).thenReturn("Foo");
+        when(podcastBusiness.getRss(any(UUID.class), anyBoolean(), anyString())).thenReturn("Foo");
 
         /* When */
-        String rss = podcastController.getRss(id, limit);
+        String rss = podcastController.getRss(id, limit, mock(HttpServletRequest.class));
 
         /* Then */
         assertThat(rss).isEqualTo("Foo");
-        verify(podcastBusiness, only()).getRss(eq(id), eq(limit));
+        verify(podcastBusiness, only()).getRss(eq(id), eq(limit), eq("http://localhost"));
     }
 
     @Test

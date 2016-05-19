@@ -7,7 +7,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

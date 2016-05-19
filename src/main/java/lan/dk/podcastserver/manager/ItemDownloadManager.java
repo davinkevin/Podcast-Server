@@ -5,12 +5,11 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -27,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
+@Transactional
 public class ItemDownloadManager {
 
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
@@ -44,7 +44,7 @@ public class ItemDownloadManager {
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
-        return podcastServerParameters.concurrentDownload();
+        return podcastServerParameters.getConcurrentDownload();
     }
 
     public void changeLimitParallelsDownload(Integer limitParallelDownload) {
@@ -70,9 +70,9 @@ public class ItemDownloadManager {
     }
 
     public String getRootfolder() {
-        return podcastServerParameters.getRootfolder();
+        return podcastServerParameters.getRootfolder().toString();
     }
-    
+
     /* METHODS */
     private void manageDownload() {
 
@@ -83,7 +83,7 @@ public class ItemDownloadManager {
             while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
                 currentItem = this.getWaitingQueue().poll();
                 if (!isStartedOrFinished(currentItem)) {
-                     getDownloaderByTypeAndRun(currentItem);
+                    getDownloaderByTypeAndRun(currentItem);
                 }
             }
             isRunning.set(false);
@@ -234,7 +234,7 @@ public class ItemDownloadManager {
             item.addATry();
             Downloader worker = downloaderSelector.of(item.getUrl());
             if (worker != null) {
-                this.getDownloadingQueue().put(item, worker);
+                this.getDownloadingQueue().put(item, worker.setItem(item).setItemDownloadManager(this));
                 new Thread(worker).start();
             }
         }
@@ -256,7 +256,7 @@ public class ItemDownloadManager {
 
 
     public boolean canBeReseted(Item item) {
-        return item.getNumberOfTry()+1 <= podcastServerParameters.numberOfTry();
+        return item.getNumberOfTry()+1 <= podcastServerParameters.getNumberOfTry();
     }
 
     public Boolean isInDownloadingQueue(Item item) {
@@ -272,7 +272,7 @@ public class ItemDownloadManager {
         List<Item> aItemList = new ArrayList<>();
 
         copyOfWaitingList.stream().forEach(aItemList::add);
-        
+
         Optional<Item> movingItem = aItemList.stream()
                 .filter(item -> item.getId().equals(itemId)).findFirst();
 
@@ -283,17 +283,16 @@ public class ItemDownloadManager {
 
         aItemList.removeIf(item -> item.getId().equals(itemId));
         aItemList.add(position, movingItem.get());
-        
+
         waitingQueue.clear();
         waitingQueue.addAll(aItemList);
 
         convertAndSendWaitingQueue();
     }
-    
+
     @PostConstruct
     public void postConstruct() throws URISyntaxException {
-        Item.fileContainer = UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).build().toUriString();
-        Item.rootFolder = podcastServerParameters.rootFolder();
-        limitParallelDownload = podcastServerParameters.concurrentDownload();
+        Item.rootFolder = podcastServerParameters.getRootfolder();
+        limitParallelDownload = podcastServerParameters.getConcurrentDownload();
     }
 }

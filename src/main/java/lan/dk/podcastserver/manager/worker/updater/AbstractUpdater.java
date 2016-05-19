@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lombok.extern.slf4j.Slf4j;

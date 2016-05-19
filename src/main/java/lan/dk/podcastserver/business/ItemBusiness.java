@@ -8,7 +8,8 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -40,6 +40,7 @@ import static lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecification
 
 @Component
 @Transactional
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemBusiness {
     private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
@@ -48,15 +49,6 @@ public class ItemBusiness {
     final ItemRepository itemRepository;
     final PodcastBusiness podcastBusiness;
     final MimeTypeService mimeTypeService;
-
-    @Autowired
-    public ItemBusiness(ItemDownloadManager itemDownloadManager, PodcastServerParameters podcastServerParameters, ItemRepository itemRepository, PodcastBusiness podcastBusiness, MimeTypeService mimeTypeService) {
-        this.itemDownloadManager = itemDownloadManager;
-        this.podcastServerParameters = podcastServerParameters;
-        this.itemRepository = itemRepository;
-        this.podcastBusiness = podcastBusiness;
-        this.mimeTypeService = mimeTypeService;
-    }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findAll(Pageable pageable) {
@@ -147,7 +139,7 @@ public class ItemBusiness {
         Item item = new Item();
         String originalFilename = uploadedFile.getOriginalFilename();
 
-        Path fileToSave = podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(originalFilename);
+        Path fileToSave = podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(originalFilename);
         Files.deleteIfExists(fileToSave);
         Files.createDirectories(fileToSave.getParent());
 
@@ -155,7 +147,6 @@ public class ItemBusiness {
 
         item.setTitle(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
                 .setPubDate(fromFileName(originalFilename.split(" - ")[1]))
-                .setUrl(UriComponentsBuilder.fromUri(podcastServerParameters.fileContainer()).pathSegment(podcast.getTitle()).pathSegment(originalFilename).build().toUriString())
                 .setLength(uploadedFile.getSize())
                 .setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(originalFilename)))
                 .setDescription(podcast.getDescription())

@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,8 +26,8 @@ public class AsyncConfig implements AsyncConfigurer {
     @Bean(name = "UpdateExecutor")
     public TaskExecutor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(podcastServerParameters.concurrentDownload());
-        executor.setMaxPoolSize(podcastServerParameters.concurrentDownload());
+        executor.setCorePoolSize(podcastServerParameters.getConcurrentDownload());
+        executor.setMaxPoolSize(podcastServerParameters.getConcurrentDownload());
         executor.setThreadNamePrefix("Update-");
         executor.initialize();
         return executor;

@@ -9,12 +9,14 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.properties.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -44,9 +46,10 @@ public class YoutubeUpdater extends AbstractUpdater {
     @Resource JsonService jsonService;
     @Resource HtmlService htmlService;
     @Resource UrlService urlService;
+    @Autowired Api api;
 
     public Set<Item> getItems(Podcast podcast) {
-        return Strings.isNullOrEmpty(podcastServerParameters.api().youtube())
+        return Strings.isNullOrEmpty(api.getYoutube())
                 ? getItemsByRss(podcast)
                 : getItemsByAPI(podcast);
     }
@@ -84,7 +87,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
 
     private String asApiPlaylistUrl(String playlistId, String pageToken) {
-        String url = String.format(API_PLAYLIST_URL, playlistId, podcastServerParameters.api().getYoutube());
+        String url = String.format(API_PLAYLIST_URL, playlistId, api.getYoutube());
         return isNull(pageToken) ? url : url.concat("&pageToken=" + pageToken);
     }
 

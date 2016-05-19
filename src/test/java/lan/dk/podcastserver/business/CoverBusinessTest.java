@@ -5,7 +5,7 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.CoverAssert;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,7 +17,6 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.util.FileSystemUtils;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CoverBusinessTest {
 
-    String ROOT_FOLDER = "/tmp/podcast";
+    private String ROOT_FOLDER = "/tmp/podcast";
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089); // No-args constructor defaults to port 8080
@@ -89,6 +88,13 @@ public class CoverBusinessTest {
     }
 
     @Test
+    public void should_not_handle_local_url() {
+        /* Given */ Podcast podcast = Podcast.builder().cover(Cover.builder().url("/url/relative").build()).build();
+        /* When */  String url = coverBusiness.download(podcast);
+        /* Then */  assertThat(url).isEqualTo("/url/relative");
+    }
+
+    @Test
     public void should_download_the_cover() throws URISyntaxException {
         /* Given */
         String podcastTitle = "Foo";
@@ -97,14 +103,15 @@ public class CoverBusinessTest {
         String serverUrl = "http://localhost:8080/";
         Podcast podcast = new Podcast().setTitle(podcastTitle).setId(UUID.randomUUID());
         podcast.setCover(new Cover("http://localhost:8089/img/image." + imageExtension));
-        when(podcastServerParameters.coverDefaultName()).thenReturn(defaultCoverValue);
-        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get(ROOT_FOLDER));
-        when(podcastServerParameters.serverUrl()).thenReturn(new URI(serverUrl));
+
+        when(podcastServerParameters.getCoverDefaultName()).thenReturn(defaultCoverValue);
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
+
         /* When */
         String url = coverBusiness.download(podcast);
 
         /* Then */
-        assertThat(url).isEqualTo(serverUrl + "api/podcast/" + podcast.getId() + "/" + defaultCoverValue + "." + imageExtension);
+        assertThat(url).isEqualTo("/api/podcast/" + podcast.getId() + "/" + defaultCoverValue + "." + imageExtension);
     }
 
     @Test
@@ -112,9 +119,8 @@ public class CoverBusinessTest {
         /* Given */
         Podcast podcast = new Podcast().setTitle("Foo");
         podcast.setCover(new Cover("http://localhost:8089/img/image.jpg"));
-        when(podcastServerParameters.coverDefaultName()).thenReturn("cover");
-        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get("/tmp"));
-        when(podcastServerParameters.fileContainer()).thenReturn(new URI("http://localhost:8080/podcast"));
+        when(podcastServerParameters.getCoverDefaultName()).thenReturn("cover");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
         /* When */
         String url = coverBusiness.download(podcast);
 
@@ -131,8 +137,8 @@ public class CoverBusinessTest {
                 .cover(new Cover("http://podcast.dk.lan/podcast/Google/aCover.jpg"))
                 .build();
 
-        when(podcastServerParameters.coverDefaultName()).thenReturn("cover");
-        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get("/podcast/"));
+        when(podcastServerParameters.getCoverDefaultName()).thenReturn("cover");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/podcast/"));
 
         /* When */
         Path coverPathOf = coverBusiness.getCoverPathOf(podcast);

@@ -20,7 +20,7 @@ public class ItemTest {
 
     public static final UUID PODCAST_ID = UUID.randomUUID();
     public static Item ITEM = new Item();
-    public static Podcast PODCAST = new Podcast();
+    public static Podcast PODCAST = new Podcast().setId(UUID.randomUUID());
     public static final ZonedDateTime NOW = ZonedDateTime.now();
     public static final Cover COVER = new Cover("http://fakeItem.com/cover");
     public static final Cover PODCAST_COVER = new Cover("PodcastCover");
@@ -51,7 +51,6 @@ public class ItemTest {
                 .setFileName("fakeItem.mp4");
 
         Item.rootFolder = Paths.get("/tmp/podcast");
-        Item.fileContainer = "http://podcast.dk.lan/";
 
         FileSystemUtils.deleteRecursively(Item.rootFolder.toFile());
         Files.createDirectories(ITEM.getLocalPath().getParent());
@@ -76,7 +75,7 @@ public class ItemTest {
                 .hasStatus(Status.NOT_DOWNLOADED)
                 .hasProgression(0);
     }
-    
+
     @Test
     public void should_change_his_status() {
 
@@ -86,7 +85,7 @@ public class ItemTest {
 
         /* When */ ITEM.setStatus(Status.FINISH);
         /* Then */ ItemAssert.assertThat(ITEM)
-                        .hasStatus(Status.FINISH);
+                .hasStatus(Status.FINISH);
     }
 
     @Test
@@ -101,7 +100,7 @@ public class ItemTest {
         /* When */  ITEM.setDownloadDate(downloaddate);
         /* Then */  ItemAssert.assertThat(ITEM).hasDownloadDate(downloaddate);
     }
-    
+
     @Test
     public void should_increment_the_number_of_retry() {
         ItemAssert.assertThat(ITEM).hasNumberOfTry(0);
@@ -133,10 +132,10 @@ public class ItemTest {
 
         ITEM.setPodcast(null);
         assertThat(ITEM.getPodcastId())
-                    .isNotEqualTo(PODCAST.getId())
-                    .isNull();
+                .isNotEqualTo(PODCAST.getId())
+                .isNull();
     }
-    
+
     @Test
     public void should_report_parent_podcast_cover() {
         assertThat(ITEM.getCoverOfItemOrPodcast()).isSameAs(COVER);
@@ -144,14 +143,14 @@ public class ItemTest {
         ITEM.setCover(null);
         assertThat(ITEM.getCoverOfItemOrPodcast()).isSameAs(PODCAST_COVER);
     }
-    
+
     @Test
     public void should_expose_the_API_url() {
         assertThat(ITEM.getProxyURLWithoutExtention())
-                    .isEqualTo(String.format("/api/podcast/%s/items/%s/download", PODCAST_ID, ID));
+                .isEqualTo(String.format("/api/podcast/%s/items/%s/download", PODCAST_ID, ID));
 
         assertThat(ITEM.getProxyURL())
-                    .isEqualTo(String.format("/api/podcast/%s/items/%s/download.mp4", PODCAST_ID, ID));
+                .isEqualTo(String.format("/api/podcast/%s/items/%s/download.mp4", PODCAST_ID, ID));
     }
 
     @Test
@@ -162,7 +161,7 @@ public class ItemTest {
         /* When */ String localStringPath = ITEM.getLocalUri();
         /* Then */ assertThat(localStringPath).isEqualTo("/tmp/podcast/Fake Podcast/fakeItem.mp4");
     }
-    
+
     @Test
     public void should_expose_isDownloaded() {
         assertThat(ITEM.isDownloaded()).isTrue();
@@ -170,21 +169,15 @@ public class ItemTest {
         ITEM.setFileName(null);
         assertThat(ITEM.isDownloaded()).isFalse();
     }
-    
-    @Test
-    public void should_expose_the_full_url() {
-        /* When */ String localUrl = ITEM.getLocalUrl();
-        /* Then */ assertThat(localUrl).isEqualTo("http://podcast.dk.lan/Fake Podcast/fakeItem.mp4");
-    }
 
     @Test
     public void should_be_reset() {
         /* Given */ ITEM.setStatus(Status.FINISH);
         /* When  */ ITEM.reset();
         /* Then  */ ItemAssert.assertThat(ITEM)
-                    .hasFileName(null)
-                    .hasDownloadDate(null)
-                    .hasStatus(Status.NOT_DOWNLOADED);
+                .hasFileName(null)
+                .hasDownloadDate(null)
+                .hasStatus(Status.NOT_DOWNLOADED);
     }
 
     @Test
@@ -192,7 +185,7 @@ public class ItemTest {
         /* When */ ITEM.setLocalUri("http://www.google.fr/mavideo.mp4");
         /* Then */ ItemAssert.assertThat(ITEM).hasFileName("mavideo.mp4");
     }
-    
+
     @Test
     public void should_equals_and_hashcode() {
         /* Given */
@@ -200,7 +193,7 @@ public class ItemTest {
         Item withSameId = new Item().setId(ID);
         Item withSameUrl = new Item().setUrl(ITEM.getUrl());
         Item withSameName = new Item().setUrl("http://test.domain.com/toto/fakeItem.com");
-        Item withSameLocalUri = new Item().setPodcast(PODCAST).setFileName("fakeItem.mp4");
+        /*Item withSameLocalUri = new Item().setPodcast(PODCAST).setFileName("fakeItem.mp4");*/
 
         /* Then */
         ItemAssert
@@ -210,7 +203,7 @@ public class ItemTest {
                 .isEqualTo(withSameId)
                 .isEqualTo(withSameUrl)
                 .isEqualTo(withSameName)
-                .isEqualTo(withSameLocalUri);
+                /*.isEqualTo(withSameLocalUri)*/;
 
         assertThat(ITEM.hashCode()).isEqualTo(new Item().setUrl(ITEM.getUrl()).setPubDate(NOW).hashCode());
 
@@ -219,7 +212,7 @@ public class ItemTest {
     @Test
     public void should_toString() {
         assertThat(ITEM.toString())
-                    .isEqualTo("Item{id="+ ID +", title='Fake Item', url='http://fakeItem.com', pubDate="+ NOW +", description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id="+PODCAST_ID+", title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}");
+                .isEqualTo("Item{id="+ ID +", title='Fake Item', url='http://fakeItem.com', pubDate="+ NOW +", description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id="+PODCAST_ID+", title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}");
 
     }
 
@@ -231,7 +224,7 @@ public class ItemTest {
                 .hasFileName(null)
                 .hasStatus(Status.DELETED);
     }
-    
+
     @Test
     public void should_preremove() throws IOException {
         /* Given */

@@ -1,7 +1,10 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +28,7 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class JdomService {
 
     // Element names :
@@ -52,24 +56,17 @@ public class JdomService {
     private static final String THUMBNAIL = "thumbnail";
     private static final String RSS = "rss";
 
-    //Useful namespace : 
+    //Useful namespace :
     public static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
-    public static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+    private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
     // URL Format
     private static final String LINK_FORMAT = "%s/api/podcast/%s/rss";
-    public static final Comparator<Item> PUBDATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
+    private static final Comparator<Item> PUBDATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
 
     final PodcastServerParameters podcastServerParameters;
     final MimeTypeService mimeTypeService;
     final UrlService urlService;
-
-    @Autowired
-    public JdomService(PodcastServerParameters podcastServerParameters, MimeTypeService mimeTypeService, UrlService urlService) {
-        this.podcastServerParameters = podcastServerParameters;
-        this.mimeTypeService = mimeTypeService;
-        this.urlService = urlService;
-    }
 
     public Optional<Document> parse(URL url) {
         try {
@@ -80,27 +77,27 @@ public class JdomService {
         }
     }
 
-    public String podcastToXMLGeneric (Podcast podcast, Boolean limit) throws IOException {
-        return podcastToXMLGeneric( podcast, withNumberOfItem(podcast, limit));
+    public String podcastToXMLGeneric(Podcast podcast, Boolean limit, String domainName) throws IOException {
+        return podcastToXMLGeneric( podcast, withNumberOfItem(podcast, limit), domainName);
     }
 
     private long withNumberOfItem(Podcast podcast, Boolean limit) {
-        return Boolean.TRUE.equals(limit) ? podcastServerParameters.rssDefaultNumberItem() : podcast.getItems().size();
+        return Boolean.TRUE.equals(limit) ? podcastServerParameters.getRssDefaultNumberItem() : podcast.getItems().size();
     }
 
-    public String podcastToXMLGeneric (Podcast podcast, Long limit) throws IOException {
+    private String podcastToXMLGeneric(Podcast podcast, Long limit, String domainName) throws IOException {
 
         Long limitOfItem = (limit == null) ? podcast.getItems().size() : limit;
 
         Element channel = new Element(CHANNEL);
 
-        String coverUrl = StringUtils.replace(podcast.getCover().getUrl(), " ", "%20");
+        String coverUrl = getCoverUrl(podcast.getCover(), domainName);
 
         Element title = new Element(TITLE);
         title.addContent(new Text(podcast.getTitle()));
 
         Element url = new Element(LINK);
-        url.addContent(new Text(String.format(LINK_FORMAT, podcastServerParameters.getServerUrl(), podcast.getId())));
+        url.addContent(new Text(String.format(LINK_FORMAT, domainName, podcast.getId())));
 
         if (nonNull(podcast.getLastUpdate())) {
             Element lastUpdate = new Element(PUB_DATE);
@@ -162,66 +159,68 @@ public class JdomService {
 
 
         podcast.getItems()
-        .stream()
-        .filter(i -> Objects.nonNull(i.getPubDate()))
-        .sorted(PUBDATE_COMPARATOR)
-        .limit(limitOfItem)
-        .forEachOrdered(item -> {
-            Element xmlItem = new Element(ITEM);
+                .stream()
+                .filter(i -> Objects.nonNull(i.getPubDate()))
+                .sorted(PUBDATE_COMPARATOR)
+                .limit(limitOfItem)
+                .forEachOrdered(item -> {
+                    Element xmlItem = new Element(ITEM);
 
-            Element item_title = new Element(TITLE);
-            item_title.addContent(new Text(item.getTitle()));
-            xmlItem.addContent(item_title);
+                    Element item_title = new Element(TITLE);
+                    item_title.addContent(new Text(item.getTitle()));
+                    xmlItem.addContent(item_title);
 
-            Element item_description = new Element(DESCRIPTION);
-            item_description.addContent(new Text(item.getDescription()));
-            xmlItem.addContent(item_description);
+                    Element item_description = new Element(DESCRIPTION);
+                    item_description.addContent(new Text(item.getDescription()));
+                    xmlItem.addContent(item_description);
 
-            Element item_enclosure = new Element(ENCLOSURE);
+                    Element item_enclosure = new Element(ENCLOSURE);
 
-            item_enclosure.setAttribute(URL_STRING, podcastServerParameters.getServerUrl()
-                    .concat(item.getProxyURLWithoutExtention())
-                    .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
+                    item_enclosure.setAttribute(URL_STRING, domainName
+                            .concat(item.getProxyURLWithoutExtention())
+                            .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
 
-            if (item.getLength() != null) {
-                item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
-            }
+                    if (item.getLength() != null) {
+                        item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
+                    }
 
-            if (StringUtils.isNotEmpty(item.getMimeType()))
-                item_enclosure.setAttribute(TYPE, item.getMimeType());
+                    if (StringUtils.isNotEmpty(item.getMimeType()))
+                        item_enclosure.setAttribute(TYPE, item.getMimeType());
 
-            xmlItem.addContent(item_enclosure);
+                    xmlItem.addContent(item_enclosure);
 
-            Element item_pubdate = new Element(PUB_DATE);
-            item_pubdate.addContent(new Text(item.getPubDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
-            xmlItem.addContent(item_pubdate);
+                    Element item_pubdate = new Element(PUB_DATE);
+                    item_pubdate.addContent(new Text(item.getPubDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
+                    xmlItem.addContent(item_pubdate);
 
-            Element itunesExplicite = new Element(EXPLICIT, ITUNES_NAMESPACE);
-            itunesExplicite.addContent(new Text(NO));
-            xmlItem.addContent(itunesExplicite);
+                    Element itunesExplicite = new Element(EXPLICIT, ITUNES_NAMESPACE);
+                    itunesExplicite.addContent(new Text(NO));
+                    xmlItem.addContent(itunesExplicite);
 
-            Element itunesItemSub = new Element(SUBTITLE, ITUNES_NAMESPACE);
-            itunesItemSub.addContent(new Text(item.getTitle()));
-            xmlItem.addContent(itunesItemSub);
+                    Element itunesItemSub = new Element(SUBTITLE, ITUNES_NAMESPACE);
+                    itunesItemSub.addContent(new Text(item.getTitle()));
+                    xmlItem.addContent(itunesItemSub);
 
-            Element itunesItemSummary = new Element(SUMMARY, ITUNES_NAMESPACE);
-            itunesItemSummary.addContent(new Text(item.getDescription()));
-            xmlItem.addContent(itunesItemSummary);
+                    Element itunesItemSummary = new Element(SUMMARY, ITUNES_NAMESPACE);
+                    itunesItemSummary.addContent(new Text(item.getDescription()));
+                    xmlItem.addContent(itunesItemSummary);
 
-            Element guid = new Element(GUID);
-            guid.addContent(new Text(podcastServerParameters.getServerUrl() + item.getProxyURL()));
-            xmlItem.addContent(guid);
+                    Element guid = new Element(GUID);
+                    guid.addContent(new Text(domainName + item.getProxyURL()));
+                    xmlItem.addContent(guid);
 
-            Element itunesItemThumbnail = new Element(IMAGE, ITUNES_NAMESPACE);
-            itunesItemThumbnail.setContent(new Text(StringUtils.replace(item.getCoverOfItemOrPodcast().getUrl(), " ", "%20")));
-            xmlItem.addContent(itunesItemThumbnail);
+                    String itemCoverUrl = getCoverUrl(item.getCoverOfItemOrPodcast(), domainName);
 
-            Element thumbnail = new Element(THUMBNAIL, MEDIA_NAMESPACE);
-            thumbnail.setAttribute(URL_STRING, item.getCoverOfItemOrPodcast().getUrl());
-            xmlItem.addContent(thumbnail);
+                    Element itunesItemThumbnail = new Element(IMAGE, ITUNES_NAMESPACE);
+                    itunesItemThumbnail.setContent(new Text(itemCoverUrl));
+                    xmlItem.addContent(itunesItemThumbnail);
 
-            channel.addContent(xmlItem);
-        });
+                    Element thumbnail = new Element(THUMBNAIL, MEDIA_NAMESPACE);
+                    thumbnail.setAttribute(URL_STRING, itemCoverUrl);
+                    xmlItem.addContent(thumbnail);
+
+                    channel.addContent(xmlItem);
+                });
 
         Element rss = new Element(RSS);
         rss.addNamespaceDeclaration(ITUNES_NAMESPACE);
@@ -232,5 +231,9 @@ public class JdomService {
 
         new XMLOutputter(Format.getPrettyFormat()).output(new Document(rss), writer);
         return writer.toString();
+    }
+
+    private String getCoverUrl(Cover cover, String domainName) {
+        return cover.getUrl().startsWith("/") ? (domainName + cover.getUrl()) : cover.getUrl();
     }
 }

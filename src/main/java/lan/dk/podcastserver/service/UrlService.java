@@ -6,6 +6,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.net.URLConnection;
 import java.util.Optional;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 09/07/15 for Podcast Server
@@ -164,8 +166,17 @@ public class UrlService {
         }
     }
 
-    /*@PostConstruct
-    public void postConstruct() {
-        System.setProperty("http.agent", HtmlService.USER_AGENT);
-    }*/
+    public String getDomainFromRequest(HttpServletRequest request) {
+        String origin = request.getHeader("origin");
+        if (nonNull(origin)) {
+            return origin;
+        }
+
+        return new StringBuilder()
+                .append(request.getScheme())
+                .append("://")
+                .append(request.getServerName())
+                .append((request.getServerPort() == 80 || request.getServerPort() == 443) ? "" : ":" + request.getServerPort())
+                .toString();
+    }
 }

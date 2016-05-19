@@ -15,7 +15,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
@@ -137,7 +136,7 @@ public class Item {
             return url.equals(item.url) || FilenameUtils.getName(item.url).equals(FilenameUtils.getName(url));
         }
 
-        return StringUtils.equals(getLocalUrl(), item.getLocalUrl());
+        return StringUtils.equals(getProxyURL(), item.getProxyURL());
     }
 
     @Override
@@ -166,14 +165,6 @@ public class Item {
     }
 
     /* Helpers */
-    @Transient @JsonView(ItemSearchListView.class)
-    public String getLocalUrl() {
-        return (fileName == null) ? null : UriComponentsBuilder.fromHttpUrl(fileContainer)
-                .pathSegment(podcast.getTitle(), fileName)
-                .build()
-                .toString();
-    }
-    
     @Transient @JsonProperty("proxyURL") @JsonView(ItemSearchListView.class)
     public String getProxyURL() {
         return String.format(PROXY_URL, podcast.getId(), id, getExtention());

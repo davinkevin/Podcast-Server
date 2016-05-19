@@ -6,7 +6,7 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +18,6 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -207,10 +206,9 @@ public class ItemBusinessTest {
 
         when(podcastBusiness.findOne(eq(idPodcast))).thenReturn(podcast);
         when(uploadedFile.getOriginalFilename()).thenReturn(title);
-        when(podcastServerParameters.rootFolder()).thenReturn(Paths.get(ROOT_FOLDER));
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(podcastBusiness.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
-        when(podcastServerParameters.fileContainer()).thenReturn(new URI("http://localhost:8080/podcast"));
         when(uploadedFile.getSize()).thenReturn(length);
         when(mimeTypeService.getMimeType(anyString())).thenReturn(aMimeType);
         /* When */
@@ -221,7 +219,7 @@ public class ItemBusinessTest {
                 .assertThat(item)
                 .hasTitle("aTitle")
                 .hasPubDate(ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(title.split(" - ")[1], DateTimeFormatter.ofPattern("yyyy-MM-dd")), LocalTime.of(0, 0)), ZoneId.systemDefault()))
-                .hasUrl("http://localhost:8080/podcast/aPodcast/" + title)
+                .hasUrl(null)
                 .hasLength(length)
                 .hasMimeType(aMimeType)
                 .hasDescription("aDescription")
@@ -230,8 +228,7 @@ public class ItemBusinessTest {
                 .hasStatus(Status.FINISH);
 
         assertThat(podcast.getItems()).contains(item);
-        verify(podcastServerParameters, times(1)).rootFolder();
-        verify(podcastServerParameters, times(1)).fileContainer();
+        verify(podcastServerParameters, times(1)).getRootfolder();
         verify(mimeTypeService, times(1)).getMimeType(eq("mp3"));
         verify(podcastBusiness, times(1)).findOne(eq(idPodcast));
         verify(podcastBusiness, times(1)).save(eq(podcast));

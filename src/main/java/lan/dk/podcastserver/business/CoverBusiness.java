@@ -3,19 +3,17 @@ package lan.dk.podcastserver.business;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
-import lan.dk.podcastserver.service.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,22 +24,17 @@ import java.util.UUID;
 /**
  * Created by kevin on 08/06/2014 for Podcast-Server
  */
+@Slf4j
 @Component
 @Transactional
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CoverBusiness {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String API_COVER = "/api/podcast/%s/cover.%s";
 
     final CoverRepository coverRepository;
     final PodcastServerParameters podcastServerParameters;
     final UrlService urlService;
-
-    @Autowired
-    public CoverBusiness(CoverRepository coverRepository, PodcastServerParameters podcastServerParameters, UrlService urlService) {
-        this.coverRepository = coverRepository;
-        this.podcastServerParameters = podcastServerParameters;
-        this.urlService = urlService;
-    }
 
     public Cover findOne(UUID id) {
         return coverRepository.findOne(id);
@@ -53,10 +46,14 @@ public class CoverBusiness {
             return "";
         }
 
-        String coverUrl = podcast.getCover().getUrl();
-        String fileName = podcastServerParameters.coverDefaultName() + "." + FilenameUtils.getExtension(coverUrl);
+        if (podcast.getCover().getUrl().startsWith("/"))
+            return podcast.getCover().getUrl();
 
-        Path fileLocation = podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(fileName);
+        String coverUrl = podcast.getCover().getUrl();
+
+        String fileName = podcastServerParameters.getCoverDefaultName() + "." + FilenameUtils.getExtension(coverUrl);
+
+        Path fileLocation = podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(fileName);
 
         // Download file to correct location :
         try {
@@ -72,24 +69,21 @@ public class CoverBusiness {
                     fileLocation,
                     StandardCopyOption.REPLACE_EXISTING
             );
-            return UriComponentsBuilder.fromUri(podcastServerParameters.serverUrl())
-                    .pathSegment("api", "podcast", podcast.getId().toString(), "cover." + FilenameUtils.getExtension(coverUrl))
-                    .build()
-                    .toUriString();
-        } catch (URISyntaxException | IOException e) {
-            logger.error("Error during downloading of the cover", e);
+            return String.format(API_COVER, podcast.getId().toString(), FilenameUtils.getExtension(coverUrl));
+        } catch (IOException e) {
+            log.error("Error during downloading of the cover", e);
             return "";
         }
     }
 
-    public Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
+    Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
         return !Objects.isNull(patchPodcast.getCover()) && !Objects.isNull(podcastToUpdate.getCover()) &&
                 patchPodcast.getCover().equals(podcastToUpdate.getCover());
     }
 
-    public Path getCoverPathOf(Podcast podcast) {
-        String fileName = podcastServerParameters.coverDefaultName() + "." + FilenameUtils.getExtension(podcast.getCover().getUrl());
-        return podcastServerParameters.rootFolder().resolve(podcast.getTitle()).resolve(fileName);
+    Path getCoverPathOf(Podcast podcast) {
+        String fileName = podcastServerParameters.getCoverDefaultName() + "." + FilenameUtils.getExtension(podcast.getCover().getUrl());
+        return podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(fileName);
     }
 
     public Cover save(Cover cover) {

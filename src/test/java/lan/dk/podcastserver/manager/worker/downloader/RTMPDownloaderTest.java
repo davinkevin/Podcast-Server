@@ -7,8 +7,9 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.PodcastServerParameters;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import lan.dk.podcastserver.service.properties.ExternalTools;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class RTMPDownloaderTest {
 
+    @Mock ExternalTools externalTools;
     @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
     @Mock ItemDownloadManager itemDownloadManager;
@@ -59,13 +61,13 @@ public class RTMPDownloaderTest {
                 .build();
         item = Item
                 .builder()
-                    .url("rtmp://a.url.com/foo/bar.mp4")
-                    .status(Status.STARTED)
-                    .podcast(podcast)
-                    .progression(0)
+                .url("rtmp://a.url.com/foo/bar.mp4")
+                .status(Status.STARTED)
+                .podcast(podcast)
+                .progression(0)
                 .build();
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
-        when(podcastServerParameters.rtmpDump()).thenReturn("/usr/local/bin/rtmpdump");
+        when(externalTools.getRtmpdump()).thenReturn("/usr/local/bin/rtmpdump");
         when(itemDownloadManager.getRootfolder()).thenReturn("/tmp");
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
 
@@ -110,7 +112,7 @@ public class RTMPDownloaderTest {
                 );
 
     }
-    
+
     @Test
     public void should_stop_download_if_ioexception() throws URISyntaxException {
         /* Given */
@@ -166,7 +168,7 @@ public class RTMPDownloaderTest {
                         "123"
                 );
     }
-    
+
     @Test
     public void should_stop_if_pause_not_working() {
         /* Given */

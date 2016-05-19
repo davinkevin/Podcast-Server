@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by kevin on 09/07/15 for Podcast Server
@@ -269,6 +273,34 @@ public class UrlServiceTest {
                 );
     }
 
+    @Test
+    public void should_get_domain_from_origin() {
+        /* Given */
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeader(eq("origin"))).thenReturn("http://a.custom.origin:8080");
 
+        /* When */
+        String domainFromRequest = urlService.getDomainFromRequest(req);
+
+        /* Then */
+        assertThat(domainFromRequest).isEqualTo("http://a.custom.origin:8080");
+    }
+
+
+    @Test
+    public void should_get_from_request() {
+        /* Given */
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeader(eq("origin"))).thenReturn(null);
+        when(req.getScheme()).thenReturn("http");
+        when(req.getServerName()).thenReturn("localhost");
+        when(req.getServerPort()).thenReturn(80);
+
+        /* When */
+        String domainFromRequest = urlService.getDomainFromRequest(req);
+
+        /* Then */
+        assertThat(domainFromRequest).isEqualTo("http://localhost");
+    }
 
 }
