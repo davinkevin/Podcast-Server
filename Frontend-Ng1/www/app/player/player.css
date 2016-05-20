@@ -1,0 +1,124 @@
+.ps .video-player videogular div.btn-video-share,
+.ps .video-player videogular div.btn-video-copy {
+  display: table-cell;
+  width: 50px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+.ps .video-player videogular div.btn-video-share a,
+.ps .video-player videogular div.btn-video-copy a,
+.ps .video-player videogular div.btn-video-share a:hover,
+.ps .video-player videogular div.btn-video-copy a:hover,
+.ps .video-player videogular div.btn-video-share a:visited,
+.ps .video-player videogular div.btn-video-copy a:visited {
+  color: white;
+  text-decoration: none;
+}
+.ps .video-player .button-list {
+  color: white;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: thin solid #1D1D1D;
+}
+.ps .video-player .player {
+  padding-top: 16px;
+}
+.ps .video-player .player,
+.ps .video-player .playlist {
+  background: #000000;
+}
+@media screen and (min-width: 1200px) {
+  .ps .video-player .player,
+  .ps .video-player .playlist {
+    height: 500px;
+  }
+}
+.ps .video-player video {
+  width: 100%;
+  height: auto;
+}
+.ps .video-player .watch-lists {
+  color: white;
+}
+.ps .video-player .watch-lists .watch-lists-body > p {
+  border-bottom: thin solid #1D1D1D;
+  padding-bottom: 10px;
+}
+.ps .video-player .playlist {
+  overflow-x: hidden;
+  overflow-y: visible;
+  height: 500px;
+}
+@media screen and (min-width: 1200px) {
+  .ps .video-player .playlist {
+    padding-top: 8px;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .ps .video-player .playlist {
+    padding-bottom: 16px;
+  }
+}
+.ps .video-player .playlist .media {
+  margin-top: 0;
+  height: 115px;
+  padding-top: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  font-weight: bold;
+}
+.ps .video-player .playlist .isReading {
+  background: #6F6F6F;
+}
+.ps .video-player .playlist .isReading img {
+  border: 2px solid rgba(216, 41, 41, 0.81);
+}
+.ps .btn-share-video videogular div.btn-video-share,
+.ps .btn-share-video videogular div.btn-video-copy {
+  display: table-cell;
+  width: 50px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+.ps .btn-share-video videogular div.btn-video-share a,
+.ps .btn-share-video videogular div.btn-video-copy a,
+.ps .btn-share-video videogular div.btn-video-share a:hover,
+.ps .btn-share-video videogular div.btn-video-copy a:hover,
+.ps .btn-share-video videogular div.btn-video-share a:visited,
+.ps .btn-share-video videogular div.btn-video-copy a:visited {
+  color: white;
+  text-decoration: none;
+}
+.ps videogular {
+  background-color: rgba(255, 255, 255, 0) !important;
+}
+.ps .item-player {
+  margin-bottom: 16px;
+}
+.ps .item-player video {
+  width: 100%;
+  height: auto;
+}
+.ps .item-player videogular div.btn-video-share,
+.ps .item-player videogular div.btn-video-copy {
+  display: table-cell;
+  width: 50px;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+.ps .item-player videogular div.btn-video-share a,
+.ps .item-player videogular div.btn-video-copy a,
+.ps .item-player videogular div.btn-video-share a:hover,
+.ps .item-player videogular div.btn-video-copy a:hover,
+.ps .item-player videogular div.btn-video-share a:visited,
+.ps .item-player videogular div.btn-video-copy a:visited {
+  color: white;
+  text-decoration: none;
+}
+.ps .item-player vg-controls {
+  top: calc(100% - 55px) !important;
+}

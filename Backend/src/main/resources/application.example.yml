@@ -1,0 +1,71 @@
+##############################
+# Database and Lucene Config #
+##############################
+spring :
+    datasource:
+        url: jdbc:h2:mem:exampledb
+        username: foo
+        password: bar
+        driver-class-name: org.h2.Driver
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        properties :
+            hibernate:
+                search.default:
+                        indexmanager: near-real-time
+                        directory_provider: ram
+                        indexBase: /tmp/lucene
+
+server:
+  port : 8080
+  compression:
+    enabled : true
+    mime-types : application/json,application/xml,text/html,text/xml,text/plain
+
+##############################
+#    Application Specific    #
+##############################
+
+podcastserver:
+    rootfolder: /tmp
+    concurrent-download: 3
+    max-update-parallels: 3
+    cover-default-name: cover
+    number-of-day-to-download: 30
+    number-of-try: 10
+    #download-extension: .psdownload
+    #rss-default-number-item: 50
+    update-and-download:
+        refresh:
+            cron: 0 0 0 * * ?
+    backup :
+      location: /tmp/
+      cron: 0 30 4 * * ?
+      binary: false
+    externaltools:
+        #rtmpdump: /usr/local/bin/rtmpdump
+        #ffmpeg: /usr/bin/ffmpeg
+    api :
+      youtube : YOUR_API_KEY_OR_EMPTY_IF_NO_ONE
+
+
+##############################
+#          Actuator          #
+##############################
+
+management:
+    context-path: /system
+
+endpoints:
+    health:
+        sensitive : false
+
+logging:
+    path: /tmp/podcastserver.log
+    level:
+        lan.dk.podcastserver : DEBUG
+
+multipart:
+    max-file-size: 512MB
+    max-request-size: 512MB
+    location : /tmp/

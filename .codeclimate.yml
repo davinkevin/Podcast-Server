@@ -4,14 +4,14 @@ engines:
 
 ratings:
   paths:
-  - "www/app/**"
+  - "Frontend-Ng1/www/app/**"
 
 exclude_paths:
-- "META-INF/**/*"
-- "src/**/*"
-- "gulp/**/*"
-- "*.js"
-- "*.json"
+- "Backend/**/*"
+- "Frontend-Ng1/gulp/**/*"
+- "Frontend-Ng1/*.js"
+- "Frontend-Ng1/*.json"
+- "Frontend-Ng1/*.xml"
 - "*.md"
 - "*.xml"
 - "LICENSE"

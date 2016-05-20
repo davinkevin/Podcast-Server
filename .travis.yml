@@ -14,26 +14,28 @@ before_script:
 - npm install -g jspm
 - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
 
-script: mvn test jacoco:report
+script:
+- mvn -f Frontend-Ng1/pom.xml install
+- mvn -f Backend/pom.xml install jacoco:report
 
 after_success:
-- mvn coveralls:report
+- mvn -f Backend/pom.xml coveralls:report
 
 before_deploy:
-- mvn package -DskipTests=true
+- mvn install -DskipTests=true
 
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
     secure: X9W0MGueni+7ly75mS+NtEAWzJWaD1CZxOtf2OBYQ0wDVABzTO2gztSQjSwgttThrwEVWeAKS7TUE8WUHSpqGoD5pkfKwOMgyiX2angPWuvtWvBgguzuxdNAiQxMVVC+0KOVcXdeuvSMt69HjoVQVa0IKOqkRDwle6U2bQXSrOk=
-  file: target/Podcast-Server.jar
+  file: Backend/target/Podcast-Server.jar
   on:
     repo: davinkevin/Podcast-Server
     tags: true
 
 after_deploy:
-- mvn docker:build
+- mvn -f Backend/pom.xml docker:build
 - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
 - docker push davinkevin/podcast-server
 
