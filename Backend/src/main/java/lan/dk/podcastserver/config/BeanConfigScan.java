@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -45,7 +44,7 @@ public class BeanConfigScan {
 
             @Override
             public Path convert(String source) {
-                return Paths.get(path);
+                return Paths.get(source);
             }
         };
     }
