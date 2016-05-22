@@ -44,10 +44,8 @@ public class DownloaderSelectorTest {
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaderSelector = new DownloaderSelector();
         downloaders = Sets.newHashSet(dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, parleysDownloader, rtmpDownloader, youtubeDownloader);
-        downloaderSelector.setDownloaders(downloaders);
-        downloaderSelector.setApplicationContext(applicationContext);
+        downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 
     private Answer<Downloader> findBean() {

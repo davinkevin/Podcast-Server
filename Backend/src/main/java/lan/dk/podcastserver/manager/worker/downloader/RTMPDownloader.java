@@ -30,7 +30,6 @@ public class RTMPDownloader extends AbstractDownloader {
     @Override
     public Item download() {
         logger.debug("Download");
-        itemDownloadManager.addACurrentDownload();
 
         try {
             target = getTagetFile(item);

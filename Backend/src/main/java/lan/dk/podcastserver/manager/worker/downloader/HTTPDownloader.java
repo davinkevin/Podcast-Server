@@ -29,23 +29,17 @@ public class HTTPDownloader extends AbstractDownloader {
 
     DownloadInfo info = null;
 
+    private final HTTPWatcher itemSynchronisation = new HTTPWatcher(this);
+
     @Override
     public Item download() {
         logger.debug("Download");
-        itemDownloadManager.addACurrentDownload();
 
         try {
-            // initialize url information object
             info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl(item)));
-            // extract infromation from the web
-            Runnable itemSynchronisation = new HTTPWatcher(this);
-
             info.extract(stopDownloading, itemSynchronisation);
             target = getTagetFile(item);
-
-            // create wget downloader
             WGet w = wGetFactory.newWGet(info, target);
-            // will blocks until download finishes
             w.download(stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
             e.getInfo().getParts()

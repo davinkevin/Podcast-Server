@@ -6,7 +6,7 @@ spring :
     mvc.view.prefix : /
     h2.console.enabled : true
     datasource:
-        url: jdbc:h2:mem:exampledb
+        url: jdbc:h2:/tmp/executor-download
         username: sa
         driver-class-name: org.h2.Driver
     jpa:

@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.selector;
 
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.downloader.NoOpDownloader;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import org.jadira.usertype.spi.utils.lang.StringUtils;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +16,13 @@ import java.util.Set;
  * Created by kevin on 17/03/15.
  */
 @Service
-//@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class DownloaderSelector {
 
-    public static final NoOpDownloader NO_OP_DOWNLOADER = new NoOpDownloader();
+    static final NoOpDownloader NO_OP_DOWNLOADER = new NoOpDownloader();
 
-    @Setter(onMethod = @__(@Autowired))
-    private ApplicationContext applicationContext;
-
-    @Setter(onMethod = @__(@Autowired))
-    private Set<Downloader> downloaders;
+    private final ApplicationContext applicationContext;
+    private final Set<Downloader> downloaders;
 
     public Downloader of(String url) {
         if (StringUtils.isEmpty(url)) {

@@ -47,7 +47,6 @@ public class YoutubeDownloader extends AbstractDownloader {
     @Override
     public Item download() {
         logger.debug("Download");
-        itemDownloadManager.addACurrentDownload();
 
         YoutubeWatcher watcher = new YoutubeWatcher(this);
         try {

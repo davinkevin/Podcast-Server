@@ -62,7 +62,6 @@ public class ParleysDownloader extends AbstractDownloader{
     @Override
     public Item download() {
 
-        itemDownloadManager.addACurrentDownload();
         item.setProgression(0);
 
         List<ParleysAssets> listOfAssets = getUrlForParleysItem(item);

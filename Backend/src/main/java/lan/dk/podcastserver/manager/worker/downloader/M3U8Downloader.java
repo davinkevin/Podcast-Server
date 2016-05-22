@@ -36,8 +36,6 @@ public class M3U8Downloader extends AbstractDownloader {
             return item;
         }
 
-        itemDownloadManager.addACurrentDownload();
-
         try(BufferedReader in = urlService.urlAsReader(getItemUrl(item))) {
             urlList = in
                     .lines()

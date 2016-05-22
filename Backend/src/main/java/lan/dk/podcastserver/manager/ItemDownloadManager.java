@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.manager;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
@@ -8,17 +10,14 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-import java.net.URISyntaxException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.StreamSupport;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -31,30 +30,35 @@ public class ItemDownloadManager {
 
     private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
 
-    @Autowired SimpMessagingTemplate template;
-    @Autowired ItemRepository itemRepository;
-    @Autowired PodcastServerParameters podcastServerParameters;
-    @Autowired DownloaderSelector downloaderSelector;
+    private final SimpMessagingTemplate template;
+    private final ItemRepository itemRepository;
+    private final PodcastServerParameters podcastServerParameters;
+    private final DownloaderSelector downloaderSelector;
+    private final ThreadPoolTaskExecutor downloadExecutor;
+    private final ReentrantLock mainLock = new ReentrantLock();
 
-    private Queue<Item> waitingQueue = new ConcurrentLinkedQueue<>();
-    private Map<Item, Downloader> downloadingQueue = new ConcurrentHashMap<>();
-    private AtomicInteger numberOfCurrentDownload = new AtomicInteger(0);
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-    private Integer limitParallelDownload = 3;
+    @Autowired
+    public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, DownloaderSelector downloaderSelector, @Qualifier("DownloadExecutor") ThreadPoolTaskExecutor downloadExecutor) {
+        this.template = template;
+        this.itemRepository = itemRepository;
+        this.podcastServerParameters = podcastServerParameters;
+        this.downloaderSelector = downloaderSelector;
+        this.downloadExecutor = downloadExecutor;
+
+        Item.rootFolder = podcastServerParameters.getRootfolder();
+    }
+
+    private Queue<Item> waitingQueue = Queues.newConcurrentLinkedQueue();
+    private Map<Item, Downloader> downloadingQueue = Maps.newConcurrentMap();
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
-        return podcastServerParameters.getConcurrentDownload();
+        return downloadExecutor.getCorePoolSize();
     }
 
-    public void changeLimitParallelsDownload(Integer limitParallelDownload) {
-
-        boolean addToDownloadList = limitParallelDownload < getLimitParallelDownload();
-
-        this.limitParallelDownload = limitParallelDownload;
-
-        if (addToDownloadList && !isRunning.get())
-            manageDownload();
+    public void setLimitParallelDownload(Integer limitParallelDownload) {
+        downloadExecutor.setCorePoolSize(limitParallelDownload);
+        manageDownload();
     }
 
     public Queue<Item> getWaitingQueue() {
@@ -66,7 +70,7 @@ public class ItemDownloadManager {
     }
 
     public int getNumberOfCurrentDownload() {
-        return numberOfCurrentDownload.get();
+        return downloadingQueue.size();
     }
 
     public String getRootfolder() {
@@ -75,19 +79,20 @@ public class ItemDownloadManager {
 
     /* METHODS */
     private void manageDownload() {
+        final ReentrantLock manageDownloadLock = this.mainLock;
 
-        if (!isRunning.get()) {
-            isRunning.set(true);
-            Item currentItem;
-
-            while (downloadingQueue.size() < this.limitParallelDownload && !waitingQueue.isEmpty()) {
-                currentItem = this.getWaitingQueue().poll();
+        manageDownloadLock.lock();
+        try {
+            while (downloadingQueue.size() < downloadExecutor.getCorePoolSize() && !waitingQueue.isEmpty()) {
+                Item currentItem = this.getWaitingQueue().poll();
                 if (!isStartedOrFinished(currentItem)) {
                     getDownloaderByTypeAndRun(currentItem);
                 }
             }
-            isRunning.set(false);
+        } finally {
+            manageDownloadLock.unlock();
         }
+        log.info("Call to convert and Send waiting queue {}", waitingQueue);
         this.convertAndSendWaitingQueue();
     }
 
@@ -168,7 +173,7 @@ public class ItemDownloadManager {
         this.addItemToQueue(itemRepository.findOne(id));
     }
 
-    public void addItemToQueue(Item item) {
+    void addItemToQueue(Item item) {
 
         if (waitingQueue.contains(item) || downloadingQueue.containsKey(item))
             return;
@@ -194,15 +199,9 @@ public class ItemDownloadManager {
 
 
     /* Helpers */
-    public void addACurrentDownload() {
-        this.numberOfCurrentDownload.incrementAndGet();
-    }
-
     public void removeACurrentDownload(Item item) {
-        this.numberOfCurrentDownload.decrementAndGet();
         this.downloadingQueue.remove(item);
-        if (!isRunning.get())
-            manageDownload();
+        manageDownload();
     }
 
     public Item getItemInDownloadingQueue(UUID id) {
@@ -220,23 +219,24 @@ public class ItemDownloadManager {
             Downloader downloader = downloadingQueue.get(item);
             downloader.startDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
-            Downloader worker = downloaderSelector.of(item.getUrl());
-
-            if (worker != null) {
-                this.getDownloadingQueue().put(item, worker.setItem(item).setItemDownloadManager(this));
-                new Thread(worker).start();
-            }
+            Downloader worker = downloaderSelector
+                    .of(item.getUrl())
+                    .setItem(item)
+                    .setItemDownloadManager(this);
+            this.getDownloadingQueue().put(item, worker);
+            downloadExecutor.execute(worker);
         }
     }
 
     public void resetDownload(Item item) {
         if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
             item.addATry();
-            Downloader worker = downloaderSelector.of(item.getUrl());
-            if (worker != null) {
-                this.getDownloadingQueue().put(item, worker.setItem(item).setItemDownloadManager(this));
-                new Thread(worker).start();
-            }
+            Downloader worker = downloaderSelector
+                    .of(item.getUrl())
+                    .setItem(item)
+                    .setItemDownloadManager(this);
+            this.getDownloadingQueue().put(item, worker);
+            downloadExecutor.execute(worker);
         }
     }
 
@@ -250,7 +250,7 @@ public class ItemDownloadManager {
         this.convertAndSendWaitingQueue();
     }
 
-    protected void convertAndSendWaitingQueue() {
+    private void convertAndSendWaitingQueue() {
         this.template.convertAndSend(WS_TOPIC_WAITINGLIST, this.waitingQueue);
     }
 
@@ -288,11 +288,5 @@ public class ItemDownloadManager {
         waitingQueue.addAll(aItemList);
 
         convertAndSendWaitingQueue();
-    }
-
-    @PostConstruct
-    public void postConstruct() throws URISyntaxException {
-        Item.rootFolder = podcastServerParameters.getRootfolder();
-        limitParallelDownload = podcastServerParameters.getConcurrentDownload();
     }
 }

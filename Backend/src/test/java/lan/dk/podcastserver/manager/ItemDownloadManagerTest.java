@@ -1,20 +1,20 @@
 package lan.dk.podcastserver.manager;
 
+import com.google.common.collect.Lists;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
+import lan.dk.podcastserver.manager.worker.downloader.NoOpDownloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -46,36 +47,44 @@ public class ItemDownloadManagerTest {
     @Mock ItemRepository itemRepository;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock DownloaderSelector downloaderSelector;
+    @Mock ThreadPoolTaskExecutor downloaderExecutor;
 
     @InjectMocks ItemDownloadManager itemDownloadManager;
-    public static final Item ITEM_1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 1).setPubDate(ZonedDateTime.now());
-    public static final Item ITEM_2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 2).setPubDate(ZonedDateTime.now()).setStatus(Status.STARTED);
-    public static final Item ITEM_3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/" + 3).setPubDate(ZonedDateTime.now()).setStatus(Status.PAUSED);
+
+    private static final Item ITEM_1 = Item.builder().id(UUID.randomUUID()).status(Status.NOT_DOWNLOADED).url("http://now.where/" + 1).pubDate(ZonedDateTime.now()).build();
+    private static final Item ITEM_2 = Item.builder().id(UUID.randomUUID()).status(Status.STARTED).url("http://now.where/" + 2).pubDate(ZonedDateTime.now()).build();
+    private static final Item ITEM_3 = Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).url("http://now.where/" + 3).pubDate(ZonedDateTime.now()).build();
 
     @Test
     public void should_get_limit_of_download () {
-        /* Given */ when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
-        /* When */  Integer nbOfDownload = itemDownloadManager.getLimitParallelDownload();
+        /* Given */
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(NUMBER_OF_DOWNLOAD);
+        /* When */
+        Integer nbOfDownload = itemDownloadManager.getLimitParallelDownload();
         /* Then */
-        verify(podcastServerParameters, times(1)).getConcurrentDownload();
         assertThat(nbOfDownload).isEqualTo(NUMBER_OF_DOWNLOAD);
+        verify(downloaderExecutor, times(1)).getCorePoolSize();
     }
 
     @Test
     public void should_change_limit_of_download_sup () {
-        /* Given */ when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
-        /* When */ itemDownloadManager.changeLimitParallelsDownload(NUMBER_OF_DOWNLOAD + 1);
-        /* Then */ verify(podcastServerParameters, times(1)).getConcurrentDownload();
+        /* Given */
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(NUMBER_OF_DOWNLOAD);
+        /* When */
+        itemDownloadManager.setLimitParallelDownload(NUMBER_OF_DOWNLOAD + 1);
+        /* Then */
+        verify(template, times(1)).convertAndSend(eq("/topic/waiting"), queueArgumentCaptor.capture());
+        assertThat(queueArgumentCaptor.getValue()).isNotNull().isEmpty();
     }
 
     @Test
-    public void should_change_limit_of_download_less () {
-        /* Given */ when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
-        /* When */  itemDownloadManager.changeLimitParallelsDownload(NUMBER_OF_DOWNLOAD - 1);
+    public void should_change_limit_of_download_for_less () {
+        /* Given */
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(NUMBER_OF_DOWNLOAD);
+        /* When */
+        itemDownloadManager.setLimitParallelDownload(NUMBER_OF_DOWNLOAD - 1);
         /* Then */
-        verify(podcastServerParameters, times(1)).getConcurrentDownload();
-        verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
-        assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
+        verify(template, times(1)).convertAndSend(eq("/topic/waiting"), queueArgumentCaptor.capture());
         assertThat(queueArgumentCaptor.getValue()).isNotNull().isEmpty();
 
     }
@@ -100,7 +109,7 @@ public class ItemDownloadManagerTest {
         /* Given */ when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_FOLDER);
         /* When */ String rootfolder = itemDownloadManager.getRootfolder();
         /* Then */
-        verify(podcastServerParameters, times(1)).getRootfolder();
+        verify(podcastServerParameters, times(2)).getRootfolder();
         assertThat(rootfolder).isSameAs(ROOT_FOLDER.toString());
     }
 
@@ -108,14 +117,11 @@ public class ItemDownloadManagerTest {
     public void should_init_download_with_empty_list() throws URISyntaxException {
         /* Given */
         when(itemRepository.findAllToDownload(any())).thenReturn(new ArrayList<>());
-        mockPodcastParametersForPostConstruct();
         /* When */
-        itemDownloadManager.postConstruct();
         itemDownloadManager.launchDownload();
         /* Then */
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
-        verifyPodcastParametersForPostConstruct();
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
     }
@@ -123,42 +129,44 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_list_of_item_larger_than_download_limit() throws URISyntaxException {
         /* Given */
-        final List<Item> itemList = Arrays.asList(new Item().setId(UUID.randomUUID()).setUrl("1").setStatus(Status.NOT_DOWNLOADED), new Item().setId(UUID.randomUUID()).setUrl("2").setStatus(Status.NOT_DOWNLOADED), new Item().setId(UUID.randomUUID()).setUrl("3").setStatus(Status.NOT_DOWNLOADED), new Item().setId(UUID.randomUUID()).setUrl("4").setStatus(Status.NOT_DOWNLOADED));
+        final List<Item> itemList = Lists.newArrayList(
+                Item.builder().id(UUID.randomUUID()).url("1").status(Status.NOT_DOWNLOADED).build(),
+                Item.builder().id(UUID.randomUUID()).url("2").status(Status.NOT_DOWNLOADED).build(),
+                Item.builder().id(UUID.randomUUID()).url("3").status(Status.NOT_DOWNLOADED).build(),
+                Item.builder().id(UUID.randomUUID()).url("4").status(Status.NOT_DOWNLOADED).build()
+        );
         when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
         Downloader downloader = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloader);
         when(downloader.setItem(any())).thenReturn(downloader);
         when(downloader.setItemDownloadManager(any())).thenReturn(downloader);
-        mockPodcastParametersForPostConstruct();
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+
         /* When */
-        itemDownloadManager.postConstruct();
         itemDownloadManager.launchDownload();
+
         /* Then */
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
-        verifyPodcastParametersForPostConstruct();
         verify(downloaderSelector, times(3)).of(itemUrlArgumentCaptor.capture());
         assertThat(itemUrlArgumentCaptor.getAllValues()).contains(itemList.get(0).getUrl(), itemList.get(1).getUrl(), itemList.get(2).getUrl());
-        verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
-        assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
+        verify(template, times(1)).convertAndSend(eq("/topic/waiting"), same(itemDownloadManager.getWaitingQueue()));
     }
 
     @Test
     public void should_relaunch_a_paused_download() throws URISyntaxException {
         /* Given */
         final Downloader mockDownloader = mock(Downloader.class);
-        final Item item = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED);
+        final Item item = Item.builder().id(UUID.randomUUID()).status(Status.NOT_DOWNLOADED).build();
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
         when(itemRepository.findAllToDownload(any())).thenReturn(Collections.singletonList(item));
-        mockPodcastParametersForPostConstruct();
 
         /* When */
-        itemDownloadManager.postConstruct();
         itemDownloadManager.launchDownload();
+
         /* Then */
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
-        verifyPodcastParametersForPostConstruct();
         verifyConvertAndSave();
     }
 
@@ -227,19 +235,16 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_add_item_to_queue() throws URISyntaxException {
         /* Given */
-        Item item = new Item().setId(UUID.randomUUID()).setStatus(Status.FINISH);
+        Item item = Item.builder().id(UUID.randomUUID()).status(Status.FINISH).build();
         when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
-        mockPodcastParametersForPostConstruct();
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
 
         /* When */
-        itemDownloadManager.postConstruct();
         itemDownloadManager.addItemToQueue(item.getId());
 
         /* Then */
-        verifyPodcastParametersForPostConstruct();
         verifyConvertAndSave();
-        verify(itemRepository, times(1)).findOne(integerArgumentCaptor.capture());
-        assertThat(integerArgumentCaptor.getValue()).isEqualTo(item.getId());
+        verify(itemRepository, times(1)).findOne(eq(item.getId()));
         assertThat(itemDownloadManager.getWaitingQueue()).isEmpty();
     }
 
@@ -266,34 +271,10 @@ public class ItemDownloadManagerTest {
         verifyConvertAndSave();
     }
 
-    @Test
-    public void should_increment_the_number_of_concurrent_download() {
-        /* Given */
-        Integer numberOfCurrentDownload = itemDownloadManager.getNumberOfCurrentDownload();
-
-        /* When */
-        itemDownloadManager.addACurrentDownload();
-
-        /* Then */
-        assertThat(itemDownloadManager.getNumberOfCurrentDownload()).isEqualTo(numberOfCurrentDownload + 1);
-
-    }
-
-
     private void verifyConvertAndSave() {
         verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
         assertThat(queueArgumentCaptor.getValue()).isSameAs(itemDownloadManager.getWaitingQueue());
-    }
-
-    private void mockPodcastParametersForPostConstruct() throws URISyntaxException {
-        when(podcastServerParameters.getConcurrentDownload()).thenReturn(NUMBER_OF_DOWNLOAD);
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/Users/kevin/Tomcat/podcast/webapps/podcast/"));
-    }
-
-    private void verifyPodcastParametersForPostConstruct() throws URISyntaxException {
-        verify(podcastServerParameters, times(1)).getConcurrentDownload();
-        verify(podcastServerParameters, times(1)).getRootfolder();
     }
 
     @Test
@@ -400,16 +381,13 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_remove_a_current_download() throws URISyntaxException {
         /* Given */
-        mockPodcastParametersForPostConstruct();
         final Downloader calledDownloader = mock(Downloader.class);
         Item item = new Item().setId(UUID.randomUUID()).setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
         itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
         /* When */
-        itemDownloadManager.postConstruct();
         itemDownloadManager.removeACurrentDownload(item);
         /* Then */
         assertThat(itemDownloadManager.getDownloadingQueue()).hasSize(0);
-        verifyPodcastParametersForPostConstruct();
         verifyConvertAndSave();
     }
 
@@ -441,7 +419,7 @@ public class ItemDownloadManagerTest {
 
     @Test
     public void should_reset_current_download() throws URISyntaxException {
-        /* Given */ mockPodcastParametersForPostConstruct();
+        /* Given */
         when(podcastServerParameters.getNumberOfTry()).thenReturn(3);
         Downloader downloaderMock = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloaderMock);
@@ -547,8 +525,27 @@ public class ItemDownloadManagerTest {
         assertThat(item).isNull();
     }
 
+    @Test
+    public void should_not_allowed_parallel_update() {
+        /* Given */
+        when(downloaderSelector.of(any())).then(i -> {
+            TimeUnit.SECONDS.sleep(1);
+            return new NoOpDownloader();
+        });
+
+        /* When */
+        itemDownloadManager.setLimitParallelDownload(5);
+        runAsync(() -> itemDownloadManager.setLimitParallelDownload(10));
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            verify(template, atLeast(2)).convertAndSend(eq("/topic/waiting"), anyCollection());
+        });
+    }
+
     @After
     public void afterEach() {
+        verify(podcastServerParameters, atLeast(1)).getRootfolder();
         verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, downloaderSelector);
     }
 
