@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
+import javaslang.control.Try;
 import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
 import lan.dk.podcastserver.utils.ThreadUtils.OutputLogger;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -31,18 +33,26 @@ public class FfmpegService {
     @Autowired ProcessBuilderFactory processBuilderFactory;
 
     public void concatDemux (File target, File... files) {
+        Path listOfFiles = null;
         try {
             Files.deleteIfExists(target.toPath());
 
             String filesStrings = Lists.newArrayList(files)
                     .stream()
-                    .map(File::getAbsolutePath)
-                    .collect(joining("|"));
+                    .map(File::getName)
+                    .map(p -> "file '" + p + "'")
+                    .collect(joining(System.getProperty("line.separator")));
+
+            listOfFiles = Files.createTempFile(target.toPath().getParent(), "ffmpeg-list", ".txt");
+            Files.write(listOfFiles, filesStrings.getBytes());
 
             ProcessBuilder pb = processBuilderFactory.newProcessBuilder(ffmpeg,
                     /*"-v", "verbose",*/
-                    "-i", "concat:" + filesStrings,
-                    "-c", "copy", target.getAbsolutePath()
+                    "-f", "concat",
+                    "-i", listOfFiles.toAbsolutePath().toString(),
+                    "-vcodec", "copy",
+                    "-acodec", "copy",
+                    target.getAbsolutePath()
             )
                     .directory(workingDirectory.toFile())
                     .redirectErrorStream(true)
@@ -59,7 +69,9 @@ public class FfmpegService {
             output.interrupt();
         } catch (IOException | InterruptedException e) {
             log.error("Error during Ffmpeg conversion", e);
-        }
+        } finally {
+            Path finalListOfFiles = listOfFiles;
+            if (nonNull(listOfFiles)) Try.of(() -> Files.deleteIfExists(finalListOfFiles)); }
     }
 
 }

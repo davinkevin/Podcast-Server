@@ -51,14 +51,17 @@ public class FfmpegServiceTest {
         verify(processBuilderFactory, times(1)).newProcessBuilder(processParameters.capture());
         assertThat(processParameters.getAllValues()).contains(
                 ffmpegService.ffmpeg,
+                "-f", "concat",
                 "-i",
-                "concat:/tmp/input1.mp4|/tmp/input2.mp4|/tmp/input3.mp4",
-                "-c",
-                "copy",
+                "-vcodec", "copy",
+                "-acodec", "copy",
                 "/tmp/output.mp4"
         );
+        assertThat(
+            processParameters.getAllValues().stream().anyMatch(s -> s.startsWith("/tmp/ffmpeg-list") && s.endsWith(".txt"))
+        ).isTrue();
     }
-    
+
     @Test
     public void should_catch_error_if_problem() {
         /* Given */
