@@ -25,7 +25,6 @@ export default class PodcastDetailsStatsComponent {
         this.chartSeries = [];
 
         this.generateChartData();
-        this.chartConfig = this.statService.highChartsConfig(this.chartSeries);
 
         $scope.$on("podcastItems:refresh", () => this.generateChartData());
     }
@@ -48,6 +47,7 @@ export default class PodcastDetailsStatsComponent {
                 this.chartSeries.push({"name": "Publication Date", "data": this.statService.mapToHighCharts(arrayResult[1])});
                 this.chartSeries.push({"name": "Creation Date", "data": this.statService.mapToHighCharts(arrayResult[2])});
                 return this.chartSeries;
-            });
+            })
+            .then(chartSeries => this.chartConfig = this.statService.highChartsConfig(chartSeries));
     }
 }
