@@ -10,8 +10,8 @@ import Rx from 'rx';
 export default class DownloadManager {
 
     WS_DOWNLOAD_BASE = '/app/download';
-    download$ = new Rx.BehaviorSubject({});
-    waiting$ = new Rx.BehaviorSubject();
+    download$ = new Rx.ReplaySubject(0);
+    waiting$ = new Rx.ReplaySubject(0);
     updating$ = new Rx.BehaviorSubject(null);
     
     constructor(ngstomp, $http) {
