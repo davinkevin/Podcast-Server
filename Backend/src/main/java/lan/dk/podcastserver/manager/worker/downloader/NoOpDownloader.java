@@ -17,7 +17,6 @@ public class NoOpDownloader implements Downloader {
     @Override public String getItemUrl(Item item) { return null; }
     @Override public void startDownload() {}
     @Override public void pauseDownload() {}
-    @Override public void restartDownload() {}
     @Override public void stopDownload() {}
     @Override public void finishDownload() {}
     @Override public void resetDownload() {}

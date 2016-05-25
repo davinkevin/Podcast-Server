@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service.properties;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URISyntaxException;
@@ -14,11 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PodcastServerParametersTest {
 
+    PodcastServerParameters parameters;
+
+    @Before
+    public void beforeEach() { parameters = new PodcastServerParameters(); }
+
     @Test
     public void should_have_default_value() throws URISyntaxException {
         Path ROOT_FOLDER = Paths.get("/tmp/");
 
-        PodcastServerParameters parameters = new PodcastServerParameters();
 
         PodcastServerParametersAssert.assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
@@ -44,7 +49,6 @@ public class PodcastServerParametersTest {
     public void should_have_mdificated_values() throws URISyntaxException {
         /* Given */
         Path ROOT_FOLDER = Paths.get("/tmp");
-        PodcastServerParameters parameters = new PodcastServerParameters();
 
         /* When */
         parameters.setRootfolder(ROOT_FOLDER);

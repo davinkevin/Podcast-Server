@@ -19,12 +19,12 @@ public class DownloadControllerWS {
     ItemDownloadManager IDM;
 
     @SubscribeMapping("/waiting")
-    private Collection<Item> waitingList() {
+    public Collection<Item> waitingList() {
         return IDM.getWaitingQueue();
     }
     
     @SubscribeMapping("/download")
-    private Collection<Item> downloadList() {
+    public Collection<Item> downloadList() {
         return IDM.getItemsInDownloadingQueue();
     }
     

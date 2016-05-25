@@ -211,8 +211,8 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_restart_all_downloads() {
         /* Given */
-        final Item itemOne = new Item().setId(UUID.randomUUID()).setStatus(Status.PAUSED);
-        final Item itemTwo = new Item().setId(UUID.randomUUID()).setStatus(Status.PAUSED);
+        final Item itemOne = Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build();
+        final Item itemTwo = Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build();
         final Downloader mockDownloaderItemOne = mock(Downloader.class);
         final Downloader mockDownloaderItemTwo = mock(Downloader.class);
         when(mockDownloaderItemOne.getItem()).thenReturn(itemOne);
@@ -360,12 +360,10 @@ public class ItemDownloadManagerTest {
         verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
     }
 
-/*
+
     @Test
     public void should_toogle_on_a_PAUSED_download() {
-        */
-/* Given *//*
-
+        /* Given */
         final Downloader notCalledDownloader = mock(Downloader.class);
         final Downloader calledDownloader = mock(Downloader.class);
         itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
@@ -373,18 +371,14 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.getDownloadingQueue().put(ITEM_3, calledDownloader);
         when(calledDownloader.getItem()).thenReturn(ITEM_3);
 
-        */
-/* When *//*
- itemDownloadManager.toogleDownload(ITEM_3.getId());
+        /* When */
+        itemDownloadManager.toogleDownload(ITEM_3.getId());
 
-        */
-/* Then *//*
-
+        /* Then */
         verify(calledDownloader, times(2)).getItem();
         verify(calledDownloader, times(1)).restartDownload();
         verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
     }
-*/
 
     @Test
     public void should_remove_a_current_download() throws URISyntaxException {

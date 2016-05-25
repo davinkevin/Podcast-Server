@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -92,7 +91,7 @@ public class M3U8DownloaderTest {
         assertThat(Paths.get("/tmp", podcast.getTitle(), item.getFileName())).exists();
         assertThat(downloaded).isSameAs(item);
         assertThat(downloaded.getStatus()).isSameAs(Status.FINISH);
-        verify(urlService, Mockito.times(5)).asStream(any());
+        verify(urlService, times(5)).asStream(any());
     }
 
     @Test

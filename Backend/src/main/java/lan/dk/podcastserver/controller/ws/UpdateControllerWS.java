@@ -15,7 +15,7 @@ public class UpdateControllerWS {
     @Resource UpdatePodcastBusiness updatePodcastBusiness;
 
     @SubscribeMapping("/updating")
-    private Boolean isUpdating() {
+    public Boolean isUpdating() {
         return updatePodcastBusiness.isUpdating();
     }
 }

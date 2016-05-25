@@ -20,20 +20,20 @@ public class UpdatePodcastController {
 
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void updatePodcast () {
+    public void updatePodcast () {
         updatePodcastBusiness.updatePodcast();
     }
 
     @RequestMapping(value = "/updateAndDownloadPodcast", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void updateAndDownloadPodcast() {
+    public void updateAndDownloadPodcast() {
         updatePodcastBusiness.updatePodcast();
         IDM.launchDownload();
     }
 
     @RequestMapping(value = "/deleteOdlItems", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    private void deleteOldItem() {
+    public void deleteOldItem() {
         updatePodcastBusiness.deleteOldEpisode();
     }
 }
