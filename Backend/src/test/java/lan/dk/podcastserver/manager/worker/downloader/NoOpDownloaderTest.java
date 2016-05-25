@@ -17,6 +17,7 @@ public class NoOpDownloaderTest {
         /* When */
         noOpDownloader.startDownload();
         noOpDownloader.pauseDownload();
+        noOpDownloader.restartDownload();
         noOpDownloader.stopDownload();
         noOpDownloader.finishDownload();
         noOpDownloader.resetDownload();

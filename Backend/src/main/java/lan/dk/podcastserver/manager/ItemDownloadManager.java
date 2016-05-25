@@ -217,7 +217,7 @@ public class ItemDownloadManager {
         if (downloadingQueue.containsKey(item)) { // Cas ou le Worker se met en pause et reste en mémoire // dans la DownloadingQueue
             log.debug("Start Item : " + item.getTitle());
             Downloader downloader = downloadingQueue.get(item);
-            downloader.startDownload();
+            downloader.restartDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
             Downloader worker = downloaderSelector
                     .of(item.getUrl())

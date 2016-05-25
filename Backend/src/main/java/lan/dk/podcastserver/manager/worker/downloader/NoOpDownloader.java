@@ -8,51 +8,21 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
  */
 public class NoOpDownloader implements Downloader {
 
-    @Override
-    public Item download() {
-        return null;
-    }
-
-    @Override
-    public Downloader setItem(Item item) {
+    @Override public Item download() { return null; }
+    @Override public Downloader setItem(Item item) { return this; }
+    @Override public Downloader setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
         return this;
     }
-
-    @Override
-    public Downloader setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
-        return this;
-    }
-
-    @Override
-    public Item getItem() {
-        return null;
-    }
-
-    @Override
-    public String getItemUrl(Item item) {
-        return null;
-    }
-
-    @Override
-    public void startDownload() {}
-
-    @Override
-    public void pauseDownload() {}
-
-    @Override
-    public void stopDownload() {}
-
-    @Override
-    public void finishDownload() {}
-
-    @Override
-    public void resetDownload() {}
-
-    @Override
-    public Integer compatibility(String url) {
+    @Override public Item getItem() { return null; }
+    @Override public String getItemUrl(Item item) { return null; }
+    @Override public void startDownload() {}
+    @Override public void pauseDownload() {}
+    @Override public void restartDownload() {}
+    @Override public void stopDownload() {}
+    @Override public void finishDownload() {}
+    @Override public void resetDownload() {}
+    @Override public Integer compatibility(String url) {
         return -1;
     }
-
-    @Override
-    public void run() {}
+    @Override public void run() {}
 }

@@ -14,8 +14,12 @@ public interface Downloader extends Runnable{
     String getItemUrl(Item item);
 
     void startDownload();
+
     void pauseDownload();
+    default void restartDownload() { this.startDownload(); }
+
     void stopDownload();
+
     void finishDownload();
     void resetDownload();
 
