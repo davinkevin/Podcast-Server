@@ -10,13 +10,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyVararg;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 20/03/2016 for Podcast Server
@@ -37,10 +36,10 @@ public class FfmpegServiceTest {
     @Test
     public void should_concat_files() {
         /* Given */
-        File output = new File("/tmp/output.mp4");
-        File input1 = new File("/tmp/input1.mp4");
-        File input2 = new File("/tmp/input2.mp4");
-        File input3 = new File("/tmp/input3.mp4");
+        Path output = Paths.get("/tmp/output.mp4");
+        Path input1 = Paths.get("/tmp/input1.mp4");
+        Path input2 = Paths.get("/tmp/input2.mp4");
+        Path input3 = Paths.get("/tmp/input3.mp4");
 
         when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).thenReturn(new ProcessBuilder("ls"));
 
@@ -65,8 +64,8 @@ public class FfmpegServiceTest {
     @Test
     public void should_catch_error_if_problem() {
         /* Given */
-        File output = new File("/bin/bash");
-        File input1 = new File("/tmp/input1.mp4");
+        Path output = Paths.get("/bin/bash");
+        Path input1 = Paths.get("/tmp/input1.mp4");
 
         /* When */
         ffmpegService.concatDemux(output, input1);

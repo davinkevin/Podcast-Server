@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,7 +54,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             v = wGetFactory.newVGet(info);
 
             v.extract(parser, stopDownloading, watcher);
-            v.setTarget(getTagetFile(item, info.getTitle()));
+            v.setTarget(getTargetFile(item, info.getTitle()).toFile());
             v.download(parser, stopDownloading, watcher);
         } catch (DownloadMultipartError e) {
             e.getInfo()
@@ -81,7 +80,7 @@ public class YoutubeDownloader extends AbstractDownloader {
         return item;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private File getTagetFile(Item item, String youtubleTitle) {
+    private Path getTargetFile(Item item, String youtubleTitle) {
 
         if (nonNull(target)) return target;
 
@@ -90,7 +89,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             if (!Files.exists(file.getParent())) {
                 Files.createDirectories(file.getParent());
             }
-            target = file.toFile();
+            target = file;
             return target;
         } catch (IOException e) {
             throw new RuntimeException("Error during creation of file", e);
@@ -101,10 +100,10 @@ public class YoutubeDownloader extends AbstractDownloader {
     public void finishDownload() {
 
         try {
-            Path fileWithExtension = target.toPath().resolveSibling(getDefinitiveFileName());
+            Path fileWithExtension = target.resolveSibling(getDefinitiveFileName());
             Files.deleteIfExists(fileWithExtension);
             Files.move(v.getTarget().toPath(), fileWithExtension);
-            target = fileWithExtension.toFile();
+            target = fileWithExtension;
         } catch (IOException e) {
             logger.error("Error during specific move", e);
             throw new RuntimeException("Error during specific move", e);
@@ -119,7 +118,7 @@ public class YoutubeDownloader extends AbstractDownloader {
     }
 
     private String getDefinitiveFileName() {
-        return target.toPath().getFileName().toString().replace(temporaryExtension, "") + "." + StringUtils.substringAfter(downloadInfo.getContentType(), "/");
+        return target.getFileName().toString().replace(temporaryExtension, "") + "." + StringUtils.substringAfter(downloadInfo.getContentType(), "/");
     }
 
     @Slf4j

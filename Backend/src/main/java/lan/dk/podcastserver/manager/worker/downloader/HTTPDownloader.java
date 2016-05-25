@@ -38,8 +38,8 @@ public class HTTPDownloader extends AbstractDownloader {
         try {
             info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl(item)));
             info.extract(stopDownloading, itemSynchronisation);
-            target = getTagetFile(item);
-            WGet w = wGetFactory.newWGet(info, target);
+            target = getTargetFile(item);
+            WGet w = wGetFactory.newWGet(info, target.toFile());
             w.download(stopDownloading, itemSynchronisation);
         } catch (DownloadMultipartError e) {
             e.getInfo().getParts()

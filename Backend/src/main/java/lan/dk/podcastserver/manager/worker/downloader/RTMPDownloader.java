@@ -32,11 +32,11 @@ public class RTMPDownloader extends AbstractDownloader {
         logger.debug("Download");
 
         try {
-            target = getTagetFile(item);
-            logger.debug("Fichier de sortie : " + target.getAbsolutePath());
+            target = getTargetFile(item);
+            logger.debug("Fichier de sortie : {}" , target.toAbsolutePath().toString());
 
             p  = processBuilderFactory
-                    .newProcessBuilder(externalTools.getRtmpdump(), "-r", getItemUrl(item), "-o", target.getAbsolutePath())
+                    .newProcessBuilder(externalTools.getRtmpdump(), "-r", getItemUrl(item), "-o", target.toAbsolutePath().toString())
                     .directory(new File("/tmp"))
                     .redirectErrorStream(true)
                     .start();

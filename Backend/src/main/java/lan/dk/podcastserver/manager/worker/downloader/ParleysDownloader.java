@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.github.axet.wget.info.DownloadInfo;
 import com.google.common.collect.Lists;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.JsonService;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -81,7 +81,7 @@ public class ParleysDownloader extends AbstractDownloader{
                 info.extract(stopDownloading, itemSynchronisation);
 
                 wGetFactory
-                        .newWGet(info, parleysAssets.getFile())
+                        .newWGet(info, parleysAssets.getFile().toFile())
                         .download(stopDownloading, itemSynchronisation);
             } catch (MalformedURLException e) {
                 logger.error("Url of assest is invalid : {}", parleysAssets.getUrl(), e);
@@ -89,14 +89,15 @@ public class ParleysDownloader extends AbstractDownloader{
             }
         }
 
-        target = getTagetFile(item);
-        List<File> listOfFilesToConcat = getListOfFiles(listOfAssets);
+        target = getTargetFile(item);
+        List<Path> listOfFilesToConcat = getListOfFiles(listOfAssets);
         logger.info("Finalisation du téléchargement");
 
         logger.info("Concatenation des vidéos");
-        ffmpegService.concatDemux(target, listOfFilesToConcat.toArray(new File[listOfFilesToConcat.size()]));
+        ffmpegService.concatDemux(target, listOfFilesToConcat.toArray(new Path[listOfFilesToConcat.size()]));
 
-        listOfFilesToConcat.forEach(File::delete);
+        listOfFilesToConcat
+                .forEach(f -> Try.run(() -> Files.deleteIfExists(f)));
 
         finishDownload();
         itemDownloadManager.removeACurrentDownload(item);
@@ -109,7 +110,7 @@ public class ParleysDownloader extends AbstractDownloader{
         return url.contains("parleys") ? 1 : Integer.MAX_VALUE;
     }
 
-    private List<File> getListOfFiles(List<ParleysAssets> listOfAssets) {
+    private List<Path> getListOfFiles(List<ParleysAssets> listOfAssets) {
         return listOfAssets.stream().filter(ParleysAssets::getValid).map(ParleysAssets::getFile).collect(toList());
     }
 
@@ -173,21 +174,21 @@ public class ParleysDownloader extends AbstractDownloader{
     private static class ParleysAssets {
         String url;
         Long size;
-        File file;
+        Path file;
         Boolean valid;
     }
 
     @Override
-    public File getTagetFile(Item item) {
+    public Path getTargetFile(Item item) {
 
         if (nonNull(target)) return target;
 
-        Path targetFile = super.getTagetFile(item).toPath();
+        Path targetFile = super.getTargetFile(item);
 
-        return targetFile.resolveSibling(FilenameUtils.getBaseName(targetFile.getFileName().toString()) + ".mp4").toFile();
+        return targetFile.resolveSibling(FilenameUtils.getBaseName(targetFile.getFileName().toString()) + ".mp4");
     }
 
-    private File getAssetFile(String url) {
+    private Path getAssetFile(String url) {
 
         if (isNull(podcastPath)) {
             podcastPath = Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle());
@@ -199,7 +200,7 @@ public class ParleysDownloader extends AbstractDownloader{
         Path finalFile = podcastPath.resolve(FilenameUtils.getName(urlWithoutParameters));
         try { Files.deleteIfExists(finalFile); } catch (IOException ignored) {}
 
-        return finalFile.toFile() ;
+        return finalFile;
     }
 
     @Slf4j

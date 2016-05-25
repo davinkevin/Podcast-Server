@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -37,14 +39,14 @@ public class M3U8Downloader extends AbstractDownloader {
                     .map(l -> urlService.urlWithDomain(getItemUrl(item), l))
                     .collect(toList());
 
-            target = getTagetFile(item);
+            target = getTargetFile(item);
         } catch (IOException e) {
             logger.error("Error during fetching individual url of M3U8", e);
             stopDownload();
             return item;
         }
 
-        try(OutputStream outputStream = new FileOutputStream(target)) {
+        try(OutputStream outputStream = Files.newOutputStream(target)) {
 
             for (int cpt = 0; cpt < urlList.size(); cpt++) {
                 String urlFragmentToDownload = urlList.get(cpt);
@@ -71,7 +73,7 @@ public class M3U8Downloader extends AbstractDownloader {
     }
 
     @Override
-    public File getTagetFile (Item item) {
+    public Path getTargetFile(Item item) {
 
         if (nonNull(target)) return target;
 
@@ -80,7 +82,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 .url(urlService.getFileNameM3U8Url(getItemUrl(item)))
             .build();
 
-        return super.getTagetFile(m3u8Item);
+        return super.getTargetFile(m3u8Item);
     }
 
     @Override

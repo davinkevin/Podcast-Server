@@ -1,7 +1,5 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import com.github.axet.wget.WGet;
-import com.github.axet.wget.info.DownloadInfo;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -20,10 +18,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.FileSystemUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -156,16 +154,13 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setItem(item);
 
-        DownloadInfo downloadInfo = mock(DownloadInfo.class);
-        WGet wGet = mock(WGet.class);
-
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
         simpleDownloader.run();
-        simpleDownloader.target = Paths.get("/tmp", podcast.getTitle(), "fake_file" + TEMPORARY_EXTENSION).toFile();
+        simpleDownloader.target = Paths.get("/tmp", podcast.getTitle(), "fake_file" + TEMPORARY_EXTENSION);
         simpleDownloader.finishDownload();
 
         /* Then */
@@ -179,8 +174,8 @@ public class DownloaderTest {
         when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
-        simpleDownloader.target = simpleDownloader.getTagetFile(item);
-        File target2 = simpleDownloader.getTagetFile(item);
+        simpleDownloader.target = simpleDownloader.getTargetFile(item);
+        Path target2 = simpleDownloader.getTargetFile(item);
 
         /* Then */
         assertThat(simpleDownloader.target).isSameAs(target2);
@@ -196,7 +191,7 @@ public class DownloaderTest {
         when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
-        File targetFile = simpleDownloader.getTagetFile(item);
+        Path targetFile = simpleDownloader.getTargetFile(item);
 
         /* Then */
         assertThat(targetFile).isNotEqualTo(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION).toFile());
@@ -214,7 +209,7 @@ public class DownloaderTest {
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
-        File targetFile = simpleDownloader.getTagetFile(item);
+        simpleDownloader.getTargetFile(item);
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
@@ -234,7 +229,7 @@ public class DownloaderTest {
         assertThat(simpleDownloader.getItem()).isSameAs(item);
         verify(itemRepository, never()).save(any(Item.class));
     }
-    
+
     @Test
     public void should_get_item_standard() {
         /* Given */
@@ -252,7 +247,7 @@ public class DownloaderTest {
         @Override
         public Item download() {
             try {
-                target = getTagetFile(item);
+                target = getTargetFile(item);
                 item.setStatus(Status.FINISH);
                 Files.createFile(Paths.get(ROOT_FOLDER, item.getPodcast().getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
                 Files.createFile(Paths.get(ROOT_FOLDER, item.getPodcast().getTitle(), "file.mp4"));

@@ -8,7 +8,10 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.FfmpegService;
+import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.MimeTypeService;
+import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.json.simple.parser.JSONParser;
@@ -28,6 +31,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,7 +66,7 @@ public class ParleysDownloaderTest {
     @Mock JsonService jsonService;
     @InjectMocks ParleysDownloader parleysDownloader;
 
-    @Captor ArgumentCaptor<File> toConcatFiles;
+    @Captor ArgumentCaptor<Path> toConcatFiles;
 
     Podcast podcast;
     Item item;
@@ -85,9 +89,9 @@ public class ParleysDownloaderTest {
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(urlService.newURL(anyString())).then(i -> Optional.of(new URL((String) i.getArguments()[0])));
         doAnswer(i -> {
-            Files.createFile(File.class.cast(i.getArguments()[0]).toPath());
+            Files.createFile(Path.class.cast(i.getArguments()[0]));
             return null;
-        }).when(ffmpegService).concatDemux(any(File.class), anyVararg());
+        }).when(ffmpegService).concatDemux(any(Path.class), anyVararg());
 
         parleysDownloader.postConstruct();
         parleysDownloader.setItem(item);
@@ -110,7 +114,7 @@ public class ParleysDownloaderTest {
         parleysDownloader.download();
 
         /* Then */
-        assertThat(parleysDownloader.target.toPath())
+        assertThat(parleysDownloader.target)
                 .exists()
                 .hasFileName("5534a6b4e4b056a82338229d.mp4")
                 .hasParent(Paths.get(ROOT_FOLDER, podcast.getTitle()));
@@ -118,9 +122,9 @@ public class ParleysDownloaderTest {
         verify(ffmpegService, times(1)).concatDemux(eq(parleysDownloader.target), toConcatFiles.capture());
         assertThat(toConcatFiles.getAllValues()).hasSize(3)
                 .containsExactly(
-                        new File("/tmp/ParleysPodcast/9Wwo6oOVmk3_177812_60938.mp4"),
-                        new File("/tmp/ParleysPodcast/X3yV1bXkPep_238750_2679062.mp4"),
-                        new File("/tmp/ParleysPodcast/9Wwo6oOVmk3_2917812_8125.mp4")
+                        Paths.get("/tmp/ParleysPodcast/9Wwo6oOVmk3_177812_60938.mp4"),
+                        Paths.get("/tmp/ParleysPodcast/X3yV1bXkPep_238750_2679062.mp4"),
+                        Paths.get("/tmp/ParleysPodcast/9Wwo6oOVmk3_2917812_8125.mp4")
                 );
     }
 
@@ -150,7 +154,7 @@ public class ParleysDownloaderTest {
         parleysDownloader.download();
 
         /* Then */
-        assertThat(parleysDownloader.target.toPath())
+        assertThat(parleysDownloader.target)
                 .exists()
                 .hasFileName("5534a6b4e4b056a82338229d.mp4")
                 .hasParent(Paths.get(ROOT_FOLDER, podcast.getTitle()));
@@ -158,8 +162,8 @@ public class ParleysDownloaderTest {
         verify(ffmpegService, times(1)).concatDemux(eq(parleysDownloader.target), toConcatFiles.capture());
         assertThat(toConcatFiles.getAllValues()).hasSize(2)
                 .containsExactly(
-                        new File("/tmp/ParleysPodcast/X3yV1bXkPep_238750_2679062.mp4"),
-                        new File("/tmp/ParleysPodcast/9Wwo6oOVmk3_2917812_8125.mp4")
+                        Paths.get("/tmp/ParleysPodcast/X3yV1bXkPep_238750_2679062.mp4"),
+                        Paths.get("/tmp/ParleysPodcast/9Wwo6oOVmk3_2917812_8125.mp4")
                 );
     }
 

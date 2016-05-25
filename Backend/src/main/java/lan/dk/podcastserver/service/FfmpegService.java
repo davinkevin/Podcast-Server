@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,18 +31,18 @@ public class FfmpegService {
 
     @Autowired ProcessBuilderFactory processBuilderFactory;
 
-    public void concatDemux (File target, File... files) {
+    public void concatDemux(Path target, Path... files) {
         Path listOfFiles = null;
         try {
-            Files.deleteIfExists(target.toPath());
+            Files.deleteIfExists(target);
 
             String filesStrings = Lists.newArrayList(files)
                     .stream()
-                    .map(File::getName)
+                    .map(f -> f.getFileName().toString())
                     .map(p -> "file '" + p + "'")
                     .collect(joining(System.getProperty("line.separator")));
 
-            listOfFiles = Files.createTempFile(target.toPath().getParent(), "ffmpeg-list", ".txt");
+            listOfFiles = Files.createTempFile(target.getParent(), "ffmpeg-list", ".txt");
             Files.write(listOfFiles, filesStrings.getBytes());
 
             ProcessBuilder pb = processBuilderFactory.newProcessBuilder(ffmpeg,
@@ -52,7 +51,7 @@ public class FfmpegService {
                     "-i", listOfFiles.toAbsolutePath().toString(),
                     "-vcodec", "copy",
                     "-acodec", "copy",
-                    target.getAbsolutePath()
+                    target.toAbsolutePath().toString()
             )
                     .directory(workingDirectory.toFile())
                     .redirectErrorStream(true)

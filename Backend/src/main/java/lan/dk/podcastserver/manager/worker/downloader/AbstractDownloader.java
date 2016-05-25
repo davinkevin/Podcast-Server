@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.ZonedDateTime;
@@ -39,7 +39,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected Item item;
 
     String temporaryExtension;
-    protected File target = null;
+    protected Path target;
     private PathMatcher hasTempExtensionMatcher;
 
     @Resource protected ItemRepository itemRepository;
@@ -82,8 +82,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         stopDownloading.set(true);
         saveSyncWithPodcast();
         itemDownloadManager.removeACurrentDownload(item);
-        if (nonNull(target) && target.exists())
-            target.delete();
+        if (nonNull(target)) Try.run(() -> Files.deleteIfExists(target));
         convertAndSaveBroadcast();
     }
 
@@ -98,21 +97,22 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         }
 
         item.setStatus(Status.FINISH);
-        try {
-            if (hasTempExtensionMatcher.matches(target.toPath().getFileName())) {
-                Path targetWithoutExtension = target.toPath().resolveSibling(target.toPath().getFileName().toString().replace(temporaryExtension, ""));
+
+        Try.run(() -> {
+            if (hasTempExtensionMatcher.matches(target.getFileName())) {
+                Path targetWithoutExtension = target.resolveSibling(target.getFileName().toString().replace(temporaryExtension, ""));
 
                 Files.deleteIfExists(targetWithoutExtension);
-                Files.move(target.toPath(), targetWithoutExtension);
+                Files.move(target, targetWithoutExtension);
 
-                target = targetWithoutExtension.toFile();
+                target = targetWithoutExtension;
             }
             item
-                .setLength(Files.size(target.toPath()))
-                .setMimeType(mimeTypeService.probeContentType(target.toPath()));
-        } catch (IOException ignored) {}
+                .setLength(Files.size(target))
+                .setMimeType(mimeTypeService.probeContentType(target));
+        });
 
-        item.setFileName(FilenameUtils.getName(target.toPath().getFileName().toString()));
+        item.setFileName(FilenameUtils.getName(target.getFileName().toString()));
         item.setDownloadDate(ZonedDateTime.now());
 
         saveSyncWithPodcast();
@@ -124,7 +124,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     @Transactional
-    public File getTagetFile (Item item) {
+    public Path getTargetFile(Item item) {
 
         if (nonNull(target)) return target;
 
@@ -135,12 +135,12 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             if (Files.notExists(finalFile.getParent())) Files.createDirectory(finalFile.getParent());
 
             if (!(Files.exists(finalFile) || Files.exists(finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension)))) {
-                return finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension).toFile();
+                return finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension);
             }
 
             logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
             String fileName = finalFile.getFileName().toString();
-            return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension).toFile();
+            return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension);
         } catch (IOException e) {
             logger.error("Error during creation of target file", e);
             stopDownload();
