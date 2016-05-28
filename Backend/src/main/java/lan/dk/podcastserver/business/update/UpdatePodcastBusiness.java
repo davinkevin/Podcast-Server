@@ -34,18 +34,17 @@ import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Component
-@Transactional
 public class UpdatePodcastBusiness  {
 
     private TimeUnit timeUnit = TimeUnit.MINUTES;
     private Integer timeValue = 5;
     private static final String WS_TOPIC_UPDATING = "/topic/updating";
 
+    private final PodcastServerParameters podcastServerParameters;
     final PodcastBusiness podcastBusiness;
     final ItemRepository itemRepository;
     final UpdaterSelector updaterSelector;
     final SimpMessagingTemplate template;
-    final PodcastServerParameters podcastServerParameters;
 
     final TaskExecutor updateExecutor;
     final TaskExecutor manualExecutor;
@@ -65,11 +64,14 @@ public class UpdatePodcastBusiness  {
         this.validator = validator;
     }
 
+    @Transactional
     public void updatePodcast() {
         updatePodcast(podcastBusiness.findByUrlIsNotNull(), updateExecutor);
     }
+    @Transactional
     public void updatePodcast(UUID id) { updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), manualExecutor); }
 
+    @Transactional
     public void forceUpdatePodcast (UUID id){
         log.info("Lancement de l'update forcé");
         Podcast podcast = podcastBusiness.findOne(id);
@@ -78,32 +80,31 @@ public class UpdatePodcastBusiness  {
         updatePodcast(podcast.getId());
     }
 
-    @Transactional(noRollbackFor=Exception.class)
-    private void updatePodcast(List<Podcast> podcasts, Executor selectedExecutor) {
-        initUpdate();
+    public Boolean isUpdating() {
+        return isUpdating.get();
+    }
 
-        log.info("Lancement de l'update");
-        log.info("Traitement de {} podcasts", podcasts.size());
+    private void updatePodcast(List<Podcast> podcasts, Executor selectedExecutor) {
+        changeAndCommunicateUpdate(Boolean.TRUE);
+
+        log.info("Update launch");
+        log.info("About to update {} podcast(s)", podcasts.size());
 
         podcasts
                 // Launch every update
                 .stream()
-                .map(podcast -> supplyAsync(() -> updaterSelector.of(podcast.getUrl()))
-                        .thenApplyAsync(updater -> updater.update(podcast), selectedExecutor))
+                .map(podcast -> supplyAsync(() -> updaterSelector.of(podcast.getUrl()).update(podcast), selectedExecutor))
                 .collect(toSet()) // Terminal operation forcing evaluation of each element upper in the stream
                 // Get result of each update
                 .stream()
                 .map(this::wait)
                 .filter(tuple -> tuple != Updater.NO_MODIFICATION_TUPLE)
-                .peek((tuple) -> changeAndCommunicateUpdate(Boolean.TRUE))
-                .forEach(tuple -> podcastBusiness.save(attachNewItemsToPodcast(tuple.first(), tuple.middle(), tuple.last())));
-
+                .peek(tuple -> changeAndCommunicateUpdate(Boolean.TRUE))
+                .map(t -> attachNewItemsToPodcast(t.first(), t.middle(), t.last()))
+                .forEach(podcastBusiness::save);
 
         log.info("Fin du traitement des {} podcasts", podcasts.size());
-        finishUpdate();
-    }
 
-    private void finishUpdate() {
         changeAndCommunicateUpdate(Boolean.FALSE);
     }
 
@@ -112,15 +113,12 @@ public class UpdatePodcastBusiness  {
         this.template.convertAndSend(WS_TOPIC_UPDATING, this.isUpdating.get());
     }
 
-    private void initUpdate() {
-        changeAndCommunicateUpdate(Boolean.TRUE);
-    }
-
     private UpdateTuple<Podcast, Set<Item>, Predicate<Item>> wait(CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> future) {
         try {
             return future.get(timeValue, timeUnit);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             log.error("Error during update", e);
+            future.cancel(true);
             return Updater.NO_MODIFICATION_TUPLE;
         }
 
@@ -167,11 +165,7 @@ public class UpdatePodcastBusiness  {
                 .forEach(itemRepository::save);
     }
 
-    public Boolean isUpdating() {
-        return isUpdating.get();
-    }
-
-    public void setTimeOut(Integer timeValue, TimeUnit timeUnit) {
+    void setTimeOut(Integer timeValue, TimeUnit timeUnit) {
         this.timeValue = timeValue;
         this.timeUnit = timeUnit;
     }

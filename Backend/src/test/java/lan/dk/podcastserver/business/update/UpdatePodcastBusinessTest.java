@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class UpdatePodcastBusinessTest {
 
-    public static Path rootFolder = Paths.get("/tmp/podcast/");
+    private static Path rootFolder = Paths.get("/tmp/podcast/");
     @Captor ArgumentCaptor<Item> ITEM_ARGUMENT_CAPTOR;
 
     @Mock PodcastBusiness podcastBusiness;
