@@ -5,7 +5,7 @@
 </div>
 
 <div class="container">
-    <form class="form-horizontal" role="form" novalidate>
+    <form class="form-horizontal" role="form" novalidate ng-submit="pac.save()">
         <div class="form-group">
             <label for="title" class="col-sm-1 control-label">Title</label>
 
@@ -79,9 +79,9 @@
         </div>
 
 
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button ng-click="pac.save()" class="btn btn-default">Save</button>
+        <div class="col-sm-12 col-xs-12 col-md-11">
+            <div class="pull-right">
+                <button class="btn btn-default">Save</button>
             </div>
         </div>
     </form>
