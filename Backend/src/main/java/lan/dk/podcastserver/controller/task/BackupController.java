@@ -1,0 +1,29 @@
+package lan.dk.podcastserver.controller.task;
+
+import lan.dk.podcastserver.service.BackupService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+
+/**
+ * Created by kevin on 18/05/2016 for Podcast Server
+ */
+@RestController
+@RequestMapping("/api/task")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+public class BackupController {
+
+    final BackupService backupService;
+
+    @RequestMapping(value = "backup", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void backup() throws IOException {
+        backupService.backupWithDefault();
+    }
+}

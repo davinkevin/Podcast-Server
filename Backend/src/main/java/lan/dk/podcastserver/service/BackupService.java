@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.podcastserver.service.properties.Backup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.search.jpa.FullTextEntityManager;
@@ -29,7 +30,6 @@ import static java.time.temporal.ChronoField.*;
 public class BackupService {
 
     private static final Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR, CompressionType.GZIP);
-
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .appendValue(YEAR, 4)
             .appendLiteral("-")
@@ -45,7 +45,13 @@ public class BackupService {
     private static final String QUERY_BACKUP_SQL = "SCRIPT TO '%s'";
     private static final String QUERY_BACKUP_BINARY = "BACKUP TO '%s'";
 
+    final Backup backup;
     final FullTextEntityManager em;
+
+    @Transactional
+    public Path backupWithDefault() throws IOException {
+        return backup(backup.getLocation(), backup.getBinary());
+    }
 
     @Transactional
     public Path backup(Path destinationDirectory, Boolean isBinary) throws IOException {
@@ -57,15 +63,18 @@ public class BackupService {
 
         Path backupFile = destinationDirectory.toAbsolutePath().resolve("podcast-server-" + ZonedDateTime.now().format(formatter) + (isBinary ? "" : ".sql"));
 
-        em.createNativeQuery(
-                String.format(isBinary ? QUERY_BACKUP_BINARY : QUERY_BACKUP_SQL,backupFile.toString())
-        ).getResultList(); // Simpler way to execute query via JPA, ExecuteUpdate not allowed here
+        // Simpler way to execute query via JPA, ExecuteUpdate not allowed here
+        em.createNativeQuery(generateQuery(isBinary, backupFile)).getResultList();
 
 
         archiver.create(backupFile.getFileName().toString(), backupFile.getParent().toFile(), backupFile.toFile());
         Files.deleteIfExists(backupFile);
 
         return backupFile.resolveSibling(backupFile.getFileName() + ".tar.gz");
+    }
+
+    private String generateQuery(Boolean isBinary, Path backupFile) {
+        return String.format(isBinary ? QUERY_BACKUP_BINARY : QUERY_BACKUP_SQL,backupFile.toString());
     }
 
 }

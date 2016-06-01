@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.podcastserver.service.properties.Backup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.search.jpa.FullTextEntityManager;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class BackupServiceTest {
 
+    @Mock Backup backup;
     @Mock FullTextEntityManager fem;
     @InjectMocks BackupService backupService;
     private static final Path NOT_DIRECTORY = Paths.get("/tmp", "foo.bar");
@@ -77,6 +79,23 @@ public class BackupServiceTest {
 
         /* When */
         Path backupFile = backupService.backup(Paths.get("/tmp"), false);
+
+        /* Then */
+        verify(fem, times(1)).createNativeQuery(contains("SCRIPT TO"));
+        assertThat(backupFile)
+                .exists()
+                .hasFileName(backupToCreate.getFileName() + ".tar.gz");
+    }
+
+    @Test
+    public void should_generate_from_backup_parameters() throws IOException {
+        /* Given */
+        when(fem.createNativeQuery(anyString())).then(generateDumpFile());
+        when(backup.getBinary()).thenReturn(Boolean.FALSE);
+        when(backup.getLocation()).thenReturn(Paths.get("/tmp"));
+
+        /* When */
+        Path backupFile = backupService.backupWithDefault();
 
         /* Then */
         verify(fem, times(1)).createNativeQuery(contains("SCRIPT TO"));
