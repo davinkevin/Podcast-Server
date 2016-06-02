@@ -76,26 +76,27 @@ public class PodcastBusiness {
         }
         */
 
-        podcastToUpdate.setTitle(patchPodcast.getTitle());
-        podcastToUpdate.setUrl(patchPodcast.getUrl());
-        podcastToUpdate.setSignature(patchPodcast.getSignature());
-        podcastToUpdate.setType(patchPodcast.getType());
-
         if (!coverBusiness.hasSameCoverURL(patchPodcast, podcastToUpdate)) {
             patchPodcast.getCover().setUrl(coverBusiness.download(patchPodcast));
         }
-        
-        podcastToUpdate.setCover(
-                coverBusiness.findOne(patchPodcast.getCover().getId())
-                    .setHeight(patchPodcast.getCover().getHeight())
-                    .setUrl(patchPodcast.getCover().getUrl())
-                    .setWidth(patchPodcast.getCover().getWidth())
-        );
-        podcastToUpdate.setDescription(patchPodcast.getDescription());
-        podcastToUpdate.setHasToBeDeleted(patchPodcast.getHasToBeDeleted());
-        podcastToUpdate.setTags(patchPodcast.getTags());
 
-        return this.reatachAndSave(podcastToUpdate);
+        podcastToUpdate
+                .setTitle(patchPodcast.getTitle())
+                .setUrl(patchPodcast.getUrl())
+                .setSignature(patchPodcast.getSignature())
+                .setType(patchPodcast.getType())
+                .setDescription(patchPodcast.getDescription())
+                .setHasToBeDeleted(patchPodcast.getHasToBeDeleted())
+                .setTags(tagBusiness.getTagListByName(patchPodcast.getTags()))
+                .setCover(
+                    coverBusiness.findOne(patchPodcast.getCover().getId())
+                        .setHeight(patchPodcast.getCover().getHeight())
+                        .setUrl(patchPodcast.getCover().getUrl())
+                        .setWidth(patchPodcast.getCover().getWidth())
+                );
+
+
+        return save(podcastToUpdate);
     }
 
     @Transactional(readOnly = true)
