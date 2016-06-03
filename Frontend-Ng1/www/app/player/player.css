@@ -50,6 +50,9 @@
   overflow-y: visible;
   height: 500px;
 }
+.ps .video-player .playlist img {
+  object-fit: cover;
+}
 @media screen and (min-width: 1200px) {
   .ps .video-player .playlist {
     padding-top: 8px;
