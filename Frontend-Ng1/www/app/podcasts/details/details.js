@@ -35,6 +35,7 @@ export default class PodcastDetailCtrl {
     }
 
     $onInit() {
+        this.TitleService.title = this.podcast.title;
 
         this.$scope.$on("podcastEdition:save", () => this.refreshItems());
         this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
@@ -48,7 +49,8 @@ export default class PodcastDetailCtrl {
 
         this.podcast.isUpdatable = () => this.type !== 'send';
 
-        this.TitleService.title = this.podcast.title;
+        if (this.podcast.isUpdatable() && !this.podcast.lastUpdate)
+            this.refresh();
     }
 
     refreshItems() {
