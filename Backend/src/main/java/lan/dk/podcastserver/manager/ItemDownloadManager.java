@@ -92,7 +92,7 @@ public class ItemDownloadManager {
         } finally {
             manageDownloadLock.unlock();
         }
-        log.info("Call to convert and Send waiting queue {}", waitingQueue);
+
         this.convertAndSendWaitingQueue();
     }
 
@@ -219,24 +219,23 @@ public class ItemDownloadManager {
             Downloader downloader = downloadingQueue.get(item);
             downloader.restartDownload();
         } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
-            Downloader worker = downloaderSelector
-                    .of(item.getUrl())
-                    .setItem(item)
-                    .setItemDownloadManager(this);
-            this.getDownloadingQueue().put(item, worker);
-            downloadExecutor.execute(worker);
+            launchWithNewWorkerFrom(item);
         }
+    }
+
+    private void launchWithNewWorkerFrom(Item item) {
+        Downloader worker = downloaderSelector
+                .of(item.getUrl())
+                .setItem(item)
+                .setItemDownloadManager(this);
+        this.getDownloadingQueue().put(item, worker);
+        downloadExecutor.execute(worker);
     }
 
     public void resetDownload(Item item) {
         if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
             item.addATry();
-            Downloader worker = downloaderSelector
-                    .of(item.getUrl())
-                    .setItem(item)
-                    .setItemDownloadManager(this);
-            this.getDownloadingQueue().put(item, worker);
-            downloadExecutor.execute(worker);
+            launchWithNewWorkerFrom(item);
         }
     }
 

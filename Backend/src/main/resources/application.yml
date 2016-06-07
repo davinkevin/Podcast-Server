@@ -6,7 +6,7 @@ spring :
     mvc.view.prefix : /
     h2.console.enabled : true
     datasource:
-        url: jdbc:h2:/tmp/executor-download
+        url: jdbc:h2:mem:example
         username: sa
         driver-class-name: org.h2.Driver
     jpa:
@@ -54,6 +54,7 @@ podcastserver:
     externaltools:
         #rtmpdump: /usr/local/bin/rtmpdump
         #ffmpeg: /usr/local/bin/ffmpeg
+        #ffprobe: /usr/local/bin/ffprobe
     api :
       youtube :
       #youtube :

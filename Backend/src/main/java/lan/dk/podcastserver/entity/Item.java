@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 
 @Entity
@@ -41,7 +42,6 @@ import static java.util.Objects.isNull;
 public class Item {
 
     public  static Path rootFolder;
-    public  static String fileContainer;
     public  static final Item DEFAULT_ITEM = new Item();
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
 
@@ -129,10 +129,10 @@ public class Item {
 
         Item item = (Item) o;
 
-        if (id != null && item.id != null)
+        if (nonNull(id) && nonNull(item.id))
             return id.equals(item.id);
 
-        if (url != null && item.url != null) {
+        if (nonNull(url) && nonNull(item.url)) {
             return url.equals(item.url) || FilenameUtils.getName(item.url).equals(FilenameUtils.getName(url));
         }
 
@@ -164,7 +164,6 @@ public class Item {
                 '}';
     }
 
-    /* Helpers */
     @Transient @JsonProperty("proxyURL") @JsonView(ItemSearchListView.class)
     public String getProxyURL() {
         return String.format(PROXY_URL, podcast.getId(), id, getExtention());

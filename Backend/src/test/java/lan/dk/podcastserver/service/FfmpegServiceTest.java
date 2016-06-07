@@ -1,7 +1,8 @@
 package lan.dk.podcastserver.service;
 
-import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
-import org.junit.Before;
+import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import net.bramp.ffmpeg.job.FFmpegJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -14,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.*;
 
 /**
@@ -23,33 +23,30 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class FfmpegServiceTest {
 
-    @Mock ProcessBuilderFactory processBuilderFactory;
+    @Mock FFmpegExecutor fFmpegExecutor;
     @InjectMocks FfmpegService ffmpegService;
 
-    @Captor ArgumentCaptor<String> processParameters;
-
-    @Before
-    public void beforeEach() {
-        ffmpegService.ffmpeg = "/usr/local/bin/ffmpeg";
-    }
+    @Captor ArgumentCaptor<FFmpegBuilder> executorBuilderCaptor;
 
     @Test
     public void should_concat_files() {
         /* Given */
+        FFmpegJob job = mock(FFmpegJob.class);
+        when(fFmpegExecutor.createJob(any())).thenReturn(job);
+
         Path output = Paths.get("/tmp/output.mp4");
         Path input1 = Paths.get("/tmp/input1.mp4");
         Path input2 = Paths.get("/tmp/input2.mp4");
         Path input3 = Paths.get("/tmp/input3.mp4");
 
-        when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).thenReturn(new ProcessBuilder("ls"));
 
         /* When */
         ffmpegService.concatDemux(output, input1, input2, input3);
 
         /* Then */
-        verify(processBuilderFactory, times(1)).newProcessBuilder(processParameters.capture());
-        assertThat(processParameters.getAllValues()).contains(
-                ffmpegService.ffmpeg,
+        verify(fFmpegExecutor, times(1)).createJob(executorBuilderCaptor.capture());
+        verify(job, times(1)).run();
+        assertThat(executorBuilderCaptor.getValue().build()).contains(
                 "-f", "concat",
                 "-i",
                 "-vcodec", "copy",
@@ -57,7 +54,7 @@ public class FfmpegServiceTest {
                 "/tmp/output.mp4"
         );
         assertThat(
-            processParameters.getAllValues().stream().anyMatch(s -> s.startsWith("/tmp/ffmpeg-list") && s.endsWith(".txt"))
+            executorBuilderCaptor.getValue().build().stream().anyMatch(s -> s.startsWith("/tmp/ffmpeg-list-") && s.endsWith(".txt"))
         ).isTrue();
     }
 
