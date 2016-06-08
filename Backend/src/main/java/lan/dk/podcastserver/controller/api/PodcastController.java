@@ -18,9 +18,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -85,8 +89,15 @@ public class PodcastController {
     }
 
     @RequestMapping(value="{id}/cover.{ext}", method = RequestMethod.GET, produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
-    public FileSystemResource cover(@PathVariable UUID id) {
-        return new FileSystemResource(podcastBusiness.coverOf(id).toFile());
+    public ResponseEntity<?> cover(@PathVariable UUID id) throws IOException {
+        Path cover = podcastBusiness.coverOf(id);
+
+        if (Files.notExists(cover))
+            return ResponseEntity.notFound().build();
+
+       return ResponseEntity.ok()
+               .lastModified(Files.getLastModifiedTime(cover).toMillis())
+               .body(new FileSystemResource(cover.toFile()));
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
