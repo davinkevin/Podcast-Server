@@ -41,10 +41,11 @@ public class BeInSportsUpdater extends AbstractUpdater {
     /* Patter to extract value from URL */
     private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\":\"([^\"]*)\".*";
     private static final String PARAMETER_SEPARATOR = "?";
-    private static final Pattern STREAM_720_URL_EXTRACTOR_PATTERN1 = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "url"));
+    private static final Pattern EXTRACTOR_ID_OF_DAILYMOTION_EMBEDED_URL = Pattern.compile(".*/(.*)$");
     private static final Pattern POSTER_URL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url"));
     private static final String PROTOCOL = "http:";
     private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
+    private static final String DAILYMOTION_PREFIX_URL = "http://www.dailymotion.com/video/%s";
     /* December 26, 2015 13:53 */
     private static final DateTimeFormatter BEINSPORTS_PARSER = DateTimeFormatter.ofPattern("MMMM d, y HH:mm", Locale.ENGLISH);
 
@@ -77,7 +78,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         Optional<Document> document = htmlService.get(urlItemBeInSport);
 
         return document
-                .map(d -> PROTOCOL + d.select("iframe").attr("src"))
+                .map(this::getDailymotionIframeUrl)
                 .flatMap(htmlService::get)
                 .map(d -> d.select("script"))
                 .map(this::getJavascriptPart)
@@ -85,12 +86,16 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .orElse(Item.DEFAULT_ITEM);
     }
 
+    private String getDailymotionIframeUrl(Document d) {
+        return PROTOCOL + d.select("iframe").attr("src"); // http://www.dailymotion.com/embed/video/k5bdvgBiDPV15Gi5vcU
+    }
+
     private Item convertHtmlToItem(Element article, String javascriptCode, Document document) {
         return Item.builder()
                 .title(article.select("h3").first().text())
                 .description(article.select("h3").first().text())
                 .pubDate(getPubDateFromDescription(document))
-                .url(getStreamUrl(javascriptCode).orElse(null))
+                .url(getStreamUrl(document).orElse(null))
                 .cover(getPoster(javascriptCode).orElse(null))
                 .build();
     }
@@ -102,13 +107,15 @@ public class BeInSportsUpdater extends AbstractUpdater {
         }
         return Optional.empty();
     }
-    private Optional<String> getStreamUrl(String javascriptCode) {
-        Matcher matcher = STREAM_720_URL_EXTRACTOR_PATTERN1.matcher(javascriptCode);
+    private Optional<String> getStreamUrl(Document document) {
+        String dailymotionEmbedded = getDailymotionIframeUrl(document);
+        Matcher matcher = EXTRACTOR_ID_OF_DAILYMOTION_EMBEDED_URL.matcher(dailymotionEmbedded);
         if (matcher.find()) {
-            return Optional.of(matcher.group(1).replace("\\", ""));
+            return Optional.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1)));
         }
         return Optional.empty();
     }
+
     private String getJavascriptPart(Elements tagScripts) {
         return tagScripts.stream()
                 .map(Element::data)

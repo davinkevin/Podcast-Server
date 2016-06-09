@@ -112,24 +112,24 @@ public class BeInSportsUpdaterTest {
         assertThat(items)
                 .hasSize(18)
                 .extracting(Item::getUrl)
-                .contains("http://www.dailymotion.com/cdn/H264-1280x720/video/x3koiok.mp4?auth=1452229872-2562-uow8ceq7-06bf8b8452db2af3d75327c80674343f",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3ig0n0.mp4?auth=1452229874-2562-m54mtomd-028db93ca85b11baf15329dce6db03bc",
-                        null,
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3kdk13.mp4?auth=1452229873-2562-7ga3u9eb-45b1e89c0f2934d5068165f71ca7fee3",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3iav4n.mp4?auth=1452229874-2562-g10bn61a-b9e74b052600f60c2a82191bd4e6b025",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3khe1b.mp4?auth=1452229872-2562-lvul65re-3c44380253b3b950515a2a4c58910c9d",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3i1zbt.mp4?auth=1452229875-2562-pgfarwjf-0d511936aa075802b9f8e58082b4bc74",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3ig3m1.mp4?auth=1452229874-2562-wwmgazi3-6e5001ae26b2cc08777d166459d7abac",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3hli2o.mp4?auth=1452229875-2562-j54pktnl-6393caeba874aa1419c0b961b23024b0",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3jnsir.mp4?auth=1452229874-2562-5tjj9n94-f0da732cb8e61267f38a4af26316c519",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3koj1b.mp4?auth=1452229871-2562-y7zrs6c4-81c7a7341797b3d29ca98726a939fb32",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3kdju2.mp4?auth=1452229873-2562-drycuxej-6b7d069ec5a336568f6c6b78050cae52",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3kbccc.mp4?auth=1452229873-2562-2m5qs1qy-c49311f6ed67907acbf2b1c2aebffcc1",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3kl91v.mp4?auth=1452229872-2562-4oyb8vrb-b262e4580abcc1786af175f134fce3e6",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3i6dn0.mp4?auth=1452229875-2562-8doginj4-a90b0fec7cb6a5cc653e82ec6a90dc75",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3jzyq5.mp4?auth=1452229873-2562-dlnowbth-fde745e58a633f1fc76b767b94cd7657",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3i6f7n.mp4?auth=1452229875-2562-mnrnreto-fc3fe9915d53a83fe936dad2d7e818ce",
-                        "http://www.dailymotion.com/cdn/H264-1280x720/video/x3hlhbm.mp4?auth=1452229876-2562-rs14ifem-32308ab7d6dcd841dde69ade51217db1");
+                .contains("http://www.dailymotion.com/video/k4y3yexksKsmgXeCSxe",
+                        "http://www.dailymotion.com/video/k4kpsSUv6NeSyHey4vH",
+                        "http://www.dailymotion.com/video/k6y8VM67Tk51cFevGLN",
+                        "http://www.dailymotion.com/video/k6qbquEPuMTupmeCSED",
+                        "http://www.dailymotion.com/video/k5UHUxaU1GuLaIeBu0v",
+                        "http://www.dailymotion.com/video/k2sZKI5e6O5o7uen8sV",
+                        "http://www.dailymotion.com/video/k4igqOiv1xAV0xeAJpE",
+                        "http://www.dailymotion.com/video/kVHDDo8VfKRgJLen7sM",
+                        "http://www.dailymotion.com/video/kisGwjQrHFzAyaeh8Pw",
+                        "http://www.dailymotion.com/video/k3Sh0hibWLhDAdeAJtJ",
+                        "http://www.dailymotion.com/video/k5PwfhTuTv77H2eletm",
+                        "http://www.dailymotion.com/video/k7GA9iL1BTLsPTelf0f",
+                        "http://www.dailymotion.com/video/k3gO65ZnEZSFuBekn69",
+                        "http://www.dailymotion.com/video/k2WnfDcKPl0fwmeCeSn",
+                        "http://www.dailymotion.com/video/k55Re7mtUjT7EOeh95e",
+                        "http://www.dailymotion.com/video/k1ngc9lfzaL98Mem6V1",
+                        "http://www.dailymotion.com/video/k15nUb4MzCk7jeeaxJ5",
+                        "http://www.dailymotion.com/video/kfJS0lTK7rLQMMeAiC0");
     }
 
     @Test
