@@ -7,8 +7,6 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
-import lan.dk.podcastserver.repository.dsl.ItemDSL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -125,23 +123,6 @@ public class ItemRepositoryTest {
                 .hasSize(1);
         ItemAssert.assertThat(itemToDelete.iterator().next())
                 .hasTitle("Geek INC 124");
-    }
-
-    @Test
-    public void should_find_by_type_and_downloaded_after() {
-        dbSetupTracker.skipNextLaunch();
-        /* Given */
-        AbstractUpdater.Type type = new AbstractUpdater.Type("YOUTUBE", "Youtube");
-        ZonedDateTime date = now().minusDays(60);
-
-        /* When */
-        Iterable<Item> itemByTypeAndDownloadAfter = itemRepository.findByTypeAndExpression(type, ItemDSL.hasBeenDownloadedAfter(date));
-
-        /* Then */
-        assertThat(itemByTypeAndDownloadAfter)
-                .hasSize(2)
-                .extracting("title")
-                .containsOnly("Geek INC 123", "Geek INC 124");
     }
 
     @Test
