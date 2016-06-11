@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -19,7 +18,6 @@ import static java.util.stream.Collectors.toSet;
  */
 @Slf4j
 @Component
-@Transactional
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TagBusiness {
 
@@ -45,6 +43,7 @@ public class TagBusiness {
     }
 
     private Tag findByName(String name) {
-        return tagRepository.findByNameIgnoreCase(name).orElseGet(() -> tagRepository.save(new Tag().setName(name)));
+        return tagRepository.findByNameIgnoreCase(name)
+                .orElseGet(() -> tagRepository.save(Tag.builder().name(name).build()));
     }
 }
