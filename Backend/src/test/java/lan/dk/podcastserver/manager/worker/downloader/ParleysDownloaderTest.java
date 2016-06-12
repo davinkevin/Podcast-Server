@@ -91,7 +91,7 @@ public class ParleysDownloaderTest {
         doAnswer(i -> {
             Files.createFile(Path.class.cast(i.getArguments()[0]));
             return null;
-        }).when(ffmpegService).concatDemux(any(Path.class), anyVararg());
+        }).when(ffmpegService).concat(any(Path.class), anyVararg());
 
         parleysDownloader.postConstruct();
         parleysDownloader.setItem(item);
@@ -119,7 +119,7 @@ public class ParleysDownloaderTest {
                 .hasFileName("5534a6b4e4b056a82338229d.mp4")
                 .hasParent(Paths.get(ROOT_FOLDER, podcast.getTitle()));
         assertThat(item.getStatus()).isSameAs(Status.FINISH);
-        verify(ffmpegService, times(1)).concatDemux(eq(parleysDownloader.target), toConcatFiles.capture());
+        verify(ffmpegService, times(1)).concat(eq(parleysDownloader.target), toConcatFiles.capture());
         assertThat(toConcatFiles.getAllValues()).hasSize(3)
                 .containsExactly(
                         Paths.get("/tmp/ParleysPodcast/9Wwo6oOVmk3_177812_60938.mp4"),
@@ -159,7 +159,7 @@ public class ParleysDownloaderTest {
                 .hasFileName("5534a6b4e4b056a82338229d.mp4")
                 .hasParent(Paths.get(ROOT_FOLDER, podcast.getTitle()));
         assertThat(item.getStatus()).isSameAs(Status.FINISH);
-        verify(ffmpegService, times(1)).concatDemux(eq(parleysDownloader.target), toConcatFiles.capture());
+        verify(ffmpegService, times(1)).concat(eq(parleysDownloader.target), toConcatFiles.capture());
         assertThat(toConcatFiles.getAllValues()).hasSize(2)
                 .containsExactly(
                         Paths.get("/tmp/ParleysPodcast/X3yV1bXkPep_238750_2679062.mp4"),

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
 import javaslang.control.Try;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
@@ -22,15 +23,16 @@ import static java.util.stream.Collectors.joining;
  */
 @Slf4j
 @Component("FfmpegService")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class FfmpegService {
 
     private static final String AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC = "aac_adtstoasc";
     private static final String CODEC_COPY = "copy";
     private static final String FORMAT_CONCAT = "concat";
 
-    @Autowired FFmpegExecutor fFmpegExecutor;
+    private final FFmpegExecutor fFmpegExecutor;
 
-    public void concatDemux(Path target, Path... files) {
+    public void concat(Path target, Path... files) {
         Path listOfFiles = null;
         try {
             Files.deleteIfExists(target);

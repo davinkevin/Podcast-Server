@@ -94,7 +94,7 @@ public class ParleysDownloader extends AbstractDownloader{
         logger.info("Finalisation du téléchargement");
 
         logger.info("Concatenation des vidéos");
-        ffmpegService.concatDemux(target, listOfFilesToConcat.toArray(new Path[listOfFilesToConcat.size()]));
+        ffmpegService.concat(target, listOfFilesToConcat.toArray(new Path[listOfFilesToConcat.size()]));
 
         listOfFilesToConcat
                 .forEach(f -> Try.run(() -> Files.deleteIfExists(f)));

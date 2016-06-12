@@ -41,7 +41,7 @@ public class FfmpegServiceTest {
 
 
         /* When */
-        ffmpegService.concatDemux(output, input1, input2, input3);
+        ffmpegService.concat(output, input1, input2, input3);
 
         /* Then */
         verify(fFmpegExecutor, times(1)).createJob(executorBuilderCaptor.capture());
@@ -65,10 +65,44 @@ public class FfmpegServiceTest {
         Path input1 = Paths.get("/tmp/input1.mp4");
 
         /* When */
-        ffmpegService.concatDemux(output, input1);
+        ffmpegService.concat(output, input1);
 
         /* Then */
         // Nothing done
     }
 
+    @Test
+    public void should_merge_audio_and_video() {
+        /* Given */
+        Path video = Paths.get("/tmp/bar.mp4");
+        Path audio = Paths.get("/tmp/bar.webm");
+        Path dest = Paths.get("/tmp/foo.mp4");
+
+        FFmpegJob job = mock(FFmpegJob.class);
+        when(fFmpegExecutor.createJob(any())).thenReturn(job);
+
+        /* When */
+        Path generatedFile = ffmpegService.mergeAudioAndVideo(video, audio, dest);
+
+        /* Then */
+        assertThat(generatedFile).isEqualTo(dest);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void should_not_merge_if_folder_is_read_only() {
+          /* Given */
+        Path video = Paths.get("/tmp/bar.mp4");
+        Path audio = Paths.get("/tmp/bar.webm");
+        Path dest = Paths.get("/foo.mp4");
+
+        FFmpegJob job = mock(FFmpegJob.class);
+        when(fFmpegExecutor.createJob(any())).thenReturn(job);
+
+        /* When */
+        ffmpegService.mergeAudioAndVideo(video, audio, dest);
+
+        /* Then */
+        /* @See Exception in annotation */
+    }
+    
 }
