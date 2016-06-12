@@ -33,7 +33,7 @@
     "jasmine-core": "^2.3.4",
     "jasmine-expect": "^2.0.0-beta2",
     "jasmine-reporters": "^2.0.7",
-    "jspm": "0.16.32",
+    "jspm": "0.16.34",
     "mkdirp": "^0.5.1",
     "node-jsxml": "^0.7.0",
     "phantomjs": "^1.9.19",
@@ -84,7 +84,9 @@
       "clean-css": "npm:clean-css@^3.4.6",
       "core-js": "npm:core-js@^1.1.4",
       "css": "github:systemjs/plugin-css@^0.1.19",
-      "text": "github:systemjs/plugin-text@^0.0.2"
+      "text": "github:systemjs/plugin-text@^0.0.2",
+      "traceur": "github:jmcriffey/bower-traceur@0.0.93",
+      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93"
     },
     "overrides": {
       "github:highcharts/highcharts-dist@4.2.3": {

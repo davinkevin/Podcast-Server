@@ -7,12 +7,11 @@ let registerGlobalHotkeys = ($location, hotkeys) => {
 
     [
         ['h', 'Goto Home', '/items'],
-        ['s', 'Goto Search', '/item/search'],
         ['p', 'Goto Podcast List','/podcasts'],
         ['d', 'Goto Download List', '/download']
     ]
         .map(hotkey => ({ combo: hotkey[0], description: hotkey[1], callback: () =>  $location.path(hotkey[2]) }))
-        .map(hotkey => hotkeys.add(hotkey));
+        .forEach(hotkey => hotkeys.add(hotkey));
 };
 
 @Module({

@@ -8,16 +8,14 @@ import urlParser from 'url';
 import runSequence from 'run-sequence';
 import paths from '../paths';
 
-let redirect = (route) => {
-    return {
-        to : function(remoteUrl) {
+let redirect = (route) => ({
+        to : (remoteUrl) => {
             let options = urlParser.parse(remoteUrl);
             options.route = route;
             options.preserveHost = true;
             return proxy(options);
         }
-    }
-};
+    });
 
 function startBrowserSync(directoryBase, files, browser) {
     browser = browser === undefined ? 'default' : browser;
