@@ -1,11 +1,17 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +24,6 @@ import org.mockito.stubbing.Answer;
 import javax.validation.Validator;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
@@ -41,8 +46,8 @@ public class DailymotionUpdaterTest {
     @Spy UrlService urlService;
     @InjectMocks DailymotionUpdater dailymotionUpdater;
 
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
     Podcast podcast;
-    JSONParser jsonParser = new JSONParser();
 
 
     @Before
@@ -51,6 +56,7 @@ public class DailymotionUpdaterTest {
                 .title("Karim Debbache")
                 .url("http://www.dailymotion.com/karimdebbache")
                 .build();
+
     }
 
     @Test
@@ -69,7 +75,7 @@ public class DailymotionUpdaterTest {
     public void should_get_items() throws MalformedURLException {
         /* Given */
         URL karimdebbache = new URL(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache"));
-        when(jsonService.from(eq(karimdebbache))).then(asJson("user.karimdebbache.json"));
+        when(jsonService.parse(eq(karimdebbache))).then(asJson("user.karimdebbache.json"));
 
         /* When */
         Set<Item> items = dailymotionUpdater.getItems(podcast);
@@ -82,7 +88,7 @@ public class DailymotionUpdaterTest {
     public void should_get_empty_list_if_error_during_fetching() throws MalformedURLException {
         /* Given */
         URL karimdebbache = new URL(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache"));
-        when(jsonService.from(eq(karimdebbache))).thenReturn(Optional.empty());
+        when(jsonService.parse(eq(karimdebbache))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = dailymotionUpdater.getItems(podcast);
@@ -106,8 +112,8 @@ public class DailymotionUpdaterTest {
         assertThat(dailymotionUpdater.type().key()).isEqualTo("Dailymotion");
     }
 
-    private Answer<Optional<JSONObject>> asJson(String file) {
-        return i -> Optional.of(JSONObject.class.cast(jsonParser.parse(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/" + file).toURI())))));
+    private Answer<Optional<DocumentContext>> asJson(String file) {
+        return i -> Optional.of(PARSER.parse(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/" + file).toURI()).toFile()));
     }
 
 }

@@ -1,12 +1,15 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
-import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,9 +18,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
@@ -32,14 +36,15 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DailymotionFinderTest {
 
-    private static final JSONParser PARSER = new JSONParser();
-    @Mock JsonService jsonService;
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
+
     @Mock ImageService imageService;
+    @Mock JsonService jsonService;
     @Mock UrlService urlService;
     @InjectMocks DailymotionFinder dailymotionFinder;
 
     @Before
-    public void beforeEach() {
+    public void beforeEach() throws URISyntaxException, IOException {
         when(urlService.newURL(anyString())).then(i -> Optional.of(new URL((String) i.getArguments()[0])));
     }
 
@@ -49,7 +54,7 @@ public class DailymotionFinderTest {
         String url = "http://www.dailymotion.com/karimdebbache";
         Cover cover = new Cover("http://s2.dmcdn.net/PB4mc/720x720-AdY.jpg", 200, 200);
         when(imageService.getCoverFromURL(eq("http://s2.dmcdn.net/PB4mc/720x720-AdY.jpg"))).thenReturn(cover);
-        when(jsonService.from(eq(new URL("https://api.dailymotion.com/user/karimdebbache?fields=avatar_720_url,description,username")))).then(readerFrom("karimdebbache"));
+        when(jsonService.parse(eq(new URL("https://api.dailymotion.com/user/karimdebbache?fields=avatar_720_url,description,username")))).then(readerFrom("karimdebbache"));
 
         /* When */
         Podcast podcast = dailymotionFinder.find(url);
@@ -88,7 +93,7 @@ public class DailymotionFinderTest {
     }
 
     private Answer<Optional<Object>> readerFrom(String url) {
-        return i -> Optional.of(PARSER.parse(Files.newBufferedReader(Paths.get(DailymotionFinderTest.class.getResource("/remote/podcast/dailymotion/" + url + ".json").toURI()))));
+        return i -> Optional.of(PARSER.parse(Paths.get(DailymotionFinderTest.class.getResource("/remote/podcast/dailymotion/" + url + ".json").toURI()).toFile()));
     }
 
 }

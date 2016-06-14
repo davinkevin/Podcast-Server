@@ -2,6 +2,10 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -14,7 +18,6 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,9 +53,9 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ParleysDownloaderTest {
 
-    private static final JSONParser PARSER = new JSONParser();
     private static final String ROOT_FOLDER = "/tmp";
     private static final String ASSETS_URL = "https://cdn.parleys.com/p/5534a6b4e4b056a82338229d/9Wwo6oOVmk3_177812_60938.mp4?Signature=Rc-FUFrD81ypdP4RKtoAMr2E3RRf-dFYAbrW9jnAstX-R1S9-lgOrZBvpLRaVdTeOKMB-Td4tkag3doUIAjEcwFXzW3EWp-Zq0htHC0RhZWCb~LxVcsyzBHo6nYpyy0V4V--44CaumrgBV-~utssWmisLU5bzmhelySHyHTCrhtVo3CAZpSXsDBIWL7gK8jZ5pB61zJtHQiRMhSFC6bjcHlEJByftM83sr9R-U8GgdtTa6t1FRjCeVXYmKKG~1snsUz9mtSLYVrEGzxz3NojtJlVuAWtD7FQPEISHI1EMxDb9cWGoL8RijXVEjyfzUNmDJTwBNMKECwWM732DhUuBg__&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4ucGFybGV5cy5jb20vcC81NTM0YTZiNGU0YjA1NmE4MjMzODIyOWQvOVd3bzZvT1ZtazNfMTc3ODEyXzYwOTM4Lm1wND9yZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWF0dGFjaG1lbnQlM0JmaWxlbmFtZSUzRCUyNzlXd282b09WbWszXzE3NzgxMl82MDkzOC5tcDQlMjciLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE0NDk0MDg1MzR9fX1dfQ__&Key-Pair-Id=APKAIUQAZRCNZDWJ4JJQ&response-content-disposition=attachment%3Bfilename%3D%279Wwo6oOVmk3_177812_60938.mp4%27";
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
 
     @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
@@ -106,7 +109,7 @@ public class ParleysDownloaderTest {
         DownloadInfo mock = mock(DownloadInfo.class);
         WGet wget = mock(WGet.class);
 
-        when(jsonService.from(eq(new URL("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))).then(readerFrom("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
+        when(jsonService.parse(eq(new URL("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))).then(readerFrom("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(mock);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wget);
 
@@ -145,7 +148,7 @@ public class ParleysDownloaderTest {
         DownloadInfo mock = mock(DownloadInfo.class);
         WGet wget = mock(WGet.class);
 
-        when(jsonService.from(eq(new URL("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))).then(readerFrom("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
+        when(jsonService.parse(eq(new URL("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))).then(readerFrom("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
         doThrow(MalformedURLException.class).when(wGetFactory).newDownloadInfo(eq(ASSETS_URL));
         when(wGetFactory.newDownloadInfo(not(eq(ASSETS_URL)))).thenReturn(mock);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wget);
@@ -173,7 +176,7 @@ public class ParleysDownloaderTest {
     }
 
     private Answer<Optional<Object>> readerFrom(String url) {
-        return i -> Optional.of(PARSER.parse(Files.newBufferedReader(Paths.get(ParleysDownloaderTest.class.getResource(url).toURI()))));
+        return i -> Optional.of(PARSER.parse(Paths.get(ParleysDownloaderTest.class.getResource(url).toURI()).toFile()));
     }
 
 }

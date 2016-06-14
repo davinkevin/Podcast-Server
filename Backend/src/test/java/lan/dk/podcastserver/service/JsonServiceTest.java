@@ -1,7 +1,8 @@
 package lan.dk.podcastserver.service;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.InvalidJsonException;
 import lan.dk.podcastserver.manager.worker.updater.DailymotionUpdaterTest;
-import org.json.simple.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -35,7 +36,7 @@ public class JsonServiceTest {
         when(urlService.urlAsReader(any(URL.class))).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
 
         /* When */
-        Optional<JSONObject> aFakeUrl = jsonService.from(new URL("http://foo.com/"));
+        Optional<DocumentContext> aFakeUrl = jsonService.parse(new URL("http://foo.com/"));
 
         /* Then */
         assertThat(aFakeUrl).isPresent();
@@ -47,7 +48,7 @@ public class JsonServiceTest {
         doThrow(IOException.class).when(urlService).urlAsReader(any(URL.class));
 
         /* When */
-        Optional<JSONObject> aFakeUrl = jsonService.from(new URL("http://foo.com/"));
+        Optional<DocumentContext> aFakeUrl = jsonService.parse(new URL("http://foo.com/"));
 
         /* Then */
         assertThat(aFakeUrl).isEmpty();
@@ -56,23 +57,22 @@ public class JsonServiceTest {
     @Test
     public void should_parse_from_string() {
         /* Given */
-        String object = "{}";
+        String object = "{ \"foo\" : \"bar\"}";
         /* When */
-        Optional<JSONObject> parse = jsonService.from(object);
+        DocumentContext parse = jsonService.parse(object);
 
         /* Then */
-        assertThat(parse).isPresent();
+        assertThat(parse.read("foo", String.class)).isEqualTo("bar");
     }
 
-    @Test
+    @Test(expected = InvalidJsonException.class)
     public void should_return_empty_if_error_during_parsing_string() {
         /* Given */
         String object = "}{{{";
 
         /* When */
-        Optional<JSONObject> parse = jsonService.from(object);
+        DocumentContext parse = jsonService.parse(object);
 
-        /* Then */
-        assertThat(parse).isEmpty();
+        /* Then @See annotation */
     }
 }

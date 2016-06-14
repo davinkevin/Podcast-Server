@@ -1,10 +1,12 @@
 package lan.dk.podcastserver.service;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,23 +25,18 @@ import static java.util.stream.Collectors.joining;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class JsonService {
 
-    final UrlService urlService;
-    final JSONParser parser = new JSONParser();
+    private final UrlService urlService;
+    private final ParseContext parserContext = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
 
-    public Optional<JSONObject> from(URL url) {
-        try (BufferedReader bufferedReader = urlService.urlAsReader(url)) {
-            return from(bufferedReader.lines().collect(joining()));
-        } catch (IOException e) {
-            log.error("Error during fetching of each items of {}", url, e);
-            return Optional.empty();
-        }
+    public DocumentContext parse(String json) {
+        return parserContext.parse(json);
     }
 
-    public Optional<JSONObject> from(String text) {
-        try {
-            return Optional.of((JSONObject) parser.parse(text));
-        } catch (ParseException e) {
-            log.error("Error during fetching of {}", text, e);
+    public Optional<DocumentContext> parse(URL url) {
+        try (BufferedReader bufferedReader = urlService.urlAsReader(url)) {
+            return Optional.of(parse(bufferedReader.lines().collect(joining())));
+        } catch (IOException e) {
+            log.error("Error during fetching of each items of {}", url, e);
             return Optional.empty();
         }
     }

@@ -1,6 +1,9 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.google.common.collect.Sets;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -9,11 +12,10 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.apache.commons.io.IOUtils;
-import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +71,9 @@ public class DailymotionDownloaderTest {
 
         dailymotionDownloader.setItem(item);
         dailymotionDownloader.setItemDownloadManager(itemDownloadManager);
-        when(jsonService.from(anyString())).then(i -> Optional.of(new JSONParser().parse((String) i.getArguments()[0])));
+        /*when(jsonService.from(anyString())).then(i -> Optional.of(new JSONParser().parse((String) i.getArguments()[0])));*/
+        when(jsonService.parse(anyString())).then(i -> JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build()).parse(i.getArgumentAt(0, String.class)));
+
     }
 
     @Test

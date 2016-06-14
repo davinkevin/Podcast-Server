@@ -1,13 +1,15 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -21,7 +23,6 @@ import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +42,7 @@ public class PluzzUpdaterTest {
 
     private static final String PLUZZ_URL = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
     private static final Podcast PODCAST = Podcast.builder().url(PLUZZ_URL).build();
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
 
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
@@ -87,7 +89,7 @@ public class PluzzUpdaterTest {
     public void should_get_items() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.of(parse("/remote/podcast/pluzz.commentcavabien.html")));
-        when(jsonService.from(any(URL.class))).then(i -> {
+        when(jsonService.parse(any(URL.class))).then(i -> {
             URL url = URL.class.cast(i.getArguments()[0]);
             if (url.toString().contains("129003962"))
                 return Optional.empty();
@@ -118,7 +120,7 @@ public class PluzzUpdaterTest {
     public void should_get_items_if_no_played_item() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Optional.of(parse("/remote/podcast/pluzz.commentcavabien.noplayeditem.html")));
-        when(jsonService.from(any(URL.class))).then(i -> Optional.of(loadEpisode(StringUtils.substringBetween(URL.class.cast(i.getArguments()[0]).toString(), "?idDiffusion=", "&catalogue"))));
+        when(jsonService.parse(any(URL.class))).then(i -> Optional.of(loadEpisode(StringUtils.substringBetween(URL.class.cast(i.getArguments()[0]).toString(), "?idDiffusion=", "&catalogue"))));
         when(urlService.getM3U8UrlFormMultiStreamFile(any())).then(i -> "/fake/url" + UUID.randomUUID());
 
         /* When */
@@ -134,8 +136,8 @@ public class PluzzUpdaterTest {
         assertThat(pluzzUpdater.type().name()).isEqualTo("Pluzz");
     }
 
-    private JSONObject loadEpisode(String id) throws URISyntaxException, IOException, ParseException {
-        return (JSONObject) new JSONParser().parse(Files.newBufferedReader(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI())));
+    private DocumentContext loadEpisode(String id) throws URISyntaxException, IOException {
+        return PARSER.parse(Paths.get(PluzzUpdaterTest.class.getResource(String.format("/remote/podcast/pluzz/pluzz.commentcavabien.%s.json", id)).toURI()).toFile());
     }
 
     private Document parse(String file) throws URISyntaxException, IOException {

@@ -1,6 +1,9 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -10,12 +13,13 @@ import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.Api;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +32,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
+import static lan.dk.podcastserver.entity.Cover.DEFAULT_COVER;
 
 @Slf4j
 @Component("YoutubeUpdater")
@@ -66,15 +71,17 @@ public class YoutubeUpdater extends AbstractUpdater {
         do {
             items.addAll(pageItems);
 
-            Optional<JSONObject> jsonResponse = urlService
+            Optional<YoutubeResponse> jsonResponse = urlService
                     .newURL(asApiPlaylistUrl(playlistId, nextPageToken))
-                    .flatMap(jsonService::from);
+                    .flatMap(jsonService::parse)
+                    .map(d -> d.read("$", YoutubeResponse.class));
 
-            pageItems = jsonResponse.map(r -> (List<JSONObject>) r.get("items"))
-                    .map(this::jsonArrayToItems)
+            pageItems = jsonResponse
+                    .map(YoutubeResponse::getItems)
+                    .map(this::convertToItems)
                     .orElse(Sets.newHashSet());
 
-            nextPageToken = jsonResponse.map(r -> String.class.cast(r.get("nextPageToken"))).orElse("");
+            nextPageToken = jsonResponse.map(YoutubeResponse::getNextPageToken).orElse("");
 
         } while(page++ < MAX_PAGE && StringUtils.isNotEmpty(nextPageToken));
         // Can't Access the podcast item here due thread-safe JPA / Hibernate problem
@@ -91,10 +98,10 @@ public class YoutubeUpdater extends AbstractUpdater {
         return isNull(pageToken) ? url : url.concat("&pageToken=" + pageToken);
     }
 
-    private Set<Item> jsonArrayToItems(List<JSONObject> jsonObjects) {
-        return jsonObjects
+    private Set<Item> convertToItems(List<YoutubeResponse.YoutubeItem> items) {
+        return items
                 .stream()
-                .map(this::generateItemFromJson)
+                .map(this::convertToItem)
                 .collect(toSet());
     }
 
@@ -102,41 +109,16 @@ public class YoutubeUpdater extends AbstractUpdater {
         return channelId.startsWith("UC") ? channelId.replaceFirst("UC", "UU") : channelId;
     }
 
-    private Item generateItemFromJson(JSONObject item) {
-        JSONObject snippet = JSONObject.class.cast(item.get("snippet"));
-        JSONObject resourceId = JSONObject.class.cast(snippet.get("resourceId"));
+    private Item convertToItem(YoutubeResponse.YoutubeItem item) {
         return Item.builder()
-                .title(snippet.get("title").toString())
-                .description(snippet.get("description").toString())
-                .pubDate(pubdateOf(snippet.get("publishedAt").toString()))
-                .url(String.format(URL_PAGE_BASE, resourceId.get("videoId")))
-                .cover(coverFromJson(((JSONObject) snippet.get("thumbnails"))))
+                    .title(item.getTitle())
+                    .description(item.getDescription())
+                    .pubDate(item.getPublishedAt())
+                    .url(item.getUrl())
+                    .cover(item.getCover()
+                            .map(t -> Cover.builder().url(t.getUrl()).width(t.getWidth()).height(t.getHeight()).build())
+                            .orElse(DEFAULT_COVER))
                 .build();
-    }
-
-    private Cover coverFromJson(JSONObject thumbnails) {
-        return getBetterThumbnails(thumbnails)
-                .map(c -> new Cover(c.get("url").toString(), Integer.valueOf(c.get("width").toString()), Integer.valueOf(c.get("height").toString())))
-                .orElse(new Cover());
-    }
-
-    private Optional<JSONObject> getBetterThumbnails(JSONObject thumbnails) {
-        if (thumbnails.containsKey("maxres"))
-            return Optional.of((JSONObject) thumbnails.get("maxres"));
-
-        if (thumbnails.containsKey("standard"))
-            return Optional.of((JSONObject) thumbnails.get("standard"));
-
-        if (thumbnails.containsKey("high"))
-            return Optional.of((JSONObject) thumbnails.get("high"));
-
-        if (thumbnails.containsKey("medium"))
-            return Optional.of((JSONObject) thumbnails.get("medium"));
-
-        if (thumbnails.containsKey("default"))
-            return Optional.of((JSONObject) thumbnails.get("default"));
-
-        return Optional.empty();
     }
 
     private Set<Item> getItemsByRss(Podcast podcast) {
@@ -220,15 +202,93 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Override
     public Integer compatibility(String url) {
-        return Arrays
-                .asList("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
-                .stream().anyMatch(url::contains)
-                ? 1
-                : Integer.MAX_VALUE;
+        return Lists.newArrayList("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
+                .stream()
+                .anyMatch(url::contains) ? 1 : Integer.MAX_VALUE;
     }
 
     @Override
     public Type type() {
         return new Type("Youtube", "Youtube");
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class YoutubeResponse {
+        @Getter @Setter private List<YoutubeItem> items;
+        @Getter @Setter private String nextPageToken;
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        private static class YoutubeItem {
+            @Setter private Snippet snippet;
+
+            public String getTitle() {
+                return snippet.getTitle();
+            }
+
+            public String getDescription() {
+                return snippet.getDescription();
+            }
+
+            ZonedDateTime getPublishedAt() {
+                return ZonedDateTime.parse(snippet.getPublishedAt(), DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
+            }
+
+            public String getUrl() {
+                return String.format(URL_PAGE_BASE, snippet.getResourceId().getVideoId());
+            }
+
+            public Optional<Thumbnails.Thumbnail> getCover() {
+                return this.snippet.getThumbnails().getBetterThumbnail();
+            }
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            private static class Snippet {
+                @Getter @Setter private String title;
+                @Getter @Setter private String description;
+                @Getter @Setter private String publishedAt;
+                @Getter @Setter private Thumbnails thumbnails;
+                @Getter @Setter private ResourceId resourceId;
+            }
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            private static class ResourceId {
+                @Getter @Setter private String videoId;
+            }
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            private static class Thumbnails {
+                @Setter private Thumbnail maxres;
+                @Setter private Thumbnail standard;
+                @Setter private Thumbnail high;
+                @Setter private Thumbnail medium;
+                @Setter @JsonProperty("default") private Thumbnail byDefault;
+
+                Optional<Thumbnail> getBetterThumbnail() {
+                    if (nonNull(maxres))
+                        return Optional.of(maxres);
+
+                    if (nonNull(standard))
+                        return Optional.of(standard);
+
+                    if (nonNull(high))
+                        return Optional.of(high);
+
+                    if (nonNull(medium))
+                        return Optional.of(medium);
+
+                    if (nonNull(byDefault))
+                        return Optional.of(byDefault);
+
+                    return Optional.empty();
+                }
+
+                @JsonIgnoreProperties(ignoreUnknown = true)
+                private static class Thumbnail {
+                    @Getter @Setter private String url;
+                    @Getter @Setter private Integer width;
+                    @Getter @Setter private Integer height;
+                }
+            }
+        }
     }
 }

@@ -1,22 +1,24 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.axet.wget.info.DownloadInfo;
 import com.google.common.collect.Lists;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.TypeRef;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
-import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -45,7 +47,7 @@ public class ParleysDownloader extends AbstractDownloader{
 
     private static final String PARLEYS_ITEM_API_URL = "http://api.parleys.com/api/presentation.json/%s?view=true";
     private static final String STREAM_TOKEN = "STREAM";
-
+    private static final TypeRef<List<ParleysAssetsDetail>> LIST_PARLEUS_ASSETS_DETAIL_TYPE = new TypeRef<List<ParleysAssetsDetail>>(){};
     /* Patter to extract value from URL */
     // --> http://www.parleys.com/play/535a2846e4b03397a8eee892
     private static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/play/([^/]*)");
@@ -64,7 +66,7 @@ public class ParleysDownloader extends AbstractDownloader{
 
         item.setProgression(0);
 
-        List<ParleysAssets> listOfAssets = getUrlForParleysItem(item);
+        List<ParleysAssetsDetail.ParleysAssetsFiles> listOfAssets = getUrlForParleysItem(item);
         if ((listOfAssets.size() == 0)) {
             logger.error("No assets found for the item with url {}", item.getUrl());
             stopDownload();
@@ -75,7 +77,7 @@ public class ParleysDownloader extends AbstractDownloader{
 
         Runnable itemSynchronisation = new ParleysWatcher(this);
 
-        for(ParleysAssets parleysAssets : listOfAssets) {
+        for(ParleysAssetsDetail.ParleysAssetsFiles parleysAssets : listOfAssets) {
             try {
                 info = wGetFactory.newDownloadInfo(parleysAssets.getUrl());
                 info.extract(stopDownloading, itemSynchronisation);
@@ -110,42 +112,32 @@ public class ParleysDownloader extends AbstractDownloader{
         return url.contains("parleys") ? 1 : Integer.MAX_VALUE;
     }
 
-    private List<Path> getListOfFiles(List<ParleysAssets> listOfAssets) {
-        return listOfAssets.stream().filter(ParleysAssets::getValid).map(ParleysAssets::getFile).collect(toList());
+    private List<Path> getListOfFiles(List<ParleysAssetsDetail.ParleysAssetsFiles> listOfAssets) {
+        return listOfAssets.stream().filter(ParleysAssetsDetail.ParleysAssetsFiles::getValid).map(ParleysAssetsDetail.ParleysAssetsFiles::getFile).collect(toList());
     }
 
-    private Long getTotalSize(List<ParleysAssets> listOfAssets) {
-        return listOfAssets.stream().mapToLong(ParleysAssets::getSize).sum();
+    private Long getTotalSize(List<ParleysAssetsDetail.ParleysAssetsFiles> listOfAssets) {
+        return listOfAssets.stream().mapToLong(ParleysAssetsDetail.ParleysAssetsFiles::getFileSize).sum();
     }
 
-    private List<ParleysAssets> getUrlForParleysItem(Item item) {
+    private List<ParleysAssetsDetail.ParleysAssetsFiles> getUrlForParleysItem(Item item) {
         return getParseJsonObjectForItem(item.getUrl())
-                .map(o -> JSONArray.class.cast(o.get("assets")))
-                .map(this::formJsonArrayToList)
+                .map(p -> p.read("assets", LIST_PARLEUS_ASSETS_DETAIL_TYPE))
+                .map(this::assetsToParleysFiles)
                 .map(list -> list.stream().map(a -> a.setFile(getAssetFile(a.getUrl()))).collect(toList()))
                 .orElse(Lists.newArrayList());
     }
 
     @SuppressWarnings("unchecked")
-    private List<ParleysAssets> formJsonArrayToList(JSONArray array) {
-        return ((List<JSONObject>) array)
+    private List<ParleysAssetsDetail.ParleysAssetsFiles> assetsToParleysFiles(List<ParleysAssetsDetail> assetsDetails) {
+        return assetsDetails
                 .stream()
-                .filter(i -> STREAM_TOKEN.equals(i.get("target")))
-                .map(i -> getParleysAssets("MP4", (JSONArray) i.get("files")))
+                .filter(i -> STREAM_TOKEN.equals(i.getTarget()))
+                .flatMap( i -> i.getFiles().stream())
+                .filter(f -> "MP4".equals(f.getFormat()))
                 .filter(Objects::nonNull)
                 .collect(toList());
     }
-
-    @SuppressWarnings("unchecked")
-    private ParleysAssets getParleysAssets(String type, JSONArray arrayOfParleysFiles) {
-        return ((List<JSONObject>) arrayOfParleysFiles)
-                .stream()
-                .filter(f -> type.equals(f.get("format")))
-                .map(i -> ParleysAssets.builder().url((String) i.get("httpDownloadURL")).size((Long) i.get("fileSize")).valid(Boolean.TRUE).build())
-                .findFirst()
-                .orElse(null);
-    }
-
 
     private String getItemUrl(String id) {
         return String.format(PARLEYS_ITEM_API_URL, id);
@@ -160,22 +152,29 @@ public class ParleysDownloader extends AbstractDownloader{
         return Optional.empty();
     }
 
-    private Optional<JSONObject> getParseJsonObjectForItem(String url) {
+    private Optional<DocumentContext> getParseJsonObjectForItem(String url) {
         return getParleysId(url)
                 .map(this::getItemUrl)
                 .flatMap(urlService::newURL)
-                .flatMap(jsonService::from);
+                .flatMap(jsonService::parse);
     }
 
 
-    @Builder
-    @Getter @Setter
-    @Accessors(chain = true)
-    private static class ParleysAssets {
-        String url;
-        Long size;
-        Path file;
-        Boolean valid;
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class ParleysAssetsDetail {
+        @JsonProperty("target") private String target;
+        @JsonProperty("files") private List<ParleysAssetsFiles> files;
+
+        @Accessors(chain = true)
+        @JsonIgnoreProperties(value = {"file", "valid"}, ignoreUnknown = true)
+        private static class ParleysAssetsFiles {
+            @JsonProperty("httpDownloadURL") @Setter @Getter private String url;
+            @Setter @Getter private Long fileSize;
+            @Setter @Getter private String format;
+            @Setter @Getter Path file;
+            @Setter @Getter Boolean valid = Boolean.TRUE;
+        }
     }
 
     @Override
@@ -198,7 +197,7 @@ public class ParleysDownloader extends AbstractDownloader{
         String urlWithoutParameters = StringUtils.substringBeforeLast(url, "?");
 
         Path finalFile = podcastPath.resolve(FilenameUtils.getName(urlWithoutParameters));
-        try { Files.deleteIfExists(finalFile); } catch (IOException ignored) {}
+        Try.of(() -> Files.deleteIfExists(finalFile));
 
         return finalFile;
     }

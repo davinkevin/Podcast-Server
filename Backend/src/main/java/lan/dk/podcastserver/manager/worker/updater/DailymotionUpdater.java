@@ -1,14 +1,17 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
+import com.jayway.jsonpath.TypeRef;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,9 +33,10 @@ import static java.util.stream.Collectors.toSet;
 @Component("DailymotionUpdater")
 public class DailymotionUpdater extends AbstractUpdater {
 
-    public static final String API_LIST_OF_ITEMS = "https://api.dailymotion.com/user/%s/videos?fields=created_time,description,id,thumbnail_720_url,title";
-    public static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com\\/(.*)");
-    public static final String ITEM_URL = "http://www.dailymotion.com/video/%s";
+    static final String API_LIST_OF_ITEMS = "https://api.dailymotion.com/user/%s/videos?fields=created_time,description,id,thumbnail_720_url,title";
+    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com\\/(.*)");
+    private static final String ITEM_URL = "http://www.dailymotion.com/video/%s";
+    private static final TypeRef<List<DailymotionVideoDetail>> LIST_DAILYMOTIONVIDEODETAIL_TYPE = new TypeRef<List<DailymotionVideoDetail>>() { };
 
     @Autowired JsonService jsonService;
     @Autowired ImageService imageService;
@@ -44,20 +48,20 @@ public class DailymotionUpdater extends AbstractUpdater {
         return usernameOf(podcast.getUrl())
                 .map(username -> String.format(API_LIST_OF_ITEMS, username))
                 .flatMap(urlService::newURL)
-                .flatMap(jsonService::from)
-                .map(o -> ((List<JSONObject>) o.get("list")))
+                .flatMap(jsonService::parse)
+                .map(p -> p.read("list", LIST_DAILYMOTIONVIDEODETAIL_TYPE))
                 .map(this::asSet)
                 .orElse(Sets.newHashSet());
     }
 
-    private Set<Item> asSet(List<JSONObject> jsonArray) {
+    private Set<Item> asSet(List<DailymotionVideoDetail> jsonArray) {
         return jsonArray.stream()
                 .map(i -> Item.builder()
-                        .url(String.format(ITEM_URL, i.get("id")))
-                        .cover(imageService.getCoverFromURL(((String) i.get("thumbnail_720_url"))))
-                        .title((String) i.get("title"))
-                        .pubDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.valueOf(i.get("created_time").toString())), ZoneId.of("Europe/Paris")))
-                        .description(((String) i.get("description")))
+                        .url(String.format(ITEM_URL, i.getId()))
+                        .cover(imageService.getCoverFromURL(i.getCover()))
+                        .title(i.getTitle())
+                        .pubDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(i.getCreationDate()), ZoneId.of("Europe/Paris")))
+                        .description((i.getDescription()))
                         .build()
                 )
                 .collect(toSet());
@@ -87,5 +91,14 @@ public class DailymotionUpdater extends AbstractUpdater {
             return Optional.of(matcher.group(1));
 
         return Optional.empty();
+    }
+
+    private static class DailymotionVideoDetail {
+        @Getter @Setter private String id;
+        @JsonProperty("thumbnail_720_url") @Getter @Setter private String cover;
+        @Getter @Setter private String title;
+        @JsonProperty("created_time") @Getter @Setter private Long creationDate;
+        @Getter @Setter private String description;
+
     }
 }

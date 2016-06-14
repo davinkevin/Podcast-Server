@@ -1,11 +1,18 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +24,6 @@ import org.mockito.stubbing.Answer;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
@@ -35,7 +41,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ParleysUpdaterTest {
 
-    public static final JSONParser PARSER = new JSONParser();
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
+
     @Mock ImageService imageService;
     @Mock UrlService urlService;
     @Mock JsonService jsonService;
@@ -50,14 +57,14 @@ public class ParleysUpdaterTest {
     public void beforeEach() {
         podcast = Podcast.builder()
                 .title("Devoxx FR 2015")
-                .url("https://www.parleys.com/channel/devoxx-france-2015/")
+                .url("https://www.parleys.com/channel/devoxx-france-2015")
                 .build();
         when(urlService.newURL(anyString())).then(i -> Optional.of(new URL((String) i.getArguments()[0])));
     }
 
     @Test
     public void should_sign_the_podcast() throws IOException {
-        when(jsonService.from(eq(new URL("http://api.parleys.com/api/presentations.json/devoxx-france-2015?index=0&size=1&text=&orderBy=date")))).then(readerFrom("devoxx-france-2015.json"));
+        when(jsonService.parse(eq(new URL("http://api.parleys.com/api/presentations.json/devoxx-france-2015?index=0&size=1&text=&orderBy=date")))).then(readerFrom("devoxx-france-2015.json"));
         when(signatureService.generateMD5Signature(anyString())).thenReturn("aSignatureWithString");
 
         /* When */
@@ -70,7 +77,7 @@ public class ParleysUpdaterTest {
     @Test
     public void should_fail_on_signature() throws IOException {
         /* Given */
-        when(jsonService.from(any(URL.class))).thenReturn(Optional.empty());
+        when(jsonService.parse(any(URL.class))).thenReturn(Optional.empty());
 
         /* When */
         String signature = parleysUpdater.signatureOf(podcast);
@@ -82,11 +89,11 @@ public class ParleysUpdaterTest {
     @Test
     public void should_get_items() throws IOException {
         /* Given */
-        when(jsonService.from(or(
+        when(jsonService.parse(or(
                 eq(new URL("http://api.parleys.com/api/presentations.json/devoxx-france-2015?index=0&size=4&text=&orderBy=date")),
                 eq(new URL("http://api.parleys.com/api/presentations.json/devoxx-france-2015?index=0&size=1&text=&orderBy=date")))
         )).then(readerFrom("devoxx-france-2015.json"));
-        when(jsonService.from(not(or(
+        when(jsonService.parse(not(or(
                 eq(new URL("http://api.parleys.com/api/presentations.json/devoxx-france-2015?index=0&size=4&text=&orderBy=date")),
                 eq(new URL("http://api.parleys.com/api/presentations.json/devoxx-france-2015?index=0&size=1&text=&orderBy=date")))))
         ).then(itemFromId());
@@ -103,7 +110,7 @@ public class ParleysUpdaterTest {
     public void should_failed_on_get_items() throws IOException {
         /* Given */
         podcast.setUrl("http://another.url.without/pattern");
-        when(jsonService.from(any(URL.class))).thenReturn(Optional.empty());
+        when(jsonService.parse(any(URL.class))).thenReturn(Optional.empty());
 
         /* When */
         Set<Item> items = parleysUpdater.getItems(podcast);
@@ -117,13 +124,33 @@ public class ParleysUpdaterTest {
         assertThat(parleysUpdater.type().key()).isEqualTo("Parleys");
         assertThat(parleysUpdater.type().name()).isEqualTo("Parleys");
     }
-    
-    private Answer<Optional<Object>> itemFromId() {
-        return i -> Optional.of(PARSER.parse(Files.newBufferedReader(Paths.get(ParleysUpdaterTest.class.getResource(String.format("/remote/podcast/parleys/%s.json", i.getArguments()[0].toString().replace("http://api.parleys.com/api/presentation.json/", "").replace("?view=true", ""))).toURI()))));
+
+    @Test
+    public void should_not_be_compatible() {
+        /* Given */
+        String url = "https://foo.bar.com/";
+        /* When */
+        Integer compatibility = parleysUpdater.compatibility(url);
+        /* Then */
+        assertThat(compatibility).isEqualTo(Integer.MAX_VALUE);
     }
 
-    private Answer<Optional<Object>> readerFrom(String url) {
-        return i -> Optional.of(PARSER.parse(Files.newBufferedReader(Paths.get(ParleysUpdaterTest.class.getResource("/remote/podcast/parleys/" + url).toURI()))));
+    @Test
+    public void should_be_compatible() {
+        /* Given */
+        String url = "https://parleys.com/foo/bar";
+        /* When */
+        Integer compatibility = parleysUpdater.compatibility(url);
+        /* Then */
+        assertThat(compatibility).isEqualTo(1);
+    }
+    
+    private Answer<Optional<DocumentContext>> itemFromId() {
+        return i -> Optional.of(PARSER.parse(Paths.get(ParleysUpdaterTest.class.getResource(String.format("/remote/podcast/parleys/%s.json", i.getArguments()[0].toString().replace("http://api.parleys.com/api/presentation.json/", "").replace("?view=true", ""))).toURI()).toFile()));
+    }
+
+    private Answer<Optional<DocumentContext>> readerFrom(String url) {
+        return i -> Optional.of(PARSER.parse(Paths.get(ParleysUpdaterTest.class.getResource("/remote/podcast/parleys/" + url).toURI()).toFile()));
     }
 
 }

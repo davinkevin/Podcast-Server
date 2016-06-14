@@ -21,6 +21,8 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class Cover {
 
+    public static final Cover DEFAULT_COVER = new Cover();
+
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")

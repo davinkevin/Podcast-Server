@@ -1,13 +1,16 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.JsonService;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -32,33 +35,11 @@ public class DailymotionDownloader extends HTTPDownloader {
         url = urlService
                 .getPageFromURL(item.getUrl())
                 .flatMap(DailymotionDownloader::getPlayerConfig)
-                .flatMap(jsonService::from)
-                .map(config -> ((JSONObject) ((JSONObject) config.get("metadata")).get("qualities")))
-                .map(DailymotionDownloader::getMaxQuality)
+                .map(json -> jsonService.parse(json).read("metadata.qualities", DailymotionQualities.class))
+                .map(DailymotionQualities::getMaxQualityUrl)
                 .orElse(null);
 
         return url;
-    }
-
-    private static String getMaxQuality(JSONObject jsonObject) {
-
-        if (jsonObject.containsKey("720"))
-            return getUrl(((JSONArray) jsonObject.get("720")));
-
-        if (jsonObject.containsKey("480"))
-            return getUrl(((JSONArray) jsonObject.get("480")));
-
-        if (jsonObject.containsKey("380"))
-            return getUrl(((JSONArray) jsonObject.get("380")));
-
-        if (jsonObject.containsKey("240"))
-            return getUrl(((JSONArray) jsonObject.get("240")));
-
-        return getUrl(((JSONArray) jsonObject.get("auto")));
-    }
-
-    private static String getUrl(JSONArray videoItem) {
-        return ((String) ((JSONObject) videoItem.get(0)).get("url"));
     }
 
     private static Optional<String> getPlayerConfig(String page) {
@@ -67,6 +48,37 @@ public class DailymotionDownloader extends HTTPDownloader {
         int begin = page.indexOf("buildPlayer({");
         int end = page.indexOf("});", begin);
         return Optional.of(page.substring(begin+"buildPlayer({".length()-1, end+1));
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class DailymotionQualities {
+        @JsonProperty("auto") @Setter List<QualityItem> auto;
+        @JsonProperty("240") @Setter List<QualityItem> p240;
+        @JsonProperty("380") @Setter List<QualityItem> p380;
+        @JsonProperty("480") @Setter List<QualityItem> p480;
+        @JsonProperty("720") @Setter List<QualityItem> p720;
+
+        String getMaxQualityUrl() {
+            if (nonNull(p720) && !p720.isEmpty())
+                return p720.get(0).getUrl();
+
+            if (nonNull(p480) && !p480.isEmpty())
+                return p480.get(0).getUrl();
+
+            if (nonNull(p380) && !p380.isEmpty())
+                return p380.get(0).getUrl();
+
+            if (nonNull(p240) && !p240.isEmpty())
+                return p240.get(0).getUrl();
+
+            return auto.get(0).getUrl();
+        }
+
+
+        private static class QualityItem {
+            @Setter @Getter private String url;
+            @Setter @Getter private String type;
+        }
     }
 
     @Override

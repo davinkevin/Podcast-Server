@@ -1,5 +1,8 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -7,10 +10,10 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -22,7 +25,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,12 +38,12 @@ import static java.util.stream.Collectors.toSet;
 @Component("PluzzUpdater")
 public class PluzzUpdater extends AbstractUpdater {
 
-    public static final String JSOUP_ITEM_SELECTOR = "#player-memeProgramme";
-    public static final String PLUZZ_INFORMATION_URL = "http://webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s&catalogue=Pluzz";
-    public static final String PLUZZ_COVER_BASE_URL = "http://refonte.webservices.francetelevisions.fr%s";
+    private static final String JSOUP_ITEM_SELECTOR = "#player-memeProgramme";
+    private static final String PLUZZ_INFORMATION_URL = "http://webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s&catalogue=Pluzz";
+
     //PATTERN :
-    public static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
-    public static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
+    private static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
+    private static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
 
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
@@ -66,15 +68,6 @@ public class PluzzUpdater extends AbstractUpdater {
                 .map(element -> getPluzzItemByUrl(element.attr("href")))
                 .collect(toSet());
     }
-
-    private ZonedDateTime fromPluzz(JSONObject responseObject){
-        if (isNull(responseObject) || isNull(responseObject.get("diffusion")) || isNull(((JSONObject) responseObject.get("diffusion")).get("timestamp"))) {
-            return null;
-        }
-
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond((Long) ((JSONObject) responseObject.get("diffusion")).get("timestamp")), ZoneId.of("Europe/Paris"));
-    }
-
 
     private Item getCurrentPlayedItem(Document page) {
         String urlContainingId = page.select("meta[name=og:image]").attr("content");
@@ -109,39 +102,31 @@ public class PluzzUpdater extends AbstractUpdater {
     private Item getPluzzItemById(String pluzzId) {
         return urlService
                 .newURL(getPluzzJsonInformation(pluzzId))
-                .flatMap(jsonService::from)
+                .flatMap(jsonService::parse)
+                .map(d -> d.read("$", PluzzItem.class))
                 .map(this::jsonToItem)
                 .orElse(Item.DEFAULT_ITEM);
     }
 
-    private Item jsonToItem(JSONObject responseObject) {
-
-        String season = String.valueOf(responseObject.get("saison"));
-        String episode = String.valueOf(responseObject.get("episode"));
-        String seasonEpisode = !"null".equals(season) && !"null".equals(episode) ? " - S".concat(season).concat("E").concat(episode).concat(" - ") : " - ";
-
+    private Item jsonToItem(PluzzItem pluzzItem) {
         return Item.builder()
-                    .title( StringUtils.join(responseObject.get("titre").toString(), seasonEpisode,responseObject.get("sous_titre").toString()) )
-                    .description( String.valueOf(responseObject.get("synopsis")))
-                    .pubDate( fromPluzz(responseObject) )
-                    .cover( imageService.getCoverFromURL(String.format(PLUZZ_COVER_BASE_URL, (String) responseObject.get("image"))))
-                    .url( getPluzzM38uUrl((JSONArray) responseObject.get("videos")))
+                    .title( pluzzItem.title() )
+                    .description( pluzzItem.getSynopsis() )
+                    .pubDate( pluzzItem.pubDate() )
+                    .cover( imageService.getCoverFromURL( pluzzItem.coverUrl() ))
+                    .url( getPluzzM38uUrl( pluzzItem.getVideos() ))
                 .build();
     }
 
     @SuppressWarnings("unchecked")
-    private String getPluzzM38uUrl(JSONArray videosArray) {
-        return ((List<JSONObject>) videosArray)
+    private String getPluzzM38uUrl(List<PluzzItem.Video> videos) {
+        return videos
                 .stream()
-                .filter(hasFormatWithM3U())
-                .map(o -> ((String) o.get("url")))
+                .filter(PluzzItem.Video::isM3U)
+                .map(PluzzItem.Video::getUrl)
                 .findFirst()
                 .map(urlService::getM3U8UrlFormMultiStreamFile)
                 .orElse("");
-    }
-
-    private Predicate<JSONObject> hasFormatWithM3U() {
-        return video -> video.get("format") != null && ((String) video.get("format")).contains("m3u8");
     }
 
     private String getPluzzJsonInformation(String pluzzId) {
@@ -166,5 +151,62 @@ public class PluzzUpdater extends AbstractUpdater {
         return StringUtils.contains(url, "pluzz.francetv.fr")
                 ? 1
                 : Integer.MAX_VALUE;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class PluzzItem {
+
+        private static final String TITLE_WITH_SEASON = "%s - S%sE%s - %s";
+        private static final String TITLE = "%s - %s";
+        private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
+        private static final String PLUZZ_COVER_BASE_URL = "http://refonte.webservices.francetelevisions.fr%s";
+
+        @Setter private String titre;
+        @JsonProperty("sous_titre") @Setter private String sousTitre;
+        @Setter @Getter private String synopsis;
+
+        @Setter private String saison;
+        @Setter private String episode;
+        @Setter private Diffusion diffusion = new Diffusion();
+        @Setter private String image;
+        @Setter @Getter private List<Video> videos = Lists.newArrayList();
+
+        String title() {
+            if (isNull(saison) || isNull(episode)) {
+                return String.format(TITLE, titre, sousTitre);
+            }
+            return String.format(TITLE_WITH_SEASON, titre, saison, episode, sousTitre);
+        }
+
+        ZonedDateTime pubDate() {
+            if (isNull(diffusion.getTimestamp())) {
+                return null;
+            }
+
+            return ZonedDateTime.ofInstant(Instant.ofEpochSecond(diffusion.getTimestamp()), ZONE_ID);
+        }
+
+        String coverUrl() {
+            return String.format(PLUZZ_COVER_BASE_URL, image);
+        }
+
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        private static class Diffusion {
+            @Setter @Getter private Long timestamp;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        private static class Video {
+            @Setter  private String format;
+            @Setter @Getter private String url;
+
+            Boolean isM3U() {
+                if (isNull(format))
+                    return Boolean.FALSE;
+
+                return format.toLowerCase().contains("m3u8");
+            }
+        }
     }
 }

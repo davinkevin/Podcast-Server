@@ -1,14 +1,16 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,17 +39,18 @@ public class DailymotionFinder implements Finder {
         return usernameOf(url)
                 .map(username -> String.format(API_URL, username))
                 .flatMap(urlService::newURL)
-                .flatMap(jsonService::from)
-                .map(o -> jsonToPodcast(url, o))
+                .flatMap(jsonService::parse)
+                .map(json -> json.read("$", DailymotionUserDetail.class))
+                .map(d -> jsonToPodcast(url, d))
                 .orElse(Podcast.builder().url(url).type("Dailymotion").cover(new Cover()).build());
     }
 
-    private Podcast jsonToPodcast(String url, JSONObject o) {
+    private Podcast jsonToPodcast(String url, DailymotionUserDetail detail) {
         return Podcast.builder()
-                .cover(imageService.getCoverFromURL((String) o.get("avatar_720_url")))
+                .cover(imageService.getCoverFromURL(detail.getAvatar()))
                 .url(url)
-                .title(((String) o.get("username")))
-                .description(((String) o.get("description")))
+                .title(detail.getUsername())
+                .description(detail.getDescription())
                 .type("Dailymotion")
                 .build();
     }
@@ -59,6 +62,12 @@ public class DailymotionFinder implements Finder {
             return Optional.of(matcher.group(1));
 
         return Optional.empty();
+    }
+
+    private static class DailymotionUserDetail {
+        @JsonProperty("avatar_720_url") @Setter @Getter private String avatar;
+        @Setter @Getter private String username;
+        @Setter @Getter private String description;
     }
 
     public Integer compatibility(@NotEmpty String url) {
