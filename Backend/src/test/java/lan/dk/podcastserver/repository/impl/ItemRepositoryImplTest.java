@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -140,6 +141,24 @@ public class ItemRepositoryImplTest {
 
         /* Then */
         assertThat(list).hasSize(0);
+    }
+
+    @Test
+    public void should_extract_id() {
+        Object[] objects = {1};
+        String[] aliases = {"id"};
+        assertThat(new ItemRepositoryImpl.HibernateIdExtractor().transformTuple(objects, aliases))
+                .isEqualTo(1);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void should_not_revert_extraction() {
+        List<String> collection = Arrays.asList("Elem1", "Elem2");
+        assertThat(new ItemRepositoryImpl.HibernateIdExtractor().transformList(collection))
+                .isNotEmpty()
+                .hasSize(collection.size())
+                .containsAll(collection);
     }
 
 }
