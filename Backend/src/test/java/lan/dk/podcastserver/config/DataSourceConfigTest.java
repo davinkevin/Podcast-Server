@@ -1,19 +1,21 @@
 package lan.dk.podcastserver.config;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.h2.tools.Server;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,18 +27,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = {DataSourceConfigTest.DataSourceConfigTestMocks.class, DataSourceConfig.class, HibernateJpaAutoConfiguration.class})
 public class DataSourceConfigTest {
 
-    public static final String USER = "sa";
-    public static final String PASSWORD = "";
-    public static final String DATA_SOURCE_URL = "jdbc:h2:tcp://localhost:9999/~/Library/H2Database/testdb";
-    public static final String DATA_SOURCE_CLASS_NAME = "org.h2.Driver";
+    private static final String USER = "sa";
+    private static final String PASSWORD = "";
+    private static final String DATA_SOURCE_URL = "jdbc:h2:mem:memoryDatabase";
+    private static final String DATA_SOURCE_CLASS_NAME = "org.h2.Driver";
 
-    @Resource DataSource dataSource;
-    @Resource Server h2Server;
+    @Autowired DataSource dataSource;
+    @Autowired DateTimeProvider dateTimeProvider;
 
     @Test
     public void should_be_configuration() {
-        assertThat(DataSourceConfig.class)
-                .hasAnnotation(Configuration.class);
+        assertThat(DataSourceConfig.class).hasAnnotation(Configuration.class);
     }
 
     @Test
@@ -50,10 +51,20 @@ public class DataSourceConfigTest {
         assertThat(hikariDataSource.getDriverClassName()).isEqualTo(DATA_SOURCE_CLASS_NAME);
     }
 
+    @Test
+    public void should_have_a_now_date_time_provider() {
+        /* Given */
+        /* When */
+        Calendar now = dateTimeProvider.getNow();
+        /* Then */
+        assertThat(now.toInstant()).isLessThanOrEqualTo(Instant.now());
+    }
+
+
     static class DataSourceConfigTestMocks {
 
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer properties() {
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer properties() {
             final PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
             final Properties properties = new Properties();
 
@@ -64,5 +75,5 @@ public class DataSourceConfigTest {
             pspc.setProperties(properties);
             return pspc;
         }
-}
+    }
 }

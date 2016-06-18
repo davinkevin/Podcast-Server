@@ -7,6 +7,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
@@ -30,6 +32,7 @@ import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
 import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
 import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.formatter;
+import static lan.dk.podcastserver.repository.dsl.ItemDSL.hasStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -135,6 +138,21 @@ public class ItemRepositoryTest {
                 .hasSize(3)
                 .extracting("title")
                 .containsOnly("Geek INC 124", "Geek INC 123", "Appload 1");
+    }
+
+    @Test
+    public void should_find_by_type_and_expression() {
+        /* Given */
+        dbSetupTracker.skipNextLaunch();
+
+        /* When */
+        Set<Item> byTypeAndExpression = itemRepository.findByTypeAndExpression(new AbstractUpdater.Type("YOUTUBE", "YOUTUBE"), hasStatus(Status.FINISH));
+
+        /* Then */
+        assertThat(byTypeAndExpression)
+                .hasSize(1)
+                .extracting(Item::getTitle)
+                .contains("Geek INC 124");
     }
 
     @Test

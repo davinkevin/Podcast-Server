@@ -1,18 +1,18 @@
 package lan.dk.podcastserver.config;
 
 import com.zaxxer.hikari.HikariDataSource;
-import lan.dk.podcastserver.utils.jpa.audit.AuditingDateTimeProvider;
-import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.GregorianCalendar;
+
+import static java.time.ZonedDateTime.now;
 
 /**
  * Created by kevin on 11/04/15
@@ -22,42 +22,25 @@ import java.sql.SQLException;
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 public class DataSourceConfig {
 
-    @Value("${spring.datasource.username:}")
-    private String user;
-
-    @Value("${spring.datasource.password:}")
-    private String password;
-
-    @Value("${spring.datasource.url}")
-    private String dataSourceUrl;
-
-    @Value("${spring.datasource.driver-class-name}")
-    private String dataSourceClassName;
-
-    // H2 Database :
-    public static final String[] PARAMETER_H2_SERVER = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", "9999"};
-
     @Bean
-    public DataSource dataSource() throws SQLException {
+    public DataSource dataSource(
+            @Value("${spring.datasource.username:sa}") String user,
+            @Value("${spring.datasource.password:}") String password,
+            @Value("${spring.datasource.url}") String url,
+            @Value("${spring.datasource.driver-class-name}") String driveClassName) throws SQLException {
+
         HikariDataSource dataSource = new HikariDataSource();
 
-        dataSource.setDriverClassName(dataSourceClassName);
-        dataSource.setJdbcUrl(dataSourceUrl);
+        dataSource.setDriverClassName(driveClassName);
+        dataSource.setJdbcUrl(url);
         dataSource.setUsername(user);
         dataSource.setPassword(password);
-
-        if (dataSourceUrl.contains(":h2:tcp://"))
-            h2Server();
 
         return dataSource;
     }
 
-    @Lazy
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public Server h2Server() throws SQLException { return Server.createTcpServer(PARAMETER_H2_SERVER); }
-
     @Bean
     DateTimeProvider dateTimeProvider() {
-        return new AuditingDateTimeProvider();
+        return () -> GregorianCalendar.from(now());
     }
 }
