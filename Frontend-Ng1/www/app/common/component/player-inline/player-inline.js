@@ -109,7 +109,6 @@ export default class PlayerInlineComponent {
         let indexOfVideo = this.getIndexOfVideoInPlaylist(this.currentVideo);
 
         if (indexOfVideo+1 === this.playlist.length) {
-            this.setMedia(0);
             return;
         }
 
