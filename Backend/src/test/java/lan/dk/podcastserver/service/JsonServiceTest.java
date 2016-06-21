@@ -1,13 +1,11 @@
 package lan.dk.podcastserver.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
 import lan.dk.podcastserver.manager.worker.updater.DailymotionUpdaterTest;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,16 +17,22 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by kevin on 22/02/2016 for Podcast Server
  */
-@RunWith(MockitoJUnitRunner.class)
 public class JsonServiceTest {
 
-    @Mock UrlService urlService;
-    @InjectMocks JsonService jsonService;
+    private UrlService urlService;
+    private JsonService jsonService;
+
+    @Before
+    public void beforeEach() {
+        urlService = mock(UrlService.class);
+        jsonService = new JsonService(urlService, new ObjectMapper());
+    }
 
     @Test
     public void should_read_json_from_files() throws URISyntaxException, IOException {

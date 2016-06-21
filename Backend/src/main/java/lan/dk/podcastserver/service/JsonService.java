@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,16 @@ import static java.util.stream.Collectors.joining;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class JsonService {
 
     private final UrlService urlService;
-    private final ParseContext parserContext = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
+    private final ParseContext parserContext;
+
+    @Autowired
+    public JsonService(UrlService urlService, ObjectMapper mapper) {
+        this.urlService = urlService;
+        this.parserContext = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider(mapper)).build());
+    }
 
     public DocumentContext parse(String json) {
         return parserContext.parse(json);
