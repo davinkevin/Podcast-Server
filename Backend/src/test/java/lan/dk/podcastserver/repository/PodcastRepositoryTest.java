@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {DatabaseConfiguraitonTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@SpringApplicationConfiguration(classes = {DatabaseConfigurationTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
 public class PodcastRepositoryTest {
 
     @Autowired DataSource dataSource;
@@ -46,7 +46,7 @@ public class PodcastRepositoryTest {
 
     @Before
     public void prepare() throws Exception {
-        Operation operation = sequenceOf(DatabaseConfiguraitonTest.DELETE_ALL, INSERT_REFERENCE_DATA);
+        Operation operation = sequenceOf(DatabaseConfigurationTest.DELETE_ALL, INSERT_REFERENCE_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);
 
         dbSetupTracker.launchIfNecessary(dbSetup);

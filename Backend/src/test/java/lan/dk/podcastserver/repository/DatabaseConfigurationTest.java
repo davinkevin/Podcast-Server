@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.repository;
 
 import com.ninja_squad.dbsetup.operation.Operation;
-import lan.dk.podcastserver.utils.jpa.audit.AuditingDateTimeProvider;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.orm.jpa.EntityScan;
@@ -17,9 +16,11 @@ import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.GregorianCalendar;
 
 import static com.ninja_squad.dbsetup.Operations.deleteAllFrom;
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
+import static java.time.ZonedDateTime.now;
 import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 
 /**
@@ -29,7 +30,7 @@ import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 @EnableJpaRepositories(basePackages = "lan.dk.podcastserver.repository")
 @EntityScan(basePackages = "lan.dk.podcastserver.entity")
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
-public class DatabaseConfiguraitonTest {
+public class DatabaseConfigurationTest {
 
     @Bean
     public DataSource dataSource() {
@@ -46,12 +47,12 @@ public class DatabaseConfiguraitonTest {
 
     @Bean
     DateTimeProvider dateTimeProvider() {
-        return new AuditingDateTimeProvider();
+        return () -> GregorianCalendar.from(now());
     }
 
+    private static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
+    private static final Operation DELETE_ALL_ITEMS = deleteAllFrom("ITEM");
+    private static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAGS"), deleteAllFrom("TAG"));
     public static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter();
-    public static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
-    public static final Operation DELETE_ALL_ITEMS = deleteAllFrom("ITEM");
-    public static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAGS"), deleteAllFrom("TAG"));
     public static final Operation DELETE_ALL = sequenceOf(WatchListRepositoryTest.DELETE_ALL_PLAYLIST, DELETE_ALL_ITEMS, DELETE_ALL_TAGS, DELETE_ALL_PODCASTS, DELETE_ALL_TAGS);
 }

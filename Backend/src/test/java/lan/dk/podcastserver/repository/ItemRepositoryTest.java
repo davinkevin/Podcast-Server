@@ -30,8 +30,8 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
-import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
-import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.formatter;
+import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
+import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.hasStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {DatabaseConfiguraitonTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@SpringApplicationConfiguration(classes = {DatabaseConfigurationTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
 public class ItemRepositoryTest {
 
     @Autowired DataSource dataSource;

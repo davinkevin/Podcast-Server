@@ -8,7 +8,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
-import lan.dk.podcastserver.repository.DatabaseConfiguraitonTest;
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest;
 import lan.dk.podcastserver.repository.ItemRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +31,8 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
-import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.DELETE_ALL;
-import static lan.dk.podcastserver.repository.DatabaseConfiguraitonTest.formatter;
+import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
+import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {DatabaseConfiguraitonTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@SpringApplicationConfiguration(classes = {DatabaseConfigurationTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
 public class ItemDslTest {
 
     @Autowired DataSource dataSource;
