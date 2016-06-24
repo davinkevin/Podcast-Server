@@ -38,13 +38,17 @@ public class ImageService {
     }
 
     public Cover getCoverFromURL (URL url) throws IOException {
-        Cover cover = new Cover(url.toString());
+        Cover cover;
 
-        try (InputStream urlInputStream = urlService.getConnectionWithTimeOut(cover.getUrl(), 5000).getInputStream() ){
+        try (InputStream urlInputStream = urlService.getConnectionWithTimeOut(url.toString(), 5000).getInputStream() ){
             ImageInputStream imageInputStream = ImageIO.createImageInputStream(urlInputStream);
             final BufferedImage image = ImageIO.read(imageInputStream);
-            cover.setWidth(image.getWidth());
-            cover.setHeight(image.getHeight());
+            cover = Cover
+                    .builder()
+                        .url(url.toString())
+                        .width(image.getWidth())
+                        .height(image.getHeight())
+                    .build();
         }
 
         return cover;
