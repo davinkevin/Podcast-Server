@@ -19,13 +19,13 @@ export default class DownloadManager {
         this.$http = $http;
         this.ngstomp = ngstomp;
 
-        this.ngstomp.subscribeTo('/topic/download').withBodyInJson()
+        this.ngstomp.subscribeTo('/topic/download').withBodyInJson().withDigest(false)
                 .callback(m => this.download$.onNext(m.body))
             .and()
-                .subscribeTo('/topic/waiting').withBodyInJson()
+                .subscribeTo('/topic/waiting').withBodyInJson().withDigest(false)
                 .callback(m => this.waiting$.onNext(m.body))
             .and()
-                .subscribeTo('/topic/updating').withBodyInJson()
+                .subscribeTo('/topic/updating').withBodyInJson().withDigest(false)
                 .callback(m => this.updating$.onNext(m.body))
             .connect();
     }
