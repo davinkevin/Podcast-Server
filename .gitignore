@@ -1,20 +1,27 @@
+# Global :
 .idea
 *.iml
-
-fonts
-jspm_packages
-node_modules
-node
-Frontend-Ng1/**/*.css
-typings
-
-lib/
-application.yml
-target
-build
-logs
-lan.dk.podcastserver.*
-etc
-
 *.DS_Store
+
+# Front End in NG1 :
+Frontend-Ng1/www/fonts/*
+Frontend-Ng1/www/jspm_packages
+Frontend-Ng1/node_modules
+Frontend-Ng1/node
+Frontend-Ng1/**/*.css
+
+
+# Front End in NG1 :
+Frontend-Ng2/typings
+
+# Back End
+Backend/lib/
+Backend/**/application.yml
+Backend/target
+Backend/build
+Backend/logs
+Backend/lan.dk.podcastserver.*
+Backend/etc
+
 .gradle/
+target

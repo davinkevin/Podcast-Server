@@ -27,7 +27,7 @@ export default class StatService {
     }
 
     dateMapper() {
-        return value => ({ date : Date.UTC(value.date[0], value.date[1]-1, value.date[2]), numberOfItems : value.numberOfItems });
+        return value => ({ date : new Date(value.date).getTime(), numberOfItems : value.numberOfItems });
     }
 
     highChartsMapper() {
