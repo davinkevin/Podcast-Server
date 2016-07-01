@@ -107,13 +107,12 @@ public class BeInSportsUpdater extends AbstractUpdater {
         }
         return Optional.empty();
     }
+
     private Optional<String> getStreamUrl(Document document) {
         String dailymotionEmbedded = getDailymotionIframeUrl(document);
         Matcher matcher = EXTRACTOR_ID_OF_DAILYMOTION_EMBEDED_URL.matcher(dailymotionEmbedded);
-        if (matcher.find()) {
-            return Optional.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1)));
-        }
-        return Optional.empty();
+
+        return matcher.find() ? Optional.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1))) : Optional.empty();
     }
 
     private String getJavascriptPart(Elements tagScripts) {
