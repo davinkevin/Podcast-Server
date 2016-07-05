@@ -1,13 +1,14 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -102,7 +103,7 @@ public class BeInSportsUpdaterTest {
     public void should_get_all_items() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
-        when(imageService.getCoverFromURL(anyString())).then(i -> new Cover((String) i.getArguments()[0]));
+        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
         configureForAllPage("/remote/podcast/beinsports/lexpresso.html");
 
         /* When */
@@ -175,33 +176,6 @@ public class BeInSportsUpdaterTest {
         assertThat(beInSportsUpdater.type().name()).isEqualTo("Be In Sports");
         assertThat(beInSportsUpdater.type().key()).isEqualTo("BeInSports");
     }
-    
-    /*@Test
-    public void should_download_each_page() throws IOException, URISyntaxException {
-        *//*Given*//*
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
-        String baseUrl = "http://www.beinsports.com%s";
-        Path folder = Paths.get(BeInSportsUpdaterTest.class.getResource("/remote/podcast/beinsports/").toURI());
-
-        *//*When*//*
-        for (Element article : htmlService.get(podcast.getUrl()).select("article")) {
-            String articleUrl = article.select("a").first().attr("data-url");
-            String url = String.format(baseUrl, articleUrl);
-            String id = StringUtils.substringBeforeLast(url.replace("http://www.beinsports.com/france/_components/replay-main/", ""), "/");
-            Path file = folder.resolve(id + ".html");
-            Files.deleteIfExists(file);
-            try(InputStream is = new URL(url).openStream()) {
-                Files.copy(is, file);
-            }
-            String iFrameUrl = "http:" + Jsoup.parse(file.toFile(), "UTF-8", "http://www.beinsports.com").select("iframe").attr("src");
-            String daylimotionPageName = StringUtils.substringAfterLast(iFrameUrl, "/") + ".html";
-            Path fileDailyMotion = folder.resolve(daylimotionPageName);
-            Files.deleteIfExists(fileDailyMotion);
-            try(InputStream is = new URL(iFrameUrl).openStream()) {
-                Files.copy(is, fileDailyMotion);
-            }
-        }
-    }*/
 
     private Answer<Optional<Document>> readHtmlFromFile(String s) throws URISyntaxException {
         Path path = Paths.get(BeInSportsUpdaterTest.class.getResource(s).toURI());
@@ -228,14 +202,10 @@ public class BeInSportsUpdaterTest {
                 .stream()
                 .map(e -> e.select("a").first().attr("data-url"))
                 .map(e -> String.format(BE_IN_SPORTS_DOMAIN, e))
-                .forEach(url -> {
-                    try {
-                        String id = StringUtils.substringBeforeLast(url.replace("http://www.beinsports.com/france/_components/replay-main/", ""), "/");
-                        configureHtmlServiceWith(url, "/remote/podcast/beinsports/" + id + ".html");
-                    } catch (IOException | URISyntaxException e) {
-                        e.printStackTrace();
-                    }
-                });
+                .forEach(url -> Try.run(() -> {
+                    String id = StringUtils.substringBeforeLast(url.replace("http://www.beinsports.com/france/_components/replay-main/", ""), "/");
+                    configureHtmlServiceWith(url, "/remote/podcast/beinsports/" + id + ".html");
+                }));
     }
 
 }
