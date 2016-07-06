@@ -32,7 +32,6 @@ export default class PlayerController {
     currentWatchList = null;
 
     playlist = null;
-    watchLists = null;
 
     constructor(VideogularService, WatchListService, TitleService) {
         "ngInject";
