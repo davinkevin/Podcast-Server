@@ -35,7 +35,7 @@ public class BeInSportsFinderTest {
     @Test
     public void should_find_podcast() throws IOException, URISyntaxException {
         /* Given */
-        Cover cover = new Cover("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG", 200, 200);
+        Cover cover = Cover.builder().url("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG").width(200).height(200).build();
         when(imageService.getCoverFromURL(eq("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG"))).thenReturn(cover);
         when(htmlService.get(eq("http://www.beinsports.com/france/replay/lexpresso"))).thenReturn(readFile("/remote/podcast/beinsports/lexpresso.html"));
 
