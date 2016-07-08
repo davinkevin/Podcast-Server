@@ -35,7 +35,7 @@ public class CanalPlusFinderTest {
     @Test
     public void should_find_podcast() throws IOException, URISyntaxException {
         /* Given */
-        Cover cover = new Cover("http://media.canal-plus.com/image/81/7/642817.ogfb.jpg", 200, 200);
+        Cover cover = Cover.builder().url("http://media.canal-plus.com/image/81/7/642817.ogfb.jpg").width(200).height(200).build();
         when(imageService.getCoverFromURL(eq("http://media.canal-plus.com/image/81/7/642817.ogfb.jpg"))).thenReturn(cover);
         when(htmlService.get(eq("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html"))).thenReturn(readFile("/remote/podcast/canalplus/lepetitjournal.html"));
 
