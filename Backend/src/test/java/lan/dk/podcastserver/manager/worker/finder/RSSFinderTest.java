@@ -37,7 +37,7 @@ public class RSSFinderTest {
     @Mock ImageService imageService;
     @InjectMocks RSSFinder rssFinder;
 
-    public static final String COVER_URL = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg";
+    private static final String COVER_URL = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg";
 
     @Before
     public void beforeEach() throws JDOMException, IOException {
@@ -47,7 +47,7 @@ public class RSSFinderTest {
         when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(((String) i.getArguments()[0]))));
         when(jdomService.parse(eq(emptyUrl))).thenReturn(Optional.empty());
         when(jdomService.parse(not(eq(emptyUrl)))).then(i -> Optional.of(urlToFile(i.getArguments()[0].toString())));
-        when(imageService.getCoverFromURL(eq(COVER_URL))).thenReturn(new Cover(COVER_URL));
+        when(imageService.getCoverFromURL(eq(COVER_URL))).thenReturn(Cover.builder().url(COVER_URL).build());
     }
 
     private Document urlToFile(String url) throws JDOMException, IOException, URISyntaxException {
