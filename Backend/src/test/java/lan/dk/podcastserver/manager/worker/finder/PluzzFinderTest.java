@@ -34,7 +34,7 @@ public class PluzzFinderTest {
     @Test
     public void should_find_podcast() throws IOException, URISyntaxException {
         /* Given */
-        Cover cover = new Cover("http://refonte.webservices.francetelevisions.fr/image/referentiel_emissions/129003962/1444405142/480/0/0/0/img.jpg", 200, 200);
+        Cover cover = Cover.builder().url("http://refonte.webservices.francetelevisions.fr/image/referentiel_emissions/129003962/1444405142/480/0/0/0/img.jpg").width(200).height(200).build();
         when(imageService.getCoverFromURL(eq("http://refonte.webservices.francetelevisions.fr/image/referentiel_emissions/129003962/1444405142/480/0/0/0/img.jpg")))
                 .thenReturn(cover);
         when(htmlService.get(eq("http://pluzz.francetv.fr/videos/comment_ca_va_bien.html")))
