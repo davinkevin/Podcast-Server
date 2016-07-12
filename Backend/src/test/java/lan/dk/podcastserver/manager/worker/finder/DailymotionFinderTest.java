@@ -6,7 +6,6 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.UrlService;
@@ -25,6 +24,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -52,7 +52,7 @@ public class DailymotionFinderTest {
     public void should_find_podcast() throws MalformedURLException {
         /* Given */
         String url = "http://www.dailymotion.com/karimdebbache";
-        Cover cover = new Cover("http://s2.dmcdn.net/PB4mc/720x720-AdY.jpg", 200, 200);
+        Cover cover = Cover.builder().url("http://s2.dmcdn.net/PB4mc/720x720-AdY.jpg").width(200).height(200).build();
         when(imageService.getCoverFromURL(eq("http://s2.dmcdn.net/PB4mc/720x720-AdY.jpg"))).thenReturn(cover);
         when(jsonService.parse(eq(new URL("https://api.dailymotion.com/user/karimdebbache?fields=avatar_720_url,description,username")))).then(readerFrom("karimdebbache"));
 
@@ -60,8 +60,7 @@ public class DailymotionFinderTest {
         Podcast podcast = dailymotionFinder.find(url);
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast)
+        assertThat(podcast)
                 .hasDescription("CHROMA est une CHROnique de cinéMA sur Dailymotion, dont la première saison se compose de dix épisodes, à raison d’un par mois, d’une durée comprise entre quinze et vingt minutes. Chaque épisode est consacré à un film en particulier.")
                 .hasCover(cover)
                 .hasTitle("karimdebbache")
@@ -75,8 +74,7 @@ public class DailymotionFinderTest {
         /* When */
         Podcast podcast = dailymotionFinder.find(url);
         /* Then */
-        PodcastAssert
-                .assertThat(podcast)
+        assertThat(podcast)
                 .hasUrl(url)
                 .hasType("Dailymotion")
                 .hasCover(new Cover());
