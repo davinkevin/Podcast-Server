@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static java.time.ZonedDateTime.now;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static lan.dk.podcastserver.manager.worker.downloader.YoutubeDownloader.YoutubeWatcher;
 import static org.mockito.Mockito.*;
@@ -103,7 +104,7 @@ public class YoutubeWatcherTest {
     public void should_retry_and_stop_download() {
         /* Given */
         YoutubeWatcher watcher = new YoutubeWatcher(YOUTUBE_DOWNLOADER);
-        watcher.MAX_WAITING_MINUTE = 0;
+        watcher.MAX_WAITING_MINUTE = -1;
         when(info.getState()).thenReturn(VideoInfo.States.RETRYING);
         when(info.getDelay()).thenReturn(0);
         when(info.getException()).thenReturn(new DownloadIOCodeError(123));
