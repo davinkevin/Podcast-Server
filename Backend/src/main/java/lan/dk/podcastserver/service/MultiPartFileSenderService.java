@@ -1,7 +1,11 @@
 package lan.dk.podcastserver.service;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -235,7 +239,7 @@ public class MultiPartFileSenderService {
             response.setDateHeader(EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
 
-            if (!StringUtils.isEmpty(disposition)) {
+            if (!Strings.isNullOrEmpty(disposition)) {
                 if (contentType == null) {
                     contentType = APPLICATION_OCTET_STREAM;
                 } else if (!contentType.startsWith(IMAGE)) {
@@ -250,8 +254,10 @@ public class MultiPartFileSenderService {
             // Send requested file (part(s)) to client ------------------------------------------------
 
             // Prepare streams.
-            try (InputStream input = new BufferedInputStream(Files.newInputStream(filepath));
-                 OutputStream output = response.getOutputStream()) {
+            try (
+                    InputStream input = new BufferedInputStream(Files.newInputStream(filepath));
+                    OutputStream output = response.getOutputStream()
+            ) {
 
                 if (ranges.isEmpty() || ranges.get(0) == full) {
 
@@ -285,7 +291,7 @@ public class MultiPartFileSenderService {
                     ServletOutputStream sos = (ServletOutputStream) output;
 
                     // Copy multi part range.
-                    for (Range r : ranges) {
+                    for (Range r : Range.relativize(ranges)) {
                         log.info("Return multi part of file : from ({}) to ({})", r.start, r.end);
                         // Add multipart boundary and header fields for every range.
                         sos.println();
@@ -318,16 +324,30 @@ public class MultiPartFileSenderService {
          * @param end End of the byte range.
          * @param total Total length of the byte source.
          */
-        public Range(long start, long end, long total) {
+        Range(long start, long end, long total) {
             this.start = start;
             this.end = end;
             this.length = end - start + 1;
             this.total = total;
         }
 
-        static long sublong(String value, int beginIndex, int endIndex) {
+        private static long sublong(String value, int beginIndex, int endIndex) {
             String substring = value.substring(beginIndex, endIndex);
             return (substring.length() > 0) ? Long.parseLong(substring) : -1;
+        }
+        
+        private static List<Range> relativize(List<Range> ranges) {
+
+            ImmutableList.Builder<Range> builder = ImmutableList.builder();
+
+            Range prevRange = null;
+            for (Range r : ranges) {
+                Range newRange = isNull(prevRange) ? r : new Range(r.start - prevRange.end - 1,  r.end - prevRange.end - 1, r.total);
+                builder.add(newRange);
+                prevRange = r;
+            }
+
+            return builder.build();
         }
 
         private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length) throws IOException {
