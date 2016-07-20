@@ -8,17 +8,18 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 15/06/15 for HackerRank problem
  */
 public class PodcastTest {
 
-    public static final ZonedDateTime NOW = ZonedDateTime.now();
-    public static final Cover COVER = new Cover("ACover");
-    public static final Podcast PODCAST = new Podcast();
-    public static String PODCAST_TOSTRING;
-    UUID id;
+    private static final ZonedDateTime NOW = ZonedDateTime.now();
+    private static final Cover COVER = Cover.builder().url("ACover").build();
+    private static final Podcast PODCAST = new Podcast();
+    private static String PODCAST_TO_STRING;
+    private UUID id;
 
 
     @Before
@@ -37,7 +38,7 @@ public class PodcastTest {
         PODCAST.setItems(Sets.newHashSet());
         PODCAST.setTags(Sets.newHashSet());
 
-        PODCAST_TOSTRING = "Podcast{id="+ id +", title='PodcastDeTest', url='http://nowhere.com', signature='ae4b93a7e8249d6be591649c936dbe7d', type='Youtube', lastUpdate=%s}";
+        PODCAST_TO_STRING = "Podcast{id="+ id +", title='PodcastDeTest', url='http://nowhere.com', signature='ae4b93a7e8249d6be591649c936dbe7d', type='Youtube', lastUpdate=%s}";
     }
 
     @Test
@@ -59,9 +60,7 @@ public class PodcastTest {
     
     @Test
     public void should_have_toString() {
-        org.assertj.core.api.Assertions.
-                assertThat(PODCAST.toString())
-                    .isEqualTo(String.format(PODCAST_TOSTRING, NOW));
+        assertThat(PODCAST.toString()).isEqualTo(String.format(PODCAST_TO_STRING, NOW));
     }
     
     @Test
@@ -80,10 +79,7 @@ public class PodcastTest {
         assertThat(PODCAST).isEqualTo(PODCAST);
         assertThat(PODCAST).isNotEqualTo(notPodcast);
         assertThat(PODCAST).isEqualTo(samePodcast);
-
-        org.assertj.core.api.Assertions.
-                assertThat(PODCAST.hashCode())
-                .isNotNull();
+        assertThat(PODCAST.hashCode()).isNotNull();
     }
     
     @Test
@@ -102,10 +98,8 @@ public class PodcastTest {
         Item itemToAdd2 = new Item().setId(UUID.randomUUID());
         PODCAST.add(itemToAdd);
 
-        org.assertj.core.api.Assertions.
-                assertThat(PODCAST.contains(itemToAdd)).isTrue();
-        org.assertj.core.api.Assertions.
-                assertThat(PODCAST.contains(itemToAdd2)).isFalse();
+        assertThat(PODCAST.contains(itemToAdd)).isTrue();
+        assertThat(PODCAST.contains(itemToAdd2)).isFalse();
     }
     
     @Test
@@ -113,8 +107,7 @@ public class PodcastTest {
         /* When */
         PODCAST.lastUpdateToNow();
         /* Then */
-        org.assertj.core.api.Assertions.
-                assertThat(PODCAST.getLastUpdate().isAfter(NOW));
+        assertThat(PODCAST.getLastUpdate().isAfter(NOW));
     }
 
 }
