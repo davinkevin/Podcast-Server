@@ -21,9 +21,9 @@ public class HtmlServiceTest {
     public WireMockRule wireMockRule = new WireMockRule(8089); // No-args constructor defaults to port 8080
 
     public static final String URL = "http://nowhere.anywhere";
-    public static final String USER_AGENT = "User-Agent";
-    public static final String REFERER = "Referer";
-    HtmlService htmlService;
+    private static final String USER_AGENT = "User-Agent";
+    private static final String REFERER = "Referer";
+    private HtmlService htmlService;
 
     @Before
     public void beforeEach() {
@@ -54,7 +54,7 @@ public class HtmlServiceTest {
 
         /* Then */
         assertThat(document).isPresent();
-        assertThat(document.get().head().select("title").text()).isEqualTo("JSOUP Example");
+        assertThat(document.map(d -> d.head().select("title").text())).hasValue("JSOUP Example");
     }
 
     @Test
@@ -65,6 +65,16 @@ public class HtmlServiceTest {
 
         /* Then */
         assertThat(document).isEmpty();
+    }
+
+    @Test
+    public void should_parse_string() {
+        /* Given */
+        String html = "<div></div>";
+        /* When */
+        Document document = htmlService.parse(html);
+        /* Then */
+        assertThat(document).isNotNull().isInstanceOf(Document.class);
     }
 
 }

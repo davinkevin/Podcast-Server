@@ -1,0 +1,148 @@
+package lan.dk.podcastserver.manager.worker.updater;
+
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.service.*;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
+
+/**
+ * Created by kevin on 21/07/2016.
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class TF1ReplayUpdaterTest {
+
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
+
+    @Mock SignatureService signatureService;
+    @Mock HtmlService htmlService;
+    @Mock ImageService imageService;
+    @Mock JsonService jsonService;
+    @Mock UrlService urlService;
+    @InjectMocks TF1ReplayUpdater updater;
+
+    @Before
+    public void beforeEach() {
+        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(i.getArgumentAt(0, String.class))));
+    }
+
+    @Test
+    public void should_sign_for_replay() throws IOException, URISyntaxException {
+        /* Given */
+        Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
+        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay")))).thenReturn(parseJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
+        when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> digest(i.getArgumentAt(0, String.class)));
+
+        /* When */
+        String signature = updater.signatureOf(podcast);
+
+        /* Then */
+        assertThat(signature).isEqualTo("7f83bdad4764c28504e39bee7ba7d737");
+    }
+
+    @Test
+    public void should_sign_for_standard_instead_of_replay() throws IOException, URISyntaxException {
+        /* Given */
+        Podcast podcast = Podcast.builder().url("http://www.tf1.fr/xtra/olive-et-tom/videos").build();
+        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=replay")))).thenReturn(parseJson("/remote/podcast/tf1replay/olive-et-tom.ajax.replay.json"));
+        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=all")))).thenReturn(parseJson("/remote/podcast/tf1replay/olive-et-tom.ajax.json"));
+        when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> digest(i.getArgumentAt(0, String.class)));
+
+        /* When */
+        String signature = updater.signatureOf(podcast);
+
+        /* Then */
+        assertThat(signature).isEqualTo("acf0b3a84ae2244194c67078c95a4efe");
+    }
+
+    @Test
+    public void should_not_get_name_from_url() {
+        /* Given */
+        Podcast podcast = Podcast.builder().url("http://www.tf1.fr/foo/bar").build();
+
+        /* When */
+        String signature = updater.signatureOf(podcast);
+
+        /* Then */
+        assertThat(signature).isEmpty();
+    }
+
+    @Test
+    public void should_get_items() throws IOException, URISyntaxException {
+        /* Given */
+        Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
+        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay")))).thenReturn(parseJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
+        when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
+
+        /* When */
+        Set<Item> items = updater.getItems(podcast);
+
+        /* Then */
+        assertThat(items).hasSize(8);
+    }
+
+    @Test
+    public void should_be_of_type() {
+        assertThat(updater.type().key()).isEqualTo("TF1Replay");
+        assertThat(updater.type().name()).isEqualTo("TF1 Replay");
+    }
+
+    @Test
+    public void should_be_compatible() {
+        /* Given */
+        String url = "www.tf1.fr/tf1/19h-live/videos";
+        /* When */
+        Integer compatibility = updater.compatibility(url);
+        /* Then */
+        assertThat(compatibility).isEqualTo(1);
+    }
+
+    @Test
+    public void should_not_be_compatible() {
+        /* Given */
+        String url = "www.tf1.com/foo/bar/videos";
+        /* When */
+        Integer compatibility = updater.compatibility(url);
+        /* Then */
+        assertThat(compatibility).isEqualTo(Integer.MAX_VALUE);
+    }
+
+    private Optional<DocumentContext> parseJson(String url) throws IOException, URISyntaxException {
+        return Optional.of(PARSER.parse(Paths.get(TF1ReplayUpdaterTest.class.getResource(url).toURI()).toFile()));
+    }
+
+    private Document parseHtml(String html) throws URISyntaxException, IOException {
+        return Jsoup.parse(html);
+    }
+
+    private String digest(String html) {
+        return DigestUtils.md5Hex(html);
+    }
+
+}

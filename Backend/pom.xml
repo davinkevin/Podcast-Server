@@ -115,6 +115,12 @@
       <artifactId>vget</artifactId>
       <version>1.1.32</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
+    <dependency>
+      <groupId>com.mashape.unirest</groupId>
+      <artifactId>unirest-java</artifactId>
+      <version>1.4.9</version>
+    </dependency>
     <!-- http://mvnrepository.com/artifact/com.jayway.jsonpath/json-path -->
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>

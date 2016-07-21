@@ -11,8 +11,9 @@ Frontend-Ng1/node
 Frontend-Ng1/**/*.css
 
 
-# Front End in NG1 :
+# Front End in NG2 :
 Frontend-Ng2/typings
+Frontend-Ng2/node_modules
 
 # Back End
 Backend/lib/

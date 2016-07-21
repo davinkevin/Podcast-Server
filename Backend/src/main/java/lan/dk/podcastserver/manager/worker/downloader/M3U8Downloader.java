@@ -4,6 +4,7 @@ import com.google.common.io.ByteStreams;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import static java.util.stream.Collectors.toList;
 public class M3U8Downloader extends AbstractDownloader {
 
     @Autowired UrlService urlService;
+    @Autowired M3U8Service m3U8Service;
 
     private List<String> urlList;
     private final M3U8Watcher watcher = new M3U8Watcher(this);
@@ -32,7 +34,7 @@ public class M3U8Downloader extends AbstractDownloader {
     public Item download() {
         logger.debug("Download");
 
-        try(BufferedReader in = urlService.urlAsReader(getItemUrl(item))) {
+        try(BufferedReader in = readM3U8()) {
             urlList = in
                     .lines()
                     .filter(l -> !l.startsWith("#"))
@@ -85,6 +87,10 @@ public class M3U8Downloader extends AbstractDownloader {
         return super.getTargetFile(m3u8Item);
     }
 
+    protected BufferedReader readM3U8() throws IOException {
+        return urlService.urlAsReader(getItemUrl(item));
+    }
+
     @Override
     public void restartDownload() {
         item.setStatus(Status.STARTED);
@@ -100,7 +106,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Slf4j
     @AllArgsConstructor
-    protected static class M3U8Watcher {
+    static class M3U8Watcher {
 
         private final M3U8Downloader downloader;
 

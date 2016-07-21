@@ -61,7 +61,11 @@ public class UrlService {
     }
 
     public String getRealURL(String url) {
-        return getRealURL(url, 0);
+        return getRealURL(url, 0, HtmlService.USER_AGENT);
+    }
+
+    public String getRealURL(String url, String userAgent) {
+        return getRealURL(url, 0, userAgent);
     }
 
     public URLConnection getConnectionWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
@@ -131,7 +135,7 @@ public class UrlService {
         return !urlToReturn.contains("://");
     }
 
-    private String getRealURL(String url, Integer numberOfRedirection) {
+    private String getRealURL(String url, Integer numberOfRedirection, String userAgent) {
         if (MAX_NUMBER_OF_REDIRECTION <= numberOfRedirection) {
             throw new RuntimeException("Too Many Redirections");
         }
@@ -139,10 +143,11 @@ public class UrlService {
         try {
             URL obj = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+            conn.setRequestProperty("User-Agent", userAgent);
             conn.setInstanceFollowRedirects(false);
             if (isARedirection(conn.getResponseCode())) {
                 conn.disconnect();
-                return getRealURL(conn.getHeaderField("Location"), numberOfRedirection+1);
+                return getRealURL(conn.getHeaderField("Location"), numberOfRedirection+1, userAgent);
             }
         } catch (IOException e) {
             log.error("Error during retrieval of the real URL for {} at {} redirection", url, numberOfRedirection);
@@ -172,11 +177,9 @@ public class UrlService {
             return origin;
         }
 
-        return new StringBuilder()
-                .append(request.getScheme())
-                .append("://")
-                .append(request.getServerName())
-                .append((request.getServerPort() == 80 || request.getServerPort() == 443) ? "" : ":" + request.getServerPort())
-                .toString();
+        return request.getScheme() +
+                "://" +
+                request.getServerName() +
+                ((request.getServerPort() == 80 || request.getServerPort() == 443) ? "" : ":" + request.getServerPort());
     }
 }

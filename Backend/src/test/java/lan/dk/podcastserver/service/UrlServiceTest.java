@@ -33,7 +33,7 @@ public class UrlServiceTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(PORT); // No-args constructor defaults to port 8080
 
-    UrlService urlService = new UrlService();
+    private UrlService urlService = new UrlService();
 
     @Test
     public void should_get_buffered_reader_of_url() throws Exception {
@@ -108,6 +108,22 @@ public class UrlServiceTest {
 
         /* When */  String lastUrl = urlService.getRealURL(HTTP_LOCALHOST + "/my/ressources1.m3u8");
         /* Then */  assertThat(lastUrl).isEqualTo(HTTP_LOCALHOST + "/my/ressources3.m3u8");
+    }
+
+    @Test
+    public void should_get_real_url_after_redirection_with_user_agent() {
+        /* Given */
+        doRedirection("/my/ressources1.m3u8", HTTP_LOCALHOST + "/my/ressources2.m3u8");
+        doRedirection("/my/ressources2.m3u8", HTTP_LOCALHOST + "/my/ressources3.m3u8");
+        stubFor(get(urlEqualTo("/my/ressources3.m3u8"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/x-mpegURL")));
+
+        /* When */
+        String lastUrl = urlService.getRealURL(HTTP_LOCALHOST + "/my/ressources1.m3u8", "Java-Podcast-Server");
+        /* Then */
+        assertThat(lastUrl).isEqualTo(HTTP_LOCALHOST + "/my/ressources3.m3u8");
     }
 
     @Test(expected = RuntimeException.class)
@@ -187,7 +203,7 @@ public class UrlServiceTest {
 
         /* Then */
         assertThat(page).isPresent();
-        assertThat(page.get()).isEqualTo("12345678");
+        assertThat(page).hasValue("12345678");
     }
 
     @Test
