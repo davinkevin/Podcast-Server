@@ -20,13 +20,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -51,7 +53,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     @Resource JsonService jsonService;
     @Resource HtmlService htmlService;
     @Resource UrlService urlService;
-    @Autowired Api api;
+    @Resource Api api;
 
     public Set<Item> getItems(Podcast podcast) {
         return Strings.isNullOrEmpty(api.getYoutube())
@@ -128,7 +130,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         return element
             .map(d -> d.getChildren("entry", d.getNamespace()))
-            .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).get()))
+            .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).orElse(Namespace.NO_NAMESPACE)))
             .orElse(Sets.newHashSet());
     }
 
@@ -146,7 +148,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         return element
                 .map(d -> d.getChildren("entry", d.getNamespace()))
-                .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).get())).collect(joining()))
+                .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).orElse(Namespace.NO_NAMESPACE))).collect(joining()))
                 .map(signatureService::generateMD5Signature)
                 .orElse("");
     }
@@ -156,18 +158,18 @@ public class YoutubeUpdater extends AbstractUpdater {
         return new Item()
                 .setTitle(entry.getChildText("title", defaultNamespace))
                 .setDescription(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
-                .setPubDate(pubdateOf(entry.getChildText("published", defaultNamespace)))
+                .setPubDate(pubDateOf(entry.getChildText("published", defaultNamespace)))
                 .setUrl(urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")))
                 .setCover(coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)));
     }
 
-    private ZonedDateTime pubdateOf(String pubDate) {
+    private ZonedDateTime pubDateOf(String pubDate) {
         return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
     }
 
     private Cover coverOf(Element thumbnail) {
         return nonNull(thumbnail)
-                ? new Cover(thumbnail.getAttributeValue("url"), Integer.valueOf(thumbnail.getAttributeValue("width")), Integer.valueOf(thumbnail.getAttributeValue("height")))
+                ? Cover.builder().url(thumbnail.getAttributeValue("url")).width(Integer.valueOf(thumbnail.getAttributeValue("width"))).height(Integer.valueOf(thumbnail.getAttributeValue("height"))).build()
                 : null;
     }
 
