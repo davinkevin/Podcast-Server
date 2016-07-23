@@ -62,7 +62,7 @@ public class JdomService {
 
     // URL Format
     private static final String LINK_FORMAT = "%s/api/podcast/%s/rss";
-    private static final Comparator<Item> PUBDATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
+    private static final Comparator<Item> PUB_DATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
 
     final PodcastServerParameters podcastServerParameters;
     final MimeTypeService mimeTypeService;
@@ -161,7 +161,7 @@ public class JdomService {
         podcast.getItems()
                 .stream()
                 .filter(i -> Objects.nonNull(i.getPubDate()))
-                .sorted(PUBDATE_COMPARATOR)
+                .sorted(PUB_DATE_COMPARATOR)
                 .limit(limitOfItem)
                 .forEachOrdered(item -> {
                     Element xmlItem = new Element(ITEM);

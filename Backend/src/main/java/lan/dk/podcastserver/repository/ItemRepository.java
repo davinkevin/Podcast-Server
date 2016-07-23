@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.mysema.query.types.expr.BooleanExpression.allOf;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
@@ -46,12 +47,12 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Iterable<Item> findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(ZonedDateTime date) {
-        return findAll(hasBeenDownloadedBefore(date).and(isDownloaded(Boolean.TRUE)).and(hasToBeDeleted(Boolean.TRUE)).and(isInAnyWatchList().not()));
+    default Set<Item> findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(ZonedDateTime date) {
+        return Sets.newHashSet(findAll(allOf(hasBeenDownloadedBefore(date), isDownloaded(Boolean.TRUE), hasToBeDeleted(Boolean.TRUE), isInAnyWatchList().not())));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Iterable<Item> findAllToDelete(ZonedDateTime date) {
+    default Set<Item> findAllToDelete(ZonedDateTime date) {
         return findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(date);
     }
 

@@ -28,7 +28,7 @@ public class ExecutorsConfigTest {
         when(podcastServerParameters.getConcurrentDownload()).thenReturn(10);
 
         /* When */
-        TaskExecutor asyncExecutor = executorsConfig.getAsyncExecutor();
+        TaskExecutor asyncExecutor = executorsConfig.updateExecutor();
 
         /* Then */
         assertThat(asyncExecutor).isNotNull().isOfAnyClassIn(ThreadPoolTaskExecutor.class, AsyncTaskExecutor.class);
@@ -61,11 +61,6 @@ public class ExecutorsConfigTest {
         assertThat(executor).isNotNull().isOfAnyClassIn(ThreadPoolTaskExecutor.class, AsyncTaskExecutor.class);
         assertThat(executor.getCorePoolSize()).isEqualTo(10);
         assertThat(executor.getThreadNamePrefix()).contains("Downloader");
-    }
-
-    @Test
-    public void should_generate_exception_handler() {
-        assertThat(executorsConfig.getAsyncUncaughtExceptionHandler()).isNull();
     }
 
 }

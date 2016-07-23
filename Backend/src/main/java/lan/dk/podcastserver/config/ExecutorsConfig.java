@@ -18,13 +18,12 @@ import javax.annotation.Resource;
 @Configuration
 @EnableAsync
 @ComponentScan(basePackages = { "lan.dk.podcastserver.manager"})
-public class ExecutorsConfig implements AsyncConfigurer {
+public class ExecutorsConfig {
 
     @Resource PodcastServerParameters podcastServerParameters;
 
-    @Override
     @Bean(name = "UpdateExecutor")
-    public TaskExecutor getAsyncExecutor() {
+    public ThreadPoolTaskExecutor updateExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(podcastServerParameters.getConcurrentDownload());
         executor.setMaxPoolSize(podcastServerParameters.getConcurrentDownload());
@@ -34,7 +33,7 @@ public class ExecutorsConfig implements AsyncConfigurer {
     }
 
     @Bean(name = "ManualUpdater")
-    public TaskExecutor singleThreadExecutor() {
+    public ThreadPoolTaskExecutor singleThreadExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
         executor.setMaxPoolSize(1);
@@ -50,10 +49,5 @@ public class ExecutorsConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix("Downloader-");
         executor.initialize();
         return executor;
-    }
-
-    @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return null;
     }
 }

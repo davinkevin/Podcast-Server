@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import java.util.UUID;
 
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @Setter @Getter
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Cover;
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
 import lan.dk.podcastserver.service.UrlService;
@@ -18,8 +19,9 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
 
 /**
  * Created by kevin on 08/06/2014 for Podcast-Server
@@ -30,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CoverBusiness {
 
-    private static final String API_COVER = "/api/podcast/%s/cover.%s";
+    private static final String API_PODCAST_COVER = "/api/podcast/%s/cover.%s";
 
     final CoverRepository coverRepository;
     final PodcastServerParameters podcastServerParameters;
@@ -69,15 +71,50 @@ public class CoverBusiness {
                     fileLocation,
                     StandardCopyOption.REPLACE_EXISTING
             );
-            return String.format(API_COVER, podcast.getId().toString(), FilenameUtils.getExtension(coverUrl));
+            return String.format(API_PODCAST_COVER, podcast.getId().toString(), FilenameUtils.getExtension(coverUrl));
         } catch (IOException e) {
             log.error("Error during downloading of the cover", e);
             return "";
         }
     }
 
+    public Boolean download(Item item) {
+        if (isNull(item.getPodcast()) || isNull(item.getId())){
+            log.error("Podcast or ID of item should not be null for element with title {}", item.getTitle());
+            return false;
+        }
+
+        if (isNull(item.getCover()) || Cover.DEFAULT_COVER.equals(item.getCover()) || StringUtils.isEmpty(item.getCover().getUrl())) {
+            log.error("Cover null or empty for item of id {}", item.getId());
+            return false;
+        }
+
+        String coverUrl = item.getCover().getUrl();
+        String fileName = item.getId() + "." + FilenameUtils.getExtension(coverUrl);
+        Path fileLocation = podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(fileName);
+
+        try {
+            if (!Files.exists(fileLocation.getParent())) {
+                Files.createDirectories(fileLocation.getParent());
+            }
+
+            URLConnection urlConnection = urlService.getConnectionWithTimeOut(coverUrl, 5000);
+
+            Files.copy(
+                    urlConnection.getInputStream(),
+                    fileLocation,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+            return true;
+        } catch (IOException e) {
+            log.error("Error during downloading of the cover", e);
+            return false;
+        }
+
+    }
+
     Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
-        return !Objects.isNull(patchPodcast.getCover()) && !Objects.isNull(podcastToUpdate.getCover()) &&
+        return !isNull(patchPodcast.getCover()) && !isNull(podcastToUpdate.getCover()) &&
                 patchPodcast.getCover().equals(podcastToUpdate.getCover());
     }
 
@@ -86,7 +123,14 @@ public class CoverBusiness {
         return podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(fileName);
     }
 
+    public Path getCoverPathOf(Item i) {
+        String fileName = i.getId() + "." + FilenameUtils.getExtension(i.getCover().getUrl());
+        return podcastServerParameters.getRootfolder().resolve(i.getPodcast().getTitle()).resolve(fileName);
+    }
+
     public Cover save(Cover cover) {
         return coverRepository.save(cover);
     }
+
+
 }

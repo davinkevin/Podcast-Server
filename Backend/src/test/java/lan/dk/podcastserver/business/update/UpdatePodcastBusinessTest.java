@@ -1,9 +1,12 @@
 package lan.dk.podcastserver.business.update;
 
+
+import com.google.common.collect.Sets;
+import javaslang.control.Try;
+import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
@@ -16,12 +19,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.validation.Validator;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -30,8 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.*;
@@ -50,15 +52,18 @@ public class UpdatePodcastBusinessTest {
     @Mock UpdaterSelector updaterSelector;
     @Mock SimpMessagingTemplate template;
     @Mock PodcastServerParameters podcastServerParameters;
-    @Spy TaskExecutor updateExecutor = new SyncTaskExecutor();
-    @Spy TaskExecutor manualExecutor = new SyncTaskExecutor();
+    @Spy ThreadPoolTaskExecutor updateExecutor = new ThreadPoolTaskExecutor();
+    @Spy ThreadPoolTaskExecutor manualExecutor = new ThreadPoolTaskExecutor();
     @Mock Validator validator;
+    @Mock CoverBusiness coverBusiness;
     @InjectMocks UpdatePodcastBusiness updatePodcastBusiness;
 
     @Before
     public void beforeEach() {
         Item.rootFolder = rootFolder;
         updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS);
+        updateExecutor.initialize();
+        manualExecutor.initialize();
     }
 
     @Test
@@ -81,11 +86,11 @@ public class UpdatePodcastBusinessTest {
         /* Then */
     }
 
-    private List<Item> generateItemsOfPodcast(Integer numberOfItem, Podcast podcast) {
+    private Set<Item> generateItemsOfPodcast(Integer numberOfItem, Podcast podcast) {
         return IntStream
                 .rangeClosed(1, numberOfItem)
                 .mapToObj(i -> new Item().setPodcast(podcast).setId(UUID.randomUUID()).setFileName(i + ".mp3"))
-                .collect(toList());
+                .collect(toSet());
     }
 
     @Test
@@ -143,17 +148,15 @@ public class UpdatePodcastBusinessTest {
 
         /* When */
         updatePodcastBusiness.updatePodcast();
+        ZonedDateTime lastFullUpdate = updatePodcastBusiness.getLastFullUpdate();
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast1)
-                .hasLastUpdate(null);
-        PodcastAssert
-                .assertThat(podcast2)
-                .hasLastUpdate(null);
+        assertThat(podcast1).hasLastUpdate(null);
+        assertThat(podcast2).hasLastUpdate(null);
         assertThat(podcast3.getLastUpdate())
                 .isBeforeOrEqualTo(ZonedDateTime.now())
                 .isAfterOrEqualTo(now);
+        assertThat(lastFullUpdate).isNotNull();
 
         verify(podcastBusiness, times(podcasts.size())).save(any(Podcast.class));
         verify(validator, times(10)).validate(any(Item.class));
@@ -186,8 +189,7 @@ public class UpdatePodcastBusinessTest {
         updatePodcastBusiness.updatePodcast(UUID.randomUUID());
 
         /* Then */
-        assertThat(podcast.getLastUpdate())
-                .isNull();
+        assertThat(podcast.getLastUpdate()).isNull();
     }
 
     @Test
@@ -224,8 +226,10 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_not_handle_too_long_update() {
         /* Given */
-        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, new SimpleAsyncTaskExecutor("test-update"), validator);
+        ThreadPoolTaskExecutor manualExecutor = new ThreadPoolTaskExecutor();
+        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
         updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS);
+        manualExecutor.initialize();
 
         Podcast podcast1 = new Podcast().setTitle("podcast1");
         podcast1.setId(UUID.randomUUID());
@@ -247,12 +251,52 @@ public class UpdatePodcastBusinessTest {
         updatePodcastBusiness.forceUpdatePodcast(UUID.randomUUID());
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast1)
-                .hasLastUpdate(null);
+        assertThat(podcast1).hasLastUpdate(null);
 
         verify(podcastBusiness, times(2)).findOne(any(UUID.class));
         verify(podcastBusiness, times(1)).save(any(Podcast.class));
+    }
+
+    @Test
+    public void should_get_number_of_active_count() {
+        /* Given */
+        ThreadPoolTaskExecutor updateExecutor = mock(ThreadPoolTaskExecutor.class);
+        ThreadPoolTaskExecutor manualExecutor = mock(ThreadPoolTaskExecutor.class);
+        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
+
+        /* When */
+        Integer numberOfActiveThread = updatePodcastBusiness.getUpdaterActiveCount();
+        /* Then */
+        assertThat(numberOfActiveThread).isEqualTo(0);
+        verify(updateExecutor, times(1)).getActiveCount();
+        verify(manualExecutor, times(1)).getActiveCount();
+    }
+
+    @Test
+    public void should_delete_cover() {
+        /* Given */
+        Podcast podcast = Podcast.builder().id(UUID.randomUUID()).build();
+        Set<Item> items = Sets.newHashSet(
+                Item.builder().title("Number1").podcast(podcast).build(),
+                Item.builder().title("Number2").podcast(podcast).build(),
+                Item.builder().title("Number3").podcast(podcast).build()
+        );
+
+        items
+            .stream()
+            .map(Item::getTitle)
+            .forEach(t -> Try.run(() -> Files.createFile(Paths.get("/tmp/", t))));
+
+        when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items);
+        when(coverBusiness.getCoverPathOf(any())).then(i -> Paths.get("/tmp/", i.getArgumentAt(0, Item.class).getTitle()));
+
+        /* When */
+        updatePodcastBusiness.deleteOldCover();
+
+        /* Then */
+        assertThat(Paths.get("/tmp/", "Number1")).doesNotExist();
+        assertThat(Paths.get("/tmp/", "Number2")).doesNotExist();
+        assertThat(Paths.get("/tmp/", "Number3")).doesNotExist();
     }
 
 

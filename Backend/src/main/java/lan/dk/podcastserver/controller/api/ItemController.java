@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
@@ -9,10 +10,15 @@ import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.MultiPartFileSenderService;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.Set;
 import java.util.UUID;
@@ -31,12 +39,13 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/podcast/{idPodcast}/items")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemController {
     
-    @Resource ItemBusiness itemBusiness;
-    @Resource ItemDownloadManager itemDownloadManager;
-    @Resource MultiPartFileSenderService multiPartFileSenderService;
-    @Autowired WatchListBusiness watchListBusiness;
+    final ItemBusiness itemBusiness;
+    final ItemDownloadManager itemDownloadManager;
+    final MultiPartFileSenderService multiPartFileSenderService;
+    final WatchListBusiness watchListBusiness;
 
     @RequestMapping(method = RequestMethod.POST)
     @JsonView(Item.ItemPodcastListView.class)
@@ -88,6 +97,21 @@ public class ItemController {
             response.sendRedirect(item.getUrl());
         }
     }
+
+    @RequestMapping(value="{id}/cover{ext}", method = RequestMethod.GET)
+    public ResponseEntity<?> getCover(@PathVariable UUID id) throws Exception {
+        Item item = itemBusiness.findOne(id);
+        Path cover = item.getCoverPath();
+
+        if (Files.notExists(cover))
+            return ResponseEntity
+                    .ok(new UrlResource(item.getCover().getUrl()));
+
+        return ResponseEntity.ok()
+                .lastModified(Files.getLastModifiedTime(cover).toMillis())
+                .body(new FileSystemResource(cover.toFile()));
+    }
+
 
     @RequestMapping(value = "{id}/reset", method = RequestMethod.GET)
     @JsonView(Item.ItemDetailsView.class)

@@ -37,13 +37,14 @@ import static java.util.Objects.nonNull;
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
 @Accessors(chain = true)
 @NoArgsConstructor @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset" })
+@JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset", "coverPath" })
 @EntityListeners(AuditingEntityListener.class)
 public class Item {
 
     public  static Path rootFolder;
     public  static final Item DEFAULT_ITEM = new Item();
     private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
+    private static final String COVER_PROXY_URL = "/api/podcast/%s/items/%s/cover.%s";
 
     @Id
     @DocumentId
@@ -207,6 +208,15 @@ public class Item {
         return rootFolder.resolve(podcast.getTitle()).resolve(fileName);
     }
 
+    public Path getCoverPath() {
+        String url = isNull(cover) ? "" : cover.getUrl();
+        return getPodcastPath().resolve(id + "." + FilenameUtils.getExtension(url));
+    }
+
+    private Path getPodcastPath() {
+        return rootFolder.resolve(podcast.getTitle());
+    }
+
     public String getProxyURLWithoutExtention() {
         return String.format(PROXY_URL, podcast.getId(), id, "");
     }
@@ -215,10 +225,12 @@ public class Item {
         String ext = FilenameUtils.getExtension(fileName);
         return (ext == null) ? "" : "."+ext;
     }
-    
+
     @JsonProperty("cover") @JsonView(ItemSearchListView.class)
     public Cover getCoverOfItemOrPodcast() {
-        return isNull(this.cover) ? podcast.getCover() : this.cover;
+        return isNull(this.cover)
+                ? podcast.getCover()
+                : this.cover.toBuilder().url(String.format(COVER_PROXY_URL, podcast.getId(), id, FilenameUtils.getExtension(this.cover.getUrl()))).build();
     }
 
     @JsonProperty("podcastId") @JsonView(ItemSearchListView.class)

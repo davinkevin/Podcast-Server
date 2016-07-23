@@ -3,6 +3,7 @@ package lan.dk.podcastserver.business;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.CoverAssert;
+import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
@@ -61,8 +62,8 @@ public class CoverBusinessTest {
     @Test
     public void should_say_it_same_cover() {
         /* Given */ Podcast p1 = new Podcast(), p2 = new Podcast();
-        p1.setCover(new Cover("http://fakeUrl.com"));
-        p2.setCover(new Cover("http://fakeurl.com"));
+        p1.setCover(Cover.builder().url("http://fakeUrl.com").build());
+        p2.setCover(Cover.builder().url("http://fakeurl.com").build());
 
         /* When */
         Boolean isSame = coverBusiness.hasSameCoverURL(p1, p2);
@@ -72,8 +73,8 @@ public class CoverBusinessTest {
     @Test
     public void should_say_its_not_same_cover() {
         /* Given */ Podcast p1 = new Podcast(), p2 = new Podcast();
-        p1.setCover(new Cover("http://fakeUrl.com"));
-        p2.setCover(new Cover("https://fakeurl.com"));
+        p1.setCover(Cover.builder().url("http://fakeUrl.com").build());
+        p2.setCover(Cover.builder().url("https://fakeurl.com").build());
 
         /* When */
         Boolean isSame = coverBusiness.hasSameCoverURL(p1, p2);
@@ -95,14 +96,13 @@ public class CoverBusinessTest {
     }
 
     @Test
-    public void should_download_the_cover() throws URISyntaxException {
+    public void should_download_the_cover_of_podcast() throws URISyntaxException {
         /* Given */
         String podcastTitle = "Foo";
         String imageExtension = "png";
         String defaultCoverValue = "cover";
-        String serverUrl = "http://localhost:8080/";
         Podcast podcast = new Podcast().setTitle(podcastTitle).setId(UUID.randomUUID());
-        podcast.setCover(new Cover("http://localhost:8089/img/image." + imageExtension));
+        podcast.setCover(Cover.builder().url("http://localhost:8089/img/image." + imageExtension).build());
 
         when(podcastServerParameters.getCoverDefaultName()).thenReturn(defaultCoverValue);
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
@@ -118,7 +118,7 @@ public class CoverBusinessTest {
     public void should_reject_by_network_exception() throws URISyntaxException {
         /* Given */
         Podcast podcast = new Podcast().setTitle("Foo");
-        podcast.setCover(new Cover("http://localhost:8089/img/image.jpg"));
+        podcast.setCover(Cover.builder().url("http://localhost:8089/img/image.jpg").build());
         when(podcastServerParameters.getCoverDefaultName()).thenReturn("cover");
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
         /* When */
@@ -134,7 +134,7 @@ public class CoverBusinessTest {
         Podcast podcast = Podcast.builder()
                 .id(UUID.randomUUID())
                 .title("A Podcast")
-                .cover(new Cover("http://podcast.dk.lan/podcast/Google/aCover.jpg"))
+                .cover(Cover.builder().url("http://podcast.dk.lan/podcast/Google/aCover.jpg").build())
                 .build();
 
         when(podcastServerParameters.getCoverDefaultName()).thenReturn("cover");
@@ -161,5 +161,83 @@ public class CoverBusinessTest {
         CoverAssert.assertThat(savedCover).hasId(createdId);
         assertThat(cover).isSameAs(savedCover);
         verify(coverRepository, only()).save(eq(cover));
+    }
+
+    @Test
+    public void should_not_download_cover_of_item_because_lack_of_id() {
+        /* Given */
+        Item item = Item.builder().build();
+
+        /* When */
+        Boolean downloaded = coverBusiness.download(item);
+
+        /* Then */
+        assertThat(downloaded).isFalse();
+    }
+
+    @Test
+    public void should_not_download_cover_of_item_because_lack_of_cover() {
+        /* Given */
+        Item item = Item.builder().podcast(new Podcast()).id(UUID.randomUUID()).build();
+
+        /* When */
+        Boolean downloaded = coverBusiness.download(item);
+
+        /* Then */
+        assertThat(downloaded).isFalse();
+    }
+
+    @Test
+    public void should_download_cover_of_item() {
+        /* Given */
+        Item item = Item.builder()
+                .id(UUID.randomUUID())
+                .podcast(Podcast.builder().title("FooPodcast").build())
+                .cover(Cover.builder().url("http://localhost:8089/img/image.png").build())
+                .build();
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
+
+        /* When */
+        Boolean downloaded = coverBusiness.download(item);
+
+        /* Then */
+        assertThat(downloaded).isTrue();
+    }
+
+    @Test
+    public void should_reject_by_network_exception_for_item() throws URISyntaxException {
+        /* Given */
+        Item item = Item.builder()
+                    .id(UUID.randomUUID())
+                    .podcast(Podcast.builder().title("FooPodcast").build())
+                    .cover(Cover.builder().url("http://localhost:8089/img/image.jpg").build())
+                .build();
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
+
+        /* When */
+        Boolean downloaded = coverBusiness.download(item);
+
+        /* Then */
+        assertThat(downloaded).isFalse();
+    }
+
+    @Test
+    public void should_find_cover_path_of_item() {
+        /* Given */
+        // @formatter:off
+        Item item = Item
+            .builder()
+                .id(UUID.randomUUID())
+                .cover(Cover.builder().url("http://www.foo.bar/image.png").build())
+                .podcast(Podcast.builder().title("FooBarPodcast").build())
+            .build();
+        // @formatter:on
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp/"));
+
+        /* When */
+        Path path = coverBusiness.getCoverPathOf(item);
+
+        /* Then */
+        assertThat(path).isEqualTo(Paths.get("/tmp", "FooBarPodcast", item.getId() + ".png"));
     }
 }

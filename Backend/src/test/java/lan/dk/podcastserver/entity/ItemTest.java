@@ -18,13 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ItemTest {
 
-    public static final UUID PODCAST_ID = UUID.randomUUID();
-    public static Item ITEM = new Item();
-    public static Podcast PODCAST = new Podcast().setId(UUID.randomUUID());
-    public static final ZonedDateTime NOW = ZonedDateTime.now();
-    public static final Cover COVER = new Cover("http://fakeItem.com/cover");
-    public static final Cover PODCAST_COVER = new Cover("PodcastCover");
-    public static final UUID ID = UUID.randomUUID();
+    private static final UUID PODCAST_ID = UUID.randomUUID();
+    private static Item ITEM = new Item();
+    private static Podcast PODCAST = new Podcast().setId(UUID.randomUUID());
+    private static final ZonedDateTime NOW = ZonedDateTime.now();
+    private static final Cover COVER = Cover.builder().url("http://fakeItem.com/cover.png").build();
+    private static final Cover PODCAST_COVER = Cover.builder().url("PodcastCover").build();
+    private static final UUID ID = UUID.randomUUID();
 
     @Before
     public void beforeEach() throws IOException {
@@ -138,7 +138,8 @@ public class ItemTest {
 
     @Test
     public void should_report_parent_podcast_cover() {
-        assertThat(ITEM.getCoverOfItemOrPodcast()).isSameAs(COVER);
+        assertThat(ITEM.getCoverOfItemOrPodcast())
+                .isEqualTo(Cover.builder().url("/api/podcast/" + PODCAST_ID + "/items/" + ID + "/cover.png").build());
 
         ITEM.setCover(null);
         assertThat(ITEM.getCoverOfItemOrPodcast()).isSameAs(PODCAST_COVER);
