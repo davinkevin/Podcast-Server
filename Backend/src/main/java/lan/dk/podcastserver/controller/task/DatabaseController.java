@@ -1,13 +1,10 @@
 package lan.dk.podcastserver.controller.task;
 
-import lan.dk.podcastserver.service.BackupService;
+import lan.dk.podcastserver.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -17,13 +14,13 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/task")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class BackupController {
+public class DatabaseController {
 
-    final BackupService backupService;
+    final DatabaseService databaseService;
 
     @RequestMapping(value = "backup", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void backup() throws IOException {
-        backupService.backupWithDefault();
+        databaseService.backupWithDefault();
     }
 }

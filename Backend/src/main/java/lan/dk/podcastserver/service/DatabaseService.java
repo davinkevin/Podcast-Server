@@ -27,7 +27,7 @@ import static java.time.temporal.ChronoField.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class BackupService {
+public class DatabaseService {
 
     private static final Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR, CompressionType.GZIP);
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
@@ -77,5 +77,13 @@ public class BackupService {
         return String.format(isBinary ? QUERY_BACKUP_BINARY : QUERY_BACKUP_SQL,backupFile.toString());
     }
 
+    @Transactional
+    public Boolean defrag() {
+        log.info("Defrag database");
+
+        em.createNativeQuery("SHUTDOWN DEFRAG;").executeUpdate();
+
+        return Boolean.TRUE;
+    }
 }
 

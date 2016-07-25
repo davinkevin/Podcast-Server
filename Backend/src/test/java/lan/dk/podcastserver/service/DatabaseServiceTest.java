@@ -28,11 +28,12 @@ import static org.mockito.Mockito.*;
  */
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
-public class BackupServiceTest {
+public class DatabaseServiceTest {
 
     @Mock Backup backup;
     @Mock FullTextEntityManager fem;
-    @InjectMocks BackupService backupService;
+    @InjectMocks
+    DatabaseService databaseService;
     private static final Path NOT_DIRECTORY = Paths.get("/tmp", "foo.bar");
     private Query query;
     private Path backupToCreate;
@@ -52,7 +53,7 @@ public class BackupServiceTest {
         Files.createFile(NOT_DIRECTORY);
 
         /* When */
-        Path backupFile = backupService.backup(NOT_DIRECTORY, true);
+        Path backupFile = databaseService.backup(NOT_DIRECTORY, true);
 
         /* Then */
         assertThat(backupFile).isSameAs(NOT_DIRECTORY);
@@ -65,7 +66,7 @@ public class BackupServiceTest {
         when(fem.createNativeQuery(anyString())).then(generateDumpFile());
 
         /* When */
-        Path backupFile = backupService.backup(Paths.get("/tmp"), true);
+        Path backupFile = databaseService.backup(Paths.get("/tmp"), true);
 
         /* Then */
         verify(fem, times(1)).createNativeQuery(contains("BACKUP TO"));
@@ -78,7 +79,7 @@ public class BackupServiceTest {
         when(fem.createNativeQuery(anyString())).then(generateDumpFile());
 
         /* When */
-        Path backupFile = backupService.backup(Paths.get("/tmp"), false);
+        Path backupFile = databaseService.backup(Paths.get("/tmp"), false);
 
         /* Then */
         verify(fem, times(1)).createNativeQuery(contains("SCRIPT TO"));
@@ -95,13 +96,28 @@ public class BackupServiceTest {
         when(backup.getLocation()).thenReturn(Paths.get("/tmp"));
 
         /* When */
-        Path backupFile = backupService.backupWithDefault();
+        Path backupFile = databaseService.backupWithDefault();
 
         /* Then */
         verify(fem, times(1)).createNativeQuery(contains("SCRIPT TO"));
         assertThat(backupFile)
                 .exists()
                 .hasFileName(backupToCreate.getFileName() + ".tar.gz");
+    }
+
+    @Test
+    public void should_defrag() {
+        /* Given */
+        Query query = mock(Query.class);
+        when(fem.createNativeQuery(anyString())).thenReturn(query);
+
+        /* When */
+        Boolean defrag = databaseService.defrag();
+
+        /* Then */
+        assertThat(defrag).isTrue();
+        verify(fem, only()).createNativeQuery(eq("SHUTDOWN DEFRAG;"));
+        verify(query, only()).executeUpdate();
     }
 
     private Answer<Object> generateDumpFile() {

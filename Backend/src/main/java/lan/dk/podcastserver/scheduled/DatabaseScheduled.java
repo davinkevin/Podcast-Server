@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.scheduled;
 
-import lan.dk.podcastserver.service.BackupService;
+import lan.dk.podcastserver.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,13 +13,18 @@ import java.io.IOException;
  */
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class DatabaseBackupScheduled {
+public class DatabaseScheduled {
 
-    final BackupService backupService;
+    final DatabaseService databaseService;
 
     @Scheduled(cron="${podcastserver.backup.cron:0 0 4 * * *}")
     public void backup() throws IOException {
-        backupService.backupWithDefault();
+        databaseService.backupWithDefault();
+    }
+
+    @Scheduled(cron="0 50 * * * * ")
+    public void defrag() {
+        databaseService.defrag();
     }
 
 }
