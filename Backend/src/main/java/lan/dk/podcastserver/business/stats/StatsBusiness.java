@@ -28,7 +28,6 @@ import static java.util.stream.Collectors.*;
  * Created by kevin on 28/04/15 for HackerRank problem
  */
 @Component
-@Transactional(readOnly = true)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class StatsBusiness {
 
