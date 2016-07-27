@@ -131,18 +131,6 @@ spring :
         <h1 class="page-header">Compatibility</h1>
         <p>This application used a concept of "Worker". A worker is a module whose can update and download podcast from different sources. RSS is the standard sources for Podcast, but you can use Youtube Channel or Canal+ replay TV as podcast.</p>
 
-        <!--<div class="media" ng-repeat="support in psgp.supports">
-            <div class="media-left">
-                <a href="#">
-                    <img class="media-object" width="96" height="96" ng-src="{{ ::support.image }}">
-                </a>
-            </div>
-            <div class="media-body">
-                <h4 class="media-heading">{{ ::support.title }}</h4>
-                <p>{{ ::support.description }}</p>
-            </div>
-        </div>-->
-
         <div class="row text-center">
 
             <div class="col-sm-4 col-md-3 support" ng-repeat="support in psgp.supports">
@@ -157,94 +145,6 @@ spring :
 
         </div>
 
-
-        <!--<div class="row text-center">
-
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/rss.png" alt="...">
-                    <div class="caption">
-                        <h3>RSS</h3>
-                        <p>The standard Really Simple Syndication Worker, compatible with RSS / ATOM and iTunes Podcast</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/canalplus.png" >
-                    <div class="caption">
-                        <h3>Canal+</h3>
-                        <p>A worker dedicated to the Canal+ Website, working on the Show URL</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/youtube.png" alt="...">
-                    <div class="caption">
-                        <h3>Youtube</h3>
-                        <p>You can transform your favorite Channels or Playlist into a Podcast. Developpement based on Axet/vget</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/beinsport.png" alt="...">
-                    <div class="caption">
-                        <h3>BeInSport</h3>
-                        <p>A worker dedicated to the show available on the BeInSport France Channel. A little part of the show is now compatible</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/jeuxvideofr.png" alt="...">
-                    <div class="caption">
-                        <h3>Jeux Video FR</h3>
-                        <p>A special worker for catching the video from the video game website JeuxVideo.fr</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/parleys.png" alt="...">
-                    <div class="caption">
-                        <h3>Parleys</h3>
-                        <p>A worker to download video from the famous conference site Parleys</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/pluzz.png" alt="...">
-                    <div class="caption">
-                        <h3>Pluzz</h3>
-                        <p>All the public replay platform (France 2, France 3, France 4, France 5, France Ô, 1er)</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/jeuxvideocom.jpg">
-                    <div class="caption">
-                        <h3>JeuxVideoCom</h3>
-                        <p>A special worker for catching the video from the video game website JeuxVideo.com</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-3">
-                <div class="thumbnail">
-                    <img src="img/worker/upload.png" alt="...">
-                    <div class="caption">
-                        <h3>Upload</h3>
-                        <p>If you create your own podcast (by ripping some Radio Stream for exemple), your can upload episodes directly on your Podcast Server.</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>-->
     </div>
 
     <div id="framework" class="clearfix">
@@ -265,15 +165,44 @@ spring :
         </div>
     </div>
 
+    <div id="sponsors" class="clearfix">
+        <h1>Sponsors</h1>
+        <p>Some company provide to the Podcast-Server team great tools to work everyday</p>
+        <div class="row">
+            <div class="col-sm-6 col-md-4">
+                <div class="thumbnail">
+                    <img src="img/sponsors/intellij.png" alt="intelliJ">
+                    <div class="caption">
+                        <h3>IntelliJ</h3>
+                        <p>JetBrains supports open source projects with its products and makes professional software development a more productive and enjoyable experience.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <div class="thumbnail">
+                    <img src="img/sponsors/yourkit.png" alt="yourkit">
+                    <div class="caption">
+                        <h3>YourKit</h3>
+                        <p>YourKit supports open source projects with its full-featured Java Profiler.
+                            YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a>
+                            and <a href="https://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>,
+                            innovative and intelligent tools for profiling Java and .NET applications.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="moretocome">
         <h1>More to come...</h1>
         <p>I really want to improve this application, so this enhancement is a kind of roadmap...</p>
         <ul>
             <li>Keep the framework up-to-date (Spring, Hibernate... )</li>
-            <li>Adding more jUnit test</li>
             <li>Create new Worker / Downloader to support other source and other protocol</li>
             <li>Anticipate the migration to Angular 2 by using better front-end tools | elements ( JSPM, Decorator...)</li>
             <li>And more... (keeping this page updated !!) --> <a href="https://github.com/davinkevin/Podcast-Server/issues">Goto Issue List</a></li>
+            <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b>Adding more jUnit test = <a href="https://coveralls.io/github/davinkevin/Podcast-Server">100% Coverage</a></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Data-visualisation of the podcast Server (number of download, by type, by podcast...</del></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Adding a video player and a playlist manager</del></li>
             <li><span class="glyphicon glyphicon-ok"></span><b> Done  </b><del>Adding a search engine, based on Hibernate Search</del></li>
@@ -309,8 +238,7 @@ spring :
                     { id: "es2015", name: "EcmasScript 2015+", image: "img/framework/ecmascript2015.png", description: 'In the July 2008 announcement, Eich also stated that the ECMAScript 4 proposal would be superseded by a new project, code-named ECMAScript Harmony. ECMAScript Harmony names the agreed upon design trajectory of post-ES5 editions. It will include syntactic extensions, but the changes will be more modest than ECMAScript 4 in both semantic and syntactic innovation. Packages, namespaces, and early binding from ECMAScript 4 are no longer included for planned releases. In addition, other goals and ideas from ECMAScript 4 are being rephrased to keep consensus in the committee; these include a notion of classes based on ECMAScript, 5th Edition (being an update to ECMAScript, 3rd edition). Drafts of ES.next have been published periodically since July 2011 and was finalized in June 2015', link : "https://en.wikipedia.org/wiki/ECMAScript" },
                     { id: "angular", name: "AngularJS", image: "img/framework/angular.png", description: 'HTML is great for declaring static documents, but it falters when we try to use it for declaring dynamic views in web-applications. AngularJS lets you extend HTML vocabulary for your application. The resulting environment is extraordinarily expressive, readable, and quick to develop.', link : "http://angularjs.org/" },
                     { id: "jspm", name: "JSPM", image: "img/framework/jspm.png", description: '<ul><li><p>jspm is a package manager for the <a href="https://github.com/systemjs/systemjs">SystemJS universal module loader</a>, built on top of the dynamic <a href="https://github.com/ModuleLoader/es6-module-loader">ES6 module loader</a></p></li><li><p>Load any module format (ES6, AMD, CommonJS and globals) directly from any registry such as <code>npm</code> and <code>GitHub</code> with flat versioned dependency management. Any custom registry endpoints can be created through the Registry API.</p></li><li><p>For development, load modules as separate files with ES6 and plugins compiled in the browser.</p></li><li><p>For production (or development too), optimize into a bundle, layered bundles or a self-executing bundle with a single command.</p></li></ul>', link : "http://jspm.io/" },
-                    { id: "bootstrap", name: "Twitter Bootstrap", image: "img/framework/TwitterBootstrap.png", description: '<h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2><p class="lead">Bootstrap makes front-end web development faster and easier. It\'s made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>', link : "http://getbootstrap.com/" },
-                    { id: "intelliJ", name: "Developped with <strong>IntelliJ IDEA</strong>", image: "img/framework/IntelliJ.png", description: '<h2 class="center-align">The Most Intelligent IDE<br>for the Java Platform</h2><div class="blockcenter block75"><p class="intr -color center-align">Out of the box, IntelliJ IDEA provides a comprehensive feature set including tools and integrations with the most important modern technologies and frameworks for enterprise and web development with <strong>Java, Scala, Groovy</strong> and other languages.</p></div>', link : "http://www.jetbrains.com/idea/" }
+                    { id: "bootstrap", name: "Twitter Bootstrap", image: "img/framework/TwitterBootstrap.png", description: '<h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2><p class="lead">Bootstrap makes front-end web development faster and easier. It\'s made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>', link : "http://getbootstrap.com/" }
                 ];
 
                 vm.frameworkHover = function(framework) {
@@ -342,14 +270,14 @@ spring :
 
                 vm.supports = [
                     { title : "RSS", description : "The standard Really Simple Syndication Worker, compatible with RSS / ATOM and iTunes Podcast", image : "img/worker/rss.png"},
-                    { title : "Youtube", description : "You can transform your favorite Channels or Playlist into a Podcast. Developpement based on Axet/vget", image : "img/worker/youtube.png"},
+                    { title : "Youtube", description : "You can transform your favorite Channel or Playlist into a Podcast. Developpement based on Axet/vget", image : "img/worker/youtube.png"},
                     { title : "Dailymotion", description : "A worker dedicated to the Dailymotion Website", image : "img/worker/dailymotion.png"},
-                    { title : "Canal+", description : "A worker dedicated to the Canal+ Website, working on the Show URL", image : "img/worker/canalplus.png"},
+                    { title : "TF1Replay", description : "All the show coming from the TF1 Group (TF1, TMC, NT1, HD1 and Xtra)", image : "img/worker/tf1.png"},
                     { title : "Pluzz", description : "All the public replay platform (France 2, France 3, France 4, France 5, France Ô, 1er", image : "img/worker/pluzz.png"},
+                    { title : "Canal+", description : "A worker dedicated to the Canal+ Website, working on the Show URL", image : "img/worker/canalplus.png"},
                     { title : "BeInSport", description : "A worker dedicated to the show available on the BeInSport France Channel. A little part of the show is now compatible", image : "img/worker/beinsport.png"},
                     { title : "Parleys", description : "A worker to download video from the famous conference site Parleys", image : "img/worker/parleys.png"},
                     { title : "JeuxVideo.com", description : "A special worker for catching the video from the video game website JeuxVideo.com", image : "img/worker/jeuxvideocom.jpg"},
-                    { title : "Jeux Video FR", description : "A special worker for catching the video from the video game website JeuxVideo.fr", image : "img/worker/jeuxvideofr.jpg"},
                     { title : "Upload", description : "If you create your own podcast (by ripping some Radio Stream for example), your can upload episodes directly on your Podcast Server.", image : "img/worker/upload.png"}
                 ];
 

@@ -75,3 +75,12 @@ div[id] {
 #compatibility .support .thumbnail {
   min-height: 306px;
 }
+#sponsors .thumbnail {
+  min-height: 300px;
+}
+#sponsors .thumbnail img[alt=yourkit] {
+  height: 44px;
+  width: 184px;
+  margin-bottom: 23px;
+  margin-top: 42px;
+}
