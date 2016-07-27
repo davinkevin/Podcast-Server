@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.DocumentContext;
-import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -46,6 +45,7 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final String REPLAY_CATEGORY = "replay";
     private static final String ALL_CATEGORY = "all";
     private static final Function<DocumentContext, TF1ReplayResponse> EXTRACT_IN_TF1_REPLAY_RESPONSE = d -> d.read("$", TF1ReplayResponse.class);
+    private static final javaslang.collection.Set<String> TYPES = javaslang.collection.HashSet.of("replay", "vidéo");
 
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
@@ -133,7 +133,19 @@ public class TF1ReplayUpdater extends AbstractUpdater {
                 .map(TF1ReplayResponse::getHtml)
                 .map(htmlService::parse)
                 .map(d -> d.select(".video"))
-                .map(elements -> elements.stream().filter(e -> StringUtils.isNotEmpty(e.attr("data-id"))).collect(toElements()));
+                .map(this::getElementsElementsFunction);
+    }
+
+    private Elements getElementsElementsFunction(Elements elements) {
+        return elements
+                .stream()
+                .filter(e -> StringUtils.isNotEmpty(e.attr("data-id")))
+                .filter(this::isReplayOrVideo)
+                .collect(toElements());
+    }
+
+    private Boolean isReplayOrVideo(Element element) {
+        return TYPES.contains(StringUtils.lowerCase(element.select(".uptitle strong").text()));
     }
 
     @Override
