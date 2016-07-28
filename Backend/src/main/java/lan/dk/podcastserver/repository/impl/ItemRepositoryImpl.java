@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.repository.impl;
 
+import com.google.common.collect.Lists;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,7 @@ import org.hibernate.transform.ResultTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
@@ -58,16 +56,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .map(subTerm -> qbDsl.keyword().onFields(SEARCH_FIELDS).matching(subTerm).createQuery())
                 .forEach(query::must);
 
-        List<UUID> results = fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
-                .setProjection("id")
-                .setResultTransformer(RESULT_TRANSFORMER)
-                .<UUID>getResultList();
-
-        if (results == null) {
-            return new ArrayList<>();
-        }
-
-        return results;
+        return Optional.ofNullable(fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
+                    .setProjection("id")
+                    .setResultTransformer(RESULT_TRANSFORMER)
+                    .<UUID>getResultList())
+                .orElseGet(Lists::newArrayList);
     }
 
     static class HibernateIdExtractor implements ResultTransformer {
