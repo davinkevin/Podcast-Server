@@ -3,8 +3,8 @@ package lan.dk.podcastserver.controller.api;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.form.MovingItemInQueueForm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +16,13 @@ import java.util.UUID;
 /**
  * Created by kevin on 26/12/2013.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/task/downloadManager")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class IDMController {
 
-    @Autowired
-    ItemDownloadManager IDM;
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    final ItemDownloadManager IDM;
 
     @RequestMapping(value="/queue", method = RequestMethod.GET)
     public Queue<Item> getDownloadList () {
@@ -58,13 +57,7 @@ public class IDMController {
     @RequestMapping(value="/launch", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void launchDownload() {
-
         IDM.launchDownload();
-    }
-
-    @RequestMapping(value="/downloading/{id}", method = RequestMethod.POST)
-    public void changeStatusDownload (@RequestBody String status, @PathVariable(value = "id") int id) {
-        logger.debug("id : " + id + "; status : " + status);
     }
 
     // Action on ALL download :

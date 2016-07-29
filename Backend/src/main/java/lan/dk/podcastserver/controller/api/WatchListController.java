@@ -3,6 +3,7 @@ package lan.dk.podcastserver.controller.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.WatchList;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +17,10 @@ import static lan.dk.podcastserver.entity.WatchList.*;
  */
 @RestController
 @RequestMapping("/api/watchlists")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WatchListController {
 
-    @Autowired WatchListBusiness watchListBusiness;
+    final WatchListBusiness watchListBusiness;
 
     @JsonView(WatchListDetailsListView.class)
     @RequestMapping(method = RequestMethod.POST)

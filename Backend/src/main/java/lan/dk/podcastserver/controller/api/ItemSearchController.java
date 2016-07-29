@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemSearchController {
 
-    final private ItemBusiness itemBusiness;
+    final ItemBusiness itemBusiness;
 
     @RequestMapping(value="pagination", method = RequestMethod.GET)
     @JsonView(Item.ItemSearchListView.class)
