@@ -21,10 +21,4 @@ public class DatabaseScheduled {
     public void backup() throws IOException {
         databaseService.backupWithDefault();
     }
-
-    @Scheduled(cron="0 50 * * * * ")
-    public void defrag() {
-        databaseService.defrag();
-    }
-
 }

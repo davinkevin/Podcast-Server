@@ -41,12 +41,4 @@ public class DatabaseScheduledTest {
         assertThat(cronValue).contains("${podcastserver.backup.cron:", "0 0 4 * * *", "}");
     }
 
-    @Test
-    public void should_defrag_database() {
-        /* When */
-        databaseScheduled.defrag();
-        /* Then */
-        verify(databaseService, only()).defrag();
-    }
-
 }

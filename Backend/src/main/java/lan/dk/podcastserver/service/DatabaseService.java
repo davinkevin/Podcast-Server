@@ -76,14 +76,5 @@ public class DatabaseService {
     private String generateQuery(Boolean isBinary, Path backupFile) {
         return String.format(isBinary ? QUERY_BACKUP_BINARY : QUERY_BACKUP_SQL,backupFile.toString());
     }
-
-    @Transactional
-    public Boolean defrag() {
-        log.info("Defrag database");
-
-        em.createNativeQuery("SHUTDOWN DEFRAG;").executeUpdate();
-
-        return Boolean.TRUE;
-    }
 }
 

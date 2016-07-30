@@ -105,21 +105,6 @@ public class DatabaseServiceTest {
                 .hasFileName(backupToCreate.getFileName() + ".tar.gz");
     }
 
-    @Test
-    public void should_defrag() {
-        /* Given */
-        Query query = mock(Query.class);
-        when(fem.createNativeQuery(anyString())).thenReturn(query);
-
-        /* When */
-        Boolean defrag = databaseService.defrag();
-
-        /* Then */
-        assertThat(defrag).isTrue();
-        verify(fem, only()).createNativeQuery(eq("SHUTDOWN DEFRAG;"));
-        verify(query, only()).executeUpdate();
-    }
-
     private Answer<Object> generateDumpFile() {
         return i -> {
             backupToCreate = Paths.get(StringUtils.substringAfter(i.getArguments()[0].toString(), "\'").replace("'", ""));
