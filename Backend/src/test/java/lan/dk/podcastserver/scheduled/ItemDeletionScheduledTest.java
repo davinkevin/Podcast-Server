@@ -25,4 +25,10 @@ public class ItemDeletionScheduledTest {
         /* Then */ verify(updatePodcastBusiness, times(1)).deleteOldEpisode();
     }
 
+    @Test
+    public void should_delete_old_cover() {
+        /* When */ itemDeletionScheduled.deleteOldCover();
+        /* Then */ verify(updatePodcastBusiness, times(1)).deleteOldCover();
+    }
+
 }

@@ -19,5 +19,9 @@ public class ItemDeletionScheduled {
     public void deleteOldItem() {
         updatePodcastBusiness.deleteOldEpisode();
     }
-    
+
+    @Scheduled(cron = "0 0 3 * * *")
+    public void deleteOldCover() {
+        updatePodcastBusiness.deleteOldCover();
+    }
 }
