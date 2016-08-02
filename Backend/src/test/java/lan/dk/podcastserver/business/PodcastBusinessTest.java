@@ -159,7 +159,7 @@ public class PodcastBusinessTest {
         tags.add(new Tag().setName("Tag1"));
         tags.add(new Tag().setName("Tag2"));
         Podcast podcast = new Podcast().setTags(tags);
-        Cover cover = new Cover("http://fakeurl.com/image.png");
+        Cover cover = Cover.builder().url("http://fakeurl.com/image.png").build();
         podcast.setCover(cover);
 
         when(coverBusiness.download(any(Podcast.class))).then(i -> ((Podcast) i.getArguments()[0]).getCover().getUrl());
@@ -244,7 +244,7 @@ public class PodcastBusinessTest {
         Podcast retrievePodcast = new Podcast(),
                 patchPodcast = new Podcast();
 
-        retrievePodcast.setCover(new Cover("http://fake.url/image2.png"));
+        retrievePodcast.setCover(Cover.builder().url("http://fake.url/image2.png").build());
         retrievePodcast.setId(id);
 
         patchPodcast.setId(id);
@@ -252,7 +252,7 @@ public class PodcastBusinessTest {
         patchPodcast.setUrl("http://fake.url/podcast.rss");
         patchPodcast.setType("RSS");
         UUID idCover = UUID.randomUUID();
-        patchPodcast.setCover(new Cover("http://fake.url/image.png").setId(idCover));
+        patchPodcast.setCover(Cover.builder().id(idCover).url("http://fake.url/image.png").build());
         patchPodcast.setDescription("Description");
         patchPodcast.setHasToBeDeleted(true);
         patchPodcast.setTags(tags);

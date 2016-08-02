@@ -13,12 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class CoverTest {
 
-    public static final String NOWHERE_URL = "http://nowhere.com";
-    public static final Cover COVER_WITH_DIMENSIONS = new Cover(NOWHERE_URL, 100, 200);
+    private static final String NOWHERE_URL = "http://nowhere.com";
+    private static final Cover COVER_WITH_DIMENSIONS = Cover.builder().url(NOWHERE_URL).width(100).height(200).build();
 
     @Test
     public void should_create_a_cover_with_url() {
-        assertThat(new Cover(NOWHERE_URL))
+        assertThat(Cover.builder().url(NOWHERE_URL).build())
                 .hasUrl(NOWHERE_URL)
                 .hasHeight(null)
                 .hasWidth(null)
@@ -55,10 +55,10 @@ public class CoverTest {
     @Test
     public void should_be_equals_and_has_same_hashcode() {
         /* Given */
-        Cover cover = new Cover(NOWHERE_URL);
-        Cover coverWithSameUrl = new Cover(NOWHERE_URL);
+        Cover cover = Cover.builder().url(NOWHERE_URL).build();
+        Cover coverWithSameUrl = Cover.builder().url(NOWHERE_URL).build();
         Object notCover = new Object();
-        Cover coverWithDiffUrl = new Cover("NotNowhereUrl");
+        Cover coverWithDiffUrl = Cover.builder().url("NotNowhereUrl").build();
 
         /* Then */
         assertThat(cover).isEqualTo(cover);

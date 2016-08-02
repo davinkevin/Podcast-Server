@@ -32,16 +32,6 @@ public class Cover {
     private Integer width;
     private Integer height;
 
-    public Cover(String url, Integer width, Integer height) {
-        this.url = url;
-        this.width = width;
-        this.height = height;
-    }
-
-    public Cover(String url) {
-        this.url = url;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

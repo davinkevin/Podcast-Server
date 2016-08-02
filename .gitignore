@@ -26,3 +26,5 @@ Backend/etc
 
 .gradle/
 target
+/lan.dk.podcastserver.entity.Item/
+/logs/
