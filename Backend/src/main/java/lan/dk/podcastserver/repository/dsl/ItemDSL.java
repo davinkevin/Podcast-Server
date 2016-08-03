@@ -91,7 +91,7 @@ public class ItemDSL {
         return BooleanExpression.allOf(
                 nonNull(ids) ? isInId(ids) : null,
                 isInTags(tags),
-                isDownloaded(downloaded)
+                nonNull(downloaded) ? downloaded ? hasStatus(Status.FINISH) : Q_ITEM.status.isNull().or(hasStatus(Status.FINISH).not()) : null
         );
     }
 

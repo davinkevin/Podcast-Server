@@ -48,7 +48,7 @@ public class ItemDslTest {
     @Autowired ItemRepository itemRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
-    public static final Operation INSERT_REFERENCE_DATA = sequenceOf(
+    private static final Operation INSERT_REFERENCE_DATA = sequenceOf(
             insertInto("PODCAST")
                     .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
                     .values(UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false)
@@ -242,11 +242,10 @@ public class ItemDslTest {
     public void should_result_with_search_without_ids() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<UUID> ids = null;
         List<Tag> tags = Collections.singletonList(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, null));
 
         /* Then */
         assertThat(items)
