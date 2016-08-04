@@ -2,6 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
+import javaslang.control.Try;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -180,6 +180,7 @@ public class Item {
     public void preRemove() {
         checkAndDelete();
         watchLists.forEach(watchList -> watchList.remove(this));
+        Try.of(() -> Files.deleteIfExists(getCoverPath())).onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
     }
 
     private void checkAndDelete() {
@@ -189,11 +190,7 @@ public class Item {
     }
 
     private void deleteFile() {
-        try {
-            Files.deleteIfExists(getLocalPath());
-        } catch (IOException e) {
-            log.error("Error during deletion of {}", this, e);
-        }
+        Try.of(() -> Files.deleteIfExists(getLocalPath())).onFailure(e -> log.error("Error during deletion of {}", this, e));
     }
 
     @Transient @JsonIgnore
@@ -205,7 +202,7 @@ public class Item {
     }
 
     public Path getLocalPath() {
-        return rootFolder.resolve(podcast.getTitle()).resolve(fileName);
+        return getPodcastPath().resolve(fileName);
     }
 
     public Path getCoverPath() {
