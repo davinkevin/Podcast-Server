@@ -5,11 +5,9 @@ import com.github.axet.vget.info.VGetParser;
 import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
-import lan.dk.podcastserver.service.UrlService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.net.MalformedURLException;
@@ -26,13 +24,7 @@ import static org.mockito.Mockito.mock;
 @RunWith(MockitoJUnitRunner.class)
 public class WGetFactoryTest {
 
-    @Mock UrlService urlService;
     @InjectMocks WGetFactory wGetFactory;
-
-    @Test
-    public void should_do_di() {
-        assertThat(wGetFactory.urlService).isNotNull();
-    }
 
     @Test
     public void should_generate_a_parser() throws MalformedURLException {
