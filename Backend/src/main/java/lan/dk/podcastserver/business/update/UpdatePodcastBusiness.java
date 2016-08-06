@@ -181,7 +181,7 @@ public class UpdatePodcastBusiness  {
     public void deleteOldCover() {
         log.info("Deletion of old covers item");
         itemRepository
-                .findAllToDelete(ZonedDateTime.now().minusYears(1))
+                .findAllToDelete(podcastServerParameters.limitToKeepCoverOnDisk())
                 .stream()
                 .map(coverBusiness::getCoverPathOf)
                 .forEach(p -> Try.of(() -> Files.deleteIfExists(p)));

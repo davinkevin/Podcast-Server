@@ -9,13 +9,14 @@ import java.nio.file.Paths;
 
 import static java.time.ZonedDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 
 /**
  * Created by kevin on 13/07/15 for Podcast Server
  */
 public class PodcastServerParametersTest {
 
-    PodcastServerParameters parameters;
+    private PodcastServerParameters parameters;
 
     @Before
     public void beforeEach() { parameters = new PodcastServerParameters(); }
@@ -25,9 +26,12 @@ public class PodcastServerParametersTest {
         Path ROOT_FOLDER = Paths.get("/tmp/");
 
 
-        PodcastServerParametersAssert.assertThat(parameters)
+        assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
-                .hasDownloadExtension(".psdownload");
+                .hasDownloadExtension(".psdownload")
+                .hasNumberOfDayToDownload(30L)
+                .hasNumberOfDayToSaveCover(365L)
+        ;
 
         assertThat(parameters.getRootfolder())
                 .isEqualTo(ROOT_FOLDER);
@@ -46,24 +50,25 @@ public class PodcastServerParametersTest {
     }
 
     @Test
-    public void should_have_mdificated_values() throws URISyntaxException {
+    public void should_have_modified_values() throws URISyntaxException {
         /* Given */
         Path ROOT_FOLDER = Paths.get("/tmp");
 
         /* When */
         parameters.setRootfolder(ROOT_FOLDER);
         parameters.setCoverDefaultName("default");
-        parameters.setDownloadExtension(".pdownload");
+        parameters.setDownloadExtension(".psdownload");
         parameters.setMaxUpdateParallels(5);
         parameters.setConcurrentDownload(5);
         parameters.setNumberOfTry(20);
         parameters.setNumberOfDayToDownload(5L);
+        parameters.setNumberOfDayToSaveCover(5L);
         parameters.setRssDefaultNumberItem(25L);
 
         /* Then */
-        PodcastServerParametersAssert.assertThat(parameters)
+        assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
-                .hasDownloadExtension(".pdownload");
+                .hasDownloadExtension(".psdownload");
 
         assertThat(parameters.getRootfolder()).isEqualTo(ROOT_FOLDER);
         assertThat(parameters.getCoverDefaultName()).isEqualTo("default");

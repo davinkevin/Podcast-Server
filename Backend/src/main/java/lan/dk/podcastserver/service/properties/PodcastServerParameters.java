@@ -54,10 +54,15 @@ public class PodcastServerParameters {
      */
     Long numberOfDayToDownload = 30L;
     /**
+     * Number of day to keep cover on disk
+     */
+    Long numberOfDayToSaveCover = 365L;
+    /**
      * Number of item by default in RSS exposed by the Podcast Server
      */
     Long rssDefaultNumberItem = 50L;
 
     //** GETTER OF THE PARAMETERS **//
     public ZonedDateTime limitDownloadDate() { return now().minusDays(numberOfDayToDownload); }
+    public ZonedDateTime limitToKeepCoverOnDisk() { return now().minusDays(numberOfDayToSaveCover); }
 }
