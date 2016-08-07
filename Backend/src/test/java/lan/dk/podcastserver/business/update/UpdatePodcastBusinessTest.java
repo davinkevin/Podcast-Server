@@ -67,17 +67,6 @@ public class UpdatePodcastBusinessTest {
     }
 
     @Test
-    public void should_do_di() {
-        assertThat(updatePodcastBusiness.podcastBusiness).isNotNull();
-        assertThat(updatePodcastBusiness.itemRepository).isNotNull();
-        assertThat(updatePodcastBusiness.updaterSelector).isNotNull();
-        assertThat(updatePodcastBusiness.template).isNotNull();
-        assertThat(updatePodcastBusiness.updateExecutor).isNotNull();
-        assertThat(updatePodcastBusiness.manualExecutor).isNotNull();
-        assertThat(updatePodcastBusiness.validator).isNotNull();
-    }
-
-    @Test
     public void should_delete_old_episode() {
         /* Given */
         when(itemRepository.findAllToDelete(any())).thenReturn(generateItemsOfPodcast(3, new Podcast().setTitle("Title")));

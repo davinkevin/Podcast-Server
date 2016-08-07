@@ -46,14 +46,14 @@ public class UpdatePodcastBusiness  {
 
     private final CoverBusiness coverBusiness;
     private final PodcastServerParameters podcastServerParameters;
-    final PodcastBusiness podcastBusiness;
-    final ItemRepository itemRepository;
-    final UpdaterSelector updaterSelector;
-    final SimpMessagingTemplate template;
+    private final PodcastBusiness podcastBusiness;
+    private final ItemRepository itemRepository;
+    private final UpdaterSelector updaterSelector;
+    private final SimpMessagingTemplate template;
 
-    final ThreadPoolTaskExecutor updateExecutor;
-    final ThreadPoolTaskExecutor manualExecutor;
-    final Validator validator;
+    private final ThreadPoolTaskExecutor updateExecutor;
+    private final ThreadPoolTaskExecutor manualExecutor;
+    private final Validator validator;
 
     private AtomicBoolean isUpdating = new AtomicBoolean(false);
 
