@@ -1,27 +1,34 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.HashMap;
 import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 08/08/2016.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class IDMControllerTest {
+
+    private static final Podcast PODCAST = Podcast.builder().title("Podcast").build();
 
     @Mock ItemDownloadManager IDM;
     @InjectMocks IDMController idmController;
@@ -30,11 +37,10 @@ public class IDMControllerTest {
     public void should_get_download_list() {
         /* Given */
         ConcurrentLinkedQueue<Item> waitingQueue = Queues.newConcurrentLinkedQueue();
-        Podcast podcast = Podcast.builder().title("Podcast").build();
 
         waitingQueue.addAll(Lists.newArrayList(
-                Item.builder().title("Foo").podcast(podcast).build(),
-                Item.builder().title("Bar").podcast(podcast).build()
+                Item.builder().title("Foo").podcast(PODCAST).build(),
+                Item.builder().title("Bar").podcast(PODCAST).build()
         ));
         when(IDM.getWaitingQueue()).thenReturn(waitingQueue);
 
@@ -45,5 +51,23 @@ public class IDMControllerTest {
         assertThat(downloadList)
                 .hasSize(2)
                 .contains(waitingQueue.toArray(new Item[waitingQueue.size()]));
+    }
+
+    @Test
+    public void should_get_downloading_list() {
+        /* Given */
+        HashMap<Item, Downloader> downloadingQueue = Maps.newHashMap();
+        downloadingQueue.put(Item.builder().id(UUID.randomUUID()).title("Foo").podcast(PODCAST).build(), mock(Downloader.class));
+        downloadingQueue.put(Item.builder().id(UUID.randomUUID()).title("Bar").podcast(PODCAST).build(), mock(Downloader.class));
+        when(IDM.getDownloadingQueue()).thenReturn(downloadingQueue);
+
+        /* When */
+        Set<Item> downloadingList = idmController.getDownloadingList();
+
+        /* Then */
+        assertThat(downloadingList)
+                .hasSize(2)
+                .contains(downloadingQueue.keySet().toArray(new Item[downloadingQueue.size()]));
+        verify(IDM, only()).getDownloadingQueue();
     }
 }
