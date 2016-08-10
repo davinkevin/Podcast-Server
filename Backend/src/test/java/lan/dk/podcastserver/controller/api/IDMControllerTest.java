@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -69,5 +70,21 @@ public class IDMControllerTest {
                 .hasSize(2)
                 .contains(downloadingQueue.keySet().toArray(new Item[downloadingQueue.size()]));
         verify(IDM, only()).getDownloadingQueue();
+    }
+
+    @Test
+    public void should_find_item_in_downloading_list_by_id() {
+        /* Given */
+        Item item = Item.builder().id(UUID.randomUUID()).build();
+        when(IDM.getItemInDownloadingQueue(eq(item.getId()))).thenReturn(item);
+
+        /* When */
+        Item itemInDownloadingList = idmController.getDownloadingList(item.getId());
+
+        /* Then */
+        assertThat(itemInDownloadingList)
+                .isSameAs(item)
+                .hasId(item.getId());
+        verify(IDM, only()).getItemInDownloadingQueue(eq(item.getId()));
     }
 }
