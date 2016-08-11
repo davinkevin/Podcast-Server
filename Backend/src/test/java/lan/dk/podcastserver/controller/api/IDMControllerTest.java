@@ -87,4 +87,16 @@ public class IDMControllerTest {
                 .hasId(item.getId());
         verify(IDM, only()).getItemInDownloadingQueue(eq(item.getId()));
     }
+
+    @Test
+    public void should_get_number_of_current_download() {
+        /* Given */
+        when(IDM.getNumberOfCurrentDownload()).thenReturn(6);
+
+        /* When */
+        Integer currentD = idmController.getNumberOfCurrentDownload();
+
+        /* Then */
+        assertThat(currentD).isEqualTo(6);
+    }
 }
