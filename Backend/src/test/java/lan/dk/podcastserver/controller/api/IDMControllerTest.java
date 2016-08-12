@@ -110,4 +110,14 @@ public class IDMControllerTest {
         assertThat(limit).isEqualTo(3);
         verify(IDM, only()).getLimitParallelDownload();
     }
+
+    @Test
+    public void should_set_limit_of_parallel_download() {
+        /* Given */
+        /* When */
+        idmController.setLimitParallelDownload(3);
+
+        /* Then */
+        verify(IDM, only()).setLimitParallelDownload(eq(3));
+    }
 }
