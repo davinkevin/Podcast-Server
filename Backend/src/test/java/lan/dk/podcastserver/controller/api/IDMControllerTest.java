@@ -99,4 +99,15 @@ public class IDMControllerTest {
         /* Then */
         assertThat(currentD).isEqualTo(6);
     }
+
+    @Test
+    public void should_get_limit_of_parallel_download() {
+        /* Given */
+        when(IDM.getLimitParallelDownload()).thenReturn(3);
+        /* When */
+        Integer limit = idmController.getLimitParallelDownload();
+        /* Then */
+        assertThat(limit).isEqualTo(3);
+        verify(IDM, only()).getLimitParallelDownload();
+    }
 }

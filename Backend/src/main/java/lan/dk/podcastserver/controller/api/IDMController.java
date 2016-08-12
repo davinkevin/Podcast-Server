@@ -45,7 +45,7 @@ public class IDMController {
     }
 
     @RequestMapping(value="/limit", method = RequestMethod.GET)
-    public int setLimitParallelDownload () {
+    public int getLimitParallelDownload () {
         return IDM.getLimitParallelDownload();
     }
 
