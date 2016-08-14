@@ -120,4 +120,14 @@ public class IDMControllerTest {
         /* Then */
         verify(IDM, only()).setLimitParallelDownload(eq(3));
     }
+
+    @Test
+    public void should_launch_download() {
+        /* Given */
+        /* When */
+        idmController.launchDownload();
+        /* Then */
+        verify(IDM, only()).launchDownload();
+    }
+
 }
