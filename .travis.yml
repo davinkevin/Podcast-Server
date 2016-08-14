@@ -10,6 +10,12 @@ services:
 
 install: true
 
+cache:
+  directories:
+  - Frontend-Ng1/node_modules
+  - Frontend-Ng2/node_modules
+  - $HOME/.m2
+
 before_script:
 - npm install -g jspm
 - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
