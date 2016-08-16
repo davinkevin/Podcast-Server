@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -13,8 +13,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -34,7 +32,7 @@ public class JeuxVideoComFinderTest {
     public void should_find_podcast() throws IOException, URISyntaxException {
         /* Given */
         String url = "/remote/podcast/JeuxVideoCom/chroniques-video.htm";
-        when(htmlService.get(eq(url))).thenReturn(readFile("/remote/podcast/JeuxVideoCom/chroniques-video.htm"));
+        when(htmlService.get(eq(url))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/JeuxVideoCom/chroniques-video.htm"));
 
         /* When */
         Podcast podcast = jeuxVideoComFinder.find(url);
@@ -52,7 +50,7 @@ public class JeuxVideoComFinderTest {
     @Test
     public void should_not_find_data_for_this_url() {
         /* Given */
-        when(htmlService.get(any())).thenReturn(Optional.empty());
+        when(htmlService.get(any())).thenReturn(Option.none());
 
         /* When */
         Podcast podcast = jeuxVideoComFinder.find("foo/bar");
@@ -83,9 +81,5 @@ public class JeuxVideoComFinderTest {
 
         /* Then */
         assertThat(compatibility).isGreaterThan(1);
-    }
-    
-    public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
-        return Optional.of(Jsoup.parse(Paths.get(JeuxVideoComFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
     }
 }

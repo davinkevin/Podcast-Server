@@ -1,13 +1,11 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -25,21 +23,13 @@ public class DailyMotionCloudDownloader extends M3U8Downloader {
         if (nonNull(redirectionUrl))
             return redirectionUrl;
 
-        Optional<String> optionalUrl = Optional.empty();
         String url = urlService.getRealURL(item.getUrl());
 
-        try(BufferedReader in = urlService.urlAsReader(url)) {
-            optionalUrl = in
-                    .lines()
-                    .filter(l -> l.contains("audio") && l.contains("video"))
-                    .reduce((u, v) -> v);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        redirectionUrl = optionalUrl
-                .map(u -> urlService.urlWithDomain(url, u))
-                .orElse("");
+        redirectionUrl = Try.of(() -> urlService.asStream(url))
+                .toOption()
+                .flatMap(m3U8Service::findBestQuality)
+                .map(u -> urlService.addDomainIfRelative(url, u))
+                .getOrElse(StringUtils.EMPTY);
 
         return redirectionUrl;
     }

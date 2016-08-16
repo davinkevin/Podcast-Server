@@ -25,7 +25,7 @@ public class JeuxVideoComFinder implements Finder {
         return htmlService
                 .get(url)
                 .map(htmlToPodcast(url))
-                .orElse(Podcast.DEFAULT_PODCAST);
+                .getOrElse(Podcast.DEFAULT_PODCAST);
     }
 
     private Function<Document, Podcast> htmlToPodcast(String url) {

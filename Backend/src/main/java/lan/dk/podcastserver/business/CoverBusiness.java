@@ -1,5 +1,8 @@
 package lan.dk.podcastserver.business;
 
+import com.mashape.unirest.http.HttpResponse;
+import javaslang.collection.List;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -15,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.net.URLConnection;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -45,7 +48,7 @@ public class CoverBusiness {
     public String download(Podcast podcast) {
 
         if (podcast.getCover() == null || StringUtils.isEmpty(podcast.getCover().getUrl())) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         if (podcast.getCover().getUrl().startsWith("/"))
@@ -64,10 +67,12 @@ public class CoverBusiness {
                 Files.createDirectories(fileLocation.getParent());
             }
 
-            URLConnection urlConnection = urlService.getConnectionWithTimeOut(coverUrl, 5000);
+            HttpResponse<InputStream> request = Try.of(() -> urlService.get(coverUrl).asBinary())
+                    .filter(this::isImage)
+                    .getOrElseThrow(() -> new IOException("Not an image in content type"));
 
             Files.copy(
-                    urlConnection.getInputStream(),
+                    request.getBody(),
                     fileLocation,
                     StandardCopyOption.REPLACE_EXISTING
             );
@@ -76,6 +81,12 @@ public class CoverBusiness {
             log.error("Error during downloading of the cover", e);
             return "";
         }
+    }
+
+    private Boolean isImage(HttpResponse<InputStream> request) {
+        return List.ofAll(request.getHeaders().get("Content-Type"))
+                .find(h -> h.contains("image"))
+                .isDefined();
     }
 
     public Boolean download(Item item) {
@@ -98,10 +109,12 @@ public class CoverBusiness {
                 Files.createDirectories(fileLocation.getParent());
             }
 
-            URLConnection urlConnection = urlService.getConnectionWithTimeOut(coverUrl, 5000);
+            HttpResponse<InputStream> request = Try.of(() -> urlService.get(coverUrl).asBinary())
+                    .filter(this::isImage)
+                    .getOrElseThrow(() -> new IOException("Not an image in content type"));
 
             Files.copy(
-                    urlConnection.getInputStream(),
+                    request.getBody(),
                     fileLocation,
                     StandardCopyOption.REPLACE_EXISTING
             );

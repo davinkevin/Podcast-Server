@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -9,6 +10,7 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,6 +43,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BeInSportsUpdaterTest {
 
+    public static final String FILE_LOCATION_BY_ID = "/remote/podcast/beinsports/%s.html";
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
     @Mock Validator validator;
@@ -78,7 +81,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_do_reject_is_signature_fail() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(anyString())).thenReturn(Optional.empty());
+        when(htmlService.get(anyString())).thenReturn(Option.none());
 
         /* When */
         String signature = beInSportsUpdater.signatureOf(podcast);
@@ -90,7 +93,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_return_empty_item_list_if_error() throws IOException {
         /* Given */
-        when(htmlService.get(anyString())).thenReturn(Optional.empty());
+        when(htmlService.get(anyString())).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = beInSportsUpdater.getItems(podcast);
@@ -137,7 +140,7 @@ public class BeInSportsUpdaterTest {
     public void should_return_default_item_if_exception() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
-        when(htmlService.get(not(eq(podcast.getUrl())))).thenReturn(Optional.empty());
+        when(htmlService.get(not(eq(podcast.getUrl())))).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = beInSportsUpdater.getItems(podcast);
@@ -177,22 +180,22 @@ public class BeInSportsUpdaterTest {
         assertThat(beInSportsUpdater.type().key()).isEqualTo("BeInSports");
     }
 
-    private Answer<Optional<Document>> readHtmlFromFile(String s) throws URISyntaxException {
-        Path path = Paths.get(BeInSportsUpdaterTest.class.getResource(s).toURI());
-        return i -> Optional.of(Jsoup.parse(path.toFile(), "UTF-8", "http://www.beinsports.com/"));
+    private Answer<Option<Document>> readHtmlFromFile(String s) throws URISyntaxException {
+        return i -> IOUtils.fileAsHtml(s);
     }
 
     private Answer<Optional<Document>> readHtmlFromFile(Path s) throws URISyntaxException {
         return i -> Optional.of(Jsoup.parse(s.toFile(), "UTF-8", "http://www.beinsports.com/"));
     }
 
-    private void configureHtmlServiceWith(String url, String file) throws IOException, URISyntaxException {
-        Path htmlPage = Paths.get(BeInSportsUpdaterTest.class.getResource(file).toURI());
+    private void configureHtmlServiceWith(String url, String id) throws IOException, URISyntaxException {
+        String page = String.format(FILE_LOCATION_BY_ID, id);
+        Path htmlPage = Paths.get(BeInSportsUpdaterTest.class.getResource(page).toURI());
         String iFrameUrl = "http:" + Jsoup.parse(htmlPage.toFile(), "UTF-8", "http://www.beinsports.com").select("iframe").attr("src");
-        Path dailymotionPage = htmlPage.getParent().resolve(StringUtils.substringAfterLast(iFrameUrl, "/") + ".html");
+        String iframeLocation = String.format(FILE_LOCATION_BY_ID, StringUtils.substringAfterLast(iFrameUrl, "/"));
 
-        when(htmlService.get(eq(url))).then(readHtmlFromFile(htmlPage));
-        when(htmlService.get(eq(iFrameUrl))).then(readHtmlFromFile(dailymotionPage));
+        when(htmlService.get(eq(url))).thenReturn(IOUtils.fileAsHtml(page));
+        when(htmlService.get(eq(iFrameUrl))).thenReturn(IOUtils.fileAsHtml(iframeLocation));
     }
 
     private void configureForAllPage(String file) throws URISyntaxException, IOException {
@@ -204,7 +207,7 @@ public class BeInSportsUpdaterTest {
                 .map(e -> String.format(BE_IN_SPORTS_DOMAIN, e))
                 .forEach(url -> Try.run(() -> {
                     String id = StringUtils.substringBeforeLast(url.replace("http://www.beinsports.com/france/_components/replay-main/", ""), "/");
-                    configureHtmlServiceWith(url, "/remote/podcast/beinsports/" + id + ".html");
+                    configureHtmlServiceWith(url, id);
                 }));
     }
 

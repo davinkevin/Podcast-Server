@@ -1,11 +1,9 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
@@ -17,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,33 +25,32 @@ import static java.util.stream.Collectors.toSet;
 @Component("CanalPlusUpdater")
 public class CanalPlusUpdater extends AbstractUpdater {
 
-    public static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
-    public static final String FRONT_TOOLS_URL_PATTERN = "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=%d&ztid=%d&nbPlusVideos0=1%s";
-    public static final String XML_INFORMATION_PATTERN = "http://service.canal-plus.com/video/rest/getVideos/cplus/%d";
-    public static final Pattern ID_EXTRACTOR = Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
-    public static final Pattern NB_PLUS_VIDEOS_PATTERN = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
-    public static final Pattern TABS_EXTRACTOR = Pattern.compile(".*tab=1-([0-9]*).*");
-    public static final String FIELD_TITRAGE = "TITRAGE";
-    public static final String FIELD_TITRE = "TITRE";
-    public static final String FIELD_PUBLICATION = "PUBLICATION";
-    public static final String FIELD_DATE = "DATE";
-    public static final String FIELD_HEURE = "HEURE";
-    public static final String FIELD_IMAGES = "IMAGES";
-    public static final String FIELD_GRAND = "GRAND";
-    public static final String FIELD_SOUS_TITRE = "SOUS_TITRE";
-    public static final String FIELD_VIDEOS = "VIDEOS";
-    public static final String FIELD_QUALITY_HLS = "HLS";
-    public static final String FIELD_QUALITY_HD = "HD";
-    public static final String SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY = "a[onclick^=loadVideoHistory]";
-    public static final String FIELD_VIDEO = "VIDEO";
-    public static final String FIELD_INFOS = "INFOS";
-    public static final String FIELD_MEDIA = "MEDIA";
+    private static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
+    private static final String FRONT_TOOLS_URL_PATTERN = "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=%d&ztid=%d&nbPlusVideos0=1%s";
+    private static final String XML_INFORMATION_PATTERN = "http://service.canal-plus.com/video/rest/getVideos/cplus/%d";
+    private static final Pattern ID_EXTRACTOR = Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
+    private static final Pattern NB_PLUS_VIDEOS_PATTERN = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
+    private static final Pattern TABS_EXTRACTOR = Pattern.compile(".*tab=1-([0-9]*).*");
+    private static final String FIELD_TITRAGE = "TITRAGE";
+    private static final String FIELD_TITRE = "TITRE";
+    private static final String FIELD_PUBLICATION = "PUBLICATION";
+    private static final String FIELD_DATE = "DATE";
+    private static final String FIELD_HEURE = "HEURE";
+    private static final String FIELD_IMAGES = "IMAGES";
+    private static final String FIELD_GRAND = "GRAND";
+    private static final String FIELD_SOUS_TITRE = "SOUS_TITRE";
+    private static final String FIELD_VIDEOS = "VIDEOS";
+    private static final String FIELD_QUALITY_HLS = "HLS";
+    private static final String FIELD_QUALITY_HD = "HD";
+    private static final String SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY = "a[onclick^=loadVideoHistory]";
+    private static final String FIELD_VIDEO = "VIDEO";
+    private static final String FIELD_INFOS = "INFOS";
+    private static final String FIELD_MEDIA = "MEDIA";
 
     @Resource JdomService jdomService;
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
-    @Resource UrlService urlService;
-
+    @Resource M3U8Service m3U8Service;
 
     public Set<Item> getItems(Podcast podcast) {
         return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast));
@@ -66,23 +62,23 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     private String getPodcastURLOfFrontTools(String url) {
         Matcher tabs = TABS_EXTRACTOR.matcher(url);
-        String liste = tabs.find() ? String.format("&liste=%d", Integer.parseInt(tabs.group(1))-1) : "";
+        String list = tabs.find() ? String.format("&liste=%d", Integer.parseInt(tabs.group(1))-1) : "";
 
         return htmlService
                 .get(url)
                 .map(p -> p.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"))
                 .flatMap(s -> patternMatcher(s, ID_EXTRACTOR))
-                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.group(1)), Integer.parseInt(ids.group(2)), liste))
-                .orElse("");
+                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.group(1)), Integer.parseInt(ids.group(2)), list))
+                .getOrElse("");
     }
 
     private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
-        Optional<Matcher> matcher = patternMatcher(canalPlusFrontToolsUrl, NB_PLUS_VIDEOS_PATTERN);
+        Option<Matcher> matcher = patternMatcher(canalPlusFrontToolsUrl, NB_PLUS_VIDEOS_PATTERN);
         return matcher
             .flatMap(id -> htmlService.get(canalPlusFrontToolsUrl))
             .map(p -> p.select("ul.features, ul.unit-gallery2"))
             .map(e -> e.get(Integer.parseInt(matcher.map(m -> m.group(1)).get())).select("li"))
-            .orElse(new Elements());
+            .getOrElse(new Elements());
     }
 
     private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
@@ -97,11 +93,9 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
 
     private Item getItemFromVideoId(Integer idCanalPlusVideo) {
-        return urlService
-                .newURL(String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo))
-                .flatMap(jdomService::parse)
-                .map(this::itemFromXml)
-                .orElse(Item.DEFAULT_ITEM);
+        return jdomService.parse(String.format(XML_INFORMATION_PATTERN, idCanalPlusVideo))
+                    .map(this::itemFromXml)
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     private Item itemFromXml(Document x) {
@@ -109,17 +103,17 @@ public class CanalPlusUpdater extends AbstractUpdater {
         org.jdom2.Element media = x.getRootElement().getChild(FIELD_VIDEO).getChild(FIELD_MEDIA);
 
         return Item.builder()
-                .title(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_TITRE))
-                .pubDate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
-                .cover(imageService.getCoverFromURL(media.getChild(FIELD_IMAGES).getChildText(FIELD_GRAND)))
-                .description(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_SOUS_TITRE))
-                .url(findUrl(media))
+                    .title(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_TITRE))
+                    .pubDate(fromCanalPlus(infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_DATE), infos.getChild(FIELD_PUBLICATION).getChildText(FIELD_HEURE)))
+                    .cover(imageService.getCoverFromURL(media.getChild(FIELD_IMAGES).getChildText(FIELD_GRAND)))
+                    .description(infos.getChild(FIELD_TITRAGE).getChildText(FIELD_SOUS_TITRE))
+                    .url(findUrl(media))
                 .build();
     }
 
     private String findUrl(org.jdom2.Element media) {
         return StringUtils.isNotEmpty(media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HLS))
-                ? urlService.getM3U8UrlFormMultiStreamFile(media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HLS))
+                ? m3U8Service.getM3U8UrlFormMultiStreamFile(media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HLS))
                 : media.getChild(FIELD_VIDEOS).getChildText(FIELD_QUALITY_HD);
     }
 
@@ -133,12 +127,12 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
 
-    private Optional<Matcher> patternMatcher(String s, Pattern pattern) {
+    private Option<Matcher> patternMatcher(String s, Pattern pattern) {
         Matcher matcher = pattern.matcher(s);
         if (!matcher.find()) {
-            return Optional.empty();
+            return Option.none();
         }
-        return Optional.of(matcher);
+        return Option.of(matcher);
     }
 
     @Override

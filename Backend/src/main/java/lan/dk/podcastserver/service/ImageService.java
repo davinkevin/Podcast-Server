@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 /**
  * Created by kevin on 28/06/15 for Podcast Server
@@ -27,30 +25,20 @@ public class ImageService {
 
     public Cover getCoverFromURL(String url) {
         if (StringUtils.isEmpty(url))
-            return null;
+            return Cover.DEFAULT_COVER;
 
-        try {
-            return getCoverFromURL(new URL(url));
-        } catch (IOException e) {
-            log.error("Error during fetching Cover information for {}", url);
-            return null;
-        }
-    }
-
-    public Cover getCoverFromURL (URL url) throws IOException {
-        Cover cover;
-
-        try (InputStream urlInputStream = urlService.getConnectionWithTimeOut(url.toString(), 5000).getInputStream() ){
-            ImageInputStream imageInputStream = ImageIO.createImageInputStream(urlInputStream);
-            final BufferedImage image = ImageIO.read(imageInputStream);
-            cover = Cover
+        try (InputStream urlInputStream = urlService.asStream(url) ){
+            final BufferedImage image = ImageIO.read(ImageIO.createImageInputStream(urlInputStream));
+            return Cover
                     .builder()
-                        .url(url.toString())
+                        .url(url)
                         .width(image.getWidth())
                         .height(image.getHeight())
                     .build();
+        } catch (IOException e) {
+            log.error("Error during fetching Cover information for {}", url);
+            return Cover.DEFAULT_COVER;
         }
-
-        return cover;
     }
+
 }

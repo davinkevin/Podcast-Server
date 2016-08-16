@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.service;
 
+import javaslang.control.Option;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -8,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jdom2.*;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -18,11 +23,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -68,13 +71,11 @@ public class JdomService {
     final MimeTypeService mimeTypeService;
     final UrlService urlService;
 
-    public Optional<Document> parse(URL url) {
-        try {
-            return Optional.of(new SAXBuilder().build(url));
-        } catch (JDOMException | IOException e) {
-            log.error("Error during parsing of {}", url.toString(), e);
-            return Optional.empty();
-        }
+    public Option<Document> parse(String url) {
+        return Try
+                .of(() -> new SAXBuilder().build(urlService.asStream(url)))
+                .onFailure(e -> log.error("Error during parsing of {}", url, e))
+                .toOption();
     }
 
     public String podcastToXMLGeneric(Podcast podcast, Boolean limit, String domainName) throws IOException {

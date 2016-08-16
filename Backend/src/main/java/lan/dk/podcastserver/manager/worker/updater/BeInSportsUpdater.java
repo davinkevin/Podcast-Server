@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -57,7 +58,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .get(podcast.getUrl())
                 .map(p -> p.select("article"))
                 .map(this::convertHtmlToItems)
-                .orElse(Sets.newHashSet());
+                .getOrElse(Sets.newHashSet());
     }
 
     private Set<Item> convertHtmlToItems(Elements htmlItems) {
@@ -75,7 +76,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     private Item getItem(Element article) {
         String urlItemBeInSport = String.format(BE_IN_SPORTS_DOMAIN, article.select("a").first().attr("data-url"));
-        Optional<Document> document = htmlService.get(urlItemBeInSport);
+        Option<Document> document = htmlService.get(urlItemBeInSport);
 
         return document
                 .map(this::getDailymotionIframeUrl)
@@ -83,7 +84,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .map(d -> d.select("script"))
                 .map(this::getJavascriptPart)
                 .map(html -> this.convertHtmlToItem(article, html, document.get()))
-                .orElse(Item.DEFAULT_ITEM);
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     private String getDailymotionIframeUrl(Document d) {
@@ -130,7 +131,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .get(podcast.getUrl())
                 .map(p -> p.select(".cluster_video").html())
                 .map(signatureService::generateMD5Signature)
-                .orElse(StringUtils.EMPTY);
+                .getOrElse(StringUtils.EMPTY);
     }
 
     private Boolean podcastContains(Podcast podcast, Item item) {

@@ -6,8 +6,8 @@ import lan.dk.podcastserver.entity.CoverAssert;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +45,8 @@ public class CoverBusinessTest {
 
     @Mock CoverRepository coverRepository;
     @Mock PodcastServerParameters podcastServerParameters;
-    @Spy  UrlService urlService;
+    @Spy
+    UrlService urlService;
     @InjectMocks CoverBusiness coverBusiness;
 
     @Test
@@ -121,6 +122,7 @@ public class CoverBusinessTest {
         podcast.setCover(Cover.builder().url("http://localhost:8089/img/image.jpg").build());
         when(podcastServerParameters.getCoverDefaultName()).thenReturn("cover");
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
+
         /* When */
         String url = coverBusiness.download(podcast);
 

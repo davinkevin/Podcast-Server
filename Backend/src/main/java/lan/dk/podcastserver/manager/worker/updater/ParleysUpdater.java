@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,14 +42,13 @@ public class ParleysUpdater extends AbstractUpdater {
     private static final TypeRef<List<ParleysResult>> LIST_PARLEYS_RESULTS = new TypeRef<List<ParleysResult>>(){};
 
     @Resource ImageService imageService;
-    @Resource UrlService urlService;
     @Resource JsonService jsonService;
 
     public Set<Item> getItems(Podcast podcast) {
         return getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()))
             .map(d -> d.read("results", LIST_PARLEYS_RESULTS))
             .map(this::fromJsonArrayToItems)
-            .orElse(Sets.newHashSet());
+            .getOrElse(Sets::newHashSet);
     }
 
     private Set<Item> fromJsonArrayToItems(List<ParleysResult> results) {
@@ -67,16 +65,15 @@ public class ParleysUpdater extends AbstractUpdater {
         return getParseJsonObject(podcast.getUrl(), null)
                 .map(d -> d.read("$", ParleysResponse.class))
                 .map(p -> signatureService.generateMD5Signature(p.toString()))
-                .orElse("");
+                .getOrElse(StringUtils.EMPTY);
     }
 
     private Item getParleysItem(String id) {
-        return urlService
-                .newURL(getItemUrl(id))
-                .flatMap(jsonService::parse)
+        return jsonService
+                .parseUrl(getItemUrl(id))
                 .map(d -> d.read("$", ParleysResult.class))
                 .map(this::fromJsonToItem)
-                .orElse(Item.DEFAULT_ITEM);
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     private Item fromJsonToItem(ParleysResult result) {
@@ -89,10 +86,9 @@ public class ParleysUpdater extends AbstractUpdater {
                 .build();
     }
 
-    private Optional<DocumentContext> getParseJsonObject(String url, Integer numberOfItem) {
-        return urlService
-                .newURL(getParleysPresentationUrl(url, numberOfItem))
-                .flatMap(jsonService::parse);
+    private Option<DocumentContext> getParseJsonObject(String url, Integer numberOfItem) {
+        return jsonService
+                .parseUrl(getParleysPresentationUrl(url, numberOfItem));
     }
 
     private String getItemUrl(String id) {
@@ -116,7 +112,7 @@ public class ParleysUpdater extends AbstractUpdater {
         return getParseJsonObject(url, 1)
             .map(d -> d.read("$", ParleysResponse.class))
             .map(ParleysResponse::getCount)
-            .orElse(100);
+            .getOrElse(100);
     }
 
     @Override

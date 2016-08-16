@@ -13,9 +13,9 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,8 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.*;
+import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.HTTPWatcher;
+import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.WS_TOPIC_DOWNLOAD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -47,17 +48,21 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class HTTPDownloaderTest {
 
-    public static final String ROOT_FOLDER = "/tmp/";
-    public static final String TEMPORARY_EXTENSION = ".psdownload";
+    private static final String ROOT_FOLDER = "/tmp/";
+    private static final String TEMPORARY_EXTENSION = ".psdownload";
 
-    @Mock UrlService urlService;
-    @Mock WGetFactory wGetFactory;
-    @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
-    @Mock ItemDownloadManager itemDownloadManager;
+    @Mock PodcastRepository podcastRepository;
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
+
+    @Mock WGetFactory wGetFactory;
+    @Mock
+    UrlService urlService;
+
+    @Mock ItemDownloadManager itemDownloadManager;
+
     @InjectMocks HTTPDownloader httpDownloader;
 
     Podcast podcast;

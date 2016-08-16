@@ -1,30 +1,24 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,7 +39,7 @@ public class CanalPlusUpdaterTest {
     @Mock JdomService jdomService;
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
-    @Mock UrlService urlService;
+    @Mock M3U8Service m3U8Service;
     @InjectMocks CanalPlusUpdater canalPlusUpdater;
     Podcast podcast;
 
@@ -58,7 +52,6 @@ public class CanalPlusUpdaterTest {
                 .title("A Canal Plus Podcast")
                 .items(Sets.newHashSet())
                 .build();
-        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL((String) i.getArguments()[0])));
     }
 
     @Test
@@ -78,7 +71,7 @@ public class CanalPlusUpdaterTest {
     @Test
     public void should_sign_the_podcast() throws URISyntaxException, IOException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal.html"));
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal.html"));
         when(signatureService.generateSignatureFromURL(anyString())).thenReturn("aSignature");
 
         /* When */
@@ -92,7 +85,7 @@ public class CanalPlusUpdaterTest {
     @Test
     public void should_reject_signature_with_empty() throws URISyntaxException, IOException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(Optional.empty());
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(Option.none());
         when(signatureService.generateSignatureFromURL(eq(""))).thenReturn("aSignature");
 
         /* When */
@@ -105,7 +98,7 @@ public class CanalPlusUpdaterTest {
     @Test
     public void should_not_find_front_tools_elements_in_page() throws URISyntaxException, IOException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal_without_loadVideoHistory.html"));
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal_without_loadVideoHistory.html"));
         when(signatureService.generateSignatureFromURL(eq(""))).thenReturn("aSignature");
 
         /* When */
@@ -118,9 +111,9 @@ public class CanalPlusUpdaterTest {
     @Test
     public void should_get_items_from_podcast() throws IOException, URISyntaxException, JDOMException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal.html"));
-        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal.front_tools.html"));
-        when(urlService.getM3U8UrlFormMultiStreamFile(any())).then(i -> "/a/fake/url/with/custom/" + UUID.randomUUID());
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal.html"));
+        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).then(i1 -> IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal.front_tools.html"));
+        when(m3U8Service.getM3U8UrlFormMultiStreamFile(any())).then(i -> "/a/fake/url/with/custom/" + UUID.randomUUID());
         prepareXmlBackend();
 
         /* When */
@@ -146,8 +139,8 @@ public class CanalPlusUpdaterTest {
     @Test
     public void should_not_videos_if_front_tools_failed() throws IOException, JDOMException, URISyntaxException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/lepetitjournal.html"));
-        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).thenReturn(Optional.empty());
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal.html"));
+        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = canalPlusUpdater.getItems(podcast);
@@ -160,16 +153,17 @@ public class CanalPlusUpdaterTest {
     public void should_handle_podcast_in_tabs_view() throws IOException, URISyntaxException, JDOMException {
         /* Given */
         podcast.setUrl(podcast.getUrl() + "&tab=1-6");
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/canalplus/page_with_tabs.html"));
-        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6130&ztid=6112&nbPlusVideos0=1&liste=5"))).then(readHtmlFromFile("/remote/podcast/canalplus/page_with_tabs_front_tools.html"));
-        when(jdomService.parse(any(URL.class))).thenReturn(Optional.empty());
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/page_with_tabs.html"));
+        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6130&ztid=6112&nbPlusVideos0=1&liste=5")))
+                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/page_with_tabs_front_tools.html"));
+        when(jdomService.parse(anyString())).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = canalPlusUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(1);
-        verify(jdomService, times(16)).parse(any(URL.class));
+        verify(jdomService, times(16)).parse(anyString());
     }
 
     @Test
@@ -183,17 +177,8 @@ public class CanalPlusUpdaterTest {
         String uri = "/remote/podcast/canalplus/lepetitjournal.%s.xml";
 
         for (String id : Arrays.asList(/*"1344688", */"1345586", "1345804", "1345857", "1345867", "1347250", "1347728", "1348127", "1348490", "1348841", "1348993", "1349772", "1350194", "1350642", "1351047", "1351482")) {
-            when(jdomService.parse(eq(new URL(String.format(url, id))))).then(readXmlFromFile(String.format(uri, id)));
+            when(jdomService.parse(eq(String.format(url, id)))).then(i -> IOUtils.fileAsXml(String.format(uri, id)));
         }
-        when(jdomService.parse(eq(new URL(String.format(url, "1344688"))))).thenReturn(Optional.empty());
-    }
-
-    private Answer<Optional<Document>> readHtmlFromFile(String s) throws URISyntaxException {
-        Path path = Paths.get(CanalPlusUpdaterTest.class.getResource(s).toURI());
-        return i -> Optional.of(Jsoup.parse(path.toFile(), "UTF-8", "http://www.canalplus.fr/"));
-    }
-
-    private Answer<Optional<org.jdom2.Document>> readXmlFromFile(String s) throws URISyntaxException {
-        return i -> Optional.of(new SAXBuilder().build(Paths.get(CanalPlusUpdaterTest.class.getResource(s).toURI()).toFile()));
+        when(jdomService.parse(eq(String.format(url, "1344688")))).thenReturn(Option.none());
     }
 }

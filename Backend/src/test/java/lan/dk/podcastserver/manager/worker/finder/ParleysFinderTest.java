@@ -10,9 +10,8 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
+import lan.dk.utils.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -21,13 +20,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.entity.Podcast.DEFAULT_PODCAST;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -38,29 +35,22 @@ public class ParleysFinderTest {
 
     private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
 
-    @Mock UrlService urlService;
     @Mock JsonService jsonService;
     @Mock ImageService imageService;
     @InjectMocks ParleysFinder parleysFinder;
-
-    @Before
-    public void beforeEach() {
-        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(i.getArgumentAt(0, String.class))));
-    }
 
     @Test
     public void should_find_podcast() throws MalformedURLException {
         /* Given */
         String originalUrl = "https://www.parleys.com/channel/devoxx-france-2015";
-        String apiUrl = "https://api.parleys.com/api/channel.json/devoxx-france-2015";
-        URL devoxx = new URL(apiUrl);
+        String devoxx = "https://api.parleys.com/api/channel.json/devoxx-france-2015";
         Cover cover = Cover.builder()
                     .url("https://cdn.parleys.com/c/551e6811e4b06d4cf459322d/MNjgARLMlrW_banniere_carre_devoxx_fr_2015_256_256.png")
                     .height(1200)
                     .width(1600)
                 .build();
 
-        when(jsonService.parse(devoxx)).then(readFrom("devoxx-france-2015.details.json"));
+        when(jsonService.parseUrl(devoxx)).then(i -> IOUtils.fileAsJson("/remote/podcast/parleys/devoxx-france-2015.details.json"));
         when(imageService.getCoverFromURL(cover.getUrl())).thenReturn(cover);
 
         /* When */

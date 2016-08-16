@@ -6,6 +6,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import javaslang.control.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,20 @@ public class JsonService {
     }
 
     public Optional<DocumentContext> parse(URL url) {
-        try (BufferedReader bufferedReader = urlService.urlAsReader(url)) {
+        try (BufferedReader bufferedReader = urlService.asReader(url.toString())) {
             return Optional.of(parse(bufferedReader.lines().collect(joining())));
         } catch (IOException e) {
             log.error("Error during fetching of each items of {}", url, e);
             return Optional.empty();
+        }
+    }
+
+    public Option<DocumentContext> parseUrl(String url) {
+        try (BufferedReader bufferedReader = urlService.asReader(url)) {
+            return Option.of(parse(bufferedReader.lines().collect(joining())));
+        } catch (IOException e) {
+            log.error("Error during fetching of each items of {}", url, e);
+            return Option.none();
         }
     }
 }

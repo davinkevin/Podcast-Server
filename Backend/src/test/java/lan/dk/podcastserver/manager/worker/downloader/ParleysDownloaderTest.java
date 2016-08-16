@@ -15,9 +15,9 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +32,6 @@ import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,10 +62,11 @@ public class ParleysDownloaderTest {
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
-    @Mock FfmpegService ffmpegService;
-    @Mock UrlService urlService;
-    @Mock WGetFactory wGetFactory;
+
     @Mock JsonService jsonService;
+    @Mock FfmpegService ffmpegService;
+    @Mock WGetFactory wGetFactory;
+
     @InjectMocks ParleysDownloader parleysDownloader;
 
     @Captor ArgumentCaptor<Path> toConcatFiles;
@@ -90,7 +90,6 @@ public class ParleysDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
-        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL((String) i.getArguments()[0])));
         doAnswer(i -> {
             Files.createFile(Path.class.cast(i.getArguments()[0]));
             return null;
@@ -109,7 +108,8 @@ public class ParleysDownloaderTest {
         DownloadInfo mock = mock(DownloadInfo.class);
         WGet wget = mock(WGet.class);
 
-        when(jsonService.parse(eq(new URL("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))).then(readerFrom("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
+        when(jsonService.parseUrl(eq("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))
+                .then(i -> IOUtils.fileAsJson("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(mock);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wget);
 
@@ -148,7 +148,8 @@ public class ParleysDownloaderTest {
         DownloadInfo mock = mock(DownloadInfo.class);
         WGet wget = mock(WGet.class);
 
-        when(jsonService.parse(eq(new URL("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))).then(readerFrom("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
+        when(jsonService.parseUrl(eq("http://api.parleys.com/api/presentation.json/5534a6b4e4b056a82338229d?view=true")))
+                .then(i -> IOUtils.fileAsJson("/remote/podcast/parleys/5534a6b4e4b056a82338229d.json"));
         doThrow(MalformedURLException.class).when(wGetFactory).newDownloadInfo(eq(ASSETS_URL));
         when(wGetFactory.newDownloadInfo(not(eq(ASSETS_URL)))).thenReturn(mock);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wget);

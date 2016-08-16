@@ -2,8 +2,10 @@ package lan.dk.podcastserver.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.Lists;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.jdom2.Document;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,19 +15,23 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by kevin on 08/09/15 for Podcast Server
@@ -35,7 +41,8 @@ public class JdomServiceTest {
 
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock MimeTypeService mimeTypeService;
-    @Mock UrlService urlService;
+    @Mock
+    UrlService urlService;
     @InjectMocks JdomService jdomService;
 
     private List<String> itemId = Lists.newArrayList(
@@ -145,33 +152,21 @@ public class JdomServiceTest {
     public WireMockRule wireMockRule = new WireMockRule(8181); // No-args constructor defaults to port 8181
 
     @Test
-    public void should_parse() throws MalformedURLException {
+    public void should_parse() throws IOException {
         /* Given */
+        String url = "http://localhost:8181/a/valid.xml";
+        when(urlService.asStream(anyString())).then(i -> IOUtils.urlAsStream(i.getArgumentAt(0, String.class)));
         stubFor(get(urlEqualTo("/a/valid.xml"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withBodyFile("service/jdomService/valid.xml")));
 
         /* When */
-        Optional<Document> document = jdomService.parse(new URL("http://localhost:8181/a/valid.xml"));
+        Option<Document> document = jdomService.parse(url);
 
         /* Then */
-        assertThat(document).isPresent();
-    }
-
-    @Test
-    public void should_do_error_during_parse() throws MalformedURLException {
-        /* Given */
-        stubFor(get(urlEqualTo("/a/invalid.xml"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBodyFile("service/jdomService/invalid.xml")));
-
-        /* When */
-        Optional<Document> document = jdomService.parse(new URL("http://localhost:8181/a/invalid.xml"));
-
-        /* Then */
-        assertThat(document).isEmpty();
+        assertThat(document.isDefined()).isTrue();
+        verify(urlService, only()).asStream(eq(url));
     }
 
     @Test

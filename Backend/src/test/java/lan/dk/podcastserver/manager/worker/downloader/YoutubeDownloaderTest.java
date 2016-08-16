@@ -17,7 +17,6 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +68,6 @@ public class YoutubeDownloaderTest {
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
     @Mock WGetFactory wGetFactory;
-    @Mock UrlService urlService;
     @InjectMocks YoutubeDownloader youtubeDownloader;
 
     @Mock VideoInfo videoInfo;
@@ -191,21 +189,10 @@ public class YoutubeDownloaderTest {
         /* Given */
         podcast.setTitle("bin");
         youtubeDownloader.setItem(item.setUrl("http://foo.bar.com/bash"));
-
-        DownloadInfo info = mock(DownloadInfo.class);
-
-        when(itemDownloadManager.getRootfolder()).thenReturn("/");
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
-        when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("bash");
-        when(videoInfo.getInfo()).thenReturn(generate(3));
-        /*when(vGet.getTarget()).then(i -> youtubeDownloader.target);*/
-        when(info.getContentType()).thenReturn("video/");
-        /*youtubeDownloader.videoFileInfoList = info;*/
+        youtubeDownloader.v = vGet;
+        youtubeDownloader.target = Paths.get("/bin/bash");
 
         /* When */
-        youtubeDownloader.download();
         youtubeDownloader.finishDownload();
     }
 

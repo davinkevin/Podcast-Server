@@ -7,7 +7,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.UrlServiceV2;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -16,12 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Optional;
-
 import static java.util.Objects.nonNull;
+import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 
 /**
  * Created by kevin on 20/07/2016.
@@ -48,7 +43,6 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     @Autowired HtmlService htmlService;
     @Autowired JsonService jsonService;
     @Autowired SignatureService signatureService;
-    @Autowired UrlServiceV2 urlServiceV2;
 
     String url = null;
 
@@ -68,7 +62,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
                 .map(this::normalizeId)
                 .map(this::getM3U8url)
                 .map(this::getHighestQualityUrl)
-                .orElseThrow(() -> new RuntimeException("Id not found for url " + url));
+                .getOrElseThrow(() -> new RuntimeException("Id not found for url " + url));
 
         return url;
     }
@@ -81,7 +75,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     }
 
     private String getAuthKey(String id) {
-        String timestamp = Try.of(() -> urlServiceV2.get(WAT_TIME_SERVER_URL).asString())
+        String timestamp = Try.of(() -> urlService.get(WAT_TIME_SERVER_URL).asString())
                 .map(HttpResponse::getBody)
                 .map(s -> StringUtils.substringBefore(s, "|"))
                 .getOrElse(StringUtils.EMPTY);
@@ -91,45 +85,45 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     }
 
     private String getM3U8url(String id) {
-        return Try.of(() -> urlServiceV2.post(API_WAT_DELIVERY)
+        return Try.of(() -> urlService.post(API_WAT_DELIVERY)
                     .header(HEADER_CONTENT_TYPE, HEADER_FORM)
                     .field(FIELD_MEDIA_ID, id)
                     .field(FIELD_APP_NAME, APP_NAME)
                     .field(FIELD_AUTH_KEY, getAuthKey(id))
                     .field(FIELD_METHOD, METHOD)
                 .asString())
-                    .map(stringHttpResponse -> stringHttpResponse.getBody())
+                    .map(HttpResponse::getBody)
                     .map(jsonService::parse)
                     .map(d -> d.read("$", TF1ReplayVideoUrl.class))
                     .map(TF1ReplayVideoUrl::getMessage)
+                    .map(this::upgradeBitrate)
                 .getOrElse("http://wat.tv/get/ipad/"+ id + ".m3u8");
     }
 
-    private String getHighestQualityUrl(String url) {
-        String realUrl = urlService.getRealURL(url, USER_AGENT_MOBILE);
+    private String upgradeBitrate(String url) {
+        // bwmin=40000&bwmax=150000
+        // bwmin=400000&bwmax=4900000
+        return url
+                .replaceFirst("bwmin=[0-9]+", "bwmin=400000")
+                .replaceFirst("bwmax=[0-9]+", "bwmax=4900000");
+    }
 
-        return Try.of(() -> urlServiceV2.get(url)
+    private String getHighestQualityUrl(String url) {
+        String realUrl = urlService.getRealURL(url, c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
+
+        return Try.of(() -> urlService.get(url)
                 .header(USER_AGENT, USER_AGENT_MOBILE)
                 .asString()
         )
                 .map(HttpResponse::getRawBody)
-                .map(m3U8Service::findBestQuality)
-                .mapTry(Optional::get)
-                .map(u -> urlService.urlWithDomain(realUrl, u))
+                .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
+                .map(u -> urlService.addDomainIfRelative(realUrl, u))
                 .getOrElseThrow((e) -> new RuntimeException("Url not found for TF1 item with m3u8 url " + url, e));
     }
 
     @Override
-    protected BufferedReader readM3U8() throws IOException {
-        return Try.of(() ->
-                urlServiceV2.get(getItemUrl(item))
-                    .header(USER_AGENT, USER_AGENT_MOBILE)
-                    .asBinary()
-                    .getRawBody()
-        )
-                .map(InputStreamReader::new)
-                .map(BufferedReader::new)
-                .getOrElseThrow(e -> new RuntimeException("Error during reading of m3u8 " + getItemUrl(item), e));
+    protected String withUserAgent() {
+        return USER_AGENT_MOBILE;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

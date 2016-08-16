@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,17 +31,15 @@ public class DailymotionFinder implements Finder {
 
     final JsonService jsonService;
     final ImageService imageService;
-    final UrlService urlService;
 
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
         return usernameOf(url)
                 .map(username -> String.format(API_URL, username))
-                .flatMap(urlService::newURL)
-                .flatMap(jsonService::parse)
+                .flatMap(jsonService::parseUrl)
                 .map(json -> json.read("$", DailymotionUserDetail.class))
                 .map(d -> jsonToPodcast(url, d))
-                .orElse(Podcast.builder().url(url).type("Dailymotion").cover(new Cover()).build());
+                .getOrElse(() -> Podcast.builder().url(url).type("Dailymotion").cover(Cover.DEFAULT_COVER).build());
     }
 
     private Podcast jsonToPodcast(String url, DailymotionUserDetail detail) {
@@ -55,13 +52,13 @@ public class DailymotionFinder implements Finder {
                 .build();
     }
 
-    private Optional<String> usernameOf(String url) {
+    private Option<String> usernameOf(String url) {
         // http://www.dailymotion.com/karimdebbache
         Matcher matcher = USER_NAME_EXTRACTOR.matcher(url);
-        if (matcher.find())
-            return Optional.of(matcher.group(1));
+        if (!matcher.find())
+            return Option.none();
 
-        return Optional.empty();
+        return Option.of(matcher.group(1));
     }
 
     private static class DailymotionUserDetail {

@@ -5,8 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,8 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -37,7 +34,7 @@ public class BeInSportsFinderTest {
         /* Given */
         Cover cover = Cover.builder().url("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG").width(200).height(200).build();
         when(imageService.getCoverFromURL(eq("https://images.beinsports.com/_04REUK9dN14HyrE2659T4C9zxQ=/670x424/smart/302352-Capture.PNG"))).thenReturn(cover);
-        when(htmlService.get(eq("http://www.beinsports.com/france/replay/lexpresso"))).thenReturn(readFile("/remote/podcast/beinsports/lexpresso.html"));
+        when(htmlService.get(eq("http://www.beinsports.com/france/replay/lexpresso"))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
 
         /* When */
         Podcast podcast = beInSportsFinder.find("http://www.beinsports.com/france/replay/lexpresso");
@@ -60,9 +57,4 @@ public class BeInSportsFinderTest {
     public void should_not_be_compatible() {
         assertThat(beInSportsFinder.compatibility("http://www.foo.com/bar/folder")).isGreaterThan(1);
     }
-    
-    public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
-        return Optional.of(Jsoup.parse(Paths.get(YoutubeFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
-    }
-
 }

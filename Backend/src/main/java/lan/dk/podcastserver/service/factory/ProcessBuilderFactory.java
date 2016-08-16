@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * Created by kevin on 25/01/2016 for Podcast Server
@@ -14,9 +13,9 @@ import java.util.List;
 public class ProcessBuilderFactory {
 
     public ProcessBuilder newProcessBuilder(String... command) { return new ProcessBuilder(command); }
-    public ProcessBuilder newProcessBuilder(List<String> command) {
+    /*public ProcessBuilder newProcessBuilder(List<String> command) {
         return new ProcessBuilder(command);
-    }
+    }*/
 
     public int pidOf(Process p) {
         try {

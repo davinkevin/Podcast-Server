@@ -26,7 +26,7 @@ public class CanalPlusFinder implements Finder {
         return htmlService
                 .get(url)
                 .map(this::htmlToPodcast)
-                .orElse(Podcast.DEFAULT_PODCAST);
+                .getOrElse(Podcast.DEFAULT_PODCAST);
     }
 
     private Podcast htmlToPodcast(Document p) {

@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
+import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,8 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -32,7 +30,7 @@ public class YoutubeFinderTest {
     public void should_find_information_about_a_youtube_podcast_with_his_url () throws JDOMException, IOException, FindPodcastNotFoundException, URISyntaxException {
         //Given
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel")))
-                .thenReturn(readFile("/remote/podcast/youtube.cauetofficiel.html"));
+                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube.cauetofficiel.html"));
 
         //When
         Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");
@@ -50,7 +48,7 @@ public class YoutubeFinderTest {
     @Test
     public void should_not_find_podcast_for_this_url() throws IOException, FindPodcastNotFoundException {
         /* Given */
-        when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel"))).thenReturn(Optional.empty());
+        when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel"))).thenReturn(Option.none());
 
         /* When */
         Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");
@@ -63,7 +61,7 @@ public class YoutubeFinderTest {
     public void should_set_default_value_for_information_not_found() throws JDOMException, IOException, FindPodcastNotFoundException, URISyntaxException {
         //Given
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel")))
-                .thenReturn(readFile("/remote/podcast/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html"));
+                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html"));
 
         //When
         Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");
@@ -76,9 +74,5 @@ public class YoutubeFinderTest {
         assertThat(cover)
                 .isNotNull()
                 .hasUrl(null);
-    }
-
-    public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
-        return Optional.of(Jsoup.parse(Paths.get(YoutubeFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
     }
 }

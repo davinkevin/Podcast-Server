@@ -5,8 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,8 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -38,7 +35,7 @@ public class PluzzFinderTest {
         when(imageService.getCoverFromURL(eq("http://refonte.webservices.francetelevisions.fr/image/referentiel_emissions/129003962/1444405142/480/0/0/0/img.jpg")))
                 .thenReturn(cover);
         when(htmlService.get(eq("http://pluzz.francetv.fr/videos/comment_ca_va_bien.html")))
-                .thenReturn(readFile("/remote/podcast/pluzz.commentcavabien.html"));
+                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/pluzz.commentcavabien.html"));
 
         /* When */
         Podcast podcast = pluzzFinder.find("http://pluzz.francetv.fr/videos/comment_ca_va_bien.html");
@@ -51,10 +48,6 @@ public class PluzzFinderTest {
                 .hasType("Pluzz")
                 .hasCover(cover)
                 .hasDescription("Avec son équipe de chroniqueurs, Stéphane Bern anime un rendez-vous consacrée à la beauté, à la mode, aux tendances, au bricolage ou encore ...");
-    }
-
-    public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
-        return Optional.of(Jsoup.parse(Paths.get(YoutubeFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
     }
 
 }

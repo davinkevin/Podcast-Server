@@ -6,13 +6,12 @@ import com.github.axet.wget.info.DownloadInfo;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
+import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -30,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,7 +55,6 @@ public class ParleysDownloader extends AbstractDownloader{
     private Path podcastPath;
 
     @Autowired FfmpegService ffmpegService;
-    @Autowired UrlService urlService;
     @Autowired WGetFactory wGetFactory;
     @Autowired JsonService jsonService;
 
@@ -125,10 +122,9 @@ public class ParleysDownloader extends AbstractDownloader{
                 .map(p -> p.read("assets", LIST_PARLEUS_ASSETS_DETAIL_TYPE))
                 .map(this::assetsToParleysFiles)
                 .map(list -> list.stream().map(a -> a.setFile(getAssetFile(a.getUrl()))).collect(toList()))
-                .orElse(Lists.newArrayList());
+                .getOrElse(Lists::newArrayList);
     }
 
-    @SuppressWarnings("unchecked")
     private List<ParleysAssetsDetail.ParleysAssetsFiles> assetsToParleysFiles(List<ParleysAssetsDetail> assetsDetails) {
         return assetsDetails
                 .stream()
@@ -143,28 +139,27 @@ public class ParleysDownloader extends AbstractDownloader{
         return String.format(PARLEYS_ITEM_API_URL, id);
     }
 
-    private Optional<String> getParleysId(String url) {
+    private Option<String> getParleysId(String url) {
         // Extraction de l'id de l'emission :
         Matcher m = ID_PARLEYS_PATTERN.matcher(url);
-        if (m.find()) {
-            return Optional.of(m.group(1));
-        }
-        return Optional.empty();
+
+        if (!m.find())
+            return Option.none();
+
+        return Option.of(m.group(1));
     }
 
-    private Optional<DocumentContext> getParseJsonObjectForItem(String url) {
+    private Option<DocumentContext> getParseJsonObjectForItem(String url) {
         return getParleysId(url)
                 .map(this::getItemUrl)
-                .flatMap(urlService::newURL)
-                .flatMap(jsonService::parse);
+                .flatMap(jsonService::parseUrl);
     }
 
 
-    @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class ParleysAssetsDetail {
-        @JsonProperty("target") private String target;
-        @JsonProperty("files") private List<ParleysAssetsFiles> files;
+        @Getter @Setter @JsonProperty("target") private String target;
+        @Getter @Setter @JsonProperty("files") private List<ParleysAssetsFiles> files;
 
         @Accessors(chain = true)
         @JsonIgnoreProperties(value = {"file", "valid"}, ignoreUnknown = true)

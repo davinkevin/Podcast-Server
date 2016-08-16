@@ -37,7 +37,6 @@ public class ParleysWatcherTest {
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
     @Mock FfmpegService ffmpegService;
-    @Mock UrlService urlService;
     @Mock WGetFactory wGetFactory;
     @Mock JsonService jsonService;
     @Mock DownloadInfo info;
@@ -56,7 +55,6 @@ public class ParleysWatcherTest {
         parleysDownloader.template = template;
         parleysDownloader.mimeTypeService = mimeTypeService;
         parleysDownloader.ffmpegService = ffmpegService;
-        parleysDownloader.urlService = urlService;
         parleysDownloader.wGetFactory = wGetFactory;
         parleysDownloader.jsonService = jsonService;
 

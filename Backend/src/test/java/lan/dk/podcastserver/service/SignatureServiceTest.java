@@ -22,14 +22,15 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SignatureServiceTest {
 
-    @Mock UrlService urlService;
+    @Mock
+    UrlService urlService;
     @InjectMocks SignatureService signatureService;
 
     @Test
     public void should_generate_md5_from_stream() throws IOException {
         /* Given */
         String stringStream = "azertyuiopqsdfghjklmwxcvbn";
-        when(urlService.urlAsReader(anyString())).thenReturn(new BufferedReader(new StringReader(stringStream)));
+        when(urlService.asReader(anyString())).thenReturn(new BufferedReader(new StringReader(stringStream)));
 
         /* When */
         String s = signatureService.generateSignatureFromURL("");
@@ -41,7 +42,7 @@ public class SignatureServiceTest {
     @Test
     public void should_return_empty_string_if_error_during_connection() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(urlService).urlAsReader(anyString());
+        doThrow(IOException.class).when(urlService).asReader(anyString());
 
         /* When */
         String s = signatureService.generateSignatureFromURL("");

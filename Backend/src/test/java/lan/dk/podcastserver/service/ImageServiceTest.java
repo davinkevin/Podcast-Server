@@ -26,14 +26,15 @@ public class ImageServiceTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(PORT); // No-args constructor defaults to port 8080
 
-    @Spy UrlService urlService;
+    @Spy
+    UrlService urlService;
     @InjectMocks ImageService imageService;
 
     @Test
     public void should_return_null_or_empty_if_no_url() throws IOException {
         /* Given */ String url = "";
         /* When */ Cover coverFromURL = imageService.getCoverFromURL(url);
-        /* Then */ assertThat(coverFromURL).isNull();
+        /* Then */ assertThat(coverFromURL).isEqualTo(Cover.DEFAULT_COVER);
     }
 
 
@@ -58,13 +59,13 @@ public class ImageServiceTest {
     
     @Test
     public void should_reject_input_stream() throws IOException {
-        /* Given */ doThrow(new IOException()).when(urlService).getConnectionWithTimeOut(HTTP_LOCALHOST + "/img/image.png", 5000);
+        /* Given */ doThrow(new IOException()).when(urlService).asStream(HTTP_LOCALHOST + "/img/image.png");
         /* When */  Cover cover = imageService.getCoverFromURL(HTTP_LOCALHOST + "/img/image.png");
-        /* Then */  assertThat(cover).isNull();
+        /* Then */  assertThat(cover).isEqualTo(Cover.DEFAULT_COVER);
     }
     
     @Test
     public void should_throw_exception_if_url_not_valid() {
-        assertThat(imageService.getCoverFromURL("blabla")).isNull();
+        assertThat(imageService.getCoverFromURL("blabla")).isEqualTo(Cover.DEFAULT_COVER);
     }
 }

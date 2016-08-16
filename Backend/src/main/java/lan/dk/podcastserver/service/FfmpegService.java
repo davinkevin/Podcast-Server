@@ -1,21 +1,30 @@
 package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import javaslang.control.Try;
+import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
+import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import net.bramp.ffmpeg.progress.ProgressListener;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.nonNull;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -26,12 +35,15 @@ import static java.util.stream.Collectors.joining;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class FfmpegService {
 
-    private static final String AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC = "aac_adtstoasc";
-    private static final String CODEC_COPY = "copy";
+    public static final String AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC = "aac_adtstoasc";
+    public static final String CODEC_COPY = "copy";
     private static final String FORMAT_CONCAT = "concat";
 
-    private final FFmpegExecutor fFmpegExecutor;
+    private final CustomRunProcessFunc runProcessFunc;
+    private final FFmpegExecutor ffmpegExecutor;
+    private final FFprobe ffprobe;
 
+    /* Concat files */
     public void concat(Path target, Path... files) {
         Path listOfFiles = null;
         try {
@@ -54,7 +66,7 @@ public class FfmpegService {
                     .setVideoCodec(CODEC_COPY)
                     .done();
 
-            fFmpegExecutor.createJob(builder).run();
+            ffmpegExecutor.createJob(builder).run();
 
         } catch (IOException e) {
             log.error("Error during Ffmpeg conversion", e);
@@ -63,17 +75,7 @@ public class FfmpegService {
             if (nonNull(listOfFiles)) Try.of(() -> Files.deleteIfExists(finalListOfFiles)); }
     }
 
-    private Path convert(Path source, Path dest) {
-        FFmpegBuilder converter = new FFmpegBuilder()
-                .setInput(source.toAbsolutePath().toString())
-                .addOutput(dest.toAbsolutePath().toString())
-                .disableVideo()
-                .done();
-
-        fFmpegExecutor.createJob(converter).run();
-        return dest;
-    }
-
+    /* Merge Audio and Video Files */
     public Path mergeAudioAndVideo(Path videoFile, Path audioFile, Path dest) {
         Path convertedAudio = convert(audioFile, audioFile.resolveSibling(changeExtension(audioFile, "aac")));
 
@@ -88,11 +90,22 @@ public class FfmpegService {
                 .setVideoCodec(CODEC_COPY)
                 .done();
 
-        fFmpegExecutor.createJob(builder).run();
+        ffmpegExecutor.createJob(builder).run();
 
         Try.of(() -> Files.deleteIfExists(convertedAudio));
         Try.of(() -> Files.move(tmpFile, dest, StandardCopyOption.REPLACE_EXISTING));
 
+        return dest;
+    }
+
+    private Path convert(Path source, Path dest) {
+        FFmpegBuilder converter = new FFmpegBuilder()
+                .setInput(source.toAbsolutePath().toString())
+                .addOutput(dest.toAbsolutePath().toString())
+                .disableVideo()
+                .done();
+
+        ffmpegExecutor.createJob(converter).run();
         return dest;
     }
 
@@ -108,5 +121,25 @@ public class FfmpegService {
     private Path changeExtension(Path audioFile, String ext) {
         String newName = FilenameUtils.getBaseName(audioFile.getFileName().toString()).concat(".").concat(ext);
         return audioFile.resolveSibling(newName);
+    }
+
+    /* Get duration of a File */
+    public double getDurationOf(String url, String userAgent) {
+        return Try.of(() -> ffprobe.probe(url, userAgent).getFormat().duration)
+                .map(d -> d*1_000_000)
+                .getOrElseThrow(e -> new UncheckedIOException((IOException) e));
+    }
+
+    /* Download delegation to ffmpeg-cli-wrapper */
+    public Process download(String url, FFmpegBuilder ffmpegBuilder, ProgressListener progressListener) {
+        ProcessListener pl = new ProcessListener(url);
+        runProcessFunc.add(pl);
+
+        runAsync(ffmpegExecutor.createJob(ffmpegBuilder, progressListener));
+
+        Future<Process> process = pl.getProcess();
+        return Try.of(() -> process.get(1, TimeUnit.SECONDS))
+                .onFailure(e -> process.cancel(true))
+                .getOrElseThrow(e -> new UncheckedExecutionException(e));
     }
 }

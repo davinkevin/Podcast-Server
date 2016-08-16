@@ -15,10 +15,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 22/02/2016 for Podcast Server
@@ -37,7 +35,7 @@ public class JsonServiceTest {
     @Test
     public void should_read_json_from_files() throws URISyntaxException, IOException {
         /* Given */
-        when(urlService.urlAsReader(any(URL.class))).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
+        when(urlService.asReader(anyString())).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
 
         /* When */
         Optional<DocumentContext> aFakeUrl = jsonService.parse(new URL("http://foo.com/"));
@@ -49,7 +47,7 @@ public class JsonServiceTest {
     @Test
     public void should_return_empty_if_error_during_parsing() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(urlService).urlAsReader(any(URL.class));
+        doThrow(IOException.class).when(urlService).asReader(anyString());
 
         /* When */
         Optional<DocumentContext> aFakeUrl = jsonService.parse(new URL("http://foo.com/"));

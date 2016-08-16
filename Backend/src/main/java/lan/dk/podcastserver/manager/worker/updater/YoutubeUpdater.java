@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.Api;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +27,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
@@ -52,7 +51,6 @@ public class YoutubeUpdater extends AbstractUpdater {
     @Resource JdomService jdomService;
     @Resource JsonService jsonService;
     @Resource HtmlService htmlService;
-    @Resource UrlService urlService;
     @Resource Api api;
 
     public Set<Item> getItems(Podcast podcast) {
@@ -61,7 +59,6 @@ public class YoutubeUpdater extends AbstractUpdater {
                 : getItemsByAPI(podcast);
     }
 
-    @SuppressWarnings("unchecked")
     private Set<Item> getItemsByAPI(Podcast podcast) {
         log.info("Youtube Update by API");
 
@@ -73,17 +70,15 @@ public class YoutubeUpdater extends AbstractUpdater {
         do {
             items.addAll(pageItems);
 
-            Optional<YoutubeResponse> jsonResponse = urlService
-                    .newURL(asApiPlaylistUrl(playlistId, nextPageToken))
-                    .flatMap(jsonService::parse)
+            Option<YoutubeResponse> jsonResponse = jsonService
+                    .parseUrl(asApiPlaylistUrl(playlistId, nextPageToken))
                     .map(d -> d.read("$", YoutubeResponse.class));
 
-            pageItems = jsonResponse
-                    .map(YoutubeResponse::getItems)
+            pageItems = jsonResponse.map(YoutubeResponse::getItems)
                     .map(this::convertToItems)
-                    .orElse(Sets.newHashSet());
+                    .getOrElse(Sets::newHashSet);
 
-            nextPageToken = jsonResponse.map(YoutubeResponse::getNextPageToken).orElse("");
+            nextPageToken = jsonResponse.map(YoutubeResponse::getNextPageToken).getOrElse(StringUtils.EMPTY);
 
         } while(page++ < MAX_PAGE && StringUtils.isNotEmpty(nextPageToken));
         // Can't Access the podcast item here due thread-safe JPA / Hibernate problem
@@ -119,19 +114,20 @@ public class YoutubeUpdater extends AbstractUpdater {
                     .url(item.getUrl())
                     .cover(item.getCover()
                             .map(t -> Cover.builder().url(t.getUrl()).width(t.getWidth()).height(t.getHeight()).build())
-                            .orElse(DEFAULT_COVER))
+                            .getOrElse(DEFAULT_COVER)
+                    )
                 .build();
     }
 
     private Set<Item> getItemsByRss(Podcast podcast) {
         log.info("Youtube Update by RSS");
 
-        Optional<Element> element = xmlOf(podcast.getUrl()).map(Document::getRootElement);
+        Option<Element> element = xmlOf(podcast.getUrl()).map(Document::getRootElement);
 
         return element
             .map(d -> d.getChildren("entry", d.getNamespace()))
-            .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).orElse(Namespace.NO_NAMESPACE)))
-            .orElse(Sets.newHashSet());
+            .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).getOrElse(Namespace.NO_NAMESPACE)))
+            .getOrElse(Sets.newHashSet());
     }
 
     private Set<Item> xmlToItems(List<Element> entry, Namespace defaultNamespace) {
@@ -143,14 +139,13 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        Optional<Element> element = xmlOf(podcast.getUrl())
-                .map(Document::getRootElement);
+        Option<Element> element = xmlOf(podcast.getUrl()).map(Document::getRootElement);
 
         return element
                 .map(d -> d.getChildren("entry", d.getNamespace()))
-                .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).orElse(Namespace.NO_NAMESPACE))).collect(joining()))
+                .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).getOrElse(Namespace.NO_NAMESPACE))).collect(joining()))
                 .map(signatureService::generateMD5Signature)
-                .orElse("");
+                .getOrElse(StringUtils.EMPTY);
     }
 
     private Item generateItemFromElement(Element entry, Namespace defaultNamespace) {
@@ -178,10 +173,8 @@ public class YoutubeUpdater extends AbstractUpdater {
         return String.format(URL_PAGE_BASE, idVideo);
     }
 
-    private Optional<Document> xmlOf(String url) {
-        return urlService
-                    .newURL(isPlaylist(url) ? String.format(PLAYLIST_RSS_BASE, playlistIdOf(url)) : String.format(CHANNEL_RSS_BASE, channelIdOf(url)))
-                    .flatMap(jdomService::parse);
+    private Option<Document> xmlOf(String url) {
+        return jdomService.parse(isPlaylist(url) ? String.format(PLAYLIST_RSS_BASE, playlistIdOf(url)) : String.format(CHANNEL_RSS_BASE, channelIdOf(url)));
     }
 
     private String playlistIdOf(String url) {
@@ -199,7 +192,7 @@ public class YoutubeUpdater extends AbstractUpdater {
             .map(p -> p.select("[data-channel-external-id]").first())
             .filter(Objects::nonNull)
             .map(e -> e.attr("data-channel-external-id"))
-            .orElse("");
+            .getOrElse(StringUtils.EMPTY);
     }
 
     @Override
@@ -239,7 +232,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                 return String.format(URL_PAGE_BASE, snippet.getResourceId().getVideoId());
             }
 
-            public Optional<Thumbnails.Thumbnail> getCover() {
+            public Option<Thumbnails.Thumbnail> getCover() {
                 return this.snippet.getThumbnails().getBetterThumbnail();
             }
 
@@ -265,23 +258,23 @@ public class YoutubeUpdater extends AbstractUpdater {
                 @Setter private Thumbnail medium;
                 @Setter @JsonProperty("default") private Thumbnail byDefault;
 
-                Optional<Thumbnail> getBetterThumbnail() {
+                Option<Thumbnail> getBetterThumbnail() {
                     if (nonNull(maxres))
-                        return Optional.of(maxres);
+                        return Option.of(maxres);
 
                     if (nonNull(standard))
-                        return Optional.of(standard);
+                        return Option.of(standard);
 
                     if (nonNull(high))
-                        return Optional.of(high);
+                        return Option.of(high);
 
                     if (nonNull(medium))
-                        return Optional.of(medium);
+                        return Option.of(medium);
 
                     if (nonNull(byDefault))
-                        return Optional.of(byDefault);
+                        return Option.of(byDefault);
 
-                    return Optional.empty();
+                    return Option.none();
                 }
 
                 @JsonIgnoreProperties(ignoreUnknown = true)

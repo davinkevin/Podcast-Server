@@ -5,8 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,8 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -37,7 +34,7 @@ public class CanalPlusFinderTest {
         /* Given */
         Cover cover = Cover.builder().url("http://media.canal-plus.com/image/81/7/642817.ogfb.jpg").width(200).height(200).build();
         when(imageService.getCoverFromURL(eq("http://media.canal-plus.com/image/81/7/642817.ogfb.jpg"))).thenReturn(cover);
-        when(htmlService.get(eq("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html"))).thenReturn(readFile("/remote/podcast/canalplus/lepetitjournal.html"));
+        when(htmlService.get(eq("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html"))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal.html"));
 
         /* When */
         Podcast podcast = canalPlusFinder.find("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html");
@@ -60,10 +57,6 @@ public class CanalPlusFinderTest {
     @Test
     public void should_not_be_compatible() {
         assertThat(canalPlusFinder.compatibility("http://www.foo.fr/bar/to.html")).isGreaterThan(1);
-    }
-
-    public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
-        return Optional.of(Jsoup.parse(Paths.get(YoutubeFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
     }
 
 }

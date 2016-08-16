@@ -3,12 +3,14 @@
   <groupId>lan.dk.PodcastServer</groupId>
   <artifactId>Backend</artifactId>
   <version>1.1.0-SNAPSHOT</version>
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>1.3.3.RELEASE</version>
     <relativePath></relativePath>
   </parent>
+
   <properties>
     <mockito.version>1.10.19</mockito.version>
     <querydsl.version>3.6.9</querydsl.version>
@@ -17,6 +19,14 @@
     <start-class>lan.dk.podcastserver.Application</start-class>
     <java.version>1.8</java.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -146,7 +156,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.16.8</version>
+      <version>1.16.10</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -154,10 +164,15 @@
       <artifactId>jarchivelib</artifactId>
       <version>0.7.1</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>net.bramp.ffmpeg</groupId>
       <artifactId>ffmpeg</artifactId>
-      <version>0.5</version>
+      <version>0.6-SNAPSHOT</version>
+    </dependency>-->
+    <dependency>
+      <groupId>com.github.davinkevin</groupId>
+      <artifactId>ffmpeg-cli-wrapper</artifactId>
+      <version>0.6-SNAPSHOT</version>
     </dependency>
     <!-- Mapper JSON -->
     <dependency>

@@ -4,7 +4,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jdom2.Element;
@@ -22,26 +21,24 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired) )
 public class RSSFinder implements Finder {
 
-    public static final String CHANNEL = "channel";
-    public static final String TITLE = "title";
-    public static final String DESCRIPTION = "description";
-    public static final String IMAGE = "image";
-    public static final String URL = "url";
-    public static final String HREF = "href";
+    private static final String CHANNEL = "channel";
+    private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
+    private static final String IMAGE = "image";
+    private static final String URL = "url";
+    private static final String HREF = "href";
 
-    final UrlService urlService;
     final JdomService jdomService;
     final ImageService imageService;
 
     @Override
     public Podcast find(String url) throws FindPodcastNotFoundException {
-        return urlService
-                .newURL(url)
-                .flatMap(jdomService::parse)
+        return jdomService
+                .parse(url)
                 .map(x -> x.getRootElement().getChild(CHANNEL))
                 .filter(Objects::nonNull)
                 .map(e -> this.xmlToPodcast(e, url))
-                .orElse(Podcast.DEFAULT_PODCAST);
+                .getOrElse(Podcast.DEFAULT_PODCAST);
     }
 
     private Podcast xmlToPodcast(Element element, String url) {

@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toSet;
 @Component("JeuxVideoComUpdater")
 public class JeuxVideoComUpdater extends AbstractUpdater {
 
-    public static final String JEUXVIDEOCOM_HOST = "http://www.jeuxvideo.com";
+    static final String JEUXVIDEOCOM_HOST = "http://www.jeuxvideo.com";
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
 
@@ -37,7 +37,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
                 .get(podcast.getUrl())
                 .map(p -> p.select("article"))
                 .map(this::htmlToItems)
-                .orElse(Sets.newHashSet());
+                .getOrElse(Sets.newHashSet());
     }
 
     private Set<Item> htmlToItems(Elements elements) {
@@ -51,7 +51,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
         return htmlService
                 .get(JEUXVIDEOCOM_HOST.concat(videoPageUrl))
                 .map(this::htmlToItem)
-                .orElse(Item.DEFAULT_ITEM);
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     private Item htmlToItem(Document page) {
@@ -71,7 +71,7 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
                 .get(podcast.getUrl())
                 .map(p -> p.select("article").html())
                 .map(signatureService::generateMD5Signature)
-                .orElse("");
+                .getOrElse("");
     }
 
     @Override

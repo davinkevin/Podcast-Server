@@ -2,6 +2,9 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mashape.unirest.http.HttpResponse;
+import javaslang.control.Option;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
@@ -11,7 +14,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -32,22 +34,26 @@ public class DailymotionDownloader extends HTTPDownloader {
             return url;
         }
 
-        url = urlService
-                .getPageFromURL(item.getUrl())
+        url = Try.of(() -> urlService
+                .get(item.getUrl())
+                .asString()
+        )
+                .map(HttpResponse::getBody)
+                .toOption()
                 .flatMap(DailymotionDownloader::getPlayerConfig)
                 .map(json -> jsonService.parse(json).read("metadata.qualities", DailymotionQualities.class))
                 .map(DailymotionQualities::getMaxQualityUrl)
-                .orElse(null);
+                .getOrElse(() -> null);
 
         return url;
     }
 
-    private static Optional<String> getPlayerConfig(String page) {
-        if (!page.contains("buildPlayer({") || !page.contains("});")) return Optional.empty();
+    private static Option<String> getPlayerConfig(String page) {
+        if (!page.contains("buildPlayer({") || !page.contains("});")) return Option.none();
 
         int begin = page.indexOf("buildPlayer({");
         int end = page.indexOf("});", begin);
-        return Optional.of(page.substring(begin+"buildPlayer({".length()-1, end+1));
+        return Option.of(page.substring(begin+"buildPlayer({".length()-1, end+1));
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -57,8 +63,12 @@ public class DailymotionDownloader extends HTTPDownloader {
         @JsonProperty("380") @Setter List<QualityItem> p380;
         @JsonProperty("480") @Setter List<QualityItem> p480;
         @JsonProperty("720") @Setter List<QualityItem> p720;
+        @JsonProperty("1080") @Setter List<QualityItem> p1080;
 
         String getMaxQualityUrl() {
+            if (nonNull(p1080) && !p1080.isEmpty())
+                return p1080.get(0).getUrl();
+
             if (nonNull(p720) && !p720.isEmpty())
                 return p720.get(0).getUrl();
 

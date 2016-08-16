@@ -1,13 +1,19 @@
 package lan.dk.podcastserver.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.jsoup.helper.HttpConnection;
+import javaslang.control.Option;
 import org.jsoup.nodes.Document;
-import org.junit.Before;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
+import org.jsoup.select.Elements;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Optional;
+import java.util.stream.Collector;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +21,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by kevin on 11/06/15 for HackerRank problem
  */
+@RunWith(MockitoJUnitRunner.class)
 public class HtmlServiceTest {
+
+    @Spy
+    UrlService urlService;
+    @InjectMocks HtmlService htmlService;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089); // No-args constructor defaults to port 8080
@@ -23,23 +34,6 @@ public class HtmlServiceTest {
     public static final String URL = "http://nowhere.anywhere";
     private static final String USER_AGENT = "User-Agent";
     private static final String REFERER = "Referer";
-    private HtmlService htmlService;
-
-    @Before
-    public void beforeEach() {
-        /* Given */
-        htmlService = new HtmlService();
-    }
-
-    @Test
-    public void should_generate_default_connection() {
-        /* When */ HttpConnection connection = (HttpConnection) htmlService.connectWithDefault(URL);
-
-        /* Then */
-            assertThat(connection.request().header(USER_AGENT)).isEqualTo(HtmlService.USER_AGENT);
-            assertThat(connection.request().header(REFERER)).isEqualTo("http://www.google.fr");
-            assertThat(connection.request().timeout()).isEqualTo(5000);
-    }
 
     @Test
     public void should_get_page() {
@@ -50,18 +44,18 @@ public class HtmlServiceTest {
                         .withBodyFile("service/htmlService/jsoup.html")));
 
         /* When */
-        Optional<Document> document = htmlService.get("http://localhost:8089/page/file.html");
+        Option<Document> document = htmlService.get("http://localhost:8089/page/file.html");
 
         /* Then */
-        assertThat(document).isPresent();
-        assertThat(document.map(d -> d.head().select("title").text())).hasValue("JSOUP Example");
+        assertThat(document.isDefined()).isTrue();
+        assertThat(document.map(d -> d.head().select("title").text())).contains("JSOUP Example");
     }
 
     @Test
     public void should_reject_get_with_empty() {
         /* Given */
         /* When */
-        Optional<Document> document = htmlService.get("http://localhost:8089/page/foo.html");
+        Option<Document> document = htmlService.get("http://localhost:8089/page/foo.html");
 
         /* Then */
         assertThat(document).isEmpty();
@@ -75,6 +69,24 @@ public class HtmlServiceTest {
         Document document = htmlService.parse(html);
         /* Then */
         assertThat(document).isNotNull().isInstanceOf(Document.class);
+    }
+
+    @Test
+    public void should_generate_a_collector_for_html_element() {
+        /* Given */
+        Collector<Element, Elements, Elements> collector = HtmlService.toElements();
+        Element divWithFooBar = new Element(Tag.valueOf("div"), "foo-bar");
+        Element span = new Element(Tag.valueOf("span"), "Text");
+
+        /* When */
+        Elements listOfElements = collector.supplier().get();
+        collector.accumulator().accept(listOfElements, divWithFooBar);
+        Elements cobinedElements = collector.combiner().apply(listOfElements, new Elements(span));
+
+        /* Then */
+        assertThat(cobinedElements)
+                .hasSize(2).contains(divWithFooBar, span)
+                .isInstanceOf(Elements.class);
     }
 
 }

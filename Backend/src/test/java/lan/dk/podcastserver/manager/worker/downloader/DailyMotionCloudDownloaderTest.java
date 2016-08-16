@@ -4,9 +4,11 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,14 +17,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -38,14 +37,17 @@ public class DailyMotionCloudDownloaderTest {
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
-    @Mock UrlService urlService;
+
+    @Mock
+    UrlService urlService;
+    @Mock M3U8Service m3U8Service;
+
     @Mock ItemDownloadManager itemDownloadManager;
     @InjectMocks DailyMotionCloudDownloader dailyMotionCloudDownloader;
 
-
     @Before
     public void beforeEach() {
-        dailyMotionCloudDownloader.setItemDownloadManager(this.itemDownloadManager);
+        dailyMotionCloudDownloader.setItemDownloadManager(itemDownloadManager);
     }
 
     @Test
@@ -54,8 +56,9 @@ public class DailyMotionCloudDownloaderTest {
         Item item = new Item().setUrl("http://www.dailymotion.com/id/of/a/video");
         String realUrl = "http://proxy-91.dailymotion.com/video/221/442/9dce76b19072beda39720aa04aa2e47a-video=1404000-audio_AACL_fra_70000_315=70000.m3u8";
         when(urlService.getRealURL(eq(item.getUrl()))).thenReturn(item.getUrl());
-        when(urlService.urlAsReader(eq(item.getUrl()))).thenReturn(getAsReader("/remote/downloader/dailymotion/dailymotion.m3u8"));
-        when(urlService.urlWithDomain(eq(item.getUrl()), eq(realUrl))).thenReturn(realUrl);
+        when(urlService.asStream(eq(item.getUrl()))).then(i -> IOUtils.fileAsStream("/remote/downloader/dailymotion/dailymotion.m3u8"));
+        when(urlService.addDomainIfRelative(eq(item.getUrl()), eq(realUrl))).thenCallRealMethod();
+        when(m3U8Service.findBestQuality(any())).thenCallRealMethod();
         dailyMotionCloudDownloader.item = item;
 
         /* When */
@@ -70,7 +73,7 @@ public class DailyMotionCloudDownloaderTest {
         /* Given */
         Item item = new Item().setUrl("http://www.dailymotion.com/id/of/a/video");
         when(urlService.getRealURL(eq(item.getUrl()))).thenReturn(item.getUrl());
-        doThrow(IOException.class).when(urlService).urlAsReader(eq(item.getUrl()));
+        doThrow(IOException.class).when(urlService).asStream(eq(item.getUrl()));
         dailyMotionCloudDownloader.item = item;
 
         /* When */
@@ -91,11 +94,4 @@ public class DailyMotionCloudDownloaderTest {
         /* Then */
         assertThat(itemUrl).isEqualTo("alreadyExistingUrl");
     }
-
-
-    private BufferedReader getAsReader(String url) throws URISyntaxException, IOException {
-        Path path = Paths.get(DailyMotionCloudDownloaderTest.class.getResource(url).toURI());
-        return Files.newBufferedReader(path);
-    }
-
 }

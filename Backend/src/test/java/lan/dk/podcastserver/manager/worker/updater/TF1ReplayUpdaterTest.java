@@ -8,10 +8,10 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
+import lan.dk.utils.IOUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,7 +20,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
@@ -42,19 +41,13 @@ public class TF1ReplayUpdaterTest {
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
     @Mock JsonService jsonService;
-    @Mock UrlService urlService;
     @InjectMocks TF1ReplayUpdater updater;
-
-    @Before
-    public void beforeEach() {
-        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(i.getArgumentAt(0, String.class))));
-    }
 
     @Test
     public void should_sign_for_replay() throws IOException, URISyntaxException {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
-        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay")))).thenReturn(parseJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
+        when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
         when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
         when(signatureService.generateMD5Signature(anyString())).then(i -> digest(i.getArgumentAt(0, String.class)));
 
@@ -69,8 +62,8 @@ public class TF1ReplayUpdaterTest {
     public void should_sign_for_standard_instead_of_replay() throws IOException, URISyntaxException {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/xtra/olive-et-tom/videos").build();
-        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=replay")))).thenReturn(parseJson("/remote/podcast/tf1replay/olive-et-tom.ajax.replay.json"));
-        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=all")))).thenReturn(parseJson("/remote/podcast/tf1replay/olive-et-tom.ajax.json"));
+        when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.replay.json"));
+        when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=all"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.json"));
         when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
         when(signatureService.generateMD5Signature(anyString())).then(i -> digest(i.getArgumentAt(0, String.class)));
 
@@ -97,7 +90,7 @@ public class TF1ReplayUpdaterTest {
     public void should_get_items() throws IOException, URISyntaxException {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
-        when(jsonService.parse(eq(new URL("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay")))).thenReturn(parseJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
+        when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
         when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
 
         /* When */

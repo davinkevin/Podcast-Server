@@ -1,11 +1,13 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -22,7 +24,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +65,7 @@ public class JeuxVideoComUpdaterTest {
     @Test
     public void should_error_during_sign() throws IOException {
         /* Given */
-        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Optional.empty());
+        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Option.none());
 
         /* When */
         String signature = jeuxVideoComUpdater.signatureOf(CHRONIQUE_VIDEO);
@@ -89,7 +90,7 @@ public class JeuxVideoComUpdaterTest {
     @Test
     public void should_return_empty_list_if_not_found() throws IOException {
         /* Given */
-        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Optional.empty());
+        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
@@ -103,7 +104,7 @@ public class JeuxVideoComUpdaterTest {
         /* Given */
         configureHtmlServiceWith(CHRONIQUE_VIDEO.getUrl(), "/remote/podcast/JeuxVideoCom/chroniques-video.htm");
         configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm");
-        when(htmlService.get(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))).thenReturn(Optional.empty());
+        when(htmlService.get(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
@@ -120,14 +121,8 @@ public class JeuxVideoComUpdaterTest {
         assertThat(jeuxVideoComUpdater.type().name()).isEqualTo("JeuxVideo.com");
     }
 
-    private Answer<Document> readHtmlFromFile(String s) throws URISyntaxException {
-        Path path = Paths.get(JeuxVideoComUpdaterTest.class.getResource(s).toURI());
-        return i -> Jsoup.parse(path.toFile(), "UTF-8", "http://www.jeuxvideo.com/");
-    }
-
-    private Answer<Optional<Document>> readHtmlFromFileOptional(String s) throws URISyntaxException {
-        Path path = Paths.get(JeuxVideoComUpdaterTest.class.getResource(s).toURI());
-        return i -> Optional.of(Jsoup.parse(path.toFile(), "UTF-8", "http://www.jeuxvideo.com/"));
+    private Answer<Option<Document>> readHtmlFromFileOptional(String s) throws URISyntaxException {
+        return i -> IOUtils.fileAsHtml(s);
     }
 
     private void configureHtmlServiceWith(String url, String file) throws IOException, URISyntaxException {

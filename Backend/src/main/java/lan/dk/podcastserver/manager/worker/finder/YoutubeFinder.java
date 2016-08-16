@@ -34,7 +34,7 @@ public class YoutubeFinder implements Finder {
         return htmlService
                 .get(url)
                 .map(p -> podcastFromHtml(url, p))
-                .orElse(Podcast.DEFAULT_PODCAST);
+                .getOrElse(Podcast.DEFAULT_PODCAST);
     }
 
     private Podcast podcastFromHtml(String url, Document p) {

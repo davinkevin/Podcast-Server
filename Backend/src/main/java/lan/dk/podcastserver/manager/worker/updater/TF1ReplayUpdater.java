@@ -3,13 +3,13 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.DocumentContext;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,6 @@ import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
 import static lan.dk.podcastserver.service.HtmlService.toElements;
 
 /**
- * Created by kevin on 20/07/2016.
+ * Created by kevin on 20/07/2016
  */
 @Slf4j
 @Component("TF1ReplayUpdater")
@@ -50,13 +49,12 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
     @Resource JsonService jsonService;
-    @Resource UrlService urlService;
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
         return getHtmlFromStandardOrReplay(podcast.getUrl())
                     .map(this::itemsFromHtml)
-                .orElse(Sets.newHashSet());
+                .getOrElse(Sets::newHashSet);
     }
 
     private Set<Item> itemsFromHtml(Elements v) {
@@ -106,29 +104,28 @@ public class TF1ReplayUpdater extends AbstractUpdater {
         return getHtmlFromStandardOrReplay(podcast.getUrl())
             .map(Elements::html)
             .map(signatureService::generateMD5Signature)
-            .orElse(StringUtils.EMPTY);
+            .getOrElse(StringUtils.EMPTY);
     }
 
-    private Optional<Elements> getHtmlFromStandardOrReplay(String url) {
-        Optional<Elements> replays = getElementsFrom(url, REPLAY_CATEGORY);
+    private Option<Elements> getHtmlFromStandardOrReplay(String url) {
+        Option<Elements> replays = getElementsFrom(url, REPLAY_CATEGORY);
 
-        if(replays.map(ArrayList::size).orElse(0) == 0) {
+        if(replays.map(ArrayList::size).getOrElse(0) == 0) {
             replays = getElementsFrom(url, ALL_CATEGORY);
         }
 
         return replays;
     }
 
-    private Optional<Elements> getElementsFrom(String url, @NotNull  String inCategory) {
+    private Option<Elements> getElementsFrom(String url, @NotNull  String inCategory) {
         Matcher matcher = CHANNEL_PROGRAM_EXTRACTOR.matcher(url);
 
         if (!matcher.find())
-            return Optional.empty();
+            return Option.none();
 
-        return Optional
+        return Option
                 .of(String.format(AJAX_URL_FORMAT, matcher.group(1), matcher.group(2), inCategory))
-                .flatMap(urlService::newURL)
-                .flatMap(jsonService::parse)
+                .flatMap(jsonService::parseUrl)
                 .map(EXTRACT_IN_TF1_REPLAY_RESPONSE)
                 .map(TF1ReplayResponse::getHtml)
                 .map(htmlService::parse)

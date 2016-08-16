@@ -30,17 +30,12 @@ import static java.util.Objects.nonNull;
 
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
+    static final String WS_TOPIC_DOWNLOAD = "/topic/download";
+
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    static final String WS_TOPIC_DOWNLOAD = "/topic/download";
-    static final String WS_TOPIC_PODCAST = "/topic/podcast/%s";
-
-    @Getter @Setter @Accessors(chain = true)
-    protected Item item;
-
-    String temporaryExtension;
-    protected Path target;
-    private PathMatcher hasTempExtensionMatcher;
+    @Getter @Setter @Accessors(chain = true) protected Item item;
+    @Setter @Accessors(chain = true) protected ItemDownloadManager itemDownloadManager;
 
     @Resource protected ItemRepository itemRepository;
     @Resource protected PodcastRepository podcastRepository;
@@ -48,9 +43,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Resource protected SimpMessagingTemplate template;
     @Resource protected MimeTypeService mimeTypeService;
 
-    @Setter @Accessors(chain = true)
-    protected ItemDownloadManager itemDownloadManager;
-
+    String temporaryExtension;
+    protected Path target;
+    private PathMatcher hasTempExtensionMatcher;
     AtomicBoolean stopDownloading = new AtomicBoolean(false);
 
     @Override
@@ -166,7 +161,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Transactional
     void convertAndSaveBroadcast() {
         template.convertAndSend(WS_TOPIC_DOWNLOAD, item);
-        /*template.convertAndSend(String.format(WS_TOPIC_PODCAST, item.getPodcast().getId()), item);*/
     }
 
     public String getItemUrl(Item item) {

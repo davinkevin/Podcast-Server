@@ -6,6 +6,7 @@ import com.github.axet.vget.info.VideoFileInfo;
 import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.URLInfo;
+import com.github.axet.wget.info.ex.DownloadError;
 import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
@@ -13,7 +14,6 @@ import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.FfmpegService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -52,7 +52,6 @@ public class YoutubeDownloader extends AbstractDownloader {
 
     final YoutubeWatcher watcher = new YoutubeWatcher(this);
 
-    @Autowired UrlService urlService;
     @Autowired WGetFactory wGetFactory;
     @Autowired FfmpegService ffmpegService;
 
@@ -82,16 +81,16 @@ public class YoutubeDownloader extends AbstractDownloader {
             stopDownload();
         } catch (DownloadInterruptedError e) {
             logger.debug("Arrêt du téléchargement par l'interface");
-        } catch (StringIndexOutOfBoundsException | MalformedURLException | NullPointerException e) {
-            logger.error("Exception tierce : ", e);
+        } catch (StringIndexOutOfBoundsException | MalformedURLException | NullPointerException | DownloadError e) {
+            logger.error("Third part Exception : ", e);
             if (itemDownloadManager.canBeReseted(item)) {
-                logger.info("Reset du téléchargement Youtube {}", item.getTitle());
+                logger.info("Reset of Youtube download {}", item.getTitle());
                 itemDownloadManager.resetDownload(item);
                 return null;
             }
             stopDownload();
         }
-        logger.debug("Download termine");
+        logger.debug("Download ended");
         return item;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -226,7 +225,6 @@ public class YoutubeDownloader extends AbstractDownloader {
             }
 
             switch (info.getState()) {
-                case EXTRACTING: break;
                 case EXTRACTING_DONE:
                     log.debug(FilenameUtils.getName(valueOf(item.getUrl())) + " " + info.getState());
                     break;
@@ -251,7 +249,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                         log.debug("Cause  : " + DownloadIOCodeError.class.cast(info.getException()).getCode());
                     }
 
-                    if (launchDateDownload.isBefore(now().minusMinutes(MAX_WAITING_MINUTE))) {
+                    if (launchDateDownload.isBefore(now().minusHours(MAX_WAITING_MINUTE))) {
                         youtubeDownloader.stopDownload();
                     }
                     break;

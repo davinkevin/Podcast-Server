@@ -7,13 +7,14 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.Api;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -26,14 +27,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toSet;
+import static lan.dk.utils.IOUtils.fileAsXml;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.AdditionalMatchers.and;
+import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -54,13 +57,11 @@ public class YoutubeUpdaterTest {
     @Mock JdomService jdomService;
     @Mock JsonService jsonService;
     @Mock HtmlService htmlService;
-    @Mock UrlService urlService;
     @InjectMocks YoutubeUpdater youtubeUpdater;
 
     @Before
     public void beforeEach() {
         when(api.getYoutube()).thenReturn("");
-        when(urlService.newURL(anyString())).then(i -> Optional.of(new URL(i.getArgumentAt(0, String.class))));
     }
 
     @Test
@@ -80,15 +81,15 @@ public class YoutubeUpdaterTest {
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
-        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
-        when(jdomService.parse(any(URL.class))).then(invocationOnMock -> Optional.of(parseXml("/remote/podcast/youtube.androiddevelopers.xml")));
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(jdomService.parse(anyString())).then(i -> fileAsXml("/remote/podcast/youtube.androiddevelopers.xml"));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(15);
-        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")));
+        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg"));
         verify(htmlService, only()).get(eq("https://www.youtube.com/user/androiddevelopers"));
     }
 
@@ -100,14 +101,14 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/playlist?list=PLAD454F0807B6CB80")
                 .build();
 
-        when(jdomService.parse(any(URL.class))).thenReturn(Optional.of(parseXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml")));
+        when(jdomService.parse(anyString())).thenReturn(fileAsXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml"));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(15);
-        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")));
+        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80"));
     }
 
     @Test
@@ -117,8 +118,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
-        when(jdomService.parse(any(URL.class))).thenReturn(Optional.of(parseXml("/remote/podcast/youtube.androiddevelopers.xml")));
+        when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(jdomService.parse(anyString())).thenReturn(fileAsXml("/remote/podcast/youtube.androiddevelopers.xml"));
         when(signatureService.generateMD5Signature(anyString())).thenReturn("Signature");
 
         /* When */
@@ -126,7 +127,7 @@ public class YoutubeUpdaterTest {
 
         /* Then */
         assertThat(signature).isEqualTo("Signature");
-        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")));
+        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg"));
         verify(htmlService, only()).get(eq("https://www.youtube.com/user/androiddevelopers"));
     }
 
@@ -136,8 +137,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
-        when(jdomService.parse(any(URL.class))).thenReturn(Optional.empty());
+        when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(jdomService.parse(anyString())).thenReturn(Option.none());
 
 
         /* When */
@@ -154,8 +155,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Optional.empty());
-        when(jdomService.parse(any(URL.class))).thenReturn(Optional.empty());
+        when(htmlService.get(anyString())).thenReturn(Option.none());
+        when(jdomService.parse(anyString())).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -171,8 +172,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Optional.empty());
-        when(jdomService.parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=")))).thenReturn(Optional.empty());
+        when(htmlService.get(any(String.class))).thenReturn(Option.none());
+        when(jdomService.parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="))).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -188,41 +189,31 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Optional.empty());
-        when(jdomService.parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=")))).thenReturn(Optional.empty());
+        when(htmlService.get(any(String.class))).thenReturn(Option.none());
+        when(jdomService.parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="))).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(0);
-        verify(jdomService, only()).parse(eq(new URL("https://www.youtube.com/feeds/videos.xml?channel_id=")));
+        verify(jdomService, only()).parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="));
         verify(htmlService, only()).get(eq("https://www.youtube.com/user/androiddevelopers"));
     }
 
     @Test
     public void should_get_items_with_API_from_channel() throws IOException, URISyntaxException {
         /* Given */
-        URL PAGE_1 = new URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO");
-        URL PAGE_2 = new URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA");
+        String page1 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO";
+        String page2 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA";
+
         when(api.getYoutube()).thenReturn("FOO");
         Podcast podcast = Podcast.builder().url("https://www.youtube.com/user/joueurdugrenier").items(Sets.newHashSet()).build();
-        when(jsonService.parse(any(URL.class))).then(i -> {
-            if (i.getArgumentAt(0, URL.class).equals(PAGE_1))
-                return parseJson("/remote/podcast/youtube/joueurdugrenier.json");
 
-            if (i.getArgumentAt(0, URL.class).equals(PAGE_2))
-                return parseJson("/remote/podcast/youtube/joueurdugrenier.2.json");
-
-            return Optional.empty();
-        });
-
-        /*when(jsonService.parse(any(URL.class)))
-                .thenReturn(parseJson("/remote/podcast/youtube/joueurdugrenier.json"))
-                .thenReturn(parseJson("/remote/podcast/youtube/joueurdugrenier.2.json"))
-        ;*/
-        /*when(jsonService.parse(eq(PAGE_2)));*/
-        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/joueurdugrenier.html")));
+        when(jsonService.parseUrl(eq(page1))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.json"));
+        when(jsonService.parseUrl(eq(page2))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json"));
+        when(jsonService.parseUrl(and(not(eq(page1)), not(eq(page2))))).then(i -> Option.none());
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -241,8 +232,8 @@ public class YoutubeUpdaterTest {
                 .items(Sets.newHashSet())
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Optional.of(parseHtml("/remote/podcast/youtube/androiddevelopers.html")));
-        when(jsonService.parse(any(URL.class))).thenReturn(Optional.empty());
+        when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(jsonService.parseUrl(anyString())).thenReturn(Option.none());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -285,9 +276,4 @@ public class YoutubeUpdaterTest {
     private Optional<DocumentContext> parseJson(String url) throws IOException, URISyntaxException {
         return Optional.of(PARSER.parse(Paths.get(YoutubeUpdater.class.getResource(url).toURI()).toFile()));
     }
-
-    private org.jdom2.Document parseXml(String name) throws JDOMException, IOException, URISyntaxException {
-        return new SAXBuilder().build(Paths.get(RSSUpdaterTest.class.getResource(name).toURI()).toFile());
-    }
-
 }

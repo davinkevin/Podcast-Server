@@ -3,11 +3,11 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.TypeRef;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,18 +39,15 @@ public class DailymotionUpdater extends AbstractUpdater {
 
     @Autowired JsonService jsonService;
     @Autowired ImageService imageService;
-    @Autowired UrlService urlService;
 
     @Override
-    @SuppressWarnings("unchecked")
     public Set<Item> getItems(Podcast podcast) {
         return usernameOf(podcast.getUrl())
                 .map(username -> String.format(API_LIST_OF_ITEMS, username))
-                .flatMap(urlService::newURL)
-                .flatMap(jsonService::parse)
+                .flatMap(jsonService::parseUrl)
                 .map(p -> p.read("list", LIST_DAILYMOTIONVIDEODETAIL_TYPE))
                 .map(this::asSet)
-                .orElse(Sets.newHashSet());
+                .getOrElse(Sets::newHashSet);
     }
 
     private Set<Item> asSet(List<DailymotionVideoDetail> jsonArray) {
@@ -71,7 +67,7 @@ public class DailymotionUpdater extends AbstractUpdater {
     public String signatureOf(Podcast podcast) {
         return usernameOf(podcast.getUrl())
                 .map(u -> signatureService.generateSignatureFromURL(String.format(API_LIST_OF_ITEMS, u)))
-                .orElseThrow(() -> new RuntimeException("Username not Found"));
+                .getOrElseThrow(() -> new RuntimeException("Username not Found"));
     }
 
     @Override
@@ -84,13 +80,13 @@ public class DailymotionUpdater extends AbstractUpdater {
         return StringUtils.contains(url, "www.dailymotion.com") ? 1 : Integer.MAX_VALUE;
     }
 
-    private Optional<String> usernameOf(String url) {
+    private Option<String> usernameOf(String url) {
         // http://www.dailymotion.com/karimdebbache
         Matcher matcher = USER_NAME_EXTRACTOR.matcher(url);
-        if (matcher.find())
-            return Optional.of(matcher.group(1));
+        if (!matcher.find())
+            return Option.none();
 
-        return Optional.empty();
+        return Option.of(matcher.group(1));
     }
 
     private static class DailymotionVideoDetail {

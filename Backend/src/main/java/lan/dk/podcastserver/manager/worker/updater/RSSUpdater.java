@@ -6,7 +6,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
@@ -27,45 +26,43 @@ import static java.util.stream.Collectors.toSet;
 @Component("RSSUpdater")
 public class RSSUpdater extends AbstractUpdater {
 
-    public static final Namespace MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
-    public static final Namespace FEEDBURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
+    private static final Namespace MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
+    private static final Namespace FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
 
-    @Resource UrlService urlService;
     @Resource JdomService jdomService;
     @Resource ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
         log.debug("Traitement des Items");
-        return urlService
-                .newURL(podcast.getUrl())
-                .flatMap(jdomService::parse)
+        return jdomService
+                .parse(podcast.getUrl())
                 .map(p -> p.getRootElement().getChild("channel").getChildren("item"))
                 .map(this::elementsToItems)
-                .orElse(Sets.newHashSet());
+                .getOrElse(Sets.newHashSet());
     }
 
     private Set<Item> elementsToItems(List<Element> elements) {
         return elements
                 .stream()
-                .filter(this::hasEnclosure)
-                .map(this::extractItem)
+                    .filter(this::hasEnclosure)
+                    .map(this::extractItem)
                 .collect(toSet());
     }
 
     private Boolean hasEnclosure(Element item) {
-        return item.getChild("enclosure") != null || item.getChild("origEnclosureLink", FEEDBURNER) != null;
+        return item.getChild("enclosure") != null || item.getChild("origEnclosureLink", FEED_BURNER) != null;
     }
 
     private Item extractItem(Element item) {
         // Gestion des cas pour l'url :
         return Item.builder()
-                .title(item.getChildText("title"))
-                .pubDate(getPubDate(item))
-                .description(item.getChildText("description"))
-                .mimeType(item.getChild("enclosure").getAttributeValue("type"))
-                .length(lengthOf(item))
-                .cover(coverOf(item))
-                .url(urlOf(item))
+                    .title(item.getChildText("title"))
+                    .pubDate(getPubDate(item))
+                    .description(item.getChildText("description"))
+                    .mimeType(item.getChild("enclosure").getAttributeValue("type"))
+                    .length(lengthOf(item))
+                    .cover(coverOf(item))
+                    .url(urlOf(item))
                 .build();
     }
 
@@ -76,8 +73,8 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
     private String urlOf(Element element) {
-        if (nonNull(element.getChild("origEnclosureLink", FEEDBURNER))) {
-            return element.getChildText("origEnclosureLink", FEEDBURNER);
+        if (nonNull(element.getChild("origEnclosureLink", FEED_BURNER))) {
+            return element.getChildText("origEnclosureLink", FEED_BURNER);
         }
 
         return element.getChild("enclosure").getAttributeValue("url");

@@ -1,161 +1,76 @@
 package lan.dk.podcastserver.service;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.BaseRequest;
+import com.mashape.unirest.request.GetRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+import javaslang.control.Option;
+import javaslang.control.Try;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Optional;
-
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import java.util.function.Consumer;
 
 /**
- * Created by kevin on 09/07/15 for Podcast Server
+ * Created by kevin on 21/07/2016.
  */
 @Slf4j
 @Service
 public class UrlService {
 
-    private static final Integer DEFAULT_TIME_OUT_IN_MILLI = 10000;
-    private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
+    public static final String USER_AGENT_DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36";
+    static final String USER_AGENT_KEY = "User-agent";
+
     private static final String PROTOCOL_SEPARATOR = "://";
+    private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
+    private static final Consumer<HttpURLConnection> NO_MODIFICATION = x -> {};
 
-    public UrlService() { System.setProperty("http.agent", HtmlService.USER_AGENT); }
+    public UrlService() {System.setProperty("http.agent", USER_AGENT_DESKTOP);}
 
-    public Optional<URL> newURL(String url) {
-        try {
-            return Optional.of(new URL(url));
-        } catch (MalformedURLException e) {
-            log.error("Error during creation of URL {}", url, e);
-            return Optional.empty();
-        }
+    /* Get, Post and Other standard request of UniREST */
+    public GetRequest get(String url) { return Unirest.get(url); }
+    public HttpRequestWithBody post(String url) {
+        return Unirest.post(url);
     }
 
-    public String getM3U8UrlFormMultiStreamFile(String url) {
-        if (isNull(url))
-            return null;
-
-        try(BufferedReader in = urlAsReader(url)) {
-            return in
-                    .lines()
-                    .filter(l -> !l.startsWith("#"))
-                    .reduce((acc, val) -> val)
-                    .map(s -> StringUtils.substringBeforeLast(s, "?"))
-                    .map(s -> (isRelativeUrl(s)) ? urlWithDomain(url, s) : s)
-                    .orElse(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
+    /* Real Url business */
     public String getRealURL(String url) {
-        return getRealURL(url, 0, HtmlService.USER_AGENT);
+        return getRealURL(url, NO_MODIFICATION, 0);
     }
-
-    public String getRealURL(String url, String userAgent) {
-        return getRealURL(url, 0, userAgent);
+    public String getRealURL(String url, Consumer<HttpURLConnection> connectionModifier) {
+        return getRealURL(url, connectionModifier, 0);
     }
-
-    public URLConnection getConnectionWithTimeOut(String stringUrl, Integer timeOutInMilli) throws IOException {
-        URL url = new URL(stringUrl);
-        return getConnectionWithTimeOut(url, timeOutInMilli);
-    }
-
-    private URLConnection getConnectionWithTimeOut(URL url, Integer timeOutInMilli) throws IOException {
-        URLConnection urlConnection = url.openConnection();
-        urlConnection.setReadTimeout(timeOutInMilli);
-        urlConnection.setConnectTimeout(timeOutInMilli);
-        return urlConnection;
-    }
-
-    URLConnection getConnection(String stringUrl) throws IOException {
-        return getConnectionWithTimeOut(stringUrl, DEFAULT_TIME_OUT_IN_MILLI);
-    }
-
-    private URLConnection getConnection(URL url) throws IOException {
-        return getConnectionWithTimeOut(url, DEFAULT_TIME_OUT_IN_MILLI);
-    }
-
-    public InputStream asStream(String stringUrl) throws IOException {
-        return asStream(new URL(stringUrl));
-    }
-
-    private InputStream asStream(URL url) throws IOException {
-        return getConnection(url).getInputStream();
-    }
-
-    public String getFileNameM3U8Url(String url) {
-        if (StringUtils.contains(url, "canal-plus") || StringUtils.contains(url, "cplus"))
-            return getFileNameFromCanalPlusM3U8Url(url);
-
-        /* In other case, remove the url parameter and extract the filename */
-        return FilenameUtils.getBaseName(StringUtils.substringBeforeLast(url, "?")).concat(".mp4");
-    }
-
-    public String urlWithDomain(String urlWithDomain, String domaineLessUrl) {
-        if (domaineLessUrl.contains(PROTOCOL_SEPARATOR))
-            return domaineLessUrl;
-
-        return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + domaineLessUrl;
-    }
-
-    public BufferedReader urlAsReader(String url) throws IOException {
-        return urlAsReader(new URL(url));
-    }
-
-    public BufferedReader urlAsReader(URL url) throws IOException {
-        return new BufferedReader(new InputStreamReader(asStream(url), "UTF-8"));
-    }
-
-    private static String getFileNameFromCanalPlusM3U8Url(String m3u8Url) {
-        /* http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8 */
-        String[] splitUrl = m3u8Url.split(",");
-
-        int lenghtTab = splitUrl.length;
-        String urlWithoutAllBandwith = splitUrl[0] + splitUrl[lenghtTab - 2] + splitUrl[lenghtTab - 1];
-
-        int posLastSlash = urlWithoutAllBandwith.lastIndexOf("/");
-
-        return FilenameUtils.getName(urlWithoutAllBandwith.substring(0, posLastSlash).replace(".csmil", ""));
-    }
-
-    private static boolean isRelativeUrl(String urlToReturn) {
-        return !urlToReturn.contains("://");
-    }
-
-    private String getRealURL(String url, Integer numberOfRedirection, String userAgent) {
+    private String getRealURL(String url, Consumer<HttpURLConnection> connectionModifier, Integer numberOfRedirection) {
         if (MAX_NUMBER_OF_REDIRECTION <= numberOfRedirection) {
-            throw new RuntimeException("Too Many Redirections");
+            throw new RuntimeException("Too many redirects");
         }
 
-        try {
-            URL obj = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
-            conn.setRequestProperty("User-Agent", userAgent);
-            conn.setInstanceFollowRedirects(false);
-            if (isARedirection(conn.getResponseCode())) {
-                conn.disconnect();
-                return getRealURL(conn.getHeaderField("Location"), numberOfRedirection+1, userAgent);
-            }
-        } catch (IOException e) {
-            log.error("Error during retrieval of the real URL for {} at {} redirection", url, numberOfRedirection);
-        }
+        HttpURLConnection con = Try.of(() -> new URL(url))
+                .mapTry(URL::openConnection)
+                .map(HttpURLConnection.class::cast)
+                .andThen(connectionModifier)
+                .andThen(c -> c.setInstanceFollowRedirects(false))
+                .onFailure(e -> log.error("Error during retrieval of the real URL for {} at {} redirection", url, numberOfRedirection, e))
+                .get();
 
-        return url;
+        Option<Integer> isRedirect = Try.of(con::getResponseCode)
+                .andThenTry(con::disconnect)
+                .filter(this::isARedirection)
+                .getOption();
+
+        return isRedirect
+                .map(r -> getRealURL(con.getHeaderField("Location"), connectionModifier, numberOfRedirection+1))
+                .getOrElse(url);
+
     }
-
     private Boolean isARedirection(int status) {
         return status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP ||
                 status == HttpURLConnection.HTTP_MOVED_PERM ||
@@ -163,23 +78,23 @@ public class UrlService {
         );
     }
 
-    public Optional<String> getPageFromURL(String url) {
-        try (InputStream in = new URL(url).openStream()) {
-            return Optional.of(IOUtils.toString(in));
-        } catch (IOException e) {
-            return Optional.empty();
-        }
+    /* Transform to Stream or Reader */
+    public InputStream asStream(String url) throws IOException {
+        return Try.of(() -> get(url))
+                .mapTry(BaseRequest::asBinary)
+                .map(HttpResponse::getBody)
+                .getOrElseThrow(e -> new IOException(e));
+    }
+    public BufferedReader asReader(String url) throws IOException {
+        return new BufferedReader(new InputStreamReader(asStream(url)));
     }
 
-    public String getDomainFromRequest(HttpServletRequest request) {
-        String origin = request.getHeader("origin");
-        if (nonNull(origin)) {
-            return origin;
-        }
+    /* Relative and absolute URL transformation */
+    public String addDomainIfRelative(String urlWithDomain, String mayBeRelativeUrl) {
+        if (mayBeRelativeUrl.contains(PROTOCOL_SEPARATOR))
+            return mayBeRelativeUrl;
 
-        return request.getScheme() +
-                "://" +
-                request.getServerName() +
-                ((request.getServerPort() == 80 || request.getServerPort() == 443) ? "" : ":" + request.getServerPort());
+        return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + mayBeRelativeUrl;
     }
+
 }

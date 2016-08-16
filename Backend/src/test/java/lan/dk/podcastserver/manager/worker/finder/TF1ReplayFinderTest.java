@@ -4,8 +4,7 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,8 +13,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +34,7 @@ public class TF1ReplayFinderTest {
     public void should_fetch_from_html_page() throws IOException, URISyntaxException {
         /* Given */
         String url = "www.tf1.fr/tf1/19h-live/videos";
-        when(htmlService.get(eq(url))).thenReturn(readFile("/remote/podcast/tf1replay/19h-live.html"));
+        when(htmlService.get(eq(url))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/tf1replay/19h-live.html"));
         when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
 
         /* When */
@@ -57,7 +54,7 @@ public class TF1ReplayFinderTest {
     public void should_fetch_from_html_page_without_url() throws IOException, URISyntaxException {
         /* Given */
         String url = "www.tf1.fr/tf1/19h-live/videos";
-        when(htmlService.get(eq(url))).thenReturn(readFile("/remote/podcast/tf1replay/19h-live.withoutpicture.html"));
+        when(htmlService.get(eq(url))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/tf1replay/19h-live.withoutpicture.html"));
         when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
 
         /* When */
@@ -91,9 +88,5 @@ public class TF1ReplayFinderTest {
         Integer compatibility = finder.compatibility(url);
         /* Then */
         assertThat(compatibility).isEqualTo(Integer.MAX_VALUE);
-    }
-
-    public static Optional<Document> readFile(String uri) throws URISyntaxException, IOException {
-        return Optional.of(Jsoup.parse(Paths.get(YoutubeFinderTest.class.getResource(uri).toURI()).toFile(),"UTF-8"));
     }
 }

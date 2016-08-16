@@ -23,7 +23,7 @@ public class SignatureService {
     final UrlService urlService;
 
     public String generateSignatureFromURL(String urlAsString) {
-        try(BufferedReader in = urlService.urlAsReader(urlAsString)) {
+        try(BufferedReader in = urlService.asReader(urlAsString)) {
             return generateMD5Signature(in.lines().collect(joining()));
         } catch (IOException e) {
             log.error("Error during signature of podcast at url {}", urlAsString, e);

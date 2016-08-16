@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.service.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +22,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toSet;
+import static javaslang.collection.HashSet.*;
 
 /**
  * Created by kevin on 09/08/2014 for Podcast Server
@@ -41,32 +39,29 @@ public class PluzzUpdater extends AbstractUpdater {
     private static final String JSOUP_ITEM_SELECTOR = "#player-memeProgramme";
     private static final String PLUZZ_INFORMATION_URL = "http://webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s&catalogue=Pluzz";
 
-    //PATTERN :
     private static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
     private static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
 
     @Resource HtmlService htmlService;
     @Resource ImageService imageService;
-    @Resource UrlService urlService;
     @Resource JsonService jsonService;
+    @Resource M3U8Service m3U8Service;
 
     public Set<Item> getItems(Podcast podcast) {
-        Optional<Document> page = htmlService.get(podcast.getUrl());
+        Option<Document> page = htmlService.get(podcast.getUrl());
 
         return page
             .map(p -> p.select(JSOUP_ITEM_SELECTOR).select("a.row"))
             .map(this::htmlToItems)
-            .map(s -> {
-                s.add(getCurrentPlayedItem(page.get()));
-                return s;
-            })
-            .orElse(Sets.newHashSet());
+            .map(s -> s.add(getCurrentPlayedItem(page.get())))
+            .map(HashSet::toJavaSet)
+            .getOrElse(Sets.newHashSet());
     }
 
-    private Set<Item> htmlToItems(Elements elements) {
+    private HashSet<Item> htmlToItems(Elements elements) {
         return elements.stream()
                 .map(element -> getPluzzItemByUrl(element.attr("href")))
-                .collect(toSet());
+                .collect(collector());
     }
 
     private Item getCurrentPlayedItem(Document page) {
@@ -81,13 +76,13 @@ public class PluzzUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        Optional<Document> page = htmlService.get(podcast.getUrl());
+        Option<Document> page = htmlService.get(podcast.getUrl());
 
         return page
             .map(p -> p.select(JSOUP_ITEM_SELECTOR))
             .map(l -> (l.size() == 0) ? page.get().html() : l.html())
             .map(signatureService::generateMD5Signature)
-            .orElse(StringUtils.EMPTY);
+            .getOrElse(StringUtils.EMPTY);
     }
 
     private Item getPluzzItemByUrl(String url) {
@@ -100,12 +95,11 @@ public class PluzzUpdater extends AbstractUpdater {
     }
 
     private Item getPluzzItemById(String pluzzId) {
-        return urlService
-                .newURL(getPluzzJsonInformation(pluzzId))
-                .flatMap(jsonService::parse)
+        return jsonService
+                .parseUrl(getPluzzJsonInformation(pluzzId))
                 .map(d -> d.read("$", PluzzItem.class))
                 .map(this::jsonToItem)
-                .orElse(Item.DEFAULT_ITEM);
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     private Item jsonToItem(PluzzItem pluzzItem) {
@@ -125,7 +119,7 @@ public class PluzzUpdater extends AbstractUpdater {
                 .filter(PluzzItem.Video::isM3U)
                 .map(PluzzItem.Video::getUrl)
                 .findFirst()
-                .map(urlService::getM3U8UrlFormMultiStreamFile)
+                .map(s -> m3U8Service.getM3U8UrlFormMultiStreamFile(s))
                 .orElse("");
     }
 

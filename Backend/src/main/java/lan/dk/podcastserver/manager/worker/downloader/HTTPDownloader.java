@@ -24,7 +24,8 @@ import static java.util.Objects.nonNull;
 @Component("HTTPDownloader")
 public class HTTPDownloader extends AbstractDownloader {
 
-    @Autowired UrlService urlService;
+    @Autowired
+    UrlService urlService;
     @Autowired WGetFactory wGetFactory;
 
     DownloadInfo info = null;

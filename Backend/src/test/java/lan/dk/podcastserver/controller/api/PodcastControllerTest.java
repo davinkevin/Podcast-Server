@@ -5,8 +5,6 @@ import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.PodcastAssert;
-import lan.dk.podcastserver.service.UrlService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,16 +30,10 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class PodcastControllerTest {
 
-    @Mock UrlService urlService;
     @Mock PodcastBusiness podcastBusiness;
     @Mock FindPodcastBusiness findPodcastBusiness;
     @Mock StatsBusiness statsBusiness;
     @InjectMocks PodcastController podcastController;
-
-    @Before
-    public void beforeEach() {
-        when(urlService.getDomainFromRequest(any(HttpServletRequest.class))).thenReturn("http://localhost");
-    }
 
     @Test
     public void should_create_podcast() {
@@ -131,18 +123,41 @@ public class PodcastControllerTest {
     }
 
     @Test
-    public void should_get_rss() {
+    public void should_get_rss_with_origin_header() {
         /* Given */
         UUID id = UUID.randomUUID();
         Boolean limit = Boolean.TRUE;
+        HttpServletRequest resquest = mock(HttpServletRequest.class);
+        when(resquest.getHeader(eq("origin"))).thenReturn("http://localhost");
         when(podcastBusiness.getRss(any(UUID.class), anyBoolean(), anyString())).thenReturn("Foo");
 
         /* When */
-        String rss = podcastController.getRss(id, limit, mock(HttpServletRequest.class));
+        String rss = podcastController.getRss(id, limit, resquest);
 
         /* Then */
         assertThat(rss).isEqualTo("Foo");
         verify(podcastBusiness, only()).getRss(eq(id), eq(limit), eq("http://localhost"));
+    }
+
+    @Test
+    public void should_get_rss_without_origin_header() {
+        /* Given */
+        UUID id = UUID.randomUUID();
+        Boolean limit = Boolean.TRUE;
+        HttpServletRequest resquest = mock(HttpServletRequest.class);
+        when(resquest.getHeader(eq("origin"))).thenReturn(null);
+        when(resquest.getScheme()).thenReturn("http");
+        when(resquest.getServerName()).thenReturn("localhost");
+        when(resquest.getServerPort()).thenReturn(6060);
+
+        when(podcastBusiness.getRss(any(UUID.class), anyBoolean(), anyString())).then(i -> "Foo");
+
+        /* When */
+        String rss = podcastController.getRss(id, limit, resquest);
+
+        /* Then */
+        assertThat(rss).isEqualTo("Foo");
+        verify(podcastBusiness, only()).getRss(eq(id), eq(limit), eq("http://localhost:6060"));
     }
 
     @Test
