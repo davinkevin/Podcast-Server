@@ -1,11 +1,12 @@
 package lan.dk.podcastserver.service;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import javaslang.control.Option;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,19 +25,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class HtmlServiceTest {
 
-    @Spy
-    UrlService urlService;
+    @Spy UrlService urlService;
     @InjectMocks HtmlService htmlService;
 
+    @ClassRule
+    public static WireMockClassRule wireMockRule = new WireMockClassRule(8090); // No-args constructor defaults to port 8080
+
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(8089); // No-args constructor defaults to port 8080
+    public WireMockClassRule instanceRule = wireMockRule;
 
     public static final String URL = "http://nowhere.anywhere";
-    private static final String USER_AGENT = "User-Agent";
-    private static final String REFERER = "Referer";
 
     @Test
-    public void should_get_page() {
+
+    public void should_reject_get_with_empty() {
+        /* Given */
+        /* When */
+        Option<Document> document = htmlService.get("http://localhost:8090/page/foo.html");
+
+        /* Then */
+        assertThat(document).isEmpty();
+    }
+
+    @Test
+    public void should_get_page() throws InterruptedException {
         /* Given */
         stubFor(get(urlEqualTo("/page/file.html"))
                 .willReturn(aResponse()
@@ -44,21 +56,11 @@ public class HtmlServiceTest {
                         .withBodyFile("service/htmlService/jsoup.html")));
 
         /* When */
-        Option<Document> document = htmlService.get("http://localhost:8089/page/file.html");
+        Option<Document> document = htmlService.get("http://localhost:8090/page/file.html");
 
         /* Then */
         assertThat(document.isDefined()).isTrue();
         assertThat(document.map(d -> d.head().select("title").text())).contains("JSOUP Example");
-    }
-
-    @Test
-    public void should_reject_get_with_empty() {
-        /* Given */
-        /* When */
-        Option<Document> document = htmlService.get("http://localhost:8089/page/foo.html");
-
-        /* Then */
-        assertThat(document).isEmpty();
     }
 
     @Test
