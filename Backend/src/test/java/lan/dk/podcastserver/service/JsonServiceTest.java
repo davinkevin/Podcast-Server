@@ -3,16 +3,15 @@ package lan.dk.podcastserver.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
+import javaslang.control.Option;
 import lan.dk.podcastserver.manager.worker.updater.DailymotionUpdaterTest;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -25,11 +24,12 @@ public class JsonServiceTest {
 
     private UrlService urlService;
     private JsonService jsonService;
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void beforeEach() {
         urlService = mock(UrlService.class);
-        jsonService = new JsonService(urlService, new ObjectMapper());
+        jsonService = new JsonService(urlService, mapper);
     }
 
     @Test
@@ -38,10 +38,10 @@ public class JsonServiceTest {
         when(urlService.asReader(anyString())).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
 
         /* When */
-        Optional<DocumentContext> aFakeUrl = jsonService.parse(new URL("http://foo.com/"));
+        Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");
 
         /* Then */
-        assertThat(aFakeUrl).isPresent();
+        assertThat(aFakeUrl.toJavaOptional()).isPresent();
     }
 
     @Test
@@ -50,10 +50,10 @@ public class JsonServiceTest {
         doThrow(IOException.class).when(urlService).asReader(anyString());
 
         /* When */
-        Optional<DocumentContext> aFakeUrl = jsonService.parse(new URL("http://foo.com/"));
+        Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");
 
         /* Then */
-        assertThat(aFakeUrl).isEmpty();
+        assertThat(aFakeUrl.toJavaOptional()).isEmpty();
     }
     
     @Test

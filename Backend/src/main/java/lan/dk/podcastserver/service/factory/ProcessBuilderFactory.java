@@ -13,9 +13,6 @@ import java.lang.reflect.Field;
 public class ProcessBuilderFactory {
 
     public ProcessBuilder newProcessBuilder(String... command) { return new ProcessBuilder(command); }
-    /*public ProcessBuilder newProcessBuilder(List<String> command) {
-        return new ProcessBuilder(command);
-    }*/
 
     public int pidOf(Process p) {
         try {

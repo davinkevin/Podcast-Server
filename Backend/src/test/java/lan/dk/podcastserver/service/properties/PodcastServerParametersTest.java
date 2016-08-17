@@ -25,7 +25,6 @@ public class PodcastServerParametersTest {
     public void should_have_default_value() throws URISyntaxException {
         Path ROOT_FOLDER = Paths.get("/tmp/");
 
-
         assertThat(parameters)
                 .hasRootfolder(ROOT_FOLDER)
                 .hasDownloadExtension(".psdownload")
@@ -33,20 +32,14 @@ public class PodcastServerParametersTest {
                 .hasNumberOfDayToSaveCover(365L)
         ;
 
-        assertThat(parameters.getRootfolder())
-                .isEqualTo(ROOT_FOLDER);
-
-        assertThat(parameters.getCoverDefaultName())
-                .isEqualTo("cover");
-
-        assertThat(parameters.getConcurrentDownload())
-                .isEqualTo(3);
-
-        assertThat(parameters.getNumberOfTry())
-                .isEqualTo(10);
-
-        assertThat(parameters.getRssDefaultNumberItem())
-                .isEqualTo(50L);
+        assertThat(parameters.getRootfolder()).isEqualTo(ROOT_FOLDER);
+        assertThat(parameters.getCoverDefaultName()).isEqualTo("cover");
+        assertThat(parameters.getConcurrentDownload()).isEqualTo(3);
+        assertThat(parameters.getNumberOfTry()).isEqualTo(10);
+        assertThat(parameters.getRssDefaultNumberItem()).isEqualTo(50L);
+        assertThat(parameters.limitToKeepCoverOnDisk())
+                .isAfter(now().minusYears(1).minusDays(10))
+                .isBefore(now().minusDays(364));
     }
 
     @Test

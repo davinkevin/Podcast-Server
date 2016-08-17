@@ -7,7 +7,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.stream.Collectors.joining;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,7 +90,7 @@ public class UrlServiceTest {
         /* Then */
         assertThat(lastUrl).isEqualTo(host("/my/ressources3.m3u8"));
     }
-
+    
     @Test(expected = RuntimeException.class)
     public void should_recject_after_too_many_redirection() {
         /* Given */
@@ -102,6 +106,24 @@ public class UrlServiceTest {
         doRedirection("/my/ressources10.m3u8", host("/my/ressources11.m3u8"));
 
         /* When */ urlService.getRealURL(host("/my/ressources1.m3u8"));
+    }
+    
+    @Test
+    public void should_get_url_as_reader() throws IOException {
+        /* Given */
+        stubFor(get(urlEqualTo("/file.txt"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/x-mpegURL")
+                        .withBody("A body for testing")
+                )
+        );
+
+        /* When */
+        BufferedReader br = urlService.asReader(HTTP_LOCALHOST + "/file.txt");
+
+        /* Then */
+        assertThat(br.lines().collect(joining())).isEqualTo("A body for testing");
     }
 
     private void doRedirection(String mockUrl, String redirectionUrl) {

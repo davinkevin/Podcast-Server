@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import javaslang.control.Try;
 import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
@@ -127,7 +126,7 @@ public class FfmpegService {
     public double getDurationOf(String url, String userAgent) {
         return Try.of(() -> ffprobe.probe(url, userAgent).getFormat().duration)
                 .map(d -> d*1_000_000)
-                .getOrElseThrow(e -> new UncheckedIOException((IOException) e));
+                .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
     }
 
     /* Download delegation to ffmpeg-cli-wrapper */
@@ -140,6 +139,6 @@ public class FfmpegService {
         Future<Process> process = pl.getProcess();
         return Try.of(() -> process.get(1, TimeUnit.SECONDS))
                 .onFailure(e -> process.cancel(true))
-                .getOrElseThrow(e -> new UncheckedExecutionException(e));
+                .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
     }
 }

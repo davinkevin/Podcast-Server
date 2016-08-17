@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.service.factory;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,17 +28,6 @@ public class ProcessBuilderFactoryTest {
 
         /* Then */
         assertThat(processBuilder.command()).contains("foo", "bar");
-    }
-
-    @Test
-    @Ignore
-    public void should_create_process_with_list() {
-        /* Given */
-        /* When */
-        /*ProcessBuilder processBuilder = processBuilderFactory.newProcessBuilder(Lists.newArrayList("foo", "bar"));*/
-
-        /* Then */
-        /*assertThat(processBuilder.command()).contains("foo", "bar");*/
     }
 
     @Test

@@ -14,7 +14,6 @@ import static java.time.ZonedDateTime.now;
 /**
  * Created by kevin on 03/02/15.
  */
-/*@Service*/
 @Setter @Getter
 @Accessors(chain = true)
 @ConfigurationProperties(value = "podcastserver"/*, ignoreUnknownFields = false*/)
@@ -24,10 +23,6 @@ public class PodcastServerParameters {
      * Location of Podcasts
      */
     Path rootfolder = Paths.get("/tmp");
-    /**
-     * Url of the Server
-     */
-    /*String serverUrl = "http://localhost:8080";*/
     /**
      * Filename of the cover
      */

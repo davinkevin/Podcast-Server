@@ -13,7 +13,6 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
-import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,9 +30,9 @@ public class ApplicationTest {
     @Test
     public void should_respond_true_to_health_check() throws IOException {
         /* Given */
-        URL health = new URL("http://localhost:9000/system/health");
+        String health = "http://localhost:9000/system/health";
         /* When */
-        ApplicationHealthStatus status = jsonService.parse(health).map(d -> d.read("$", ApplicationHealthStatus.class)).orElseThrow(RuntimeException::new);
+        ApplicationHealthStatus status = jsonService.parseUrl(health).map(d -> d.read("$", ApplicationHealthStatus.class)).getOrElseThrow(RuntimeException::new);
         /* Then */
         assertThat(status).isNotNull();
         assertThat(status.getStatus()).isEqualTo("UP");
