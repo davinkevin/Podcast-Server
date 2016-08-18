@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import com.mysema.query.types.Predicate;
 import lan.dk.podcastserver.entity.*;
-import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -181,11 +180,6 @@ public class ItemBusinessTest {
         /* Then */
         assertThat(pageOfPodcast.getContent()).isEqualTo(new ArrayList<>());
         verify(itemRepository, times(1)).findByPodcast(eq(idPodcast), eq(pageRequest));
-    }
-
-    @Test(expected = PodcastNotFoundException.class)
-    public void should_reject_because_no_podcast_found() throws IOException, URISyntaxException {
-        itemBusiness.addItemByUpload(UUID.randomUUID(), mock(MultipartFile.class));
     }
 
     @Test

@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
@@ -27,7 +26,7 @@ public class YoutubeFinderTest {
     @InjectMocks YoutubeFinder youtubeFinder;
 
     @Test
-    public void should_find_information_about_a_youtube_podcast_with_his_url () throws JDOMException, IOException, FindPodcastNotFoundException, URISyntaxException {
+    public void should_find_information_about_a_youtube_podcast_with_his_url () throws JDOMException, IOException, URISyntaxException {
         //Given
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel")))
                 .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube.cauetofficiel.html"));
@@ -46,7 +45,7 @@ public class YoutubeFinderTest {
     }
 
     @Test
-    public void should_not_find_podcast_for_this_url() throws IOException, FindPodcastNotFoundException {
+    public void should_not_find_podcast_for_this_url() throws IOException {
         /* Given */
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel"))).thenReturn(Option.none());
 
@@ -58,7 +57,7 @@ public class YoutubeFinderTest {
     }
 
     @Test
-    public void should_set_default_value_for_information_not_found() throws JDOMException, IOException, FindPodcastNotFoundException, URISyntaxException {
+    public void should_set_default_value_for_information_not_found() throws JDOMException, IOException, URISyntaxException {
         //Given
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel")))
                 .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html"));

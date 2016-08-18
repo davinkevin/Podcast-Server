@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -9,6 +8,6 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public interface Finder {
 
-    Podcast find(String url) throws FindPodcastNotFoundException;
+    Podcast find(String url);
     Integer compatibility(@NotEmpty String url);
 }

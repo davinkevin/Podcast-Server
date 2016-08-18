@@ -4,7 +4,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
-import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -129,9 +128,6 @@ public class ItemBusiness {
 
     public Item addItemByUpload(UUID podcastId, MultipartFile uploadedFile) throws IOException, URISyntaxException {
         Podcast podcast = podcastBusiness.findOne(podcastId);
-        if (podcast == null) {
-            throw new PodcastNotFoundException();
-        }
 
         //TODO utiliser BEAN_UTIL pour faire du dynamique :
         // 1er temps : Template en dure : {title} - {date} - {title}.mp3

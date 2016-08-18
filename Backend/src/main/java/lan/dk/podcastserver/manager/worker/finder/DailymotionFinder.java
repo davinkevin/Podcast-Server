@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
@@ -33,7 +32,7 @@ public class DailymotionFinder implements Finder {
     final ImageService imageService;
 
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return usernameOf(url)
                 .map(username -> String.format(API_URL, username))
                 .flatMap(jsonService::parseUrl)

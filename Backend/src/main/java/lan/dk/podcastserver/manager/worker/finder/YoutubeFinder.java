@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -30,7 +29,7 @@ public class YoutubeFinder implements Finder {
     }
 
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return htmlService
                 .get(url)
                 .map(p -> podcastFromHtml(url, p))

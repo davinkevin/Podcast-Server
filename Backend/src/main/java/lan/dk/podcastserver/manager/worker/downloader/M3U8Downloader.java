@@ -24,8 +24,7 @@ import static java.util.Objects.nonNull;
 @Component("M3U8Downloader")
 public class M3U8Downloader extends AbstractDownloader {
 
-    @Autowired
-    UrlService urlService;
+    @Autowired UrlService urlService;
     @Autowired M3U8Service m3U8Service;
     @Autowired FfmpegService ffmpegService;
     @Autowired ProcessBuilderFactory processBuilderFactory;

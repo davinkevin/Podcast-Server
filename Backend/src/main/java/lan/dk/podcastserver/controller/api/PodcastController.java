@@ -6,7 +6,6 @@ import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
@@ -102,7 +101,7 @@ public class PodcastController {
 
     @JsonView(Podcast.PodcastDetailsView.class)
     @RequestMapping(value="fetch", method = RequestMethod.POST)
-    public Podcast fetchPodcastInfoByUrl(@RequestBody String url) throws FindPodcastNotFoundException {
+    public Podcast fetchPodcastInfoByUrl(@RequestBody String url) {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 

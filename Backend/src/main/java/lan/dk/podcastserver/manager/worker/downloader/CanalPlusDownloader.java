@@ -34,11 +34,11 @@ public class CanalPlusDownloader extends M3U8Downloader {
         String[] splitUrl = m3u8Url.split(",");
 
         int lenghtTab = splitUrl.length;
-        String urlWithoutAllBandwith = splitUrl[0] + splitUrl[lenghtTab - 2] + splitUrl[lenghtTab - 1];
+        String urlWithoutAllBandwidth = splitUrl[0] + splitUrl[lenghtTab - 2] + splitUrl[lenghtTab - 1];
 
-        int posLastSlash = urlWithoutAllBandwith.lastIndexOf("/");
+        int posLastSlash = urlWithoutAllBandwidth.lastIndexOf("/");
 
-        return FilenameUtils.getName(urlWithoutAllBandwith.substring(0, posLastSlash).replace(".csmil", ""));
+        return FilenameUtils.getName(urlWithoutAllBandwidth.substring(0, posLastSlash).replace(".csmil", ""));
     }
 
 

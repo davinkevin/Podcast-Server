@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.DocumentContext;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
@@ -32,7 +31,7 @@ public class ParleysFinder implements Finder {
     private final ImageService imageService;
 
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return extractIdOf(url)
                 .map(id -> String.format(API_URL, id))
                 .flatMap(jsonService::parseUrl)

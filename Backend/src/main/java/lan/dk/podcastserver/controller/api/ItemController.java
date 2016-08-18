@@ -1,16 +1,13 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
-import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.MultiPartFileSenderService;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -121,7 +117,7 @@ public class ItemController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @JsonView(Item.ItemDetailsView.class)
-    public Item uploadFile(@PathVariable UUID idPodcast, @RequestPart("file") MultipartFile file) throws PodcastNotFoundException, IOException, ParseException, URISyntaxException {
+    public Item uploadFile(@PathVariable UUID idPodcast, @RequestPart("file") MultipartFile file) throws IOException, ParseException, URISyntaxException {
         return itemBusiness.addItemByUpload(idPodcast, file);
     }
 }

@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.utils.IOUtils;
@@ -54,7 +53,7 @@ public class RSSFinderTest {
     }
 
     @Test
-    public void should_find_information_about_an_rss_podcast_with_his_url () throws JDOMException, IOException, FindPodcastNotFoundException {
+    public void should_find_information_about_an_rss_podcast_with_his_url () throws JDOMException, IOException {
         //When
         Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.xml");
         Cover cover = podcast.getCover();
@@ -67,7 +66,7 @@ public class RSSFinderTest {
     }
 
     @Test
-    public void should_find_information_with_itunes_cover() throws FindPodcastNotFoundException, IOException, JDOMException {
+    public void should_find_information_with_itunes_cover() throws IOException, JDOMException {
         //When
         Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.withItunesCover.xml");
 
@@ -77,7 +76,7 @@ public class RSSFinderTest {
     }
 
     @Test
-    public void should_find_information_without_any_cover() throws FindPodcastNotFoundException, IOException, JDOMException {
+    public void should_find_information_without_any_cover() throws IOException, JDOMException {
         //When
         Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.withoutAnyCover.xml");
 
@@ -86,7 +85,7 @@ public class RSSFinderTest {
     }
 
     @Test
-    public void should_reject_if_not_found() throws JDOMException, IOException, FindPodcastNotFoundException {
+    public void should_reject_if_not_found() throws JDOMException, IOException {
         /* When */
         Podcast podcast = rssFinder.find("/remote/podcast/withEmpty.xml");
 

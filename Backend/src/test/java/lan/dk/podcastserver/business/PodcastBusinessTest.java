@@ -85,6 +85,15 @@ public class PodcastBusinessTest {
         verify(podcastRepository, times(1)).findOne(eq(podcastId));
     }
 
+    @Test(expected = PodcastNotFoundException.class)
+    public void should_throw_exception_if_id_not_found() {
+        /* Given */
+        when(podcastRepository.findOne(any())).thenReturn(null);
+        /* When */
+        podcastBusiness.findOne(UUID.randomUUID());
+        /* Then see @Test */
+    }
+
     @Test
     public void should_delete() {
         /* Given */ UUID podcastId = UUID.randomUUID();
@@ -220,6 +229,7 @@ public class PodcastBusinessTest {
     public void should_return_empty_string_for_exception() throws IOException {
         /* Given */
         doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean(), anyString());
+        when(podcastRepository.findOne(any())).thenReturn(Podcast.DEFAULT_PODCAST);
 
         /* When */
         String rssReturn = podcastBusiness.getRss(UUID.randomUUID(), false, "http://localhost");

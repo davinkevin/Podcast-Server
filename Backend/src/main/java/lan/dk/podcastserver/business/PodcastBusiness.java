@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -43,7 +44,7 @@ public class PodcastBusiness {
     }
 
     public Podcast findOne(UUID id) {
-        return podcastRepository.findOne(id);
+        return Option.of(podcastRepository.findOne(id)).getOrElseThrow(() -> new PodcastNotFoundException(id));
     }
 
     public void delete(UUID id) {
@@ -63,9 +64,6 @@ public class PodcastBusiness {
     //*****//
     public Podcast patchUpdate(Podcast patchPodcast) {
         Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
-
-        if (podcastToUpdate == null)
-            throw new PodcastNotFoundException();
 
         /*
         // Move folder if name has change :

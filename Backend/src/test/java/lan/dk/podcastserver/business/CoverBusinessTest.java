@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.business;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.CoverAssert;
 import lan.dk.podcastserver.entity.Item;
@@ -9,6 +9,7 @@ import lan.dk.podcastserver.repository.CoverRepository;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +36,8 @@ public class CoverBusinessTest {
 
     private String ROOT_FOLDER = "/tmp/podcast";
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(8089); // No-args constructor defaults to port 8080
+    @ClassRule public static WireMockClassRule wireMockRule = new WireMockClassRule(8089); // No-args constructor defaults to port 8080
+    @Rule public WireMockClassRule instanceRule = wireMockRule;
 
     @Before
     public void beforeEach() {

@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +20,7 @@ public class JeuxVideoComFinder implements Finder {
     final HtmlService htmlService;
 
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return htmlService
                 .get(url)
                 .map(htmlToPodcast(url))

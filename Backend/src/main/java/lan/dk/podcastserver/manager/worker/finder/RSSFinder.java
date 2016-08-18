@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class RSSFinder implements Finder {
     final ImageService imageService;
 
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return jdomService
                 .parse(url)
                 .map(x -> x.getRootElement().getChild(CHANNEL))

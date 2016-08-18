@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -9,7 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class NoOpFinder implements Finder {
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return Podcast.DEFAULT_PODCAST;
     }
 

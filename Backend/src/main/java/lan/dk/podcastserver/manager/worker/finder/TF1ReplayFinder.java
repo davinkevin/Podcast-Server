@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.FindPodcastNotFoundException;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class TF1ReplayFinder implements Finder {
     final ImageService imageService;
 
     @Override
-    public Podcast find(String url) throws FindPodcastNotFoundException {
+    public Podcast find(String url) {
         return htmlService
                 .get(url)
                 .map(htmlToPodcast(url))
