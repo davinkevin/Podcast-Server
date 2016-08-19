@@ -27,7 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -103,7 +102,7 @@ public class YoutubeDownloader extends AbstractDownloader {
         if (nonNull(target)) return target;
 
         try {
-            Path file = Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), youtubeTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
+            Path file = podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(youtubeTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
             if (!Files.exists(file.getParent())) {
                 Files.createDirectories(file.getParent());
             }

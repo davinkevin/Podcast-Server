@@ -28,7 +28,7 @@ import static java.util.stream.Collectors.toList;
 @Transactional
 public class ItemDownloadManager {
 
-    private static final String WS_TOPIC_WAITINGLIST = "/topic/waiting";
+    private static final String WS_TOPIC_WAITING_LIST = "/topic/waiting";
 
     private final SimpMessagingTemplate template;
     private final ItemRepository itemRepository;
@@ -250,7 +250,7 @@ public class ItemDownloadManager {
     }
 
     private void convertAndSendWaitingQueue() {
-        this.template.convertAndSend(WS_TOPIC_WAITINGLIST, this.waitingQueue);
+        this.template.convertAndSend(WS_TOPIC_WAITING_LIST, this.waitingQueue);
     }
 
 

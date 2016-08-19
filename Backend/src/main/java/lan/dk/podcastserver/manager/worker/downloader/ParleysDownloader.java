@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -185,7 +184,7 @@ public class ParleysDownloader extends AbstractDownloader{
     private Path getAssetFile(String url) {
 
         if (isNull(podcastPath)) {
-            podcastPath = Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle());
+            podcastPath = podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle());
             try { Files.createDirectory(podcastPath); } catch (IOException ignored) {}
         }
 

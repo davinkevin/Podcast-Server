@@ -75,7 +75,7 @@ public class M3U8DownloaderTest {
 
         m3U8Downloader.setItemDownloadManager(itemDownloadManager);
         m3U8Downloader.setItem(item);
-        when(itemDownloadManager.getRootfolder()).thenReturn("/tmp");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);

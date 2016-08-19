@@ -145,7 +145,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     private Path getDestinationFile(Item item) {
         String fileName = FilenameUtils.getName(StringUtils.substringBefore(getItemUrl(item), "?"));
-        return  Paths.get(itemDownloadManager.getRootfolder(), item.getPodcast().getTitle(), fileName);
+        return  podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(fileName);
     }
 
     @Transactional

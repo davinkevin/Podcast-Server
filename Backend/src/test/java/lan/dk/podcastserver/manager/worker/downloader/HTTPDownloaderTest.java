@@ -84,7 +84,7 @@ public class HTTPDownloaderTest {
         httpDownloader.setItemDownloadManager(itemDownloadManager);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         httpDownloader.postConstruct();
-
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER, podcast.getTitle()).toFile());
     }
 
@@ -99,7 +99,6 @@ public class HTTPDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         doAnswer(i -> {
@@ -131,7 +130,6 @@ public class HTTPDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         doAnswer(i -> Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION)))
@@ -161,7 +159,6 @@ public class HTTPDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         when(error.getInfo()).thenReturn(downloadInfo);
@@ -189,7 +186,6 @@ public class HTTPDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         doThrow(DownloadInterruptedError.class).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
@@ -215,7 +211,6 @@ public class HTTPDownloaderTest {
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         doThrow(IOException.class).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));

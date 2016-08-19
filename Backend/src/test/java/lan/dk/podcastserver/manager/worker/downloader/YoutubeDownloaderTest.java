@@ -92,7 +92,7 @@ public class YoutubeDownloaderTest {
                 .add(item);
 
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
-
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
         vGet = mock(VGet.class, RETURNS_SMART_NULLS);
         when(vGet.getVideo()).thenReturn(videoInfo);
 
@@ -111,7 +111,6 @@ public class YoutubeDownloaderTest {
         when(vGet.getContentExt(any())).thenCallRealMethod();
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -142,7 +141,6 @@ public class YoutubeDownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -172,7 +170,7 @@ public class YoutubeDownloaderTest {
 
         DownloadInfo info = mock(DownloadInfo.class);
 
-        when(itemDownloadManager.getRootfolder()).thenReturn("/bin/foo/");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/bin/foo/"));
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -205,7 +203,6 @@ public class YoutubeDownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -229,7 +226,7 @@ public class YoutubeDownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast.setTitle("bin"));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn("/");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/"));
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -252,7 +249,6 @@ public class YoutubeDownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -274,7 +270,6 @@ public class YoutubeDownloaderTest {
         /* Given */
         youtubeDownloader.setItem(item.setStatus(Status.STARTED));
 
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -293,7 +288,6 @@ public class YoutubeDownloaderTest {
         /* Given */
         youtubeDownloader.setItem(item.setStatus(Status.STARTED));
 
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(itemDownloadManager.canBeReseted(eq(item))).thenReturn(true);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
@@ -315,7 +309,6 @@ public class YoutubeDownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
         when(itemDownloadManager.canBeReseted(eq(item))).thenReturn(false);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);

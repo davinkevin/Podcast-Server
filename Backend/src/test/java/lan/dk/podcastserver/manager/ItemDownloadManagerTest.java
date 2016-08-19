@@ -105,15 +105,6 @@ public class ItemDownloadManagerTest {
     }
 
     @Test
-    public void should_get_root_folder() {
-        /* Given */ when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_FOLDER);
-        /* When */ String rootfolder = itemDownloadManager.getRootfolder();
-        /* Then */
-        verify(podcastServerParameters, times(2)).getRootfolder();
-        assertThat(rootfolder).isSameAs(ROOT_FOLDER.toString());
-    }
-
-    @Test
     public void should_init_download_with_empty_list() throws URISyntaxException {
         /* Given */
         when(itemRepository.findAllToDownload(any())).thenReturn(new ArrayList<>());

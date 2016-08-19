@@ -7,9 +7,9 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
 import lan.dk.podcastserver.service.properties.ExternalTools;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +68,7 @@ public class RTMPDownloaderTest {
                 .build();
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(externalTools.getRtmpdump()).thenReturn("/usr/local/bin/rtmpdump");
-        when(itemDownloadManager.getRootfolder()).thenReturn("/tmp");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
 
         rtmpDownloader.setItem(item);

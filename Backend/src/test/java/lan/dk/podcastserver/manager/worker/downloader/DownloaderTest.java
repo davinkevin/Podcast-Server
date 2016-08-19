@@ -37,8 +37,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DownloaderTest {
 
-    public static final String ROOT_FOLDER = "/tmp/";
-    public static final String TEMPORARY_EXTENSION = ".psdownload";
+    static final String ROOT_FOLDER = "/tmp/";
+    static final String TEMPORARY_EXTENSION = ".psdownload";
 
     @Mock PodcastRepository podcastRepository;
     @Mock ItemRepository itemRepository;
@@ -67,6 +67,7 @@ public class DownloaderTest {
 
         simpleDownloader.setItemDownloadManager(itemDownloadManager);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
         simpleDownloader.postConstruct();
 
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER, podcast.getTitle()).toFile());
@@ -79,7 +80,6 @@ public class DownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
         simpleDownloader.run();
@@ -137,7 +137,6 @@ public class DownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
         simpleDownloader.run();
@@ -156,7 +155,6 @@ public class DownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
         simpleDownloader.run();
@@ -171,7 +169,6 @@ public class DownloaderTest {
     public void should_get_the_same_target_file_each_call() throws MalformedURLException {
         /* Given */
         simpleDownloader.setItem(item);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
 
         /* When */
         simpleDownloader.target = simpleDownloader.getTargetFile(item);
@@ -188,8 +185,6 @@ public class DownloaderTest {
         Files.createDirectory(Paths.get(ROOT_FOLDER, podcast.getTitle()));
         Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
 
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
-
         /* When */
         Path targetFile = simpleDownloader.getTargetFile(item);
 
@@ -204,7 +199,7 @@ public class DownloaderTest {
         podcast.setTitle("bin");
         simpleDownloader.setItem(item.setUrl("http://foo.bar.com/bash"));
 
-        when(itemDownloadManager.getRootfolder()).thenReturn("/");
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/"));
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 

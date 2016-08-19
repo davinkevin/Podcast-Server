@@ -88,7 +88,7 @@ public class ParleysDownloaderTest {
 
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
-        when(itemDownloadManager.getRootfolder()).thenReturn(ROOT_FOLDER);
+        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         doAnswer(i -> {
             Files.createFile(Path.class.cast(i.getArguments()[0]));
