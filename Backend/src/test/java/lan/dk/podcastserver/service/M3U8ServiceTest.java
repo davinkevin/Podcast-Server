@@ -73,7 +73,7 @@ public class M3U8ServiceTest {
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
 
         /* When */  String lastUrl = m3U8Service.getM3U8UrlFormMultiStreamFile(resourcePath);
-        /* Then */  assertThat(lastUrl).isEqualTo("http://a.custom.dom/__files/service/urlService/9dce76b19072beda39720aa04aa2e47a-video=1404000-audio_AACL_fra_70000_315=70000.m3u8");
+        /* Then */  assertThat(lastUrl).isEqualTo("http://a.custom.dom/9dce76b19072beda39720aa04aa2e47a-video=1404000-audio_AACL_fra_70000_315=70000.m3u8");
     }
 
     @Test

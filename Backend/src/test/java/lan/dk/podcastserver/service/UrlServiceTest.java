@@ -90,6 +90,22 @@ public class UrlServiceTest {
         /* Then */
         assertThat(lastUrl).isEqualTo(host("/my/ressources3.m3u8"));
     }
+
+    @Test
+    public void should_handle_redirection_even_if_it_is_relative() {
+        /* Given */
+        doRedirection("/my/ressources1.m3u8", "/my/ressources2.m3u8");
+        doRedirection("/my/ressources2.m3u8", host("/my/ressources3.m3u8"));
+        stubFor(get(urlEqualTo("/my/ressources3.m3u8"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/x-mpegURL")));
+
+        /* When */
+        String lastUrl = urlService.getRealURL(host("/my/ressources1.m3u8"), c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
+        /* Then */
+        assertThat(lastUrl).isEqualTo(host("/my/ressources3.m3u8"));
+    }
     
     @Test(expected = RuntimeException.class)
     public void should_recject_after_too_many_redirection() {
