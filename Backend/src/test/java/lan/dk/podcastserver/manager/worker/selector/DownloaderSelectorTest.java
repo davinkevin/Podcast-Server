@@ -23,6 +23,7 @@ public class DownloaderSelectorTest {
 
     private DownloaderSelector downloaderSelector;
 
+    @Mock CanalPlusDownloader canalPlusDownloader;
     @Mock DailyMotionCloudDownloader dailyMotionCloudDownloader;
     @Mock DailymotionDownloader dailymotionDownloader;
     @Mock HTTPDownloader httpDownloader;
@@ -35,6 +36,7 @@ public class DownloaderSelectorTest {
 
     @Before
     public void setUp() throws Exception {
+        when(canalPlusDownloader.compatibility(anyString())).thenCallRealMethod();
         when(dailyMotionCloudDownloader.compatibility(anyString())).thenCallRealMethod();
         when(dailymotionDownloader.compatibility(anyString())).thenCallRealMethod();
         when(httpDownloader.compatibility(anyString())).thenCallRealMethod();
@@ -44,7 +46,7 @@ public class DownloaderSelectorTest {
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaders = Sets.newHashSet(dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, parleysDownloader, rtmpDownloader, youtubeDownloader);
+        downloaders = Sets.newHashSet(canalPlusDownloader, dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, parleysDownloader, rtmpDownloader, youtubeDownloader);
         downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 
@@ -81,9 +83,15 @@ public class DownloaderSelectorTest {
     }
 
     @Test
-    public void should_return_an_M3U8Downloader() {
-        /* When  */ Downloader updaterClass = downloaderSelector.of("http://us-cplus-aka.canal-plus.com/i/1503/17/nip_NIP_47464_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8");
+    public void should_return_a_M3U8Downloader() {
+        /* When  */ Downloader updaterClass = downloaderSelector.of("http://foo.bar.com/a/path/with/file.m3u8");
         /* Then  */ assertThat(updaterClass).isEqualTo(m3U8Downloader);
+    }
+
+    @Test
+    public void should_return_a_CanalPlusDownloader() {
+        /* When  */ Downloader updaterClass = downloaderSelector.of("http://us-cplus-aka.canal-plus.com/i/1503/17/nip_NIP_47464_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8");
+        /* Then  */ assertThat(updaterClass).isEqualTo(canalPlusDownloader);
     }
 
     @Test
