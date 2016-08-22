@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +26,6 @@ import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 @Component("TF1ReplayDownloader")
 public class TF1ReplayDownloader extends M3U8Downloader {
 
-    private static final String USER_AGENT_MOBILE = "AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)";
     private static final String APP_NAME = "sdk/Iphone/1.0";
     private static final String WAT_TIME_SERVER_URL = "http://www.wat.tv/servertime";
     private static final String SECRET = "W3m0#1mFI";
@@ -112,7 +112,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
         String realUrl = urlService.getRealURL(url, c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
 
         return Try.of(() -> urlService.get(url)
-                .header(USER_AGENT, USER_AGENT_MOBILE)
+                .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
                 .asString()
         )
                 .map(HttpResponse::getRawBody)
@@ -123,7 +123,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
 
     @Override
     protected String withUserAgent() {
-        return USER_AGENT_MOBILE;
+        return UrlService.USER_AGENT_MOBILE;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

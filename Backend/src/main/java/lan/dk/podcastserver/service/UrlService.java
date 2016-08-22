@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 public class UrlService {
 
     public static final String USER_AGENT_DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36";
+    public static final String USER_AGENT_MOBILE = "AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)";
     static final String USER_AGENT_KEY = "User-agent";
 
     private static final String PROTOCOL_SEPARATOR = "://";

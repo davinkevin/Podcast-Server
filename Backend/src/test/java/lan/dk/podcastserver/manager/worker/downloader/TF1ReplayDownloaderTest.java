@@ -34,8 +34,7 @@ public class TF1ReplayDownloaderTest {
     @Mock HtmlService htmlService;
     @Mock JsonService jsonService;
     @Mock SignatureService signatureService;
-    @Mock
-    UrlService urlService;
+    @Mock UrlService urlService;
     @InjectMocks TF1ReplayDownloader downloader;
 
     @Test
@@ -170,6 +169,17 @@ public class TF1ReplayDownloaderTest {
         /* Then */
         assertThat(videoUrl).isNotNull();
         assertThat(videoUrl.getMessage()).isEqualTo("http://www.wat.tv/get/iphone/13075615.m3u8?token=b35fc8b36d16b0110fd6220bd9df7164%2F576eb335&bwmin=400000&bwmax=1500000");
+    }
+
+    @Test
+    public void should_use_a_user_agent_mobile() {
+        /* Given */
+
+        /* When */
+        String ua = downloader.withUserAgent();
+
+        /* Then */
+        assertThat(ua).isEqualTo("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)");
     }
 
 }
