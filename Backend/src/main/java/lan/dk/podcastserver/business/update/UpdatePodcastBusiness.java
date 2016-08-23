@@ -76,7 +76,7 @@ public class UpdatePodcastBusiness  {
         lastFullUpdate = ZonedDateTime.now();
     }
     @Transactional
-    public void updatePodcast(UUID id) { updatePodcast(Collections.singletonList(podcastBusiness.findOne(id)), manualExecutor); }
+    public void updatePodcast(UUID id) { updatePodcast(Sets.newHashSet(podcastBusiness.findOne(id)), manualExecutor); }
 
     @Transactional
     public void forceUpdatePodcast (UUID id){
@@ -91,7 +91,7 @@ public class UpdatePodcastBusiness  {
         return isUpdating.get();
     }
 
-    private void updatePodcast(List<Podcast> podcasts, Executor selectedExecutor) {
+    private void updatePodcast(Set<Podcast> podcasts, Executor selectedExecutor) {
         changeAndCommunicateUpdate(Boolean.TRUE);
 
         log.info("Update launch");

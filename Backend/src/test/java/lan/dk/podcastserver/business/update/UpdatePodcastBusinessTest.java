@@ -85,9 +85,9 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_reset_item_with_incorrect_state() {
         /* Given */
-        List<Item> items = Arrays.asList(
-                new Item().setStatus(Status.STARTED),
-                new Item().setStatus(Status.PAUSED)
+        Set<Item> items = Sets.newHashSet(
+                Item.builder().id(UUID.randomUUID()).status(Status.STARTED).build(),
+                Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build()
         );
         when(itemRepository.findByStatus(anyVararg())).thenReturn(items);
         /* When */
@@ -117,7 +117,7 @@ public class UpdatePodcastBusinessTest {
         Podcast podcast2 = new Podcast().setTitle("podcast2");
         Podcast podcast3 = new Podcast().setTitle("podcast3");
         Updater updater = mock(Updater.class);
-        List<Podcast> podcasts = Arrays.asList(podcast1, podcast2, podcast3);
+        Set<Podcast> podcasts = Sets.newHashSet(podcast1, podcast2, podcast3);
         when(podcastBusiness.findByUrlIsNotNull()).thenReturn(podcasts);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {

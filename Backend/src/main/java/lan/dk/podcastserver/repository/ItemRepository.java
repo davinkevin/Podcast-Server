@@ -23,6 +23,7 @@ import static com.mysema.query.types.expr.BooleanExpression.allOf;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
+@SuppressWarnings("unchecked")
 public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositoryCustom, QueryDslPredicateExecutor<Item> {
 
     @CacheEvict(value = {"search", "stats"}, allEntries = true)
@@ -37,13 +38,13 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Iterable<Item> findAllToDownload(ZonedDateTime date) {
+    default Set<Item> findAllToDownload(ZonedDateTime date) {
         return findAllNotDownloadedAndNewerThan(date);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Iterable<Item> findAllNotDownloadedAndNewerThan(ZonedDateTime date) {
-        return findAll(isNewerThan(date).and(isDownloaded(Boolean.FALSE)));
+    default Set<Item> findAllNotDownloadedAndNewerThan(ZonedDateTime date) {
+        return Sets.newHashSet(findAll(isNewerThan(date).and(isDownloaded(Boolean.FALSE))));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -62,8 +63,8 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Iterable<Item> findByStatus(Status... status) {
-        return findAll(hasStatus(status));
+    default Set<Item> findByStatus(Status... status) {
+        return Sets.newHashSet(findAll(hasStatus(status)));
     }
 
 }

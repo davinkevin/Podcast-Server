@@ -57,7 +57,7 @@ public class PodcastBusiness {
         //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
-    public List<Podcast> findByUrlIsNotNull() {
+    public Set<Podcast> findByUrlIsNotNull() {
         return podcastRepository.findByUrlIsNotNull();
     }
 

@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -111,11 +112,11 @@ public class PodcastBusinessTest {
     @Test
     public void should_find_with_url_not_null() {
        /* Given */
-        ArrayList<Podcast> listOfPodcast = new ArrayList<>();
+        Set<Podcast> listOfPodcast = Sets.newHashSet();
         when(podcastRepository.findByUrlIsNotNull()).thenReturn(listOfPodcast);
 
        /* When */
-        List<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
+        Set<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
 
        /* Then */
         assertThat(podcasts).isSameAs(listOfPodcast);

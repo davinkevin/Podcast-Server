@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
@@ -11,7 +11,10 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -20,7 +23,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
@@ -107,7 +112,7 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_empty_list() throws URISyntaxException {
         /* Given */
-        when(itemRepository.findAllToDownload(any())).thenReturn(new ArrayList<>());
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet());
         /* When */
         itemDownloadManager.launchDownload();
         /* Then */
@@ -120,13 +125,12 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_list_of_item_larger_than_download_limit() throws URISyntaxException {
         /* Given */
-        final List<Item> itemList = Lists.newArrayList(
-                Item.builder().id(UUID.randomUUID()).url("1").status(Status.NOT_DOWNLOADED).build(),
-                Item.builder().id(UUID.randomUUID()).url("2").status(Status.NOT_DOWNLOADED).build(),
-                Item.builder().id(UUID.randomUUID()).url("3").status(Status.NOT_DOWNLOADED).build(),
-                Item.builder().id(UUID.randomUUID()).url("4").status(Status.NOT_DOWNLOADED).build()
-        );
-        when(itemRepository.findAllToDownload(any())).thenReturn(itemList);
+        Item item1 = Item.builder().id(UUID.randomUUID()).url("1").status(Status.NOT_DOWNLOADED).build();
+        Item item2 = Item.builder().id(UUID.randomUUID()).url("2").status(Status.NOT_DOWNLOADED).build();
+        Item item3 = Item.builder().id(UUID.randomUUID()).url("3").status(Status.NOT_DOWNLOADED).build();
+        Item item4 = Item.builder().id(UUID.randomUUID()).url("4").status(Status.NOT_DOWNLOADED).build();
+        Set<Item> items = Sets.newHashSet(item1, item2, item3, item4);
+        when(itemRepository.findAllToDownload(any())).thenReturn(items);
         Downloader downloader = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloader);
         when(downloader.setItem(any())).thenReturn(downloader);
@@ -140,7 +144,7 @@ public class ItemDownloadManagerTest {
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
         verify(downloaderSelector, times(3)).of(itemUrlArgumentCaptor.capture());
-        assertThat(itemUrlArgumentCaptor.getAllValues()).contains(itemList.get(0).getUrl(), itemList.get(1).getUrl(), itemList.get(2).getUrl());
+        assertThat(itemUrlArgumentCaptor.getAllValues()).hasSize(3);
         verify(template, times(1)).convertAndSend(eq("/topic/waiting"), same(itemDownloadManager.getWaitingQueue()));
     }
 
@@ -150,7 +154,7 @@ public class ItemDownloadManagerTest {
         final Downloader mockDownloader = mock(Downloader.class);
         final Item item = Item.builder().id(UUID.randomUUID()).status(Status.NOT_DOWNLOADED).build();
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Collections.singletonList(item));
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(item));
 
         /* When */
         itemDownloadManager.launchDownload();

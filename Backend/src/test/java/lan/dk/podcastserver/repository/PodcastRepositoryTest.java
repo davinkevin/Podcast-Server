@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
@@ -56,7 +56,7 @@ public class PodcastRepositoryTest {
     public void should_find_by_url_not_null() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<Podcast> podcasts = podcastRepository.findByUrlIsNotNull();
+        Set<Podcast> podcasts = podcastRepository.findByUrlIsNotNull();
 
         /* Then */
         assertThat(podcasts)
