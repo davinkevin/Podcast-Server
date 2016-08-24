@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -17,13 +16,12 @@ import java.util.UUID;
 @Builder
 @Getter @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(chain = true)
 public class WatchList {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue
     @Column(columnDefinition = "UUID")
     private UUID id;
 

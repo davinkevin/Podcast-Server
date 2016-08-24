@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.repository;
 
 import com.google.common.collect.Sets;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.Predicate;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
@@ -19,7 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.mysema.query.types.expr.BooleanExpression.allOf;
+import static com.querydsl.core.types.ExpressionUtils.allOf;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
@@ -58,7 +58,7 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Set<Item> findByTypeAndExpression(AbstractUpdater.Type type, BooleanExpression filter) {
+    default Set<Item> findByTypeAndExpression(AbstractUpdater.Type type, Predicate filter) {
         return Sets.newHashSet(findAll(isOfType(type.key()).and(filter)));
     }
 

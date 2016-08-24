@@ -2,7 +2,7 @@ package lan.dk.podcastserver.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +18,9 @@ public class JacksonConfig {
         return new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .registerModules(
-                        new Hibernate4Module()
-                            .enable(Hibernate4Module.Feature.FORCE_LAZY_LOADING)
-                            .disable(Hibernate4Module.Feature.USE_TRANSIENT_ANNOTATION),
+                        new Hibernate5Module()
+                            .enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING)
+                            .disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION),
                         new JavaTimeModule()
                 )
         ;

@@ -46,7 +46,7 @@ public class TagBusinessTest {
         /* Given */
         UUID tagId = UUID.randomUUID();
         Tag tag = new Tag().setId(tagId);
-        when(tagRepository.findOne(any())).thenReturn(tag);
+        when(tagRepository.findOne(any(UUID.class))).thenReturn(tag);
 
         /* When */
         Tag tagToFind = tagBusiness.findOne(tagId);

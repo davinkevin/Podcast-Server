@@ -3,11 +3,11 @@ package lan.dk.podcastserver.manager.worker.selector;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.downloader.NoOpDownloader;
 import lombok.RequiredArgsConstructor;
-import org.jadira.usertype.spi.utils.lang.StringUtils;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Comparator;
 import java.util.Set;

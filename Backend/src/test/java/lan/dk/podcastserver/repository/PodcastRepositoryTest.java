@@ -9,10 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
@@ -26,9 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by kevin on 17/08/15 for Podcast Server
  */
-@Transactional
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {DatabaseConfigurationTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@SpringBootTest(classes = {DatabaseConfigurationTest.class})
 public class PodcastRepositoryTest {
 
     @Autowired DataSource dataSource;

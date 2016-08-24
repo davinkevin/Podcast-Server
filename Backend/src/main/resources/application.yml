@@ -76,6 +76,7 @@ logging:
     path: /private/tmp/logs/podcastserver.log
     level:
         lan.dk.podcastserver : DEBUG
+        org.springframework.http.converter.json : DEBUG
 
 multipart:
     max-file-size: 512MB

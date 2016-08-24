@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.business;
 
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;

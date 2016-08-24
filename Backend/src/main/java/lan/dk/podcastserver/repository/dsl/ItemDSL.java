@@ -1,18 +1,21 @@
 package lan.dk.podcastserver.repository.dsl;
 
-import com.mysema.query.types.Predicate;
-import com.mysema.query.types.expr.BooleanExpression;
+
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lan.dk.podcastserver.entity.QItem;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.*;
 
 /**
  * Created by kevin on 08/06/2014 for Podcast Server
@@ -25,7 +28,7 @@ public class ItemDSL {
         throw new AssertionError();
     }
 
-    public static BooleanExpression isDownloaded(Boolean downloaded) {
+    public static Predicate isDownloaded(Boolean downloaded) {
         if (isNull(downloaded)) return null;
         if (downloaded) return hasStatus(Status.FINISH);
 
@@ -61,26 +64,22 @@ public class ItemDSL {
         return Q_ITEM.id.in(ids);
     }
 
-    public static BooleanExpression isInTags(List<Tag> tags) {
+    public static Predicate isInTags(List<Tag> tags) {
         return isInTags(tags.toArray(new Tag[tags.size()]));
     }
 
-    public static BooleanExpression isInTags(final Tag... tags) {
-        return BooleanExpression.allOf(
-                Arrays
-                        .stream(tags)
+    public static Predicate isInTags(final Tag... tags) {
+        return ExpressionUtils.allOf(Stream.of(tags)
                         .map(Q_ITEM.podcast.tags::contains)
-                        .toArray(BooleanExpression[]::new)
-        );
+                        .collect(toList())
+                );
     }
 
-    public static BooleanExpression hasStatus(final Status... statuses) {
-        return BooleanExpression.anyOf(
-                Arrays
-                        .stream(statuses)
+    public static Predicate hasStatus(final Status... statuses) {
+        return ExpressionUtils.anyOf(Stream.of(statuses)
                         .map(Q_ITEM.status::eq)
-                        .toArray(BooleanExpression[]::new)
-        );
+                        .collect(toList())
+                );
     }
 
     public static BooleanExpression isInPodcast(UUID podcastId) {
@@ -88,7 +87,7 @@ public class ItemDSL {
     }
 
     public static Predicate getSearchSpecifications(List<UUID> ids, List<Tag> tags, Boolean downloaded) {
-        return BooleanExpression.allOf(
+        return ExpressionUtils.allOf(
                 nonNull(ids) ? isInId(ids) : null,
                 isInTags(tags),
                 nonNull(downloaded) ? downloaded ? hasStatus(Status.FINISH) : Q_ITEM.status.isNull().or(hasStatus(Status.FINISH).not()) : null

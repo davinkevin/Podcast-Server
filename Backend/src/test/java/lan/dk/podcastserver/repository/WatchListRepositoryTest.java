@@ -3,7 +3,6 @@ package lan.dk.podcastserver.repository;
 import com.google.common.collect.Sets;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
-import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
@@ -13,17 +12,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
-import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.ninja_squad.dbsetup.Operations.deleteAllFrom;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
@@ -33,9 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by kevin on 17/01/2016 for PodcastServer
  */
-@Transactional
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {DatabaseConfigurationTest.class, HibernateJpaAutoConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@DataJpaTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {DatabaseConfigurationTest.class})
 public class WatchListRepositoryTest {
 
     @Autowired DataSource dataSource;
@@ -43,8 +39,7 @@ public class WatchListRepositoryTest {
     @Autowired ItemRepository itemRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
-    public static final Operation DELETE_ALL_PLAYLIST = Operations.sequenceOf(deleteAllFrom("WATCH_LIST_ITEMS"), deleteAllFrom("WATCH_LIST"));
-    public static final Operation INSERT_PLAYLIST_DATA = sequenceOf(
+    private static final Operation INSERT_PLAYLIST_DATA = sequenceOf(
             ItemRepositoryTest.INSERT_ITEM_DATA,
             insertInto("WATCH_LIST")
                     .columns("ID", "NAME")

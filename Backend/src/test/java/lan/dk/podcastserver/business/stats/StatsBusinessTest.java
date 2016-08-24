@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.business.stats;
 
 import com.google.common.collect.Sets;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

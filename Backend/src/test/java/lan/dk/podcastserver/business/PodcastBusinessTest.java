@@ -89,7 +89,7 @@ public class PodcastBusinessTest {
     @Test(expected = PodcastNotFoundException.class)
     public void should_throw_exception_if_id_not_found() {
         /* Given */
-        when(podcastRepository.findOne(any())).thenReturn(null);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(null);
         /* When */
         podcastBusiness.findOne(UUID.randomUUID());
         /* Then see @Test */
@@ -230,7 +230,7 @@ public class PodcastBusinessTest {
     public void should_return_empty_string_for_exception() throws IOException {
         /* Given */
         doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean(), anyString());
-        when(podcastRepository.findOne(any())).thenReturn(Podcast.DEFAULT_PODCAST);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(Podcast.DEFAULT_PODCAST);
 
         /* When */
         String rssReturn = podcastBusiness.getRss(UUID.randomUUID(), false, "http://localhost");

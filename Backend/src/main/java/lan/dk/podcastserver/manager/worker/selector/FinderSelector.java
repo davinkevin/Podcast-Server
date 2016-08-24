@@ -3,9 +3,9 @@ package lan.dk.podcastserver.manager.worker.selector;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
 import lan.dk.podcastserver.manager.worker.finder.NoOpFinder;
 import lombok.Setter;
-import org.jadira.usertype.spi.utils.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Comparator;
 import java.util.Set;

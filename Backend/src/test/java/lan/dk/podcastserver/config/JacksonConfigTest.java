@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.ZoneId;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 15/06/2016 for Podcast Server
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {JacksonConfig.class})
+@SpringBootTest(classes = {JacksonConfig.class})
 public class JacksonConfigTest {
 
     @Autowired ObjectMapper mapper;
