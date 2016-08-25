@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import javaslang.Tuple3;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.utils.facade.UpdateTuple;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,8 +42,11 @@ public class UpdaterTest {
         podcast.setId(UUID.randomUUID());
         podcast.setSignature("123456789");
 
-        /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> no_change_result = simpleUpdater.update(podcast);
-        /* Then */ assertThat(no_change_result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
+        /* When */
+        Tuple3<Podcast, Set<Item>, Predicate<Item>> no_change_result = simpleUpdater.update(podcast);
+
+        /* Then */
+        assertThat(no_change_result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
     }
 
     @Test
@@ -53,14 +56,16 @@ public class UpdaterTest {
         podcast.setId(UUID.randomUUID());
         podcast.setSignature("XYZ");
 
-        /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+        /* When */
+        Tuple3<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+
         /* Then */
         assertThat(result).isNotSameAs(Updater.NO_MODIFICATION_TUPLE);
-        assertThat(result.first()).isSameAs(podcast);
-        assertThat(result.second())
+        assertThat(result._1()).isSameAs(podcast);
+        assertThat(result._2())
                 .isInstanceOf(HashSet.class)
                 .hasSize(3);
-        assertThat(result.third()).isNotNull();
+        assertThat(result._3()).isNotNull();
     }
 
     @Test
@@ -68,8 +73,11 @@ public class UpdaterTest {
         /* Given */
         Podcast podcast = Podcast.builder().id(ERROR_UUID).signature("XYZ").build();
 
-        /* When */ UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
-        /* Then */ assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
+        /* When */
+        Tuple3<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+
+        /* Then */
+        assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE);
     }
     
     @Test
@@ -84,10 +92,11 @@ public class UpdaterTest {
 
 
         /* When */
-        UpdateTuple<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
-        Set<Item> collectedItem = result.second()
+        Tuple3<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
+
+        Set<Item> collectedItem = result._2()
                 .stream()
-                .filter(result.third())
+                .filter(result._3())
                 .collect(toSet());
 
         /* Then */

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business.update;
 
 import com.google.common.collect.Sets;
+import javaslang.Tuple3;
 import javaslang.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
@@ -11,7 +12,6 @@ import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,9 @@ import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 import java.nio.file.Files;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -108,7 +110,7 @@ public class UpdatePodcastBusiness  {
                     .map(this::wait)
                     .filter(tuple -> tuple != Updater.NO_MODIFICATION_TUPLE)
                     .peek(tuple -> changeAndCommunicateUpdate(Boolean.TRUE))
-                    .map(t -> attachNewItemsToPodcast(t.first(), t.middle(), t.last()))
+                    .map(t -> attachNewItemsToPodcast(t._1(), t._2(), t._3()))
                     .flatMap(Collection::stream)
                 .forEach(coverBusiness::download);
         // @formatter:on
@@ -123,15 +125,13 @@ public class UpdatePodcastBusiness  {
         this.template.convertAndSend(WS_TOPIC_UPDATING, this.isUpdating.get());
     }
 
-    private UpdateTuple<Podcast, Set<Item>, Predicate<Item>> wait(CompletableFuture<UpdateTuple<Podcast, Set<Item>, Predicate<Item>>> future) {
-        try {
-            return future.get(timeValue, timeUnit);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            log.error("Error during update", e);
-            future.cancel(true);
-            return Updater.NO_MODIFICATION_TUPLE;
-        }
-
+    private Tuple3<Podcast, Set<Item>, Predicate<Item>> wait(CompletableFuture<Tuple3<Podcast, Set<Item>, Predicate<Item>>> future) {
+        return Try.of(() -> future.get(timeValue, timeUnit))
+            .onFailure(e -> {
+                log.error("Error during update", e);
+                future.cancel(true);
+            })
+            .getOrElse(Updater.NO_MODIFICATION_TUPLE);
     }
 
     private Set<Item> attachNewItemsToPodcast(Podcast podcast, Set<Item> items, Predicate<Item> filter) {

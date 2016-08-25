@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business.update;
 
 
 import com.google.common.collect.Sets;
+import javaslang.Tuple;
 import javaslang.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
@@ -12,7 +13,6 @@ import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import lan.dk.podcastserver.utils.facade.UpdateTuple;
 import org.assertj.core.api.Condition;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -126,11 +128,11 @@ public class UpdatePodcastBusinessTest {
         });
         when(updater.update(eq(podcast3))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return UpdateTuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
+            return Tuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
         });
         when(updater.update(not(eq(podcast3)))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return UpdateTuple.of(podcast, podcast.getItems(), updater.notIn(podcast));
+            return Tuple.of(podcast, podcast.getItems(), updater.notIn(podcast));
         });
         when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
 
@@ -170,7 +172,7 @@ public class UpdatePodcastBusinessTest {
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
-            return UpdateTuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
+            return Tuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
         });
         when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
 
@@ -195,7 +197,7 @@ public class UpdatePodcastBusinessTest {
         });
         when(updater.update(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
-            return UpdateTuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
+            return Tuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
         });
         when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
 
@@ -233,7 +235,7 @@ public class UpdatePodcastBusinessTest {
         when(updater.update(any(Podcast.class))).then(i -> {
             TimeUnit.SECONDS.sleep(15);
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return UpdateTuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
+            return Tuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
         });
 
         /* When */
