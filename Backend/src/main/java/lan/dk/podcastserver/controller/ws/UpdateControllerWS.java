@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
  * Created by kevin on 15/05/15 for HackerRank problem
  */
 @Controller
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class UpdateControllerWS {
 
     final UpdatePodcastBusiness updatePodcastBusiness;

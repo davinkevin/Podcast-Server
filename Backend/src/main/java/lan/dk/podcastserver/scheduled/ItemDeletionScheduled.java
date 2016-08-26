@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * Created by kevin on 26/12/2013.
  */
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ItemDeletionScheduled {
 
     final UpdatePodcastBusiness updatePodcastBusiness;

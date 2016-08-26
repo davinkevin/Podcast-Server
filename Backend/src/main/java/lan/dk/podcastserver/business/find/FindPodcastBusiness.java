@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * Created by kevin on 22/02/15 for Podcast Server
  */
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class FindPodcastBusiness {
 
     final FinderSelector finderSelector;

@@ -17,7 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/stats")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class StatsController {
 
     final StatsBusiness itemStatsBusiness;

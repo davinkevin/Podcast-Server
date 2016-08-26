@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * Created by kevin on 18/03/2016 for Podcast Server
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class BeInSportsFinder implements Finder{
 
     final HtmlService htmlService;

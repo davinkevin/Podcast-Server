@@ -20,7 +20,7 @@ import java.util.stream.Collector;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class HtmlService {
 
     private final UrlService urlService;

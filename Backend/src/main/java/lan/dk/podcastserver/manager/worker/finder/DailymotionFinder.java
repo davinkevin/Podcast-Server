@@ -22,7 +22,7 @@ import static java.util.Objects.nonNull;
  * Created by kevin on 23/02/2016 for Podcast Server
  */
 @Service("DailymotionFinder")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor
 public class DailymotionFinder implements Finder {
 
     private static final String API_URL = "https://api.dailymotion.com/user/%s?fields=avatar_720_url,description,username";

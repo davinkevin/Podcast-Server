@@ -32,7 +32,7 @@ import static java.util.Objects.isNull;
 @Slf4j
 @Component
 @Transactional
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class CoverBusiness {
 
     private static final String API_PODCAST_COVER = "/api/podcast/%s/cover.%s";

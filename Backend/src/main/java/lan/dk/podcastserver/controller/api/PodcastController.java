@@ -35,7 +35,7 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @RestController
 @RequestMapping("/api/podcast")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class PodcastController {
 
     final PodcastBusiness podcastBusiness;

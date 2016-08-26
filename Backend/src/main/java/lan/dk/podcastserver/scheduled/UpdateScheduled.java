@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class UpdateScheduled {
 
     final UpdatePodcastBusiness updatePodcastBusiness;

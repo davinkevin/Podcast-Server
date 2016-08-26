@@ -17,7 +17,7 @@ import static lan.dk.podcastserver.entity.WatchList.*;
  */
 @RestController
 @RequestMapping("/api/watchlists")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class WatchListController {
 
     final WatchListBusiness watchListBusiness;

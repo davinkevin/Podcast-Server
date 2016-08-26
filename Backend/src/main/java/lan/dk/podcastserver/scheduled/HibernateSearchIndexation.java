@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * Created by kevin on 22/08/2014.
  */
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class HibernateSearchIndexation {
 
     final ItemBusiness itemBusiness;

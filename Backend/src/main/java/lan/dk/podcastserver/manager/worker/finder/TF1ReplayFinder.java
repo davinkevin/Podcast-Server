@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * Created by kevin on 20/07/2016.
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class TF1ReplayFinder implements Finder {
 
     public static final Pattern PICTURE_EXTRACTOR = Pattern.compile("url\\(([^)]+)\\).*");

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * Created by kevin on 12/06/2016 for PodcastServer
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ParleysFinder implements Finder {
 
     private static final Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/channel/([^/]*)");

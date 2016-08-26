@@ -16,7 +16,7 @@ import java.util.UUID;
  * Created by kevin on 17/01/2016 for PodcastServer
  */
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class WatchListBusiness {
 
     private final WatchListRepository watchListRepository;

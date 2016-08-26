@@ -14,7 +14,7 @@ import java.util.Set;
  * Created by kevin on 23/02/2016 for Podcast Server
  */
 @Service
-//@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+//@RequiredArgsConstructor
 public class FinderSelector {
 
     public static final NoOpFinder NO_OP_FINDER = new NoOpFinder();

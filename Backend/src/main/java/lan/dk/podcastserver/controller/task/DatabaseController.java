@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 @RestController
 @RequestMapping("/api/task")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class DatabaseController {
 
     final DatabaseService databaseService;

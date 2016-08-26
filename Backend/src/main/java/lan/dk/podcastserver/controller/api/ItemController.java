@@ -35,7 +35,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/podcast/{idPodcast}/items")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ItemController {
     
     final ItemBusiness itemBusiness;

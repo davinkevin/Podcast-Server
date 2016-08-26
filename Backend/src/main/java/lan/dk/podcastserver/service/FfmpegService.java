@@ -11,7 +11,6 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ import static java.util.stream.Collectors.joining;
  */
 @Slf4j
 @Component("FfmpegService")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class FfmpegService {
 
     public static final String AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC = "aac_adtstoasc";

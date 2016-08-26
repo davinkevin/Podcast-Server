@@ -14,7 +14,7 @@ import java.util.function.Function;
  * Created by kevin on 22/03/2016 for Podcast Server
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class JeuxVideoComFinder implements Finder {
 
     final HtmlService htmlService;

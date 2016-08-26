@@ -39,7 +39,7 @@ import static lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecification
 
 @Component
 @Transactional
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ItemBusiness {
     private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 

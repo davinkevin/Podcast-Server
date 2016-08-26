@@ -12,7 +12,7 @@ import java.io.IOException;
  * Created by kevin on 28/03/2016 for Podcast Server
  */
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class DatabaseScheduled {
 
     final DatabaseService databaseService;

@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by kevin on 27/06/2014.
  */
 @Controller
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class DownloadControllerWS {
 
     final ItemDownloadManager IDM;

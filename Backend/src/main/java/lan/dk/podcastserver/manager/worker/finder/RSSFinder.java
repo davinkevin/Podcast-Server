@@ -17,7 +17,7 @@ import static java.util.Objects.nonNull;
  * Created by kevin on 22/02/15.
  */
 @Service("RSSFinder")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor
 public class RSSFinder implements Finder {
 
     private static final String CHANNEL = "channel";

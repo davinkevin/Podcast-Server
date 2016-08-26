@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.*;
  * Created by kevin on 28/04/15 for HackerRank problem
  */
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class StatsBusiness {
 
     final ItemRepository itemRepository;

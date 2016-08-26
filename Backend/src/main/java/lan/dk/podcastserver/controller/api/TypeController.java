@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/api/types")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class TypeController {
 
     final UpdaterSelector updaterSelector;

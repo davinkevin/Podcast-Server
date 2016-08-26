@@ -29,7 +29,7 @@ import static java.util.Objects.nonNull;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class MultiPartFileSenderService {
 
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";

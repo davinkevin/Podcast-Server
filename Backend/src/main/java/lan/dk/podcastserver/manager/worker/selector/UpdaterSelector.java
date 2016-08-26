@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toSet;
  * Created by kevin on 06/03/15.
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor
 public class UpdaterSelector {
 
     public static final NoOpUpdater NO_OP_UPDATER = new NoOpUpdater();

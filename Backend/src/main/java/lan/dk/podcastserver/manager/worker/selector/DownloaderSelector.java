@@ -16,7 +16,7 @@ import java.util.Set;
  * Created by kevin on 17/03/15.
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor
 public class DownloaderSelector {
 
     static final NoOpDownloader NO_OP_DOWNLOADER = new NoOpDownloader();

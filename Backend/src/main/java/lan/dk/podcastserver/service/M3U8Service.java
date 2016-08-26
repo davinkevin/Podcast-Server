@@ -17,7 +17,7 @@ import static java.util.Objects.isNull;
  * Created by kevin on 21/07/2016.
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class M3U8Service {
 
     private final UrlService urlService;

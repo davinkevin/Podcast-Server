@@ -18,7 +18,7 @@ import java.io.InputStream;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ImageService {
 
     final UrlService urlService;

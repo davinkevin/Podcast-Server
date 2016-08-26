@@ -19,7 +19,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/task/downloadManager")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class IDMController {
 
     final ItemDownloadManager IDM;

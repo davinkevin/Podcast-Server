@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * Created by kevin on 08/03/2016 for Podcast Server
  */
 @Service("PluzzFinder")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor
 public class PluzzFinder implements Finder {
 
     final HtmlService htmlService;

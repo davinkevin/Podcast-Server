@@ -26,7 +26,7 @@ import static java.time.temporal.ChronoField.*;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class DatabaseService {
 
     private static final Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR, CompressionType.GZIP);

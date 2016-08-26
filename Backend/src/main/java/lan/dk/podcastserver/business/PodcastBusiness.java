@@ -24,7 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @Transactional
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class PodcastBusiness {
 
     final PodcastServerParameters podcastServerParameters;

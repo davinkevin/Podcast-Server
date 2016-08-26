@@ -31,7 +31,7 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class JdomService {
 
     // Element names :

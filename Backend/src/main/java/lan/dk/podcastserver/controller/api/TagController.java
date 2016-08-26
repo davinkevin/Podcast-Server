@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/tag")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class TagController {
 
     final TagBusiness tagBusiness;

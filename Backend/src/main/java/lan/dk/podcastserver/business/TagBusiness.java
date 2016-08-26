@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toSet;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class TagBusiness {
 
     final TagRepository tagRepository;
