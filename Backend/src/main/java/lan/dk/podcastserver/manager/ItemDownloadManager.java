@@ -1,13 +1,20 @@
 package lan.dk.podcastserver.manager;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import javaslang.Tuple2;
+import javaslang.collection.HashMap;
+import javaslang.collection.HashSet;
+import javaslang.collection.List;
+import javaslang.collection.Map;
+import javaslang.collection.Queue;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,12 +23,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.StreamSupport;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static java.util.stream.Collectors.toList;
+import static lan.dk.podcastserver.manager.worker.selector.DownloaderSelector.NO_OP_DOWNLOADER;
 
 @Slf4j
 @Service
@@ -48,8 +56,8 @@ public class ItemDownloadManager {
         Item.rootFolder = podcastServerParameters.getRootfolder();
     }
 
-    private Queue<Item> waitingQueue = Queues.newConcurrentLinkedQueue();
-    private Map<Item, Downloader> downloadingQueue = Maps.newConcurrentMap();
+    private @Getter Queue<Item> waitingQueue = Queue.empty();
+    private @Getter Map<Item, Downloader> downloadingQueue = HashMap.empty();
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
@@ -61,20 +69,8 @@ public class ItemDownloadManager {
         manageDownload();
     }
 
-    public Queue<Item> getWaitingQueue() {
-        return waitingQueue;
-    }
-
-    public Map<Item, Downloader> getDownloadingQueue() {
-        return downloadingQueue;
-    }
-
     public int getNumberOfCurrentDownload() {
         return downloadingQueue.size();
-    }
-
-    public String getRootfolder() {
-        return podcastServerParameters.getRootfolder().toString();
     }
 
     /* METHODS */
@@ -84,7 +80,9 @@ public class ItemDownloadManager {
         manageDownloadLock.lock();
         try {
             while (downloadingQueue.size() < downloadExecutor.getCorePoolSize() && !waitingQueue.isEmpty()) {
-                Item currentItem = this.getWaitingQueue().poll();
+                Tuple2<Item, Queue<Item>> dequeue = waitingQueue.dequeue();
+                Item currentItem = dequeue._1();
+                this.waitingQueue = dequeue._2();
                 if (!isStartedOrFinished(currentItem)) {
                     getDownloaderByTypeAndRun(currentItem);
                 }
@@ -101,10 +99,10 @@ public class ItemDownloadManager {
     }
 
     private void initDownload() {
-        StreamSupport
-                .stream(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate()).spliterator(), false)
-                .filter(item -> !waitingQueue.contains(item))
-                .forEach(waitingQueue::add);
+        waitingQueue = waitingQueue.enqueueAll(
+                HashSet.ofAll(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate()))
+                    .filter(item -> !waitingQueue.contains(item))
+        );
     }
 
     public void launchDownload() {
@@ -112,12 +110,9 @@ public class ItemDownloadManager {
         this.manageDownload();
     }
 
-
     // Change status of all downloads :
     public void stopAllDownload() {
-        downloadingQueue.values()
-                .stream().collect(toList())
-                .forEach(Downloader::stopDownload);
+        downloadingQueue.values().forEach(Downloader::stopDownload);
     }
 
     public void pauseAllDownload() {
@@ -125,40 +120,36 @@ public class ItemDownloadManager {
     }
 
     public void restartAllDownload() {
-        downloadingQueue.values()
-                .stream()
+        List.ofAll(downloadingQueue.values())
                 .filter(downloader -> Status.PAUSED == downloader.getItem().getStatus())
                 .forEach(downloader -> runAsync(() -> getDownloaderByTypeAndRun(downloader.getItem())));
     }
 
     // Change State of id identified download
     public void stopDownload(UUID id) {
-        getDownloaderOfItemWithId(id).ifPresent(Downloader::stopDownload);
+        getDownloaderOfItemWithId(id).forEach(Downloader::stopDownload);
     }
 
     public void pauseDownload(UUID id) {
-        getDownloaderOfItemWithId(id).ifPresent(Downloader::pauseDownload);
+        getDownloaderOfItemWithId(id).forEach(Downloader::pauseDownload);
     }
 
-    private Optional<Downloader> getDownloaderOfItemWithId(UUID id) {
+    private Option<Downloader> getDownloaderOfItemWithId(UUID id) {
         return downloadingQueue
-                .entrySet()
-                .stream()
-                .filter(es -> Objects.equals(es.getKey().getId(), id))
-                .map(Map.Entry::getValue)
-                .findFirst();
+                .find(es -> Objects.equals(es._1().getId(), id))
+                .map(Tuple2::_2);
     }
 
     public void restartDownload(UUID id) {
         getDownloaderOfItemWithId(id)
                 .map(Downloader::getItem)
-                .ifPresent(this::getDownloaderByTypeAndRun);
+                .forEach(this::getDownloaderByTypeAndRun);
     }
 
-    public void toogleDownload(UUID id) {
+    public void toggleDownload(UUID id) {
         Item item = getDownloaderOfItemWithId(id)
                 .map(Downloader::getItem)
-                .orElse(Item.DEFAULT_ITEM);
+                .getOrElse(Item.DEFAULT_ITEM);
 
         if (Status.PAUSED == item.getStatus()) {
             log.debug("restart du download");
@@ -175,10 +166,10 @@ public class ItemDownloadManager {
 
     void addItemToQueue(Item item) {
 
-        if (waitingQueue.contains(item) || downloadingQueue.containsKey(item))
+        if (waitingQueue.contains(item) || isInDownloadingQueue(item))
             return;
 
-        waitingQueue.add(item);
+        waitingQueue = waitingQueue.enqueue(item);
         manageDownload();
     }
 
@@ -194,31 +185,28 @@ public class ItemDownloadManager {
     }
 
     private void removeItemFromQueue(Item item) {
-        waitingQueue.remove(item);
+        waitingQueue = waitingQueue.remove(item);
     }
-
 
     /* Helpers */
     public void removeACurrentDownload(Item item) {
-        this.downloadingQueue.remove(item);
+        downloadingQueue = downloadingQueue.remove(item);
         manageDownload();
     }
 
     public Item getItemInDownloadingQueue(UUID id) {
         return this.downloadingQueue
                 .keySet()
-                .stream()
-                .filter(i -> Objects.equals(i.getId(), id))
-                .findFirst()
-                .orElse(null);
+                .find(i -> Objects.equals(i.getId(), id))
+                .getOrElse(() -> null);
     }
 
     private void getDownloaderByTypeAndRun(Item item) {
-        if (downloadingQueue.containsKey(item)) { // Cas ou le Worker se met en pause et reste en mémoire // dans la DownloadingQueue
+        if (isInDownloadingQueue(item)) { // case when the worker stay in the downloading queue
             log.debug("Start Item : " + item.getTitle());
-            Downloader downloader = downloadingQueue.get(item);
+            Downloader downloader = downloadingQueue.get(item).getOrElse(NO_OP_DOWNLOADER);
             downloader.restartDownload();
-        } else { // Cas ou le Worker se coupe pour la pause et nécessite un relancement
+        } else { // Case when the worker totally end when paused, need to launch as new
             launchWithNewWorkerFrom(item);
         }
     }
@@ -228,33 +216,33 @@ public class ItemDownloadManager {
                 .of(item.getUrl())
                 .setItem(item)
                 .setItemDownloadManager(this);
-        this.getDownloadingQueue().put(item, worker);
+
+        downloadingQueue = downloadingQueue.put(item, worker);
         downloadExecutor.execute(worker);
     }
 
     public void resetDownload(Item item) {
-        if (downloadingQueue.containsKey(item) && canBeReseted(item)) {
+        if (isInDownloadingQueue(item) && canBeReset(item)) {
             item.addATry();
             launchWithNewWorkerFrom(item);
         }
     }
 
-    public void removeItemFromQueueAndDownload(Item itemToDelete) {
-        //* Si le téléchargement est en cours ou en attente : *//
-        if (this.getDownloadingQueue().containsKey(itemToDelete)) {
-            this.stopDownload(itemToDelete.getId());
-        } else if (this.getWaitingQueue().contains(itemToDelete)) {
-            this.removeItemFromQueue(itemToDelete);
+    public void removeItemFromQueueAndDownload(Item itemToRemove) {
+        //* If the download is started or paused : *//
+        if (isInDownloadingQueue(itemToRemove)) {
+            stopDownload(itemToRemove.getId());
+        } else if (waitingQueue.contains(itemToRemove)) {
+            removeItemFromQueue(itemToRemove);
         }
         this.convertAndSendWaitingQueue();
     }
 
     private void convertAndSendWaitingQueue() {
-        this.template.convertAndSend(WS_TOPIC_WAITING_LIST, this.waitingQueue);
+        this.template.convertAndSend(WS_TOPIC_WAITING_LIST, Queues.newConcurrentLinkedQueue(this.waitingQueue));
     }
 
-
-    public boolean canBeReseted(Item item) {
+    public boolean canBeReset(Item item) {
         return item.getNumberOfTry()+1 <= podcastServerParameters.getNumberOfTry();
     }
 
@@ -263,29 +251,26 @@ public class ItemDownloadManager {
     }
 
     public Set<Item> getItemsInDownloadingQueue() {
-        return downloadingQueue.keySet();
+        return downloadingQueue.keySet().toJavaSet();
     }
 
     public void moveItemInQueue(UUID itemId, Integer position) {
-        List<Item> copyOfWaitingList = Arrays.asList(waitingQueue.toArray(new Item[waitingQueue.size()]));
-        List<Item> aItemList = new ArrayList<>();
+        List<Item> copyWL = List.ofAll(waitingQueue);
 
-        copyOfWaitingList.stream().forEach(aItemList::add);
+        Item itemToMove = copyWL
+            .find(item -> item.getId().equals(itemId))
+            .getOrElseThrow(() -> new RuntimeException("Moving element in waiting list not authorized : Element wasn't in the list"));
 
-        Optional<Item> movingItem = aItemList.stream()
-                .filter(item -> item.getId().equals(itemId)).findFirst();
+        List<Item> reorderList = copyWL
+                .removeFirst(item -> item.getId().equals(itemId))
+                .insert(position, itemToMove);
 
-        if (!movingItem.isPresent()) {
-            log.error("Moving element in waiting list not authorized : Element wasn't in the list");
-            return;
-        }
-
-        aItemList.removeIf(item -> item.getId().equals(itemId));
-        aItemList.add(position, movingItem.get());
-
-        waitingQueue.clear();
-        waitingQueue.addAll(aItemList);
+        waitingQueue = Queue.ofAll(reorderList);
 
         convertAndSendWaitingQueue();
+    }
+
+    public void clearWaitingQueue() {
+        waitingQueue = Queue.empty();
     }
 }

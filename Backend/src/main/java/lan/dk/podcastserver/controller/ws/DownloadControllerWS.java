@@ -3,7 +3,6 @@ package lan.dk.podcastserver.controller.ws;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
@@ -21,7 +20,7 @@ public class DownloadControllerWS {
 
     @SubscribeMapping("/waiting")
     public Collection<Item> waitingList() {
-        return IDM.getWaitingQueue();
+        return IDM.getWaitingQueue().toJavaList();
     }
     
     @SubscribeMapping("/download")
@@ -46,7 +45,7 @@ public class DownloadControllerWS {
 
     @MessageMapping("/download/toogle")
     public void toogle(Item item) {
-        IDM.toogleDownload(item.getId());
+        IDM.toggleDownload(item.getId());
     }
     
 }

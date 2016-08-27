@@ -82,7 +82,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             logger.debug("Arrêt du téléchargement par l'interface");
         } catch (StringIndexOutOfBoundsException | MalformedURLException | NullPointerException | DownloadError e) {
             logger.error("Third part Exception : ", e);
-            if (itemDownloadManager.canBeReseted(item)) {
+            if (itemDownloadManager.canBeReset(item)) {
                 logger.info("Reset of Youtube download {}", item.getTitle());
                 itemDownloadManager.resetDownload(item);
                 return null;

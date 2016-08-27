@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.controller.api;
 
+import com.google.common.collect.Queues;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.form.MovingItemInQueueForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +26,12 @@ public class IDMController {
 
     @RequestMapping(value="/queue", method = RequestMethod.GET)
     public Queue<Item> getDownloadList () {
-        return IDM.getWaitingQueue();
+        return Queues.newConcurrentLinkedQueue(IDM.getWaitingQueue());
     }
 
     @RequestMapping(value="/downloading", method = RequestMethod.GET)
     public Set<Item> getDownloadingList () {
-        return IDM.getDownloadingQueue().keySet();
+        return IDM.getItemsInDownloadingQueue();
     }
 
     @RequestMapping(value="/downloading/{id}", method = RequestMethod.GET)
@@ -101,7 +101,7 @@ public class IDMController {
     @RequestMapping(value="/toogleDownload", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void toggleCurrentDownload(@RequestBody UUID id) {
-        IDM.toogleDownload(id);
+        IDM.toggleDownload(id);
     }
 
     @RequestMapping(value="/queue/add", method = RequestMethod.POST)
@@ -125,7 +125,7 @@ public class IDMController {
     @RequestMapping(value="/queue", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void emptyQueue() {
-        IDM.getWaitingQueue().clear();
+        IDM.clearWaitingQueue();
     }
 
     @RequestMapping(value="/move", method = RequestMethod.POST)

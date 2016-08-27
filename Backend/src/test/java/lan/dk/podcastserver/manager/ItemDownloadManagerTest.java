@@ -1,6 +1,8 @@
 package lan.dk.podcastserver.manager;
 
 import com.google.common.collect.Sets;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
@@ -16,12 +18,11 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.verification.VerificationMode;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.Queue;
 import java.util.Set;
@@ -40,7 +41,6 @@ import static org.mockito.Mockito.*;
 public class ItemDownloadManagerTest {
 
     private static final Integer NUMBER_OF_DOWNLOAD = 3;
-    private static final Path ROOT_FOLDER = Paths.get("/tmp/ps");
 
     @Captor ArgumentCaptor<String> stringArgumentCaptor;
     @Captor ArgumentCaptor<Queue<Item>> queueArgumentCaptor;
@@ -145,7 +145,7 @@ public class ItemDownloadManagerTest {
         verify(itemRepository, times(1)).findAllToDownload(any());
         verify(downloaderSelector, times(3)).of(itemUrlArgumentCaptor.capture());
         assertThat(itemUrlArgumentCaptor.getAllValues()).hasSize(3);
-        verify(template, times(1)).convertAndSend(eq("/topic/waiting"), same(itemDownloadManager.getWaitingQueue()));
+        verifyConvertAndSave(times(1));
     }
 
     @Test
@@ -162,69 +162,78 @@ public class ItemDownloadManagerTest {
         /* Then */
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(itemRepository, times(1)).findAllToDownload(any());
-        verifyConvertAndSave();
+        verifyConvertAndSave(times(1));
     }
 
     @Test
     public void should_stop_all_downloads() {
         /* Given */
-        final Downloader mockDownloader1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
-        final Downloader mockDownloader2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
-        final Downloader mockDownloader3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> mockDownloader1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> mockDownloader2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> mockDownloader3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(mockDownloader1._1(), mockDownloader2._1(), mockDownloader3._1()));
+        itemDownloadManager.launchDownload();
 
         /* When */
         itemDownloadManager.stopAllDownload();
 
         /* Then */
-        verify(mockDownloader1, times(1)).stopDownload();
-        verify(mockDownloader2, times(1)).stopDownload();
-        verify(mockDownloader3, times(1)).stopDownload();
+        verify(mockDownloader1._2(), times(1)).stopDownload();
+        verify(mockDownloader2._2(), times(1)).stopDownload();
+        verify(mockDownloader3._2(), times(1)).stopDownload();
+        verifyPostLaunchDownload();
     }
 
-    private Downloader generateDownloaderAndRegisterIt(UUID id) {
+    private Tuple2<Item, Downloader> generateDownloaderAndRegisterIt(UUID id) {
         final Downloader mockDownloader = mock(Downloader.class);
-        Item item = new Item().setId(id);
+        Item item = Item.builder().id(id).url(id.toString()).numberOfTry(0).build();
         when(mockDownloader.getItem()).thenReturn(item);
-        itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
-        return mockDownloader;
+        when(downloaderSelector.of(eq(id.toString()))).thenReturn(mockDownloader);
+        when(mockDownloader.setItem(any())).thenReturn(mockDownloader);
+        when(mockDownloader.setItemDownloadManager(any())).thenReturn(mockDownloader);
+        when(mockDownloader.getItem()).thenReturn(item);
+        return Tuple.of(item, mockDownloader);
     }
 
     @Test
     public void should_pause_all_downloads() {
         /* Given */
-        final Downloader mockDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(new Item().setId(UUID.randomUUID()), mockDownloader);
-        itemDownloadManager.getDownloadingQueue().put(new Item().setId(UUID.randomUUID()), mockDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1()));
+        itemDownloadManager.launchDownload();
 
         /* When */
         itemDownloadManager.pauseAllDownload();
 
         /* Then */
-        verify(mockDownloader, times(2)).pauseDownload();
+        verify(entry1._2(), times(1)).pauseDownload();
+        verify(entry2._2(), times(1)).pauseDownload();
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_restart_all_downloads() {
         /* Given */
-        final Item itemOne = Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build();
-        final Item itemTwo = Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build();
-        final Downloader mockDownloaderItemOne = mock(Downloader.class);
-        final Downloader mockDownloaderItemTwo = mock(Downloader.class);
-        when(mockDownloaderItemOne.getItem()).thenReturn(itemOne);
-        when(mockDownloaderItemTwo.getItem()).thenReturn(itemTwo);
-        itemDownloadManager.getDownloadingQueue().put(itemOne, mockDownloaderItemOne);
-        itemDownloadManager.getDownloadingQueue().put(itemTwo, mockDownloaderItemTwo);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        entry1._1().setStatus(Status.PAUSED);
+        entry2._1().setStatus(Status.PAUSED);
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1()));
+        itemDownloadManager.launchDownload();
 
         /* When */
         itemDownloadManager.restartAllDownload();
 
         /* Then */
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            verify(mockDownloaderItemOne, times(2)).getItem();
-            verify(mockDownloaderItemTwo, times(2)).getItem();
-            verify(mockDownloaderItemOne, times(1)).restartDownload();
-            verify(mockDownloaderItemTwo, times(1)).restartDownload();
+            verify(entry2._2(), atLeast(1)).restartDownload();
+            verify(entry2._2(), atLeast(1)).restartDownload();
         });
+        verifyPostLaunchDownload();
     }
 
     @Test
@@ -238,7 +247,7 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.addItemToQueue(item.getId());
 
         /* Then */
-        verifyConvertAndSave();
+        verifyConvertAndSave(times(1));
         verify(itemRepository, times(1)).findOne(eq(item.getId()));
         assertThat(itemDownloadManager.getWaitingQueue()).isEmpty();
     }
@@ -246,10 +255,14 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_not_treat_item_in_waiting_list() {
         /* Given */
-        final Item item = new Item().setId(UUID.randomUUID());
-        itemDownloadManager.getWaitingQueue().add(item);
+        Item item = new Item().setId(UUID.randomUUID());
+        itemDownloadManager.addItemToQueue(item);
 
-        /* When */ itemDownloadManager.addItemToQueue(item);
+        /* When */
+        itemDownloadManager.addItemToQueue(item);
+
+        /* Then */
+        verifyConvertAndSave(times(1));
     }
 
     @Test
@@ -263,21 +276,21 @@ public class ItemDownloadManagerTest {
         verify(itemRepository, times(1)).findOne(integerArgumentCaptor.capture());
         assertThat(integerArgumentCaptor.getValue()).isEqualTo(item.getId());
         verify(itemRepository, times(1)).save(eq(item));
-        verifyConvertAndSave();
+        verifyConvertAndSave(times(1));
     }
 
-    private void verifyConvertAndSave() {
-        verify(template, times(1)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
+    private void verifyConvertAndSave(VerificationMode mode) {
+        verify(template, mode).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
-        assertThat(queueArgumentCaptor.getValue()).isSameAs(itemDownloadManager.getWaitingQueue());
+        assertThat(queueArgumentCaptor.getValue()).containsAll(itemDownloadManager.getWaitingQueue());
     }
 
     @Test
     public void should_check_if_can_be_reseted () {
         /* Given */ when(podcastServerParameters.getNumberOfTry()).thenReturn(3);
         /* When */
-        Boolean isResetable = itemDownloadManager.canBeReseted(new Item().setNumberOfTry(2));
-        Boolean isNotResetable = itemDownloadManager.canBeReseted(new Item().setNumberOfTry(4));
+        Boolean isResetable = itemDownloadManager.canBeReset(new Item().setNumberOfTry(2));
+        Boolean isNotResetable = itemDownloadManager.canBeReset(new Item().setNumberOfTry(4));
 
         /* Then */
         assertThat(isResetable).isTrue();
@@ -289,90 +302,110 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_stop_a_current_download() {
         /* Given */
-        final Downloader notCalledDownloader = mock(Downloader.class);
-        final Downloader calledDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
 
-        /* When */ itemDownloadManager.stopDownload(ITEM_2.getId());
+        /* When */
+        itemDownloadManager.stopDownload(entry2._1().getId());
 
         /* Then */
-        verify(calledDownloader, times(1)).stopDownload();
-        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+        verify(entry1._2(), never()).stopDownload();
+        verify(entry2._2(), times(1)).stopDownload();
+        verify(entry3._2(), never()).stopDownload();
+        verifyPostLaunchDownload();
+    }
+
+    protected void verifyPostLaunchDownload() {
+        verify(itemRepository, atLeast(1)).findAllToDownload(any());
+        verify(podcastServerParameters, atLeast(1)).limitDownloadDate();
+        verify(downloaderSelector, atLeast(1)).of(anyString());
+        verifyConvertAndSave(atLeast(1));
     }
 
     @Test
     public void should_pause_a_current_download() {
         /* Given */
-        final Downloader notCalledDownloader = mock(Downloader.class);
-        final Downloader calledDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
 
-        /* When */ itemDownloadManager.pauseDownload(ITEM_2.getId());
+        /* When */ itemDownloadManager.pauseDownload(entry2._1().getId());
 
         /* Then */
-        verify(calledDownloader, times(1)).pauseDownload();
-        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+        verify(entry1._2(), never()).pauseDownload();
+        verify(entry2._2(), times(1)).pauseDownload();
+        verify(entry3._2(), never()).pauseDownload();
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_restart_a_current_download() {
         /* Given */
-        final Downloader notCalledDownloader = mock(Downloader.class);
-        final Downloader calledDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
-        when(calledDownloader.getItem()).thenReturn(ITEM_2);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
 
-
-        /* When */ itemDownloadManager.restartDownload(ITEM_2.getId());
+        /* When */
+        itemDownloadManager.restartDownload(entry2._1().getId());
 
         /* Then */
-        verify(calledDownloader, times(1)).restartDownload();
-        verify(calledDownloader, times(1)).getItem();
-        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+        verify(entry1._2(), never()).restartDownload();
+        verify(entry2._2(), times(1)).restartDownload();
+        verify(entry3._2(), never()).restartDownload();
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_toogle_on_a_STARTED_download() {
         /* Given */
-        final Downloader notCalledDownloader = mock(Downloader.class);
-        final Downloader calledDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_2, calledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_3, notCalledDownloader);
-        when(calledDownloader.getItem()).thenReturn(ITEM_2);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
+        entry2._1().setStatus(Status.STARTED);
 
-        /* When */ itemDownloadManager.toogleDownload(ITEM_2.getId());
+        /* When */
+        itemDownloadManager.toggleDownload(entry2._1().getId());
 
         /* Then */
-        verify(calledDownloader, times(1)).pauseDownload();
-        verify(calledDownloader, times(1)).getItem();
-        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+        verify(entry1._2(), never()).pauseDownload();
+        verify(entry2._2(), times(1)).pauseDownload();
+        verify(entry3._2(), never()).pauseDownload();
+        verifyPostLaunchDownload();
     }
 
 
     @Test
     public void should_toogle_on_a_PAUSED_download() {
         /* Given */
-        final Downloader notCalledDownloader = mock(Downloader.class);
-        final Downloader calledDownloader = mock(Downloader.class);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_1, notCalledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_2, notCalledDownloader);
-        itemDownloadManager.getDownloadingQueue().put(ITEM_3, calledDownloader);
-        when(calledDownloader.getItem()).thenReturn(ITEM_3);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
+        entry2._1().setStatus(Status.PAUSED);
 
         /* When */
-        itemDownloadManager.toogleDownload(ITEM_3.getId());
+        itemDownloadManager.toggleDownload(entry2._1().getId());
 
         /* Then */
-        verify(calledDownloader, times(2)).getItem();
-        verify(calledDownloader, times(1)).restartDownload();
-        verifyNoMoreInteractions(notCalledDownloader, calledDownloader);
+        verify(entry1._2(), never()).restartDownload();
+        verify(entry2._2(), times(1)).restartDownload();
+        verify(entry3._2(), never()).restartDownload();
+        verifyPostLaunchDownload();
     }
 
     @Test
@@ -385,123 +418,138 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.removeACurrentDownload(item);
         /* Then */
         assertThat(itemDownloadManager.getDownloadingQueue()).hasSize(0);
-        verifyConvertAndSave();
+        verifyConvertAndSave(times(1));
     }
 
 
     @Test
     public void should_move_item_in_queue() {
         /* Given */
-        itemDownloadManager.getWaitingQueue().add(ITEM_1);
-        itemDownloadManager.getWaitingQueue().add(ITEM_2);
-        itemDownloadManager.getWaitingQueue().add(ITEM_3);
-        /* When */ itemDownloadManager.moveItemInQueue(ITEM_2.getId(), 2);
+        itemDownloadManager.addItemToQueue(ITEM_1);
+        itemDownloadManager.addItemToQueue(ITEM_2);
+        itemDownloadManager.addItemToQueue(ITEM_3);
+
+        /* When */
+        itemDownloadManager.moveItemInQueue(ITEM_2.getId(), 2);
+
         /* Then */
         assertThat(itemDownloadManager.getWaitingQueue())
                 .containsSequence(ITEM_1, ITEM_3, ITEM_2);
 
-        verifyConvertAndSave();
+        verifyConvertAndSave(times(4));
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void should_do_nothing_on_non_present_item_movement() {
-        itemDownloadManager.getWaitingQueue().add(ITEM_1);
-        itemDownloadManager.getWaitingQueue().add(ITEM_2);
-        itemDownloadManager.getWaitingQueue().add(ITEM_3);
-        /* When */ itemDownloadManager.moveItemInQueue(UUID.randomUUID(), 2);
+        /* Given */
+        itemDownloadManager.addItemToQueue(ITEM_1);
+        itemDownloadManager.addItemToQueue(ITEM_2);
+        itemDownloadManager.addItemToQueue(ITEM_3);
+        verifyConvertAndSave(times(3));
+
+        /* When */
+        itemDownloadManager.moveItemInQueue(UUID.randomUUID(), 2);
+
         /* Then */
-        assertThat(itemDownloadManager.getWaitingQueue())
-                .containsSequence(ITEM_1, ITEM_2, ITEM_3);
+        assertThat(itemDownloadManager.getWaitingQueue()).containsSequence(ITEM_1, ITEM_2, ITEM_3);
     }
 
     @Test
     public void should_reset_current_download() throws URISyntaxException {
         /* Given */
         when(podcastServerParameters.getNumberOfTry()).thenReturn(3);
-        Downloader downloaderMock = mock(Downloader.class);
-        when(downloaderSelector.of(anyString())).thenReturn(downloaderMock);
-        final Downloader calledDownloader = mock(Downloader.class);
-        when(downloaderMock.setItem(any())).thenReturn(downloaderMock);
-        when(downloaderMock.setItemDownloadManager(any())).thenReturn(downloaderMock);
-        Item item = new Item().setId(UUID.randomUUID()).setUrl("1").setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
-        itemDownloadManager.getDownloadingQueue().put(item, calledDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1()));
+        itemDownloadManager.launchDownload();
 
-        /* When */ itemDownloadManager.resetDownload(item);
+        /* When */
+        itemDownloadManager.resetDownload(entry1._1());
+
         /* Then */
-        assertThat(item.getNumberOfTry()).isEqualTo(1);
+        assertThat(entry1._1().getNumberOfTry()).isEqualTo(1);
         verify(podcastServerParameters, times(1)).getNumberOfTry();
-        verify(downloaderSelector, times(1)).of(eq(item.getUrl()));
+        verify(downloaderSelector, times(2)).of(eq(entry1._1().getUrl()));
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_remove_from_both_queue() {
         /* Given */
-        final Downloader calledDownloader = mock(Downloader.class);
-        Item itemWaiting = new Item().setId(UUID.randomUUID()).setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
-        Item itemDownloading = new Item().setId(UUID.randomUUID()).setPubDate(ZonedDateTime.now()).setUrl("http://nowhere.else");
-        itemDownloadManager.getDownloadingQueue().put(itemDownloading, calledDownloader);
-        itemDownloadManager.getWaitingQueue().add(itemWaiting);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(1);
+        when(itemRepository.findAllToDownload(any()))
+                .thenReturn(Sets.newHashSet(entry1._1()))
+                .thenReturn(Sets.newHashSet(entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
+        itemDownloadManager.launchDownload();
+
         /* When */
-        itemDownloadManager.removeItemFromQueueAndDownload(itemWaiting);
-        itemDownloadManager.removeItemFromQueueAndDownload(itemDownloading);
+        itemDownloadManager.removeItemFromQueueAndDownload(entry1._1());
+        itemDownloadManager.removeItemFromQueueAndDownload(entry3._1());
 
         /* Then */
-        assertThat(itemDownloadManager.getWaitingQueue()).isEmpty();
-        verify(calledDownloader, times(1)).stopDownload();
-        verify(template, times(2)).convertAndSend(stringArgumentCaptor.capture(), queueArgumentCaptor.capture());
-        assertThat(stringArgumentCaptor.getValue()).isEqualTo("/topic/waiting");
-        assertThat(queueArgumentCaptor.getValue()).isSameAs(itemDownloadManager.getWaitingQueue());
+        assertThat(itemDownloadManager.getWaitingQueue()).hasSize(1);
+        verify(entry1._2(), times(1)).stopDownload();
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_detect_if_is_in_downloading_queue() {
         /* Given */
-        final Downloader mockDownloader = mock(Downloader.class);
-        final Item item = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/").setPubDate(ZonedDateTime.now());
-        itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
                 
         /* When */
-        Boolean isIn = itemDownloadManager.isInDownloadingQueue(item);
-        Boolean isNotIn = itemDownloadManager.isInDownloadingQueue(new Item());
+        Boolean isIn = itemDownloadManager.isInDownloadingQueue(entry1._1());
+        Boolean isNotIn = itemDownloadManager.isInDownloadingQueue(Item.DEFAULT_ITEM);
 
         /* Then */
         assertThat(isIn).isTrue();
         assertThat(isNotIn).isFalse();
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_get_downloading_item_list() {
         /* Given */
-        final Downloader mockDownloader = mock(Downloader.class);
-        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubDate(ZonedDateTime.now());
-        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubDate(ZonedDateTime.now());
-        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubDate(ZonedDateTime.now());
-        itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
-        itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
-        itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
 
-        /* When */ Set<Item> items = itemDownloadManager.getItemsInDownloadingQueue();
+        /* When */
+        Set<Item> items = itemDownloadManager.getItemsInDownloadingQueue();
 
         /* Then */
-        assertThat(items).contains(item1, item2, item3);
+        assertThat(items).contains(entry1._1(), entry2._1(), entry3._1());
+        verifyPostLaunchDownload();
     }
 
     @Test
     public void should_find_item_in_downloading_queue() {
         /* Given */
-        final Downloader mockDownloader = mock(Downloader.class);
-        Item item1 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+1).setPubDate(ZonedDateTime.now());
-        Item item2 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+2).setPubDate(ZonedDateTime.now());
-        Item item3 = new Item().setId(UUID.randomUUID()).setStatus(Status.NOT_DOWNLOADED).setUrl("http://now.where/"+3).setPubDate(ZonedDateTime.now());
-        itemDownloadManager.getDownloadingQueue().put(item1, mockDownloader);
-        itemDownloadManager.getDownloadingQueue().put(item2, mockDownloader);
-        itemDownloadManager.getDownloadingQueue().put(item3, mockDownloader);
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
 
         /* When */
-        Item item = itemDownloadManager.getItemInDownloadingQueue(item2.getId());
+        Item item = itemDownloadManager.getItemInDownloadingQueue(entry1._1().getId());
 
         /* Then */
-        assertThat(item).isSameAs(item2);
+        assertThat(item).isSameAs(entry1._1());
+        verifyPostLaunchDownload();
     }
 
     @Test

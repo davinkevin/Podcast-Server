@@ -19,7 +19,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class DownloaderSelector {
 
-    static final NoOpDownloader NO_OP_DOWNLOADER = new NoOpDownloader();
+    public static final NoOpDownloader NO_OP_DOWNLOADER = new NoOpDownloader();
 
     private final ApplicationContext applicationContext;
     private final Set<Downloader> downloaders;

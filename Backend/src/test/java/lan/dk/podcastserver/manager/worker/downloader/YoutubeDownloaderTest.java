@@ -288,7 +288,7 @@ public class YoutubeDownloaderTest {
         /* Given */
         youtubeDownloader.setItem(item.setStatus(Status.STARTED));
 
-        when(itemDownloadManager.canBeReseted(eq(item))).thenReturn(true);
+        when(itemDownloadManager.canBeReset(eq(item))).thenReturn(true);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -309,7 +309,7 @@ public class YoutubeDownloaderTest {
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.canBeReseted(eq(item))).thenReturn(false);
+        when(itemDownloadManager.canBeReset(eq(item))).thenReturn(false);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
