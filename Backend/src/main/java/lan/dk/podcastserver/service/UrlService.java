@@ -8,6 +8,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -96,9 +97,11 @@ public class UrlService {
         if (mayBeRelativeUrl.contains(PROTOCOL_SEPARATOR))
             return mayBeRelativeUrl;
 
+        Boolean isFromRoot = mayBeRelativeUrl.startsWith("/");
+
         return Try.of(() -> new URL(urlWithDomain))
-                .map(u -> u.getProtocol() + PROTOCOL_SEPARATOR + u.getAuthority())
-                .map(s -> s + (!mayBeRelativeUrl.startsWith("/") ? "/" : "") + mayBeRelativeUrl)
+                .map(u -> u.getProtocol() + PROTOCOL_SEPARATOR + u.getAuthority() + (isFromRoot ? "" : StringUtils.substringBeforeLast(u.getPath(), "/")))
+                .map(s -> s + (isFromRoot ? "" : "/") + mayBeRelativeUrl)
                 .getOrElseThrow(e -> new RuntimeException(e));
 
         /*return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + mayBeRelativeUrl;*/

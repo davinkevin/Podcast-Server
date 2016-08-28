@@ -103,6 +103,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     private String upgradeBitrate(String url) {
         // bwmin=40000&bwmax=150000
         // bwmin=400000&bwmax=4900000
+        logger.info("Url before upgrade : " + url);
         return url
                 .replaceFirst("bwmin=[0-9]+", "bwmin=400000")
                 .replaceFirst("bwmax=[0-9]+", "bwmax=4900000");
@@ -112,12 +113,11 @@ public class TF1ReplayDownloader extends M3U8Downloader {
         String realUrl = urlService.getRealURL(url, c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
 
         return Try.of(() -> urlService.get(url)
-                .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
-                .asString()
-        )
-                .map(HttpResponse::getRawBody)
-                .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
-                .map(u -> urlService.addDomainIfRelative(realUrl, u))
+                    .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
+                .asString())
+                    .map(HttpResponse::getRawBody)
+                    .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
+                    .map(u -> urlService.addDomainIfRelative(realUrl, u))
                 .getOrElseThrow((e) -> new RuntimeException("Url not found for TF1 item with m3u8 url " + url, e));
     }
 

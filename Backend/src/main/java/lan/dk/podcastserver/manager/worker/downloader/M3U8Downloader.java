@@ -122,7 +122,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public void stopDownload() {
-        process.destroy();
+        Try.run(() -> process.destroy());
         super.stopDownload();
     }
 

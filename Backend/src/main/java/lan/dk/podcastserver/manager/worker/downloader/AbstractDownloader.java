@@ -60,7 +60,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         stopDownloading.set(false);
         saveSyncWithPodcast();
         convertAndSaveBroadcast();
-        download();
+        Try.of(this::download)
+            .onFailure(e -> logger.error("Error during download", e))
+            .onFailure(e -> this.stopDownload());
     }
 
     @Override
