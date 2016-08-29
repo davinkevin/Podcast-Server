@@ -73,8 +73,8 @@ public class TF1ReplayUpdater extends AbstractUpdater {
 
     private String getTitle(Element v) {
         String text = v.select("p.title").text();
-        if (text.contains("-")) {
-            return StringUtils.substringAfter(text, "-").trim();
+        if (text.contains(" - ")) {
+            return StringUtils.substringAfter(text, " - ").trim();
         }
 
         return text;
