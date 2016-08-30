@@ -588,6 +588,24 @@ public class ItemDownloadManagerTest {
         });
     }
 
+    @Test
+    public void should_clear_waiting_list() {
+        /* Given */
+        Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(downloaderExecutor.getCorePoolSize()).thenReturn(1);
+        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        itemDownloadManager.launchDownload();
+
+        /* When */
+        itemDownloadManager.clearWaitingQueue();
+
+        /* Then */
+        assertThat(itemDownloadManager.getWaitingQueue()).hasSize(0);
+        verifyPostLaunchDownload();
+    }
+
     @After
     public void afterEach() {
         verify(podcastServerParameters, atLeast(1)).getRootfolder();
