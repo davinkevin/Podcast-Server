@@ -5,11 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.FfmpegService;
-import lan.dk.podcastserver.service.M3U8Service;
-import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +37,7 @@ public class CanalPlusDownloaderTest {
     @Mock UrlService urlService;
     @Mock M3U8Service m3U8Service;
     @Mock FfmpegService ffmpegService;
-    @Mock ProcessBuilderFactory processBuilderFactory;
+    @Mock ProcessService processService;
 
     @InjectMocks CanalPlusDownloader canalPlusDownloader;
 

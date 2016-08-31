@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.ExternalTools;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class RTMPDownloader extends AbstractDownloader {
 
     int pid = 0;
 
-    @Autowired ProcessBuilderFactory processBuilderFactory;
+    @Autowired ProcessService processService;
     @Autowired ExternalTools externalTools;
 
     Process p = null;
@@ -35,13 +35,13 @@ public class RTMPDownloader extends AbstractDownloader {
             target = getTargetFile(item);
             logger.debug("Fichier de sortie : {}" , target.toAbsolutePath().toString());
 
-            p  = processBuilderFactory
+            p  = processService
                     .newProcessBuilder(externalTools.getRtmpdump(), "-r", getItemUrl(item), "-o", target.toAbsolutePath().toString())
                     .directory(new File("/tmp"))
                     .redirectErrorStream(true)
                     .start();
 
-            pid = processBuilderFactory.pidOf(p);
+            pid = processService.pidOf(p);
 
             new RTMPWatcher(this).run();
 
@@ -57,8 +57,7 @@ public class RTMPDownloader extends AbstractDownloader {
     @Override
     public void startDownload() {
         if (pid != 0 && nonNull(p)) { //Relancement du process UNIX
-            //ProcessBuilder pb = new ProcessBuilder("kill", "-CONT", "" + pid);
-            logger.debug("Relaunch download");
+            logger.debug("Stop previous process");
             p.destroy();
         }
         super.startDownload();
@@ -66,7 +65,7 @@ public class RTMPDownloader extends AbstractDownloader {
 
     @Override
     public void pauseDownload() {
-        ProcessBuilder stopProcess = processBuilderFactory.newProcessBuilder("kill", "-STOP", "" + pid);
+        ProcessBuilder stopProcess = processService.newProcessBuilder("kill", "-STOP", "" + pid);
         try {
             stopProcess.start();
             super.pauseDownload();

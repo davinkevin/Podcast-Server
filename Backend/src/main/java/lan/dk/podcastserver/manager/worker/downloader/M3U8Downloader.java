@@ -5,8 +5,8 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.M3U8Service;
+import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import org.apache.commons.io.FilenameUtils;
@@ -27,7 +27,7 @@ public class M3U8Downloader extends AbstractDownloader {
     @Autowired UrlService urlService;
     @Autowired M3U8Service m3U8Service;
     @Autowired FfmpegService ffmpegService;
-    @Autowired ProcessBuilderFactory processBuilderFactory;
+    @Autowired ProcessService processService;
 
     private Process process;
 
@@ -52,7 +52,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
         process = ffmpegService.download(getItemUrl(item), command, handleProgression(duration));
 
-        Try.run(process::waitFor);
+        processService.waitFor(process);
 
         if (item.getStatus() == Status.STARTED)
             finishDownload();
@@ -94,21 +94,21 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public void pauseDownload() {
-        ProcessBuilder pauseProcess = processBuilderFactory.newProcessBuilder("kill", "-STOP", "" + processBuilderFactory.pidOf(process));
-        Try
-            .run(pauseProcess::start)
-            .andThenTry(super::pauseDownload)
-            .onFailure(e -> {
-                logger.error("Error during pause of process :", e);
-                this.stopDownload();
-            });
+        ProcessBuilder pauseProcess = processService.newProcessBuilder("kill", "-STOP", "" + processService.pidOf(process));
+        processService
+                .start(pauseProcess)
+                .andThenTry(super::pauseDownload)
+                .onFailure(e -> {
+                    logger.error("Error during pause of process :", e);
+                    this.stopDownload();
+                });
     }
 
     @Override
     public void restartDownload() {
-        ProcessBuilder pauseProcess = processBuilderFactory.newProcessBuilder("kill", "-SIGCONT", "" + processBuilderFactory.pidOf(process));
-        Try
-            .run(pauseProcess::start)
+        ProcessBuilder restart = new ProcessBuilder("kill", "-SIGCONT", "" + processService.pidOf(process));
+
+        processService.start(restart)
             .andThenTry(() -> {
                 item.setStatus(Status.STARTED);
                 saveSyncWithPodcast();

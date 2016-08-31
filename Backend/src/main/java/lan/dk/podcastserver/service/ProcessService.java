@@ -1,5 +1,6 @@
-package lan.dk.podcastserver.service.factory;
+package lan.dk.podcastserver.service;
 
+import javaslang.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +11,13 @@ import java.lang.reflect.Field;
  */
 @Slf4j
 @Service
-public class ProcessBuilderFactory {
+public class ProcessService {
 
     public ProcessBuilder newProcessBuilder(String... command) { return new ProcessBuilder(command); }
+
+    public Try<Process> start(ProcessBuilder processBuilder) {
+        return Try.of(processBuilder::start);
+    }
 
     public int pidOf(Process p) {
         try {
@@ -23,5 +28,9 @@ public class ProcessBuilderFactory {
             }
         } catch (IllegalAccessException | NoSuchFieldException ignored) {}
         return -1;
+    }
+
+    public Try<Integer> waitFor(Process process) {
+        return Try.of(process::waitFor);
     }
 }

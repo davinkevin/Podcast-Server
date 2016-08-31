@@ -7,7 +7,8 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.factory.ProcessBuilderFactory;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.ExternalTools;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
@@ -46,7 +47,7 @@ public class RTMPDownloaderTest {
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
-    @Mock ProcessBuilderFactory processBuilderFactory;
+    @Mock ProcessService processService;
     @InjectMocks RTMPDownloader rtmpDownloader;
 
     @Captor ArgumentCaptor<String> processParameters;
@@ -88,11 +89,11 @@ public class RTMPDownloaderTest {
     public void should_download() throws IOException, URISyntaxException {
         /* Given */
         ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", fileUri("/remote/downloader/rtmpdump/rtmpdump.txt"));
-        when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).then(i -> {
+        when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
             Files.createFile(Paths.get("/tmp", "RTMP Podcast", "bar.mp4.psdownload"));
             return processBuilder;
         });
-        when(processBuilderFactory.pidOf(any())).thenReturn(1234);
+        when(processService.pidOf(any())).thenReturn(1234);
 
         /* When */
         rtmpDownloader.download();
@@ -100,7 +101,7 @@ public class RTMPDownloaderTest {
         /* Then */
         assertThat(rtmpDownloader.pid).isEqualTo(0);
         assertThat(Paths.get("/tmp", "RTMP Podcast", "bar.mp4")).exists();
-        verify(processBuilderFactory, times(1)).newProcessBuilder(processParameters.capture());
+        verify(processService, times(1)).newProcessBuilder(processParameters.capture());
         assertThat(processParameters.getAllValues())
                 .hasSize(5)
                 .containsExactly(
@@ -117,8 +118,8 @@ public class RTMPDownloaderTest {
     public void should_stop_download_if_ioexception() throws URISyntaxException {
         /* Given */
         ProcessBuilder processBuilder = new ProcessBuilder("/bin");
-        when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).then(i -> processBuilder);
-        when(processBuilderFactory.pidOf(any())).thenReturn(1234);
+        when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> processBuilder);
+        when(processService.pidOf(any())).thenReturn(1234);
         rtmpDownloader.p = mock(Process.class);
 
         /* When */
@@ -136,11 +137,11 @@ public class RTMPDownloaderTest {
         rtmpDownloader.p = process;
 
         ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", fileUri("/remote/downloader/rtmpdump/rtmpdump.txt"));
-        when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).then(i -> {
+        when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
             Files.createFile(Paths.get("/tmp", "RTMP Podcast", "bar.mp4.psdownload"));
             return processBuilder;
         });
-        when(processBuilderFactory.pidOf(any())).thenReturn(1234);
+        when(processService.pidOf(any())).thenReturn(1234);
 
         /* When */
         rtmpDownloader.startDownload();
@@ -153,13 +154,13 @@ public class RTMPDownloaderTest {
     public void should_pause_process_on_pause_of_download() {
         /* Given */
         rtmpDownloader.pid = 123;
-        when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).thenReturn(new ProcessBuilder("/bin/ls"));
+        when(processService.newProcessBuilder((String[]) anyVararg())).thenReturn(new ProcessBuilder("/bin/ls"));
 
         /* When */
         rtmpDownloader.pauseDownload();
 
         /* Then */
-        verify(processBuilderFactory, times(1)).newProcessBuilder(processParameters.capture());
+        verify(processService, times(1)).newProcessBuilder(processParameters.capture());
         assertThat(processParameters.getAllValues())
                 .hasSize(3)
                 .containsExactly(
@@ -175,7 +176,7 @@ public class RTMPDownloaderTest {
         Process process = mock(Process.class);
         rtmpDownloader.pid = 123;
         rtmpDownloader.p = process;
-        when(processBuilderFactory.newProcessBuilder((String[]) anyVararg())).thenReturn(new ProcessBuilder("/bin"));
+        when(processService.newProcessBuilder((String[]) anyVararg())).thenReturn(new ProcessBuilder("/bin"));
 
         /* When */
         rtmpDownloader.pauseDownload();
