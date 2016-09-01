@@ -4,6 +4,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.body.MultipartBody;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.*;
@@ -54,9 +55,15 @@ public class TF1ReplayDownloaderTest {
         when(htmlService.get(eq(item.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"));
 
         HttpRequestWithBody apiRequest = mock(HttpRequestWithBody.class, RETURNS_DEEP_STUBS);
+        MultipartBody multipartBody = mock(MultipartBody.class);
         HttpResponse apiResponse = mock(HttpResponse.class, RETURNS_DEEP_STUBS);
         when(urlService.post(anyString())).thenReturn(apiRequest);
-        when(apiRequest.header(any(), any()).asString()).thenReturn(apiResponse);
+        when(apiRequest.header(any(), any())).thenReturn(apiRequest);
+        when(apiRequest.field(anyString(), any(Object.class))).thenReturn(multipartBody);
+        when(multipartBody.field(anyString(), anyString()))
+                .thenReturn(multipartBody)
+        ;
+        when(multipartBody.asString()).thenReturn(apiResponse);
         when(apiResponse.getBody()).thenReturn("{ \"code\": 200, \"message\" : \"http:\\/\\/www.wat.tv\\/get\\/iphone\\/13075615.m3u8?token=b35fc8b36d16b0110fd6220bd9df7164%2F576eb335&bwmin=400000&bwmax=1500000\"}");
 
         GetRequest getRequest = mock(GetRequest.class, RETURNS_DEEP_STUBS);

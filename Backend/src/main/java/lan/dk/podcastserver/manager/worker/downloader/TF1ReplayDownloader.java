@@ -97,13 +97,13 @@ public class TF1ReplayDownloader extends M3U8Downloader {
                     .map(d -> d.read("$", TF1ReplayVideoUrl.class))
                     .map(TF1ReplayVideoUrl::getMessage)
                     .map(this::upgradeBitrate)
+                .onFailure(e -> logger.error("Error during fetching", e))
                 .getOrElse("http://wat.tv/get/ipad/"+ id + ".m3u8");
     }
 
     private String upgradeBitrate(String url) {
         // bwmin=40000&bwmax=150000
         // bwmin=400000&bwmax=4900000
-        logger.info("Url before upgrade : " + url);
         return url
                 .replaceFirst("bwmin=[0-9]+", "bwmin=400000")
                 .replaceFirst("bwmax=[0-9]+", "bwmax=4900000");
