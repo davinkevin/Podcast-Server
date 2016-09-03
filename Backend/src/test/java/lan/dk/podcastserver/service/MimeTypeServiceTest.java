@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,7 +79,7 @@ public class MimeTypeServiceTest {
     public void should_get_mimeType_with_probeContentType() throws URISyntaxException, IOException {
         /* Given */
         Path path = Paths.get(MimeTypeServiceTest.class.getResource("/remote/podcast/plain.text.txt").toURI());
-        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Optional.of("text/plain"));
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Option.of("text/plain"));
 
         /* When */ String type = mimeTypeService.probeContentType(path);
         /* Then */ assertThat(type).isEqualTo("text/plain");
@@ -89,7 +89,7 @@ public class MimeTypeServiceTest {
     public void should_get_mimeType_with_tika() throws URISyntaxException, IOException {
         /* Given */
         Path file = Paths.get("/", "tmp", "foo");
-        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Optional.of("Foo/bar"));
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Option.of("Foo/bar"));
 
         /* When */ String type = mimeTypeService.probeContentType(file);
         /* Then */ assertThat(type).isEqualTo("Foo/bar");
@@ -99,7 +99,7 @@ public class MimeTypeServiceTest {
     public void should_find_mimeType_from_inline_map() throws IOException {
         /* Given */
         Path file = Paths.get("/", "tmp", "foo");
-        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Optional.empty());
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Option.none());
 
         /* When */
         String contentType = mimeTypeService.probeContentType(file);

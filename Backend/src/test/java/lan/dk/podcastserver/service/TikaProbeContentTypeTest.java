@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import javaslang.control.Option;
 import org.apache.tika.Tika;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +39,7 @@ public class TikaProbeContentTypeTest {
         when(tika.detect(any(File.class))).thenReturn("Foo/bar");
 
         /* When */
-        Optional<String> mimeType = tikaProbeContentType.probeContentType(Paths.get("/", "tmp", "Bar"));
+        Option<String> mimeType = tikaProbeContentType.probeContentType(Paths.get("/", "tmp", "Bar"));
 
         /* Then */
         assertThat(mimeType).contains("Foo/bar");
@@ -51,7 +51,7 @@ public class TikaProbeContentTypeTest {
         doThrow(IOException.class).when(tika).detect(any(File.class));
 
         /* When */
-        Optional<String> mimeType = tikaProbeContentType.probeContentType(Paths.get("/", "tmp", "Bar"));
+        Option<String> mimeType = tikaProbeContentType.probeContentType(Paths.get("/", "tmp", "Bar"));
 
         /* Then */
         assertThat(mimeType).isEmpty();

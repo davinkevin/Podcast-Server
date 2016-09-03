@@ -1,6 +1,11 @@
 package lan.dk.podcastserver.service;
 
-import com.google.common.collect.Maps;
+import javaslang.Tuple;
+import javaslang.Tuple2;
+import javaslang.collection.HashMap;
+import javaslang.collection.Map;
+import javaslang.control.Option;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
@@ -11,8 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server
@@ -20,32 +24,32 @@ import java.util.Optional;
 @Service
 public class MimeTypeService {
 
-    private final Map<String, String> mimeMap;
     private final TikaProbeContentType tikaProbeContentType;
+    private final Map<String, String> mimeMap;
 
     @Autowired
     public MimeTypeService(TikaProbeContentType tikaProbeContentType) {
         this.tikaProbeContentType = tikaProbeContentType;
-        mimeMap = Maps.newHashMap();
-        mimeMap.put("mp4", "video/mp4");
-        mimeMap.put("mp3", "audio/mp3");
-        mimeMap.put("flv", "video/flv");
-        mimeMap.put("webm", "video/webm");
-        mimeMap.put("", "video/mp4");
+        mimeMap = HashMap.ofEntries(
+                Tuple.of("mp4", "video/mp4"),
+                Tuple.of("mp3", "audio/mp3"),
+                Tuple.of("flv", "video/flv"),
+                Tuple.of("webm", "video/webm"),
+                Tuple.of("", "video/mp4")
+        );
     }
 
     public String getMimeType(String extension) {
         if (extension.isEmpty())
             return "application/octet-stream";
 
-        if (mimeMap.containsKey(extension)) {
-            return mimeMap.get(extension);
-        } else {
-            return "unknown/" + extension;
-        }
+        return mimeMap
+                .filter(e -> e._1().equals(extension))
+                .map(Tuple2::_2)
+                .getOrElse(() -> "unknown/" + extension);
     }
 
-    public String getExtension(Item item) {
+    String getExtension(Item item) {
         if (item.getMimeType() != null) {
             return item.getMimeType().replace("audio/", ".").replace("video/", ".");
         }
@@ -60,16 +64,14 @@ public class MimeTypeService {
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public String probeContentType(Path file) {
         return filesProbeContentType(file)
-                .orElseGet(() -> tikaProbeContentType.probeContentType(file)
-                .orElseGet(() -> getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())))));
+                .orElse(() -> tikaProbeContentType.probeContentType(file))
+                .getOrElse(() -> getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName()))));
     }
 
-    private Optional<String> filesProbeContentType(Path file) {
-        String mimeType = null;
-
-        try { mimeType = Files.probeContentType(file); } catch (IOException ignored) {}
-
-        return Optional.ofNullable(mimeType);
+    private Option<String> filesProbeContentType(Path file) {
+        return Try.of(() -> Files.probeContentType(file))
+                .filter(Objects::nonNull)
+                .toOption();
     }
 
     @RequiredArgsConstructor
@@ -77,11 +79,11 @@ public class MimeTypeService {
 
         private final Tika tika;
 
-        Optional<String> probeContentType(Path file) {
+        Option<String> probeContentType(Path file) {
             try {
-                return Optional.of(tika.detect(file.toFile()));
+                return Option.of(tika.detect(file.toFile()));
             } catch (IOException ignored) {
-                return Optional.empty();
+                return Option.none();
             }
         }
     }
