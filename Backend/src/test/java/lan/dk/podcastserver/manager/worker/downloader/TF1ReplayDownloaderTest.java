@@ -91,6 +91,18 @@ public class TF1ReplayDownloaderTest {
     }
 
     @Test
+    public void should_not_get_real_item_url_if_already_defined() {
+        /* Given */
+        downloader.url= "http://a.custom.url.com/";
+
+        /* When */
+        String targetUrl = downloader.getItemUrl(null);
+
+        /* Then */
+        assertThat(targetUrl).isSameAs(downloader.url);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void should_get_url_with_short_id() throws IOException, URISyntaxException, UnirestException {
         /* Given */
