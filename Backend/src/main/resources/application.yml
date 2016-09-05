@@ -2,8 +2,9 @@
 # Database and Lucene Config #
 ##############################
 spring :
-    mvc.view.suffix : .html
-    mvc.view.prefix : /
+    mvc.view:
+      suffix : .html
+      prefix : /
     h2.console.enabled : true
     datasource:
         url: jdbc:h2:/tmp/podcast-server
@@ -12,8 +13,7 @@ spring :
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
         show-sql: false
-        hibernate :
-            ddl-auto: update
+        hibernate.ddl-auto: update
         properties :
             hibernate:
                 format_sql: true
@@ -21,9 +21,11 @@ spring :
                         indexmanager: near-real-time
                         directory_provider: ram
                         indexBase: /tmp/lucene
-            jadira:
-              usertype:
-                autoRegisterUserTypes: true
+            jadira.usertype.autoRegisterUserTypes: true
+    http.multipart:
+          max-file-size: 512MB
+          max-request-size: 512MB
+          location : /tmp/
 
 server:
   port : 8080
@@ -45,9 +47,7 @@ podcastserver:
     #number-of-try: 10
     #download-extention: .psdownload
     #rss-default-number-item: 50
-    update-and-download:
-        refresh:
-            cron: 0 0 0 * * ?
+    update-and-download.refresh.cron: 0 0 0 * * ?
     backup :
         location: /tmp/
         cron: 0 30 4 * * ?
@@ -57,7 +57,7 @@ podcastserver:
         #ffmpeg: /usr/local/bin/ffmpeg
         #ffprobe: /usr/local/bin/ffprobe
     api :
-      youtube : AIzaSyAKgONm3AO-SpwYjSkiQSbnMcu62zx0quM
+      youtube :
       #youtube :
 
 
@@ -65,20 +65,11 @@ podcastserver:
 #          Actuator          #
 ##############################
 
-management:
-    context-path: /system
-
-endpoints:
-    health:
-        sensitive : false
+management.context-path: /system
+endpoints.health.sensitive: false
 
 logging:
     path: /private/tmp/logs/podcastserver.log
     level:
         lan.dk.podcastserver : DEBUG
         org.springframework.http.converter.json : DEBUG
-
-multipart:
-    max-file-size: 512MB
-    max-request-size: 512MB
-    location : /tmp/

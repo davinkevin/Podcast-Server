@@ -9,12 +9,14 @@ spring :
         driver-class-name: org.h2.Driver
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
-        properties :
-            hibernate:
-                search.default:
+        properties.hibernate.search.default:
                         indexmanager: near-real-time
                         directory_provider: ram
                         indexBase: /tmp/lucene
+    http.multipart:
+        max-file-size: 512MB
+        max-request-size: 512MB
+        location : /tmp/
 
 server:
   port : 8080
@@ -54,19 +56,11 @@ podcastserver:
 #          Actuator          #
 ##############################
 
-management:
-    context-path: /system
+management.context-path: /system
 
-endpoints:
-    health:
-        sensitive : false
+endpoints.health.sensitive: false
 
 logging:
     path: /tmp/podcastserver.log
     level:
         lan.dk.podcastserver : DEBUG
-
-multipart:
-    max-file-size: 512MB
-    max-request-size: 512MB
-    location : /tmp/
