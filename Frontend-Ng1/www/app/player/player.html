@@ -30,15 +30,16 @@
             <div class="col-lg-4 col-sm-4 col-xs-4 col-md-4 text-center" ng-click="pc.loadWatchList()"><span class="fa fa-align-justify"></span> WatchList</div>
         </div>
         <div class="watch-lists clearfix" ng-if="pc.watchLists" ng-repeat="watchList in pc.watchLists track by watchList.id">
-            <button ng-click="pc.removeWatchList(watchList)" type="button" class="pull-right close"><span aria-hidden="true">&times;</span></button>
+            <button ng-click="pc.removeWatchList(watchList)" type="button" class="pull-right close"><i class="ionicons ion-close"></i></button>
 
+            <a ng-href="{{ ::'/api/watchlists/' + watchList.id + '/rss' }}" target="_blank" class="pull-left rss"><span class="ionicons ion-social-rss"></span></a>
             <div class="watch-lists-body" ng-click="pc.selectWatchList(watchList)">
-                <p class="">{{ ::watchList.name }}</p>
+                <p>{{ ::watchList.name }}</p>
             </div>
         </div>
 
         <div class="media clearfix" ng-if="!pc.watchLists" ng-repeat="item in pc.currentWatchList.items track by item.id" ng-class="{'isReading' : pc.currentVideo.id === item.id}">
-            <button ng-click="pc.remove(item)" type="button" class="pull-right close"><span aria-hidden="true">&times;</span></button>
+            <button ng-click="pc.remove(item)" type="button" class="pull-right close"><i class="ionicons ion-close"></i></button>
 
             <a class="pull-left cover" ng-click="pc.setVideo($index)">
                 <img ng-src="{{ ::item.cover.url}}" width="100" height="100" style="">

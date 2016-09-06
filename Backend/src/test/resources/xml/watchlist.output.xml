@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
+    <channel>
+        <title>A custom WatchList</title>
+        <link>http://localhost/api/watchlists/c988babd-a2b1-4774-b8f8-fa4903dc3786/rss</link>
+        <item>
+            <title>name0</title>
+            <description>0 Loren Ipsum</description>
+            <pubDate>Tue, 8 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name0</itunes:subtitle>
+            <itunes:summary>0 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/789cec3a-72cb-970a-264a-d5b4bf953183/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/789cec3a-72cb-970a-264a-d5b4bf953183/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/789cec3a-72cb-970a-264a-d5b4bf953183/cover.png"/>
+            <enclosure length="0" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/789cec3a-72cb-970a-264a-d5b4bf953183/download.mp4"/>
+        </item>
+        <item>
+            <title>name1</title>
+            <description>1 Loren Ipsum</description>
+            <pubDate>Mon, 7 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name1</itunes:subtitle>
+            <itunes:summary>1 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/374ea8c6-2390-eab6-51d4-d3f5a8f5e7b7/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/374ea8c6-2390-eab6-51d4-d3f5a8f5e7b7/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/374ea8c6-2390-eab6-51d4-d3f5a8f5e7b7/cover.png"/>
+            <enclosure length="1024" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/374ea8c6-2390-eab6-51d4-d3f5a8f5e7b7/download.mp4"/>
+        </item>
+        <item>
+            <title>name2</title>
+            <description>2 Loren Ipsum</description>
+            <pubDate>Sun, 6 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name2</itunes:subtitle>
+            <itunes:summary>2 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/5f6cda11-24e1-1fc9-8494-17bc9140bc52/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/5f6cda11-24e1-1fc9-8494-17bc9140bc52/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/5f6cda11-24e1-1fc9-8494-17bc9140bc52/cover.png"/>
+            <enclosure length="2048" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/5f6cda11-24e1-1fc9-8494-17bc9140bc52/download.mp4"/>
+        </item>
+        <item>
+            <title>name3</title>
+            <description>3 Loren Ipsum</description>
+            <pubDate>Sat, 5 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name3</itunes:subtitle>
+            <itunes:summary>3 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/19508a7e-3588-8999-baf4-bad1215e3905/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/19508a7e-3588-8999-baf4-bad1215e3905/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/19508a7e-3588-8999-baf4-bad1215e3905/cover.png"/>
+            <enclosure length="3072" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/19508a7e-3588-8999-baf4-bad1215e3905/download.mp4"/>
+        </item>
+        <item>
+            <title>name4</title>
+            <description>4 Loren Ipsum</description>
+            <pubDate>Fri, 4 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name4</itunes:subtitle>
+            <itunes:summary>4 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/ba7aae7e-eded-b7a0-578f-87e40cc39946/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/ba7aae7e-eded-b7a0-578f-87e40cc39946/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/ba7aae7e-eded-b7a0-578f-87e40cc39946/cover.png"/>
+            <enclosure length="4096" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/ba7aae7e-eded-b7a0-578f-87e40cc39946/download.mp4"/>
+        </item>
+        <item>
+            <title>name5</title>
+            <description>5 Loren Ipsum</description>
+            <pubDate>Thu, 3 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name5</itunes:subtitle>
+            <itunes:summary>5 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/8c352463-83f7-c2ad-355d-5d5741b359d4/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/8c352463-83f7-c2ad-355d-5d5741b359d4/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/8c352463-83f7-c2ad-355d-5d5741b359d4/cover.png"/>
+            <enclosure length="5120" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/8c352463-83f7-c2ad-355d-5d5741b359d4/download.mp4"/>
+        </item>
+        <item>
+            <title>name6</title>
+            <description>6 Loren Ipsum</description>
+            <pubDate>Wed, 2 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name6</itunes:subtitle>
+            <itunes:summary>6 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/0fadeb67-3024-9eb3-4db5-8231b80fda0f/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/0fadeb67-3024-9eb3-4db5-8231b80fda0f/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/0fadeb67-3024-9eb3-4db5-8231b80fda0f/cover.png"/>
+            <enclosure length="6144" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/0fadeb67-3024-9eb3-4db5-8231b80fda0f/download.mp4"/>
+        </item>
+        <item>
+            <title>name7</title>
+            <description>7 Loren Ipsum</description>
+            <pubDate>Tue, 1 Sep 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name7</itunes:subtitle>
+            <itunes:summary>7 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/7cd43954-67e6-50c1-bc3c-fe84a01eb007/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/7cd43954-67e6-50c1-bc3c-fe84a01eb007/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/7cd43954-67e6-50c1-bc3c-fe84a01eb007/cover.png"/>
+            <enclosure length="7168" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/7cd43954-67e6-50c1-bc3c-fe84a01eb007/download.mp4"/>
+        </item>
+        <item>
+            <title>name8</title>
+            <description>8 Loren Ipsum</description>
+            <pubDate>Mon, 31 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name8</itunes:subtitle>
+            <itunes:summary>8 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/c175e97c-83d9-e4e5-7c2d-8db98f5624eb/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/c175e97c-83d9-e4e5-7c2d-8db98f5624eb/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/c175e97c-83d9-e4e5-7c2d-8db98f5624eb/cover.png"/>
+            <enclosure length="8192" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/c175e97c-83d9-e4e5-7c2d-8db98f5624eb/download.mp4"/>
+        </item>
+        <item>
+            <title>name9</title>
+            <description>9 Loren Ipsum</description>
+            <pubDate>Sun, 30 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name9</itunes:subtitle>
+            <itunes:summary>9 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/37e4db3c-e1d2-7a40-b438-63de026c7108/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/37e4db3c-e1d2-7a40-b438-63de026c7108/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/37e4db3c-e1d2-7a40-b438-63de026c7108/cover.png"/>
+            <enclosure length="9216" type="video/mp4" url="http://localhost/api/podcast/029d7820-b7e1-4c0f-a94f-235584ffb570/items/37e4db3c-e1d2-7a40-b438-63de026c7108/download.mp4"/>
+        </item>
+        <item>
+            <title>name10</title>
+            <description>10 Loren Ipsum</description>
+            <pubDate>Sat, 29 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name10</itunes:subtitle>
+            <itunes:summary>10 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/28606eb1-da7f-6ba2-20a3-6aad64c6ca9d/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/28606eb1-da7f-6ba2-20a3-6aad64c6ca9d/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/28606eb1-da7f-6ba2-20a3-6aad64c6ca9d/cover.png"/>
+            <enclosure length="10240" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/28606eb1-da7f-6ba2-20a3-6aad64c6ca9d/download.mp4"/>
+        </item>
+        <item>
+            <title>name11</title>
+            <description>11 Loren Ipsum</description>
+            <pubDate>Fri, 28 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name11</itunes:subtitle>
+            <itunes:summary>11 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/c24b4dd3-dbe6-76b2-22aa-580d2515184c/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/c24b4dd3-dbe6-76b2-22aa-580d2515184c/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/c24b4dd3-dbe6-76b2-22aa-580d2515184c/cover.png"/>
+            <enclosure length="11264" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/c24b4dd3-dbe6-76b2-22aa-580d2515184c/download.mp4"/>
+        </item>
+        <item>
+            <title>name12</title>
+            <description>12 Loren Ipsum</description>
+            <pubDate>Thu, 27 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name12</itunes:subtitle>
+            <itunes:summary>12 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/6866c5ce-2daf-f618-ebd4-18efe49f7f83/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/6866c5ce-2daf-f618-ebd4-18efe49f7f83/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/6866c5ce-2daf-f618-ebd4-18efe49f7f83/cover.png"/>
+            <enclosure length="12288" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/6866c5ce-2daf-f618-ebd4-18efe49f7f83/download.mp4"/>
+        </item>
+        <item>
+            <title>name13</title>
+            <description>13 Loren Ipsum</description>
+            <pubDate>Wed, 26 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name13</itunes:subtitle>
+            <itunes:summary>13 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/d935b07e-34a9-ecff-7105-9b0e07804593/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/d935b07e-34a9-ecff-7105-9b0e07804593/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/d935b07e-34a9-ecff-7105-9b0e07804593/cover.png"/>
+            <enclosure length="13312" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/d935b07e-34a9-ecff-7105-9b0e07804593/download.mp4"/>
+        </item>
+        <item>
+            <title>name14</title>
+            <description>14 Loren Ipsum</description>
+            <pubDate>Tue, 25 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name14</itunes:subtitle>
+            <itunes:summary>14 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/8f717fab-f672-a7d5-22ad-d961797b1571/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/8f717fab-f672-a7d5-22ad-d961797b1571/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/8f717fab-f672-a7d5-22ad-d961797b1571/cover.png"/>
+            <enclosure length="14336" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/8f717fab-f672-a7d5-22ad-d961797b1571/download.mp4"/>
+        </item>
+        <item>
+            <title>name15</title>
+            <description>15 Loren Ipsum</description>
+            <pubDate>Mon, 24 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name15</itunes:subtitle>
+            <itunes:summary>15 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/05f62dd4-e345-3eeb-3e31-5a8a50a85175/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/05f62dd4-e345-3eeb-3e31-5a8a50a85175/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/05f62dd4-e345-3eeb-3e31-5a8a50a85175/cover.png"/>
+            <enclosure length="15360" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/05f62dd4-e345-3eeb-3e31-5a8a50a85175/download.mp4"/>
+        </item>
+        <item>
+            <title>name16</title>
+            <description>16 Loren Ipsum</description>
+            <pubDate>Sun, 23 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name16</itunes:subtitle>
+            <itunes:summary>16 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/a60cce2c-1f9c-47be-b06b-04065d96f551/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/a60cce2c-1f9c-47be-b06b-04065d96f551/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/a60cce2c-1f9c-47be-b06b-04065d96f551/cover.png"/>
+            <enclosure length="16384" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/a60cce2c-1f9c-47be-b06b-04065d96f551/download.mp4"/>
+        </item>
+        <item>
+            <title>name17</title>
+            <description>17 Loren Ipsum</description>
+            <pubDate>Sat, 22 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name17</itunes:subtitle>
+            <itunes:summary>17 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/655e53db-0123-76d7-eb46-24a11a20fab9/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/655e53db-0123-76d7-eb46-24a11a20fab9/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/655e53db-0123-76d7-eb46-24a11a20fab9/cover.png"/>
+            <enclosure length="17408" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/655e53db-0123-76d7-eb46-24a11a20fab9/download.mp4"/>
+        </item>
+        <item>
+            <title>name18</title>
+            <description>18 Loren Ipsum</description>
+            <pubDate>Fri, 21 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name18</itunes:subtitle>
+            <itunes:summary>18 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/5642ad48-db22-0c7e-32ca-865e83d58e48/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/5642ad48-db22-0c7e-32ca-865e83d58e48/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/5642ad48-db22-0c7e-32ca-865e83d58e48/cover.png"/>
+            <enclosure length="18432" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/5642ad48-db22-0c7e-32ca-865e83d58e48/download.mp4"/>
+        </item>
+        <item>
+            <title>name19</title>
+            <description>19 Loren Ipsum</description>
+            <pubDate>Thu, 20 Aug 2015 07:00:00 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>name19</itunes:subtitle>
+            <itunes:summary>19 Loren Ipsum</itunes:summary>
+            <guid>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/2c2c2ad9-5a84-807b-81af-55378b534b71/download.mp4</guid>
+            <itunes:image>http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/2c2c2ad9-5a84-807b-81af-55378b534b71/cover.png</itunes:image>
+            <media:thumbnail url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/2c2c2ad9-5a84-807b-81af-55378b534b71/cover.png"/>
+            <enclosure length="19456" type="video/mp4" url="http://localhost/api/podcast/526d5187-0563-4c44-801f-3bea447a86ea/items/2c2c2ad9-5a84-807b-81af-55378b534b71/download.mp4"/>
+        </item>
+    </channel>
+</rss>

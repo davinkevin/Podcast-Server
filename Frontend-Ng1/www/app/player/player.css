@@ -45,6 +45,17 @@
   border-bottom: thin solid #1D1D1D;
   padding-bottom: 10px;
 }
+.ps .video-player .watch-lists .rss {
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 1px 0 #fff;
+}
+.ps .video-player .watch-lists .rss,
+.ps .video-player .watch-lists .close {
+  min-width: 25px;
+  color: white;
+}
 .ps .video-player .playlist {
   overflow-x: hidden;
   overflow-y: visible;

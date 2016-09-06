@@ -5,11 +5,11 @@ import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -17,17 +17,16 @@ import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.function.Function;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 @Service
@@ -64,7 +63,8 @@ public class JdomService {
     private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
     // URL Format
-    private static final String LINK_FORMAT = "%s/api/podcast/%s/rss";
+    private static final String LINK_PODCAST_FORMAT = "%s/api/podcast/%s/rss";
+    private static final String LINK_WATCHLIST_FORMAT = "%s/api/watchlists/%s/rss";
     private static final Comparator<Item> PUB_DATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
 
     final PodcastServerParameters podcastServerParameters;
@@ -72,166 +72,121 @@ public class JdomService {
     final UrlService urlService;
 
     public Option<Document> parse(String url) {
-        return Try
-                .of(() -> new SAXBuilder().build(urlService.asStream(url)))
+        return Try.of(() -> new SAXBuilder().build(urlService.asStream(url)))
                 .onFailure(e -> log.error("Error during parsing of {}", url, e))
                 .toOption();
     }
 
-    public String podcastToXMLGeneric(Podcast podcast, Boolean limit, String domainName) throws IOException {
-        return podcastToXMLGeneric( podcast, withNumberOfItem(podcast, limit), domainName);
+    public String podcastToXMLGeneric(Podcast podcast, String domainName, Boolean limit) throws IOException {
+        return podcastToXMLGeneric( podcast, domainName, withNumberOfItem(podcast, limit));
     }
 
-    private long withNumberOfItem(Podcast podcast, Boolean limit) {
-        return Boolean.TRUE.equals(limit) ? podcastServerParameters.getRssDefaultNumberItem() : podcast.getItems().size();
-    }
-
-    private String podcastToXMLGeneric(Podcast podcast, Long limit, String domainName) throws IOException {
+    private String podcastToXMLGeneric(Podcast podcast, String domainName, Long limit) throws IOException {
 
         Long limitOfItem = (limit == null) ? podcast.getItems().size() : limit;
 
-        Element channel = new Element(CHANNEL);
-
         String coverUrl = getCoverUrl(podcast.getCover(), domainName);
 
-        Element title = new Element(TITLE);
-        title.addContent(new Text(podcast.getTitle()));
-
-        Element url = new Element(LINK);
-        url.addContent(new Text(String.format(LINK_FORMAT, domainName, podcast.getId())));
+        Element channel = new Element(CHANNEL)
+            .addContent(new Element(TITLE).addContent(new Text(podcast.getTitle())))
+            .addContent(new Element(LINK).addContent(new Text(String.format(LINK_PODCAST_FORMAT, domainName, podcast.getId()))))
+            .addContent(new Element(DESCRIPTION).addContent(new Text(podcast.getDescription())))
+            .addContent(new Element(SUBTITLE, ITUNES_NAMESPACE).addContent(new Text(podcast.getDescription())))
+            .addContent(new Element(SUMMARY, ITUNES_NAMESPACE).addContent(new Text(podcast.getDescription())))
+            .addContent(new Element(LANGUAGE).addContent(new Text("fr-fr")))
+            .addContent(new Element(AUTHOR, ITUNES_NAMESPACE).addContent(new Text(podcast.getType())))
+            .addContent(new Element(CATEGORY, ITUNES_NAMESPACE));
 
         if (nonNull(podcast.getLastUpdate())) {
-            Element lastUpdate = new Element(PUB_DATE);
-            lastUpdate.addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
-            channel.addContent(lastUpdate);
+            channel
+                .addContent(new Element(PUB_DATE)
+                        .addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)))
+                );
         }
 
-        Element description = new Element(DESCRIPTION);
-        description.addContent(new Text(podcast.getDescription()));
-
-        Element itunesSub = new Element(SUBTITLE, ITUNES_NAMESPACE);
-        itunesSub.addContent(new Text(podcast.getDescription()));
-
-        Element itunesSummary = new Element(SUMMARY, ITUNES_NAMESPACE);
-        itunesSummary.addContent(new Text(podcast.getDescription()));
-
-        Element language = new Element(LANGUAGE);
-        language.addContent(new Text("fr-fr"));
-
-        //Element copyright = new Element("copyright");
-        //copyright.addContent(new Text(podcast.getTitle()));
-
-        Element itunesAuthor = new Element(AUTHOR, ITUNES_NAMESPACE);
-        itunesAuthor.addContent(new Text(podcast.getType()));
-
-        Element itunesCategory = new Element(CATEGORY, ITUNES_NAMESPACE);
-
-
-        channel.addContent(url);
-        channel.addContent(title);
-        /*channel.addContent(lastUpdate);*/
-        channel.addContent(description);
-        channel.addContent(itunesSub);
-        channel.addContent(itunesSummary);
-        channel.addContent(language);
-        //channel.addContent(copyright);
-        channel.addContent(itunesAuthor);
-        channel.addContent(itunesCategory);
-
-
-        Element itunesImage = new Element(IMAGE, ITUNES_NAMESPACE);
         if (podcast.getCover() != null) {
+            Element itunesImage = new Element(IMAGE, ITUNES_NAMESPACE);
             Element image = new Element(IMAGE);
-            Element image_url = new Element(URL_STRING);
-            Element image_width = new Element(WIDTH);
-            Element image_height = new Element(HEIGHT);
 
             itunesImage.addContent(new Text(coverUrl));
 
-            image_url.addContent(coverUrl);
-            image_width.addContent(String.valueOf(podcast.getCover().getWidth()));
-            image_height.addContent(String.valueOf(podcast.getCover().getHeight()));
-            image.addContent(image_height);
-            image.addContent(image_url);
-            image.addContent(image_width);
-            channel.addContent(image);
-            channel.addContent(itunesImage);
+            image
+                    .addContent(new Element(HEIGHT).addContent(String.valueOf(podcast.getCover().getHeight())))
+                    .addContent(new Element(URL_STRING).addContent(coverUrl))
+                    .addContent(new Element(WIDTH).addContent(String.valueOf(podcast.getCover().getWidth())));
+
+            channel
+                    .addContent(image)
+                    .addContent(itunesImage);
         }
 
 
         podcast.getItems()
                 .stream()
-                .filter(i -> Objects.nonNull(i.getPubDate()))
+                .filter(i -> nonNull(i.getPubDate()))
                 .sorted(PUB_DATE_COMPARATOR)
                 .limit(limitOfItem)
-                .forEachOrdered(item -> {
-                    Element xmlItem = new Element(ITEM);
+                .map(this.itemToElementWithDomain(domainName))
+                .forEachOrdered(channel::addContent);
 
-                    Element item_title = new Element(TITLE);
-                    item_title.addContent(new Text(item.getTitle()));
-                    xmlItem.addContent(item_title);
+        return channelToRss(channel);
+    }
 
-                    Element item_description = new Element(DESCRIPTION);
-                    item_description.addContent(new Text(item.getDescription()));
-                    xmlItem.addContent(item_description);
+    public String watchListToXml(WatchList watchList, String domainName) {
+        Element channel = new Element(CHANNEL)
+            .addContent(new Element(TITLE).addContent(new Text(watchList.getName())))
+            .addContent(new Element(LINK).addContent(new Text(String.format(LINK_WATCHLIST_FORMAT, domainName, watchList.getId()))));
 
-                    Element item_enclosure = new Element(ENCLOSURE);
+        watchList.getItems().stream()
+                .filter(i -> nonNull(i.getPubDate()))
+                .sorted(PUB_DATE_COMPARATOR)
+                .map(this.itemToElementWithDomain(domainName))
+                .forEachOrdered(channel::addContent);
 
-                    item_enclosure.setAttribute(URL_STRING, domainName
-                            .concat(item.getProxyURLWithoutExtention())
-                            .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
+        return channelToRss(channel);
+    }
 
-                    if (item.getLength() != null) {
-                        item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
-                    }
+    private Function<Item, Element> itemToElementWithDomain(String domainName) {
+        return item -> {
+            /* Cover */
+            String itemCoverUrl = getCoverUrl(item.getCoverOfItemOrPodcast(), domainName);
+            Element itunesItemThumbnail = new Element(IMAGE, ITUNES_NAMESPACE).setContent(new Text(itemCoverUrl));
+            Element thumbnail = new Element(THUMBNAIL, MEDIA_NAMESPACE).setAttribute(URL_STRING, itemCoverUrl);
 
-                    if (StringUtils.isNotEmpty(item.getMimeType()))
-                        item_enclosure.setAttribute(TYPE, item.getMimeType());
+            /* Enclosure */
+            Element item_enclosure = new Element(ENCLOSURE).setAttribute(URL_STRING, domainName
+                    .concat(item.getProxyURLWithoutExtention())
+                    .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
+            if (item.getLength() != null) item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
+            if (!isEmpty(item.getMimeType())) item_enclosure.setAttribute(TYPE, item.getMimeType());
 
-                    xmlItem.addContent(item_enclosure);
+            return new Element(ITEM)
+                    .addContent(new Element(TITLE).addContent(new Text(item.getTitle())))
+                    .addContent(new Element(DESCRIPTION).addContent(new Text(item.getDescription())))
+                    .addContent(new Element(PUB_DATE).addContent(new Text(item.getPubDate().format(DateTimeFormatter.RFC_1123_DATE_TIME))))
+                    .addContent(new Element(EXPLICIT, ITUNES_NAMESPACE).addContent(new Text(NO)))
+                    .addContent(new Element(SUBTITLE, ITUNES_NAMESPACE).addContent(new Text(item.getTitle())))
+                    .addContent(new Element(SUMMARY, ITUNES_NAMESPACE).addContent(new Text(item.getDescription())))
+                    .addContent(new Element(GUID).addContent(new Text(domainName + item.getProxyURL())))
+                    .addContent(itunesItemThumbnail)
+                    .addContent(thumbnail)
+                    .addContent(item_enclosure);
+        };
+    }
 
-                    Element item_pubdate = new Element(PUB_DATE);
-                    item_pubdate.addContent(new Text(item.getPubDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
-                    xmlItem.addContent(item_pubdate);
-
-                    Element itunesExplicite = new Element(EXPLICIT, ITUNES_NAMESPACE);
-                    itunesExplicite.addContent(new Text(NO));
-                    xmlItem.addContent(itunesExplicite);
-
-                    Element itunesItemSub = new Element(SUBTITLE, ITUNES_NAMESPACE);
-                    itunesItemSub.addContent(new Text(item.getTitle()));
-                    xmlItem.addContent(itunesItemSub);
-
-                    Element itunesItemSummary = new Element(SUMMARY, ITUNES_NAMESPACE);
-                    itunesItemSummary.addContent(new Text(item.getDescription()));
-                    xmlItem.addContent(itunesItemSummary);
-
-                    Element guid = new Element(GUID);
-                    guid.addContent(new Text(domainName + item.getProxyURL()));
-                    xmlItem.addContent(guid);
-
-                    String itemCoverUrl = getCoverUrl(item.getCoverOfItemOrPodcast(), domainName);
-
-                    Element itunesItemThumbnail = new Element(IMAGE, ITUNES_NAMESPACE);
-                    itunesItemThumbnail.setContent(new Text(itemCoverUrl));
-                    xmlItem.addContent(itunesItemThumbnail);
-
-                    Element thumbnail = new Element(THUMBNAIL, MEDIA_NAMESPACE);
-                    thumbnail.setAttribute(URL_STRING, itemCoverUrl);
-                    xmlItem.addContent(thumbnail);
-
-                    channel.addContent(xmlItem);
-                });
-
-        Element rss = new Element(RSS);
+    private String channelToRss(Element channel) {
+        Element rss = new Element(RSS).addContent(channel);
         rss.addNamespaceDeclaration(ITUNES_NAMESPACE);
         rss.addNamespaceDeclaration(MEDIA_NAMESPACE);
-        rss.addContent(channel);
 
-        Writer writer = new StringWriter();
+        return Try.of(StringWriter::new)
+            .andThenTry(sw -> new XMLOutputter(Format.getPrettyFormat()).output(new Document(rss), sw))
+            .map(StringWriter::toString)
+            .getOrElseThrow(e -> new RuntimeException("Error during generation of RSS", e));
+    }
 
-        new XMLOutputter(Format.getPrettyFormat()).output(new Document(rss), writer);
-        return writer.toString();
+    private long withNumberOfItem(Podcast podcast, Boolean limit) {
+        return Boolean.TRUE.equals(limit) ? podcastServerParameters.getRssDefaultNumberItem() : podcast.getItems().size();
     }
 
     private String getCoverUrl(Cover cover, String domainName) {

@@ -73,4 +73,7 @@ public class IOUtils {
         return PARSER.parse(text);
     }
 
+    public static Path get(String uri) throws URISyntaxException {
+        return Paths.get(IOUtils.class.getResource(uri).toURI());
+    }
 }

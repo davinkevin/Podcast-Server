@@ -112,7 +112,8 @@
     "prebuild": "npm install",
     "postinstall": "jspm install && gulp less",
     "build": "gulp build",
-    "release": "gulp release --type $(type)"
+    "release": "gulp release --type $(type)",
+    "serve": "gulp serve"
   },
   "bugs": {
     "url": "https://github.com/davinkevin/Podcast-Server/issues"

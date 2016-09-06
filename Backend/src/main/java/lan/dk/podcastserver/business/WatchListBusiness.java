@@ -1,11 +1,12 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.WatchListRepository;
+import lan.dk.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,9 +22,11 @@ public class WatchListBusiness {
 
     private final WatchListRepository watchListRepository;
     private final ItemRepository itemRepository;
+    private final JdomService jdomService;
 
     public WatchList findOne(UUID id) {
-        return watchListRepository.findOne(id);
+        return Option.of(watchListRepository.findOne(id))
+                .getOrElseThrow(() -> new RuntimeException("Watchlist not found"));
     }
 
     public List<WatchList> findAll() {
@@ -55,5 +58,9 @@ public class WatchListBusiness {
 
     public WatchList save(WatchList watchList) {
         return watchListRepository.save(watchList);
+    }
+
+    public String asRss(UUID id, String domainFromRequest) {
+        return jdomService.watchListToXml(findOne(id), domainFromRequest);
     }
 }

@@ -196,7 +196,7 @@ public class PodcastBusinessTest {
         Podcast podcast = new Podcast();
         String response = "Success";
         when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
-        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean(), anyString())).thenReturn(response);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), anyString(), anyBoolean())).thenReturn(response);
         UUID id = UUID.randomUUID();
 
         /* When */
@@ -205,7 +205,7 @@ public class PodcastBusinessTest {
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
         verify(podcastRepository, times(1)).findOne(eq(id));
-        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(true), eq("http://localhost"));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq("http://localhost"), eq(true));
     }
 
     @Test
@@ -214,7 +214,7 @@ public class PodcastBusinessTest {
         Podcast podcast = new Podcast();
         String response = "Success";
         when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
-        when(jdomService.podcastToXMLGeneric(eq(podcast), anyBoolean(), anyString())).thenReturn(response);
+        when(jdomService.podcastToXMLGeneric(eq(podcast), anyString(), anyBoolean())).thenReturn(response);
         UUID id = UUID.randomUUID();
 
         /* When */
@@ -223,13 +223,13 @@ public class PodcastBusinessTest {
         /* Then */
         assertThat(rssReturn).isEqualTo(response);
         verify(podcastRepository, times(1)).findOne(eq(id));
-        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq(false), eq("http://localhost"));
+        verify(jdomService, times(1)).podcastToXMLGeneric(eq(podcast), eq("http://localhost"), eq(false));
     }
 
     @Test
     public void should_return_empty_string_for_exception() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyBoolean(), anyString());
+        doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyString(), anyBoolean());
         when(podcastRepository.findOne(any(UUID.class))).thenReturn(Podcast.DEFAULT_PODCAST);
 
         /* When */

@@ -16,7 +16,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -41,8 +40,7 @@ public class JdomServiceTest {
 
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock MimeTypeService mimeTypeService;
-    @Mock
-    UrlService urlService;
+    @Mock UrlService urlService;
     @InjectMocks JdomService jdomService;
 
     private List<String> itemId = Lists.newArrayList(
@@ -189,10 +187,10 @@ public class JdomServiceTest {
                 .setItems(generateItems(podcast, 100));
 
         /* When */
-        String xml = jdomService.podcastToXMLGeneric(podcast, true, "http://localhost");
+        String xml = jdomService.podcastToXMLGeneric(podcast, "http://localhost", true);
 
         /* Then */
-        assertThat(xml).isXmlEqualToContentOf(Paths.get(JdomService.class.getResource("/xml/podcast.output.50.xml").toURI()).toFile());
+        assertThat(xml).isXmlEqualToContentOf(IOUtils.get("/xml/podcast.output.50.xml").toFile());
     }
 
     @Test
@@ -213,10 +211,45 @@ public class JdomServiceTest {
                 .setItems(generateItems(podcast, 100));
 
         /* When */
-        String xml = jdomService.podcastToXMLGeneric(podcast, false, "http://localhost");
+        String xml = jdomService.podcastToXMLGeneric(podcast, "http://localhost", false);
 
         /* Then */
-        assertThat(xml).isXmlEqualToContentOf(Paths.get(JdomService.class.getResource("/xml/podcast.output.100.xml").toURI()).toFile());
+        assertThat(xml).isXmlEqualToContentOf(IOUtils.get("/xml/podcast.output.100.xml").toFile());
+    }
+
+    @Test
+    public void should_generate_xml_from_watch_list() throws URISyntaxException {
+        /* Given */
+        Podcast podcastOne = Podcast.builder()
+                .id(UUID.fromString("029d7820-b7e1-4c0f-a94f-235584ffb570"))
+                .title("FakePodcast_1")
+                .cover(Cover.builder().height(200).width(200).url("http://fake.url/1234/cover.png").build())
+                .signature("123456789")
+                .lastUpdate(ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris")))
+                .build();
+
+        Podcast podcastTwo = Podcast.builder()
+                .id(UUID.fromString("526d5187-0563-4c44-801f-3bea447a86ea"))
+                .title("FakePodcast_2")
+                .cover(Cover.builder().height(200).width(200).url("http://fake.url/4567/cover.png").build())
+                .signature("987654321")
+                .lastUpdate(ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris")))
+                .build();
+
+        Set<Item> allItems = generateItems(podcastOne, 10);
+        allItems.addAll(generateItems(podcastTwo, 20));
+
+        WatchList watchList = WatchList.builder()
+                .id(UUID.fromString("c988babd-a2b1-4774-b8f8-fa4903dc3786"))
+                .name("A custom WatchList")
+                .items(allItems)
+                .build();
+
+        /* When */
+        String xml = jdomService.watchListToXml(watchList, "http://localhost");
+
+        /* Then */
+        assertThat(xml).isXmlEqualToContentOf(IOUtils.get("/xml/watchlist.output.xml").toFile());
     }
 
     private Set<Item> generateItems(Podcast podcast, Integer limit) {

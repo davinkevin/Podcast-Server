@@ -10,7 +10,6 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,7 +99,7 @@ public class PodcastBusiness {
     @Transactional(readOnly = true)
     public String getRss(UUID id, Boolean limit, String domainName) {
         try {
-            return jdomService.podcastToXMLGeneric(findOne(id), limit, domainName);
+            return jdomService.podcastToXMLGeneric(findOne(id), domainName, limit);
         } catch (IOException e) {
             log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e);
             return "";

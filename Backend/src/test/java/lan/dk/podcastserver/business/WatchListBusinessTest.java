@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.entity.WatchListAssert;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.WatchListRepository;
+import lan.dk.podcastserver.service.JdomService;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +30,7 @@ public class WatchListBusinessTest {
 
     @Mock WatchListRepository watchListRepository;
     @Mock ItemRepository itemRepository;
+    @Mock JdomService jdomService;
     @InjectMocks WatchListBusiness watchListBusiness;
 
     @Test
@@ -172,6 +174,29 @@ public class WatchListBusinessTest {
         /* Then */
         assertThat(aWatchList).isSameAs(watchList);
         verify(watchListRepository, only()).findOne(eq(watchList.getId()));
+    }
+
+    @Test
+    public void should_generate_watchlist_as_xml() {
+        /* Given */
+        UUID id = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634");
+        String domain = "http://localhost";
+        WatchList watchList = WatchList
+                .builder()
+                    .id(id)
+                    .name("First")
+                    .items(Sets.newHashSet())
+                .build();
+        when(jdomService.watchListToXml(eq(watchList), anyString())).thenReturn("anXml");
+        when(watchListRepository.findOne(eq(id))).thenReturn(watchList);
+
+        /* When */
+        String s = watchListBusiness.asRss(id, domain);
+
+        /* Then */
+        assertThat(s).isEqualTo("anXml");
+        verify(watchListRepository).findOne(eq(id));
+        verify(jdomService).watchListToXml(same(watchList), eq(domain));
     }
 
     @After
