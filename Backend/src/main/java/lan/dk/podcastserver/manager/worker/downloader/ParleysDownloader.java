@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -185,7 +184,7 @@ public class ParleysDownloader extends AbstractDownloader{
 
         if (isNull(podcastPath)) {
             podcastPath = podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle());
-            try { Files.createDirectory(podcastPath); } catch (IOException ignored) {}
+            Try.of(() -> Files.createDirectory(podcastPath));
         }
 
         String urlWithoutParameters = StringUtils.substringBeforeLast(url, "?");

@@ -152,12 +152,11 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Transactional
     protected void saveSyncWithPodcast() {
-        try {
+        Try.run(() -> {
             item.setPodcast(podcastRepository.findOne(item.getPodcast().getId()));
             itemRepository.save(item);
-        } catch (Exception e) {
-            logger.error("Error during save and Sync of the item {}", item, e);
-        }
+        })
+            .onFailure(e -> logger.error("Error during save and Sync of the item {}", item, e));
     }
 
     @Transactional

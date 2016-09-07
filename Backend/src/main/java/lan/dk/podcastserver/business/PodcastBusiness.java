@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import javaslang.control.Option;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -10,10 +11,10 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -98,12 +99,9 @@ public class PodcastBusiness {
 
     @Transactional(readOnly = true)
     public String getRss(UUID id, Boolean limit, String domainName) {
-        try {
-            return jdomService.podcastToXMLGeneric(findOne(id), domainName, limit);
-        } catch (IOException e) {
-            log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e);
-            return "";
-        }
+        return Try.of(() -> jdomService.podcastToXMLGeneric(findOne(id), domainName, limit))
+            .onFailure(e -> log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e))
+            .getOrElse(StringUtils.EMPTY);
     }
 
     public Set<Item> getItems(UUID id){

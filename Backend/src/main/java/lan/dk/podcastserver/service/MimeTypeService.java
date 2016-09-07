@@ -13,7 +13,6 @@ import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -80,11 +79,9 @@ public class MimeTypeService {
         private final Tika tika;
 
         Option<String> probeContentType(Path file) {
-            try {
-                return Option.of(tika.detect(file.toFile()));
-            } catch (IOException ignored) {
-                return Option.none();
-            }
+            return Try.of(() -> tika.detect(file.toFile()))
+                .filter(Objects::nonNull)
+                .toOption();
         }
     }
 }

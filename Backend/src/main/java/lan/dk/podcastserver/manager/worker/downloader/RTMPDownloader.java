@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.service.ProcessService;
@@ -66,13 +67,12 @@ public class RTMPDownloader extends AbstractDownloader {
     @Override
     public void pauseDownload() {
         ProcessBuilder stopProcess = processService.newProcessBuilder("kill", "-STOP", "" + pid);
-        try {
-            stopProcess.start();
-            super.pauseDownload();
-        } catch (IOException e) {
-            logger.error("IOException :", e);
-            this.stopDownload();
-        }
+        Try.of(stopProcess::start)
+            .andThen(super::pauseDownload)
+            .onFailure(e -> {
+                logger.error("IOException :", e);
+                this.stopDownload();
+            });
     }
 
     @Override
