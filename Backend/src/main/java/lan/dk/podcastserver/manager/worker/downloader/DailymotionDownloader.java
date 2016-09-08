@@ -9,11 +9,12 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
@@ -22,13 +23,17 @@ import static java.util.Objects.nonNull;
  */
 @Scope("prototype")
 @Component("DailymotionDownloader")
-public class DailymotionDownloader extends HTTPDownloader {
+public class DailymotionDownloader extends M3U8Downloader {
 
     String url = null;
 
     @Autowired JsonService jsonService;
 
     public String getItemUrl(Item item) {
+
+        if (!Objects.equals(this.item, item)) {
+            return super.getItemUrl(item);
+        }
 
         if (nonNull(url)) {
             return url;
@@ -41,11 +46,17 @@ public class DailymotionDownloader extends HTTPDownloader {
                 .map(HttpResponse::getBody)
                 .toOption()
                 .flatMap(DailymotionDownloader::getPlayerConfig)
-                .map(json -> jsonService.parse(json).read("metadata.qualities", DailymotionQualities.class))
-                .map(DailymotionQualities::getMaxQualityUrl)
+                .map(json -> jsonService.parse(json).read("metadata", DailymotionMetadata.class))
+                .map(DailymotionMetadata::getUrl)
+                .map(m3U8Service::getM3U8UrlFormMultiStreamFile)
+                .map(this::removeHash)
                 .getOrElse(() -> null);
 
         return url;
+    }
+
+    private String removeHash(String s) {
+        return StringUtils.substringBefore(s, "#");
     }
 
     private static Option<String> getPlayerConfig(String page) {
@@ -57,38 +68,8 @@ public class DailymotionDownloader extends HTTPDownloader {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class DailymotionQualities {
-        @JsonProperty("auto") @Setter List<QualityItem> auto;
-        @JsonProperty("240") @Setter List<QualityItem> p240;
-        @JsonProperty("380") @Setter List<QualityItem> p380;
-        @JsonProperty("480") @Setter List<QualityItem> p480;
-        @JsonProperty("720") @Setter List<QualityItem> p720;
-        @JsonProperty("1080") @Setter List<QualityItem> p1080;
-
-        String getMaxQualityUrl() {
-            if (nonNull(p1080) && !p1080.isEmpty())
-                return p1080.get(0).getUrl();
-
-            if (nonNull(p720) && !p720.isEmpty())
-                return p720.get(0).getUrl();
-
-            if (nonNull(p480) && !p480.isEmpty())
-                return p480.get(0).getUrl();
-
-            if (nonNull(p380) && !p380.isEmpty())
-                return p380.get(0).getUrl();
-
-            if (nonNull(p240) && !p240.isEmpty())
-                return p240.get(0).getUrl();
-
-            return auto.get(0).getUrl();
-        }
-
-
-        private static class QualityItem {
-            @Setter @Getter private String url;
-            @Setter @Getter private String type;
-        }
+    private static class DailymotionMetadata {
+        @JsonProperty("stream_chromecast_url") @Getter @Setter String url;
     }
 
     @Override

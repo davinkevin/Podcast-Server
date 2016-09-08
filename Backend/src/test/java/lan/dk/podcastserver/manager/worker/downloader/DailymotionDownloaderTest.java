@@ -14,6 +14,7 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
@@ -49,10 +50,10 @@ public class DailymotionDownloaderTest {
     @Mock ItemDownloadManager itemDownloadManager;
     @Mock SimpMessagingTemplate template;
     @Mock MimeTypeService mimeTypeService;
-    @Mock
-    UrlService urlService;
+    @Mock UrlService urlService;
     @Mock WGetFactory wGetFactory;
     @Mock JsonService jsonService;
+    @Mock M3U8Service m3U8Service;
     @InjectMocks DailymotionDownloader dailymotionDownloader;
 
     Item item;
@@ -73,83 +74,34 @@ public class DailymotionDownloaderTest {
 
         dailymotionDownloader.setItem(item);
         dailymotionDownloader.setItemDownloadManager(itemDownloadManager);
+    }
+
+    @Test
+    public void should_load_chromecast_stream() throws URISyntaxException, IOException, UnirestException {
+        /* Given */
+        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.html"));
         when(jsonService.parse(anyString())).then(i -> JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build()).parse(i.getArgumentAt(0, String.class)));
-    }
-
-    @Test
-    public void should_load_1080_stream() throws URISyntaxException, IOException, UnirestException {
-        /* Given */
-        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.1080p.html"));
+        when(m3U8Service.getM3U8UrlFormMultiStreamFile(anyString())).then(i -> "https://proxy-005.dc3.dailymotion.com/sec(c261ed40cc95bcf93923ccd7f1c92a83)/video/574/494/277494475_mp4_h264_aac_fhd.m3u8#cell=core&comment=QOEABR17&hls_maxMaxBufferLength=105");
 
         /* When */
         String itemUrl = dailymotionDownloader.getItemUrl(item);
         String anotherItemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
-        assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-1920x1080/video/x4eq3z9.mp4?auth=1469777104-2562-rdf21ecr-a46fac6683a03618a720724db9f44b1c");
+        assertThat(itemUrl).isEqualTo("https://proxy-005.dc3.dailymotion.com/sec(c261ed40cc95bcf93923ccd7f1c92a83)/video/574/494/277494475_mp4_h264_aac_fhd.m3u8");
         assertThat(itemUrl).isSameAs(anotherItemUrl);
     }
 
     @Test
-    public void should_load_720_stream() throws URISyntaxException, IOException {
+    public void should_use_parent_getItem() {
         /* Given */
-        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.720p.html"));
+        Item item = Item.builder().url("http://foo.bar.com").build();
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl(item);
-        String anotherItemUrl = dailymotionDownloader.getItemUrl(item);
+        String url = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
-        assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-1280x720/video/x4eq3z9.mp4?auth=1469777104-2562-b84nscso-712c4b4393d45fba34ae88084d27c46f");
-        assertThat(itemUrl).isSameAs(anotherItemUrl);
-    }
-
-    @Test
-    public void should_load_480_stream() throws IOException, URISyntaxException {
-        /* Given */
-        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.480p.html"));
-
-        /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl(item);
-
-        /* Then */
-        assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-848x480/video/x4eq3z9.mp4?auth=1469777104-2562-ekho4d17-c60c4162844bf079e16c2f6e84bd2b46");
-    }
-
-    @Test
-    public void should_load_380_stream() throws IOException, URISyntaxException {
-        /* Given */
-        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.380p.html"));
-
-        /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl(item);
-
-        /* Then */
-        assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-512x384/video/x4eq3z9.mp4?auth=1469777104-2562-82qq5949-5ae5fd910db89335c537d448d29450e6");
-    }
-
-    @Test
-    public void should_load_240_stream() throws IOException, URISyntaxException {
-        /* Given */
-        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.240p.html"));
-
-        /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl(item);
-
-        /* Then */
-        assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/H264-320x240/video/x4eq3z9.mp4?auth=1469777104-2562-y77qb97c-54cb20972eefbd1bd96eaccc0f17400a");
-    }
-
-    @Test
-    public void should_load_auto() throws IOException, URISyntaxException {
-        /* Given */
-        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.auto.html"));
-
-        /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl(item);
-
-        /* Then */
-        assertThat(itemUrl).isEqualTo("http://www.dailymotion.com/cdn/manifest/video/x4eq3z9.m3u8?auth=1469777104-2562-jcoeffc7-51407ef99b433264b032634411fed1b5");
+        assertThat(url).isEqualTo(item.getUrl());
     }
 
     @SuppressWarnings("unchecked")
