@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class SendUpdaterTest {
     public static final Item ITEM_2 = new Item().setId(UUID.randomUUID());
     public static final Item ITEM_3 = new Item().setId(UUID.randomUUID());
 
-    SendUpdater sendUpdater = new SendUpdater();
+    @InjectMocks SendUpdater sendUpdater;
 
     public static Podcast PODCAST;
 

@@ -10,15 +10,18 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -46,9 +49,17 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final Function<DocumentContext, TF1ReplayResponse> EXTRACT_IN_TF1_REPLAY_RESPONSE = d -> d.read("$", TF1ReplayResponse.class);
     private static final javaslang.collection.Set<String> TYPES = javaslang.collection.HashSet.of("replay", "vidéo");
 
-    @Resource HtmlService htmlService;
-    @Resource ImageService imageService;
-    @Resource JsonService jsonService;
+    private final HtmlService htmlService;
+    private final ImageService imageService;
+    private final JsonService jsonService;
+
+    public TF1ReplayUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService, JsonService jsonService) {
+        super(podcastServerParameters, signatureService, validator);
+        this.htmlService = htmlService;
+        this.imageService = imageService;
+        this.jsonService = jsonService;
+    }
+
 
     @Override
     public Set<Item> getItems(Podcast podcast) {

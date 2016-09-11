@@ -7,6 +7,8 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -14,7 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -50,8 +52,14 @@ public class BeInSportsUpdater extends AbstractUpdater {
     /* December 26, 2015 13:53 */
     private static final DateTimeFormatter BEINSPORTS_PARSER = DateTimeFormatter.ofPattern("MMMM d, y HH:mm", Locale.ENGLISH);
 
-    @Resource HtmlService htmlService;
-    @Resource ImageService imageService;
+    final HtmlService htmlService;
+    final ImageService imageService;
+
+    public BeInSportsUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService) {
+        super(podcastServerParameters, signatureService, validator);
+        this.htmlService = htmlService;
+        this.imageService = imageService;
+    }
 
     public Set<Item> getItems(Podcast podcast) {
         return htmlService

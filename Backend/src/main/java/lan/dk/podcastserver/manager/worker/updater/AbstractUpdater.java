@@ -7,22 +7,24 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j
 @Transactional(noRollbackFor=Exception.class)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractUpdater implements Updater {
 
-    @Resource PodcastServerParameters podcastServerParameters;
-    @Resource SignatureService signatureService;
-    @Resource(name="Validator") Validator validator;
+    final PodcastServerParameters podcastServerParameters;
+    final SignatureService signatureService;
+    final Validator validator;
 
     public Tuple3<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
         try {
@@ -41,15 +43,11 @@ public abstract class AbstractUpdater implements Updater {
         return NO_MODIFICATION_TUPLE;
     }
 
+    @RequiredArgsConstructor
     public static class Type {
 
         private final String key;
         private final String name;
-
-        public Type(String key, String name) {
-            this.key = key;
-            this.name = name;
-        }
 
         @JsonProperty("key")
         public String key() {

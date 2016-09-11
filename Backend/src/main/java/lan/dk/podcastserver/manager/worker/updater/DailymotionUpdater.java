@@ -6,15 +6,16 @@ import com.jayway.jsonpath.TypeRef;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,8 +38,14 @@ public class DailymotionUpdater extends AbstractUpdater {
     private static final String ITEM_URL = "http://www.dailymotion.com/video/%s";
     private static final TypeRef<List<DailymotionVideoDetail>> LIST_DAILYMOTIONVIDEODETAIL_TYPE = new TypeRef<List<DailymotionVideoDetail>>() { };
 
-    @Autowired JsonService jsonService;
-    @Autowired ImageService imageService;
+    private final JsonService jsonService;
+    private final ImageService imageService;
+
+    public DailymotionUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, ImageService imageService, JsonService jsonService) {
+        super(podcastServerParameters, signatureService, validator);
+        this.imageService = imageService;
+        this.jsonService = jsonService;
+    }
 
     @Override
     public Set<Item> getItems(Podcast podcast) {

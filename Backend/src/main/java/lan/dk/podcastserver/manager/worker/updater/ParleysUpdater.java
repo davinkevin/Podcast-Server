@@ -9,13 +9,16 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,8 +44,15 @@ public class ParleysUpdater extends AbstractUpdater {
 
     private static final TypeRef<List<ParleysResult>> LIST_PARLEYS_RESULTS = new TypeRef<List<ParleysResult>>(){};
 
-    @Resource ImageService imageService;
-    @Resource JsonService jsonService;
+    private final ImageService imageService;
+    private final JsonService jsonService;
+
+    public ParleysUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, ImageService imageService, JsonService jsonService) {
+        super(podcastServerParameters, signatureService, validator);
+        this.imageService = imageService;
+        this.jsonService = jsonService;
+    }
+
 
     public Set<Item> getItems(Podcast podcast) {
         return getParseJsonObject(podcast.getUrl(), getNumberOfItem(podcast.getUrl()))

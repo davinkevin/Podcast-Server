@@ -4,13 +4,15 @@ import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -47,10 +49,18 @@ public class CanalPlusUpdater extends AbstractUpdater {
     private static final String FIELD_INFOS = "INFOS";
     private static final String FIELD_MEDIA = "MEDIA";
 
-    @Resource JdomService jdomService;
-    @Resource HtmlService htmlService;
-    @Resource ImageService imageService;
-    @Resource M3U8Service m3U8Service;
+    private final JdomService jdomService;
+    private final HtmlService htmlService;
+    private final ImageService imageService;
+    private final M3U8Service m3U8Service;
+
+    public CanalPlusUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, JdomService jdomService, HtmlService htmlService, ImageService imageService, M3U8Service m3U8Service) {
+        super(podcastServerParameters, signatureService, validator);
+        this.jdomService = jdomService;
+        this.htmlService = htmlService;
+        this.imageService = imageService;
+        this.m3U8Service = m3U8Service;
+    }
 
     public Set<Item> getItems(Podcast podcast) {
         return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast));

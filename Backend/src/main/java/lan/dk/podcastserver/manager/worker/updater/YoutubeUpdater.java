@@ -12,7 +12,9 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.Api;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -48,10 +50,19 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
     private static final String API_PLAYLIST_URL = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=%s&key=%s";
 
-    @Resource JdomService jdomService;
-    @Resource JsonService jsonService;
-    @Resource HtmlService htmlService;
-    @Resource Api api;
+    private final JdomService jdomService;
+    private final JsonService jsonService;
+    private final HtmlService htmlService;
+    private final Api api;
+
+    public YoutubeUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, JdomService jdomService, JsonService jsonService, HtmlService htmlService, Api api) {
+        super(podcastServerParameters, signatureService, validator);
+        this.jdomService = jdomService;
+        this.jsonService = jsonService;
+        this.htmlService = htmlService;
+        this.api = api;
+    }
+
 
     public Set<Item> getItems(Podcast podcast) {
         return Strings.isNullOrEmpty(api.getYoutube())

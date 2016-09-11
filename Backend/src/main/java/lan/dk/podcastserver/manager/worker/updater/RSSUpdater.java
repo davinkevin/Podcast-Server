@@ -6,13 +6,16 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,8 +32,15 @@ public class RSSUpdater extends AbstractUpdater {
     private static final Namespace MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     private static final Namespace FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0");
 
-    @Resource JdomService jdomService;
-    @Resource ImageService imageService;
+    private final JdomService jdomService;
+    private final ImageService imageService;
+
+    public RSSUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, JdomService jdomService, ImageService imageService) {
+        super(podcastServerParameters, signatureService, validator);
+        this.jdomService = jdomService;
+        this.imageService = imageService;
+    }
+
 
     public Set<Item> getItems(Podcast podcast) {
         log.debug("Traitement des Items");

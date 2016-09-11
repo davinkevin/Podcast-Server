@@ -111,6 +111,10 @@ public class UpdaterTest {
 
     static class SimpleUpdater extends AbstractUpdater {
 
+        public SimpleUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator) {
+            super(podcastServerParameters, signatureService, validator);
+        }
+
         @Override
         public Set<Item> getItems(Podcast podcast) {
             return Sets.newHashSet(

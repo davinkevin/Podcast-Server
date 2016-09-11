@@ -9,15 +9,17 @@ import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static javaslang.collection.HashSet.*;
+import static javaslang.collection.HashSet.collector;
 
 /**
  * Created by kevin on 09/08/2014 for Podcast Server
@@ -42,10 +44,19 @@ public class PluzzUpdater extends AbstractUpdater {
     private static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
     private static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
 
-    @Resource HtmlService htmlService;
-    @Resource ImageService imageService;
-    @Resource JsonService jsonService;
-    @Resource M3U8Service m3U8Service;
+    private final HtmlService htmlService;
+    private final ImageService imageService;
+    private final JsonService jsonService;
+    private final M3U8Service m3U8Service;
+
+    public PluzzUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService, JsonService jsonService, M3U8Service m3U8Service) {
+        super(podcastServerParameters, signatureService, validator);
+        this.htmlService = htmlService;
+        this.imageService = imageService;
+        this.jsonService = jsonService;
+        this.m3U8Service = m3U8Service;
+    }
+
 
     public Set<Item> getItems(Podcast podcast) {
         Option<Document> page = htmlService.get(podcast.getUrl());
