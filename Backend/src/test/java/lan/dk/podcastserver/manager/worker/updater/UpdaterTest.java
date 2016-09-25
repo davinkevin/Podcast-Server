@@ -66,6 +66,7 @@ public class UpdaterTest {
                 .isInstanceOf(HashSet.class)
                 .hasSize(3);
         assertThat(result._3()).isNotNull();
+        assertThat(result._1().getSignature()).isEqualTo("123456789");
     }
 
     @Test

@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javaslang.Tuple;
 import javaslang.Tuple3;
+import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;
@@ -27,20 +28,14 @@ public abstract class AbstractUpdater implements Updater {
     final Validator validator;
 
     public Tuple3<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
-        try {
-            log.info("Ajout du podcast \"{}\" à l'executor", podcast.getTitle());
-            String signature = signatureOf(podcast);
-            if ( !StringUtils.equals(signature, podcast.getSignature()) ) {
-                podcast.setSignature(signature);
-                return Tuple.of(podcast, getItems(podcast), notIn(podcast));
-            } else {
-                log.info("Podcast non traité car signature identique : \"{}\"", podcast.getTitle());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        log.info("Add podcast \"{}\" to executor", podcast.getTitle());
 
-        return NO_MODIFICATION_TUPLE;
+        return Try.of(() -> signatureOf(podcast))
+                .filter(signature -> !StringUtils.equals(signature, podcast.getSignature()))
+                .andThen(podcast::setSignature)
+                .map(s -> Tuple.of(podcast, getItems(podcast), notIn(podcast)))
+                .onFailure(e -> log.error("Error during update of \"{}\"", podcast.getTitle(), e))
+                .getOrElse(NO_MODIFICATION_TUPLE);
     }
 
     @RequiredArgsConstructor
