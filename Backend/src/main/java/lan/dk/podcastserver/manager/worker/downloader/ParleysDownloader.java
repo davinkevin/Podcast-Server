@@ -37,6 +37,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Created by kevin on 13/07/2014 for Podcast Server
  */
+@Slf4j
 @Scope("prototype")
 @Component("ParleysDownloader")
 public class ParleysDownloader extends AbstractDownloader{
@@ -63,7 +64,7 @@ public class ParleysDownloader extends AbstractDownloader{
 
         List<ParleysAssetsDetail.ParleysAssetsFiles> listOfAssets = getUrlForParleysItem(item);
         if ((listOfAssets.size() == 0)) {
-            logger.error("No assets found for the item with url {}", item.getUrl());
+            log.error("No assets found for the item with url {}", item.getUrl());
             stopDownload();
             return null;
         }
@@ -81,16 +82,16 @@ public class ParleysDownloader extends AbstractDownloader{
                         .newWGet(info, parleysAssets.getFile().toFile())
                         .download(stopDownloading, itemSynchronisation);
             } catch (MalformedURLException e) {
-                logger.error("Url of assest is invalid : {}", parleysAssets.getUrl(), e);
+                log.error("Url of assest is invalid : {}", parleysAssets.getUrl(), e);
                 parleysAssets.setValid(Boolean.FALSE);
             }
         }
 
         target = getTargetFile(item);
         List<Path> listOfFilesToConcat = getListOfFiles(listOfAssets);
-        logger.info("Finalisation du téléchargement");
+        log.info("Finalisation du téléchargement");
 
-        logger.info("Concatenation des vidéos");
+        log.info("Concatenation des vidéos");
         ffmpegService.concat(target, listOfFilesToConcat.toArray(new Path[listOfFilesToConcat.size()]));
 
         listOfFilesToConcat

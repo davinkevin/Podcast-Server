@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
@@ -12,6 +13,7 @@ import static java.util.Objects.nonNull;
 /**
  * Created by kevin on 28/02/15.
  */
+@Slf4j
 @Scope("prototype")
 @Component("DailyMotionCloudDownloader")
 public class DailyMotionCloudDownloader extends M3U8Downloader {

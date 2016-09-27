@@ -20,6 +20,7 @@ import java.util.Objects;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+@Slf4j
 @Scope("prototype")
 @Component("HTTPDownloader")
 public class HTTPDownloader extends AbstractDownloader {
@@ -34,7 +35,7 @@ public class HTTPDownloader extends AbstractDownloader {
 
     @Override
     public Item download() {
-        logger.debug("Download");
+        log.debug("Download");
 
         try {
             info = wGetFactory.newDownloadInfo(urlService.getRealURL(getItemUrl(item)));
@@ -51,9 +52,9 @@ public class HTTPDownloader extends AbstractDownloader {
 
             stopDownload();
         } catch (DownloadInterruptedError e) {
-            logger.debug("Arrêt du téléchargement");
+            log.debug("Arrêt du téléchargement");
         } catch (IOException e) {
-            logger.debug("Exception during download", e);
+            log.debug("Exception during download", e);
             stopDownload();
         }
         return item;

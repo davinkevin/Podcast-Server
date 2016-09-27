@@ -11,28 +11,29 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+@Slf4j
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
     static final String WS_TOPIC_DOWNLOAD = "/topic/download";
-
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Getter @Setter @Accessors(chain = true) protected Item item;
     @Setter @Accessors(chain = true) protected ItemDownloadManager itemDownloadManager;
@@ -50,7 +51,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     @Override
     public void run() {
-        logger.debug("Run");
+        log.debug("Run");
         startDownload();
     }
 
@@ -61,7 +62,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         saveSyncWithPodcast();
         convertAndSaveBroadcast();
         Try.of(this::download)
-            .onFailure(e -> logger.error("Error during download", e))
+            .onFailure(e -> log.error("Error during download", e))
             .onFailure(e -> this.stopDownload());
     }
 
@@ -126,7 +127,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         if (nonNull(target)) return target;
 
         Path finalFile = getDestinationFile(item);
-        logger.debug("Creation of file : {}", finalFile.toFile().getAbsolutePath());
+        log.debug("Creation of file : {}", finalFile.toFile().getAbsolutePath());
 
         try {
             if (Files.notExists(finalFile.getParent())) Files.createDirectory(finalFile.getParent());
@@ -135,11 +136,11 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
                 return finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension);
             }
 
-            logger.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
+            log.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
             String fileName = finalFile.getFileName().toString();
             return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension);
         } catch (IOException e) {
-            logger.error("Error during creation of target file", e);
+            log.error("Error during creation of target file", e);
             stopDownload();
             return null;
         }
@@ -156,7 +157,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             item.setPodcast(podcastRepository.findOne(item.getPodcast().getId()));
             itemRepository.save(item);
         })
-            .onFailure(e -> logger.error("Error during save and Sync of the item {}", item, e));
+            .onFailure(e -> log.error("Error during save and Sync of the item {}", item, e));
     }
 
     @Transactional

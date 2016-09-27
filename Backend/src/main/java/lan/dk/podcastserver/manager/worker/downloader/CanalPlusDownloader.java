@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import static java.util.Objects.nonNull;
 /**
  * Created by kevin on 14/08/2016
  */
+@Slf4j
 @Scope("prototype")
 @Component("CanalPlusDownloader")
 public class CanalPlusDownloader extends M3U8Downloader {

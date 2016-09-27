@@ -9,6 +9,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,6 +22,7 @@ import static java.util.Objects.nonNull;
 /**
  * Created by kevin on 21/02/2016 for Podcast Server
  */
+@Slf4j
 @Scope("prototype")
 @Component("DailymotionDownloader")
 public class DailymotionDownloader extends M3U8Downloader {

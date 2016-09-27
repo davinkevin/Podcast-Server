@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
 
+@Slf4j
 @Component("RTMPDownloader")
 @Scope("prototype")
 public class RTMPDownloader extends AbstractDownloader {
@@ -30,11 +31,11 @@ public class RTMPDownloader extends AbstractDownloader {
 
     @Override
     public Item download() {
-        logger.debug("Download");
+        log.debug("Download");
 
         try {
             target = getTargetFile(item);
-            logger.debug("Fichier de sortie : {}" , target.toAbsolutePath().toString());
+            log.debug("Fichier de sortie : {}" , target.toAbsolutePath().toString());
 
             p  = processService
                     .newProcessBuilder(externalTools.getRtmpdump(), "-r", getItemUrl(item), "-o", target.toAbsolutePath().toString())
@@ -49,7 +50,7 @@ public class RTMPDownloader extends AbstractDownloader {
             p.waitFor();
             pid = 0;
         } catch (IOException | InterruptedException e) {
-            logger.error("IOException | InterruptedException :", e);
+            log.error("IOException | InterruptedException :", e);
             stopDownload();
         }
         return item;
@@ -58,7 +59,7 @@ public class RTMPDownloader extends AbstractDownloader {
     @Override
     public void startDownload() {
         if (pid != 0 && nonNull(p)) { //Relancement du process UNIX
-            logger.debug("Stop previous process");
+            log.debug("Stop previous process");
             p.destroy();
         }
         super.startDownload();
@@ -70,7 +71,7 @@ public class RTMPDownloader extends AbstractDownloader {
         Try.of(stopProcess::start)
             .andThen(super::pauseDownload)
             .onFailure(e -> {
-                logger.error("IOException :", e);
+                log.error("IOException :", e);
                 this.stopDownload();
             });
     }

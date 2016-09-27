@@ -10,6 +10,7 @@ import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 /**
  * Created by kevin on 20/07/2016.
  */
+@Slf4j
 @Scope("prototype")
 @Component("TF1ReplayDownloader")
 public class TF1ReplayDownloader extends M3U8Downloader {
@@ -97,7 +99,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
                     .map(d -> d.read("$", TF1ReplayVideoUrl.class))
                     .map(TF1ReplayVideoUrl::getMessage)
                     .map(this::upgradeBitrate)
-                .onFailure(e -> logger.error("Error during fetching", e))
+                .onFailure(e -> log.error("Error during fetching", e))
                 .getOrElse("http://wat.tv/get/ipad/"+ id + ".m3u8");
     }
 

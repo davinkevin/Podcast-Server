@@ -41,6 +41,8 @@ import static java.util.Objects.nonNull;
 /**
  * Created by kevin on 14/12/2013 for Podcast Server
  */
+
+@Slf4j
 @Scope("prototype")
 @Component("YoutubeDownloader")
 public class YoutubeDownloader extends AbstractDownloader {
@@ -56,7 +58,7 @@ public class YoutubeDownloader extends AbstractDownloader {
 
     @Override
     public Item download() {
-        logger.debug("Download");
+        log.debug("Download");
         try {
             VGetParser parser = wGetFactory.parser(item.getUrl());
             v = wGetFactory.newVGet(parser.info(new URL(item.getUrl())));
@@ -79,17 +81,17 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             stopDownload();
         } catch (DownloadInterruptedError e) {
-            logger.debug("Arrêt du téléchargement par l'interface");
+            log.debug("Arrêt du téléchargement par l'interface");
         } catch (StringIndexOutOfBoundsException | MalformedURLException | NullPointerException | DownloadError e) {
-            logger.error("Third part Exception : ", e);
+            log.error("Third part Exception : ", e);
             if (itemDownloadManager.canBeReset(item)) {
-                logger.info("Reset of Youtube download {}", item.getTitle());
+                log.info("Reset of Youtube download {}", item.getTitle());
                 itemDownloadManager.resetDownload(item);
                 return null;
             }
             stopDownload();
         }
-        logger.debug("Download ended");
+        log.debug("Download ended");
         return item;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -166,7 +168,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                 Files.deleteIfExists(audioFile);
             }
         } catch (IOException e) {
-            logger.error("Error during specific move", e);
+            log.error("Error during specific move", e);
             throw new RuntimeException("Error during specific move", e);
         }
 

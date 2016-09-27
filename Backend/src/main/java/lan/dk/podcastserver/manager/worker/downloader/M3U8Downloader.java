@@ -7,6 +7,7 @@ import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.UrlService;
+import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import org.apache.commons.io.FilenameUtils;
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
+@Slf4j
 @Scope("prototype")
 @Component("M3U8Downloader")
 public class M3U8Downloader extends AbstractDownloader {
@@ -33,7 +35,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public Item download() {
-        logger.debug("Download");
+        log.debug("Download");
 
         target = getTargetFile(item);
 
@@ -70,7 +72,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
     private void broadcastProgression(int cpt) {
         item.setProgression(cpt);
-        logger.debug("Progression : {}", item.getProgression());
+        log.debug("Progression : {}", item.getProgression());
         convertAndSaveBroadcast();
     }
 
@@ -99,7 +101,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 .start(pauseProcess)
                 .andThenTry(super::pauseDownload)
                 .onFailure(e -> {
-                    logger.error("Error during pause of process :", e);
+                    log.error("Error during pause of process :", e);
                     this.stopDownload();
                 });
     }
@@ -115,7 +117,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 convertAndSaveBroadcast();
             })
             .onFailure(e -> {
-                logger.error("Error during restart of process :", e);
+                log.error("Error during restart of process :", e);
                 this.stopDownload();
             });
     }
