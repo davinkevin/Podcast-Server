@@ -6,13 +6,16 @@ import com.mashape.unirest.http.HttpResponse;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -29,7 +32,12 @@ public class DailymotionDownloader extends M3U8Downloader {
 
     String url = null;
 
-    @Autowired JsonService jsonService;
+    private final JsonService jsonService;
+
+    public DailymotionDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, JsonService jsonService) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
+        this.jsonService = jsonService;
+    }
 
     public String getItemUrl(Item item) {
 

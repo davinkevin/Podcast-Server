@@ -9,17 +9,21 @@ import com.jayway.jsonpath.TypeRef;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
@@ -47,15 +51,22 @@ public class ParleysDownloader extends AbstractDownloader{
     private static final TypeRef<List<ParleysAssetsDetail>> LIST_PARLEUS_ASSETS_DETAIL_TYPE = new TypeRef<List<ParleysAssetsDetail>>(){};
     /* Patter to extract value from URL */
     // --> http://www.parleys.com/play/535a2846e4b03397a8eee892
-    private static Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/play/([^/]*)");
+    private static final Pattern ID_PARLEYS_PATTERN = Pattern.compile(".*/play/([^/]*)");
 
     protected DownloadInfo info = null;
     private Long totalSize;
     private Path podcastPath;
 
-    @Autowired FfmpegService ffmpegService;
-    @Autowired WGetFactory wGetFactory;
-    @Autowired JsonService jsonService;
+    final FfmpegService ffmpegService;
+    final WGetFactory wGetFactory;
+    final JsonService jsonService;
+
+    public ParleysDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, FfmpegService ffmpegService, WGetFactory wGetFactory, JsonService jsonService) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
+        this.ffmpegService = ffmpegService;
+        this.wGetFactory = wGetFactory;
+        this.jsonService = jsonService;
+    }
 
     @Override
     public Item download() {

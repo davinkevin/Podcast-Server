@@ -239,6 +239,10 @@ public class DownloaderTest {
 
     static class SimpleDownloader extends AbstractDownloader {
 
+        SimpleDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService) {
+            super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
+        }
+
         @Override
         public Item download() {
             try {

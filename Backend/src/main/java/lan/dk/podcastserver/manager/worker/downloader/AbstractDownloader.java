@@ -9,6 +9,7 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -31,6 +31,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
     static final String WS_TOPIC_DOWNLOAD = "/topic/download";
@@ -38,11 +39,11 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Getter @Setter @Accessors(chain = true) protected Item item;
     @Setter @Accessors(chain = true) protected ItemDownloadManager itemDownloadManager;
 
-    @Resource protected ItemRepository itemRepository;
-    @Resource protected PodcastRepository podcastRepository;
-    @Resource protected PodcastServerParameters podcastServerParameters;
-    @Resource protected SimpMessagingTemplate template;
-    @Resource protected MimeTypeService mimeTypeService;
+    protected final ItemRepository itemRepository;
+    protected final PodcastRepository podcastRepository;
+    protected final PodcastServerParameters podcastServerParameters;
+    protected final SimpMessagingTemplate template;
+    protected final MimeTypeService mimeTypeService;
 
     String temporaryExtension;
     protected Path target;

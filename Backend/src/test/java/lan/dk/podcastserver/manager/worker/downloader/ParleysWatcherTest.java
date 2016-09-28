@@ -47,17 +47,7 @@ public class ParleysWatcherTest {
 
     @Before
     public void beforeEach() {
-        parleysDownloader = new ParleysDownloader();
-        parleysDownloader.podcastRepository = podcastRepository;
-        parleysDownloader.itemRepository = itemRepository;
-        parleysDownloader.itemDownloadManager = itemDownloadManager;
-        parleysDownloader.podcastServerParameters = podcastServerParameters;
-        parleysDownloader.template = template;
-        parleysDownloader.mimeTypeService = mimeTypeService;
-        parleysDownloader.ffmpegService = ffmpegService;
-        parleysDownloader.wGetFactory = wGetFactory;
-        parleysDownloader.jsonService = jsonService;
-
+        parleysDownloader = new ParleysDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, ffmpegService, wGetFactory, jsonService);
 
         item = Item.builder().url("http://aFakeUrl/foo.mp4").podcast(podcast).build();
         parleysDownloader.item = item;

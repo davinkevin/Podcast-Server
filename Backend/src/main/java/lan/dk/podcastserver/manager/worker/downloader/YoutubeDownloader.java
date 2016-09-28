@@ -13,13 +13,17 @@ import com.github.axet.wget.info.ex.DownloadMultipartError;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
+import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -53,8 +57,14 @@ public class YoutubeDownloader extends AbstractDownloader {
 
     final YoutubeWatcher watcher = new YoutubeWatcher(this);
 
-    @Autowired WGetFactory wGetFactory;
-    @Autowired FfmpegService ffmpegService;
+    private final WGetFactory wGetFactory;
+    private final FfmpegService ffmpegService;
+
+    public YoutubeDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, WGetFactory wGetFactory, FfmpegService ffmpegService) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
+        this.wGetFactory = wGetFactory;
+        this.ffmpegService = ffmpegService;
+    }
 
     @Override
     public Item download() {

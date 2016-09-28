@@ -3,12 +3,16 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.ExternalTools;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -22,12 +26,17 @@ import static java.util.Objects.nonNull;
 @Scope("prototype")
 public class RTMPDownloader extends AbstractDownloader {
 
+    private final ProcessService processService;
+    private final ExternalTools externalTools;
+
     int pid = 0;
-
-    @Autowired ProcessService processService;
-    @Autowired ExternalTools externalTools;
-
     Process p = null;
+
+    public RTMPDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, ProcessService processService, ExternalTools externalTools) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
+        this.processService = processService;
+        this.externalTools = externalTools;
+    }
 
     @Override
     public Item download() {

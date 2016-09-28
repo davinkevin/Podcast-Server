@@ -7,13 +7,17 @@ import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -26,12 +30,20 @@ import static java.util.Objects.nonNull;
 @Component("M3U8Downloader")
 public class M3U8Downloader extends AbstractDownloader {
 
-    @Autowired UrlService urlService;
-    @Autowired M3U8Service m3U8Service;
-    @Autowired FfmpegService ffmpegService;
-    @Autowired ProcessService processService;
+    protected final UrlService urlService;
+    protected final M3U8Service m3U8Service;
+    protected final FfmpegService ffmpegService;
+    private final ProcessService processService;
 
     private Process process;
+
+    public M3U8Downloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
+        this.urlService = urlService;
+        this.m3U8Service = m3U8Service;
+        this.ffmpegService = ffmpegService;
+        this.processService = processService;
+    }
 
     @Override
     public Item download() {

@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mashape.unirest.http.HttpResponse;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import static java.util.Objects.nonNull;
@@ -42,11 +42,18 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     private static final String METHOD = "getUrl";
     private static final String USER_AGENT = "User-Agent";
 
-    @Autowired HtmlService htmlService;
-    @Autowired JsonService jsonService;
-    @Autowired SignatureService signatureService;
+    private final HtmlService htmlService;
+    private final JsonService jsonService;
+    private final SignatureService signatureService;
 
     String url = null;
+
+    public TF1ReplayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService, SignatureService signatureService) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
+        this.htmlService = htmlService;
+        this.jsonService = jsonService;
+        this.signatureService = signatureService;
+    }
 
     @Override
     public String getItemUrl(Item item) {

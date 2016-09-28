@@ -6,12 +6,15 @@ import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
+import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.factory.WGetFactory;
+import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,13 +28,18 @@ import static java.util.Objects.nonNull;
 @Component("HTTPDownloader")
 public class HTTPDownloader extends AbstractDownloader {
 
-    @Autowired
-    UrlService urlService;
-    @Autowired WGetFactory wGetFactory;
+    final UrlService urlService;
+    final WGetFactory wGetFactory;
 
     DownloadInfo info = null;
 
     private final HTTPWatcher itemSynchronisation = new HTTPWatcher(this);
+
+    public HTTPDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, WGetFactory wGetFactory) {
+        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
+        this.urlService = urlService;
+        this.wGetFactory = wGetFactory;
+    }
 
     @Override
     public Item download() {
