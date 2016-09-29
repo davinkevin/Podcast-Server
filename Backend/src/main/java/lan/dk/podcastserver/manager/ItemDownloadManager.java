@@ -45,6 +45,9 @@ public class ItemDownloadManager {
     private final ThreadPoolTaskExecutor downloadExecutor;
     private final ReentrantLock mainLock = new ReentrantLock();
 
+    private @Getter Queue<Item> waitingQueue = Queue.empty();
+    private @Getter Map<Item, Downloader> downloadingQueue = HashMap.empty();
+
     @Autowired
     public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, DownloaderSelector downloaderSelector, @Qualifier("DownloadExecutor") ThreadPoolTaskExecutor downloadExecutor) {
         this.template = template;
@@ -55,9 +58,6 @@ public class ItemDownloadManager {
 
         Item.rootFolder = podcastServerParameters.getRootfolder();
     }
-
-    private @Getter Queue<Item> waitingQueue = Queue.empty();
-    private @Getter Map<Item, Downloader> downloadingQueue = HashMap.empty();
 
     /* GETTER & SETTER */
     public int getLimitParallelDownload() {
