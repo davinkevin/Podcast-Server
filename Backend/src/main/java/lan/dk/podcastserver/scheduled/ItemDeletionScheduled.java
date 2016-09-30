@@ -2,7 +2,6 @@ package lan.dk.podcastserver.scheduled;
 
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

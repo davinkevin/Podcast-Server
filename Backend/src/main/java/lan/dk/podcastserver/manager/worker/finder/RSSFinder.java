@@ -6,7 +6,6 @@ import lan.dk.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jdom2.Element;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;

@@ -4,7 +4,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;

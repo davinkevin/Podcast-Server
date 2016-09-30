@@ -10,7 +10,6 @@ import lan.dk.podcastserver.service.MultiPartFileSenderService;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;

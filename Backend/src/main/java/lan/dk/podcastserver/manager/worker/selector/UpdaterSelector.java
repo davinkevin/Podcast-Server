@@ -4,7 +4,6 @@ import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

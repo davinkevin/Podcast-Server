@@ -43,5 +43,5 @@ public class WatchList {
         return this;
     }
 
-    public interface WatchListDetailsListView {};
+    public interface WatchListDetailsListView {}
 }

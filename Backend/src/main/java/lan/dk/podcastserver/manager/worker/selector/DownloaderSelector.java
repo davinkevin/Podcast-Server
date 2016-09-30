@@ -4,7 +4,6 @@ import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.downloader.NoOpDownloader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.TargetClassAware;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

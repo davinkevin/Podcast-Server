@@ -3,7 +3,6 @@ package lan.dk.podcastserver.controller.api;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

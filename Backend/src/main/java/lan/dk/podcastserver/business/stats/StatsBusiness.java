@@ -10,7 +10,6 @@ import lan.dk.podcastserver.repository.dsl.ItemDSL;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

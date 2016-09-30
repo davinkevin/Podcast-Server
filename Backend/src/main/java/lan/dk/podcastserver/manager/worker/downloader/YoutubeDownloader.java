@@ -167,7 +167,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             Files.deleteIfExists(target);
 
             if (hasOnlyOneStream()) {
-                target = Files.move(v.getVideo().getInfo().get(0).targetFile.toPath(), fileWithExtension, StandardCopyOption.REPLACE_EXISTING);;
+                target = Files.move(v.getVideo().getInfo().get(0).targetFile.toPath(), fileWithExtension, StandardCopyOption.REPLACE_EXISTING);
             } else {
                 Path audioFile = getStream("audio");
                 Path video = getStream("video");
