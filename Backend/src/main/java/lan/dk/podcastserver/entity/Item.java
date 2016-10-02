@@ -2,6 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
+import javaslang.control.Option;
 import javaslang.control.Try;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -166,7 +167,7 @@ public class Item {
 
     @Transient @JsonProperty("proxyURL") @JsonView(ItemSearchListView.class)
     public String getProxyURL() {
-        return String.format(PROXY_URL, podcast.getId(), id, getExtention());
+        return String.format(PROXY_URL, podcast.getId(), id, getExtension());
     }
 
     @Transient @JsonProperty("isDownloaded") @JsonView(ItemSearchListView.class)
@@ -217,9 +218,11 @@ public class Item {
         return String.format(PROXY_URL, podcast.getId(), id, "");
     }
 
-    private String getExtention() {
-        String ext = FilenameUtils.getExtension(fileName);
-        return (ext == null) ? "" : "."+ext;
+    private String getExtension() {
+        return Option.of(fileName)
+                .map(FilenameUtils::getExtension)
+                .map(ext -> "."+ext)
+                .getOrElse("");
     }
 
     @JsonProperty("cover") @JsonView(ItemSearchListView.class)
