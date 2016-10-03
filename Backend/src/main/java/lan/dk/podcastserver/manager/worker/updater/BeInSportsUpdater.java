@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -104,24 +103,28 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .title(article.select("h3").first().text())
                 .description(article.select("h3").first().text())
                 .pubDate(getPubDateFromDescription(document))
-                .url(getStreamUrl(document).orElse(null))
-                .cover(getPoster(javascriptCode).orElse(null))
+                .url(getStreamUrl(document).getOrElse(() -> null))
+                .cover(getPoster(javascriptCode).getOrElse(Cover.DEFAULT_COVER))
                 .build();
     }
 
-    private Optional<Cover> getPoster(String javascriptCode) {
+    private Option<Cover> getPoster(String javascriptCode) {
         Matcher thumbnailMatcher = POSTER_URL_EXTRACTOR_PATTERN.matcher(javascriptCode);
         if (thumbnailMatcher.find()) {
-            return Optional.of(imageService.getCoverFromURL(thumbnailMatcher.group(1).replace("\\", "")));
+            return Option.of(imageService.getCoverFromURL(thumbnailMatcher.group(1).replace("\\", "")));
         }
-        return Optional.empty();
+        return Option.none();
     }
 
-    private Optional<String> getStreamUrl(Document document) {
+    private Option<String> getStreamUrl(Document document) {
         String dailymotionEmbedded = getDailymotionIframeUrl(document);
         Matcher matcher = EXTRACTOR_ID_OF_DAILYMOTION_EMBEDED_URL.matcher(dailymotionEmbedded);
 
-        return matcher.find() ? Optional.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1))) : Optional.empty();
+        if (matcher.find()) {
+            return Option.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1)));
+        }
+
+        return Option.none();
     }
 
     private String getJavascriptPart(Elements tagScripts) {

@@ -43,15 +43,17 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BeInSportsUpdaterTest {
 
-    public static final String FILE_LOCATION_BY_ID = "/remote/podcast/beinsports/%s.html";
+    private static final String FILE_LOCATION_BY_ID = "/remote/podcast/beinsports/%s.html";
+    private static final String PROTOCOL = "http:";
+    private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
+
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
     @Mock Validator validator;
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
     @InjectMocks BeInSportsUpdater beInSportsUpdater;
-    private static final String PROTOCOL = "http:";
-    private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
+
     Podcast podcast;
 
     @Before
