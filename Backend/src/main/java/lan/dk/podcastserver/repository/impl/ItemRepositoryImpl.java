@@ -11,7 +11,6 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.transform.ResultTransformer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -22,9 +21,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     private static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
     private static final HibernateIdExtractor RESULT_TRANSFORMER = new HibernateIdExtractor();
 
-    final FullTextEntityManager fullTextEntityManager;
+    private final FullTextEntityManager fullTextEntityManager;
 
-    @Autowired
     public ItemRepositoryImpl(FullTextEntityManager fem) {
         this.fullTextEntityManager = fem;
     }
@@ -33,11 +31,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public void reindex() throws InterruptedException {
         fullTextEntityManager
                 .createIndexer(Item.class)
-                .batchSizeToLoadObjects(25)
-                .cacheMode(CacheMode.NORMAL)
-                .idFetchSize(150)
-                .threadsToLoadObjects(1)
-                .progressMonitor(new SimpleIndexingProgressMonitor(1000))
+                    .batchSizeToLoadObjects(25)
+                    .cacheMode(CacheMode.NORMAL)
+                    .idFetchSize(150)
+                    .threadsToLoadObjects(1)
+                    .progressMonitor(new SimpleIndexingProgressMonitor(1000))
                 .startAndWait();
     }
 
