@@ -60,15 +60,15 @@ public class ItemDSL {
 
     }
 
-    public static BooleanExpression isInId(final List<UUID> ids){
+    static BooleanExpression isInId(final List<UUID> ids){
         return Q_ITEM.id.in(ids);
     }
 
-    public static Predicate isInTags(List<Tag> tags) {
+    private static Predicate isInTags(List<Tag> tags) {
         return isInTags(tags.toArray(new Tag[tags.size()]));
     }
 
-    public static Predicate isInTags(final Tag... tags) {
+    static Predicate isInTags(final Tag... tags) {
         return ExpressionUtils.allOf(Stream.of(tags)
                         .map(Q_ITEM.podcast.tags::contains)
                         .collect(toList())
