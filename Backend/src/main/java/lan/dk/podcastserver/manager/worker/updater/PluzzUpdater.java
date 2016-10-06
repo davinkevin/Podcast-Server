@@ -56,7 +56,6 @@ public class PluzzUpdater extends AbstractUpdater {
         this.m3U8Service = m3U8Service;
     }
 
-
     public Set<Item> getItems(Podcast podcast) {
         Option<Document> page = htmlService.get(podcast.getUrl());
 
@@ -82,7 +81,6 @@ public class PluzzUpdater extends AbstractUpdater {
         }
         return getPluzzItemById(m.group(1));
     }
-
 
     @Override
     public String signatureOf(Podcast podcast) {
@@ -129,7 +127,7 @@ public class PluzzUpdater extends AbstractUpdater {
                 .filter(PluzzItem.Video::isM3U)
                 .map(PluzzItem.Video::getUrl)
                 .findFirst()
-                .map(s -> m3U8Service.getM3U8UrlFormMultiStreamFile(s))
+                .map(m3U8Service::getM3U8UrlFormMultiStreamFile)
                 .orElse("");
     }
 

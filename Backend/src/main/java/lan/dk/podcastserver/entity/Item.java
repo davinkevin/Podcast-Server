@@ -128,13 +128,13 @@ public class Item {
         if (!(o instanceof Item)) return false;
         if (this == DEFAULT_ITEM && o != DEFAULT_ITEM || this != DEFAULT_ITEM && o == DEFAULT_ITEM) return false;
 
-        Item item = (Item) o;
+        Item item = Item.class.cast(o);
 
         if (nonNull(id) && nonNull(item.id))
             return id.equals(item.id);
 
         if (nonNull(url) && nonNull(item.url)) {
-            return url.equals(item.url) || FilenameUtils.getName(item.url).equals(FilenameUtils.getName(url));
+            return url.equals(item.url);
         }
 
         return StringUtils.equals(getProxyURL(), item.getProxyURL());

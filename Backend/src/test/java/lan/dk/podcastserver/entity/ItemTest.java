@@ -197,14 +197,13 @@ public class ItemTest {
         /*Item withSameLocalUri = new Item().setPodcast(PODCAST).setFileName("fakeItem.mp4");*/
 
         /* Then */
-        ItemAssert
-                .assertThat(ITEM)
-                .isEqualTo(ITEM)
-                .isNotEqualTo(anObject)
-                .isEqualTo(withSameId)
-                .isEqualTo(withSameUrl)
-                .isEqualTo(withSameName)
-                /*.isEqualTo(withSameLocalUri)*/;
+        assertThat(ITEM)
+            .isEqualTo(ITEM)
+            .isNotEqualTo(anObject)
+            .isEqualTo(withSameId)
+            .isEqualTo(withSameUrl)
+            .isNotEqualTo(withSameName)
+            /*.isEqualTo(withSameLocalUri)*/;
 
         assertThat(ITEM.hashCode()).isEqualTo(new Item().setUrl(ITEM.getUrl()).setPubDate(NOW).hashCode());
 
