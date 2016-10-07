@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.nio.file.Paths;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+
 /**
  * Created by kevin on 13/04/2016 for Podcast Server
  */
@@ -22,8 +24,7 @@ public class BackupTest {
         /* Given */
         /* When */
         /* Then */
-        BackupAssert
-                .assertThat(backup)
+        assertThat(backup)
                 .hasLocation(null)
                 .hasCron("0 0 4 * * *")
                 .hasBinary(false);
@@ -39,8 +40,7 @@ public class BackupTest {
             .setLocation(Paths.get("/tmp"));
 
         /* Then */
-        BackupAssert
-                .assertThat(backup)
+        assertThat(backup)
                 .hasBinary(true)
                 .hasCron("cron")
                 .hasLocation(Paths.get("/tmp"))

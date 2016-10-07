@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.UUID;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+
 /**
  * Created by kevin on 19/03/2016 for Podcast Server
  */
@@ -25,8 +27,7 @@ public class WatchListTest {
                 .setName(name);
 
         /* Then */
-        WatchListAssert
-                .assertThat(watchList)
+        assertThat(watchList)
                 .hasId(UUID.fromString(uuid))
                 .hasNoItems()
                 .hasName(name);

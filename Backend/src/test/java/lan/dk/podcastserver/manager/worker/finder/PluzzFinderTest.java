@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.utils.IOUtils;
@@ -15,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -41,13 +41,12 @@ public class PluzzFinderTest {
         Podcast podcast = pluzzFinder.find("http://pluzz.francetv.fr/videos/comment_ca_va_bien.html");
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast)
-                .hasUrl("http://pluzz.francetv.fr/videos/comment_ca_va_bien.html")
-                .hasTitle("Comment ça va bien !")
-                .hasType("Pluzz")
-                .hasCover(cover)
-                .hasDescription("Avec son équipe de chroniqueurs, Stéphane Bern anime un rendez-vous consacrée à la beauté, à la mode, aux tendances, au bricolage ou encore ...");
+        assertThat(podcast)
+            .hasUrl("http://pluzz.francetv.fr/videos/comment_ca_va_bien.html")
+            .hasTitle("Comment ça va bien !")
+            .hasType("Pluzz")
+            .hasCover(cover)
+            .hasDescription("Avec son équipe de chroniqueurs, Stéphane Bern anime un rendez-vous consacrée à la beauté, à la mode, aux tendances, au bricolage ou encore ...");
     }
 
 }

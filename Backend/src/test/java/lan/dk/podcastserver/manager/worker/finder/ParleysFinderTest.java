@@ -7,11 +7,9 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,7 +21,8 @@ import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static lan.dk.podcastserver.entity.Podcast.DEFAULT_PODCAST;
 import static org.mockito.Mockito.when;
 
@@ -57,13 +56,12 @@ public class ParleysFinderTest {
         Podcast podcast = parleysFinder.find(originalUrl);
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast)
-                    .hasTitle("Devoxx France 2015")
-                    .hasUrl(originalUrl)
-                    .hasDescription("<div style=\"text-align: justify; \">Devoxx France 2015, 4ème édition, a accueilli 2500 personnes pendant 3 jours. Autour des 20 ans du langage Java et du Futur,&nbsp;<span style=\"line-height: 1.42857143;\">le programme propose plus de 150 conférences. Rendez-vous dès décembre pour s’inscrire à la prochaine édition.</span></div>")
-                    .hasType("Parleys")
-                    .hasCover(cover);
+        assertThat(podcast)
+            .hasTitle("Devoxx France 2015")
+            .hasUrl(originalUrl)
+            .hasDescription("<div style=\"text-align: justify; \">Devoxx France 2015, 4ème édition, a accueilli 2500 personnes pendant 3 jours. Autour des 20 ans du langage Java et du Futur,&nbsp;<span style=\"line-height: 1.42857143;\">le programme propose plus de 150 conférences. Rendez-vous dès décembre pour s’inscrire à la prochaine édition.</span></div>")
+            .hasType("Parleys")
+            .hasCover(cover);
     }
 
     @Test
@@ -83,7 +81,7 @@ public class ParleysFinderTest {
         /* When */
         Integer compatibility = parleysFinder.compatibility(url);
         /* Then */
-        Assertions.assertThat(compatibility).isEqualTo(Integer.MAX_VALUE);
+        assertThat(compatibility).isEqualTo(Integer.MAX_VALUE);
     }
 
     @Test
@@ -93,7 +91,7 @@ public class ParleysFinderTest {
         /* When */
         Integer compatibility = parleysFinder.compatibility(url);
         /* Then */
-        Assertions.assertThat(compatibility).isEqualTo(1);
+        assertThat(compatibility).isEqualTo(1);
     }
 
     private Answer<Optional<DocumentContext>> readFrom(String url) {

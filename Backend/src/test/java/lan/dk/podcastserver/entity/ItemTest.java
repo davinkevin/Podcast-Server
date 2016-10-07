@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 
 /**
  * Created by kevin on 15/06/15 for HackerRank problem
@@ -61,7 +62,7 @@ public class ItemTest {
     public void should_have_be_initialazed() {
         /* When */
         /* Then */
-        ItemAssert.assertThat(ITEM)
+        assertThat(ITEM)
                 .hasId(ID)
                 .hasTitle("Fake Item")
                 .hasUrl("http://fakeItem.com")
@@ -80,36 +81,36 @@ public class ItemTest {
     public void should_change_his_status() {
 
         /* When */ ITEM.setStatus(Status.PAUSED);
-        /* Then */ ItemAssert.assertThat(ITEM)
+        /* Then */ assertThat(ITEM)
                 .hasStatus(Status.PAUSED);
 
         /* When */ ITEM.setStatus(Status.FINISH);
-        /* Then */ ItemAssert.assertThat(ITEM)
+        /* Then */ assertThat(ITEM)
                 .hasStatus(Status.FINISH);
     }
 
     @Test
     public void should_advance_in_progression() {
         /* When */ ITEM.setProgression(50);
-        /* Then */ ItemAssert.assertThat(ITEM).hasProgression(50);
+        /* Then */ assertThat(ITEM).hasProgression(50);
     }
 
     @Test
     public void should_set_the_downloaddate() {
         /* Given */ ZonedDateTime downloaddate = ZonedDateTime.now();
         /* When */  ITEM.setDownloadDate(downloaddate);
-        /* Then */  ItemAssert.assertThat(ITEM).hasDownloadDate(downloaddate);
+        /* Then */  assertThat(ITEM).hasDownloadDate(downloaddate);
     }
 
     @Test
     public void should_increment_the_number_of_retry() {
-        ItemAssert.assertThat(ITEM).hasNumberOfTry(0);
+        assertThat(ITEM).hasNumberOfTry(0);
 
         ITEM.setNumberOfTry(6);
-        ItemAssert.assertThat(ITEM).hasNumberOfTry(6);
+        assertThat(ITEM).hasNumberOfTry(6);
 
         ITEM.addATry();
-        ItemAssert.assertThat(ITEM).hasNumberOfTry(7);
+        assertThat(ITEM).hasNumberOfTry(7);
     }
 
     @Test
@@ -175,8 +176,7 @@ public class ItemTest {
     public void should_be_reset() {
         /* Given */ ITEM.setStatus(Status.FINISH);
         /* When  */ ITEM.reset();
-        /* Then  */ ItemAssert.assertThat(ITEM)
-                .hasFileName(null)
+        /* Then  */ assertThat(ITEM).hasFileName(null)
                 .hasDownloadDate(null)
                 .hasStatus(Status.NOT_DOWNLOADED);
     }
@@ -184,7 +184,7 @@ public class ItemTest {
     @Test
     public void should_change_the_local_uri() {
         /* When */ ITEM.setLocalUri("http://www.google.fr/mavideo.mp4");
-        /* Then */ ItemAssert.assertThat(ITEM).hasFileName("mavideo.mp4");
+        /* Then */ assertThat(ITEM).hasFileName("mavideo.mp4");
     }
 
     @Test
@@ -220,8 +220,7 @@ public class ItemTest {
     public void should_delete() {
         /* Given */ ITEM.setStatus(Status.FINISH);
         /* When  */ ITEM.deleteDownloadedFile();
-        /* Then  */ ItemAssert.assertThat(ITEM)
-                .hasFileName(null)
+        /* Then  */ assertThat(ITEM).hasFileName(null)
                 .hasStatus(Status.DELETED);
     }
 

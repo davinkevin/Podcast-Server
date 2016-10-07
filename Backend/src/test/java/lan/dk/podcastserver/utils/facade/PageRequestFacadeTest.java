@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 
 
 /**
@@ -15,8 +16,7 @@ public class PageRequestFacadeTest {
 
     @Test
     public void should_have_default_value() {
-        PageRequestFacadeAssert
-                .assertThat(new PageRequestFacade())
+        assertThat(new PageRequestFacade())
                 .hasSize(10)
                 .hasPage(0);
     }
@@ -32,8 +32,7 @@ public class PageRequestFacadeTest {
                 .setPage(10);
 
         /* Then */
-        PageRequestFacadeAssert
-                .assertThat(pageRequestFacade)
+        assertThat(pageRequestFacade)
                 .hasSize(5)
                 .hasPage(10);
     }

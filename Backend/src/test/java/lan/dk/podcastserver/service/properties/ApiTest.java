@@ -3,6 +3,8 @@ package lan.dk.podcastserver.service.properties;
 import org.junit.Before;
 import org.junit.Test;
 
+import static lan.dk.podcastserver.service.properties.ApiAssert.assertThat;
+
 /**
  * Created by kevin on 13/04/2016 for Podcast Server
  */
@@ -20,8 +22,7 @@ public class ApiTest {
         /* Given */
         /* When */
         /* Then */
-        ApiAssert
-                .assertThat(api)
+        assertThat(api)
                 .hasYoutube(null)
                 .hasDailymotion(null);
     }
@@ -35,8 +36,7 @@ public class ApiTest {
         api.setDailymotion(dailymotionKey).setYoutube(youtubeKey);
 
         /* Then */
-        ApiAssert
-                .assertThat(api)
+        assertThat(api)
                 .hasYoutube(youtubeKey)
                 .hasDailymotion(dailymotionKey);
     }

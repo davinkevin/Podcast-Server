@@ -3,6 +3,8 @@ package lan.dk.podcastserver.service.properties;
 import org.junit.Before;
 import org.junit.Test;
 
+import static lan.dk.podcastserver.service.properties.ExternalToolsAssert.*;
+
 /**
  * Created by kevin on 13/04/2016 for Podcast Server
  */
@@ -17,8 +19,7 @@ public class ExternalToolsTest {
 
     @Test
     public void should_have_default_value() {
-        ExternalToolsAssert
-                .assertThat(externalTools)
+        assertThat(externalTools)
                 .hasFfmpeg("/usr/local/bin/ffmpeg")
                 .hasRtmpdump("/usr/local/bin/rtmpdump");
     }
@@ -30,8 +31,7 @@ public class ExternalToolsTest {
         externalTools.setFfmpeg("/tmp/ffmpeg").setRtmpdump("/tmp/rtmpdump");
 
         /* Then */
-        ExternalToolsAssert
-                .assertThat(externalTools)
+        assertThat(externalTools)
                 .hasFfmpeg("/tmp/ffmpeg")
                 .hasRtmpdump("/tmp/rtmpdump");
     }

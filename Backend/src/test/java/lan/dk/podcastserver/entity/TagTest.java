@@ -6,14 +6,14 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.entity.TagAssert.assertThat;
-
+import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by kevin on 15/06/15 for HackerRank problem
  */
 public class TagTest {
 
-    public static final Podcast PODCAST_1 = new Podcast();
-    public static final Podcast PODCAST_2 = new Podcast();
+    private static final Podcast PODCAST_1 = new Podcast();
+    private static final Podcast PODCAST_2 = new Podcast();
 
     @Before
     public void init() {
@@ -51,8 +51,7 @@ public class TagTest {
         assertThat(tag).isEqualTo(tag);
         assertThat(tag).isNotEqualTo(notEquals);
         assertThat(tag).isNotEqualTo(notSameType);
-        org.assertj.core.api.Assertions.
-                assertThat(tag.hashCode()).isEqualTo("Humour".hashCode());
+        assertThat(tag.hashCode()).isEqualTo("Humour".hashCode());
     }
 
 }

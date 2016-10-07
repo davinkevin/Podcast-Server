@@ -2,7 +2,6 @@ package lan.dk.podcastserver.controller.api;
 
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Tag;
-import lan.dk.podcastserver.entity.TagAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -37,9 +36,7 @@ public class TagControllerTest {
         Tag tagById = tagController.findById(id);
 
         /* Then */
-        TagAssert
-                .assertThat(tagById)
-                .isSameAs(value);
+        assertThat(tagById).isSameAs(value);
         verify(tagBusiness, only()).findOne(eq(id));
     }
 

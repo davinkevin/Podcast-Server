@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
-import lan.dk.podcastserver.entity.WatchListAssert;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.WatchListRepository;
 import lan.dk.podcastserver.service.JdomService;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -89,9 +89,7 @@ public class WatchListBusinessTest {
 
         /* Then */
         assertThat(watchListOfItem).isSameAs(watchList);
-        WatchListAssert
-                .assertThat(watchListOfItem)
-                .hasItems(item);
+        assertThat(watchListOfItem).hasItems(item);
         verify(itemRepository, only()).findOne(eq(id));
         verify(watchListRepository, times(1)).findOne(eq(watchList.getId()));
         verify(watchListRepository, times(1)).save(eq(watchList));
@@ -118,9 +116,7 @@ public class WatchListBusinessTest {
 
         /* Then */
         assertThat(watchListOfItem).isSameAs(watchList);
-        WatchListAssert
-                .assertThat(watchListOfItem)
-                .doesNotHaveItems(item);
+        assertThat(watchListOfItem).doesNotHaveItems(item);
         verify(itemRepository, only()).findOne(eq(id));
         verify(watchListRepository, times(1)).findOne(eq(watchList.getId()));
         verify(watchListRepository, times(1)).save(eq(watchList));

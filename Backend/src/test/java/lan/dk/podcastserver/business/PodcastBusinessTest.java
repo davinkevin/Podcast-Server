@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -79,10 +80,9 @@ public class PodcastBusinessTest {
         Podcast aPodcast = podcastBusiness.findOne(podcastId);
 
         /* Then */
-        PodcastAssert
-                .assertThat(aPodcast)
-                .hasId(podcastId)
-                .isSameAs(podcast);
+        assertThat(aPodcast)
+            .hasId(podcastId)
+            .isSameAs(podcast);
         verify(podcastRepository, times(1)).findOne(eq(podcastId));
     }
 
@@ -155,8 +155,7 @@ public class PodcastBusinessTest {
         Podcast savedPodcast = podcastBusiness.reatachAndSave(podcast);
 
        /* Then */
-        PodcastAssert
-                .assertThat(savedPodcast)
+        assertThat(savedPodcast)
                 .hasTags(tags.toArray(new Tag[tags.size()]));
         verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(podcast));
@@ -180,8 +179,7 @@ public class PodcastBusinessTest {
         Podcast savedPodcast = podcastBusiness.create(podcast);
 
         /* Then */
-        PodcastAssert
-                .assertThat(savedPodcast)
+        assertThat(savedPodcast)
                 .hasTags(tags.toArray(new Tag[tags.size()]))
                 .hasCover(cover);
 
@@ -278,8 +276,7 @@ public class PodcastBusinessTest {
         Podcast updatedPodcast = podcastBusiness.patchUpdate(patchPodcast);
 
         /* Then */
-        PodcastAssert
-                .assertThat(updatedPodcast)
+        assertThat(updatedPodcast)
                 .hasId(patchPodcast.getId())
                 .hasTitle(patchPodcast.getTitle())
                 .hasUrl(patchPodcast.getUrl())

@@ -7,7 +7,6 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
-import lan.dk.podcastserver.entity.WatchListAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +22,7 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,10 +86,7 @@ public class WatchListRepositoryTest {
         /* Then */
         assertThat(watchList).isNotNull();
         assertThat(watchList.getItems()).hasSize(2);
-        WatchListAssert
-                .assertThat(watchList)
-                .hasId(id)
-                .hasName("Humour Playlist");
+        assertThat(watchList).hasId(id).hasName("Humour Playlist");
     }
 
     @Test

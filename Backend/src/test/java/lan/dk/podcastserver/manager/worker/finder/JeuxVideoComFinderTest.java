@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -38,8 +38,7 @@ public class JeuxVideoComFinderTest {
         Podcast podcast = jeuxVideoComFinder.find(url);
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast)
+        assertThat(podcast)
                 .hasTitle("Dernières vidéos de chroniques")
                 .hasDescription("Découvrez toutes les chroniques de jeux vidéo ainsi que les dernières vidéos de chroniques comme Chronique,Chronique,Chronique,...")
                 .hasType("JeuxVideoCom")

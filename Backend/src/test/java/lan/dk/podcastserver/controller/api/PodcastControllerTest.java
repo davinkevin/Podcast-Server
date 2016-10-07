@@ -4,7 +4,6 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -45,7 +45,7 @@ public class PodcastControllerTest {
         Podcast createdPodcast = podcastController.create(podcast);
 
         /* Then */
-        PodcastAssert.assertThat(createdPodcast).isEqualTo(podcast);
+        assertThat(createdPodcast).isEqualTo(podcast);
         verify(podcastBusiness, only()).create(eq(podcast));
     }
 
@@ -60,7 +60,7 @@ public class PodcastControllerTest {
         Podcast podcastById = podcastController.findById(id);
 
         /* Then */
-        PodcastAssert.assertThat(podcastById).isSameAs(podcast);
+        assertThat(podcastById).isSameAs(podcast);
         verify(podcastBusiness, only()).findOne(eq(id));
     }
 
@@ -74,7 +74,7 @@ public class PodcastControllerTest {
         Podcast podcastUpdated = podcastController.update(podcast, id);
 
         /* Then */
-        PodcastAssert.assertThat(podcastUpdated)
+        assertThat(podcastUpdated)
                 .isInstanceOf(Podcast.class)
                 .hasId(id);
         verify(podcastBusiness, only()).reatachAndSave(same(podcast));
@@ -91,7 +91,7 @@ public class PodcastControllerTest {
         Podcast podcastUpdated = podcastController.patchUpdate(podcast, id);
 
         /* Then */
-        PodcastAssert.assertThat(podcastUpdated)
+        assertThat(podcastUpdated)
                 .isInstanceOf(Podcast.class)
                 .hasId(id);
         verify(podcastBusiness, only()).patchUpdate(same(podcast));
@@ -170,6 +170,6 @@ public class PodcastControllerTest {
         Podcast anUrl = podcastController.fetchPodcastInfoByUrl("anUrl");
 
         /* Then */
-        PodcastAssert.assertThat(anUrl).isSameAs(podcast);
+        assertThat(anUrl).isSameAs(podcast);
     }
 }

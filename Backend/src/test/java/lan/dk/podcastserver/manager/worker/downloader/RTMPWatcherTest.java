@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Status;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.manager.worker.downloader.RTMPDownloader.RTMPWatcher;
 import static org.mockito.Mockito.*;
 
@@ -71,8 +71,7 @@ public class RTMPWatcherTest {
         /* Then */
         verify(rtmpDownloader, times(3)).convertAndSaveBroadcast();
         verify(rtmpDownloader, times(1)).finishDownload();
-        ItemAssert
-                .assertThat(rtmpDownloader.item)
+        assertThat(rtmpDownloader.item)
                 .hasProgression(3)
                 .hasStatus(Status.FINISH);
     }
@@ -91,8 +90,7 @@ public class RTMPWatcherTest {
         verify(rtmpDownloader, never()).convertAndSaveBroadcast();
         verify(rtmpDownloader, never()).finishDownload();
         verify(rtmpDownloader, times(1)).resetDownload();
-        ItemAssert
-                .assertThat(rtmpDownloader.item)
+        assertThat(rtmpDownloader.item)
                 .hasProgression(0)
                 .hasStatus(Status.STARTED);
     }
@@ -114,8 +112,7 @@ public class RTMPWatcherTest {
         verify(rtmpDownloader, never()).convertAndSaveBroadcast();
         verify(rtmpDownloader, never()).finishDownload();
         verify(rtmpDownloader, times(1)).resetDownload();
-        ItemAssert
-                .assertThat(rtmpDownloader.item)
+        assertThat(rtmpDownloader.item)
                 .hasProgression(0)
                 .hasStatus(Status.STARTED);
     }

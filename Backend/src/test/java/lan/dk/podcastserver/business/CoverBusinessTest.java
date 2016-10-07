@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.CoverAssert;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
@@ -24,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -57,7 +57,8 @@ public class CoverBusinessTest {
         UUID id = UUID.randomUUID();
         /* When */
         Cover cover = coverBusiness.findOne(id);
-        /* Then */  CoverAssert.assertThat(cover).hasId(id);
+        /* Then */
+        assertThat(cover).hasId(id);
         verify(coverRepository, times(1)).findOne(eq(id));
     }
 
@@ -161,7 +162,7 @@ public class CoverBusinessTest {
         Cover savedCover = coverBusiness.save(cover);
 
         /* Then */
-        CoverAssert.assertThat(savedCover).hasId(createdId);
+        assertThat(savedCover).hasId(createdId);
         assertThat(cover).isSameAs(savedCover);
         verify(coverRepository, only()).save(eq(cover));
     }

@@ -5,7 +5,6 @@ import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.ItemAssert;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import org.junit.Before;
@@ -28,6 +27,7 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.hasStatus;
@@ -97,9 +97,7 @@ public class ItemRepositoryTest {
                 .hasTotalPages(3)
                 .hasNumberOfElements(1);
 
-        ItemAssert
-                .assertThat(itemByPodcast.getContent().get(0))
-                .hasTitle("Appload 1");
+        assertThat(itemByPodcast.getContent().get(0)).hasTitle("Appload 1");
     }
 
     @Test
@@ -110,7 +108,7 @@ public class ItemRepositoryTest {
         /* Then */
         assertThat(itemToDownload)
                 .hasSize(1);
-        ItemAssert.assertThat(itemToDownload.iterator().next())
+        assertThat(itemToDownload.iterator().next())
                 .hasTitle("Appload 3");
     }
     
@@ -122,7 +120,7 @@ public class ItemRepositoryTest {
         /* Then */
         assertThat(itemToDelete)
                 .hasSize(1);
-        ItemAssert.assertThat(itemToDelete.iterator().next())
+        assertThat(itemToDelete.iterator().next())
                 .hasTitle("Geek INC 124");
     }
 

@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.finder;
 
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.entity.PodcastAssert;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.utils.IOUtils;
@@ -15,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -40,8 +40,7 @@ public class CanalPlusFinderTest {
         Podcast podcast = canalPlusFinder.find("http://www.canalplus.fr/c-emissions/pid6378-c-le-petit-journal.html");
 
         /* Then */
-        PodcastAssert
-                .assertThat(podcast)
+        assertThat(podcast)
                 .hasUrl("http://www.canalplus.fr/c-emissions/c-le-petit-journal/pid6515-le-petit-journal.html")
                 .hasTitle("Le Petit Journal")
                 .hasType("CanalPlus")

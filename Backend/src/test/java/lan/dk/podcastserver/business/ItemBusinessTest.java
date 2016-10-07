@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ItemBusinessTest {
 
-    String ROOT_FOLDER = "/tmp/podcast";
+    private String ROOT_FOLDER = "/tmp/podcast";
 
     @Mock ItemDownloadManager itemDownloadManager;
     @Mock PodcastServerParameters podcastServerParameters;
@@ -60,9 +61,7 @@ public class ItemBusinessTest {
         Page<Item> pageResponse = itemBusiness.findAll(pageRequest);
 
         /* Then */
-        assertThat(pageResponse)
-                .isSameAs(page);
-
+        PageAssert.assertThat(pageResponse).isSameAs(page);
         verify(itemRepository, times(1)).findAll(eq(pageRequest));
     }
 
@@ -74,9 +73,7 @@ public class ItemBusinessTest {
         /* When */
         Item savedItem = itemBusiness.save(item);
         /* Then */
-        ItemAssert
-                .assertThat(savedItem)
-                .isSameAs(item);
+        assertThat(savedItem).isSameAs(item);
         verify(itemRepository, times(1)).save(eq(item));
     }
 
@@ -89,9 +86,7 @@ public class ItemBusinessTest {
         /* When */
         Item savedItem = itemBusiness.findOne(idOfItem);
         /* Then */
-        ItemAssert
-                .assertThat(savedItem)
-                .isSameAs(item);
+        assertThat(savedItem).isSameAs(item);
         verify(itemRepository, times(1)).findOne(idOfItem);
     }
 
@@ -140,8 +135,7 @@ public class ItemBusinessTest {
         Item resetedItem = itemBusiness.reset(itemId);
 
         /* Then */
-        assertThat(resetedItem)
-                .isSameAs(item);
+        assertThat(resetedItem).isSameAs(item);
         verify(itemRepository, times(1)).findOne(eq(itemId));
         verify(itemDownloadManager, times(1)).isInDownloadingQueue(eq(item));
         verify(item, times(1)).reset();
@@ -209,8 +203,7 @@ public class ItemBusinessTest {
         Item item = itemBusiness.addItemByUpload(idPodcast, uploadedFile);
 
         /* Then */
-        ItemAssert
-                .assertThat(item)
+        assertThat(item)
                 .hasTitle("aTitle")
                 .hasPubDate(ZonedDateTime.of(LocalDateTime.of(LocalDate.parse(title.split(" - ")[1], DateTimeFormatter.ofPattern("yyyy-MM-dd")), LocalTime.of(0, 0)), ZoneId.systemDefault()))
                 .hasUrl(null)
@@ -244,9 +237,7 @@ public class ItemBusinessTest {
         Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, true, pageRequest);
 
         /* Then */
-        assertThat(byTagsAndFullTextTerm)
-                .isSameAs(pageResponse);
-
+        PageAssert.assertThat(byTagsAndFullTextTerm).isSameAs(pageResponse);
         verify(itemRepository, times(1)).fullTextSearch(eq(term));
         verify(itemRepository, times(1)).findAll(any(Predicate.class), eq(pageRequest));
     }
@@ -264,9 +255,7 @@ public class ItemBusinessTest {
         Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, true, pageRequest);
 
         /* Then */
-        assertThat(byTagsAndFullTextTerm)
-                .isSameAs(pageResponse);
-
+        PageAssert.assertThat(byTagsAndFullTextTerm).isSameAs(pageResponse);
         verify(itemRepository, times(1)).findAll(any(Predicate.class), eq(pageRequest));
     }
 
@@ -287,9 +276,7 @@ public class ItemBusinessTest {
         Page<Item> pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, true, pageRequest);
 
         /* Then */
-        assertThat(pageOfItem.getContent())
-                .contains(itemsFrom1To20.get(15),itemsFrom1To20.get(14),itemsFrom1To20.get(13));
-
+        assertThat(pageOfItem.getContent()).contains(itemsFrom1To20.get(15),itemsFrom1To20.get(14),itemsFrom1To20.get(13));
         verify(itemRepository, times(1)).fullTextSearch(eq(term));
         verify(itemRepository, times(1)).findAll(any(Predicate.class));
     }
