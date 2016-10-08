@@ -158,8 +158,6 @@ public class PluzzUpdater extends AbstractUpdater {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class PluzzItem {
 
-        private static final String TITLE_WITH_SEASON = "%s - S%sE%s - %s";
-        private static final String TITLE = "%s - %s";
         private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
         private static final String PLUZZ_COVER_BASE_URL = "http://refonte.webservices.francetelevisions.fr%s";
 
@@ -174,10 +172,20 @@ public class PluzzUpdater extends AbstractUpdater {
         @Setter @Getter private List<Video> videos = Lists.newArrayList();
 
         String title() {
-            if (isNull(saison) || isNull(episode)) {
-                return String.format(TITLE, titre, sousTitre);
+            String title = titre;
+            if (StringUtils.isNotEmpty(saison)) {
+                title = title + " - S" + saison;
             }
-            return String.format(TITLE_WITH_SEASON, titre, saison, episode, sousTitre);
+
+            if (StringUtils.isNotEmpty(episode)) {
+                title = title + "E" + episode;
+            }
+
+            if (StringUtils.isNotEmpty(sousTitre)) {
+                title = title + " - " + sousTitre;
+            }
+
+            return title;
         }
 
         ZonedDateTime pubDate() {
