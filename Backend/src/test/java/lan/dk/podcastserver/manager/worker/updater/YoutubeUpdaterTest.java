@@ -3,20 +3,20 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.HtmlService;
+import lan.dk.podcastserver.service.JdomService;
+import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.Api;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,9 +27,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -264,16 +262,5 @@ public class YoutubeUpdaterTest {
         Set<Integer> results = urls.stream().map(youtubeUpdater::compatibility).distinct().collect(toSet());
         /* Then */
         assertThat(results).contains(1);
-    }
-
-    private Document parseHtml(String url) throws URISyntaxException, IOException {
-        return Jsoup.parse(
-                Paths.get(YoutubeUpdaterTest.class.getResource(url).toURI()).toFile(),
-                "UTF-8",
-                "http://www.youtube.com/");
-    }
-
-    private Optional<DocumentContext> parseJson(String url) throws IOException, URISyntaxException {
-        return Optional.of(PARSER.parse(Paths.get(YoutubeUpdater.class.getResource(url).toURI()).toFile()));
     }
 }

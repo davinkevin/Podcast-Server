@@ -244,6 +244,9 @@ public class YoutubeUpdater extends AbstractUpdater {
             }
 
             public Option<Thumbnails.Thumbnail> getCover() {
+                if (isNull(this.snippet.thumbnails))
+                    return Option.none();
+
                 return this.snippet.getThumbnails().getBetterThumbnail();
             }
 
