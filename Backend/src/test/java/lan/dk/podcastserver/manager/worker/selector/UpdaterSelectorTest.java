@@ -24,7 +24,6 @@ public class UpdaterSelectorTest {
     @Mock BeInSportsUpdater beInSportsUpdater;
     @Mock CanalPlusUpdater canalPlusUpdater;
     @Mock JeuxVideoComUpdater jeuxVideoComUpdater;
-    @Mock ParleysUpdater parleysUpdater;
     @Mock PluzzUpdater pluzzUpdater;
     @Mock DailymotionUpdater dailymotionUpdater;
 
@@ -36,7 +35,6 @@ public class UpdaterSelectorTest {
         when(beInSportsUpdater.compatibility(anyString())).thenCallRealMethod();
         when(canalPlusUpdater.compatibility(anyString())).thenCallRealMethod();
         when(jeuxVideoComUpdater.compatibility(anyString())).thenCallRealMethod();
-        when(parleysUpdater.compatibility(anyString())).thenCallRealMethod();
         when(pluzzUpdater.compatibility(anyString())).thenCallRealMethod();
         when(dailymotionUpdater.compatibility(anyString())).thenCallRealMethod();
 
@@ -45,13 +43,12 @@ public class UpdaterSelectorTest {
         when(beInSportsUpdater.type()).thenCallRealMethod();
         when(canalPlusUpdater.type()).thenCallRealMethod();
         when(jeuxVideoComUpdater.type()).thenCallRealMethod();
-        when(parleysUpdater.type()).thenCallRealMethod();
         when(pluzzUpdater.type()).thenCallRealMethod();
         when(dailymotionUpdater.type()).thenCallRealMethod();
 
         //updaterSelector = new UpdaterSelector();
         //updaterSelector.setUpdaters(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, parleysUpdater, pluzzUpdater, dailymotionUpdater));
-        updaterSelector = new UpdaterSelector(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, parleysUpdater, pluzzUpdater, dailymotionUpdater));
+        updaterSelector = new UpdaterSelector(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, pluzzUpdater, dailymotionUpdater));
     }
     
     @Test
@@ -85,12 +82,6 @@ public class UpdaterSelectorTest {
     }
 
     @Test
-    public void should_return_a_ParleysUpdater() {
-        /* When */ Updater updaterClass = updaterSelector.of("http://www.parleys.com/show/for/dummies");
-        /* Then */ assertThat(updaterClass).isEqualTo(parleysUpdater);
-    }
-
-    @Test
     public void should_return_a_PluzzUpdater() {
         /* When */ Updater updaterClass = updaterSelector.of("http://www.pluzz.francetv.fr/show/for/dummies");
         /* Then */ assertThat(updaterClass).isEqualTo(pluzzUpdater);
@@ -114,7 +105,7 @@ public class UpdaterSelectorTest {
         Set<AbstractUpdater.Type> types = updaterSelector.types();
 
         /* Then */
-        assertThat(types).isNotEmpty().hasSize(8);
+        assertThat(types).isNotEmpty().hasSize(7);
     }
 
 }

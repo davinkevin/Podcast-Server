@@ -28,7 +28,6 @@ public class DownloaderSelectorTest {
     @Mock DailymotionDownloader dailymotionDownloader;
     @Mock HTTPDownloader httpDownloader;
     @Mock M3U8Downloader m3U8Downloader;
-    @Mock ParleysDownloader parleysDownloader;
     @Mock RTMPDownloader rtmpDownloader;
     @Mock YoutubeDownloader youtubeDownloader;
     @Mock ApplicationContext applicationContext;
@@ -41,12 +40,11 @@ public class DownloaderSelectorTest {
         when(dailymotionDownloader.compatibility(anyString())).thenCallRealMethod();
         when(httpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(m3U8Downloader.compatibility(anyString())).thenCallRealMethod();
-        when(parleysDownloader.compatibility(anyString())).thenCallRealMethod();
         when(rtmpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaders = Sets.newHashSet(canalPlusDownloader, dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, parleysDownloader, rtmpDownloader, youtubeDownloader);
+        downloaders = Sets.newHashSet(canalPlusDownloader, dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader);
         downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 
@@ -92,12 +90,6 @@ public class DownloaderSelectorTest {
     public void should_return_a_CanalPlusDownloader() {
         /* When  */ Downloader updaterClass = downloaderSelector.of("http://us-cplus-aka.canal-plus.com/i/1503/17/nip_NIP_47464_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8");
         /* Then  */ assertThat(updaterClass).isEqualTo(canalPlusDownloader);
-    }
-
-    @Test
-    public void should_return_an_ParleysDownloader() {
-        /* When  */ Downloader updaterClass = downloaderSelector.of("http://www.parleys.com/play/54d78f6de4b0767f26dffb67");
-        /* Then  */ assertThat(updaterClass).isEqualTo(parleysDownloader);
     }
 
     @Test
