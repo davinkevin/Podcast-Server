@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.utils.facade.stats;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -10,15 +11,11 @@ import java.time.LocalDate;
  * Created by kevin on 06/04/15.
  */
 @Getter
+@AllArgsConstructor
 public class NumberOfItemByDateWrapper {
 
     private LocalDate date;
     private Long numberOfItems;
-
-    public NumberOfItemByDateWrapper(LocalDate date, Long numberOfItems) {
-        this.date = date;
-        this.numberOfItems = numberOfItems;
-    }
 
     @Override
     public boolean equals(Object o) {
