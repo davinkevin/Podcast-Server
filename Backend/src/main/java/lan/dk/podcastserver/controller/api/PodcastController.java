@@ -49,20 +49,20 @@ public class PodcastController {
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="{id}", method = RequestMethod.GET)
+    @GetMapping("{id}")
     public Podcast findById(@PathVariable UUID id) {
         return podcastBusiness.findOne(id);
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="{id}", method = RequestMethod.PUT)
+    @PutMapping("{id}")
     public Podcast update(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
         podcast.setId(id);
         return podcastBusiness.reatachAndSave(podcast);
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="{id}", method = RequestMethod.PATCH)
+    @PatchMapping("{id}")
     public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) throws PodcastNotFoundException {
         podcast.setId(id);
         Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
@@ -70,23 +70,23 @@ public class PodcastController {
         return patchedPodcast;
     }
 
-    @RequestMapping(value="{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete (@PathVariable UUID id) {
         podcastBusiness.delete(id);
     }
 
+    @GetMapping
     @Cacheable("podcasts")
     @JsonView(Podcast.PodcastListingView.class)
-    @RequestMapping(method = RequestMethod.GET)
     public List<Podcast> findAll() { return podcastBusiness.findAll(); }
 
-    @RequestMapping(value="{id}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
+    @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, HttpServletRequest request) {
         return podcastBusiness.getRss(id, limit, this.getDomainFromRequest(request));
     }
 
-    @RequestMapping(value="{id}/cover.{ext}", method = RequestMethod.GET, produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
+    @GetMapping(value="{id}/cover.{ext}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
     public ResponseEntity<?> cover(@PathVariable UUID id) throws IOException {
         Path cover = podcastBusiness.coverOf(id);
 
@@ -99,34 +99,34 @@ public class PodcastController {
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @RequestMapping(value="fetch", method = RequestMethod.POST)
+    @PostMapping("fetch")
     public Podcast fetchPodcastInfoByUrl(@RequestBody String url) {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 
-    @RequestMapping(value="{id}/stats/byPubDate", method = RequestMethod.POST)
+    @PostMapping(value="{id}/stats/byPubDate")
     public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByPubDate(id, numberOfMonth);
     }
 
-    @RequestMapping(value="{id}/stats/byDownloadDate", method = RequestMethod.POST)
+    @PostMapping("{id}/stats/byDownloadDate")
     public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByDownloadDate(id, numberOfMonth);
     }
 
-    @RequestMapping(value="{id}/stats/byCreationDate", method = RequestMethod.POST)
+    @PostMapping("{id}/stats/byCreationDate")
     public Set<NumberOfItemByDateWrapper> statsByCreationDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
         return statsBusiness.statsByCreationDate(id, numberOfMonth);
     }
 
-    @RequestMapping(value = "{id}/update", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @GetMapping("{id}/update")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePodcast (@PathVariable UUID id) {
         updatePodcastBusiness.updatePodcast(id);
     }
 
-    @RequestMapping(value = "{id}/update/force", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @GetMapping("{id}/update/force")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePodcastForced (@PathVariable UUID id) {
         updatePodcastBusiness.forceUpdatePodcast(id);
     }

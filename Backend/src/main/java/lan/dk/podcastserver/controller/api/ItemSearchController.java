@@ -24,14 +24,14 @@ public class ItemSearchController {
 
     final ItemBusiness itemBusiness;
 
-    @RequestMapping(value="pagination", method = RequestMethod.GET)
+    @GetMapping("pagination")
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> findAll(PageRequestFacade pageRequestFacade) {
         return itemBusiness.findAll(pageRequestFacade.toPageRequest());
     }
 
     @Cacheable("search")
-    @RequestMapping(value= "search", method = RequestMethod.POST )
+    @PostMapping("search")
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestBody SearchItemPageRequestWrapper searchWrapper) {
         return searchWrapper.isSearch()
@@ -39,7 +39,7 @@ public class ItemSearchController {
                 : itemBusiness.findAll(searchWrapper.toPageRequest());
     }
 
-    @RequestMapping(value="reindex", method = RequestMethod.GET)
+    @GetMapping("reindex")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void reindex() throws InterruptedException {
         itemBusiness.reindex();

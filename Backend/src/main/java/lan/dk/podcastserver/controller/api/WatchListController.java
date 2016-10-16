@@ -24,40 +24,40 @@ public class WatchListController {
     final WatchListBusiness watchListBusiness;
 
     @JsonView(WatchListDetailsListView.class)
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public WatchList create(@RequestBody WatchList entity) {
         return watchListBusiness.save(entity);
     }
 
     @JsonView(Object.class)
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public List<WatchList> findAll() {
         return watchListBusiness.findAll();
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    @GetMapping("{id}")
     public WatchList findOne(@PathVariable UUID id) {
         return watchListBusiness.findOne(id);
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("{id}")
     public void delete(@PathVariable UUID id) {
         watchListBusiness.delete(id);
     }
 
     @JsonView(WatchListDetailsListView.class)
-    @RequestMapping(value = "{id}/{itemId}", method = RequestMethod.POST)
+    @PostMapping("{id}/{itemId}")
     public WatchList add(@PathVariable UUID id, @PathVariable UUID itemId) {
         return watchListBusiness.add(id, itemId);
     }
 
     @JsonView(WatchListDetailsListView.class)
-    @RequestMapping(value = "{id}/{itemId}", method = RequestMethod.DELETE)
+    @DeleteMapping("{id}/{itemId}")
     public WatchList remove(@PathVariable UUID id, @PathVariable UUID itemId) {
         return watchListBusiness.remove(id, itemId);
     }
 
-    @RequestMapping(value="{id}/rss", method = RequestMethod.GET, produces = "application/xml; charset=utf-8")
+    @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String asRss(@PathVariable UUID id, HttpServletRequest request) {
         return watchListBusiness.asRss(id, this.getDomainFromRequest(request));
     }

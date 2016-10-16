@@ -18,17 +18,17 @@ public class TagController {
 
     final TagBusiness tagBusiness;
 
-    @RequestMapping(value="{id}", method = RequestMethod.GET)
+    @GetMapping("{id}")
     public Tag findById(@PathVariable UUID id) {
         return tagBusiness.findOne(id);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public List<Tag> findAll() {
         return tagBusiness.findAll();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public List<Tag> findByNameLike(@RequestParam String name) {
         return tagBusiness.findByNameLike(name);
     }

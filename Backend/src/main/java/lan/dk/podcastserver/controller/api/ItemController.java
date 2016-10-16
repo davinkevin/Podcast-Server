@@ -42,43 +42,43 @@ public class ItemController {
     final MultiPartFileSenderService multiPartFileSenderService;
     final WatchListBusiness watchListBusiness;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @JsonView(Item.ItemPodcastListView.class)
     public Page<Item> findAll(@PathVariable UUID idPodcast, @RequestBody PageRequestFacade pageRequestFacade) {
         return itemBusiness.findByPodcast(idPodcast, pageRequestFacade.toPageRequest());
     }
 
-    @RequestMapping(value="{id}", method = RequestMethod.GET)
+    @GetMapping("{id}")
     @JsonView(Item.ItemDetailsView.class)
     public Item findById(@PathVariable UUID id) {
         return itemBusiness.findOne(id);
     }
 
-    @RequestMapping(value="{id}", method = RequestMethod.PUT)
+    @PutMapping("{id}")
     @JsonView(Item.ItemDetailsView.class)
     public Item update(@RequestBody Item item, @PathVariable("id") UUID id) {
         item.setId(id);
         return itemBusiness.save(item);
     }
 
-    @RequestMapping(value="{id}/watchlists", method = RequestMethod.GET)
+    @GetMapping("{id}/watchlists")
     @JsonView(Object.class)
     public Set<WatchList> getWatchListOfItem(@PathVariable("id") UUID id) {
         return watchListBusiness.findContainsItem(id);
     }
 
-    @RequestMapping(value="{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete (@PathVariable(value = "id") UUID id) {
         itemBusiness.delete(id);
     }
 
-    @RequestMapping(value="{id}/addtoqueue", method = RequestMethod.GET)
+    @GetMapping("{id}/addtoqueue")
     public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
     }
 
-    @RequestMapping(value="{id}/download{ext}", method = RequestMethod.GET)
+    @GetMapping("{id}/download{ext}")
     public void getEpisodeFile(@PathVariable UUID id, HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.debug("Download du fichier d'item {}", id);
         Item item = itemBusiness.findOne(id);
@@ -93,7 +93,7 @@ public class ItemController {
         }
     }
 
-    @RequestMapping(value="{id}/cover{ext}", method = RequestMethod.GET)
+    @GetMapping("{id}/cover{ext}")
     public ResponseEntity<?> getCover(@PathVariable UUID id) throws Exception {
         Item item = itemBusiness.findOne(id);
         Path cover = item.getCoverPath();
@@ -108,13 +108,13 @@ public class ItemController {
     }
 
 
-    @RequestMapping(value = "{id}/reset", method = RequestMethod.GET)
+    @GetMapping("{id}/reset")
     @JsonView(Item.ItemDetailsView.class)
     public Item reset(@PathVariable UUID id) {
         return itemBusiness.reset(id);
     }
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @PostMapping("/upload")
     @JsonView(Item.ItemDetailsView.class)
     public Item uploadFile(@PathVariable UUID idPodcast, @RequestPart("file") MultipartFile file) throws IOException, ParseException, URISyntaxException {
         return itemBusiness.addItemByUpload(idPodcast, file);
