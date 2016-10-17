@@ -47,7 +47,7 @@ export default class PodcastDetailCtrl {
             { heading : 'Stats', active : false }
         ];
 
-        this.podcast.isUpdatable = () => this.type !== 'send';
+        this.podcast.isUpdatable = function() { return this.type !== 'send'; };
 
         if (this.podcast.isUpdatable() && !this.podcast.lastUpdate)
             this.refresh();
