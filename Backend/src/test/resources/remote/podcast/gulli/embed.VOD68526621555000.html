@@ -1,0 +1,333 @@
+<html>
+<head>
+        <script type="text/javascript" src="/js/compiled/video.js"></script>
+        <script type="text/javascript">jwplayer.key = "95iWa83JYhuGVX7ZqAQZH34xuhPLzWsre5Gh2A==";</script>
+    <link href="//ssl.p.jwpcdn.com/player/v/7.2.3/skins/six.css" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .bloc_player * {
+            box-sizing: border-box;
+        }
+
+        .bloc_player .embed-responsive {
+            display: block;
+            height: 0;
+            overflow: hidden;
+            padding: 0;
+            position: relative;
+        }
+
+        .bloc_player .embed-responsive.embed-responsive-16by9 {
+            padding-bottom: 56.25%;
+        }
+
+        .bloc_player .embed-responsive .jwplayer {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .bloc_player .embed-responsive .embed-responsive-item,
+        .bloc_player .embed-responsive iframe,
+        .bloc_player .embed-responsive embed,
+        .bloc_player .embed-responsive object {
+            border: 0 none;
+            bottom: 0;
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
+
+        .bloc_player .jw-skin-seven .jw-slider-horizontal .jw-slider-container {
+            margin-top: 7px;
+        }
+
+        .bloc_player .jw-playlist .jw-label,
+        .bloc_player .jw-playlist .jw-name {
+            vertical-align: middle;
+        }
+
+        .bloc_player .jw-playlist-container {
+            left: -21%;
+            width: auto;
+        }
+
+        .bloc_player .jw-playlist .jw-name {
+            width: 100%
+        }
+    </style>
+</head>
+<script type="text/javascript">
+    xtnv = document;
+    xtsd = 'http://logc279';
+    xtsite = '517473';
+    xtpage = 'embed_a_couper';
+
+    (function () {
+        var scriptElt1 = document.createElement("script");
+        scriptElt1.id = "tc_script_1_11";
+        scriptElt1.src = "http://cdn-analytics.ladmedia.fr/gulli/xtcore.js";
+        scriptElt1.async = true;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0] || document.getElementsByTagName('script')[0].parentNode).insertBefore(scriptElt1, null);
+    })();
+</script>
+
+<body>
+<div class="bloc_player clearfix">
+        <div class="embed-responsive embed-responsive-16by9">
+        <div id="jwplayer_container">Chargement du player ...</div>
+    </div>
+</div>
+
+<script type="text/javascript" language="javascript">
+    var aTags = {};
+    aTags['pre_roll'] = 131910;
+    aTags['pre_roll_2'] = 131911;
+    aTags['pre_roll_3'] = 135091;
+    aTags['post_roll'] = 131912;
+
+    // xtPlaylist must be a global variable
+    if (typeof xtPlaylist == 'undefined') {
+        var xtPlaylist = new Object();
+    }
+
+    real_richname = 'video::' + 'dessins-animes::pokemon_s19::s19e13';
+
+    var richnamePub = 'pub';
+    var richnameSite = 'replay::' + real_richname;
+    xtPlaylist['jwplayer_container'] = [
+        {
+            type: 'video',
+            xtn2: 1,
+            richname: richnameSite,
+            clink: '',
+//            refresh: '30',
+            stream: '18',
+            location: 'int',
+            mode: 'clip',
+            size: '',
+            extension: '9'
+        }
+    ];
+    initjwplayer('jwplayer_container', aTags, richnameSite, richnamePub);
+
+    function initjwplayer(idplayer, aTags, richnameSite, richnamePub) {
+        var playing_video = false;
+        var confGeneral = {
+            flashplayer: "http://replay.gulli.fr/bundles/jeunesseintegrationreplay/flash/jwpl-7.swf",
+            controlbar: 'over',
+            idlehide: true,
+//            autostart: true,
+//            stretching: 'exactfit',
+            debug: 'none',
+            modes: [
+                {
+                    type: 'flash',
+                    src: "http://replay.gulli.fr/bundles/jeunesseintegrationreplay/flash/jwpl-7.swf"
+                },
+                {type: 'html5'}
+            ],
+            width: jQuery(document).width(),
+            height: jQuery(document).height(),
+            playlist: [
+                                                                                                                                                                                                {
+                    sources: [
+                        {file:"http://gulli-replay-transmux.scdn.arkena.com/68526621555000/68526621555000_Ipad.smil/playlist.m3u8"},
+                        {file:"http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4"}
+                    ],
+                    image: "http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621555000_20161007-141504.png",
+                    title: "Saison 19, Episode 13 : Voyages croisés",
+                    titleHTML: "Saison 19, Episode 13 <span>Voyages croisés</span>",
+                    playlist_title: "Pokémon - Saison 19, Episode 13 : Voyages croisés",
+                    playlist_titleHTML: "<p>Pokémon</p>Saison 19, Episode 13 <span>Voyages croisés</span>",
+                    mediaid: "VOD68526621555000"
+                },
+                                {
+                    sources: [
+                        {file:"http://gulli-replay-transmux.scdn.arkena.com/68526621609000/68526621609000_Ipad.smil/playlist.m3u8"},
+                        {file:"http://gulli-replay-mp4.scdn.arkena.com/68526621609000/68526621609000_1500.mp4"}
+                    ],
+                    image: "http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621609000_20161007-142635.png",
+                    title: "Saison 19, Episode 14 : Une opération explosive",
+                    titleHTML: "Saison 19, Episode 14 <span>Une opération explosive</span>",
+                    playlist_title: "Pokémon - Saison 19, Episode 14 : Une opération explosive",
+                    playlist_titleHTML: "<p>Pokémon</p>Saison 19, Episode 14 <span>Une opération explosive</span>",
+                    mediaid: "VOD68526621609000"
+                },
+                                            ],
+
+            events: {
+                onReady: function () {
+                    xtjw_init(jwplayer(idplayer), xtPlaylist);
+
+                    setTimeout(function () {
+                        jwplayer(idplayer).playlistItem(0);
+                    }, 100);
+                },
+                onPlaylistItem: function (index, playlist) {
+                    setTimeout(function () {
+                        if (window.top.changePlayListIndex) {
+                            window.top.changePlayListIndex(index.index);
+
+                            //rafraichissement des tags
+                            xt_med('F', xtn2, xtpage);
+                            ga('send', 'pageview');
+                        }
+                    }, 1000);
+                    playing_video = false;
+                },
+                onAdCompanions: function (event) {
+                    console.log('companions', event.companions);
+                    for (var i = 0; i < event.companions.length; i++) {
+                        var entry = event.companions[i],
+                                resource = entry.resource;
+                        if (resource.match(/\.swf/i)) {
+                            insertAdToBanner(entry);
+                        }
+                        else {
+                            insertAdToHabillage(i, entry);
+                        }
+                    }
+                    playing_video = false;
+                },
+                onAdComplete: function () {
+                    xtPlaylist[idplayer][0].richname = richnamePub;
+                    xtPlaylist[idplayer][0].mode = 'live';
+                    xtPlaylist[idplayer][0].duration = null;
+                    xtPlaylist[idplayer][0].refresh = '0';
+                    xtHitjw_v2(this, xtPlaylist, {newstate: 'idle', oldstate: 'playing'});    // stop
+
+                    // reset habillage
+                    var parentDocument = parent.document.getElementsByTagName('head'),
+                            scriptTag;
+                    if (parentDocument.length) {
+                        scriptTag = document.createElement('script');
+                        scriptTag.setAttribute('type', 'text/javascript');
+                        scriptTag.innerHTML = 'jQuery.la.promo.removeSkin();';
+                        parentDocument[0].appendChild(scriptTag);
+                    }
+
+                    // reset bannière
+                    parentDocument = parent.document.getElementById('banner_synchro');
+                    if (parentDocument) {
+                        parentDocument.innerHTML('');
+                    }
+
+                    playing_video = false;
+                },
+
+                onTime: function (time) {
+                    // si on est en train la vidéo (et non la pub)
+                    // si la video a déjà commencé depuis 1 seconde
+                    if (playing_video === false && time.position >= 1.00 && time.position < jwplayer(idplayer).getDuration() - 5) {
+                        // positionnement playlist
+                        var scrollablePl = document.getElementsByClassName("jw-playlist");
+                        if (scrollablePl.length) {
+                            scrollablePl[0].scrollTop = jwplayer(idplayer).getPlaylistIndex() * $('li.jw-option').height();
+                        }
+                        playing_video = true;
+                    }
+                }
+            },
+            hlslabels: {
+                "135": "very low",
+                "279": "low",
+                "438": "medium",
+                "862": "high"
+            },
+            cast: {
+                appid: "580B0092",
+                loadscreen: "/bundles/jeunesseintegrationreplay/images/header/logo-gulli.png",
+                endscreen: "/bundles/jeunesseintegrationreplay/images/header/logo-gulli.png",
+                logo: "/bundles/jeunesseintegrationreplay/images/header/logo-gulli.png",
+                railcolor: "#ffffff"
+            }
+        };
+
+        if (typeof a2dRandom === "undefined") {
+            var a2dRandom = Math.floor(Math.random() * 100000);
+        }
+        var confSchedule = {},
+                sex = {0: 'mixte', 1: 'filles', 2: 'garcons', 3: 'mixte'},
+                keyword_a2d = 'pokemon_s19:plus-grands:' + sex[3],
+                sTags = 's[]=' + aTags['pre_roll'] + '&s[]=' + aTags['pre_roll_2'] + '&s[]=' + aTags['pre_roll_3'];
+
+        confSchedule = jQuery.extend(true, confSchedule,
+                {
+                    preroll: {
+                        offset: "pre",
+                        tag: 'http://fr.a2dfp.net/plv?' + sTags + '&m=xml&ncb=' + a2dRandom + '&kw=' + keyword_a2d
+                    }
+                });
+
+        console.log('a2d', 'http://fr.a2dfp.net/plv?' + sTags + '&m=xml&ncb=' + a2dRandom + '&kw=' + keyword_a2d);
+
+        if (aTags['post_roll']) {
+            confSchedule = jQuery.extend(true, confSchedule,
+                    {
+                        postroll: {
+                            offset: "post",
+                            tag: 'http://fr.a2dfp.net/ad?s=' + aTags['post_roll'] + '&m=xml&ncb=' + a2dRandom + '&kw=' + keyword_a2d
+                        }
+                    });
+        }
+
+        var confA2D = {
+            primary: 'flash',
+            advertising: {
+                client: 'vast',
+                admessage: 'Votre vidéo dans XX secondes.',
+                schedule: confSchedule
+                            }
+        };
+
+        var confRelated = {};
+        var confGA = {ga: {}};
+        var confSharing = {};
+
+        jwplayer(idplayer).setup(
+                jQuery.extend(
+                        true,
+                        confGeneral,
+                        confA2D,
+                        confRelated,
+                        confGA,
+                        confSharing
+                )
+        );
+
+        // debug HLS
+        jwplayer(idplayer).on('visualQuality', function (e) {
+            console.log('quality', e);
+        });
+        return false;
+    }
+</script>
+<!-- DEBUT  GA -->
+<script type="text/javascript">
+    // <![CDATA[
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8420698-1']);
+    _gaq.push(['_setDomainName', '.gulli.fr']);
+    _gaq.push(['_trackPageview']);
+    _gaq.push(['_trackPageLoadTime']);
+    (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+    })();
+    // ]]>
+</script>
+<!-- FIN  GA --></body>
+</html>

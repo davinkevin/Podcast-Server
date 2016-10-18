@@ -1,5 +1,9 @@
 package lan.dk.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -7,6 +11,7 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import javaslang.control.Option;
 import javaslang.control.Try;
+import javaslang.jackson.datatype.JavaslangModule;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
@@ -27,7 +32,17 @@ import java.util.function.Function;
  */
 public class IOUtils {
 
-    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
+    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider(
+            new ObjectMapper()
+                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    .registerModules(
+                            new Hibernate5Module()
+                                    .enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING)
+                                    .disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION),
+                            new JavaTimeModule(),
+                            new JavaslangModule()
+                    )
+    )).build());
 
     public static Option<org.jdom2.Document> fileAsXml(String path) throws JDOMException, IOException, URISyntaxException {
         return Option.of(new SAXBuilder().build(Paths.get(IOUtils.class.getResource(path).toURI()).toFile()));
@@ -52,6 +67,9 @@ public class IOUtils {
                 .map(Path::toFile)
                 .mapTry(PARSER::parse)
                 .toOption();
+    }
+    public static DocumentContext parseJson(String json) {
+        return PARSER.parse(json);
     }
 
     public static InputStream fileAsStream(String file) {

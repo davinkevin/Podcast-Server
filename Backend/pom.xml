@@ -187,6 +187,11 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.javaslang</groupId>
+      <artifactId>javaslang-jackson</artifactId>
+      <version>2.0.4</version>
+    </dependency>
     <!-- Java API -->
     <dependency>
       <groupId>javax.validation</groupId>

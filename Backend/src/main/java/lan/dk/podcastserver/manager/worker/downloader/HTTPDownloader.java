@@ -29,7 +29,7 @@ import static java.util.Objects.nonNull;
 public class HTTPDownloader extends AbstractDownloader {
 
     final UrlService urlService;
-    final WGetFactory wGetFactory;
+    private final WGetFactory wGetFactory;
 
     DownloadInfo info = null;
 
