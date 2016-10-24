@@ -1,61 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>lan.dk.PodcastServer</groupId>
-    <artifactId>frontend</artifactId>
-    <version>2.0.0</version>
-    <packaging>jar</packaging>
+  <groupId>lan.dk.PodcastServer</groupId>
+  <artifactId>frontend</artifactId>
+  <version>2.0.0</version>
+  <packaging>jar</packaging>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>${project.build.directory}/dist</directory>
-            </resource>
-        </resources>
-        <plugins>
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>0.0.29</version>
-                <configuration>
-                    <installDirectory>target</installDirectory>
-                </configuration>
+  <build>
+    <resources>
+      <resource>
+        <directory>${project.build.directory}/dist</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>0.0.29</version>
+        <configuration>
+          <installDirectory>target</installDirectory>
+        </configuration>
 
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <nodeVersion>v6.2.0</nodeVersion>
-                            <npmVersion>2.15.6</npmVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <nodeVersion>v6.8.1</nodeVersion>
+              <npmVersion>3.10.8</npmVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <arguments>run test</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/classes/static/</outputDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <outputDirectory>${project.build.directory}/classes/static/</outputDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -2,28 +2,30 @@
 .idea
 *.iml
 *.DS_Store
+node_modules
+logs
+target
+.gradle
 
 # Front End in NG1 :
 Frontend-Ng1/www/fonts/
 Frontend-Ng1/www/jspm_packages
-Frontend-Ng1/node_modules
 Frontend-Ng1/node
 Frontend-Ng1/**/*.css
 
 
 # Front End in NG2 :
-Frontend-Ng2/typings
-Frontend-Ng2/node_modules
+Frontend-Ng2/dist
+Frontend-Ng2/coverage
 
 # Back End
 Backend/lib/
 Backend/**/application.yml
 Backend/build
-Backend/logs
 Backend/lan.dk.podcastserver.*
 Backend/etc
 
-.gradle/
-target
+
+
 /lan.dk.podcastserver.entity.Item/
-/logs/
+
