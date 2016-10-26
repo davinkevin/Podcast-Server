@@ -1,7 +1,7 @@
 {
   "project": {
     "version": "1.0.0-beta.17",
-    "name": "frontend-ng2"
+    "name": "Podcast-Server"
   },
   "apps": [
     {
@@ -17,7 +17,9 @@
       "styles": [
         "styles.scss"
       ],
-      "scripts": [],
+      "scripts": [
+        "../node_modules/hammerjs/hammer.min.js"
+      ],
       "environments": {
         "source": "environments/environment.ts",
         "dev": "environments/environment.ts",

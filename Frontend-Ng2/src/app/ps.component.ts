@@ -1,10 +1,21 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ItemService} from "./shared/item/item.service";
+import {Page, Item} from "./shared/entity";
 
 @Component({
-  selector: 'app-root',
+  selector: 'ps-root',
   templateUrl: './ps.component.html',
   styleUrls: ['./ps.component.scss']
 })
-export class AppComponent {
-  title = 'app works!';
+export class PsComponent implements OnInit {
+
+  itemsPage: Page<Item>;
+
+  constructor(private itemService: ItemService) { }
+
+  ngOnInit(): void {
+    this.itemService
+      .search()
+      .subscribe(page => this.itemsPage = page);
+  }
 }
