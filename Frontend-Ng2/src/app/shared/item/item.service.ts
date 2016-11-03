@@ -12,7 +12,7 @@ export class ItemService {
   search(searchPageRequest: SearchItemPageRequest = { page : 0, size : 12, downloaded : null}) : Observable<Page<Item>> {
     return this.http
       .post('/api/item/search', searchPageRequest)
-      .map(res => res.json())
+      .map(res => res.json());
   }
 
 }
