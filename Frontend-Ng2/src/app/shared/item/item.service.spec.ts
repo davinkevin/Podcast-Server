@@ -2,7 +2,7 @@
 
 import { TestBed, async, inject } from '@angular/core/testing';
 import { ItemService } from './item.service';
-import {Http, Response} from "@angular/http";
+import {Http} from "@angular/http";
 import {Observable} from "rxjs";
 
 describe('Service: Item', () => {
@@ -15,7 +15,6 @@ describe('Service: Item', () => {
       ItemService
     ]
   }));
-
 
   it('should be defined', inject([ItemService], (service: ItemService) => {
     expect(service).toBeTruthy();
