@@ -70,10 +70,13 @@ public class DailymotionDownloader extends M3U8Downloader {
     }
 
     private static Option<String> getPlayerConfig(String page) {
-        if (!page.contains("buildPlayer({") || !page.contains("});")) return Option.none();
+        if (!page.contains("var config = ") || !page.contains("}};")) {
+            log.error("Structure of Dailymotion page changed");
+            return Option.none();
+        }
 
-        int begin = page.indexOf("buildPlayer({");
-        int end = page.indexOf("});", begin);
+        int begin = page.indexOf("var config = ");
+        int end = page.indexOf("};", begin);
         return Option.of(page.substring(begin+"buildPlayer({".length()-1, end+1));
     }
 
