@@ -61,10 +61,8 @@ public class GulliUpdater extends AbstractUpdater {
         return Option.of(e.select("a").first())
             .map(elem -> elem.attr("href"))
             .flatMap(htmlService::get)
-            .flatMap(Option::of)
             .map(d -> d.select(".bloc_streaming").first())
             .flatMap(this::htmlToItem)
-            .flatMap(Option::of)
             .map(i -> i.setCover(getCover(e)))
             .getOrElse(Item.DEFAULT_ITEM);
     }

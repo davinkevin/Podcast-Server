@@ -79,7 +79,6 @@ public class GulliDownloader extends HTTPDownloader {
                     .map(d -> d.read("$", GULLI_ITEM_TYPE_REF))
                     .map(l -> l.get(numberInPlaylist))
                     .flatMap(i -> i.getSources().find(s -> s.file.contains("mp4")))
-                    .flatMap(Option::of)
                     .map(GulliItem.GulliSource::getFile);
         }
 
