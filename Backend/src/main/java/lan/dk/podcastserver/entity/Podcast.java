@@ -29,6 +29,7 @@ import java.util.UUID;
 public class Podcast implements Serializable {
 
     public static final Podcast DEFAULT_PODCAST = new Podcast();
+    public static final String COVER_PROXY_URL = "/api/podcasts/%s/cover.%s";
 
     @Id
     @GeneratedValue

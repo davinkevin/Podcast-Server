@@ -31,7 +31,7 @@ export default class WatchListService {
     }
 
     findAllWithItem(item) {
-        return this.$http.get(`/api/podcast/${item.podcastId}/items/${item.id}/watchlists`).then(res => res.data);
+        return this.$http.get(`/api/podcasts/${item.podcastId}/items/${item.id}/watchlists`).then(res => res.data);
     }
 
     addItemToWatchList(watchlist, item) {

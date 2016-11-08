@@ -25,23 +25,23 @@ export default class ItemService {
     }
 
     findById(podcastId, itemId) {
-        return this.$http.get(`/api/podcast/${podcastId}/items/${itemId}`).then(r => r.data);
+        return this.$http.get(`/api/podcasts/${podcastId}/items/${itemId}`).then(r => r.data);
     }
 
     getItemForPodcastWithPagination(podcast, pageParemeters) {
-        return this.$http.post(`/api/podcast/${podcast.id}/items`, pageParemeters).then(r => r.data);
+        return this.$http.post(`/api/podcasts/${podcast.id}/items`, pageParemeters).then(r => r.data);
     }
 
     delete(item) {
-        return this.$http.delete(`/api/podcast/${item.podcastId}/items/${item.id}`);
+        return this.$http.delete(`/api/podcasts/${item.podcastId}/items/${item.id}`);
     }
 
     reset(item) {
-        return this.$http.get(`/api/podcast/${item.podcastId}/items/${item.id}/reset`).then(r => r.data);
+        return this.$http.get(`/api/podcasts/${item.podcastId}/items/${item.id}/reset`).then(r => r.data);
     }
 
     download(item) {
-        return this.$http.get(`/api/podcast/${item.podcastId}/items/${item.id}/addtoqueue`).then(r => r.data);
+        return this.$http.get(`/api/podcasts/${item.podcastId}/items/${item.id}/addtoqueue`).then(r => r.data);
     }
 
     upload(podcast, file) {
@@ -54,7 +54,7 @@ export default class ItemService {
         };
 
         return this.$http
-            .post(`/api/podcast/${podcast.id}/items/upload`, formData, config)
+            .post(`/api/podcasts/${podcast.id}/items/upload`, formData, config)
             .then(r => r.data);
     }
 

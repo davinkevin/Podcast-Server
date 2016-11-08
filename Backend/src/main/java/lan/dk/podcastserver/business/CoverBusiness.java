@@ -34,8 +34,6 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class CoverBusiness {
 
-    private static final String API_PODCAST_COVER = "/api/podcast/%s/cover.%s";
-
     final CoverRepository coverRepository;
     final PodcastServerParameters podcastServerParameters;
     final UrlService urlService;
@@ -61,7 +59,7 @@ public class CoverBusiness {
         return Try.run(() -> createParentDirectory(fileLocation))
             .mapTry(v -> imageRequest(coverUrl))
             .andThenTry(saveToDisk(fileLocation))
-            .map(v -> String.format(API_PODCAST_COVER, podcast.getId().toString(), FilenameUtils.getExtension(coverUrl)))
+            .map(v -> String.format(Podcast.COVER_PROXY_URL, podcast.getId().toString(), FilenameUtils.getExtension(coverUrl)))
             .onFailure(e -> log.error("Error during downloading of the cover", e))
             .getOrElse("");
     }

@@ -33,7 +33,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/podcast/{idPodcast}/items")
+@RequestMapping("/api/podcasts/{idPodcast}/items")
 @RequiredArgsConstructor
 public class ItemController {
     

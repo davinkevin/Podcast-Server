@@ -44,8 +44,8 @@ public class Item {
 
     public  static Path rootFolder;
     public  static final Item DEFAULT_ITEM = new Item();
-    private static final String PROXY_URL = "/api/podcast/%s/items/%s/download%s";
-    private static final String COVER_PROXY_URL = "/api/podcast/%s/items/%s/cover.%s";
+    private static final String PROXY_URL = "/api/podcasts/%s/items/%s/download%s";
+    private static final String COVER_PROXY_URL = "/api/podcasts/%s/items/%s/cover.%s";
 
     @Id
     @DocumentId

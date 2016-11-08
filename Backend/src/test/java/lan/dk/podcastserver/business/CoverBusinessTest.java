@@ -114,7 +114,7 @@ public class CoverBusinessTest {
         String url = coverBusiness.download(podcast);
 
         /* Then */
-        assertThat(url).isEqualTo("/api/podcast/" + podcast.getId() + "/" + defaultCoverValue + "." + imageExtension);
+        assertThat(url).isEqualTo("/api/podcasts/" + podcast.getId() + "/" + defaultCoverValue + "." + imageExtension);
     }
 
     @Test

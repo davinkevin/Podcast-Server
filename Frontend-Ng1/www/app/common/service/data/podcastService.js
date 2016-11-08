@@ -15,50 +15,50 @@ export default class PodcastService  {
     }
 
     findById(id) {
-        return this.$http.get(`/api/podcast/${id}`).then(r => r.data);
+        return this.$http.get(`/api/podcasts/${id}`).then(r => r.data);
     }
 
     findAll() {
-        return this.$http.get(`/api/podcast`).then(r => r.data);
+        return this.$http.get(`/api/podcasts`).then(r => r.data);
     }
 
     save(podcast) {
         if (podcast.id) {
-            return this.$http.put(`/api/podcast/${podcast.id}`, podcast).then(r => r.data);
+            return this.$http.put(`/api/podcasts/${podcast.id}`, podcast).then(r => r.data);
         }
-        return this.$http.post(`/api/podcast`, podcast).then(r => r.data);
+        return this.$http.post(`/api/podcasts`, podcast).then(r => r.data);
     }
 
     patch(podcast) {
-        return this.$http.patch(`/api/podcast/${podcast.id}`, podcast).then(r => r.data);
+        return this.$http.patch(`/api/podcasts/${podcast.id}`, podcast).then(r => r.data);
     }
 
     delete(podcast) {
-        return this.$http.delete(`/api/podcast/${podcast.id}`);
+        return this.$http.delete(`/api/podcasts/${podcast.id}`);
     }
 
     findInfo(url) {
         let headers = {'Content-Type': 'text/plain'};
-        return this.$http.post(`/api/podcast/fetch`, url, { headers }).then(r => r.data);
+        return this.$http.post(`/api/podcasts/fetch`, url, { headers }).then(r => r.data);
     }
 
     statsByPubDate(id, numberOfMonth = 6) {
-        return this.$http.post(`/api/podcast/${id}/stats/byPubDate`, numberOfMonth).then(r => r.data);
+        return this.$http.post(`/api/podcasts/${id}/stats/byPubDate`, numberOfMonth).then(r => r.data);
     }
 
     statsByByDownloadDate(id, numberOfMonth = 6) {
-        return this.$http.post(`/api/podcast/${id}/stats/byDownloadDate`, numberOfMonth).then(r => r.data);
+        return this.$http.post(`/api/podcasts/${id}/stats/byDownloadDate`, numberOfMonth).then(r => r.data);
     }
 
     statsByCreationDate(id, numberOfMonth = 6) {
-        return this.$http.post(`/api/podcast/${id}/stats/byCreationDate`, numberOfMonth).then(r => r.data);
+        return this.$http.post(`/api/podcasts/${id}/stats/byCreationDate`, numberOfMonth).then(r => r.data);
     }
 
     refresh(id) {
-        return this.$http.get(`/api/podcast/${id}/update`);
+        return this.$http.get(`/api/podcasts/${id}/update`);
     }
 
     forceRefresh(id) {
-        return this.$http.get(`/api/podcast/${id}/update/force`);
+        return this.$http.get(`/api/podcasts/${id}/update/force`);
     }
 }

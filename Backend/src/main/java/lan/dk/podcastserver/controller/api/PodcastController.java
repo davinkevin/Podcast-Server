@@ -33,7 +33,7 @@ import static java.util.Objects.nonNull;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/podcast")
+@RequestMapping("/api/podcasts")
 @RequiredArgsConstructor
 public class PodcastController {
 
