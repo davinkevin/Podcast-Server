@@ -19,7 +19,7 @@ import template from './creation.html!text';
     as : 'pac',
     template : template,
 
-    path : '/podcast-creation',
+    path : '/podcasts/new',
     resolve : { types: typeService => {"ngInject"; return typeService.findAll();}}
 })
 @Constant({ name : 'defaultPodcast', value : { hasToBeDeleted : true, cover : { height: 200, width: 200 }} })

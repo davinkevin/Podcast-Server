@@ -13,7 +13,7 @@ import './podcasts.css!';
 
 @Module({
     name : 'ps.podcasts',
-    modules : [PodcastDetailsModule, PodcastCreationModule, PodcastService, AppRouteConfig, TypeService, TitleService]
+    modules : [PodcastCreationModule, PodcastDetailsModule, PodcastService, AppRouteConfig, TypeService, TitleService]
 })
 @Component({
     selector : 'podcasts',
