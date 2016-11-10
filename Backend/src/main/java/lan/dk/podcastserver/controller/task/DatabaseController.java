@@ -11,8 +11,8 @@ import java.io.IOException;
  * Created by kevin on 18/05/2016 for Podcast Server
  */
 @RestController
-@RequestMapping("/api/task")
 @RequiredArgsConstructor
+@RequestMapping("/api/task")
 public class DatabaseController {
 
     final DatabaseService databaseService;

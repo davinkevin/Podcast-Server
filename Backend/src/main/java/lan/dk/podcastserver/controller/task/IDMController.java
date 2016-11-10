@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.controller.api;
+package lan.dk.podcastserver.controller.task;
 
 import com.google.common.collect.Queues;
 import lan.dk.podcastserver.entity.Item;
@@ -18,8 +18,8 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/task/downloadManager")
 @RequiredArgsConstructor
+@RequestMapping("/api/task/downloadManager")
 public class IDMController {
 
     final ItemDownloadManager IDM;

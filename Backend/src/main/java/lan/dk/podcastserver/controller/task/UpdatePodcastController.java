@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/task/updateManager")
 @RequiredArgsConstructor
+@RequestMapping("/api/task/updateManager")
 public class UpdatePodcastController {
 
     final UpdatePodcastBusiness updatePodcastBusiness;
