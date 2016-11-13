@@ -1,12 +1,11 @@
 package lan.dk.podcastserver.utils.facade;
 
+import javaslang.collection.List;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.ArrayList;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -40,7 +39,7 @@ public class PageRequestFacadeTest {
     @Test
     public void should_generate_page_request() {
         /* Given */
-        PageRequestFacade pageRequestFacade = new PageRequestFacade().setOrders(new ArrayList<>());
+        PageRequestFacade pageRequestFacade = new PageRequestFacade().setOrders(List.empty());
 
         /* When */
         PageRequest pageRequest = pageRequestFacade.toPageRequest();

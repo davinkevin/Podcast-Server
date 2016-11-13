@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.utils.facade;
 
 import com.google.common.collect.Lists;
+import javaslang.collection.List;
 import lan.dk.podcastserver.entity.Tag;
 import org.junit.Test;
 import org.springframework.data.domain.Sort;
@@ -70,7 +71,7 @@ public class SearchItemPageRequestWrapperTest {
                 .setTerm("Search")
                 .setPage(1)
                 .setSize(12)
-                .setOrders(Lists.newArrayList(new PageRequestFacade.OrderFacade(Sort.Direction.ASC.toString(), "downloadedDate")));
+                .setOrders(List.of(new PageRequestFacade.OrderFacade(Sort.Direction.ASC.toString(), "downloadedDate")));
 
         PageRequestFacade prf2 = new SearchItemPageRequestWrapper()
                 .setDownloaded(Boolean.TRUE)
@@ -78,7 +79,7 @@ public class SearchItemPageRequestWrapperTest {
                 .setTerm("Search")
                 .setPage(1)
                 .setSize(12)
-                .setOrders(Lists.newArrayList(new PageRequestFacade.OrderFacade(Sort.Direction.ASC.toString(), "downloadedDate")));
+                .setOrders(List.of(new PageRequestFacade.OrderFacade(Sort.Direction.ASC.toString(), "downloadedDate")));
 
 
         /* When */

@@ -5,8 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class SearchItemPageRequestWrapper extends PageRequestFacade {
     private Boolean downloaded;
 
     public SearchItemPageRequestWrapper() {
-        this.orders.add(new OrderFacade(Sort.Direction.DESC.toString(), "pubDate"));
+        this.orders = this.orders.append(new OrderFacade(Sort.Direction.DESC.toString(), "pubDate"));
         this.downloaded = Boolean.TRUE;
     }
 
