@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.utils.facade;
 
+import javaslang.collection.List;
 import lan.dk.podcastserver.entity.Tag;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -7,10 +8,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.util.Objects.nonNull;
 
 /**
@@ -21,7 +18,7 @@ import static java.util.Objects.nonNull;
 @Accessors(chain = true)
 public class SearchItemPageRequestWrapper extends PageRequestFacade {
 
-    private List<Tag> tags = new ArrayList<>();
+    private List<Tag> tags = List.empty();
     private String term;
     private Boolean downloaded;
 

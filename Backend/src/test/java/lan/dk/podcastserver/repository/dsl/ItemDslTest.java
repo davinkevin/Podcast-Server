@@ -5,7 +5,9 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
+import com.querydsl.core.types.ExpressionUtils;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.QItem;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest;
@@ -22,13 +24,14 @@ import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
+import static java.util.stream.Collectors.toList;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
@@ -194,8 +197,12 @@ public class ItemDslTest {
         dbSetupTracker.skipNextLaunch();
         Tag tag = new Tag().setId(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08")).setName("French Spin");
 
+
         /* When */
-        Iterable<Item> items = itemRepository.findAll(isInTags(tag));
+        Iterable<Item> items = itemRepository.findAll(ExpressionUtils.allOf(Stream.of(new Tag[]{tag})
+                .map(QItem.item.podcast.tags::contains)
+                .collect(toList())
+        ));
 
         /* Then */
         assertThat(items)
@@ -224,7 +231,7 @@ public class ItemDslTest {
         /* Given */
         dbSetupTracker.skipNextLaunch();
         List<UUID> ids = Lists.newArrayList(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
-        List<Tag> tags = Collections.singletonList(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
@@ -240,7 +247,7 @@ public class ItemDslTest {
     public void should_result_with_search_without_ids() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<Tag> tags = Collections.singletonList(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, null));

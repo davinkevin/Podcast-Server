@@ -54,13 +54,13 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
+    public Page<Item> findByTagsAndFullTextTerm(String term, javaslang.collection.List<Tag> tags, Boolean downloaded, PageRequest page) {
         return page.getSort().getOrderFor("pertinence") == null
                 ? itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page)
                 : findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page);
     }
 
-    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
+    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, javaslang.collection.List<Tag> tags, Boolean downloaded, PageRequest page) {
         // List with the order of pertinence of search result :
         List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 

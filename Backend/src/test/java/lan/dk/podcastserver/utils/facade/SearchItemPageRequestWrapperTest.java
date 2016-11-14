@@ -1,13 +1,10 @@
 package lan.dk.podcastserver.utils.facade;
 
-import com.google.common.collect.Lists;
 import javaslang.collection.List;
 import lan.dk.podcastserver.entity.Tag;
 import org.junit.Test;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,23 +28,25 @@ public class SearchItemPageRequestWrapperTest {
         SearchItemPageRequestWrapper searchItemPageRequestWrapper = new SearchItemPageRequestWrapper();
 
         /* When */
-        Tag tag1 = new Tag().setId(UUID.randomUUID());
-        Tag tag2 = new Tag().setId(UUID.randomUUID());
+        Tag tag1 = new Tag().setId(UUID.randomUUID()).setName("Tag1");
+        Tag tag2 = new Tag().setId(UUID.randomUUID()).setName("Tag2");
         searchItemPageRequestWrapper
                 .setTerm("A Term to Find")
-                .setTags(Arrays.asList(tag1, tag2));
+                .setTags(List.of(tag1, tag2));
 
         /* Then */
         SearchItemPageRequestWrapperAssert
                 .assertThat(searchItemPageRequestWrapper)
-                .hasTerm("A Term to Find")
-                .hasOnlyTags(tag1, tag2);
+                .hasTerm("A Term to Find");
+
+        assertThat(searchItemPageRequestWrapper.getTags().toJavaList())
+                .containsOnly(tag1, tag2);
     }
 
     @Test
     public void should_be_search() {
         /* Given */
-        SearchItemPageRequestWrapper siWithTags = new SearchItemPageRequestWrapper().setTags(new ArrayList<>());
+        SearchItemPageRequestWrapper siWithTags = new SearchItemPageRequestWrapper().setTags(List.empty());
         SearchItemPageRequestWrapper siWithTerm = new SearchItemPageRequestWrapper().setTerm("Foo");
         SearchItemPageRequestWrapper siWithDownload = new SearchItemPageRequestWrapper();
         SearchItemPageRequestWrapper siWithoutDownload = new SearchItemPageRequestWrapper().setDownloaded(null);
@@ -67,7 +66,7 @@ public class SearchItemPageRequestWrapperTest {
 
         PageRequestFacade prf1 = new SearchItemPageRequestWrapper()
                 .setDownloaded(Boolean.TRUE)
-                .setTags(Lists.newArrayList(foo, bar))
+                .setTags(List.of(foo, bar))
                 .setTerm("Search")
                 .setPage(1)
                 .setSize(12)
@@ -75,7 +74,7 @@ public class SearchItemPageRequestWrapperTest {
 
         PageRequestFacade prf2 = new SearchItemPageRequestWrapper()
                 .setDownloaded(Boolean.TRUE)
-                .setTags(Lists.newArrayList(foo, bar))
+                .setTags(List.of(foo, bar))
                 .setTerm("Search")
                 .setPage(1)
                 .setSize(12)
