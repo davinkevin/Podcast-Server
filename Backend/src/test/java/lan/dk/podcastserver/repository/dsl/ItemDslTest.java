@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.repository.dsl;
 
-import com.google.common.collect.Lists;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -23,8 +22,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -179,7 +176,7 @@ public class ItemDslTest {
     public void should_be_in_id_list() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<UUID> listOfId = Arrays.asList(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
+        javaslang.collection.List<UUID> listOfId = javaslang.collection.List.of(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(isInId(listOfId));
@@ -230,7 +227,7 @@ public class ItemDslTest {
     public void should_result_with_search() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        List<UUID> ids = Lists.newArrayList(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
+        javaslang.collection.List<UUID> ids = javaslang.collection.List.of(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
         javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */

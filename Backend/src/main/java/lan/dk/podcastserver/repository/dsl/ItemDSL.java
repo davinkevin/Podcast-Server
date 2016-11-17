@@ -60,8 +60,8 @@ public class ItemDSL {
 
     }
 
-    static BooleanExpression isInId(final List<UUID> ids){
-        return Q_ITEM.id.in(ids);
+    static BooleanExpression isInId(final javaslang.collection.List<UUID> ids){
+        return Q_ITEM.id.in(ids.toJavaList());
     }
 
     private static Predicate isInTags(javaslang.collection.List<Tag> tags) {
@@ -84,7 +84,7 @@ public class ItemDSL {
         return Q_ITEM.podcast.id.eq(podcastId);
     }
 
-    public static Predicate getSearchSpecifications(List<UUID> ids, javaslang.collection.List<Tag> tags, Boolean downloaded) {
+    public static Predicate getSearchSpecifications(javaslang.collection.List<UUID> ids, javaslang.collection.List<Tag> tags, Boolean downloaded) {
         return ExpressionUtils.allOf(
                 nonNull(ids) ? isInId(ids) : null,
                 isInTags(tags),

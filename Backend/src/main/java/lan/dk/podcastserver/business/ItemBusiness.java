@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.collection.List;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -10,7 +12,6 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,11 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.time.ZonedDateTime.now;
 import static java.time.ZonedDateTime.of;
@@ -54,37 +52,34 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Page<Item> findByTagsAndFullTextTerm(String term, javaslang.collection.List<Tag> tags, Boolean downloaded, PageRequest page) {
+    public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
         return page.getSort().getOrderFor("pertinence") == null
-                ? itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page)
+                ? itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : List.ofAll(itemRepository.fullTextSearch(term)), tags, downloaded), page)
                 : findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page);
     }
 
-    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, javaslang.collection.List<Tag> tags, Boolean downloaded, PageRequest page) {
+    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
         // List with the order of pertinence of search result :
-        List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
+        List<UUID> fullTextIdsWithOrder = List.ofAll(itemRepository.fullTextSearch(term));
 
         // Reverse if order is ASC
         if ("ASC".equals(page.getSort().getOrderFor("pertinence").getDirection().toString())) {
-            Collections.reverse(fullTextIdsWithOrder);
+            fullTextIdsWithOrder = fullTextIdsWithOrder.reverse();
         }
         
         // List of all the item matching the search result :
-        List<Item> allResult = (List<Item>) itemRepository.findAll(getSearchSpecifications(fullTextIdsWithOrder, tags, downloaded));
+        List<Item> allResult = List.ofAll(itemRepository.findAll(getSearchSpecifications(fullTextIdsWithOrder, tags, downloaded)));
 
         //Re-order the result list : 
-        List<Item> orderedList = fullTextIdsWithOrder
-                .stream()
-                .map(id -> allResult.stream().filter(item -> id.equals(item.getId())).findFirst())
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        List<Item> result = fullTextIdsWithOrder
+                .map(id -> allResult.find(item -> id.equals(item.getId())))
+                .filter(Option::isDefined)
+                .map(Option::get)
                 // Keep only the needed element for the page
-                .skip(page.getOffset())
-                .limit(page.getPageSize())
-                // Collect them all !
-                .collect(Collectors.toList());
+                .drop(page.getOffset())
+                .take(page.getPageSize());
 
-        return new PageImpl<>(orderedList, page, orderedList.size());
+        return new PageImpl<>(result.toJavaList(), page, result.length());
     }
 
     public Item save(Item entity) {
