@@ -180,11 +180,17 @@ public class Item {
     public void preRemove() {
         checkAndDelete();
         watchLists.forEach(watchList -> watchList.remove(this));
-        Try.of(() -> Files.deleteIfExists(getCoverPath())).onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
     }
 
     private void checkAndDelete() {
-        if (podcast.getHasToBeDeleted() && isDownloaded()) {
+
+        if (!podcast.getHasToBeDeleted())
+            return;
+
+        Try .of(() -> Files.deleteIfExists(getCoverPath()))
+            .onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
+
+        if (isDownloaded()) {
             deleteFile();
         }
     }

@@ -9,6 +9,7 @@ import javaslang.collection.Map;
 import javaslang.collection.Queue;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
@@ -57,6 +58,7 @@ public class ItemDownloadManager {
         this.downloadExecutor = downloadExecutor;
 
         Item.rootFolder = podcastServerParameters.getRootfolder();
+        Podcast.rootFolder = podcastServerParameters.getRootfolder();
     }
 
     /* GETTER & SETTER */

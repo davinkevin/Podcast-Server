@@ -5,20 +5,25 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import javaslang.control.Try;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.util.FileSystemUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Entity
 @Builder
 @Getter @Setter
@@ -28,6 +33,7 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"signature", "items", "contains", "add", "lastUpdateToNow" })
 public class Podcast implements Serializable {
 
+    public static Path rootFolder;
     public static final Podcast DEFAULT_PODCAST = new Podcast();
     public static final String COVER_PROXY_URL = "/api/podcasts/%s/cover.%s";
 
@@ -108,6 +114,17 @@ public class Podcast implements Serializable {
                 .append(signature)
                 .append(lastUpdate)
                 .toHashCode();
+    }
+
+    @PostRemove
+    public void postRemove() {
+
+        if (!this.getHasToBeDeleted()) return;
+
+        Path folder = rootFolder.resolve(this.getTitle());
+
+        Try.of(() -> FileSystemUtils.deleteRecursively(folder.toFile()))
+            .onFailure(e -> log.error("Error during deletion of podcast of {}", this, e));
     }
 
     public Boolean contains(Item item) {
