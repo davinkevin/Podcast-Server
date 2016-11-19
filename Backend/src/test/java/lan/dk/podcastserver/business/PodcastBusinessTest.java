@@ -1,25 +1,31 @@
 package lan.dk.podcastserver.business;
 
 import com.google.common.collect.Sets;
-import lan.dk.podcastserver.entity.*;
+import lan.dk.podcastserver.entity.Cover;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -37,6 +43,13 @@ public class PodcastBusinessTest {
     @Mock CoverBusiness coverBusiness;
     @Mock MimeTypeService mimeTypeService;
     @InjectMocks PodcastBusiness podcastBusiness;
+
+    static Path workingFolder = Paths.get("/tmp", "PodcastBusinessTest");
+
+    @Before
+    public void beforeEach() {
+        FileSystemUtils.deleteRecursively(workingFolder.toFile());
+    }
 
     @Test
     public void should_find_all() {
@@ -243,7 +256,7 @@ public class PodcastBusinessTest {
     }
 
     @Test
-    public void should_patch_podcast() {
+    public void should_patch_podcast() throws IOException {
         /* Given */
         UUID id = UUID.randomUUID();
         Set<Tag> tags = new HashSet<>();
@@ -253,19 +266,23 @@ public class PodcastBusinessTest {
         Podcast retrievePodcast = new Podcast(),
                 patchPodcast = new Podcast();
 
-        retrievePodcast.setCover(Cover.builder().url("http://fake.url/image2.png").build());
-        retrievePodcast.setId(id);
+        retrievePodcast
+                .setTitle("Titi")
+                .setCover(Cover.builder().url("http://fake.url/image2.png").build())
+                .setId(id);
 
-        patchPodcast.setId(id);
-        patchPodcast.setTitle("Toto");
-        patchPodcast.setUrl("http://fake.url/podcast.rss");
-        patchPodcast.setType("RSS");
         UUID idCover = UUID.randomUUID();
-        patchPodcast.setCover(Cover.builder().id(idCover).url("http://fake.url/image.png").build());
-        patchPodcast.setDescription("Description");
-        patchPodcast.setHasToBeDeleted(true);
-        patchPodcast.setTags(tags);
+        patchPodcast.setId(id)
+            .setTitle("Toto")
+            .setUrl("http://fake.url/podcast.rss")
+            .setType("RSS")
+            .setCover(Cover.builder().id(idCover).url("http://fake.url/image.png").build())
+            .setDescription("Description")
+            .setHasToBeDeleted(true)
+            .setTags(tags);
 
+        Files.createDirectories(workingFolder.resolve(retrievePodcast.getTitle()));
+        when(podcastServerParameters.getRootfolder()).thenReturn(workingFolder);
         when(podcastRepository.findOne(eq(patchPodcast.getId()))).thenReturn(retrievePodcast);
         when(coverBusiness.hasSameCoverURL(any(Podcast.class), any(Podcast.class))).thenReturn(false);
         when(coverBusiness.findOne(any(UUID.class))).then(i -> new Cover().setId((UUID) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
@@ -285,6 +302,9 @@ public class PodcastBusinessTest {
                 .hasDescription(patchPodcast.getDescription())
                 .hasHasToBeDeleted(patchPodcast.getHasToBeDeleted())
                 .hasTags(tags.toArray(new Tag[tags.size()]));
+
+        assertThat(workingFolder.resolve(patchPodcast.getTitle())).exists();
+        assertThat(workingFolder.resolve("Titi")).doesNotExist();
 
         verify(podcastRepository, times(1)).findOne(eq(id));
         verify(coverBusiness, times(1)).hasSameCoverURL(eq(patchPodcast), eq(retrievePodcast));

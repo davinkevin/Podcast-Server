@@ -15,6 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -65,14 +68,13 @@ public class PodcastBusiness {
     public Podcast patchUpdate(Podcast patchPodcast) {
         Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
 
-        /*
         // Move folder if name has change :
-        if (StringUtils.equals(podcastToUpdate.getTitle(), patchPodcast.getTitle())) {
-                TODO : Move Folder to new Location using java.nio.FILES and java.nio.PATH
-                It must add modification on each item of the podcast (localUrl)
-
+        if (!StringUtils.equals(podcastToUpdate.getTitle(), patchPodcast.getTitle())) {
+            Try.of(() -> Files.move(
+                    podcastServerParameters.getRootfolder().resolve(podcastToUpdate.getTitle()),
+                    podcastServerParameters.getRootfolder().resolve(patchPodcast.getTitle())
+            )).getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
         }
-        */
 
         if (!coverBusiness.hasSameCoverURL(patchPodcast, podcastToUpdate)) {
             patchPodcast.getCover().setUrl(coverBusiness.download(patchPodcast));
