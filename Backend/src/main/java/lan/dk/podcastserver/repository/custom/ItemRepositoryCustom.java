@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.repository.custom;
 
-import java.util.List;
+import javaslang.collection.List;
+
 import java.util.UUID;
 
 public interface ItemRepositoryCustom {

@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.repository.impl;
 
-import com.google.common.collect.Lists;
+import javaslang.collection.List;
 import lan.dk.podcastserver.entity.Item;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;
@@ -17,8 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,7 +66,7 @@ public class ItemRepositoryImplTest {
     @SuppressWarnings("unchecked")
     public void should_search_fulltext() {
         /* Given */
-        List<UUID> results = Lists.newArrayList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        List<UUID> results = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
         SearchFactory searchFactory = mock(SearchFactory.class);
         QueryContextBuilder queryContextBuilder = mock(QueryContextBuilder.class);
         EntityContext entityContext = mock(EntityContext.class);
@@ -93,14 +91,13 @@ public class ItemRepositoryImplTest {
         when(booleanJunction.createQuery()).thenReturn(mock(Query.class));
         when(fullTextQuery.setProjection(anyString())).thenReturn(fullTextQuery);
         when(fullTextQuery.setResultTransformer(any(ResultTransformer.class))).thenReturn(fullTextQuery);
-        when(fullTextQuery.getResultList()).thenReturn(results);
+        when(fullTextQuery.getResultList()).thenReturn(results.toJavaList());
 
         /* When */
         List<UUID> list = itemRepositoryImpl.fullTextSearch("A super query");
 
         /* Then */
-        assertThat(list)
-                .containsExactlyElementsOf(results);
+        assertThat(list.toJavaList()).containsExactlyElementsOf(results);
 
         verify(termMatchingContext, times(3)).matching(or(or(eq("A"), eq("super")), eq("query")));
         verify(booleanJunction, times(3)).must(any());
@@ -140,7 +137,7 @@ public class ItemRepositoryImplTest {
         List<UUID> list = itemRepositoryImpl.fullTextSearch("A super query");
 
         /* Then */
-        assertThat(list).hasSize(0);
+        assertThat(list.toJavaList()).hasSize(0);
     }
 
     @Test
@@ -154,8 +151,8 @@ public class ItemRepositoryImplTest {
     @Test
     @SuppressWarnings("unchecked")
     public void should_not_revert_extraction() {
-        List<String> collection = Arrays.asList("Elem1", "Elem2");
-        assertThat(new ItemRepositoryImpl.HibernateIdExtractor().transformList(collection))
+        List<String> collection = List.of("Elem1", "Elem2");
+        assertThat(new ItemRepositoryImpl.HibernateIdExtractor().transformList(collection.toJavaList()))
                 .isNotEmpty()
                 .hasSize(collection.size())
                 .containsAll(collection);

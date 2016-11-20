@@ -1,7 +1,11 @@
 package lan.dk.podcastserver.business;
 
 import com.querydsl.core.types.Predicate;
-import lan.dk.podcastserver.entity.*;
+import javaslang.collection.List;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.Status;
+import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -23,12 +27,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -226,11 +231,11 @@ public class ItemBusinessTest {
     public void should_find_by_tags_and_full_text_without_specific_order() {
         /* Given */
         String term = "Foo";
-        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        List<Tag> tags = List.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
-        when(itemRepository.fullTextSearch(eq(term))).thenReturn(Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
+        when(itemRepository.fullTextSearch(eq(term))).thenReturn(List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
 
         /* When */
@@ -245,7 +250,7 @@ public class ItemBusinessTest {
     @Test
     public void should_find_by_tags() {
         /* Given */
-        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        List<Tag> tags = List.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
@@ -263,13 +268,13 @@ public class ItemBusinessTest {
     public void should_find_by_tags_and_full_text_with_pertinence_order_asc() {
         /* Given */
         String term = "Foo";
-        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        List<Tag> tags = List.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("ASC"), "pertinence");
         List<Item> itemsFrom1To20 = IntStream.range(1, 20)
                 .mapToObj(id -> new Item().setId(UUID.randomUUID()))
-                .collect(toList());
+                .collect(List.collector());
 
-        when(itemRepository.fullTextSearch(eq(term))).thenReturn(itemsFrom1To20.stream().map(Item::getId).collect(toList()));
+        when(itemRepository.fullTextSearch(eq(term))).thenReturn(itemsFrom1To20.map(Item::getId));
         when(itemRepository.findAll(any(Predicate.class))).thenReturn(itemsFrom1To20);
 
         /* When */
