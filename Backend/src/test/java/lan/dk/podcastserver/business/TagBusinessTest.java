@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.TagRepository;
 import org.junit.Test;
@@ -8,7 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.and;
@@ -34,10 +38,10 @@ public class TagBusinessTest {
         when(tagRepository.findAll()).thenReturn(list);
 
         /* When */
-        List<Tag> tags = tagBusiness.findAll();
+        javaslang.collection.List<Tag> tags = tagBusiness.findAll();
 
         /* Then */
-        assertThat(tags).isSameAs(list);
+        assertThat(tags.toJavaList()).isEqualTo(list);
         verify(tagRepository, times(1)).findAll();
     }
 
@@ -60,14 +64,14 @@ public class TagBusinessTest {
     public void should_find_by_name_like() {
          /* Given */
         String searchWord = "name";
-        ArrayList<Tag> list = new ArrayList<>();
-        when(tagRepository.findByNameContainsIgnoreCase(anyString())).thenReturn(list);
+        javaslang.collection.Set<Tag> foundTags = javaslang.collection.HashSet.empty();
+        when(tagRepository.findByNameContainsIgnoreCase(anyString())).thenReturn(foundTags);
 
         /* When */
-        List<Tag> tags = tagBusiness.findByNameLike(searchWord);
+        javaslang.collection.Set<Tag> tags = tagBusiness.findByNameLike(searchWord);
 
         /* Then */
-        assertThat(tags).isSameAs(list);
+        assertThat(tags).isSameAs(foundTags);
         verify(tagRepository, times(1)).findByNameContainsIgnoreCase(eq(searchWord));
     }
     
@@ -87,16 +91,18 @@ public class TagBusinessTest {
         tags.add(tag4);
 
 
-        when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Optional.of(tag1));
-        when(tagRepository.findByNameIgnoreCase(eq(tag2.getName()))).thenReturn(Optional.of(tag2));
-        when(tagRepository.findByNameIgnoreCase(and(not(eq(tag1.getName())), not(eq(tag1.getName()))))).thenReturn(Optional.empty());
+        when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Option.of(tag1));
+        when(tagRepository.findByNameIgnoreCase(eq(tag2.getName()))).thenReturn(Option.of(tag2));
+        when(tagRepository.findByNameIgnoreCase(and(not(eq(tag1.getName())), not(eq(tag1.getName()))))).thenReturn(Option.none());
 
         when(tagRepository.save(any(Tag.class))).then(t -> t.getArgumentAt(0, Tag.class).setId(UUID.randomUUID()));
 
         /* When */
-        Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);
+        javaslang.collection.Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);
 
         /* Then */
-        assertThat(tagListByName).extracting("name", String.class).contains(tag1.getName(), tag2.getName(), tag3.getName(), tag4.getName());
+        assertThat(tagListByName.toJavaSet())
+                .extracting("name", String.class)
+                .contains(tag1.getName(), tag2.getName(), tag3.getName(), tag4.getName());
     }
 }

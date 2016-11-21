@@ -44,7 +44,7 @@ public class PodcastBusinessTest {
     @Mock MimeTypeService mimeTypeService;
     @InjectMocks PodcastBusiness podcastBusiness;
 
-    static Path workingFolder = Paths.get("/tmp", "PodcastBusinessTest");
+    private static Path workingFolder = Paths.get("/tmp", "PodcastBusinessTest");
 
     @Before
     public void beforeEach() {
@@ -94,8 +94,8 @@ public class PodcastBusinessTest {
 
         /* Then */
         assertThat(aPodcast)
-            .hasId(podcastId)
-            .isSameAs(podcast);
+                .hasId(podcastId)
+                .isSameAs(podcast);
         verify(podcastRepository, times(1)).findOne(eq(podcastId));
     }
 
@@ -155,11 +155,12 @@ public class PodcastBusinessTest {
     @Test
     public void should_reattach_and_save() {
        /* Given */
-        Set<Tag> tags = new HashSet<>();
-        tags.add(new Tag().setName("Tag1"));
-        tags.add(new Tag().setName("Tag2"));
-        Podcast podcast = new Podcast()
-                .setTags(tags);
+        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(
+                new Tag().setName("Tag1"),
+                new Tag().setName("Tag2")
+        );
+
+        Podcast podcast = new Podcast().setTags(tags.toJavaSet());
 
         when(tagBusiness.getTagListByName(anySetOf(Tag.class))).thenReturn(tags);
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
@@ -168,19 +169,21 @@ public class PodcastBusinessTest {
         Podcast savedPodcast = podcastBusiness.reatachAndSave(podcast);
 
        /* Then */
-        assertThat(savedPodcast)
-                .hasTags(tags.toArray(new Tag[tags.size()]));
-        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
+        assertThat(savedPodcast).hasTags(tags.toJavaArray(Tag.class));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags.toJavaSet()));
         verify(podcastRepository, times(1)).save(eq(podcast));
     }
 
     @Test
     public void should_create_podcast() {
         /* Given */
-        Set<Tag> tags = new HashSet<>();
-        tags.add(new Tag().setName("Tag1"));
-        tags.add(new Tag().setName("Tag2"));
-        Podcast podcast = new Podcast().setTags(tags);
+
+        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(
+                new Tag().setName("Tag1"),
+                new Tag().setName("Tag2")
+        );
+
+        Podcast podcast = new Podcast().setTags(tags.toJavaSet());
         Cover cover = Cover.builder().url("http://fakeurl.com/image.png").build();
         podcast.setCover(cover);
 
@@ -193,11 +196,11 @@ public class PodcastBusinessTest {
 
         /* Then */
         assertThat(savedPodcast)
-                .hasTags(tags.toArray(new Tag[tags.size()]))
+                .hasTags(tags.toJavaArray(Tag.class))
                 .hasCover(cover);
 
         verify(coverBusiness, times(1)).download(eq(podcast));
-        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags.toJavaSet()));
         verify(podcastRepository, times(1)).save(eq(podcast));
     }
 
@@ -259,9 +262,10 @@ public class PodcastBusinessTest {
     public void should_patch_podcast() throws IOException {
         /* Given */
         UUID id = UUID.randomUUID();
-        Set<Tag> tags = new HashSet<>();
-        tags.add(new Tag().setName("Tag1"));
-        tags.add(new Tag().setName("Tag2"));
+        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(
+                new Tag().setName("Tag1"),
+                new Tag().setName("Tag2")
+        );
 
         Podcast retrievePodcast = new Podcast(),
                 patchPodcast = new Podcast();
@@ -273,20 +277,20 @@ public class PodcastBusinessTest {
 
         UUID idCover = UUID.randomUUID();
         patchPodcast.setId(id)
-            .setTitle("Toto")
-            .setUrl("http://fake.url/podcast.rss")
-            .setType("RSS")
-            .setCover(Cover.builder().id(idCover).url("http://fake.url/image.png").build())
-            .setDescription("Description")
-            .setHasToBeDeleted(true)
-            .setTags(tags);
+                .setTitle("Toto")
+                .setUrl("http://fake.url/podcast.rss")
+                .setType("RSS")
+                .setCover(Cover.builder().id(idCover).url("http://fake.url/image.png").build())
+                .setDescription("Description")
+                .setHasToBeDeleted(true)
+                .setTags(tags.toJavaSet());
 
         Files.createDirectories(workingFolder.resolve(retrievePodcast.getTitle()));
         when(podcastServerParameters.getRootfolder()).thenReturn(workingFolder);
         when(podcastRepository.findOne(eq(patchPodcast.getId()))).thenReturn(retrievePodcast);
         when(coverBusiness.hasSameCoverURL(any(Podcast.class), any(Podcast.class))).thenReturn(false);
         when(coverBusiness.findOne(any(UUID.class))).then(i -> new Cover().setId((UUID) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
-        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).then(i -> i.getArguments()[0]);
+        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).then(i -> javaslang.collection.HashSet.ofAll(i.getArgumentAt(0, java.util.Set.class)));
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -301,7 +305,7 @@ public class PodcastBusinessTest {
                 .hasCover(patchPodcast.getCover())
                 .hasDescription(patchPodcast.getDescription())
                 .hasHasToBeDeleted(patchPodcast.getHasToBeDeleted())
-                .hasTags(tags.toArray(new Tag[tags.size()]));
+                .hasTags(tags.toJavaArray(Tag.class));
 
         assertThat(workingFolder.resolve(patchPodcast.getTitle())).exists();
         assertThat(workingFolder.resolve("Titi")).doesNotExist();
@@ -309,7 +313,7 @@ public class PodcastBusinessTest {
         verify(podcastRepository, times(1)).findOne(eq(id));
         verify(coverBusiness, times(1)).hasSameCoverURL(eq(patchPodcast), eq(retrievePodcast));
         verify(coverBusiness, times(1)).findOne(eq(idCover));
-        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags.toJavaSet()));
         verify(podcastRepository, times(1)).save(eq(retrievePodcast));
     }
 

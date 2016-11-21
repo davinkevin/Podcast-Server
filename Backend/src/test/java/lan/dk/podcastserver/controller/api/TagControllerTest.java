@@ -1,5 +1,8 @@
 package lan.dk.podcastserver.controller.api;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.List;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Tag;
 import org.junit.Test;
@@ -8,8 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +44,7 @@ public class TagControllerTest {
     @Test
     public void should_find_all_tag() {
         /* Given */
-        List<Tag> tags = new ArrayList<>();
+        List<Tag> tags = List.empty();
         when(tagBusiness.findAll()).thenReturn(tags);
 
         /* When */
@@ -58,11 +59,11 @@ public class TagControllerTest {
     public void should_find_by_name() {
         /* Given */
         String name = "Foo";
-        List<Tag> tags = new ArrayList<>();
+        Set<Tag> tags = HashSet.empty();
         when(tagBusiness.findByNameLike(eq(name))).thenReturn(tags);
 
         /* When */
-        List<Tag> tagsFoundByName = tagController.findByNameLike(name);
+        Set<Tag> tagsFoundByName = tagController.findByNameLike(name);
 
         /* Then */
         assertThat(tagsFoundByName).isSameAs(tags);

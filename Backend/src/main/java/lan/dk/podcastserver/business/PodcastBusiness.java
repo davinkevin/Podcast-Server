@@ -87,7 +87,7 @@ public class PodcastBusiness {
                 .setType(patchPodcast.getType())
                 .setDescription(patchPodcast.getDescription())
                 .setHasToBeDeleted(patchPodcast.getHasToBeDeleted())
-                .setTags(tagBusiness.getTagListByName(patchPodcast.getTags()))
+                .setTags(tagBusiness.getTagListByName(patchPodcast.getTags()).toJavaSet())
                 .setCover(
                     coverBusiness.findOne(patchPodcast.getCover().getId())
                         .setHeight(patchPodcast.getCover().getHeight())
@@ -111,7 +111,7 @@ public class PodcastBusiness {
     }
 
     public Podcast reatachAndSave(Podcast podcast) {
-        podcast.setTags(tagBusiness.getTagListByName(podcast.getTags()));
+        podcast.setTags(tagBusiness.getTagListByName(podcast.getTags()).toJavaSet());
         return save(podcast);
     }
     

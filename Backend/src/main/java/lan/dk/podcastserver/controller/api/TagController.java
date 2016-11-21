@@ -1,11 +1,12 @@
 package lan.dk.podcastserver.controller.api;
 
+import javaslang.collection.List;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,7 +30,7 @@ public class TagController {
     }
 
     @PostMapping
-    public List<Tag> findByNameLike(@RequestParam String name) {
+    public Set<Tag> findByNameLike(@RequestParam String name) {
         return tagBusiness.findByNameLike(name);
     }
 }
