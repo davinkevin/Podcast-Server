@@ -15,7 +15,6 @@ export default class tagService {
     }
 
     search(query) {
-        return this.$http.post('/api/tag', null, { params : {name : query} });
+        return this.$http.post('/api/tags', null, { params : {name : query} });
     }
-
 }

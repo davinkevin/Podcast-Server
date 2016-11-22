@@ -13,8 +13,8 @@ import java.util.UUID;
  * Created by kevin on 07/06/2014 for Podcast Server
  */
 @RestController
-@RequestMapping("/api/tag")
 @RequiredArgsConstructor
+@RequestMapping("/api/tags")
 public class TagController {
 
     final TagBusiness tagBusiness;
