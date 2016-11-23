@@ -1,16 +1,18 @@
 package lan.dk.podcastserver.repository;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.entity.QPodcast;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Repository
-@SuppressWarnings("unchecked")
-public interface PodcastRepository  extends JpaRepository<Podcast, UUID> {
+public interface PodcastRepository  extends JpaRepository<Podcast, UUID>, QueryDslPredicateExecutor<Podcast> {
 
     @CacheEvict(value = {"podcasts", "search", "stats"}, allEntries = true)
     Podcast save(Podcast p);
@@ -18,5 +20,7 @@ public interface PodcastRepository  extends JpaRepository<Podcast, UUID> {
     @CacheEvict(value = {"podcasts", "search", "stats"}, allEntries = true)
     void delete(UUID id);
 
-    Set<Podcast> findByUrlIsNotNull();
+    default Set<Podcast> findByUrlIsNotNull() {
+        return HashSet.ofAll(findAll(QPodcast.podcast.url.isNotNull()));
+    }
 }

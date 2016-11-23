@@ -4,6 +4,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Podcast;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
-import javax.transaction.Transactional;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
@@ -34,7 +33,7 @@ public class PodcastRepositoryTest {
     @Autowired PodcastRepository podcastRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
-    public static final Operation INSERT_REFERENCE_DATA = sequenceOf(
+    private static final Operation INSERT_REFERENCE_DATA = sequenceOf(
                     insertInto("PODCAST")
                             .columns("ID", "TITLE", "URL")
                             .values(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", null)
@@ -58,7 +57,7 @@ public class PodcastRepositoryTest {
         Set<Podcast> podcasts = podcastRepository.findByUrlIsNotNull();
 
         /* Then */
-        assertThat(podcasts)
+        assertThat(podcasts.toJavaSet())
                 .hasSize(1)
                 .extracting(Podcast::getTitle)
                 .contains("Geek Inc HD");

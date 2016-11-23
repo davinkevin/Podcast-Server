@@ -1,8 +1,9 @@
 package lan.dk.podcastserver.business.update;
 
 
-import com.google.common.collect.Sets;
 import javaslang.Tuple;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
@@ -22,19 +23,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toSet;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
@@ -71,27 +69,20 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_delete_old_episode() {
         /* Given */
-        when(itemRepository.findAllToDelete(any())).thenReturn(generateItemsOfPodcast(3, new Podcast().setTitle("Title")));
+        when(itemRepository.findAllToDelete(any())).thenReturn(generateItems(3, new Podcast().setTitle("Title")).toJavaSet());
         /* When */
         updatePodcastBusiness.deleteOldEpisode();
         /* Then */
     }
 
-    private Set<Item> generateItemsOfPodcast(Integer numberOfItem, Podcast podcast) {
-        return IntStream
-                .rangeClosed(1, numberOfItem)
-                .mapToObj(i -> new Item().setPodcast(podcast).setId(UUID.randomUUID()).setFileName(i + ".mp3"))
-                .collect(toSet());
-    }
-
     @Test
     public void should_reset_item_with_incorrect_state() {
         /* Given */
-        Set<Item> items = Sets.newHashSet(
+        HashSet<Item> items = HashSet.of(
                 Item.builder().id(UUID.randomUUID()).status(Status.STARTED).build(),
                 Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build()
         );
-        when(itemRepository.findByStatus(anyVararg())).thenReturn(items);
+        when(itemRepository.findByStatus(anyVararg())).thenReturn(items.toJavaSet());
         /* When */
         updatePodcastBusiness.resetItemWithIncorrectState();
 
@@ -119,7 +110,7 @@ public class UpdatePodcastBusinessTest {
         Podcast podcast2 = new Podcast().setTitle("podcast2");
         Podcast podcast3 = new Podcast().setTitle("podcast3");
         Updater updater = mock(Updater.class);
-        Set<Podcast> podcasts = Sets.newHashSet(podcast1, podcast2, podcast3);
+        Set<Podcast> podcasts = HashSet.of(podcast1, podcast2, podcast3);
         when(podcastBusiness.findByUrlIsNotNull()).thenReturn(podcasts);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
@@ -128,13 +119,13 @@ public class UpdatePodcastBusinessTest {
         });
         when(updater.update(eq(podcast3))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
+            return Tuple.of(podcast, generateItems(10, podcast).toJavaSet(), updater.notIn(podcast));
         });
         when(updater.update(not(eq(podcast3)))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
             return Tuple.of(podcast, podcast.getItems(), updater.notIn(podcast));
         });
-        when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
+        when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 
 
         /* When */
@@ -172,9 +163,9 @@ public class UpdatePodcastBusinessTest {
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
+            return Tuple.of(podcastArgument, generateItems(10, podcastArgument).toJavaSet(), updater.notIn(podcastArgument));
         });
-        when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
+        when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 
         /* When */
         updatePodcastBusiness.updatePodcast(UUID.randomUUID());
@@ -196,10 +187,10 @@ public class UpdatePodcastBusinessTest {
             return (Predicate<Item>) item -> !podcastArgument.contains(item);
         });
         when(updater.update(any(Podcast.class))).then(i -> {
-            Podcast podcastArgument = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcastArgument, generateSetOfItem(10, podcastArgument), updater.notIn(podcastArgument));
+            Podcast p = (Podcast) i.getArguments()[0];
+            return Tuple.of(p, generateItems(10, p).toJavaSet(), updater.notIn(p));
         });
-        when(validator.validate(any(Item.class))).thenReturn(new HashSet<>());
+        when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 
 
         /* When */
@@ -235,7 +226,7 @@ public class UpdatePodcastBusinessTest {
         when(updater.update(any(Podcast.class))).then(i -> {
             TimeUnit.SECONDS.sleep(15);
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcast, generateSetOfItem(10, podcast), updater.notIn(podcast));
+            return Tuple.of(podcast, generateItems(10, podcast).toJavaSet(), updater.notIn(podcast));
         });
 
         /* When */
@@ -267,18 +258,17 @@ public class UpdatePodcastBusinessTest {
     public void should_delete_cover() {
         /* Given */
         Podcast podcast = Podcast.builder().id(UUID.randomUUID()).build();
-        Set<Item> items = Sets.newHashSet(
+        HashSet<Item> items = HashSet.of(
                 Item.builder().title("Number1").podcast(podcast).build(),
                 Item.builder().title("Number2").podcast(podcast).build(),
                 Item.builder().title("Number3").podcast(podcast).build()
         );
 
         items
-            .stream()
             .map(Item::getTitle)
             .forEach(t -> Try.run(() -> Files.createFile(Paths.get("/tmp/", t))));
 
-        when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items);
+        when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items.toJavaSet());
         when(coverBusiness.getCoverPathOf(any())).then(i -> Paths.get("/tmp/", i.getArgumentAt(0, Item.class).getTitle()));
 
         /* When */
@@ -290,11 +280,9 @@ public class UpdatePodcastBusinessTest {
         assertThat(Paths.get("/tmp/", "Number3")).doesNotExist();
     }
 
-
-    private Set<Item> generateSetOfItem(Integer numberOfItem, Podcast podcast) {
-        return IntStream
-                .rangeClosed(1, numberOfItem)
-                .mapToObj(i -> new Item().setPodcast(podcast).setId(UUID.randomUUID()).setFileName(i + ".mp3"))
-                .collect(toSet());
+    private Set<Item> generateItems(Integer number, Podcast podcast) {
+        return HashSet.rangeClosed(1, number)
+                .map(i -> Item.builder().podcast(podcast).id(UUID.randomUUID()).fileName(i + ".mp3").build());
     }
+
 }

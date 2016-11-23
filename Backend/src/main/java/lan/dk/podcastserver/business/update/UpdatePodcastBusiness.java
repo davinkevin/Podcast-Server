@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business.update;
 
 import com.google.common.collect.Sets;
 import javaslang.Tuple3;
+import javaslang.collection.HashSet;
 import javaslang.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
@@ -25,15 +26,17 @@ import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 import java.nio.file.Files;
 import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
@@ -77,8 +80,9 @@ public class UpdatePodcastBusiness  {
         updatePodcast(podcastBusiness.findByUrlIsNotNull(), updateExecutor);
         lastFullUpdate = ZonedDateTime.now();
     }
+
     @Transactional
-    public void updatePodcast(UUID id) { updatePodcast(Sets.newHashSet(podcastBusiness.findOne(id)), manualExecutor); }
+    public void updatePodcast(UUID id) { updatePodcast(HashSet.of(podcastBusiness.findOne(id)), manualExecutor); }
 
     @Transactional
     public void forceUpdatePodcast (UUID id){
@@ -93,27 +97,21 @@ public class UpdatePodcastBusiness  {
         return isUpdating.get();
     }
 
-    private void updatePodcast(Set<Podcast> podcasts, Executor selectedExecutor) {
+    private void updatePodcast(javaslang.collection.Set<Podcast> podcasts, Executor selectedExecutor) {
         changeAndCommunicateUpdate(Boolean.TRUE);
 
         log.info("Update launch");
         log.info("About to update {} podcast(s)", podcasts.size());
 
-        // @formatter:off
         podcasts
-                // Launch every update
-                .stream()
-                    .map(podcast -> supplyAsync(() -> updaterSelector.of(podcast.getUrl()).update(podcast), selectedExecutor))
-                .collect(toSet()) // Terminal operation forcing evaluation of each element upper in the stream
-                // Get result of each update
-                .stream()
-                    .map(this::wait)
-                    .filter(tuple -> tuple != Updater.NO_MODIFICATION_TUPLE)
-                    .peek(tuple -> changeAndCommunicateUpdate(Boolean.TRUE))
-                    .map(t -> attachNewItemsToPodcast(t._1(), t._2(), t._3()))
-                    .flatMap(Collection::stream)
-                .forEach(coverBusiness::download);
-        // @formatter:on
+            .map(podcast -> supplyAsync(() -> updaterSelector.of(podcast.getUrl()).update(podcast), selectedExecutor))
+            .toStream()
+            .map(this::wait)
+            .filter(tuple -> tuple != Updater.NO_MODIFICATION_TUPLE)
+            .peek(tuple -> changeAndCommunicateUpdate(Boolean.TRUE))
+            .map(t -> attachNewItemsToPodcast(t._1(), t._2(), t._3()))
+            .flatMap(identity())
+            .forEach(coverBusiness::download);
 
         log.info("Fin du traitement des {} podcasts", podcasts.size());
 
@@ -126,7 +124,7 @@ public class UpdatePodcastBusiness  {
     }
 
     private Tuple3<Podcast, Set<Item>, Predicate<Item>> wait(CompletableFuture<Tuple3<Podcast, Set<Item>, Predicate<Item>>> future) {
-        return Try.of(() -> future.get(timeValue, timeUnit))
+       return Try.of(() -> future.get(timeValue, timeUnit))
             .onFailure(e -> {
                 log.error("Error during update", e);
                 future.cancel(true);
