@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import javaslang.control.Option;
 import javaslang.control.Try;
-import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -21,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -104,10 +102,6 @@ public class PodcastBusiness {
         return Try.of(() -> jdomService.podcastToXMLGeneric(findOne(id), domainName, limit))
             .onFailure(e -> log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e))
             .getOrElse(StringUtils.EMPTY);
-    }
-
-    public Set<Item> getItems(UUID id){
-        return podcastRepository.findOne(id).getItems();
     }
 
     public Podcast reatachAndSave(Podcast podcast) {

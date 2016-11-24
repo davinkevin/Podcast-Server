@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.business;
 
 import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -21,7 +20,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,22 +134,6 @@ public class PodcastBusinessTest {
        /* Then */
         assertThat(podcasts).isSameAs(listOfPodcast);
         verify(podcastRepository, times(1)).findByUrlIsNotNull();
-    }
-
-    @Test
-    public void should_get_items() {
-       /* Given */
-        UUID idPodcast = UUID.randomUUID();
-        Podcast podcast = new Podcast();
-        podcast.setItems(new HashSet<>());
-        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
-
-       /* When */
-        Set<Item> items = podcastBusiness.getItems(idPodcast);
-
-       /* Then */
-        assertThat(items).isSameAs(podcast.getItems());
-        verify(podcastRepository, times(1)).findOne(eq(idPodcast));
     }
 
     @Test
