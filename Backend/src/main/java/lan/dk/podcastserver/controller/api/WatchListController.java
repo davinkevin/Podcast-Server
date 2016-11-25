@@ -1,13 +1,13 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.WatchList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
@@ -31,7 +31,7 @@ public class WatchListController {
 
     @JsonView(Object.class)
     @GetMapping
-    public List<WatchList> findAll() {
+    public Set<WatchList> findAll() {
         return watchListBusiness.findAll();
     }
 

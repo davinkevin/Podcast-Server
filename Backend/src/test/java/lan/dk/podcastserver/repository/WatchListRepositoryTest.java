@@ -1,10 +1,11 @@
 package lan.dk.podcastserver.repository;
 
-import com.google.common.collect.Sets;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import org.junit.Before;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
@@ -150,7 +150,7 @@ public class WatchListRepositoryTest {
         /* Given */
         dbSetupTracker.skipNextLaunch();
         /* When */
-        Set<Item> allToDelete = Sets.newHashSet(itemRepository.findAllToDelete(now()));
+        Set<Item> allToDelete = HashSet.ofAll(itemRepository.findAllToDelete(now()));
         /* Then */
         assertThat(allToDelete).isEmpty();
     }

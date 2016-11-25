@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
@@ -9,8 +11,6 @@ import lan.dk.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -29,13 +29,14 @@ public class WatchListBusiness {
                 .getOrElseThrow(() -> new RuntimeException("Watchlist not found"));
     }
 
-    public List<WatchList> findAll() {
-        return watchListRepository.findAll();
+    public Set<WatchList> findAll() {
+        return HashSet.ofAll(watchListRepository.findAll());
     }
 
     public Set<WatchList> findContainsItem(UUID itemId) {
-        Item item = itemRepository.findOne(itemId);
-        return watchListRepository.findContainsItem(item);
+        return Option.of(itemRepository.findOne(itemId))
+                .map(watchListRepository::findContainsItem)
+                .getOrElse(HashSet.empty());
     }
 
     public WatchList add(UUID watchListId, UUID itemId) {

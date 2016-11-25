@@ -1,7 +1,8 @@
 package lan.dk.podcastserver.business;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -14,8 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
@@ -36,14 +37,14 @@ public class WatchListBusinessTest {
     @Test
     public void should_find_all() {
         /* Given */
-        List<WatchList> watchLists = Lists.newArrayList();
+        List<WatchList> watchLists = new ArrayList<>();
         when(watchListRepository.findAll()).thenReturn(watchLists);
 
         /* When */
-        List<WatchList> all = watchListBusiness.findAll();
+        Set<WatchList> all = watchListBusiness.findAll();
 
         /* Then */
-        assertThat(all).isSameAs(watchLists);
+        assertThat(all).isEmpty();
         verify(watchListRepository, only()).findAll();
     }
 
@@ -54,7 +55,7 @@ public class WatchListBusinessTest {
         Item item = new Item().setId(id);
         WatchList p1 = WatchList.builder().id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")).name("First").build();
         WatchList p2 = WatchList.builder().id(UUID.fromString("86faa982-f462-400a-bc9b-91eb299910b6")).name("Second").build();
-        Set<WatchList> watchLists = Sets.newHashSet(p1, p2);
+        Set<WatchList> watchLists = HashSet.of(p1, p2);
 
         when(itemRepository.findOne(eq(id))).thenReturn(item);
         when(watchListRepository.findContainsItem(eq(item))).thenReturn(watchLists);
