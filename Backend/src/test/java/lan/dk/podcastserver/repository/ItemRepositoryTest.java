@@ -4,6 +4,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
@@ -21,7 +22,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.time.ZonedDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
@@ -103,25 +103,29 @@ public class ItemRepositoryTest {
     @Test
     public void should_find_all_to_download() {
         dbSetupTracker.skipNextLaunch();
-        /* Given */ ZonedDateTime date = now().minusDays(15);
-        /* When */  Iterable<Item> itemToDownload = itemRepository.findAllToDownload(date);
+        /* Given */
+        ZonedDateTime date = now().minusDays(15);
+
+        /* When */
+        Set<Item> itemToDownload = itemRepository.findAllToDownload(date);
+
         /* Then */
-        assertThat(itemToDownload)
-                .hasSize(1);
-        assertThat(itemToDownload.iterator().next())
-                .hasTitle("Appload 3");
+        assertThat(itemToDownload).hasSize(1);
+        assertThat(itemToDownload.get()).hasTitle("Appload 3");
     }
     
     @Test
     public void should_find_all_to_delete() {
         dbSetupTracker.skipNextLaunch();
-        /* Given */ ZonedDateTime today = now();
-        /* When */ Iterable<Item> itemToDelete = itemRepository.findAllToDelete(today);
+        /* Given */
+        ZonedDateTime today = now();
+
+        /* When */
+        Set<Item> itemToDelete = itemRepository.findAllToDelete(today);
+
         /* Then */
-        assertThat(itemToDelete)
-                .hasSize(1);
-        assertThat(itemToDelete.iterator().next())
-                .hasTitle("Geek INC 124");
+        assertThat(itemToDelete).hasSize(1);
+        assertThat(itemToDelete.get()).hasTitle("Geek INC 124");
     }
 
     @Test
@@ -130,7 +134,7 @@ public class ItemRepositoryTest {
         dbSetupTracker.skipNextLaunch();
 
         /* When */
-        Iterable<Item> itemByStatus = itemRepository.findByStatus(Status.FINISH, Status.DELETED);
+        Set<Item> itemByStatus = itemRepository.findByStatus(Status.FINISH, Status.DELETED);
 
         /* Then */
         assertThat(itemByStatus)

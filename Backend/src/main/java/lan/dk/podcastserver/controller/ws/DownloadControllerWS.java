@@ -24,7 +24,7 @@ public class DownloadControllerWS {
     }
     
     @SubscribeMapping("/download")
-    public Collection<Item> downloadList() {
+    public Iterable<Item> downloadList() {
         return IDM.getItemsInDownloadingQueue();
     }
     

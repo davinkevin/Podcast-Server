@@ -33,7 +33,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import java.util.stream.StreamSupport;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.function.Function.identity;
@@ -165,7 +164,7 @@ public class UpdatePodcastBusiness  {
 
         itemRepository
                 .findAllToDelete(podcastServerParameters.limitDownloadDate())
-                .stream()
+                .toStream()
                 .peek(item -> log.info("Deletion of file associated with item {} : {}", item.getId(), item.getLocalPath().toAbsolutePath()))
                 .map(Item::deleteDownloadedFile)
                 .forEach(itemRepository::save);
@@ -180,7 +179,6 @@ public class UpdatePodcastBusiness  {
         log.info("Deletion of old covers item");
         itemRepository
                 .findAllToDelete(podcastServerParameters.limitToKeepCoverOnDisk())
-                .stream()
                 .map(coverBusiness::getCoverPathOf)
                 .forEach(p -> Try.of(() -> Files.deleteIfExists(p)));
     }
@@ -193,9 +191,8 @@ public class UpdatePodcastBusiness  {
     public void resetItemWithIncorrectState() {
         log.info("Reset des Started et Paused");
 
-        StreamSupport
-                .stream(itemRepository.findByStatus(Status.STARTED, Status.PAUSED).spliterator(), false)
-                .map(item -> item.setStatus(Status.NOT_DOWNLOADED))
+        itemRepository.findByStatus(Status.STARTED, Status.PAUSED)
+                .map(i -> i.setStatus(Status.NOT_DOWNLOADED))
                 .forEach(itemRepository::save);
     }
 }

@@ -3,10 +3,10 @@ package lan.dk.podcastserver.manager;
 import com.google.common.collect.Queues;
 import javaslang.Tuple2;
 import javaslang.collection.HashMap;
-import javaslang.collection.HashSet;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.Queue;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -101,9 +100,9 @@ public class ItemDownloadManager {
     }
 
     private void initDownload() {
-        waitingQueue = waitingQueue.enqueueAll(
-                HashSet.ofAll(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate()))
-                    .filter(item -> !waitingQueue.contains(item))
+        waitingQueue = waitingQueue
+                .enqueueAll(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate())
+                .filter(item -> !waitingQueue.contains(item))
         );
     }
 
@@ -253,7 +252,7 @@ public class ItemDownloadManager {
     }
 
     public Set<Item> getItemsInDownloadingQueue() {
-        return downloadingQueue.keySet().toJavaSet();
+        return downloadingQueue.keySet();
     }
 
     public void moveItemInQueue(UUID itemId, Integer position) {

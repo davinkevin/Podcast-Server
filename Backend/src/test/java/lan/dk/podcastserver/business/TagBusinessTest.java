@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.TagRepository;
@@ -10,8 +12,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,11 +64,11 @@ public class TagBusinessTest {
     public void should_find_by_name_like() {
          /* Given */
         String searchWord = "name";
-        javaslang.collection.Set<Tag> foundTags = javaslang.collection.HashSet.empty();
+        Set<Tag> foundTags = HashSet.empty();
         when(tagRepository.findByNameContainsIgnoreCase(anyString())).thenReturn(foundTags);
 
         /* When */
-        javaslang.collection.Set<Tag> tags = tagBusiness.findByNameLike(searchWord);
+        Set<Tag> tags = tagBusiness.findByNameLike(searchWord);
 
         /* Then */
         assertThat(tags).isSameAs(foundTags);
@@ -78,18 +78,13 @@ public class TagBusinessTest {
     @Test
     public void should_get_tag_by_name_in_set() {
         /* Given */
-        Set<Tag> tags = new HashSet<>();
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
         Tag tag1 = new Tag().setId(id1).setName("tag" + id1);
         Tag tag2 = new Tag().setId(id2).setName("tag" + id2);
         Tag tag3 = new Tag().setName("Foo");
         Tag tag4 = new Tag().setName("Bar");
-        tags.add(tag1);
-        tags.add(tag2);
-        tags.add(tag3);
-        tags.add(tag4);
-
+        javaslang.collection.HashSet<Tag> tags = HashSet.of(tag1, tag2, tag3, tag4);
 
         when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Option.of(tag1));
         when(tagRepository.findByNameIgnoreCase(eq(tag2.getName()))).thenReturn(Option.of(tag2));
@@ -98,7 +93,7 @@ public class TagBusinessTest {
         when(tagRepository.save(any(Tag.class))).then(t -> t.getArgumentAt(0, Tag.class).setId(UUID.randomUUID()));
 
         /* When */
-        javaslang.collection.Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);
+        Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);
 
         /* Then */
         assertThat(tagListByName.toJavaSet())

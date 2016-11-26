@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.task;
 
 import com.google.common.collect.Queues;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.form.MovingItemInQueueForm;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Queue;
-import java.util.Set;
 import java.util.UUID;
 
 /**

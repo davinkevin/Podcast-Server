@@ -1,8 +1,9 @@
 package lan.dk.podcastserver.manager;
 
-import com.google.common.collect.Sets;
 import javaslang.Tuple;
 import javaslang.Tuple2;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
@@ -25,7 +26,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.Queue;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -112,7 +112,7 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_init_download_with_empty_list() throws URISyntaxException {
         /* Given */
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet());
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.empty());
         /* When */
         itemDownloadManager.launchDownload();
         /* Then */
@@ -129,7 +129,7 @@ public class ItemDownloadManagerTest {
         Item item2 = Item.builder().id(UUID.randomUUID()).url("2").status(Status.NOT_DOWNLOADED).build();
         Item item3 = Item.builder().id(UUID.randomUUID()).url("3").status(Status.NOT_DOWNLOADED).build();
         Item item4 = Item.builder().id(UUID.randomUUID()).url("4").status(Status.NOT_DOWNLOADED).build();
-        Set<Item> items = Sets.newHashSet(item1, item2, item3, item4);
+        Set<Item> items = HashSet.of(item1, item2, item3, item4);
         when(itemRepository.findAllToDownload(any())).thenReturn(items);
         Downloader downloader = mock(Downloader.class);
         when(downloaderSelector.of(anyString())).thenReturn(downloader);
@@ -154,7 +154,7 @@ public class ItemDownloadManagerTest {
         final Downloader mockDownloader = mock(Downloader.class);
         final Item item = Item.builder().id(UUID.randomUUID()).status(Status.NOT_DOWNLOADED).build();
         itemDownloadManager.getDownloadingQueue().put(item, mockDownloader);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(item));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(item));
 
         /* When */
         itemDownloadManager.launchDownload();
@@ -172,7 +172,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> mockDownloader2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> mockDownloader3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(mockDownloader1._1(), mockDownloader2._1(), mockDownloader3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(mockDownloader1._1(), mockDownloader2._1(), mockDownloader3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -202,7 +202,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -222,7 +222,7 @@ public class ItemDownloadManagerTest {
         entry1._1().setStatus(Status.PAUSED);
         entry2._1().setStatus(Status.PAUSED);
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -306,7 +306,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -333,7 +333,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */ itemDownloadManager.pauseDownload(entry2._1().getId());
@@ -352,7 +352,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -372,7 +372,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
         entry2._1().setStatus(Status.STARTED);
 
@@ -394,7 +394,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
         entry2._1().setStatus(Status.PAUSED);
 
@@ -460,7 +460,7 @@ public class ItemDownloadManagerTest {
         when(podcastServerParameters.getNumberOfTry()).thenReturn(3);
         Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -481,8 +481,8 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(1);
         when(itemRepository.findAllToDownload(any()))
-                .thenReturn(Sets.newHashSet(entry1._1()))
-                .thenReturn(Sets.newHashSet(entry2._1(), entry3._1()));
+                .thenReturn(HashSet.of(entry1._1()))
+                .thenReturn(HashSet.of(entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
         itemDownloadManager.launchDownload();
 
@@ -503,7 +503,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
                 
         /* When */
@@ -523,7 +523,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -541,7 +541,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -595,7 +595,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(1);
-        when(itemRepository.findAllToDownload(any())).thenReturn(Sets.newHashSet(entry1._1(), entry2._1(), entry3._1()));
+        when(itemRepository.findAllToDownload(any())).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
 
         /* When */

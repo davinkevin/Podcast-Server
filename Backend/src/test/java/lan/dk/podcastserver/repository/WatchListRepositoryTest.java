@@ -4,7 +4,6 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
-import javaslang.collection.HashSet;
 import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
@@ -150,7 +149,7 @@ public class WatchListRepositoryTest {
         /* Given */
         dbSetupTracker.skipNextLaunch();
         /* When */
-        Set<Item> allToDelete = HashSet.ofAll(itemRepository.findAllToDelete(now()));
+        Set<Item> allToDelete = itemRepository.findAllToDelete(now());
         /* Then */
         assertThat(allToDelete).isEmpty();
     }

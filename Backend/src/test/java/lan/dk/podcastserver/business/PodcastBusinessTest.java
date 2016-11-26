@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Tag;
@@ -125,11 +127,11 @@ public class PodcastBusinessTest {
     @Test
     public void should_find_with_url_not_null() {
        /* Given */
-        javaslang.collection.Set<Podcast> listOfPodcast = javaslang.collection.HashSet.empty();
+        Set<Podcast> listOfPodcast = HashSet.empty();
         when(podcastRepository.findByUrlIsNotNull()).thenReturn(listOfPodcast);
 
        /* When */
-        javaslang.collection.Set<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
+        Set<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
 
        /* Then */
         assertThat(podcasts).isSameAs(listOfPodcast);
@@ -139,14 +141,14 @@ public class PodcastBusinessTest {
     @Test
     public void should_reattach_and_save() {
        /* Given */
-        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(
+        Set<Tag> tags = HashSet.of(
                 new Tag().setName("Tag1"),
                 new Tag().setName("Tag2")
         );
 
         Podcast podcast = new Podcast().setTags(tags.toJavaSet());
 
-        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).thenReturn(tags);
+        when(tagBusiness.getTagListByName(any())).thenReturn(tags);
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
 
        /* When */
@@ -154,7 +156,7 @@ public class PodcastBusinessTest {
 
        /* Then */
         assertThat(savedPodcast).hasTags(tags.toJavaArray(Tag.class));
-        verify(tagBusiness, times(1)).getTagListByName(eq(tags.toJavaSet()));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(podcast));
     }
 
@@ -162,7 +164,7 @@ public class PodcastBusinessTest {
     public void should_create_podcast() {
         /* Given */
 
-        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(
+        Set<Tag> tags = HashSet.of(
                 new Tag().setName("Tag1"),
                 new Tag().setName("Tag2")
         );
@@ -172,7 +174,7 @@ public class PodcastBusinessTest {
         podcast.setCover(cover);
 
         when(coverBusiness.download(any(Podcast.class))).then(i -> ((Podcast) i.getArguments()[0]).getCover().getUrl());
-        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).thenReturn(tags);
+        when(tagBusiness.getTagListByName(any())).thenReturn(tags);
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -184,7 +186,7 @@ public class PodcastBusinessTest {
                 .hasCover(cover);
 
         verify(coverBusiness, times(1)).download(eq(podcast));
-        verify(tagBusiness, times(1)).getTagListByName(eq(tags.toJavaSet()));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(podcast));
     }
 
@@ -246,7 +248,7 @@ public class PodcastBusinessTest {
     public void should_patch_podcast() throws IOException {
         /* Given */
         UUID id = UUID.randomUUID();
-        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(
+        Set<Tag> tags = HashSet.of(
                 new Tag().setName("Tag1"),
                 new Tag().setName("Tag2")
         );
@@ -274,7 +276,7 @@ public class PodcastBusinessTest {
         when(podcastRepository.findOne(eq(patchPodcast.getId()))).thenReturn(retrievePodcast);
         when(coverBusiness.hasSameCoverURL(any(Podcast.class), any(Podcast.class))).thenReturn(false);
         when(coverBusiness.findOne(any(UUID.class))).then(i -> new Cover().setId((UUID) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
-        when(tagBusiness.getTagListByName(anySetOf(Tag.class))).then(i -> javaslang.collection.HashSet.ofAll(i.getArgumentAt(0, java.util.Set.class)));
+        when(tagBusiness.getTagListByName(any())).then(i -> HashSet.ofAll(i.getArgumentAt(0, java.util.Set.class)));
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -297,7 +299,7 @@ public class PodcastBusinessTest {
         verify(podcastRepository, times(1)).findOne(eq(id));
         verify(coverBusiness, times(1)).hasSameCoverURL(eq(patchPodcast), eq(retrievePodcast));
         verify(coverBusiness, times(1)).findOne(eq(idCover));
-        verify(tagBusiness, times(1)).getTagListByName(eq(tags.toJavaSet()));
+        verify(tagBusiness, times(1)).getTagListByName(eq(tags));
         verify(podcastRepository, times(1)).save(eq(retrievePodcast));
     }
 

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.task;
 
-import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Queue;
-import java.util.Set;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
@@ -50,7 +50,7 @@ public class IDMControllerTest {
     @Test
     public void should_get_downloading_list() {
         /* Given */
-        Set<Item> items = Sets.newHashSet(
+        Set<Item> items = HashSet.of(
                 Item.builder().id(UUID.randomUUID()).title("Foo").podcast(PODCAST).build(),
                 Item.builder().id(UUID.randomUUID()).title("Bar").podcast(PODCAST).build()
         );
@@ -60,10 +60,7 @@ public class IDMControllerTest {
         Set<Item> downloadingList = idmController.getDownloadingList();
 
         /* Then */
-        assertThat(downloadingList)
-                .hasSize(2)
-                .containsAll(items);
-
+        assertThat(downloadingList).hasSize(2).containsAll(items);
         verify(IDM, only()).getItemsInDownloadingQueue();
     }
 

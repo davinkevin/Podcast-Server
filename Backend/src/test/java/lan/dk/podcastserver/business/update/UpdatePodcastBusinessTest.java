@@ -69,7 +69,7 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_delete_old_episode() {
         /* Given */
-        when(itemRepository.findAllToDelete(any())).thenReturn(generateItems(3, new Podcast().setTitle("Title")).toJavaSet());
+        when(itemRepository.findAllToDelete(any())).thenReturn(generateItems(3, new Podcast().setTitle("Title")));
         /* When */
         updatePodcastBusiness.deleteOldEpisode();
         /* Then */
@@ -78,11 +78,12 @@ public class UpdatePodcastBusinessTest {
     @Test
     public void should_reset_item_with_incorrect_state() {
         /* Given */
-        HashSet<Item> items = HashSet.of(
+        Set<Item> items = HashSet.of(
                 Item.builder().id(UUID.randomUUID()).status(Status.STARTED).build(),
                 Item.builder().id(UUID.randomUUID()).status(Status.PAUSED).build()
         );
-        when(itemRepository.findByStatus(anyVararg())).thenReturn(items.toJavaSet());
+        when(itemRepository.findByStatus(anyVararg())).thenReturn(items);
+
         /* When */
         updatePodcastBusiness.resetItemWithIncorrectState();
 
@@ -145,7 +146,7 @@ public class UpdatePodcastBusinessTest {
     }
 
     @Test
-    public void should_add_no_new_item_in_podcast_becase_every_item_already_exists() {
+    public void should_add_no_new_item_in_podcast_because_every_item_already_exists() {
         /* Given */
         Item item1 = new Item();
         Item item2 = new Item();
@@ -268,7 +269,7 @@ public class UpdatePodcastBusinessTest {
             .map(Item::getTitle)
             .forEach(t -> Try.run(() -> Files.createFile(Paths.get("/tmp/", t))));
 
-        when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items.toJavaSet());
+        when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items);
         when(coverBusiness.getCoverPathOf(any())).then(i -> Paths.get("/tmp/", i.getArgumentAt(0, Item.class).getTitle()));
 
         /* When */

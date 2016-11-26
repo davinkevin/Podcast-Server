@@ -63,7 +63,7 @@ public class StatsBusiness {
         Set<NumberOfItemByDateWrapper> values =
                 itemRepository
                         .findByTypeAndExpression(type, selector.filter.apply(dateInPast))
-                        .stream()
+                        .toJavaStream()
                         .map(selector.getDownloadDate)
                         .filter(Objects::nonNull)
                         .map(ZonedDateTime::toLocalDate)

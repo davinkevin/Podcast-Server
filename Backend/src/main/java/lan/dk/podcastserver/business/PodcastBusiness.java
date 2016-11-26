@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import javaslang.collection.HashSet;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Podcast;
@@ -85,7 +86,7 @@ public class PodcastBusiness {
                 .setType(patchPodcast.getType())
                 .setDescription(patchPodcast.getDescription())
                 .setHasToBeDeleted(patchPodcast.getHasToBeDeleted())
-                .setTags(tagBusiness.getTagListByName(patchPodcast.getTags()).toJavaSet())
+                .setTags(tagBusiness.getTagListByName(HashSet.ofAll(patchPodcast.getTags())).toJavaSet())
                 .setCover(
                     coverBusiness.findOne(patchPodcast.getCover().getId())
                         .setHeight(patchPodcast.getCover().getHeight())
@@ -105,7 +106,7 @@ public class PodcastBusiness {
     }
 
     public Podcast reatachAndSave(Podcast podcast) {
-        podcast.setTags(tagBusiness.getTagListByName(podcast.getTags()).toJavaSet());
+        podcast.setTags(tagBusiness.getTagListByName(HashSet.ofAll(podcast.getTags())).toJavaSet());
         return save(podcast);
     }
     

@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.business;
 
-import javaslang.collection.HashSet;
 import javaslang.collection.List;
 import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Tag;
@@ -33,11 +32,8 @@ public class TagBusiness {
         return tagRepository.findByNameContainsIgnoreCase(name);
     }
 
-    Set<Tag> getTagListByName(java.util.Set<Tag> tagList) {
-        return tagList
-                .stream()
-                .map(t -> findByName(t.getName()))
-                .collect(HashSet.collector());
+    Set<Tag> getTagListByName(Set<Tag> tagList) {
+        return tagList.map(t -> findByName(t.getName()));
     }
 
     private Tag findByName(String name) {
