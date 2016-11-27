@@ -29,7 +29,7 @@
         <div class="row button-list">
             <div class="col-lg-4 col-sm-4 col-xs-4 col-md-4 text-center" ng-click="pc.loadWatchList()"><span class="fa fa-align-justify"></span> WatchList</div>
         </div>
-        <div class="watch-lists clearfix" ng-if="pc.watchLists" ng-repeat="watchList in pc.watchLists track by watchList.id">
+        <div class="watch-lists clearfix" ng-if="pc.watchLists" ng-repeat="watchList in pc.watchLists | orderBy:'name' track by watchList.id">
             <button ng-click="pc.removeWatchList(watchList)" type="button" class="pull-right close"><i class="ionicons ion-close"></i></button>
 
             <a ng-href="{{ ::'/api/watchlists/' + watchList.id + '/rss' }}" target="_blank" class="pull-left rss"><span class="ionicons ion-social-rss"></span></a>

@@ -7,7 +7,7 @@
 
         <!-- Add an item to playlist -->
         <li class="list-group-item"
-           ng-repeat="watchlist in ::wlc.watchLists"
+           ng-repeat="watchlist in ::wlc.watchLists | orderBy:'name ' track by watchlist.id"
            ng-class="{'disabled' : wlc.isInPlaylist(watchlist)}"
            ng-click="wlc.isInPlaylist(watchlist) ? wlc.remove(watchlist) : wlc.select(watchlist)" > {{ ::watchlist.name }}
             <span ng-if="!wlc.isInPlaylist(watchlist)"  class="fa fa-plus pull-right" aria-hidden="true"></span>
