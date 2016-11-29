@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import javaslang.collection.HashSet;
 import javaslang.collection.List;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -18,11 +19,8 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static javaslang.collection.HashSet.collector;
 
 /**
  * Created by kevin on 05/10/2016 for Podcast Server
@@ -43,18 +41,17 @@ public class GulliUpdater extends AbstractUpdater {
     }
 
     @Override
-    public Set<Item> getItems(Podcast podcast) {
+    public java.util.Set<Item> getItems(Podcast podcast) {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("div.all-videos ul li.col-md-3"))
-                .map(this::asSet)
-                .map(HashSet::toJavaSet)
-                .getOrElse(java.util.HashSet::new);
+                .map(this::asItemsSet)
+                .getOrElse(HashSet::empty)
+                .toJavaSet();
     }
 
-    private HashSet<Item> asSet(Elements elements) {
-        return elements.stream()
-                .map(this::findDetailsInFromPage)
-                .collect(collector());
+    private Set<Item> asItemsSet(Elements elements) {
+        return HashSet.ofAll(elements)
+                .map(this::findDetailsInFromPage);
     }
 
     private Item findDetailsInFromPage(Element e) {

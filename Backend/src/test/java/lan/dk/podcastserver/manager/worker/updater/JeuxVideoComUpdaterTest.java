@@ -44,7 +44,8 @@ public class JeuxVideoComUpdaterTest {
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
     @InjectMocks JeuxVideoComUpdater jeuxVideoComUpdater;
-    public static final Podcast CHRONIQUE_VIDEO = Podcast.builder()
+
+    private static final Podcast CHRONIQUE_VIDEO = Podcast.builder()
             .title("Chronique Video HD")
             .url("http://www.jeuxvideo.com/chroniques-video.htm")
             .build();

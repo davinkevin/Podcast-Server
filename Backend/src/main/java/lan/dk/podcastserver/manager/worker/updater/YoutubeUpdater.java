@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -27,14 +28,11 @@ import org.springframework.stereotype.Component;
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 import static lan.dk.podcastserver.entity.Cover.DEFAULT_COVER;
 
 @Slf4j
@@ -64,10 +62,11 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
 
-    public Set<Item> getItems(Podcast podcast) {
-        return Strings.isNullOrEmpty(api.getYoutube())
+    public java.util.Set<Item> getItems(Podcast podcast) {
+        return (Strings.isNullOrEmpty(api.getYoutube())
                 ? getItemsByRss(podcast)
-                : getItemsByAPI(podcast);
+                : getItemsByAPI(podcast)
+        ).toJavaSet();
     }
 
     private Set<Item> getItemsByAPI(Podcast podcast) {
@@ -76,10 +75,11 @@ public class YoutubeUpdater extends AbstractUpdater {
         String playlistId = isPlaylist(podcast.getUrl()) ? playlistIdOf(podcast.getUrl()) : transformChannelIdToPlaylistId(channelIdOf(podcast.getUrl()));
 
         String nextPageToken = null;
-        Set<Item> items = Sets.newHashSet(), pageItems = Sets.newHashSet();
+        Set<Item> items = HashSet.empty();
+        Set<Item> pageItems = HashSet.empty();
         Integer page = 0;
         do {
-            items.addAll(pageItems);
+            items = items.addAll(pageItems);
 
             Option<YoutubeResponse> jsonResponse = jsonService
                     .parseUrl(asApiPlaylistUrl(playlistId, nextPageToken))
@@ -87,7 +87,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
             pageItems = jsonResponse.map(YoutubeResponse::getItems)
                     .map(this::convertToItems)
-                    .getOrElse(Sets::newHashSet);
+                    .getOrElse(HashSet::empty);
 
             nextPageToken = jsonResponse.map(YoutubeResponse::getNextPageToken).getOrElse(StringUtils.EMPTY);
 
@@ -95,7 +95,9 @@ public class YoutubeUpdater extends AbstractUpdater {
         // Can't Access the podcast item here due thread-safe JPA / Hibernate problem
         // So, I choose to limit to 500 item / 10 Page of Youtube
 
-        if (StringUtils.isEmpty(nextPageToken)) items.addAll(pageItems);
+        if (StringUtils.isEmpty(nextPageToken)) {
+            items = items.addAll(pageItems);;
+        }
 
         return items;
     }
@@ -106,11 +108,8 @@ public class YoutubeUpdater extends AbstractUpdater {
         return isNull(pageToken) ? url : url.concat("&pageToken=" + pageToken);
     }
 
-    private Set<Item> convertToItems(List<YoutubeResponse.YoutubeItem> items) {
-        return items
-                .stream()
-                .map(this::convertToItem)
-                .collect(toSet());
+    private Set<Item> convertToItems(Set<YoutubeResponse.YoutubeItem> items) {
+        return items.map(this::convertToItem);
     }
 
     private String transformChannelIdToPlaylistId(String channelId) {
@@ -137,15 +136,13 @@ public class YoutubeUpdater extends AbstractUpdater {
 
         return element
             .map(d -> d.getChildren("entry", d.getNamespace()))
+            .map(HashSet::ofAll)
             .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).getOrElse(Namespace.NO_NAMESPACE)))
-            .getOrElse(Sets.newHashSet());
+            .getOrElse(HashSet::empty);
     }
 
-    private Set<Item> xmlToItems(List<Element> entry, Namespace defaultNamespace) {
-        return entry
-                .stream()
-                .map(elem -> generateItemFromElement(elem, defaultNamespace))
-                .collect(toSet());
+    private Set<Item> xmlToItems(Set<Element> entry, Namespace defaultNamespace) {
+        return entry.map(elem -> generateItemFromElement(elem, defaultNamespace));
     }
 
     @Override
@@ -161,12 +158,13 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     private Item generateItemFromElement(Element entry, Namespace defaultNamespace) {
         Element mediaGroup = entry.getChild("group", MEDIA_NAMESPACE);
-        return new Item()
-                .setTitle(entry.getChildText("title", defaultNamespace))
-                .setDescription(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
-                .setPubDate(pubDateOf(entry.getChildText("published", defaultNamespace)))
-                .setUrl(urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")))
-                .setCover(coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)));
+        return Item.builder()
+                    .title(entry.getChildText("title", defaultNamespace))
+                    .description(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
+                    .pubDate(pubDateOf(entry.getChildText("published", defaultNamespace)))
+                    .url(urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")))
+                    .cover(coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)))
+                .build();
     }
 
     private ZonedDateTime pubDateOf(String pubDate) {
@@ -220,7 +218,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class YoutubeResponse {
-        @Getter @Setter private List<YoutubeItem> items;
+        @Getter @Setter private Set<YoutubeItem> items;
         @Getter @Setter private String nextPageToken;
 
         @JsonIgnoreProperties(ignoreUnknown = true)

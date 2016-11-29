@@ -1,8 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.common.collect.Sets;
 import com.jayway.jsonpath.DocumentContext;
+import javaslang.collection.HashSet;
+import javaslang.collection.List;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -24,11 +26,9 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static lan.dk.podcastserver.service.HtmlService.toElements;
 
@@ -61,23 +61,24 @@ public class TF1ReplayUpdater extends AbstractUpdater {
 
 
     @Override
-    public Set<Item> getItems(Podcast podcast) {
+    public java.util.Set<Item> getItems(Podcast podcast) {
         return getHtmlFromStandardOrReplay(podcast.getUrl())
-                    .map(this::itemsFromHtml)
-                .getOrElse(Sets::newHashSet);
+                .map(this::itemsFromHtml)
+                .getOrElse(HashSet::empty)
+                .toJavaSet();
     }
 
-    private Set<Item> itemsFromHtml(Elements v) {
-        return v.stream().map(this::getItem).collect(Collectors.toSet());
+    private Set<Item> itemsFromHtml(Elements els) {
+        return HashSet.ofAll(els).map(this::getItem);
     }
 
-    private Item getItem(Element v) {
+    private Item getItem(Element e) {
         return Item.builder()
-                    .title(getTitle(v))
-                    .description(v.select("p.stitle").text())
-                    .pubDate(getDate(v))
-                    .url(DOMAIN + v.select(".videoLink").attr("href"))
-                    .cover(getCover(v))
+                    .title(getTitle(e))
+                    .description(e.select("p.stitle").text())
+                    .pubDate(getDate(e))
+                    .url(DOMAIN + e.select(".videoLink").attr("href"))
+                    .cover(getCover(e))
                 .build();
     }
 
@@ -97,14 +98,12 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     }
 
     private ZonedDateTime getDate(Element v) {
-        return v
-                .select(".momentDate")
-                .stream()
-                    .filter(e -> !e.hasAttr("data-format"))
-                    .findFirst()
-                .map(e -> e.attr("data-date"))
-                .map(ZonedDateTime::parse)
-                .orElse(null);
+        return List.ofAll(v.select(".momentDate"))
+                .toStream()
+                    .find(e -> !e.hasAttr("data-format"))
+                    .map(e -> e.attr("data-date"))
+                    .map(ZonedDateTime::parse)
+                .getOrElse(() -> null);
     }
 
     @Override

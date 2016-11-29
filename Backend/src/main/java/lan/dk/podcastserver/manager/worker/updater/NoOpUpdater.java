@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
 import javaslang.Tuple3;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -18,7 +18,7 @@ public class NoOpUpdater implements Updater {
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 
     @Override

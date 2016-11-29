@@ -2,9 +2,8 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -22,13 +21,11 @@ import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static javaslang.collection.HashSet.collector;
+
 
 /**
  * Created by kevin on 09/08/2014 for Podcast Server
@@ -56,21 +53,20 @@ public class PluzzUpdater extends AbstractUpdater {
         this.m3U8Service = m3U8Service;
     }
 
-    public Set<Item> getItems(Podcast podcast) {
+    public java.util.Set<Item> getItems(Podcast podcast) {
         Option<Document> page = htmlService.get(podcast.getUrl());
 
         return page
             .map(p -> p.select(JSOUP_ITEM_SELECTOR).select("a.row"))
             .map(this::htmlToItems)
             .map(s -> s.add(getCurrentPlayedItem(page.get())))
-            .map(HashSet::toJavaSet)
-            .getOrElse(Sets.newHashSet());
+            .getOrElse(HashSet::empty)
+            .toJavaSet();
     }
 
-    private HashSet<Item> htmlToItems(Elements elements) {
-        return elements.stream()
-                .map(element -> getPluzzItemByUrl(element.attr("href")))
-                .collect(collector());
+    private Set<Item> htmlToItems(Elements elements) {
+        return HashSet.ofAll(elements)
+                .map(element -> getPluzzItemByUrl(element.attr("href")));
     }
 
     private Item getCurrentPlayedItem(Document page) {
@@ -116,19 +112,18 @@ public class PluzzUpdater extends AbstractUpdater {
                     .description( pluzzItem.getSynopsis() )
                     .pubDate( pluzzItem.pubDate() )
                     .cover( imageService.getCoverFromURL( pluzzItem.coverUrl() ))
-                    .url( getPluzzM38uUrl( pluzzItem.getVideos() ))
+                    .url(getPluzzM38uUrl( pluzzItem.getVideos() ))
                 .build();
     }
 
     @SuppressWarnings("unchecked")
-    private String getPluzzM38uUrl(List<PluzzItem.Video> videos) {
+    private String getPluzzM38uUrl(javaslang.collection.List<PluzzItem.Video> videos) {
         return videos
-                .stream()
-                .filter(PluzzItem.Video::isM3U)
+                .toStream()
+                .find(PluzzItem.Video::isM3U)
                 .map(PluzzItem.Video::getUrl)
-                .findFirst()
                 .map(m3U8Service::getM3U8UrlFormMultiStreamFile)
-                .orElse("");
+                .getOrElse("");
     }
 
     private String getPluzzJsonInformation(String pluzzId) {
@@ -169,7 +164,7 @@ public class PluzzUpdater extends AbstractUpdater {
         @Setter private String episode;
         @Setter private Diffusion diffusion = new Diffusion();
         @Setter private String image;
-        @Setter @Getter private List<Video> videos = Lists.newArrayList();
+        @Setter @Getter private javaslang.collection.List<Video> videos = javaslang.collection.List.empty();
 
         String title() {
             String title = titre;

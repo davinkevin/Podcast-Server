@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -8,7 +10,7 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
@@ -16,11 +18,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Component("CanalPlusUpdater")
@@ -61,8 +60,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
         this.m3U8Service = m3U8Service;
     }
 
-    public Set<Item> getItems(Podcast podcast) {
-        return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast));
+    public java.util.Set<Item> getItems(Podcast podcast) {
+        return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast)).toJavaSet();
     }
 
     public String signatureOf(Podcast podcast) {
@@ -81,23 +80,22 @@ public class CanalPlusUpdater extends AbstractUpdater {
                 .getOrElse("");
     }
 
-    private Elements getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
+    private Set<Element> getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
         Option<Matcher> matcher = patternMatcher(canalPlusFrontToolsUrl, NB_PLUS_VIDEOS_PATTERN);
         return matcher
             .flatMap(id -> htmlService.get(canalPlusFrontToolsUrl))
             .map(p -> p.select("ul.features, ul.unit-gallery2"))
             .map(e -> e.get(Integer.parseInt(matcher.map(m -> m.group(1)).get())).select("li"))
-            .getOrElse(new Elements());
+            .map(HashSet::ofAll)
+            .getOrElse(HashSet::empty);
     }
 
-    private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
+    private javaslang.collection.Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
         return getHTMLListingEpisodeFromFrontTools(urlFrontTools)
-                .stream()
                 .filter(e -> !e.hasClass("blankMS"))
                 .map(e -> e.select("li._thumbs").first().id().replace("video_", ""))
                 .map(Integer::valueOf)
-                .map(this::getItemFromVideoId)
-                .collect(toSet());
+                .map(this::getItemFromVideoId);
     }
 
 
@@ -134,7 +132,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
     private String getRealUrl(Podcast podcast) {
         return podcast.getUrl().contains("front_tools") ? podcast.getUrl() : this.getPodcastURLOfFrontTools(podcast.getUrl());
     }
-
 
     private Option<Matcher> patternMatcher(String s, Pattern pattern) {
         Matcher matcher = pattern.matcher(s);

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -18,9 +19,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 18/12/14.
@@ -41,19 +39,17 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
 
 
     @Override
-    public Set<Item> getItems(Podcast podcast) {
-        return htmlService
-                .get(podcast.getUrl())
+    public java.util.Set<Item> getItems(Podcast podcast) {
+        return htmlService.get(podcast.getUrl())
                 .map(p -> p.select("article"))
                 .map(this::htmlToItems)
-                .getOrElse(Sets.newHashSet());
+                .getOrElse(HashSet::empty)
+                .toJavaSet();
     }
 
     private Set<Item> htmlToItems(Elements elements) {
-        return elements
-                .stream()
-                .map(element -> generateItemFromPage(element.select("a").first().attr("href")))
-                .collect(toSet());
+        return HashSet.ofAll(elements)
+                .map(element -> generateItemFromPage(element.select("a").first().attr("href")));
     }
 
     private Item generateItemFromPage(String videoPageUrl) {

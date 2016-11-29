@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -17,12 +18,9 @@ import org.springframework.stereotype.Component;
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Set;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Component("RSSUpdater")
@@ -41,21 +39,20 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
 
-    public Set<Item> getItems(Podcast podcast) {
-        log.debug("Traitement des Items");
+    public java.util.Set<Item> getItems(Podcast podcast) {
         return jdomService
                 .parse(podcast.getUrl())
                 .map(p -> p.getRootElement().getChild("channel").getChildren("item"))
+                .map(HashSet::ofAll)
                 .map(this::elementsToItems)
-                .getOrElse(Sets.newHashSet());
+                .getOrElse(HashSet::empty)
+                .toJavaSet();
     }
 
-    private Set<Item> elementsToItems(List<Element> elements) {
-        return elements
-                .stream()
+    private Set<Item> elementsToItems(Set<Element> elements) {
+        return HashSet.ofAll(elements)
                     .filter(this::hasEnclosure)
-                    .map(this::extractItem)
-                .collect(toSet());
+                    .map(this::extractItem);
     }
 
     private Boolean hasEnclosure(Element item) {

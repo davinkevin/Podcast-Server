@@ -1,6 +1,8 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.List;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -22,13 +24,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 22/02/2014.
@@ -43,7 +43,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
     /* Patter to extract value from URL */
     private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\":\"([^\"]*)\".*";
     private static final String PARAMETER_SEPARATOR = "?";
-    private static final Pattern EXTRACTOR_ID_OF_DAILYMOTION_EMBEDED_URL = Pattern.compile(".*/(.*)$");
+    private static final Pattern EXTRACTOR_ID_OF_DAILYMOTION_EMBEDDED_URL = Pattern.compile(".*/(.*)$");
     private static final Pattern POSTER_URL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url"));
     private static final String PROTOCOL = "http:";
     private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
@@ -60,16 +60,17 @@ public class BeInSportsUpdater extends AbstractUpdater {
         this.imageService = imageService;
     }
 
-    public Set<Item> getItems(Podcast podcast) {
+    public java.util.Set<Item> getItems(Podcast podcast) {
         return htmlService
                 .get(podcast.getUrl())
                 .map(p -> p.select("article"))
                 .map(this::convertHtmlToItems)
-                .getOrElse(Sets.newHashSet());
+                .map(Set::toJavaSet)
+                .getOrElse(java.util.HashSet::new);
     }
 
-    private Set<Item> convertHtmlToItems(Elements htmlItems) {
-        return htmlItems.stream().map(this::getItem).collect(toSet());
+    private javaslang.collection.Set<Item> convertHtmlToItems(Elements htmlItems) {
+        return HashSet.ofAll(htmlItems).map(this::getItem);
     }
 
     private ZonedDateTime getPubDateFromDescription(Element article) {
@@ -80,7 +81,6 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 : ZonedDateTime.of(LocalDateTime.parse(time.attr("datetime"), BEINSPORTS_PARSER), ZoneId.systemDefault());
     }
 
-
     private Item getItem(Element article) {
         String urlItemBeInSport = String.format(BE_IN_SPORTS_DOMAIN, article.select("a").first().attr("data-url"));
         Option<Document> document = htmlService.get(urlItemBeInSport);
@@ -88,7 +88,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
         return document
                 .map(this::getDailymotionIframeUrl)
                 .flatMap(htmlService::get)
-                .map(d -> d.select("script"))
+                .map(d -> List.ofAll(d.select("script")))
                 .map(this::getJavascriptPart)
                 .map(html -> this.convertHtmlToItem(article, html, document.get()))
                 .getOrElse(Item.DEFAULT_ITEM);
@@ -100,11 +100,11 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     private Item convertHtmlToItem(Element article, String javascriptCode, Document document) {
         return Item.builder()
-                .title(article.select("h3").first().text())
-                .description(article.select("h3").first().text())
-                .pubDate(getPubDateFromDescription(document))
-                .url(getStreamUrl(document).getOrElse(() -> null))
-                .cover(getPoster(javascriptCode).getOrElse(Cover.DEFAULT_COVER))
+                    .title(article.select("h3").first().text())
+                    .description(article.select("h3").first().text())
+                    .pubDate(getPubDateFromDescription(document))
+                    .url(getStreamUrl(document).getOrElse(() -> null))
+                    .cover(getPoster(javascriptCode).getOrElse(Cover.DEFAULT_COVER))
                 .build();
     }
 
@@ -118,7 +118,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
 
     private Option<String> getStreamUrl(Document document) {
         String dailymotionEmbedded = getDailymotionIframeUrl(document);
-        Matcher matcher = EXTRACTOR_ID_OF_DAILYMOTION_EMBEDED_URL.matcher(dailymotionEmbedded);
+        Matcher matcher = EXTRACTOR_ID_OF_DAILYMOTION_EMBEDDED_URL.matcher(dailymotionEmbedded);
 
         if (matcher.find()) {
             return Option.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1)));
@@ -127,12 +127,12 @@ public class BeInSportsUpdater extends AbstractUpdater {
         return Option.none();
     }
 
-    private String getJavascriptPart(Elements tagScripts) {
-        return tagScripts.stream()
+    private String getJavascriptPart(List<Element> tagScripts) {
+        return tagScripts
+                .toStream()
                 .map(Element::data)
-                .filter(data -> data.contains("720"))
-                .findFirst()
-                .orElse("");
+                .find(data -> data.contains("720"))
+                .getOrElse("");
     }
 
     @Override
@@ -156,7 +156,6 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .map(url -> StringUtils.substringBefore(url, PARAMETER_SEPARATOR))
                 .anyMatch(itemToFindSimplifiedUrl::equals);
     }
-
 
     public Predicate<Item> notIn(Podcast podcast) {
         return item -> !podcastContains(podcast, item);
