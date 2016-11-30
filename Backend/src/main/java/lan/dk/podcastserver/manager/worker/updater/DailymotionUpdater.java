@@ -46,14 +46,13 @@ public class DailymotionUpdater extends AbstractUpdater {
     }
 
     @Override
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         return usernameOf(podcast.getUrl())
                 .map(username -> String.format(API_LIST_OF_ITEMS, username))
                 .flatMap(jsonService::parseUrl)
                 .map(p -> p.read("list", LIST_DAILYMOTIONVIDEODETAIL_TYPE))
                 .map(this::asSet)
-                .getOrElse(HashSet::empty)
-                .toJavaSet();
+                .getOrElse(HashSet::empty);
     }
 
     private Set<Item> asSet(Set<DailymotionVideoDetail> jsonArray) {

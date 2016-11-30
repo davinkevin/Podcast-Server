@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import javaslang.collection.List;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -20,10 +20,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -88,8 +87,8 @@ public class GulliUpdaterTest {
 
         /* When */
         Set<Item> items = gulliUpdater.getItems(podcast);
-        Item first = List.ofAll(items).get(0);
-        Item second = List.ofAll(items).get(1);
+        Item first = items.filter(i -> i.getTitle().contains("13")).getOrElseThrow(() -> new RuntimeException("Episode 13 Not Found"));
+        Item second = items.filter(i -> i.getTitle().contains("14")).getOrElseThrow(() -> new RuntimeException("Episode 14 Not Found"));;
 
         /* Then */
         assertThat(items)

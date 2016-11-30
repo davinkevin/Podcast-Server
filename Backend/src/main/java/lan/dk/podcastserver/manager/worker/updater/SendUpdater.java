@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;
@@ -7,7 +9,6 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
-import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -22,7 +23,7 @@ public class SendUpdater extends AbstractUpdater {
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
-        return podcast.getItems();
+        return HashSet.ofAll(podcast.getItems());
     }
 
     @Override

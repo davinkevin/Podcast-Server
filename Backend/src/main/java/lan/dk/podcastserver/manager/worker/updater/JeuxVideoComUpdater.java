@@ -39,12 +39,11 @@ public class JeuxVideoComUpdater extends AbstractUpdater {
 
 
     @Override
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         return htmlService.get(podcast.getUrl())
                 .map(p -> p.select("article"))
                 .map(this::htmlToItems)
-                .getOrElse(HashSet::empty)
-                .toJavaSet();
+                .getOrElse(HashSet::empty);
     }
 
     private Set<Item> htmlToItems(Elements elements) {

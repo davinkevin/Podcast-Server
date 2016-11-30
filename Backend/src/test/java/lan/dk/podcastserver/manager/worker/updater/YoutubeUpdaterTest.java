@@ -6,6 +6,7 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -28,7 +29,6 @@ import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 import static lan.dk.utils.IOUtils.fileAsXml;
@@ -259,7 +259,7 @@ public class YoutubeUpdaterTest {
                 "http://gdata.youtube.com/feeds/api/playlists/foo"
         );
         /* When */
-        Set<Integer> results = urls.stream().map(youtubeUpdater::compatibility).distinct().collect(toSet());
+        java.util.Set<Integer> results = urls.stream().map(youtubeUpdater::compatibility).distinct().collect(toSet());
         /* Then */
         assertThat(results).contains(1);
     }

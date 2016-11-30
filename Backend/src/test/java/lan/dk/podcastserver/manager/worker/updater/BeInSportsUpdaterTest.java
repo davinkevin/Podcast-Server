@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
@@ -28,7 +29,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -53,15 +53,14 @@ public class PluzzUpdater extends AbstractUpdater {
         this.m3U8Service = m3U8Service;
     }
 
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         Option<Document> page = htmlService.get(podcast.getUrl());
 
         return page
             .map(p -> p.select(JSOUP_ITEM_SELECTOR).select("a.row"))
             .map(this::htmlToItems)
             .map(s -> s.add(getCurrentPlayedItem(page.get())))
-            .getOrElse(HashSet::empty)
-            .toJavaSet();
+            .getOrElse(HashSet::empty);
     }
 
     private Set<Item> htmlToItems(Elements elements) {

@@ -39,14 +39,13 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
 
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         return jdomService
                 .parse(podcast.getUrl())
                 .map(p -> p.getRootElement().getChild("channel").getChildren("item"))
                 .map(HashSet::ofAll)
                 .map(this::elementsToItems)
-                .getOrElse(HashSet::empty)
-                .toJavaSet();
+                .getOrElse(HashSet::empty);
     }
 
     private Set<Item> elementsToItems(Set<Element> elements) {

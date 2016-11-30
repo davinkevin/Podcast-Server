@@ -41,12 +41,11 @@ public class GulliUpdater extends AbstractUpdater {
     }
 
     @Override
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("div.all-videos ul li.col-md-3"))
                 .map(this::asItemsSet)
-                .getOrElse(HashSet::empty)
-                .toJavaSet();
+                .getOrElse(HashSet::empty);
     }
 
     private Set<Item> asItemsSet(Elements elements) {

@@ -62,11 +62,10 @@ public class YoutubeUpdater extends AbstractUpdater {
     }
 
 
-    public java.util.Set<Item> getItems(Podcast podcast) {
-        return (Strings.isNullOrEmpty(api.getYoutube())
+    public Set<Item> getItems(Podcast podcast) {
+        return Strings.isNullOrEmpty(api.getYoutube())
                 ? getItemsByRss(podcast)
-                : getItemsByAPI(podcast)
-        ).toJavaSet();
+                : getItemsByAPI(podcast);
     }
 
     private Set<Item> getItemsByAPI(Podcast podcast) {

@@ -61,11 +61,10 @@ public class TF1ReplayUpdater extends AbstractUpdater {
 
 
     @Override
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         return getHtmlFromStandardOrReplay(podcast.getUrl())
                 .map(this::itemsFromHtml)
-                .getOrElse(HashSet::empty)
-                .toJavaSet();
+                .getOrElse(HashSet::empty);
     }
 
     private Set<Item> itemsFromHtml(Elements els) {

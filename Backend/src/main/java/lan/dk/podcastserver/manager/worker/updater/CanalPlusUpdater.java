@@ -60,8 +60,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
         this.m3U8Service = m3U8Service;
     }
 
-    public java.util.Set<Item> getItems(Podcast podcast) {
-        return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast)).toJavaSet();
+    public Set<Item> getItems(Podcast podcast) {
+        return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast));
     }
 
     public String signatureOf(Podcast podcast) {

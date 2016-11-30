@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -16,7 +17,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

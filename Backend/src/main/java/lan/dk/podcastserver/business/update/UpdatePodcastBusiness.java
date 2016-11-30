@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.business.update;
 
-import com.google.common.collect.Sets;
 import javaslang.Tuple3;
 import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 import java.nio.file.Files;
 import java.time.ZonedDateTime;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -36,7 +35,6 @@ import java.util.function.Predicate;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Component
@@ -96,7 +94,7 @@ public class UpdatePodcastBusiness  {
         return isUpdating.get();
     }
 
-    private void updatePodcast(javaslang.collection.Set<Podcast> podcasts, Executor selectedExecutor) {
+    private void updatePodcast(Set<Podcast> podcasts, Executor selectedExecutor) {
         changeAndCommunicateUpdate(Boolean.TRUE);
 
         log.info("Update launch");
@@ -136,23 +134,22 @@ public class UpdatePodcastBusiness  {
         if (items == null || items.isEmpty() ) {
             log.info("Reset de la signature afin de forcer le prochain update de : {}", podcast.getTitle());
             podcastBusiness.save(podcast.setSignature(""));
-            return Sets.newHashSet();
+            return HashSet.empty();
         }
 
-        Set<Item> itemsToAdd = items.stream()
+        Set<Item> itemsToAdd = items
                 .filter(filter)
                 .map(item -> item.setPodcast(podcast))
                 .filter(item -> validator.validate(item).isEmpty())
-                .peek(item -> log.debug("Add Item {} to Podcast {}", item.getTitle(), podcast.getTitle()))
-                .collect(toSet());
+                .peek(item -> log.debug("Add Item {} to Podcast {}", item.getTitle(), podcast.getTitle()));
 
         if (itemsToAdd.isEmpty()) {
             return itemsToAdd;
         }
 
-        itemsToAdd.stream()
-                .peek(podcast::add)
-                .forEach(itemRepository::save);
+        itemsToAdd
+            .peek(podcast::add)
+            .forEach(itemRepository::save);
 
         podcastBusiness.save(podcast.lastUpdateToNow());
 

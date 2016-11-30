@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javaslang.Tuple;
 import javaslang.Tuple3;
+import javaslang.collection.Set;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -15,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Validator;
-import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j

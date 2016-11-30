@@ -60,13 +60,12 @@ public class BeInSportsUpdater extends AbstractUpdater {
         this.imageService = imageService;
     }
 
-    public java.util.Set<Item> getItems(Podcast podcast) {
+    public Set<Item> getItems(Podcast podcast) {
         return htmlService
                 .get(podcast.getUrl())
                 .map(p -> p.select("article"))
                 .map(this::convertHtmlToItems)
-                .map(Set::toJavaSet)
-                .getOrElse(java.util.HashSet::new);
+                .getOrElse(HashSet::empty);
     }
 
     private javaslang.collection.Set<Item> convertHtmlToItems(Elements htmlItems) {

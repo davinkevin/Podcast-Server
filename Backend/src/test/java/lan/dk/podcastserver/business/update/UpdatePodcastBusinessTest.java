@@ -120,11 +120,11 @@ public class UpdatePodcastBusinessTest {
         });
         when(updater.update(eq(podcast3))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcast, generateItems(10, podcast).toJavaSet(), updater.notIn(podcast));
+            return Tuple.of(podcast, generateItems(10, podcast), updater.notIn(podcast));
         });
         when(updater.update(not(eq(podcast3)))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcast, podcast.getItems(), updater.notIn(podcast));
+            return Tuple.of(podcast, HashSet.ofAll(podcast.getItems()), updater.notIn(podcast));
         });
         when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 
@@ -164,7 +164,7 @@ public class UpdatePodcastBusinessTest {
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
-            return Tuple.of(podcastArgument, generateItems(10, podcastArgument).toJavaSet(), updater.notIn(podcastArgument));
+            return Tuple.of(podcastArgument, generateItems(10, podcastArgument), updater.notIn(podcastArgument));
         });
         when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 
@@ -189,7 +189,7 @@ public class UpdatePodcastBusinessTest {
         });
         when(updater.update(any(Podcast.class))).then(i -> {
             Podcast p = (Podcast) i.getArguments()[0];
-            return Tuple.of(p, generateItems(10, p).toJavaSet(), updater.notIn(p));
+            return Tuple.of(p, generateItems(10, p), updater.notIn(p));
         });
         when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 

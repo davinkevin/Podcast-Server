@@ -2,6 +2,8 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
 import javaslang.Tuple3;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;
@@ -14,12 +16,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.validation.Validator;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @RunWith(MockitoJUnitRunner.class)
 public class UpdaterTest {
 
-    public static final UUID ERROR_UUID = UUID.randomUUID();
+    private static final UUID ERROR_UUID = UUID.randomUUID();
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock SignatureService signatureService;
     @Mock Validator validator;
@@ -62,9 +61,7 @@ public class UpdaterTest {
         /* Then */
         assertThat(result).isNotSameAs(Updater.NO_MODIFICATION_TUPLE);
         assertThat(result._1()).isSameAs(podcast);
-        assertThat(result._2())
-                .isInstanceOf(HashSet.class)
-                .hasSize(3);
+        assertThat(result._2()).isInstanceOf(HashSet.class).hasSize(3);
         assertThat(result._3()).isNotNull();
         assertThat(result._1().getSignature()).isEqualTo("123456789");
     }
@@ -95,10 +92,7 @@ public class UpdaterTest {
         /* When */
         Tuple3<Podcast, Set<Item>, Predicate<Item>> result = simpleUpdater.update(podcast);
 
-        Set<Item> collectedItem = result._2()
-                .stream()
-                .filter(result._3())
-                .collect(toSet());
+        Set<Item> collectedItem = result._2().filter(result._3());
 
         /* Then */
         assertThat(collectedItem).hasSize(2);
@@ -118,7 +112,8 @@ public class UpdaterTest {
 
         @Override
         public Set<Item> getItems(Podcast podcast) {
-            return Sets.newHashSet(
+
+            return javaslang.collection.HashSet.of(
                     new Item().setId(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")),
                     new Item().setId(UUID.randomUUID()),
                     new Item().setId(UUID.randomUUID())
