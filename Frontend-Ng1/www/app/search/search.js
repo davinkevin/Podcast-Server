@@ -18,7 +18,10 @@ import './search.css!';
 
 @Module({
     name : 'ps.search',
-    modules : [ItemMenu, NgTagsInput, NgStorage, AppRouteConfig, DownloadManager, ItemService, TagService, PlaylistService, TitleService]
+    modules : [
+        ItemMenu, NgTagsInput, NgStorage, AppRouteConfig, DownloadManager,
+        ItemService, TagService, PlaylistService, TitleService
+    ]
 })
 @Component({
     selector : 'search',
@@ -145,6 +148,10 @@ export default class ItemSearchCtrl {
 
     updatePageWhenUpdateDone(isInUpdate) {
         if(isInUpdate === false) { this.changePage(); }
+    }
+
+    play(item) {
+        this.itemService.play(item);
     }
 }
 

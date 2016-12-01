@@ -65,7 +65,7 @@
                     </item-menu>
                 </div>
                 <div class="cover" ng-style="::{ 'background-image' : 'url(\''+ item.cover.url + '\')'}" ng-class="{'grayscale' : (!item.isDownloaded) }">
-                    <a class="overlay-main-button no-grayscale" target="_self" ng-href="{{ ::item.proxyURL  }}" >
+                    <a class="overlay-main-button no-grayscale" ng-click="isc.play(item)" >
                         <span ng-class="{'glyphicon-globe' : (!item.isDownloaded), 'glyphicon-play' : (item.isDownloaded)}" class="glyphicon "></span>
                     </a>
                 </div>
