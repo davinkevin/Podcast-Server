@@ -103,8 +103,8 @@ public class ItemBusiness {
     //****************************//
 
     @Transactional(readOnly = true)
-    public Page<Item> findByPodcast(UUID idPodcast, PageRequest pageRequest) {
-        return itemRepository.findByPodcast(idPodcast, pageRequest);
+    public Page<Item> findByPodcast(UUID idPodcast, Pageable pageable) {
+        return itemRepository.findByPodcast(idPodcast, pageable);
     }
 
     public void reindex() throws InterruptedException {

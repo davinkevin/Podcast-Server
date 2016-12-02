@@ -8,12 +8,12 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.MultiPartFileSenderService;
-import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,10 +42,10 @@ public class ItemController {
     final MultiPartFileSenderService multiPartFileSenderService;
     final WatchListBusiness watchListBusiness;
 
-    @PostMapping
+    @GetMapping
     @JsonView(Item.ItemPodcastListView.class)
-    public Page<Item> findAll(@PathVariable UUID idPodcast, @RequestBody PageRequestFacade pageRequestFacade) {
-        return itemBusiness.findByPodcast(idPodcast, pageRequestFacade.toPageRequest());
+    public Page<Item> findAll(@PathVariable UUID idPodcast, Pageable pageable) {
+        return itemBusiness.findByPodcast(idPodcast, pageable);
     }
 
     @GetMapping("{id}")

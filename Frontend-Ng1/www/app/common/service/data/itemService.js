@@ -28,8 +28,9 @@ export default class ItemService {
         return this.$http.get(`/api/podcasts/${podcastId}/items/${itemId}`).then(r => r.data);
     }
 
-    getItemForPodcastWithPagination(podcast, pageParemeters) {
-        return this.$http.post(`/api/podcasts/${podcast.id}/items`, pageParemeters).then(r => r.data);
+    getItemForPodcastWithPagination(podcast, params) {
+        params.sort = params.sort.map(o => `${o.property},${o.direction}`);
+        return this.$http.get(`/api/podcasts/${podcast.id}/items`, { params }).then(r => r.data);
     }
 
     delete(item) {

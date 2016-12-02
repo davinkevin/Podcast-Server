@@ -59,7 +59,7 @@ export default class PodcastItemsListComponent {
         return this.itemService.getItemForPodcastWithPagination(this.podcast, {
                 size: this.itemPerPage,
                 page : this.currentPage - 1,
-                orders : [{ direction : 'DESC', property : 'pubDate'}]
+                sort : [{ direction : 'DESC', property : 'pubDate'}]
             })
             .then(itemsResponse => { this.podcast.items = itemsResponse.content; this.podcast.totalItems = itemsResponse.totalElements; });
     }

@@ -9,7 +9,7 @@ import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.stereotype.Repository;
@@ -32,7 +32,7 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     void delete(Item item);
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Page<Item> findByPodcast(UUID idPodcast, PageRequest pageRequest) {
+    default Page<Item> findByPodcast(UUID idPodcast, Pageable pageRequest) {
         return findAll(isInPodcast(idPodcast), pageRequest);
     }
 
