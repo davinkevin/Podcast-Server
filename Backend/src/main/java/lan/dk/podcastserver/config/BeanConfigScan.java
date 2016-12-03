@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.config;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.service.properties.Api;
 import lan.dk.podcastserver.service.properties.Backup;
 import lan.dk.podcastserver.service.properties.ExternalTools;
@@ -45,6 +47,16 @@ public class BeanConfigScan {
             @Override
             public Path convert(String source) {
                 return Paths.get(source);
+            }
+        };
+    }
+
+    @Bean
+    Converter<String, Set<String>> stringToSet() {
+        return new Converter<String, Set<String>>() {
+            @Override
+            public Set<String> convert(String s) {
+                return HashSet.of(s.split(","));
             }
         };
     }

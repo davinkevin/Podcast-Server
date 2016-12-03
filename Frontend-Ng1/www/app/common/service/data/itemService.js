@@ -20,8 +20,11 @@ export default class ItemService {
         this.playlistService = playlistService;
     }
 
-    search(searchParameters = { page : 0, size : 12, downloaded : true} ) {
-        return this.$http.post(`/api/item/search`, searchParameters).then(r => r.data);
+    search(searchParams = { page : 0, size : 12, downloaded : true, tags: []} ) {
+        let params = Object.assign({}, searchParams);
+        params.sort = params.sort.map(o => `${o.property},${o.direction}`);
+        params.tags = params.tags.map(t => t.name).join();
+        return this.$http.get(`/api/item/search`, { params }).then(r => r.data);
     }
 
     findById(podcastId, itemId) {

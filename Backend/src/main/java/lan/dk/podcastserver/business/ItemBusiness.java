@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
@@ -52,13 +51,13 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
+    public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, Boolean downloaded, Pageable page) {
         return page.getSort().getOrderFor("pertinence") == null
                 ? itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page)
                 : findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page);
     }
 
-    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, Boolean downloaded, PageRequest page) {
+    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, Boolean downloaded, Pageable page) {
         // List with the order of pertinence of search result :
         List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 

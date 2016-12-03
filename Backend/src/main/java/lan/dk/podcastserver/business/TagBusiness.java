@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import javaslang.collection.List;
 import javaslang.collection.Set;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,12 @@ public class TagBusiness {
         return tagRepository
                 .findByNameIgnoreCase(name)
                 .getOrElse(() -> tagRepository.save(Tag.builder().name(name).build()));
+    }
+
+    public Set<Tag> findAllByName(Set<String> names){
+        return names
+                .map(tagRepository::findByNameIgnoreCase)
+                .filter(Option::isDefined)
+                .map(Option::get);
     }
 }

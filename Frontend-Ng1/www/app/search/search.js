@@ -34,7 +34,7 @@ import './search.css!';
 })
 @Constant({
     name : 'DefaultItemSearchParameters',
-    value : { page: 0, size: 12, term: undefined, tags: [], orders: [{ direction : 'DESC', property : 'pubDate'}], downloaded : "true"}
+    value : { page: 0, size: 12, q: undefined, tags: [], sort: [{ direction : 'DESC', property : 'pubDate'}], downloaded : "true"}
 })
 export default class ItemSearchCtrl {
 
@@ -112,11 +112,11 @@ export default class ItemSearchCtrl {
             .then((itemsResponse) => this.attachResponse(itemsResponse));
     }
 
-    attachResponse(itemsResponse) {
-        this.items = itemsResponse.content;
-        this.totalPages = itemsResponse.totalPages;
-        this.totalItems = itemsResponse.totalElements;
-        this.SearchItemCache.page = itemsResponse.number;
+    attachResponse({content, totalPages, totalElements, number}) {
+        this.items = content;
+        this.totalPages = totalPages;
+        this.totalItems = totalElements;
+        this.SearchItemCache.page = number;
         this.currentPage = this.SearchItemCache.page + 1;
         this.$location.search("page", this.currentPage);
     }
