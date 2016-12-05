@@ -24,7 +24,7 @@ export default class ItemService {
         let params = Object.assign({}, searchParams);
         params.sort = params.sort.map(o => `${o.property},${o.direction}`);
         params.tags = params.tags.map(t => t.name).join();
-        return this.$http.get(`/api/item/search`, { params }).then(r => r.data);
+        return this.$http.get(`/api/items/search`, { params }).then(r => r.data);
     }
 
     findById(podcastId, itemId) {
@@ -64,7 +64,7 @@ export default class ItemService {
 
     play(item) {
         if (ItemService.isVideo(item)) {
-            return this.$location.path(`/podcasts/${item.podcastId}/item/${item.id}/play`);
+            return this.$location.path(`/podcasts/${item.podcastId}/items/${item.id}/play`);
         }
 
         return this.playlistService.play(item);

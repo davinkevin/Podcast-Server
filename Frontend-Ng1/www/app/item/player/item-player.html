@@ -3,7 +3,7 @@
     <ol class="breadcrumb">
         <li><a href="/podcasts">Podcasts</a></li>
         <li><a ng-href="/podcasts/{{ ipc.item.podcast.id }}"> {{ ipc.item.podcast.title }}</a></li>
-        <li class="active"><a ng-href="/podcasts/{{ ipc.item.podcast.id }}/item/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>
+        <li class="active"><a ng-href="/podcasts/{{ ipc.item.podcast.id }}/items/{{ ipc.item.id }}">{{ ipc.item.title }}</a></li>
     </ol>
 
     <div ng-show="ipc.item.isDownloaded" class="videogular-container">

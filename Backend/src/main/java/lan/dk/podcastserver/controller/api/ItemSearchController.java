@@ -8,6 +8,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import static java.util.Objects.nonNull;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/item")
+@RequestMapping("/api/items")
 @RequiredArgsConstructor
 public class ItemSearchController {
 
@@ -35,7 +36,7 @@ public class ItemSearchController {
         return itemBusiness.findAll(pageRequestFacade.toPageRequest());
     }
 
-    /*@Cacheable("search")*/
+    @Cacheable("search")
     @GetMapping("search")
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestParam(value = "q", required = false, defaultValue = "") String q,
@@ -53,7 +54,7 @@ public class ItemSearchController {
         itemBusiness.reindex();
     }
 
-    public static Boolean isSearch(String q, Set<String> tags, Boolean downloaded) {
+    private static Boolean isSearch(String q, Set<String> tags, Boolean downloaded) {
         return !StringUtils.isEmpty(q) || !tags.isEmpty() || nonNull(downloaded);
     }
 

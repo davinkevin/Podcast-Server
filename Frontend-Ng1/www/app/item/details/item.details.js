@@ -19,7 +19,7 @@ import template from './item-details.html!text';
     as : 'idc',
     template : template,
 
-    path : '/podcasts/:podcastId/item/:itemId',
+    path : '/podcasts/:podcastId/items/:itemId',
     resolve : {
         item : (itemService, $route) => { "ngInject"; return itemService.findById($route.current.params.podcastId, $route.current.params.itemId);},
         podcast : (podcastService, $route) => { "ngInject"; return podcastService.findById($route.current.params.podcastId);}

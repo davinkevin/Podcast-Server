@@ -39,7 +39,7 @@ export default class DownloadManager {
     }
 
     download(item) {
-        return this.$http.get(`/api/item/${item.id}/addtoqueue`);
+        return this.$http.get(`/api/items/${item.id}/addtoqueue`);
     }
     stopAllDownload () {
         return this.$http.get(`/api/task/downloadManager/stopAllDownload`);
