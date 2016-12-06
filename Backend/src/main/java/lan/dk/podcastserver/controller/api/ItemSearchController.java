@@ -5,7 +5,6 @@ import javaslang.collection.Set;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.utils.facade.PageRequestFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,12 +28,6 @@ public class ItemSearchController {
 
     private final ItemBusiness itemBusiness;
     private final TagBusiness tagBusiness;
-
-    @GetMapping("pagination")
-    @JsonView(Item.ItemSearchListView.class)
-    public Page<Item> findAll(PageRequestFacade pageRequestFacade) {
-        return itemBusiness.findAll(pageRequestFacade.toPageRequest());
-    }
 
     @Cacheable("search")
     @GetMapping("search")
