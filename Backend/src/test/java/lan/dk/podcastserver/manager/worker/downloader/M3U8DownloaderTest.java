@@ -131,7 +131,7 @@ public class M3U8DownloaderTest {
 
         /* When */
         runAsync(() -> m3U8Downloader.download());
-        Try.run(() -> TimeUnit.SECONDS.sleep(1));
+        Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
         m3U8Downloader.restartDownload();
 
         /* Then */
@@ -151,7 +151,7 @@ public class M3U8DownloaderTest {
 
         /* When */
         runAsync(() -> m3U8Downloader.download());
-        Try.run(() -> TimeUnit.SECONDS.sleep(1));
+        Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
         m3U8Downloader.restartDownload();
 
         /* Then */
@@ -170,11 +170,11 @@ public class M3U8DownloaderTest {
 
         /* When */
         CompletableFuture<Void> future = runAsync(() -> m3U8Downloader.download());
-        Try.run(() -> TimeUnit.SECONDS.sleep(3));
+        Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
         m3U8Downloader.pauseDownload();
 
         /* Then */
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        await().atMost(2, TimeUnit.SECONDS).until(() -> {
             assertThat(item).hasStatus(Status.PAUSED);
         });
         future.cancel(true);
@@ -190,11 +190,11 @@ public class M3U8DownloaderTest {
 
         /* When */
         CompletableFuture<Void> future = runAsync(() -> m3U8Downloader.download());
-        Try.run(() -> TimeUnit.SECONDS.sleep(3));
+        Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
         m3U8Downloader.pauseDownload();
 
         /* Then */
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        await().atMost(2, TimeUnit.SECONDS).until(() -> {
             assertThat(item).hasStatus(Status.STOPPED);
         });
         future.cancel(true);
@@ -209,11 +209,11 @@ public class M3U8DownloaderTest {
 
         /* When */
         CompletableFuture<Void> future = runAsync(() -> m3U8Downloader.download());
-        Try.run(() -> TimeUnit.SECONDS.sleep(3));
+        Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
         m3U8Downloader.stopDownload();
 
         /* Then */
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        await().atMost(2, TimeUnit.SECONDS).until(() -> {
             assertThat(item).hasStatus(Status.STOPPED);
         });
         future.cancel(true);

@@ -211,7 +211,7 @@ public class UpdatePodcastBusinessTest {
         /* Given */
         ThreadPoolTaskExecutor manualExecutor = new ThreadPoolTaskExecutor();
         updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
-        updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS);
+        updatePodcastBusiness.setTimeOut(1, TimeUnit.MILLISECONDS);
         manualExecutor.initialize();
 
         Podcast podcast1 = new Podcast().setTitle("podcast1");
@@ -220,13 +220,10 @@ public class UpdatePodcastBusinessTest {
         when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast1);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(podcastBusiness.save(any(Podcast.class))).thenReturn(podcast1);
-        when(updater.notIn(any(Podcast.class))).then(i -> {
-            Podcast podcast = (Podcast) i.getArguments()[0];
-            return (Predicate<Item>) item -> !podcast.contains(item);
-        });
+        when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> !i.getArgumentAt(0, Podcast.class).contains(item));
         when(updater.update(any(Podcast.class))).then(i -> {
             TimeUnit.SECONDS.sleep(15);
-            Podcast podcast = (Podcast) i.getArguments()[0];
+            Podcast podcast = i.getArgumentAt(0, Podcast.class);
             return Tuple.of(podcast, generateItems(10, podcast).toJavaSet(), updater.notIn(podcast));
         });
 
