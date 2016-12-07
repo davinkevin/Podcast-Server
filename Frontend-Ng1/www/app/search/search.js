@@ -3,7 +3,7 @@
  */
 
 import angular from 'angular';
-import {Component, Module, Constant, Service} from '../decorators';
+import {Component, Module, Constant} from '../decorators';
 import {TitleService} from '../common/service/title.service';
 import NgStorage from 'ngstorage';
 import NgTagsInput from '../common/modules/ngTagsInput';
@@ -30,7 +30,12 @@ import './search.css!';
 
     path : '/items',
     reloadOnSearch : false,
-    resolve : { page : (itemService, SearchItemCache) => {"ngInject"; return itemService.search(SearchItemCache.parameters);}}
+    resolve : {
+        page : (itemService, $sessionStorage, DefaultItemSearchParameters) => {
+            "ngInject";
+            return itemService.search($sessionStorage.searchParameters || DefaultItemSearchParameters);
+        }
+    }
 })
 @Constant({
     name : 'DefaultItemSearchParameters',
@@ -38,13 +43,13 @@ import './search.css!';
 })
 export default class ItemSearchCtrl {
 
+    currentPage = 1;
     totalItems = Number.MAX_VALUE;
     maxSize = 10;
 
-    constructor($scope, SearchItemCache, $location, itemService, tagService, DonwloadManager, playlistService, hotkeys, TitleService) {
+    constructor($scope, $location, itemService, tagService, DonwloadManager, playlistService, hotkeys, TitleService, $sessionStorage, DefaultItemSearchParameters) {
         "ngInject";
         this.$scope = $scope;
-        this.SearchItemCache = SearchItemCache;
         this.$location = $location;
         this.itemService = itemService;
         this.tagService = tagService;
@@ -52,11 +57,13 @@ export default class ItemSearchCtrl {
         this.playlistService = playlistService;
         this.hotkeys = hotkeys;
         this.TitleService = TitleService;
+        this.$sessionStorage = $sessionStorage;
+        this.DefaultItemSearchParameters = DefaultItemSearchParameters;
     }
 
     $onInit() {
-        this.currentPage = this.SearchItemCache.page + 1;
-        this.searchParameters = this.SearchItemCache.parameters;
+        this.searchParameters = this.searchParameters || this.DefaultItemSearchParameters;
+        this.currentPage = this.searchParameters.page + 1;
         this.TitleService.title = 'Search';
 
         this.hotkeys
@@ -100,15 +107,15 @@ export default class ItemSearchCtrl {
             return this.changePage();
         }
 
-        var elemToUpdate = this.items.find((elem) => elem.id === item.id);
+        let elemToUpdate = this.items.find((elem) => elem.id === item.id);
         if (elemToUpdate)
             Object.assign(elemToUpdate, item);
     }
 
     changePage() {
-        this.SearchItemCache.page = this.calculatePage();
+        this.searchParameters.page = this.calculatePage();
         return this.itemService
-            .search(this.SearchItemCache.parameters)
+            .search(this.searchParameters)
             .then((itemsResponse) => this.attachResponse(itemsResponse));
     }
 
@@ -116,13 +123,13 @@ export default class ItemSearchCtrl {
         this.items = content;
         this.totalPages = totalPages;
         this.totalItems = totalElements;
-        this.SearchItemCache.page = number;
-        this.currentPage = this.SearchItemCache.page + 1;
+        this.searchParameters.page = number;
+        this.currentPage = this.searchParameters.page + 1;
         this.$location.search("page", this.currentPage);
     }
 
     swipePage(val) {
-        this.currentPage = this.SearchItemCache.page + val + 1;
+        this.currentPage = this.searchParameters.page + val + 1;
         return this.changePage();
     }
 
@@ -133,8 +140,8 @@ export default class ItemSearchCtrl {
     calculatePage() {
         if (this.currentPage <= 1) {
             return 0;
-        } else if (this.currentPage > Math.ceil(this.totalItems / this.SearchItemCache.size)) {
-            return Math.ceil(this.totalItems / this.SearchItemCache.size) - 1;
+        } else if (this.currentPage > Math.ceil(this.totalItems / this.searchParameters.size)) {
+            return Math.ceil(this.totalItems / this.searchParameters.size) - 1;
         } else {
             return this.currentPage - 1;
         }
@@ -142,7 +149,7 @@ export default class ItemSearchCtrl {
 
     resetSearch() {
         this.currentPage = 1;
-        this.SearchItemCache.updateSearchParam(this.searchParameters);
+        this.searchParameters = this.searchParameters;
         return this.changePage();
     }
 
@@ -153,41 +160,12 @@ export default class ItemSearchCtrl {
     play(item) {
         this.itemService.play(item);
     }
-}
 
-
-@Module({
-    inject : ItemSearchCtrl
-})
-@Service('SearchItemCache')
-export class SearchItemCache {
-    constructor(DefaultItemSearchParameters, $sessionStorage) {
-        "ngInject";
-        this.$sessionStorage = $sessionStorage;
-        this.$sessionStorage.searchParameters = DefaultItemSearchParameters;
+    set searchParameters(val) {
+        this.$sessionStorage.searchParameters = angular.extend({}, this.searchParameters, val);
     }
 
-    get parameters() {
+    get searchParameters() {
         return this.$sessionStorage.searchParameters;
-    }
-
-    set page(page) {
-        this.$sessionStorage.searchParameters.page = page;
-    }
-
-    get page() {
-        return this.$sessionStorage.searchParameters.page;
-    }
-
-    set size(sizeNumber) {
-        this.$sessionStorage.searchParameters.size = sizeNumber;
-    }
-
-    get size() {
-        return this.$sessionStorage.searchParameters.size;
-    }
-
-    updateSearchParam(searchParam) {
-        this.$sessionStorage.searchParameters = angular.extend({}, this.$sessionStorage.searchParameters, searchParam);
     }
 }

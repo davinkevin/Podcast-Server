@@ -4,31 +4,19 @@
 
 import angular from 'angular';
 
-export function Module({name, inject, modules = []}) {
+export function Module({name, modules = []}) {
     return Target => {
 
-        if (angular.isDefined(name) && angular.isDefined(inject))
-            throw new TypeError ("Name and Inject can't be define in the same @Module");
-
-        Target.$angularModule = angular.isUndefined(inject) ? angular.module(name, modules.map(extractAngularModuleName)) : extractAngularModule(inject);
+        Target.$angularModule = angular.module(name, modules.map(extractAngularModuleName));
 
         if (Target.component) Target.$angularModule.component(Target.$componentName, Target.component);
         if (Target.directive) Target.$angularModule.directive(Target.$directiveName, Target.directive);
         if (Target.routeConfig) Target.$angularModule.config(($routeProvider) => { "ngInject"; $routeProvider.when(...Target.routeConfig); });
         if (Target.$serviceName) Target.$angularModule.service(Target.$serviceName, Target);
 
-        for (let config of Target.$config || []) {
-            Target.$angularModule.config(config);
-        }
-
-        for (let constant of Target.$constant || []) {
-            Target.$angularModule.constant(constant.name, constant.value);
-        }
-
-        for (let run of Target.$run || []) {
-            Target.$angularModule.run(run);
-        }
-
+        (Target.$config || []).forEach(c => Target.$angularModule.config(c));
+        (Target.$constant || []).forEach(c => Target.$angularModule.constant(c.name, c.value));
+        (Target.$run || []).forEach(r => Target.$angularModule.run(r));
     };
 }
 
@@ -188,8 +176,4 @@ function extractAngularModuleName(clazz) {
         return clazz.$angularModule.name;
 
     return clazz.name ? clazz.name : clazz;
-}
-
-function extractAngularModule(clazz) {
-    return clazz.$angularModule ? clazz.$angularModule : clazz;
 }
