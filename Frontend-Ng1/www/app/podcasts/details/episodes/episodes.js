@@ -14,15 +14,16 @@ import template from './episodes.html!text';
 @Component({
     selector : 'podcast-items-list',
     as : 'pic',
-    bindings : { podcast : '='},
+    bindings : { podcast : '<'},
     template : template
 })
 @Constant({ name : 'PodcastItemPerPage', value : 10 })
 export default class PodcastItemsListComponent {
 
-    currentPage = 1;
+    currentPage = null;
+    totalItems = Number.MAX_VALUE;
 
-    constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService, hotkeys) {
+    constructor($scope, DonwloadManager, PodcastItemPerPage, itemService, playlistService, hotkeys, $sessionStorage) {
         "ngInject";
         /* DI */
         this.$scope = $scope;
@@ -31,10 +32,12 @@ export default class PodcastItemsListComponent {
         this.itemService = itemService;
         this.playlistService = playlistService;
         this.hotkeys = hotkeys;
+        this.$sessionStorage = $sessionStorage;
     }
 
     $onInit() {
         this.podcast.items = [];
+        this.currentPage = (this.searchParameters && this.searchParameters.page+1) || 1;
         this.loadPage();
 
         this.subscription = this.DownloadManager
@@ -56,12 +59,12 @@ export default class PodcastItemsListComponent {
 
     loadPage() {
         this.currentPage = (this.currentPage < 1) ? 1 : (this.currentPage > Math.ceil(this.totalItems / this.itemPerPage)) ? Math.ceil(this.totalItems / this.itemPerPage) : this.currentPage;
-        return this.itemService.getItemForPodcastWithPagination(this.podcast, {
-                size: this.itemPerPage,
-                page : this.currentPage - 1,
-                sort : [{ direction : 'DESC', property : 'pubDate'}]
-            })
-            .then(itemsResponse => { this.podcast.items = itemsResponse.content; this.podcast.totalItems = itemsResponse.totalElements; });
+        this.searchParameters = {page: this.currentPage-1};
+        return this.itemService.getItemForPodcastWithPagination(this.podcast, this.searchParameters)
+            .then(itemsResponse => {
+                this.podcast.items = itemsResponse.content;
+                this.podcast.totalItems = itemsResponse.totalElements;
+            });
     }
 
     remove(item) {
@@ -90,5 +93,18 @@ export default class PodcastItemsListComponent {
 
     play(item){
         return this.itemService.play(item);
+    }
+
+    get searchParameters() {
+        return this.$sessionStorage[`podcast-${this.podcast.id}`];
+    }
+
+    set searchParameters(val) {
+        this.$sessionStorage[`podcast-${this.podcast.id}`] = Object.assign(
+            {},
+            {size: this.itemPerPage, sort: [{direction : 'DESC', property : 'pubDate'}]},
+            this.searchParameters,
+            val
+        );
     }
 }
