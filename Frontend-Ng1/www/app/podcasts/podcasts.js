@@ -26,12 +26,27 @@ import './podcasts.css!';
         types: typeService => {"ngInject"; return typeService.findAll(); }
     }
 })
-export default class PodcastsListCtrl {
+export default class PodcastsListComponent {
 
-    constructor(TitleService) {
+    static defaultFilters = { title: '', type: '' };
+
+    constructor(TitleService, $sessionStorage) {
         "ngInject";
-        this.filters = { title : '', type : '' };
+        this.$sessionStorage = $sessionStorage;
+        this.TitleService = TitleService;
+    }
+
+    $onInit(){
         TitleService.title = 'Podcasts';
+        this.filters = PodcastsListComponent.defaultFilters;
+    }
+
+    get filters() {
+        return this.$sessionStorage.podcasts;
+    }
+
+    set filters(val) {
+        this.$sessionStorage.podcasts = this.$sessionStorage.podcasts || val;
     }
 
 }
