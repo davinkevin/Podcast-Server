@@ -3,7 +3,9 @@
     <div class="player-inline">
 
         <div class="pull-left current-cover">
-            <img class="current-cover" ng-src="{{ pic.currentVideo.cover.url }}" alt=""/>
+            <a ng-href="{{::'/podcasts/' + pic.currentVideo.podcast.id + '/items/' + pic.currentVideo.id }}">
+                <img class="current-cover" ng-src="{{ pic.currentVideo.cover.url }}" alt=""/>
+            </a>
         </div>
         <div class="pull-left player">
             <div class="action-button-row">
