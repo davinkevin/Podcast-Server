@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {ItemService} from "./shared/item/item.service";
-import {Page, Item} from "./shared/entity";
+import {ItemService} from './shared/item/item.service';
+import {Page, Item} from './shared/entity';
 
 @Component({
   selector: 'ps-root',

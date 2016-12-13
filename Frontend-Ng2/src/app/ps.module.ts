@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
 import { PsComponent } from './ps.component';
-import {ItemService} from "./shared/item/item.service";
+import {ItemService} from './shared/item/item.service';
 
 @NgModule({
   declarations: [

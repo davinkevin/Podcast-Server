@@ -1,10 +1,10 @@
-import { FrontendNg2Page } from './app.po';
+import { PodcastServerPage } from './app.po';
 
-describe('frontend-ng2 App', function() {
-  let page: FrontendNg2Page;
+describe('podcast-server App', function() {
+  let page: PodcastServerPage;
 
   beforeEach(() => {
-    page = new FrontendNg2Page();
+    page = new PodcastServerPage();
   });
 
   it('should display message saying app works', () => {

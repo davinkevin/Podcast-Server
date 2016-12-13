@@ -1,13 +1,16 @@
 {
   "project": {
-    "version": "1.0.0-beta.17",
-    "name": "Podcast-Server"
+    "version": "1.0.0-beta.21",
+    "name": "podcast-server"
   },
   "apps": [
     {
       "root": "src",
       "outDir": "dist",
-      "assets": "assets",
+      "assets": [
+        "assets",
+        "favicon.ico"
+      ],
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
@@ -17,9 +20,7 @@
       "styles": [
         "styles.scss"
       ],
-      "scripts": [
-        "../node_modules/hammerjs/hammer.min.js"
-      ],
+      "scripts": [],
       "environments": {
         "source": "environments/environment.ts",
         "dev": "environments/environment.ts",
@@ -41,6 +42,18 @@
   },
   "defaults": {
     "styleExt": "scss",
-    "prefixInterfaces": false
+    "prefixInterfaces": false,
+    "inline": {
+      "style": false,
+      "template": false
+    },
+    "spec": {
+      "class": false,
+      "component": true,
+      "directive": true,
+      "module": false,
+      "pipe": true,
+      "service": true
+    }
   }
 }

@@ -2,16 +2,16 @@
 
 import { TestBed, async } from '@angular/core/testing';
 import { PsComponent } from './ps.component';
-import {NO_ERRORS_SCHEMA} from "@angular/core";
-import {ItemService} from "./shared/item/item.service";
-import {HttpModule} from "@angular/http";
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ItemService} from './shared/item/item.service';
+import {HttpModule} from '@angular/http';
 
 describe('App: Podcast-Server', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [PsComponent],
-      providers:[ItemService],
-      imports:[HttpModule],
+      providers: [ItemService],
+      imports: [HttpModule],
       schemas: [NO_ERRORS_SCHEMA]
     });
   });

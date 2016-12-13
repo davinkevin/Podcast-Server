@@ -1,6 +1,6 @@
 import { browser, element, by } from 'protractor';
 
-export class FrontendNg2Page {
+export class PodcastServerPage {
   navigateTo() {
     return browser.get('/');
   }

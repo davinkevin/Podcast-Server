@@ -1,9 +1,9 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, inject } from '@angular/core/testing';
+import { TestBed, inject } from '@angular/core/testing';
 import { ItemService } from './item.service';
-import {Http} from "@angular/http";
-import {Observable} from "rxjs";
+import {Http} from '@angular/http';
+import {Observable} from 'rxjs';
 
 describe('Service: Item', () => {
 
