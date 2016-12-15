@@ -60,7 +60,7 @@ public class GulliDownloader extends HTTPDownloader {
 
         url = htmlService.get(item.getUrl())
                 .map(d -> d.select("script"))
-                .flatMap(scripts -> List.ofAll(scripts).find(e -> e.html().contains("playlist")))
+                .flatMap(scripts -> List.ofAll(scripts).find(e -> e.html().contains("playlist:")))
                 .flatMap(this::getPlaylistFromGulliScript)
                 .getOrElse(StringUtils.EMPTY);
 
