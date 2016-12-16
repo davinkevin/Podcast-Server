@@ -4,9 +4,10 @@
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
+    "build:prod": "ng build --prod --aot",
     "lint": "tslint \"src/**/*.ts\"",
-    "test": "ng test",
+    "test": "ng t -w false --browsers PhantomJS",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
   },
@@ -38,6 +39,7 @@
     "karma-cli": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-remap-istanbul": "^0.2.1",
+    "karma-phantomjs-launcher": "^1.0.2",
     "protractor": "4.0.9",
     "ts-node": "1.2.1",
     "tslint": "3.13.0",

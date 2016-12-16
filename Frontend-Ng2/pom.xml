@@ -51,7 +51,7 @@
           <execution>
             <id>test</id>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
             <phase>test</phase>
             <configuration>
@@ -62,7 +62,7 @@
           <execution>
             <id>build</id>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
             <phase>package</phase>
             <configuration>
