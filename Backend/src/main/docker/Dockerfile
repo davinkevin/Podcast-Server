@@ -26,4 +26,4 @@ RUN sh -c 'touch /opt/podcast-server/app.jar'
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/podcast-server/app.jar"]
 
 # RUN with docker like that :
-# $ docker run -it -p 8080:8080 -p 2000:2000 -e podcastserver.server-url='http://dockerhost:8080/' davinkevin/podcast-server:v1.0.0
+# $ docker run -it -p 8080:8080 -p 2000:2000 davinkevin/podcast-server:v1.0.0
