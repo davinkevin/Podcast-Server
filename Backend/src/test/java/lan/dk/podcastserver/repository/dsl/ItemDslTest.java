@@ -228,7 +228,7 @@ public class ItemDslTest {
         /* Given */
         dbSetupTracker.skipNextLaunch();
         javaslang.collection.List<UUID> ids = javaslang.collection.List.of(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
-        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
@@ -244,7 +244,7 @@ public class ItemDslTest {
     public void should_result_with_search_without_ids() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        javaslang.collection.List<Tag> tags = javaslang.collection.List.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, null));

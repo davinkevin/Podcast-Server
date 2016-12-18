@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import javaslang.collection.List;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -51,13 +52,13 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Page<Item> findByTagsAndFullTextTerm(String term, List<Tag> tags, Boolean downloaded, Pageable page) {
+    public Page<Item> findByTagsAndFullTextTerm(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
         return page.getSort().getOrderFor("pertinence") == null
                 ? itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page)
                 : findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page);
     }
 
-    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, List<Tag> tags, Boolean downloaded, Pageable page) {
+    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
         // List with the order of pertinence of search result :
         List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 

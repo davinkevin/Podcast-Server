@@ -37,7 +37,7 @@ public class ItemSearchController {
                              @RequestParam(value = "downloaded", required = false, defaultValue = "") Boolean downloaded,
                              Pageable pageable) {
         return isSearch(q, tags, downloaded)
-                ? itemBusiness.findByTagsAndFullTextTerm(q, tagBusiness.findAllByName(tags).toList(), downloaded, pageable)
+                ? itemBusiness.findByTagsAndFullTextTerm(q, tagBusiness.findAllByName(tags), downloaded, pageable)
                 : itemBusiness.findAll(pageable);
     }
 

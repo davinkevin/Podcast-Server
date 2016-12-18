@@ -64,7 +64,7 @@ public class ItemDSL {
         return Q_ITEM.id.in(ids.toJavaList());
     }
 
-    private static Predicate isInTags(javaslang.collection.List<Tag> tags) {
+    private static Predicate isInTags(javaslang.collection.Set<Tag> tags) {
         List<Predicate> predicates = tags
                 .map(Q_ITEM.podcast.tags::contains)
                 .map(Predicate.class::cast)
@@ -84,7 +84,7 @@ public class ItemDSL {
         return Q_ITEM.podcast.id.eq(podcastId);
     }
 
-    public static Predicate getSearchSpecifications(javaslang.collection.List<UUID> ids, javaslang.collection.List<Tag> tags, Boolean downloaded) {
+    public static Predicate getSearchSpecifications(javaslang.collection.List<UUID> ids, javaslang.collection.Set<Tag> tags, Boolean downloaded) {
         return ExpressionUtils.allOf(
                 nonNull(ids) ? isInId(ids) : null,
                 isInTags(tags),
