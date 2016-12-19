@@ -5,6 +5,7 @@
             <div class="input-group">
                 <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
                 <input type="text" class="form-control" ng-model="plc.filters.title" placeholder="Global Search" ng-model-options="{ debounce: 500 }">
+                <div class="input-group-addon" ng-click="plc.filters.title = ''"><i class="ionicons ion-android-cancel"></i></div>
             </div>
         </div>
 
