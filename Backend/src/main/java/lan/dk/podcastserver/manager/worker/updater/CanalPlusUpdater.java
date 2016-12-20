@@ -90,7 +90,7 @@ public class CanalPlusUpdater extends AbstractUpdater {
             .getOrElse(HashSet::empty);
     }
 
-    private javaslang.collection.Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
+    private Set<Item> getSetItemToPodcastFromFrontTools(String urlFrontTools) {
         return getHTMLListingEpisodeFromFrontTools(urlFrontTools)
                 .filter(e -> !e.hasClass("blankMS"))
                 .map(e -> e.select("li._thumbs").first().id().replace("video_", ""))

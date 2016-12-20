@@ -12,9 +12,11 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import javaslang.jackson.datatype.JavaslangModule;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -68,10 +70,6 @@ public class IOUtils {
                 .mapTry(PARSER::parse)
                 .toOption();
     }
-    public static DocumentContext parseJson(String json) {
-        return PARSER.parse(json);
-    }
-
     public static InputStream fileAsStream(String file) {
         return IOUtils.class.getResourceAsStream(file);
     }
@@ -90,8 +88,14 @@ public class IOUtils {
     public static DocumentContext stringAsJson(String text) {
         return PARSER.parse(text);
     }
+    public static Document stringAsHtml(String html) {
+        return Try.of(() -> Jsoup.parse(html)).getOrElseThrow(e -> new RuntimeException(e));
+    }
 
     public static Path get(String uri) throws URISyntaxException {
         return Paths.get(IOUtils.class.getResource(uri).toURI());
+    }
+    public static String digest(String text) {
+        return DigestUtils.md5Hex(text);
     }
 }

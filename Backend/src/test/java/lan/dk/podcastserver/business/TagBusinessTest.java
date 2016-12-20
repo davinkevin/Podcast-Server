@@ -84,7 +84,7 @@ public class TagBusinessTest {
         Tag tag2 = new Tag().setId(id2).setName("tag" + id2);
         Tag tag3 = new Tag().setName("Foo");
         Tag tag4 = new Tag().setName("Bar");
-        javaslang.collection.HashSet<Tag> tags = HashSet.of(tag1, tag2, tag3, tag4);
+        Set<Tag> tags = HashSet.of(tag1, tag2, tag3, tag4);
 
         when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Option.of(tag1));
         when(tagRepository.findByNameIgnoreCase(eq(tag2.getName()))).thenReturn(Option.of(tag2));

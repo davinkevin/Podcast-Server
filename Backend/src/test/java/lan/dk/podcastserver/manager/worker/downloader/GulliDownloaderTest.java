@@ -71,7 +71,7 @@ public class GulliDownloaderTest {
     public void should_find_url_for_gulli_item() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/embed.VOD68526621555000.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.parseJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
 
         /* When */
         String url = gulliDownloader.getItemUrl(gulliDownloader.getItem());

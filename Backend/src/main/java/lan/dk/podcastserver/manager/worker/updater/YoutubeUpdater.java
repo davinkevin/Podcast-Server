@@ -95,7 +95,7 @@ public class YoutubeUpdater extends AbstractUpdater {
         // So, I choose to limit to 500 item / 10 Page of Youtube
 
         if (StringUtils.isEmpty(nextPageToken)) {
-            items = items.addAll(pageItems);;
+            items = items.addAll(pageItems);
         }
 
         return items;

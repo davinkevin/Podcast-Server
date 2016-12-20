@@ -34,21 +34,20 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CoverBusinessTest {
 
-    private String ROOT_FOLDER = "/tmp/podcast";
-
     @ClassRule public static WireMockClassRule wireMockRule = new WireMockClassRule(8089); // No-args constructor defaults to port 8080
     @Rule public WireMockClassRule instanceRule = wireMockRule;
+
+    private String ROOT_FOLDER = "/tmp/podcast";
+
+    @Mock CoverRepository coverRepository;
+    @Mock PodcastServerParameters podcastServerParameters;
+    @Spy UrlService urlService;
+    @InjectMocks CoverBusiness coverBusiness;
 
     @Before
     public void beforeEach() {
         FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER).toFile());
     }
-
-    @Mock CoverRepository coverRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Spy
-    UrlService urlService;
-    @InjectMocks CoverBusiness coverBusiness;
 
     @Test
     public void should_find_one() {
@@ -75,7 +74,9 @@ public class CoverBusinessTest {
 
     @Test
     public void should_say_its_not_same_cover() {
-        /* Given */ Podcast p1 = new Podcast(), p2 = new Podcast();
+        /* Given */
+        Podcast p1 = new Podcast();
+        Podcast p2 = new Podcast();
         p1.setCover(Cover.builder().url("http://fakeUrl.com").build());
         p2.setCover(Cover.builder().url("https://fakeurl.com").build());
 

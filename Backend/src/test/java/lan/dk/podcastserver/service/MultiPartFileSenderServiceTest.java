@@ -15,9 +15,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 import static lan.dk.podcastserver.service.MultiPartFileSenderService.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,16 +25,16 @@ import static org.mockito.Mockito.*;
  */
 public class MultiPartFileSenderServiceTest {
 
-    public static final String STRING_FILE_PATH = "/__files/utils/multipart/file_to_serve.txt";
-    MultiPartFileSenderService multiPartFileSenderService;
-    MimeTypeService mimeTypeService;
-    HttpServletResponse response;
-    HttpServletRequest request;
-    Long lastModifiedDate;
-    String fileName;
-    Path binaryPath;
-    Path filePath;
-    Long length;
+    private static final String STRING_FILE_PATH = "/__files/utils/multipart/file_to_serve.txt";
+    private MultiPartFileSenderService multiPartFileSenderService;
+    private MimeTypeService mimeTypeService;
+    private HttpServletResponse response;
+    private HttpServletRequest request;
+    private Long lastModifiedDate;
+    private String fileName;
+    private Path binaryPath;
+    private Path filePath;
+    private Long length;
 
     @Before
     public void beforeEach() throws URISyntaxException, IOException {

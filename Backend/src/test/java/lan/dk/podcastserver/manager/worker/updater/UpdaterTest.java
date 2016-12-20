@@ -113,7 +113,7 @@ public class UpdaterTest {
         @Override
         public Set<Item> getItems(Podcast podcast) {
 
-            return javaslang.collection.HashSet.of(
+            return HashSet.of(
                     new Item().setId(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")),
                     new Item().setId(UUID.randomUUID()),
                     new Item().setId(UUID.randomUUID())

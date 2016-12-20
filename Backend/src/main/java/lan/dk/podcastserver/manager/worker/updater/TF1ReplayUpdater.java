@@ -46,7 +46,7 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final String REPLAY_CATEGORY = "replay";
     private static final String ALL_CATEGORY = "all";
     private static final Function<DocumentContext, TF1ReplayResponse> EXTRACT_IN_TF1_REPLAY_RESPONSE = d -> d.read("$", TF1ReplayResponse.class);
-    private static final javaslang.collection.Set<String> TYPES = javaslang.collection.HashSet.of("replay", "vidéo");
+    private static final Set<String> TYPES = HashSet.of("replay", "vidéo");
 
     private final HtmlService htmlService;
     private final ImageService imageService;

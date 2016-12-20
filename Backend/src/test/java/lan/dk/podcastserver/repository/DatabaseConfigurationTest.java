@@ -29,6 +29,14 @@ import static org.hibernate.search.jpa.Search.getFullTextEntityManager;
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 public class DatabaseConfigurationTest {
 
+    private static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
+    private static final Operation DELETE_ALL_ITEMS = deleteAllFrom("ITEM");
+    private static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAGS"), deleteAllFrom("TAG"));
+    private static final Operation DELETE_ALL_PLAYLIST = Operations.sequenceOf(deleteAllFrom("WATCH_LIST_ITEMS"), deleteAllFrom("WATCH_LIST"));
+
+    public static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter();
+    public static final Operation DELETE_ALL = sequenceOf(DELETE_ALL_PLAYLIST, DELETE_ALL_ITEMS, DELETE_ALL_TAGS, DELETE_ALL_PODCASTS, DELETE_ALL_TAGS);
+
     @Bean FullTextEntityManager fullTextEntityManager(EntityManager entityManager) {
         return getFullTextEntityManager(entityManager);
     }
@@ -37,12 +45,5 @@ public class DatabaseConfigurationTest {
         return () -> GregorianCalendar.from(now());
     }
 
-    public static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter();
-
-    private static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
-    private static final Operation DELETE_ALL_ITEMS = deleteAllFrom("ITEM");
-    private static final Operation DELETE_ALL_TAGS = sequenceOf(deleteAllFrom("PODCAST_TAGS"), deleteAllFrom("TAG"));
-    private static final Operation DELETE_ALL_PLAYLIST = Operations.sequenceOf(deleteAllFrom("WATCH_LIST_ITEMS"), deleteAllFrom("WATCH_LIST"));
-    public static final Operation DELETE_ALL = sequenceOf(DELETE_ALL_PLAYLIST, DELETE_ALL_ITEMS, DELETE_ALL_TAGS, DELETE_ALL_PODCASTS, DELETE_ALL_TAGS);
 
 }

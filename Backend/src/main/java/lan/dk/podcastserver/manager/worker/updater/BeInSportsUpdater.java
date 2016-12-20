@@ -68,7 +68,7 @@ public class BeInSportsUpdater extends AbstractUpdater {
                 .getOrElse(HashSet::empty);
     }
 
-    private javaslang.collection.Set<Item> convertHtmlToItems(Elements htmlItems) {
+    private Set<Item> convertHtmlToItems(Elements htmlItems) {
         return HashSet.ofAll(htmlItems).map(this::getItem);
     }
 

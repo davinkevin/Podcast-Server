@@ -30,7 +30,8 @@ public class ApiTest {
     @Test
     public void should_have_specified_values() {
         /* Given */
-        String youtubeKey = "YoutubeKey", dailymotionKey = "dailymotionKey";
+        String youtubeKey = "YoutubeKey";
+        String dailymotionKey = "dailymotionKey";
 
         /* When */
         api.setDailymotion(dailymotionKey).setYoutube(youtubeKey);

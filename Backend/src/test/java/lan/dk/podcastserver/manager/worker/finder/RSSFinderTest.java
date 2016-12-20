@@ -6,10 +6,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.utils.IOUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
@@ -43,13 +38,6 @@ public class RSSFinderTest {
         when(jdomService.parse(eq(url))).thenReturn(Option.none());
         when(jdomService.parse(not(eq(url)))).then(i -> IOUtils.fileAsXml(i.getArgumentAt(0, String.class)));
         when(imageService.getCoverFromURL(eq(COVER_URL))).thenReturn(Cover.builder().url(COVER_URL).build());
-    }
-
-    private Document urlToFile(String url) throws JDOMException, IOException, URISyntaxException {
-        return new SAXBuilder().build(Paths.get(RSSFinderTest.class.getResource(
-                "/remote/podcast/" + FilenameUtils.getName(url)
-        ).toURI())
-        .toFile());
     }
 
     @Test

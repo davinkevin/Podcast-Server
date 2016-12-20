@@ -30,11 +30,12 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DatabaseServiceTest {
 
+    private static final Path NOT_DIRECTORY = Paths.get("/tmp", "foo.bar");
+
     @Mock Backup backup;
     @Mock FullTextEntityManager fem;
-    @InjectMocks
-    DatabaseService databaseService;
-    private static final Path NOT_DIRECTORY = Paths.get("/tmp", "foo.bar");
+    @InjectMocks DatabaseService databaseService;
+
     private Query query;
     private Path backupToCreate;
 

@@ -73,7 +73,7 @@ public class JsonServiceTest {
         String object = "}{{{";
 
         /* When */
-        DocumentContext parse = jsonService.parse(object);
+        jsonService.parse(object);
 
         /* Then @See annotation */
     }

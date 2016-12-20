@@ -1,10 +1,5 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ParseContext;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import javaslang.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -13,9 +8,6 @@ import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.utils.IOUtils;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,8 +16,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -38,8 +28,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TF1ReplayUpdaterTest {
 
-    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
-
     @Mock SignatureService signatureService;
     @Mock HtmlService htmlService;
     @Mock ImageService imageService;
@@ -51,8 +39,8 @@ public class TF1ReplayUpdaterTest {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
-        when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> digest(i.getArgumentAt(0, String.class)));
+        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgumentAt(0, String.class)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
@@ -67,8 +55,8 @@ public class TF1ReplayUpdaterTest {
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/xtra/olive-et-tom/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.replay.json"));
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=all"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.json"));
-        when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> digest(i.getArgumentAt(0, String.class)));
+        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgumentAt(0, String.class)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
@@ -94,7 +82,7 @@ public class TF1ReplayUpdaterTest {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
-        when(htmlService.parse(anyString())).then(i -> parseHtml(i.getArgumentAt(0, String.class)));
+        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
 
         /* When */
         Set<Item> items = updater.getItems(podcast);
@@ -128,17 +116,4 @@ public class TF1ReplayUpdaterTest {
         /* Then */
         assertThat(compatibility).isEqualTo(Integer.MAX_VALUE);
     }
-
-    private Optional<DocumentContext> parseJson(String url) throws IOException, URISyntaxException {
-        return Optional.of(PARSER.parse(Paths.get(TF1ReplayUpdaterTest.class.getResource(url).toURI()).toFile()));
-    }
-
-    private Document parseHtml(String html) throws URISyntaxException, IOException {
-        return Jsoup.parse(html);
-    }
-
-    private String digest(String html) {
-        return DigestUtils.md5Hex(html);
-    }
-
 }
