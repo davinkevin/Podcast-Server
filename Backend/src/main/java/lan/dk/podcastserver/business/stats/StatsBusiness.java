@@ -14,10 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
@@ -82,7 +79,7 @@ public class StatsBusiness {
                 .stream()
                 .map(type -> generateForType(type, numberOfMonth, selector))
                 .filter(stats -> stats.values().size() > 0)
-                .sorted((s1, s2) -> s1.type().compareTo(s2.type()))
+                .sorted(Comparator.comparing(StatsPodcastType::type))
                 .collect(toList());
     }
 
@@ -92,7 +89,7 @@ public class StatsBusiness {
                 .getItems()
                 .stream()
                 .map(mapper)
-                .filter(date -> date != null)
+                .filter(Objects::nonNull)
                 .map(ZonedDateTime::toLocalDate)
                 .filter(date -> date.isAfter(dateInPast))
                 .collect(groupingBy(o -> o, counting()))

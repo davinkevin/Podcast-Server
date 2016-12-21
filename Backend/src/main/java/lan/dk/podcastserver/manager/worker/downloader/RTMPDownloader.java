@@ -103,7 +103,7 @@ public class RTMPDownloader extends AbstractDownloader {
     static class RTMPWatcher implements Runnable {
 
         static final String DOWNLOAD_COMPLETE = "download complete";
-        static final Pattern RTMPDUMP_PROGRESSION_PATTERN_EXTRACTOR = Pattern.compile("[^\\(]*\\(([0-9]*).*%\\)");
+        static final Pattern RTMPDUMP_PROGRESSION_PATTERN_EXTRACTOR = Pattern.compile("[^(]*\\(([0-9]*).*%\\)");
         final RTMPDownloader rtmpDownloader;
 
         private BufferedReader getBufferedReader(InputStream is) {

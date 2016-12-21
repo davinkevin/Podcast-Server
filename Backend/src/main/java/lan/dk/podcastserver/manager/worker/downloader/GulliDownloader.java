@@ -35,7 +35,7 @@ import static java.util.Objects.nonNull;
 @Component("GulliDownloader")
 public class GulliDownloader extends HTTPDownloader {
 
-    private static final Pattern NUMBER_IN_PLAYLIST_EXTRACTOR = Pattern.compile("playlistItem\\(([^\\)]*)\\);");
+    private static final Pattern NUMBER_IN_PLAYLIST_EXTRACTOR = Pattern.compile("playlistItem\\(([^)]*)\\);");
     private static final Pattern PLAYLIST_EXTRACTOR = Pattern.compile("playlist:\\s*(.*?(?=events:))", Pattern.DOTALL);
     private static final TypeRef<List<GulliItem>> GULLI_ITEM_TYPE_REF = new TypeRef<List<GulliItem>>() { };
 

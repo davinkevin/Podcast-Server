@@ -25,7 +25,7 @@ import static java.util.Objects.nonNull;
 public class DailymotionFinder implements Finder {
 
     private static final String API_URL = "https://api.dailymotion.com/user/%s?fields=avatar_720_url,description,username";
-    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com\\/(.*)");
+    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com/(.*)");
 
     final JsonService jsonService;
     final ImageService imageService;

@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 public class DailymotionUpdater extends AbstractUpdater {
 
     static final String API_LIST_OF_ITEMS = "https://api.dailymotion.com/user/%s/videos?fields=created_time,description,id,thumbnail_720_url,title";
-    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com\\/(.*)");
+    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com/(.*)");
     private static final String ITEM_URL = "http://www.dailymotion.com/video/%s";
     private static final TypeRef<Set<DailymotionVideoDetail>> LIST_DAILYMOTIONVIDEODETAIL_TYPE = new TypeRef<Set<DailymotionVideoDetail>>() { };
 
