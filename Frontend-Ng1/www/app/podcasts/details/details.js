@@ -26,6 +26,8 @@ import template from './details.html!text';
 })
 export default class PodcastDetailCtrl {
 
+    totalItems = null;
+
     constructor($scope, podcastService, $timeout, TitleService){
         "ngInject";
         this.$scope = $scope;
@@ -73,5 +75,9 @@ export default class PodcastDetailCtrl {
 
     isUpdatable() {
         return this.podcast.isUpdatable();
+    }
+
+    updateNumberOfEpisodes(num){
+        this.totalItems = num;
     }
 }

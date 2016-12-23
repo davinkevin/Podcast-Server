@@ -14,7 +14,7 @@ import template from './episodes.html!text';
 @Component({
     selector : 'podcast-items-list',
     as : 'pic',
-    bindings : { podcast : '<'},
+    bindings : { podcast : '<', onChangeNumberOfEpisodes: '&' },
     template : template
 })
 @Constant({ name : 'PodcastItemPerPage', value : 10 })
@@ -63,7 +63,9 @@ export default class PodcastItemsListComponent {
         return this.itemService.getItemForPodcastWithPagination(this.podcast, this.searchParameters)
             .then(itemsResponse => {
                 this.podcast.items = itemsResponse.content;
-                this.podcast.totalItems = itemsResponse.totalElements;
+                this.totalItems = itemsResponse.totalElements;
+                debugger;
+                this.onChangeNumberOfEpisodes({num: this.totalItems});
             });
     }
 
