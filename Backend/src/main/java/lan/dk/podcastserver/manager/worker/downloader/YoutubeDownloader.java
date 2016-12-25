@@ -78,7 +78,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             v
                 .getVideo()
                 .getInfo()
-                .forEach(vi -> vi.targetFile = generatePartFile(getTargetFile(item, v.getVideo().getTitle()), vi).toFile());
+                .forEach(vi -> vi.setTarget(generatePartFile(getTargetFile(item, v.getVideo().getTitle()), vi).toFile()));
 
             v.download(parser, stopDownloading, watcher);
         } catch (DownloadMultipartError e) {
@@ -91,14 +91,17 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             stopDownload();
         } catch (DownloadInterruptedError e) {
-            log.debug("Arrêt du téléchargement par l'interface");
+            e.printStackTrace();
+            log.debug("Stopped", e);
         } catch (StringIndexOutOfBoundsException | MalformedURLException | NullPointerException | DownloadError e) {
             log.error("Third part Exception : ", e);
+
             if (itemDownloadManager.canBeReset(item)) {
                 log.info("Reset of Youtube download {}", item.getTitle());
                 itemDownloadManager.resetDownload(item);
                 return null;
             }
+
             stopDownload();
         }
         log.debug("Download ended");
