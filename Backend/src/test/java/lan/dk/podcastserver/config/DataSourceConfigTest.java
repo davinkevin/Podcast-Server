@@ -72,6 +72,10 @@ public class DataSourceConfigTest {
             properties.setProperty("spring.datasource.password", PASSWORD);
             properties.setProperty("spring.datasource.url", DATA_SOURCE_URL);
             properties.setProperty("spring.datasource.driver-class-name", DATA_SOURCE_CLASS_NAME);
+            properties.setProperty("spring.jpa.properties.hibernate.search.default.indexmanager", "near-real-time");
+            properties.setProperty("spring.jpa.properties.hibernate.search.default.directory_provider", "ram");
+            properties.setProperty("spring.jpa.properties.hibernate.search.default.indexBase", "/tmp/lucene");
+
             pspc.setProperties(properties);
             return pspc;
         }

@@ -8,18 +8,6 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/PodcastServer.log</file>
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
-        </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- rotate every day for log collection and archiving -->
-            <fileNamePattern>logs/PodcastServer.%d{yyyyMMdd}.log</fileNamePattern>
-        </rollingPolicy>
-    </appender>
-
     <logger name="lan.dk.podcastserver" level="DEBUG"/>
     <logger name="lan.dk.podcastserver.utils" level="WARN"/>
     <logger name="org.hibernate" level="OFF" />
@@ -35,7 +23,6 @@
 
     <root level="info">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
     </root>
 
 </configuration>

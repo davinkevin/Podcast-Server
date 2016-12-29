@@ -15,15 +15,13 @@ spring :
         hibernate :
             ddl-auto: update
         properties :
-            hibernate:
-                format_sql: true
-                search.default:
-                        indexmanager: near-real-time
-                        directory_provider: ram
-                        indexBase: /tmp/lucene
-            jadira:
-              usertype:
-                autoRegisterUserTypes: true
+                    hibernate:
+                        format_sql: true
+                        search.default:
+                                indexmanager: near-real-time
+                                directory_provider: ram
+                                indexBase: /tmp/lucene
+                    jadira.usertype.autoRegisterUserTypes: true
 
 server:
   port : 8080
