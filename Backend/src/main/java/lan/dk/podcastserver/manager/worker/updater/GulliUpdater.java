@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 @Component("GulliUpdater")
 public class GulliUpdater extends AbstractUpdater {
 
-    private static final Pattern FRAME_EXTRACTOR = Pattern.compile(".*\\.html\\(.<iframe.* src=\"([^\"]*)\".*");
+    private static final Pattern FRAME_EXTRACTOR = Pattern.compile(".*\\.html\\(.*<iframe.* src=\"([^\"]*)\".*");
 
     private final HtmlService htmlService;
     private final ImageService imageService;

@@ -273,7 +273,7 @@
                     dataType: "json",
                     success: function (oRes) {
                         if (oRes.filename) {
-                            jQuery('#flashcontent').html('<iframe onload="onPlayerLoaded(this)"; id="jwpiframe" src="http://replay.gulli.fr/jwplayer/embed/VOD68526621555000" frameborder="0" allowfullscreen width=784 height="780" scrolling="no"></iframe>');
+                            jQuery('#flashcontent').html('<div class="lajwpl" style="position:relative;">                        <img style="display:block;width:100%;height:auto;" src="http://resize1-gulli.ladmedia.fr/rcrop/748,420/img/var/storage/imports/replay/images_programme/pokemon_s19.jpg" />                        <div class="lazyplayercontainer" style="overflow:visible;position:absolute;top:0;left:0;width:100%;height:100%;">                            <iframe onload="onPlayerLoaded(this)"; id="jwpiframe" src="http://replay.gulli.fr/jwplayer/embed/VOD68526621555000" frameborder="0" allowfullscreen width=784 height="780" scrolling="no"></iframe>');
                         } else {
                             /* display geoblocking message */
                         }
