@@ -16,52 +16,52 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 28/06/15 for Podcast Server
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SendUpdaterTest {
+public class UploadUpdaterTest {
 
-    public static final Item ITEM_1 = new Item().setId(UUID.randomUUID());
-    public static final Item ITEM_2 = new Item().setId(UUID.randomUUID());
-    public static final Item ITEM_3 = new Item().setId(UUID.randomUUID());
+    private Podcast podcast;
+    private final Item item1 = new Item().setId(UUID.randomUUID());
+    private final Item item2 = new Item().setId(UUID.randomUUID());
+    private final Item item3 = new Item().setId(UUID.randomUUID());
 
-    @InjectMocks SendUpdater sendUpdater;
+    private @InjectMocks UploadUpdater uploadUpdater;
 
-    public static Podcast PODCAST;
 
     @Before
     public void beforeEach() {
-        PODCAST = new Podcast();
-        PODCAST.add(ITEM_1);
-        PODCAST.add(ITEM_2);
-        PODCAST.add(ITEM_3);
+        podcast = new Podcast();
+        podcast.add(item1);
+        podcast.add(item2);
+        podcast.add(item3);
     }
 
     @Test
     public void should_serve_items() {
-        assertThat(sendUpdater.getItems(PODCAST))
+        assertThat(uploadUpdater.getItems(podcast))
                 .hasSize(3)
-                .contains(ITEM_1, ITEM_2, ITEM_3);
+                .contains(item1, item2, item3);
     }
 
     @Test
     public void should_generate_an_empty_signature() {
-        assertThat(sendUpdater.signatureOf(PODCAST))
+        assertThat(uploadUpdater.signatureOf(podcast))
                 .isEmpty();
     }
 
     @Test
     public void should_reject_every_item() {
-        assertThat(sendUpdater.notIn(PODCAST).test(new Item()))
+        assertThat(uploadUpdater.notIn(podcast).test(new Item()))
                 .isFalse();
     }
     
     @Test
     public void should_show_his_type() {
-        AbstractUpdater.Type type = sendUpdater.type();
-        assertThat(type.key()).isEqualTo("send");
-        assertThat(type.name()).isEqualTo("Send");
+        AbstractUpdater.Type type = uploadUpdater.type();
+        assertThat(type.key()).isEqualTo("upload");
+        assertThat(type.name()).isEqualTo("Upload");
     }
 
     @Test
     public void should_not_be_compatible() {
-        assertThat(sendUpdater.compatibility("http://foo/bar")).isEqualTo(Integer.MAX_VALUE);
+        assertThat(uploadUpdater.compatibility("http://foo/bar")).isEqualTo(Integer.MAX_VALUE);
     }
 }

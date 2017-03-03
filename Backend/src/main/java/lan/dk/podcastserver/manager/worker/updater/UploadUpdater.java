@@ -14,10 +14,10 @@ import java.util.function.Predicate;
 /**
  * Created by kevin on 15/05/15 for HackerRank problem
  */
-@Component("SendUpdater")
-public class SendUpdater extends AbstractUpdater {
+@Component("UploadUpdater")
+public class UploadUpdater extends AbstractUpdater {
 
-    SendUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator) {
+    UploadUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator) {
         super(podcastServerParameters, signatureService, validator);
     }
 
@@ -38,7 +38,7 @@ public class SendUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("send", "Send");
+        return new Type("upload", "Upload");
     }
 
     @Override
