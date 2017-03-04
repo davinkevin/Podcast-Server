@@ -1,13 +1,13 @@
 package lan.dk.podcastserver.business;
 
 import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +29,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PodcastBusiness {
 
-    final PodcastServerParameters podcastServerParameters;
-    final JdomService jdomService;
-    final PodcastRepository podcastRepository;
-    final TagBusiness tagBusiness;
-    final CoverBusiness coverBusiness;
-    final MimeTypeService mimeTypeService;
+    private final PodcastServerParameters podcastServerParameters;
+    private final JdomService jdomService;
+    private final PodcastRepository podcastRepository;
+    private final TagBusiness tagBusiness;
+    private final CoverBusiness coverBusiness;
 
     //** Delegate du Repository **//
     public List<Podcast> findAll() {
@@ -59,7 +58,7 @@ public class PodcastBusiness {
         //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
-    public javaslang.collection.Set<Podcast> findByUrlIsNotNull() {
+    public Set<Podcast> findByUrlIsNotNull() {
         return podcastRepository.findByUrlIsNotNull();
     }
 
