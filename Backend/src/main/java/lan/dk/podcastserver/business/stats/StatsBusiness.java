@@ -26,9 +26,9 @@ import static java.util.stream.Collectors.*;
 @RequiredArgsConstructor
 public class StatsBusiness {
 
-    final ItemRepository itemRepository;
-    final PodcastBusiness podcastBusiness;
-    final UpdaterSelector updaterSelector;
+    private final ItemRepository itemRepository;
+    private final PodcastBusiness podcastBusiness;
+    private final UpdaterSelector updaterSelector;
 
     public List<StatsPodcastType> allStatsByTypeAndDownloadDate(Integer numberOfMonth) {
         return allStatsByType(numberOfMonth, Selector.BY_DOWNLOAD_DATE);

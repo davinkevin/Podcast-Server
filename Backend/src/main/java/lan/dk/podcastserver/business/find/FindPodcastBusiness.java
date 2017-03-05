@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FindPodcastBusiness {
 
-    final FinderSelector finderSelector;
+    private final FinderSelector finderSelector;
     
     public Podcast fetchPodcastInfoByUrl(String url) {
         return finderSelector.of(url).find(url);

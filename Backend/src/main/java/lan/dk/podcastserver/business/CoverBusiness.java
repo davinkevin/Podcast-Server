@@ -34,9 +34,9 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class CoverBusiness {
 
-    final CoverRepository coverRepository;
-    final PodcastServerParameters podcastServerParameters;
-    final UrlService urlService;
+    private final CoverRepository coverRepository;
+    private final PodcastServerParameters podcastServerParameters;
+    private final UrlService urlService;
 
     public Cover findOne(UUID id) {
         return coverRepository.findOne(id);

@@ -38,13 +38,14 @@ import static lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecification
 @Transactional
 @RequiredArgsConstructor
 public class ItemBusiness {
+
     private static final String UPLOAD_PATTERN = "yyyy-MM-dd";
 
-    final ItemDownloadManager itemDownloadManager;
-    final PodcastServerParameters podcastServerParameters;
-    final ItemRepository itemRepository;
-    final PodcastBusiness podcastBusiness;
-    final MimeTypeService mimeTypeService;
+    private final ItemDownloadManager itemDownloadManager;
+    private final PodcastServerParameters podcastServerParameters;
+    private final ItemRepository itemRepository;
+    private final PodcastBusiness podcastBusiness;
+    private final MimeTypeService mimeTypeService;
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findAll(Pageable pageable) {

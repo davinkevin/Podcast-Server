@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TagBusiness {
 
-    final TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
     public List<Tag> findAll() {
         return List.ofAll(tagRepository.findAll());
