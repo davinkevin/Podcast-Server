@@ -21,7 +21,7 @@ import static lan.dk.podcastserver.entity.WatchList.WatchListDetailsListView;
 @RequiredArgsConstructor
 public class WatchListController {
 
-    final WatchListBusiness watchListBusiness;
+    private final WatchListBusiness watchListBusiness;
 
     @JsonView(WatchListDetailsListView.class)
     @PostMapping

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/task/updateManager")
 public class UpdatePodcastController {
 
-    final UpdatePodcastBusiness updatePodcastBusiness;
-    final ItemDownloadManager IDM;
+    private final UpdatePodcastBusiness updatePodcastBusiness;
+    private final ItemDownloadManager IDM;
 
     @RequestMapping(value = "/updatePodcast", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)

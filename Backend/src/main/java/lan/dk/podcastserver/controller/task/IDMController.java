@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequestMapping("/api/task/downloadManager")
 public class IDMController {
 
-    final ItemDownloadManager IDM;
+    private final ItemDownloadManager IDM;
 
     @GetMapping("/queue")
     public Queue<Item> getDownloadList () {

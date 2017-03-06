@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequestMapping("/api/task")
 public class DatabaseController {
 
-    final DatabaseService databaseService;
+    private final DatabaseService databaseService;
 
     @RequestMapping(value = "backup", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.NO_CONTENT)

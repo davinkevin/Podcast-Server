@@ -37,10 +37,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ItemController {
     
-    final ItemBusiness itemBusiness;
-    final ItemDownloadManager itemDownloadManager;
-    final MultiPartFileSenderService multiPartFileSenderService;
-    final WatchListBusiness watchListBusiness;
+    private final ItemBusiness itemBusiness;
+    private final ItemDownloadManager itemDownloadManager;
+    private final MultiPartFileSenderService multiPartFileSenderService;
+    private final WatchListBusiness watchListBusiness;
 
     @GetMapping
     @JsonView(Item.ItemPodcastListView.class)

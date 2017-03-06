@@ -37,11 +37,11 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class PodcastController {
 
-    final PodcastBusiness podcastBusiness;
-    final FindPodcastBusiness findPodcastBusiness;
-    final StatsBusiness statsBusiness;
-    final PodcastServerParameters podcastServerParameters;
-    final UpdatePodcastBusiness updatePodcastBusiness;
+    private final PodcastBusiness podcastBusiness;
+    private final FindPodcastBusiness findPodcastBusiness;
+    private final StatsBusiness statsBusiness;
+    private final PodcastServerParameters podcastServerParameters;
+    private final UpdatePodcastBusiness updatePodcastBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {

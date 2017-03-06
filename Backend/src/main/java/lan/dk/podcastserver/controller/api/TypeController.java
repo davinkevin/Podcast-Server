@@ -18,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TypeController {
 
-    final UpdaterSelector updaterSelector;
+    private final UpdaterSelector updaterSelector;
 
     @Cacheable("types")
     @GetMapping

@@ -16,7 +16,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class DownloadControllerWS {
 
-    final ItemDownloadManager IDM;
+    private final ItemDownloadManager IDM;
 
     @SubscribeMapping("/waiting")
     public Collection<Item> waitingList() {

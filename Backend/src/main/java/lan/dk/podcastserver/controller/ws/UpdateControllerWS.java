@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class UpdateControllerWS {
 
-    final UpdatePodcastBusiness updatePodcastBusiness;
+    private final UpdatePodcastBusiness updatePodcastBusiness;
 
     @SubscribeMapping("/updating")
     public Boolean isUpdating() {

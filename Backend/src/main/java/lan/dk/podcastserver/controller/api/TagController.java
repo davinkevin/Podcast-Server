@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping("/api/tags")
 public class TagController {
 
-    final TagBusiness tagBusiness;
+    private final TagBusiness tagBusiness;
 
     @GetMapping("{id}")
     public Tag findById(@PathVariable UUID id) {

@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatsController {
 
-    final StatsBusiness itemStatsBusiness;
+    private final StatsBusiness itemStatsBusiness;
 
     @PostMapping("byDownloadDate")
     @Cacheable(value = "stats", key = "{#root.methodName, #numberOfMonth}")
