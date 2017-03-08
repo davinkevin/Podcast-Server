@@ -100,7 +100,7 @@ public class PodcastController {
 
     @JsonView(Podcast.PodcastDetailsView.class)
     @PostMapping("fetch")
-    public Podcast fetchPodcastInfoByUrl(@RequestBody String url) {
+    public Podcast fetchPodcastInfoByUrl(@RequestBody(required=false) String url) {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
 
