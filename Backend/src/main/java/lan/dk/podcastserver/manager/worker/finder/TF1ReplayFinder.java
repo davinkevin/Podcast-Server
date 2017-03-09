@@ -21,9 +21,10 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class TF1ReplayFinder implements Finder {
 
-    public static final Pattern PICTURE_EXTRACTOR = Pattern.compile("url\\(([^)]+)\\).*");
-    final HtmlService htmlService;
-    final ImageService imageService;
+    private static final Pattern PICTURE_EXTRACTOR = Pattern.compile("url\\(([^)]+)\\).*");
+
+    private final HtmlService htmlService;
+    private final ImageService imageService;
 
     @Override
     public Podcast find(String url) {
@@ -51,7 +52,9 @@ public class TF1ReplayFinder implements Finder {
         if (!m.find())
             return imageService.getCoverFromURL(p.select("meta[property=og:image]").attr("content"));
 
-        return imageService.getCoverFromURL(m.group(1));
+        String url = m.group(1).startsWith("//") ? "http:" + m.group(1) : m.group(1);
+
+        return imageService.getCoverFromURL(url);
     }
 
 

@@ -26,9 +26,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TF1ReplayFinderTest {
 
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @InjectMocks TF1ReplayFinder finder;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @InjectMocks TF1ReplayFinder finder;
 
     @Test
     public void should_fetch_from_html_page() throws IOException, URISyntaxException {
