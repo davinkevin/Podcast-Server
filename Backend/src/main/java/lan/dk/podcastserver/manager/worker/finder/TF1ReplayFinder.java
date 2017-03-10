@@ -1,9 +1,11 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.utils.MatcherExtractor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -11,7 +13,6 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -47,14 +48,11 @@ public class TF1ReplayFinder implements Finder {
     private Cover getCover(Document p) {
         String style = p.select(".focalImg style").html();
 
-        Matcher m = PICTURE_EXTRACTOR.matcher(style);
-
-        if (!m.find())
-            return imageService.getCoverFromURL(p.select("meta[property=og:image]").attr("content"));
-
-        String url = m.group(1).startsWith("//") ? "http:" + m.group(1) : m.group(1);
-
-        return imageService.getCoverFromURL(url);
+        return MatcherExtractor.of(PICTURE_EXTRACTOR, style).group(1)
+                .orElse(Option.of(p.select("meta[property=og:image]").attr("content")))
+                .map(url -> url.startsWith("//") ? "http:" + url : url)
+                .map(imageService::getCoverFromURL)
+                .getOrElse(Cover.DEFAULT_COVER);
     }
 
 
