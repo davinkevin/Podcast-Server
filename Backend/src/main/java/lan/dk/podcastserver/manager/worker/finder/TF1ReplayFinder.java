@@ -5,7 +5,6 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.utils.MatcherExtractor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -13,7 +12,9 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
-import java.util.regex.Pattern;
+
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 20/07/2016.
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class TF1ReplayFinder implements Finder {
 
-    private static final Pattern PICTURE_EXTRACTOR = Pattern.compile("url\\(([^)]+)\\).*");
+    private static final PatternExtractor PICTURE_EXTRACTOR = from("url\\(([^)]+)\\).*");
 
     private final HtmlService htmlService;
     private final ImageService imageService;
@@ -48,7 +49,8 @@ public class TF1ReplayFinder implements Finder {
     private Cover getCover(Document p) {
         String style = p.select(".focalImg style").html();
 
-        return MatcherExtractor.of(PICTURE_EXTRACTOR, style).group(1)
+        return PICTURE_EXTRACTOR.extractFrom(style)
+                .group(1)
                 .orElse(Option.of(p.select("meta[property=og:image]").attr("content")))
                 .map(url -> url.startsWith("//") ? "http:" + url : url)
                 .map(imageService::getCoverFromURL)

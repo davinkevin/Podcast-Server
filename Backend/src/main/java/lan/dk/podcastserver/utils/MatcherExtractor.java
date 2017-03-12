@@ -19,16 +19,26 @@ public class MatcherExtractor {
         this.isFind = matcher.find();
     }
 
-    public static MatcherExtractor of(Pattern p, String value) {
-        return new MatcherExtractor(p.matcher(value));
+    public static PatternExtractor from(String pattern) {
+        return new PatternExtractor(pattern);
     }
 
-    public Option<String> group(Integer number) {
+    public Option<String> group(Integer group) {
         if (!isFind) {
             return Option.none();
         }
 
-        return Try.of(() -> matcher.group(number)).toOption();
+        return Try.of(() -> matcher.group(group)).toOption();
+    }
+
+    public static class PatternExtractor {
+
+        private final Pattern pattern;
+
+        PatternExtractor(String pattern) { this.pattern = Pattern.compile(pattern); }
+
+        public MatcherExtractor extractFrom(String value) { return new MatcherExtractor(pattern.matcher(value)); }
+
     }
 
 }
