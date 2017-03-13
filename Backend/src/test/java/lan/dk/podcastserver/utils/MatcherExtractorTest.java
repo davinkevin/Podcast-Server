@@ -3,6 +3,8 @@ package lan.dk.podcastserver.utils;
 import javaslang.control.Option;
 import org.junit.Test;
 
+import java.util.regex.Pattern;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -14,10 +16,10 @@ public class MatcherExtractorTest {
     public void should_return_value() {
         /* GIVEN */
         String s = "foo";
-        String p = "(.*)";
+        Pattern p = Pattern.compile("(.*)");
 
         /* WHEN  */
-        Option<String> v = MatcherExtractor.from(p).extractFrom(s).group(1);
+        Option<String> v = MatcherExtractor.from(p).on(s).group(1);
 
         /* THEN  */
         assertThat(v).containsExactly("foo");
@@ -27,10 +29,10 @@ public class MatcherExtractorTest {
     public void should_return_no_value() {
         /* GIVEN */
         String s = "";
-        String p = "abc";
+        Pattern p = Pattern.compile("abc");
 
         /* WHEN  */
-        Option<String> v = MatcherExtractor.from(p).extractFrom(s).group(1);
+        Option<String> v = MatcherExtractor.from(p).on(s).group(1);
 
         /* THEN  */
         assertThat(v).isEqualTo(Option.none());

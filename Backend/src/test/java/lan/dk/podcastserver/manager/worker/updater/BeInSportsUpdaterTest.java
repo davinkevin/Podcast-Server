@@ -10,7 +10,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -21,14 +20,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
-import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,12 +43,12 @@ public class BeInSportsUpdaterTest {
     private static final String PROTOCOL = "http:";
     private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @InjectMocks BeInSportsUpdater beInSportsUpdater;
+    /*private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock Validator validator;*/
+    private @Mock SignatureService signatureService;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @InjectMocks BeInSportsUpdater beInSportsUpdater;
 
     Podcast podcast;
 
@@ -70,7 +66,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_do_singature_of_podcast() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
+        when(htmlService.get(eq(podcast.getUrl()))).then(i -> IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
         when(signatureService.generateMD5Signature(anyString())).thenReturn("aSignature");
 
         /* When */
@@ -107,7 +103,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_get_all_items() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
+        when(htmlService.get(eq(podcast.getUrl()))).then(i1 -> IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
         when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
         configureForAllPage("/remote/podcast/beinsports/lexpresso.html");
 
@@ -141,7 +137,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_return_default_item_if_exception() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).then(readHtmlFromFile("/remote/podcast/beinsports/lexpresso.html"));
+        when(htmlService.get(eq(podcast.getUrl()))).then(i -> IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
         when(htmlService.get(not(eq(podcast.getUrl())))).thenReturn(Option.none());
 
         /* When */
@@ -180,14 +176,6 @@ public class BeInSportsUpdaterTest {
     public void should_have_a_type() {
         assertThat(beInSportsUpdater.type().name()).isEqualTo("Be In Sports");
         assertThat(beInSportsUpdater.type().key()).isEqualTo("BeInSports");
-    }
-
-    private Answer<Option<Document>> readHtmlFromFile(String s) throws URISyntaxException {
-        return i -> IOUtils.fileAsHtml(s);
-    }
-
-    private Answer<Optional<Document>> readHtmlFromFile(Path s) throws URISyntaxException {
-        return i -> Optional.of(Jsoup.parse(s.toFile(), "UTF-8", "http://www.beinsports.com/"));
     }
 
     private void configureHtmlServiceWith(String url, String id) throws IOException, URISyntaxException {

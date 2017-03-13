@@ -19,7 +19,7 @@ public class MatcherExtractor {
         this.isFind = matcher.find();
     }
 
-    public static PatternExtractor from(String pattern) {
+    public static PatternExtractor from(Pattern pattern) {
         return new PatternExtractor(pattern);
     }
 
@@ -35,9 +35,9 @@ public class MatcherExtractor {
 
         private final Pattern pattern;
 
-        PatternExtractor(String pattern) { this.pattern = Pattern.compile(pattern); }
+        private PatternExtractor(Pattern pattern) { this.pattern = pattern; }
 
-        public MatcherExtractor extractFrom(String value) { return new MatcherExtractor(pattern.matcher(value)); }
+        public MatcherExtractor on(String value) { return new MatcherExtractor(pattern.matcher(value)); }
 
     }
 

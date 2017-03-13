@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
@@ -23,7 +24,7 @@ import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 @RequiredArgsConstructor
 public class TF1ReplayFinder implements Finder {
 
-    private static final PatternExtractor PICTURE_EXTRACTOR = from("url\\(([^)]+)\\).*");
+    private static final PatternExtractor PICTURE_EXTRACTOR = from(Pattern.compile("url\\(([^)]+)\\).*"));
 
     private final HtmlService htmlService;
     private final ImageService imageService;
@@ -49,7 +50,7 @@ public class TF1ReplayFinder implements Finder {
     private Cover getCover(Document p) {
         String style = p.select(".focalImg style").html();
 
-        return PICTURE_EXTRACTOR.extractFrom(style)
+        return PICTURE_EXTRACTOR.on(style)
                 .group(1)
                 .orElse(Option.of(p.select("meta[property=og:image]").attr("content")))
                 .map(url -> url.startsWith("//") ? "http:" + url : url)

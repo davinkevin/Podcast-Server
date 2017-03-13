@@ -24,9 +24,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DailymotionFinderTest {
 
-    @Mock ImageService imageService;
-    @Mock JsonService jsonService;
-    @InjectMocks DailymotionFinder dailymotionFinder;
+    private @Mock ImageService imageService;
+    private @Mock JsonService jsonService;
+    private @InjectMocks DailymotionFinder dailymotionFinder;
 
     @Test
     public void should_find_podcast() throws MalformedURLException {

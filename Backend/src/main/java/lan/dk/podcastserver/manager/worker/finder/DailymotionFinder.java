@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
@@ -12,10 +11,11 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.stereotype.Service;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 23/02/2016 for Podcast Server
@@ -25,14 +25,15 @@ import static java.util.Objects.nonNull;
 public class DailymotionFinder implements Finder {
 
     private static final String API_URL = "https://api.dailymotion.com/user/%s?fields=avatar_720_url,description,username";
-    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com/(.*)");
+    private static final PatternExtractor USER_NAME_EXTRACTOR = from(Pattern.compile("^.+dailymotion.com/(.*)"));
 
-    final JsonService jsonService;
-    final ImageService imageService;
+    private final JsonService jsonService;
+    private final ImageService imageService;
 
     @Override
     public Podcast find(String url) {
-        return usernameOf(url)
+        // http://www.dailymotion.com/karimdebbache
+        return USER_NAME_EXTRACTOR.on(url).group(1)
                 .map(username -> String.format(API_URL, username))
                 .flatMap(jsonService::parseUrl)
                 .map(json -> json.read("$", DailymotionUserDetail.class))
@@ -48,15 +49,6 @@ public class DailymotionFinder implements Finder {
                 .description(detail.getDescription())
                 .type("Dailymotion")
                 .build();
-    }
-
-    private Option<String> usernameOf(String url) {
-        // http://www.dailymotion.com/karimdebbache
-        Matcher matcher = USER_NAME_EXTRACTOR.matcher(url);
-        if (!matcher.find())
-            return Option.none();
-
-        return Option.of(matcher.group(1));
     }
 
     private static class DailymotionUserDetail {

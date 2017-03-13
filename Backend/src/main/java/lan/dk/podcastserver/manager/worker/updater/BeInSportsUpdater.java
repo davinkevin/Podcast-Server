@@ -25,10 +25,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 22/02/2014.
@@ -43,8 +44,8 @@ public class BeInSportsUpdater extends AbstractUpdater {
     /* Patter to extract value from URL */
     private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\":\"([^\"]*)\".*";
     private static final String PARAMETER_SEPARATOR = "?";
-    private static final Pattern EXTRACTOR_ID_OF_DAILYMOTION_EMBEDDED_URL = Pattern.compile(".*/(.*)$");
-    private static final Pattern POSTER_URL_EXTRACTOR_PATTERN = Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url"));
+    private static final PatternExtractor EXTRACTOR_ID_OF_DAILYMOTION_EMBEDDED_URL = from(Pattern.compile(".*/(.*)$"));
+    private static final PatternExtractor POSTER_URL_EXTRACTOR_PATTERN = from(Pattern.compile(String.format(ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE, "poster_url")));
     private static final String PROTOCOL = "http:";
     private static final String BE_IN_SPORTS_DOMAIN = PROTOCOL + "//www.beinsports.com%s";
     private static final String DAILYMOTION_PREFIX_URL = "http://www.dailymotion.com/video/%s";
@@ -108,22 +109,16 @@ public class BeInSportsUpdater extends AbstractUpdater {
     }
 
     private Option<Cover> getPoster(String javascriptCode) {
-        Matcher thumbnailMatcher = POSTER_URL_EXTRACTOR_PATTERN.matcher(javascriptCode);
-        if (thumbnailMatcher.find()) {
-            return Option.of(imageService.getCoverFromURL(thumbnailMatcher.group(1).replace("\\", "")));
-        }
-        return Option.none();
+        return POSTER_URL_EXTRACTOR_PATTERN.on(javascriptCode)
+                .group(1)
+                .map(s -> s.replace("\\", ""))
+                .map(imageService::getCoverFromURL);
     }
 
     private Option<String> getStreamUrl(Document document) {
-        String dailymotionEmbedded = getDailymotionIframeUrl(document);
-        Matcher matcher = EXTRACTOR_ID_OF_DAILYMOTION_EMBEDDED_URL.matcher(dailymotionEmbedded);
-
-        if (matcher.find()) {
-            return Option.of(String.format(DAILYMOTION_PREFIX_URL, matcher.group(1)));
-        }
-
-        return Option.none();
+        return EXTRACTOR_ID_OF_DAILYMOTION_EMBEDDED_URL.on(getDailymotionIframeUrl(document))
+                .group(1)
+                .map(s -> String.format(DAILYMOTION_PREFIX_URL, s));
     }
 
     private String getJavascriptPart(List<Element> tagScripts) {
