@@ -27,10 +27,11 @@ import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static lan.dk.podcastserver.service.HtmlService.toElements;
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 20/07/2016
@@ -39,7 +40,7 @@ import static lan.dk.podcastserver.service.HtmlService.toElements;
 @Component("TF1ReplayUpdater")
 public class TF1ReplayUpdater extends AbstractUpdater {
 
-    private static final Pattern CHANNEL_PROGRAM_EXTRACTOR = Pattern.compile("[^:]+://www.tf1.fr/([^/]+)/([^/]+)/videos.*");
+    private static final PatternExtractor CHANNEL_PROGRAM_EXTRACTOR = from(Pattern.compile("[^:]+://www.tf1.fr/([^/]+)/([^/]+)/videos.*"));
     private static final String AJAX_URL_FORMAT = "http://www.tf1.fr/ajax/%s/%s/videos?filter=%s";
     private static final String SCHEME_DEFAULT = "https:";
     private static final String DOMAIN = "http://www.tf1.fr";
@@ -73,11 +74,11 @@ public class TF1ReplayUpdater extends AbstractUpdater {
 
     private Item getItem(Element e) {
         return Item.builder()
-                    .title(getTitle(e))
-                    .description(e.select("p.stitle").text())
-                    .pubDate(getDate(e))
-                    .url(DOMAIN + e.select(".videoLink").attr("href"))
-                    .cover(getCover(e))
+                .title(getTitle(e))
+                .description(e.select("p.stitle").text())
+                .pubDate(getDate(e))
+                .url(DOMAIN + e.select(".videoLink").attr("href"))
+                .cover(getCover(e))
                 .build();
     }
 
@@ -99,9 +100,9 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private ZonedDateTime getDate(Element v) {
         return List.ofAll(v.select(".momentDate"))
                 .toStream()
-                    .find(e -> !e.hasAttr("data-format"))
-                    .map(e -> e.attr("data-date"))
-                    .map(ZonedDateTime::parse)
+                .find(e -> !e.hasAttr("data-format"))
+                .map(e -> e.attr("data-date"))
+                .map(ZonedDateTime::parse)
                 .getOrElse(() -> null);
     }
 
@@ -110,9 +111,9 @@ public class TF1ReplayUpdater extends AbstractUpdater {
         // Url origine : http://www.tf1.fr/tf1/19h-live/videos
         // Url replay : http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay
         return getHtmlFromStandardOrReplay(podcast.getUrl())
-            .map(Elements::html)
-            .map(signatureService::generateMD5Signature)
-            .getOrElse(StringUtils.EMPTY);
+                .map(Elements::html)
+                .map(signatureService::generateMD5Signature)
+                .getOrElse(StringUtils.EMPTY);
     }
 
     private Option<Elements> getHtmlFromStandardOrReplay(String url) {
@@ -126,13 +127,8 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     }
 
     private Option<Elements> getElementsFrom(String url, @NotNull  String inCategory) {
-        Matcher matcher = CHANNEL_PROGRAM_EXTRACTOR.matcher(url);
-
-        if (!matcher.find())
-            return Option.none();
-
-        return Option
-                .of(String.format(AJAX_URL_FORMAT, matcher.group(1), matcher.group(2), inCategory))
+        return CHANNEL_PROGRAM_EXTRACTOR.on(url).groups()
+                .map(l -> String.format(AJAX_URL_FORMAT, l.get(0), l.get(1), inCategory))
                 .flatMap(jsonService::parseUrl)
                 .map(EXTRACT_IN_TF1_REPLAY_RESPONSE)
                 .map(TF1ReplayResponse::getHtml)

@@ -28,11 +28,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TF1ReplayUpdaterTest {
 
-    @Mock SignatureService signatureService;
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @Mock JsonService jsonService;
-    @InjectMocks TF1ReplayUpdater updater;
+    private @Mock SignatureService signatureService;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @Mock JsonService jsonService;
+    private @InjectMocks TF1ReplayUpdater updater;
 
     @Test
     public void should_sign_for_replay() throws IOException, URISyntaxException {

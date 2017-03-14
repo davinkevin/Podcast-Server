@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.utils;
 
+import javaslang.collection.List;
+import javaslang.collection.Stream;
 import javaslang.control.Option;
 import javaslang.control.Try;
 
@@ -29,6 +31,19 @@ public class MatcherExtractor {
         }
 
         return Try.of(() -> matcher.group(group)).toOption();
+    }
+
+    public Option<List<String>> groups() {
+        if (!isFind) {
+            return Option.none();
+        }
+
+        return Option.of(
+                Stream.from(1)
+                        .take(matcher.groupCount())
+                        .map(matcher::group)
+                        .toList()
+        );
     }
 
     public static class PatternExtractor {
