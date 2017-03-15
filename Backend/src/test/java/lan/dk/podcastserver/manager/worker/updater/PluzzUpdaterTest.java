@@ -33,14 +33,14 @@ public class PluzzUpdaterTest {
     private static final String PLUZZ_URL = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
     private static final Podcast PODCAST = Podcast.builder().url(PLUZZ_URL).build();
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @Mock JsonService jsonService;
-    @Mock M3U8Service m3U8Service;
-    @InjectMocks PluzzUpdater pluzzUpdater;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SignatureService signatureService;
+    private @Mock Validator validator;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @Mock JsonService jsonService;
+    private @Mock M3U8Service m3U8Service;
+    private @InjectMocks PluzzUpdater pluzzUpdater;
 
     @Test
     public void should_sign_the_podcast() throws IOException, URISyntaxException {

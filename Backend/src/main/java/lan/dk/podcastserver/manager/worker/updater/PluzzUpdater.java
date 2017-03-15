@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javaslang.collection.HashSet;
+import javaslang.collection.List;
 import javaslang.collection.Set;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
@@ -21,10 +22,11 @@ import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 
 /**
@@ -37,8 +39,8 @@ public class PluzzUpdater extends AbstractUpdater {
     private static final String JSOUP_ITEM_SELECTOR = "#player-memeProgramme";
     private static final String PLUZZ_INFORMATION_URL = "http://webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s&catalogue=Pluzz";
 
-    private static Pattern ID_PLUZZ_PATTERN = Pattern.compile(".*,([0-9]*).html");
-    private static Pattern ID_PLUZZ_MAIN_PAGE_PATTERN = Pattern.compile(".*/referentiel_emissions/([^/]*)/.*");
+    private static PatternExtractor ID_PLUZZ_PATTERN = from(Pattern.compile(".*,([0-9]*).html"));
+    private static PatternExtractor ID_PLUZZ_MAIN_PAGE_PATTERN = from(Pattern.compile(".*/referentiel_emissions/([^/]*)/.*"));
 
     private final HtmlService htmlService;
     private final ImageService imageService;
@@ -69,12 +71,11 @@ public class PluzzUpdater extends AbstractUpdater {
     }
 
     private Item getCurrentPlayedItem(Document page) {
-        String urlContainingId = page.select("meta[name=og:image]").attr("content");
-        Matcher m = ID_PLUZZ_MAIN_PAGE_PATTERN.matcher(urlContainingId);
-        if (!m.find()) {
-            return Item.DEFAULT_ITEM;
-        }
-        return getPluzzItemById(m.group(1));
+        return ID_PLUZZ_MAIN_PAGE_PATTERN
+                .on(page.select("meta[name=og:image]").attr("content"))
+                .group(1)
+                .map(this::getPluzzItemById)
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     @Override
@@ -89,12 +90,11 @@ public class PluzzUpdater extends AbstractUpdater {
     }
 
     private Item getPluzzItemByUrl(String url) {
-        String pluzzId = getPluzzId(url);
-
-        if (pluzzId.isEmpty())
-            return Item.DEFAULT_ITEM;
-
-        return getPluzzItemById(pluzzId);
+        return ID_PLUZZ_PATTERN.on(url)
+                .group(1)
+                .filter(v -> !v.isEmpty())
+                .map(this::getPluzzItemById)
+                .getOrElse(Item.DEFAULT_ITEM);
     }
 
     private Item getPluzzItemById(String pluzzId) {
@@ -116,7 +116,7 @@ public class PluzzUpdater extends AbstractUpdater {
     }
 
     @SuppressWarnings("unchecked")
-    private String getPluzzM38uUrl(javaslang.collection.List<PluzzItem.Video> videos) {
+    private String getPluzzM38uUrl(List<PluzzItem.Video> videos) {
         return videos
                 .toStream()
                 .find(PluzzItem.Video::isM3U)
@@ -127,14 +127,6 @@ public class PluzzUpdater extends AbstractUpdater {
 
     private String getPluzzJsonInformation(String pluzzId) {
         return String.format(PLUZZ_INFORMATION_URL, pluzzId);
-    }
-
-    private String getPluzzId(String url) {
-        Matcher m = ID_PLUZZ_PATTERN.matcher(url);
-        if (m.find()) {
-            return m.group(1);
-        }
-        return "";
     }
 
     @Override
@@ -163,7 +155,7 @@ public class PluzzUpdater extends AbstractUpdater {
         @Setter private String episode;
         @Setter private Diffusion diffusion = new Diffusion();
         @Setter private String image;
-        @Setter @Getter private javaslang.collection.List<Video> videos = javaslang.collection.List.empty();
+        @Setter @Getter private List<Video> videos = List.empty();
 
         String title() {
             String title = titre;
