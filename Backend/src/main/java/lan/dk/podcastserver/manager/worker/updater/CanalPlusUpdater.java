@@ -18,8 +18,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 @Slf4j
 @Component("CanalPlusUpdater")
@@ -28,8 +30,8 @@ public class CanalPlusUpdater extends AbstractUpdater {
     private static final String CANALPLUS_PATTERN = "dd/MM/yyyy-HH:mm:ss";
     private static final String FRONT_TOOLS_URL_PATTERN = "http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=%d&ztid=%d&nbPlusVideos0=1%s";
     private static final String XML_INFORMATION_PATTERN = "http://service.canal-plus.com/video/rest/getVideos/cplus/%d";
-    private static final Pattern ID_EXTRACTOR = Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);");
-    private static final Pattern NB_PLUS_VIDEOS_PATTERN = Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*");
+    private static final PatternExtractor ID_EXTRACTOR = from(Pattern.compile("^loadVideoHistory\\('[0-9]*','[0-9]*','[0-9]*','([0-9]*)','([0-9]*)', '[0-9]*', '[^']*'\\);"));
+    private static final PatternExtractor NB_PLUS_VIDEOS_PATTERN = from(Pattern.compile(".*nbPlusVideos([0-9])=[1-9].*"));
     private static final Pattern TABS_EXTRACTOR = Pattern.compile(".*tab=1-([0-9]*).*");
     private static final String FIELD_TITRAGE = "TITRAGE";
     private static final String FIELD_TITRE = "TITRE";
@@ -69,23 +71,29 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     private String getPodcastURLOfFrontTools(String url) {
-        Matcher tabs = TABS_EXTRACTOR.matcher(url);
-        String list = tabs.find() ? String.format("&liste=%d", Integer.parseInt(tabs.group(1))-1) : "";
+        String list = from(TABS_EXTRACTOR).on(url).group(1)
+                .map(Integer::parseInt)
+                .map(v -> v-1)
+                .map(v -> String.format("&liste=%d", v))
+                .getOrElse("");
 
         return htmlService
                 .get(url)
                 .map(p -> p.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"))
-                .flatMap(s -> patternMatcher(s, ID_EXTRACTOR))
-                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.group(1)), Integer.parseInt(ids.group(2)), list))
+                .flatMap(s -> ID_EXTRACTOR.on(s).groups())
+                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.get(0)), Integer.parseInt(ids.get(1)), list))
                 .getOrElse("");
     }
 
     private Set<Element> getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
-        Option<Matcher> matcher = patternMatcher(canalPlusFrontToolsUrl, NB_PLUS_VIDEOS_PATTERN);
-        return matcher
+        Option<Integer> position = NB_PLUS_VIDEOS_PATTERN.on(canalPlusFrontToolsUrl)
+                .group(1)
+                .map(Integer::parseInt);
+
+        return position
             .flatMap(id -> htmlService.get(canalPlusFrontToolsUrl))
             .map(p -> p.select("ul.features, ul.unit-gallery2"))
-            .map(e -> e.get(Integer.parseInt(matcher.map(m -> m.group(1)).get())).select("li"))
+            .map(e -> e.get(position.get()).select("li"))
             .map(HashSet::ofAll)
             .getOrElse(HashSet::empty);
     }
@@ -131,14 +139,6 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
     private String getRealUrl(Podcast podcast) {
         return podcast.getUrl().contains("front_tools") ? podcast.getUrl() : this.getPodcastURLOfFrontTools(podcast.getUrl());
-    }
-
-    private Option<Matcher> patternMatcher(String s, Pattern pattern) {
-        Matcher matcher = pattern.matcher(s);
-        if (!matcher.find()) {
-            return Option.none();
-        }
-        return Option.of(matcher);
     }
 
     @Override

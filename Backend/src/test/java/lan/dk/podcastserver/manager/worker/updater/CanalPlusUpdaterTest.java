@@ -33,15 +33,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CanalPlusUpdaterTest {
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @Mock JdomService jdomService;
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @Mock M3U8Service m3U8Service;
-    @InjectMocks CanalPlusUpdater canalPlusUpdater;
-    Podcast podcast;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SignatureService signatureService;
+    private @Mock Validator validator;
+    private @Mock JdomService jdomService;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @Mock M3U8Service m3U8Service;
+    private @InjectMocks CanalPlusUpdater canalPlusUpdater;
+    private Podcast podcast;
 
     @Before
     public void beforeEach() {
