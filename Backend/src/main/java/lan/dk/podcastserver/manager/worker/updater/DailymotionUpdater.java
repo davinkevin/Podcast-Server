@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jayway.jsonpath.TypeRef;
 import javaslang.collection.HashSet;
 import javaslang.collection.Set;
-import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
@@ -21,8 +20,10 @@ import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 21/02/2016 for Podcast Server
@@ -32,7 +33,8 @@ import java.util.regex.Pattern;
 public class DailymotionUpdater extends AbstractUpdater {
 
     static final String API_LIST_OF_ITEMS = "https://api.dailymotion.com/user/%s/videos?fields=created_time,description,id,thumbnail_720_url,title";
-    private static final Pattern USER_NAME_EXTRACTOR = Pattern.compile("^.+dailymotion.com/(.*)");
+    // http://www.dailymotion.com/karimdebbache
+    private static final PatternExtractor USER_NAME_EXTRACTOR = from(Pattern.compile("^.+dailymotion.com/(.*)"));
     private static final String ITEM_URL = "http://www.dailymotion.com/video/%s";
     private static final TypeRef<Set<DailymotionVideoDetail>> LIST_DAILYMOTIONVIDEODETAIL_TYPE = new TypeRef<Set<DailymotionVideoDetail>>() { };
 
@@ -47,7 +49,7 @@ public class DailymotionUpdater extends AbstractUpdater {
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
-        return usernameOf(podcast.getUrl())
+        return USER_NAME_EXTRACTOR.on(podcast.getUrl()).group(1)
                 .map(username -> String.format(API_LIST_OF_ITEMS, username))
                 .flatMap(jsonService::parseUrl)
                 .map(p -> p.read("list", LIST_DAILYMOTIONVIDEODETAIL_TYPE))
@@ -69,7 +71,7 @@ public class DailymotionUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        return usernameOf(podcast.getUrl())
+        return USER_NAME_EXTRACTOR.on(podcast.getUrl()).group(1)
                 .map(u -> signatureService.generateSignatureFromURL(String.format(API_LIST_OF_ITEMS, u)))
                 .getOrElseThrow(() -> new RuntimeException("Username not Found"));
     }
@@ -82,15 +84,6 @@ public class DailymotionUpdater extends AbstractUpdater {
     @Override
     public Integer compatibility(String url) {
         return StringUtils.contains(url, "www.dailymotion.com") ? 1 : Integer.MAX_VALUE;
-    }
-
-    private Option<String> usernameOf(String url) {
-        // http://www.dailymotion.com/karimdebbache
-        Matcher matcher = USER_NAME_EXTRACTOR.matcher(url);
-        if (!matcher.find())
-            return Option.none();
-
-        return Option.of(matcher.group(1));
     }
 
     private static class DailymotionVideoDetail {

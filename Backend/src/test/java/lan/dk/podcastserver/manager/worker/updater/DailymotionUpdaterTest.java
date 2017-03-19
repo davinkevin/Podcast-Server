@@ -29,12 +29,12 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DailymotionUpdaterTest {
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @Mock JsonService jsonService;
-    @Mock ImageService imageService;
-    @InjectMocks DailymotionUpdater dailymotionUpdater;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SignatureService signatureService;
+    private @Mock Validator validator;
+    private @Mock JsonService jsonService;
+    private @Mock ImageService imageService;
+    private @InjectMocks DailymotionUpdater dailymotionUpdater;
 
     Podcast podcast;
 
