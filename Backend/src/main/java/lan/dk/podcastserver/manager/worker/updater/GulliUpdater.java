@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 05/10/2016 for Podcast Server
@@ -29,7 +31,7 @@ import java.util.regex.Pattern;
 @Component("GulliUpdater")
 public class GulliUpdater extends AbstractUpdater {
 
-    private static final Pattern FRAME_EXTRACTOR = Pattern.compile(".*\\.html\\(.*<iframe.* src=\"([^\"]*)\".*");
+    private static final PatternExtractor FRAME_EXTRACTOR = from(Pattern.compile(".*\\.html\\(.*<iframe.* src=\"([^\"]*)\".*"));
 
     private final HtmlService htmlService;
     private final ImageService imageService;
@@ -67,9 +69,8 @@ public class GulliUpdater extends AbstractUpdater {
         return List.ofAll(block.select("script"))
                 .find(e -> e.html().contains("iframe"))
                 .map(Element::html)
-                .map(FRAME_EXTRACTOR::matcher)
-                .filter(Matcher::find)
-                .map(m -> m.group(1))
+                .map(FRAME_EXTRACTOR::on)
+                .flatMap(m -> m.group(1))
                 .map(url -> Item.builder()
                     .title(block.select(".episode_title").text())
                     .description(block.select(".description").text())

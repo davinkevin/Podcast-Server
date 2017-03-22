@@ -32,12 +32,12 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class GulliUpdaterTest {
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @InjectMocks GulliUpdater gulliUpdater;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SignatureService signatureService;
+    private @Mock Validator validator;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @InjectMocks GulliUpdater gulliUpdater;
 
     Podcast podcast;
 
