@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.TypeRef;
+import javaslang.Tuple;
 import javaslang.collection.List;
 import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
@@ -22,10 +23,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
+import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 12/10/2016 for Podcast Server
@@ -35,8 +37,8 @@ import static java.util.Objects.nonNull;
 @Component("GulliDownloader")
 public class GulliDownloader extends HTTPDownloader {
 
-    private static final Pattern NUMBER_IN_PLAYLIST_EXTRACTOR = Pattern.compile("playlistItem\\(([^)]*)\\);");
-    private static final Pattern PLAYLIST_EXTRACTOR = Pattern.compile("playlist:\\s*(.*?(?=events:))", Pattern.DOTALL);
+    private static final PatternExtractor NUMBER_IN_PLAYLIST_EXTRACTOR = from(Pattern.compile("playlistItem\\(([^)]*)\\);"));
+    private static final PatternExtractor PLAYLIST_EXTRACTOR = from(Pattern.compile("playlist:\\s*(.*?(?=events:))", Pattern.DOTALL));
     private static final TypeRef<List<GulliItem>> GULLI_ITEM_TYPE_REF = new TypeRef<List<GulliItem>>() { };
 
     private final HtmlService htmlService;
@@ -68,21 +70,16 @@ public class GulliDownloader extends HTTPDownloader {
     }
 
     private Option<String> getPlaylistFromGulliScript(Element element) {
-
-        Matcher position = NUMBER_IN_PLAYLIST_EXTRACTOR.matcher(element.html());
-        Matcher playlist = PLAYLIST_EXTRACTOR.matcher(element.html());
-
-        if (position.find() && playlist.find()) {
-            Integer numberInPlaylist = Integer.valueOf(position.group(1));
-            return Option.of(playlist.group(1))
-                    .map(jsonService::parse)
-                    .map(d -> d.read("$", GULLI_ITEM_TYPE_REF))
-                    .map(l -> l.get(numberInPlaylist))
-                    .flatMap(i -> i.getSources().find(s -> s.file.contains("mp4")))
-                    .map(GulliItem.GulliSource::getFile);
-        }
-
-        return Option.none();
+        Option<String> playlist = PLAYLIST_EXTRACTOR.on(element.html()).group(1);
+        return NUMBER_IN_PLAYLIST_EXTRACTOR
+                .on(element.html()).group(1)
+                .map(Integer::valueOf)
+                .flatMap(v -> playlist.map(s -> Tuple.of(v, s)))
+                .map(t -> t.map2(jsonService::parse))
+                .map(t -> t.map2(d -> d.read("$", GULLI_ITEM_TYPE_REF)))
+                .map(t -> t.transform((v, s) -> s.get(v)))
+                .flatMap(i -> i.getSources().find(s -> s.file.contains("mp4")))
+                .map(GulliItem.GulliSource::getFile);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

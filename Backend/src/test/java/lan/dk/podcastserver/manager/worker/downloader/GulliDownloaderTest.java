@@ -30,15 +30,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class GulliDownloaderTest {
 
-    @Mock HtmlService htmlService;
-    @Mock JsonService jsonService;
-    @Mock UrlService urlService;
-    @Mock WGetFactory wGetFactory;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastRepository podcastRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @InjectMocks GulliDownloader gulliDownloader;
+    private @Mock HtmlService htmlService;
+    private @Mock JsonService jsonService;
+    private @Mock UrlService urlService;
+    private @Mock WGetFactory wGetFactory;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    private @InjectMocks GulliDownloader gulliDownloader;
 
     @Before
     public void beforeEach() {
