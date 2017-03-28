@@ -38,12 +38,11 @@ public class MatcherExtractor {
             return Option.none();
         }
 
-        return Option.of(
-                Stream.from(1)
-                        .take(matcher.groupCount())
-                        .map(matcher::group)
-                        .toList()
-        );
+        return Stream.from(1)
+                .take(matcher.groupCount())
+                .map(matcher::group)
+                .toList()
+                .transform(Option::of);
     }
 
     public static class PatternExtractor {
