@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CanalPlusFinder implements Finder {
 
-    final HtmlService htmlService;
-    final ImageService imageService;
+    private final HtmlService htmlService;
+    private final ImageService imageService;
 
     @Override
     public Podcast find(String url) {

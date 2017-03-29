@@ -3,11 +3,11 @@ package lan.dk.podcastserver.manager.worker.finder;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Stream;
@@ -19,14 +19,10 @@ import static java.util.Objects.nonNull;
  */
 @Slf4j
 @Service("YoutubeFinder")
+@RequiredArgsConstructor
 public class YoutubeFinder implements Finder {
 
-    private HtmlService htmlService;
-
-    @Autowired
-    public YoutubeFinder(HtmlService htmlService) {
-        this.htmlService = htmlService;
-    }
+    private final HtmlService htmlService;
 
     @Override
     public Podcast find(String url) {
@@ -37,13 +33,12 @@ public class YoutubeFinder implements Finder {
     }
 
     private Podcast podcastFromHtml(String url, Document p) {
-        return Podcast
-                .builder()
-                    .url(url)
-                    .type("Youtube")
-                    .title(getTitle(p))
-                    .description(getDescription(p))
-                    .cover(getCover(p))
+        return Podcast.builder()
+                .url(url)
+                .type("Youtube")
+                .title(getTitle(p))
+                .description(getDescription(p))
+                .cover(getCover(p))
                 .build();
     }
 
@@ -70,9 +65,9 @@ public class YoutubeFinder implements Finder {
         if (nonNull(elementWithExternalId)) {
             return Cover
                     .builder()
-                        .url(elementWithExternalId.attr("src"))
-                        .height(200)
-                        .width(200)
+                    .url(elementWithExternalId.attr("src"))
+                    .height(200)
+                    .width(200)
                     .build();
         }
 

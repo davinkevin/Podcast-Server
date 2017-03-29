@@ -16,7 +16,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JeuxVideoComFinder implements Finder {
 
-    final HtmlService htmlService;
+    private final HtmlService htmlService;
 
     @Override
     public Podcast find(String url) {

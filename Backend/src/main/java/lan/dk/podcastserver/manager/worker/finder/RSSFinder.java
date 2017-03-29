@@ -26,8 +26,8 @@ public class RSSFinder implements Finder {
     private static final String URL = "url";
     private static final String HREF = "href";
 
-    final JdomService jdomService;
-    final ImageService imageService;
+    private final JdomService jdomService;
+    private final ImageService imageService;
 
     @Override
     public Podcast find(String url) {

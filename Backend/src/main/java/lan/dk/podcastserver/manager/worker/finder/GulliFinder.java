@@ -19,8 +19,8 @@ public class GulliFinder implements Finder {
 
     private static final String COVER_SELECTOR = "div.program_gullireplay a[href=%s] img";
 
-    final HtmlService htmlService;
-    final ImageService imageService;
+    private final HtmlService htmlService;
+    private final ImageService imageService;
 
     @Override
     public Podcast find(String url) {
