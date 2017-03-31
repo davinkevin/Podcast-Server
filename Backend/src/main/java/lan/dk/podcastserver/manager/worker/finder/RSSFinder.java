@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
+import javaslang.control.Option;
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
@@ -10,10 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
-import static java.util.Objects.nonNull;
-
 /**
- * Created by kevin on 22/02/15.
+ * Created by kevin on 22/02/15
  */
 @Service("RSSFinder")
 @RequiredArgsConstructor
@@ -45,21 +45,25 @@ public class RSSFinder implements Finder {
                 .url(url)
                 .title(element.getChildText(TITLE))
                 .description(element.getChildText(DESCRIPTION))
-                .cover(imageService.getCoverFromURL(coverUrlOf(element)))
-            .build();
+                .cover(coverUrlOf(element))
+                .build();
     }
 
-    private String coverUrlOf(Element channelElement) {
-        Element rssImage = channelElement.getChild(IMAGE);
-        if (nonNull(rssImage)) {
-            return rssImage.getChildText(URL);
-        }
+    private Cover coverUrlOf(Element channelElement) {
+        return getRssImage(channelElement)
+                .orElse(getItunesImage(channelElement))
+                .map(imageService::getCoverFromURL)
+                .getOrElse(Cover.DEFAULT_COVER);
+    }
 
-        Element itunesImage = channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE);
-        if (nonNull(itunesImage))
-            return itunesImage.getAttributeValue(HREF);
+    private Option<String> getItunesImage(Element channelElement) {
+        return Option.of(channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE))
+                .map(itunesImage -> itunesImage.getAttributeValue(HREF));
+    }
 
-        return null;
+    private Option<String> getRssImage(Element channelElement) {
+        return Option.of(channelElement.getChild(IMAGE))
+                .map(rssImage -> rssImage.getChildText(URL));
     }
 
     public Integer compatibility(@NotEmpty String url) {

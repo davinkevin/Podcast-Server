@@ -69,7 +69,7 @@ public class RSSFinderTest {
         Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.withoutAnyCover.xml");
 
         //Then
-        assertThat(podcast.getCover()).isNull();
+        assertThat(podcast.getCover()).isEqualTo(Cover.DEFAULT_COVER);
     }
 
     @Test
