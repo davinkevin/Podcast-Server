@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import static javaslang.API.$;
+import static javaslang.API.Case;
+import static javaslang.API.Match;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -31,8 +34,7 @@ public class TF1ReplayFinder implements Finder {
 
     @Override
     public Podcast find(String url) {
-        return htmlService
-                .get(url)
+        return htmlService.get(url)
                 .map(htmlToPodcast(url))
                 .getOrElse(Podcast.DEFAULT_PODCAST);
     }
@@ -48,14 +50,18 @@ public class TF1ReplayFinder implements Finder {
     }
 
     private Cover getCover(Document p) {
-        String style = p.select(".focalImg style").html();
-
-        return PICTURE_EXTRACTOR.on(style)
-                .group(1)
+        return PICTURE_EXTRACTOR.on(p.select(".focalImg style").html()).group(1)
                 .orElse(Option.of(p.select("meta[property=og:image]").attr("content")))
-                .map(url -> url.startsWith("//") ? "http:" + url : url)
+                .map(this::getUrl)
                 .map(imageService::getCoverFromURL)
                 .getOrElse(Cover.DEFAULT_COVER);
+    }
+
+    private String getUrl(String url) {
+        return Match(url).of(
+                Case(u -> u.startsWith("//"), u -> "http:" + u),
+                Case($(), Function.identity())
+        );
     }
 
 
