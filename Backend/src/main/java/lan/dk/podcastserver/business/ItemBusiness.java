@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import javaslang.collection.List;
 import javaslang.collection.Set;
-import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -71,16 +70,13 @@ public class ItemBusiness {
         // List of all the item matching the search result :
         List<Item> allResult = List.ofAll(itemRepository.findAll(getSearchSpecifications(fullTextIdsWithOrder, tags, downloaded)));
 
-        //Re-order the result list : 
-        List<Item> result = fullTextIdsWithOrder
-                .map(id -> allResult.find(item -> id.equals(item.getId())))
-                .filter(Option::isDefined)
-                .map(Option::get)
+        //Re-order and transform to page :
+        return fullTextIdsWithOrder
+                .flatMap(id -> allResult.find(item -> id.equals(item.getId())))
                 // Keep only the needed element for the page
                 .drop(page.getOffset())
-                .take(page.getPageSize());
-
-        return new PageImpl<>(result.toJavaList(), page, result.length());
+                .take(page.getPageSize())
+                .transform(v -> new PageImpl<>(v.toJavaList(), page, v.length()));
     }
 
     public Item save(Item entity) {

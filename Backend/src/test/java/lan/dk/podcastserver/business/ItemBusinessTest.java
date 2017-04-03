@@ -45,12 +45,12 @@ public class ItemBusinessTest {
 
     private String ROOT_FOLDER = "/tmp/podcast";
 
-    @Mock ItemDownloadManager itemDownloadManager;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastBusiness podcastBusiness;
-    @Mock MimeTypeService mimeTypeService;
-    @InjectMocks ItemBusiness itemBusiness;
+    private @Mock ItemDownloadManager itemDownloadManager;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastBusiness podcastBusiness;
+    private @Mock MimeTypeService mimeTypeService;
+    private @InjectMocks ItemBusiness itemBusiness;
 
     @Before
     public void beforeEach() {
