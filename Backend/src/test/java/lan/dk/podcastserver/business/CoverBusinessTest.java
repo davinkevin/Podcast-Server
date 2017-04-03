@@ -39,10 +39,10 @@ public class CoverBusinessTest {
 
     private String ROOT_FOLDER = "/tmp/podcast";
 
-    @Mock CoverRepository coverRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Spy UrlService urlService;
-    @InjectMocks CoverBusiness coverBusiness;
+    private @Mock CoverRepository coverRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Spy UrlService urlService;
+    private @InjectMocks CoverBusiness coverBusiness;
 
     @Before
     public void beforeEach() {

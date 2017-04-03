@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import com.mashape.unirest.http.HttpResponse;
 import javaslang.collection.List;
+import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -43,25 +44,33 @@ public class CoverBusiness {
     }
 
     public String download(Podcast podcast) {
+        Cover cover = podcast.getCover();
 
-        if (podcast.getCover() == null || StringUtils.isEmpty(podcast.getCover().getUrl())) {
+        if (Option.of(cover).map(Cover::getUrl).filter(v -> !StringUtils.isEmpty(v)).isEmpty()) {
             return StringUtils.EMPTY;
         }
 
-        if (podcast.getCover().getUrl().startsWith("/"))
-            return podcast.getCover().getUrl();
+        if (cover.getUrl().startsWith("/")) {
+            return cover.getUrl();
+        }
 
-        String coverUrl = podcast.getCover().getUrl();
-        String fileName = podcastServerParameters.getCoverDefaultName() + "." + FilenameUtils.getExtension(coverUrl);
-        Path fileLocation = podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(fileName);
+        String coverUrl = cover.getUrl();
+        String extension = FilenameUtils.getExtension(coverUrl);
+        Path fileLocation = podcastServerParameters.getRootfolder()
+                .resolve(podcast.getTitle())
+                .resolve(podcastServerParameters.getCoverDefaultName() + "." + extension);
 
         // Download file to correct location :
-        return Try.run(() -> createParentDirectory(fileLocation))
-            .mapTry(v -> imageRequest(coverUrl))
-            .andThenTry(saveToDisk(fileLocation))
-            .map(v -> String.format(Podcast.COVER_PROXY_URL, podcast.getId().toString(), FilenameUtils.getExtension(coverUrl)))
+        return urlToDisk(coverUrl, fileLocation)
+            .map(v -> String.format(Podcast.COVER_PROXY_URL, podcast.getId().toString(), extension))
             .onFailure(e -> log.error("Error during downloading of the cover", e))
             .getOrElse("");
+    }
+
+    private Try<HttpResponse<InputStream>> urlToDisk(String coverUrl, Path fileLocation) {
+        return Try.run(() -> createParentDirectory(fileLocation))
+            .mapTry(v -> imageRequest(coverUrl))
+            .andThenTry(r -> Files.copy(r.getBody(), fileLocation, StandardCopyOption.REPLACE_EXISTING));
     }
 
     public Boolean download(Item item) {
@@ -76,12 +85,11 @@ public class CoverBusiness {
         }
 
         String coverUrl = item.getCover().getUrl();
-        String fileName = item.getId() + "." + FilenameUtils.getExtension(coverUrl);
-        Path fileLocation = podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(fileName);
+        Path fileLocation = podcastServerParameters.getRootfolder()
+                .resolve(item.getPodcast().getTitle())
+                .resolve(item.getId() + "." + FilenameUtils.getExtension(coverUrl));
 
-        return Try.run(() -> createParentDirectory(fileLocation))
-                .mapTry(v -> imageRequest(coverUrl))
-                .andThenTry(saveToDisk(fileLocation))
+        return urlToDisk(coverUrl, fileLocation)
                 .map(v -> Boolean.TRUE)
                 .onFailure(e -> log.error("Error during downloading of the cover", e))
                 .getOrElse(Boolean.FALSE);
@@ -104,13 +112,6 @@ public class CoverBusiness {
 
     public Cover save(Cover cover) {
         return coverRepository.save(cover);
-    }
-
-    private Try.CheckedConsumer<HttpResponse<InputStream>> saveToDisk(Path fileLocation) {
-        return r -> Files.copy(
-                r.getBody(),
-                fileLocation,
-                StandardCopyOption.REPLACE_EXISTING );
     }
 
     private HttpResponse<InputStream> imageRequest(String coverUrl) throws IOException {
