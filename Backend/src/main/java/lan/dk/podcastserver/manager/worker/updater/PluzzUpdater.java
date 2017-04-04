@@ -100,7 +100,7 @@ public class PluzzUpdater extends AbstractUpdater {
     private Item getPluzzItemById(String pluzzId) {
         return jsonService
                 .parseUrl(getPluzzJsonInformation(pluzzId))
-                .map(d -> d.read("$", PluzzItem.class))
+                .map(JsonService.to(PluzzItem.class))
                 .map(this::jsonToItem)
                 .getOrElse(Item.DEFAULT_ITEM);
     }

@@ -76,7 +76,7 @@ public class GulliDownloader extends HTTPDownloader {
                 .map(Integer::valueOf)
                 .flatMap(v -> playlist.map(s -> Tuple.of(v, s)))
                 .map(t -> t.map2(jsonService::parse))
-                .map(t -> t.map2(d -> d.read("$", GULLI_ITEM_TYPE_REF)))
+                .map(t -> t.map2(JsonService.to(GULLI_ITEM_TYPE_REF)))
                 .map(t -> t.transform((v, s) -> s.get(v)))
                 .flatMap(i -> i.getSources().find(s -> s.file.contains("mp4")))
                 .map(GulliItem.GulliSource::getFile);

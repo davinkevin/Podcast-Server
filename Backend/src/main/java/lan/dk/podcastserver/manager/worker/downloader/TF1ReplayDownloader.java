@@ -103,7 +103,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
                 .asString())
                     .map(HttpResponse::getBody)
                     .map(jsonService::parse)
-                    .map(d -> d.read("$", TF1ReplayVideoUrl.class))
+                    .map(JsonService.to(TF1ReplayVideoUrl.class))
                     .map(TF1ReplayVideoUrl::getMessage)
                     .map(this::upgradeBitrate)
                 .onFailure(e -> log.error("Error during fetching", e))

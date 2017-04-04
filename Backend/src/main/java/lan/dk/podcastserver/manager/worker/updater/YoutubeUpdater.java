@@ -82,7 +82,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
             Option<YoutubeResponse> jsonResponse = jsonService
                     .parseUrl(asApiPlaylistUrl(playlistId, nextPageToken))
-                    .map(d -> d.read("$", YoutubeResponse.class));
+                    .map(JsonService.to(YoutubeResponse.class));
 
             pageItems = jsonResponse.map(YoutubeResponse::getItems)
                     .map(this::convertToItems)

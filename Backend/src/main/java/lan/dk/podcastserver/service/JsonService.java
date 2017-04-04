@@ -1,10 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import javaslang.control.Option;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
 
@@ -43,5 +41,21 @@ public class JsonService {
             log.error("Error during fetching of each items of {}", url, e);
             return Option.none();
         }
+    }
+
+    public static <T> Function<DocumentContext, T> to(Class<T> clazz) {
+        return JsonService.to("$", clazz);
+    }
+
+    public static <T> Function<DocumentContext, T> to(String from, Class<T> clazz) {
+        return d -> d.read(from, clazz);
+    }
+
+    public static <T> Function<DocumentContext, T> to(TypeRef<T> typeRef) {
+        return JsonService.to("$", typeRef);
+    }
+
+    public static <T> Function<DocumentContext, T> to(String from, TypeRef<T> typeRef) {
+        return d -> d.read(from, typeRef);
     }
 }

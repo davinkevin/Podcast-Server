@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.jayway.jsonpath.DocumentContext;
 import javaslang.collection.HashSet;
 import javaslang.collection.List;
 import javaslang.collection.Set;
@@ -26,7 +25,6 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static lan.dk.podcastserver.service.HtmlService.toElements;
@@ -46,7 +44,6 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final String DOMAIN = "http://www.tf1.fr";
     private static final String REPLAY_CATEGORY = "replay";
     private static final String ALL_CATEGORY = "all";
-    private static final Function<DocumentContext, TF1ReplayResponse> EXTRACT_IN_TF1_REPLAY_RESPONSE = d -> d.read("$", TF1ReplayResponse.class);
     private static final Set<String> TYPES = HashSet.of("replay", "vidéo");
 
     private final HtmlService htmlService;
@@ -130,7 +127,7 @@ public class TF1ReplayUpdater extends AbstractUpdater {
         return CHANNEL_PROGRAM_EXTRACTOR.on(url).groups()
                 .map(l -> String.format(AJAX_URL_FORMAT, l.get(0), l.get(1), inCategory))
                 .flatMap(jsonService::parseUrl)
-                .map(EXTRACT_IN_TF1_REPLAY_RESPONSE)
+                .map(JsonService.to(TF1ReplayResponse.class))
                 .map(TF1ReplayResponse::getHtml)
                 .map(htmlService::parse)
                 .map(d -> d.select(".video"))
