@@ -4,18 +4,19 @@ package lan.dk.podcastserver.repository.dsl;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import javaslang.collection.List;
+import javaslang.collection.Set;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.QItem;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by kevin on 08/06/2014 for Podcast Server
@@ -60,17 +61,15 @@ public class ItemDSL {
 
     }
 
-    static BooleanExpression isInId(final javaslang.collection.List<UUID> ids){
+    static BooleanExpression isInId(final List<UUID> ids){
         return Q_ITEM.id.in(ids.toJavaList());
     }
 
-    private static Predicate isInTags(javaslang.collection.Set<Tag> tags) {
-        List<Predicate> predicates = tags
+    private static Predicate isInTags(Set<Tag> tags) {
+        return ExpressionUtils.allOf(tags
                 .map(Q_ITEM.podcast.tags::contains)
                 .map(Predicate.class::cast)
-                .toJavaList();
-
-        return ExpressionUtils.allOf(predicates);
+                .toJavaList());
     }
 
     public static Predicate hasStatus(final Status... statuses) {
@@ -84,11 +83,13 @@ public class ItemDSL {
         return Q_ITEM.podcast.id.eq(podcastId);
     }
 
-    public static Predicate getSearchSpecifications(javaslang.collection.List<UUID> ids, javaslang.collection.Set<Tag> tags, Boolean downloaded) {
+    public static Predicate getSearchSpecifications(List<UUID> ids, Set<Tag> tags, Boolean downloaded) {
         return ExpressionUtils.allOf(
-                nonNull(ids) ? isInId(ids) : null,
+                Option.of(ids).map(ItemDSL::isInId).getOrElse(() -> null),
                 isInTags(tags),
-                nonNull(downloaded) ? downloaded ? hasStatus(Status.FINISH) : Q_ITEM.status.isNull().or(hasStatus(Status.FINISH).not()) : null
+                Option.of(downloaded)
+                    .map(d -> d ? hasStatus(Status.FINISH) : Q_ITEM.status.isNull().or(hasStatus(Status.FINISH).not()))
+                    .getOrElse(() -> null)
         );
     }
 
