@@ -17,7 +17,7 @@ public class DatabaseController {
 
     private final DatabaseService databaseService;
 
-    @RequestMapping(value = "backup", method = RequestMethod.GET)
+    @GetMapping("backup")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void backup() throws IOException {
         databaseService.backupWithDefault();
