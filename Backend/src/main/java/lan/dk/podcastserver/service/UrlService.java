@@ -5,12 +5,15 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import javaslang.control.Option;
 import javaslang.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,11 +31,12 @@ public class UrlService {
 
     public static final String USER_AGENT_DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36";
     public static final String USER_AGENT_MOBILE = "AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)";
-    static final String USER_AGENT_KEY = "User-agent";
+    public static final String USER_AGENT_KEY = "User-agent";
 
     private static final String PROTOCOL_SEPARATOR = "://";
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
     private static final Consumer<HttpURLConnection> NO_MODIFICATION = x -> {};
+    private static final Set<Integer> EMPTY_PORT = HashSet.of(80, 443);
 
     public UrlService() {System.setProperty("http.agent", USER_AGENT_DESKTOP);}
 
@@ -88,14 +92,16 @@ public class UrlService {
                 .map(HttpResponse::getBody)
                 .getOrElseThrow(e -> new IOException(e));
     }
+
     public BufferedReader asReader(String url) throws IOException {
         return new BufferedReader(new InputStreamReader(asStream(url)));
     }
 
     /* Relative and absolute URL transformation */
     public String addDomainIfRelative(String urlWithDomain, String mayBeRelativeUrl) {
-        if (mayBeRelativeUrl.contains(PROTOCOL_SEPARATOR))
+        if (mayBeRelativeUrl.contains(PROTOCOL_SEPARATOR)) {
             return mayBeRelativeUrl;
+        }
 
         Boolean isFromRoot = mayBeRelativeUrl.startsWith("/");
 
@@ -103,8 +109,18 @@ public class UrlService {
                 .map(u -> u.getProtocol() + PROTOCOL_SEPARATOR + u.getAuthority() + (isFromRoot ? "" : StringUtils.substringBeforeLast(u.getPath(), "/")))
                 .map(s -> s + (isFromRoot ? "" : "/") + mayBeRelativeUrl)
                 .getOrElseThrow(e -> new RuntimeException(e));
-
-        /*return StringUtils.substringBeforeLast(urlWithDomain, "/") + "/" + mayBeRelativeUrl;*/
     }
+
+    public static String getDomainFromRequest(HttpServletRequest request) {
+        return Option
+                .of(request.getHeader("origin"))
+                .getOrElse(() -> request.getScheme() +
+                        "://" +
+                        request.getServerName() +
+                        (EMPTY_PORT.contains(request.getServerPort()) ? "" : ":" + request.getServerPort())
+                );
+    }
+
+
 
 }

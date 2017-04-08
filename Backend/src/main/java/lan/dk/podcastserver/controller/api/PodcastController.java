@@ -7,6 +7,7 @@ import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
+import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 26/12/2013.
@@ -83,7 +82,7 @@ public class PodcastController {
 
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, HttpServletRequest request) {
-        return podcastBusiness.getRss(id, limit, this.getDomainFromRequest(request));
+        return podcastBusiness.getRss(id, limit, UrlService.getDomainFromRequest(request));
     }
 
     @GetMapping(value="{id}/cover.{ext}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
@@ -129,18 +128,5 @@ public class PodcastController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePodcastForced (@PathVariable UUID id) {
         updatePodcastBusiness.forceUpdatePodcast(id);
-    }
-
-
-    private String getDomainFromRequest(HttpServletRequest request) {
-        String origin = request.getHeader("origin");
-        if (nonNull(origin)) {
-            return origin;
-        }
-
-        return request.getScheme() +
-                "://" +
-                request.getServerName() +
-                ((request.getServerPort() == 80 || request.getServerPort() == 443) ? "" : ":" + request.getServerPort());
     }
 }

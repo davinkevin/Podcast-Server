@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonView;
 import javaslang.collection.Set;
 import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.WatchList;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
-import static java.util.Objects.nonNull;
 import static lan.dk.podcastserver.entity.WatchList.WatchListDetailsListView;
 
 /**
@@ -59,18 +59,6 @@ public class WatchListController {
 
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String asRss(@PathVariable UUID id, HttpServletRequest request) {
-        return watchListBusiness.asRss(id, this.getDomainFromRequest(request));
-    }
-
-    private String getDomainFromRequest(HttpServletRequest request) {
-        String origin = request.getHeader("origin");
-        if (nonNull(origin)) {
-            return origin;
-        }
-
-        return request.getScheme() +
-                "://" +
-                request.getServerName() +
-                ((request.getServerPort() == 80 || request.getServerPort() == 443) ? "" : ":" + request.getServerPort());
+        return watchListBusiness.asRss(id, UrlService.getDomainFromRequest(request));
     }
 }
