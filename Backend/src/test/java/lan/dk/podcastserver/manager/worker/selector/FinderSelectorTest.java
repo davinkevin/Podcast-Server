@@ -38,9 +38,7 @@ public class FinderSelectorTest {
         when(rssFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
 
-        finderSelector = new FinderSelector();
-
-        finderSelector.setFinders(Sets.newHashSet(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, pluzzFinder, rssFinder, youtubeFinder));
+        finderSelector = new FinderSelector(Sets.newHashSet(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, pluzzFinder, rssFinder, youtubeFinder));
     }
 
     @Test

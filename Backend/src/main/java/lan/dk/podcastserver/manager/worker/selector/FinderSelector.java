@@ -2,8 +2,7 @@ package lan.dk.podcastserver.manager.worker.selector;
 
 import lan.dk.podcastserver.manager.worker.finder.Finder;
 import lan.dk.podcastserver.manager.worker.finder.NoOpFinder;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,13 +13,12 @@ import java.util.Set;
  * Created by kevin on 23/02/2016 for Podcast Server
  */
 @Service
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class FinderSelector {
 
     public static final NoOpFinder NO_OP_FINDER = new NoOpFinder();
 
-    @Setter(onMethod = @__(@Autowired))
-    private Set<Finder> finders;
+    private final Set<Finder> finders;
 
     public Finder of(String url) {
         if (StringUtils.isEmpty(url)) {

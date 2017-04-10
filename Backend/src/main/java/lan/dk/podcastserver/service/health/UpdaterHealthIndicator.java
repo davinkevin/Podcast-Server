@@ -1,8 +1,7 @@
 package lan.dk.podcastserver.service.health;
 
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,7 @@ import static java.util.Objects.isNull;
  * Created by kevin on 18/07/2016.
  */
 @Component
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class UpdaterHealthIndicator extends AbstractHealthIndicator {
 
     private final UpdatePodcastBusiness updater;
