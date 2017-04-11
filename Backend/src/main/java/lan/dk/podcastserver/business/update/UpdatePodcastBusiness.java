@@ -140,16 +140,13 @@ public class UpdatePodcastBusiness  {
         Set<Item> itemsToAdd = items
                 .filter(filter)
                 .map(item -> item.setPodcast(podcast))
-                .filter(item -> validator.validate(item).isEmpty())
-                .peek(item -> log.debug("Add Item {} to Podcast {}", item.getTitle(), podcast.getTitle()));
+                .filter(item -> validator.validate(item).isEmpty());
 
         if (itemsToAdd.isEmpty()) {
             return itemsToAdd;
         }
 
-        itemsToAdd
-            .peek(podcast::add)
-            .forEach(itemRepository::save);
+        itemsToAdd.peek(podcast::add).forEach(itemRepository::save);
 
         podcastBusiness.save(podcast.lastUpdateToNow());
 

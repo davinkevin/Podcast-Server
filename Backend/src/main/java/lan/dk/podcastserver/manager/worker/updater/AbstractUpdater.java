@@ -34,6 +34,7 @@ public abstract class AbstractUpdater implements Updater {
                 .filter(signature -> !StringUtils.equals(signature, podcast.getSignature()))
                 .andThen(podcast::setSignature)
                 .map(s -> Tuple.of(podcast, getItems(podcast), notIn(podcast)))
+                .onFailure(e -> log.error("Error during update : {}", e))
                 .getOrElse(NO_MODIFICATION_TUPLE);
     }
 
