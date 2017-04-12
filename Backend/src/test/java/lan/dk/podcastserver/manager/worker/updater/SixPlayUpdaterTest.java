@@ -53,7 +53,7 @@ public class SixPlayUpdaterTest {
         Set<Item> items = updater.getItems(turbo);
 
         /* Then */
-        assertThat(items).hasSize(150).are(allValid());
+        assertThat(items).hasSize(152).are(allValid());
     }
 
     @Test

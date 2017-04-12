@@ -94,12 +94,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         return subCatIds
                 .flatMap(v -> root6Play.map(s -> Tuple.of(s, String.format(VIDEOS_SELECTOR, programId, v))))
                 .flatMap(t -> JsonService.to(t._2(), TYPE_ITEMS).apply(t._1()))
-                .map(s -> this.convertToItem(s, basePath))
-                .filter(this::isValid);
-    }
-
-    private Boolean isValid(Item item) {
-        return nonNull(item.getPubDate());
+                .map(s -> this.convertToItem(s, basePath));
     }
 
     private Item convertToItem(SixPlayItem i, String basePath) {
@@ -165,7 +160,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         ZonedDateTime getLastDiffusion() {
             return Option.of(lastDiffusion)
                     .map(l -> ZonedDateTime.of(LocalDateTime.parse(l, DATE_FORMATTER), ZoneId.of("Europe/Paris")))
-                    .getOrElse(() -> null);
+                    .getOrElse(ZonedDateTime::now);
         }
 
         String url(String basePath) {
