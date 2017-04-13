@@ -67,9 +67,9 @@ public class JdomService {
     private static final String LINK_WATCHLIST_FORMAT = "%s/api/watchlists/%s/rss";
     private static final Comparator<Item> PUB_DATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
 
-    final PodcastServerParameters podcastServerParameters;
-    final MimeTypeService mimeTypeService;
-    final UrlService urlService;
+    private final PodcastServerParameters podcastServerParameters;
+    private final MimeTypeService mimeTypeService;
+    private final UrlService urlService;
 
     public Option<Document> parse(String url) {
         return Try.of(() -> new SAXBuilder().build(urlService.asStream(url)))
