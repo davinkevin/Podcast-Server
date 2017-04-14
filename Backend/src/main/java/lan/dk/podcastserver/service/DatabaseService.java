@@ -44,8 +44,8 @@ public class DatabaseService {
     private static final String QUERY_BACKUP_SQL = "SCRIPT TO '%s'";
     private static final String QUERY_BACKUP_BINARY = "BACKUP TO '%s'";
 
-    final Backup backup;
-    final FullTextEntityManager em;
+    private final Backup backup;
+    private final FullTextEntityManager em;
 
     @Transactional
     public Path backupWithDefault() throws IOException {
