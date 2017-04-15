@@ -14,7 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class DatabaseScheduled {
 
-    final DatabaseService databaseService;
+    private final DatabaseService databaseService;
 
     @Scheduled(cron="${podcastserver.backup.cron:0 0 4 * * *}")
     public void backup() throws IOException {

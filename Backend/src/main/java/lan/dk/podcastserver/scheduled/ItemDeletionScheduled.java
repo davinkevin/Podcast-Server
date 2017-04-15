@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ItemDeletionScheduled {
 
-    final UpdatePodcastBusiness updatePodcastBusiness;
+    private final UpdatePodcastBusiness updatePodcastBusiness;
 
     @Scheduled(fixedDelay = 86400000)
     public void deleteOldItem() {

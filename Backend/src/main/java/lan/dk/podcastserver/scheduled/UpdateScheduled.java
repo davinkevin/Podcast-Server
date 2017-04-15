@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UpdateScheduled {
 
-    final UpdatePodcastBusiness updatePodcastBusiness;
-    final ItemDownloadManager IDM;
+    private final UpdatePodcastBusiness updatePodcastBusiness;
+    private final ItemDownloadManager IDM;
 
     @Scheduled(cron="${podcastserver.update-and-download.refresh.cron:0 0 * * * *}")
     public void updateAndDownloadPodcast() {

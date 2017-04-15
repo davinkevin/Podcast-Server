@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class HibernateSearchIndexation {
 
-    final ItemBusiness itemBusiness;
+    private final ItemBusiness itemBusiness;
 
     @Scheduled(fixedDelay = 86400000)
     public void refreshIndex() throws InterruptedException {
