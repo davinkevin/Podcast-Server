@@ -69,7 +69,7 @@ export default class PodcastCreationController {
         } else if (this.podcast.url && this.podcast.url.length > 0) {
             this.podcast.type = "RSS";
         } else {
-            this.podcast.type = "Send";
+            this.podcast.type = "upload";
         }
     }
 

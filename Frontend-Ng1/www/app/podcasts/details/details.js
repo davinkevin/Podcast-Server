@@ -45,11 +45,11 @@ export default class PodcastDetailCtrl {
         this.podcastTabs = [
             { heading : 'Episodes', active : true},
             { heading : 'Edition', active : false},
-            { heading : 'Upload', disabled : this.podcast.type !== 'send'},
+            { heading : 'Upload', disabled : this.podcast.type !== 'upload'},
             { heading : 'Stats', active : false }
         ];
 
-        this.podcast.isUpdatable = function() { return this.type !== 'send'; };
+        this.podcast.isUpdatable = function() { return this.type !== 'upload'; };
 
         if (this.podcast.isUpdatable() && !this.podcast.lastUpdate)
             this.refresh();
