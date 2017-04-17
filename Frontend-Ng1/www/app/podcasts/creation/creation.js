@@ -49,30 +49,6 @@ export default class PodcastCreationController {
         return this.tagService.search(query);
     }
 
-    changeType() {
-        if (/beinsports\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "BeInSports";
-        } else if (/canalplus\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "CanalPlus";
-        } else if (/jeuxvideo\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "JeuxVideoFR";
-        } else if (/jeuxvideo\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "JeuxVideoCom";
-        } else if (/parleys\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "Parleys";
-        } else if (/pluzz\.francetv\.fr/i.test(this.podcast.url)) {
-            this.podcast.type = "Pluzz";
-        } else if (/youtube\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "Youtube";
-        } else if (/dailymotion\.com/i.test(this.podcast.url)) {
-            this.podcast.type = "Dailymotion";
-        } else if (this.podcast.url && this.podcast.url.length > 0) {
-            this.podcast.type = "RSS";
-        } else {
-            this.podcast.type = "upload";
-        }
-    }
-
     save() {
         this.podcastService
             .save(this.podcast)
