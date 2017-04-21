@@ -1,6 +1,6 @@
 import { PodcastServerPage } from './app.po';
 
-describe('podcast-server App', function() {
+describe('podcast-server App', () => {
   let page: PodcastServerPage;
 
   beforeEach(() => {
@@ -9,6 +9,6 @@ describe('podcast-server App', function() {
 
   it('should display message saying app works', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('app works!');
+    expect(page.getParagraphText()).toEqual('ps works!');
   });
 });
