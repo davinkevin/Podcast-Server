@@ -1,0 +1,75 @@
+##############################
+# Database and Lucene Config #
+##############################
+spring :
+    mvc.view:
+      suffix : .html
+      prefix : /
+    h2.console.enabled : true
+    datasource:
+        url: jdbc:h2:/tmp/podcast-server
+        username: sa
+        driver-class-name: org.h2.Driver
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        show-sql: false
+        hibernate.ddl-auto: update
+        properties :
+            hibernate:
+                format_sql: true
+                search.default:
+                        indexmanager: near-real-time
+                        directory_provider: ram
+                        indexBase: /tmp/lucene
+            jadira.usertype.autoRegisterUserTypes: true
+    http.multipart:
+          max-file-size: 512MB
+          max-request-size: 512MB
+          location : /tmp/
+
+server:
+  port : 8080
+  compression:
+    enabled : true
+    mime-types : application/json,application/xml,text/html,text/xml,text/plain
+
+##############################
+#    Application Specific    #
+##############################
+
+podcastserver:
+    rootfolder: /tmp/podcast
+    #concurrent-download: 2
+    #max-update-parallels: 3
+    #cover-default-name: cover
+    number-of-day-to-download: 30
+    number-of-day-to-save-cover: 30
+    #number-of-try: 10
+    #download-extension: .psdownload
+    #rss-default-number-item: 50
+    update-and-download.refresh.cron: 0 0 0 * * ?
+    backup :
+        location: /tmp/
+        cron: 0 30 4 * * ?
+        binary: false
+    externaltools:
+        #rtmpdump: /usr/local/bin/rtmpdump
+        #ffmpeg: /usr/local/bin/ffmpeg
+        #ffprobe: /usr/local/bin/ffprobe
+    api :
+      youtube :
+      #youtube :
+
+
+##############################
+#          Actuator          #
+##############################
+
+management.context-path: /system
+endpoints.health.sensitive: false
+
+logging:
+    path: /private/tmp/logs/podcastserver.log
+    level:
+        lan.dk.podcastserver : DEBUG
+        org.springframework.http.converter.json : DEBUG
