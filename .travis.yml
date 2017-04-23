@@ -8,6 +8,11 @@ sudo: required
 services:
 - docker
 
+before_install:
+- export CHROME_BIN=chromium-browser
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+
 install: true
 
 cache:
@@ -22,6 +27,7 @@ before_script:
 
 script:
 - mvn -f Frontend-Ng1/pom.xml install
+- mvn -f Frontend-Ng2/pom.xml install
 - mvn -f Backend/pom.xml install jacoco:report
 
 after_success:
