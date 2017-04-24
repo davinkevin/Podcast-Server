@@ -17,8 +17,8 @@ install: true
 
 cache:
   directories:
-  - Frontend-Ng1/node_modules
-  - Frontend-Ng2/node_modules
+  - frontend-angularjs/node_modules
+  - frontend-angularjs/node_modules
   - $HOME/.m2
 
 before_script:
@@ -26,8 +26,8 @@ before_script:
 - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
 
 script:
-- mvn -f Frontend-Ng1/pom.xml install
-- mvn -f Frontend-Ng2/pom.xml install
+- mvn -f frontend-angularjs/pom.xml install
+- mvn -f frontend-angular/pom.xml install
 - mvn -f Backend/pom.xml install jacoco:report
 
 after_success:

@@ -11,7 +11,7 @@
 
     <modules>
         <module>Backend</module>
-        <module>Frontend-Ng1</module>
-        <module>Frontend-Ng2</module>
+        <module>frontend-angularjs</module>
+        <module>frontend-angular</module>
     </modules>
 </project>

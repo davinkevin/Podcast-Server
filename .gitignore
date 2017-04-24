@@ -7,16 +7,16 @@ logs
 target
 .gradle
 
-# Front End in NG1 :
-Frontend-Ng1/www/fonts/
-Frontend-Ng1/www/jspm_packages
-Frontend-Ng1/node
-Frontend-Ng1/**/*.css
+# Front End in AngularJS :
+frontend-angularjs/www/fonts/
+frontend-angularjs/www/jspm_packages
+frontend-angularjs/node
+frontend-angularjs/**/*.css
 
 
-# Front End in NG2 :
-Frontend-Ng2/dist
-Frontend-Ng2/coverage
+# Front End in Angular :
+frontend-angular/dist
+frontend-angular/coverage
 
 # Back End
 Backend/lib/

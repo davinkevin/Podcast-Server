@@ -4,14 +4,14 @@ engines:
 
 ratings:
   paths:
-  - "Frontend-Ng1/www/app/**"
+  - "frontend-angularjs/www/app/**"
 
 exclude_paths:
 - "Backend/**/*"
-- "Frontend-Ng1/gulp/**/*"
-- "Frontend-Ng1/*.js"
-- "Frontend-Ng1/*.json"
-- "Frontend-Ng1/*.xml"
+- "frontend-angularjs/gulp/**/*"
+- "frontend-angularjs/*.js"
+- "frontend-angularjs/*.json"
+- "frontend-angularjs/*.xml"
 - "*.md"
 - "*.xml"
 - "LICENSE"
