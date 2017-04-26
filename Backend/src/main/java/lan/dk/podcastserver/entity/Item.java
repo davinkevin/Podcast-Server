@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
 import javaslang.control.Option;
 import javaslang.control.Try;
+import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -243,7 +244,7 @@ public class Item {
         
     @AssertTrue
     public boolean hasValidURL() {
-        return (!StringUtils.isEmpty(this.url)) || "send".equals(this.podcast.getType());
+        return (!StringUtils.isEmpty(this.url)) || UploadUpdater.TYPE.key().equals(this.podcast.getType());
     }
 
     public Item reset() {

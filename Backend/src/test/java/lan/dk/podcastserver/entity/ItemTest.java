@@ -117,7 +117,7 @@ public class ItemTest {
     public void should_have_a_valid_url() {
         assertThat(ITEM.hasValidURL()).isTrue();
 
-        PODCAST.setType("send");
+        PODCAST.setType("upload");
         ITEM.setUrl("");
         assertThat(ITEM.hasValidURL()).isTrue();
 

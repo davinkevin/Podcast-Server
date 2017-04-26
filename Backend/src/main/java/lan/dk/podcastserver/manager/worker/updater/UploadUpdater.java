@@ -17,6 +17,8 @@ import java.util.function.Predicate;
 @Component("UploadUpdater")
 public class UploadUpdater extends AbstractUpdater {
 
+    public static final Type TYPE = new Type("upload", "Upload");
+
     UploadUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator) {
         super(podcastServerParameters, signatureService, validator);
     }
@@ -38,7 +40,7 @@ public class UploadUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("upload", "Upload");
+        return TYPE;
     }
 
     @Override
