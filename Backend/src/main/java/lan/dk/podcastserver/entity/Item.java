@@ -26,7 +26,6 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 
@@ -185,8 +184,9 @@ public class Item {
 
     private void checkAndDelete() {
 
-        if (!podcast.getHasToBeDeleted())
+        if (!podcast.getHasToBeDeleted()) {
             return;
+        }
 
         Try .of(() -> Files.deleteIfExists(getCoverPath()))
             .onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
@@ -213,8 +213,12 @@ public class Item {
     }
 
     public Path getCoverPath() {
-        String url = isNull(cover) ? "" : cover.getUrl();
-        return getPodcastPath().resolve(id + "." + FilenameUtils.getExtension(url));
+        return Option.of(cover)
+                .map(Cover::getUrl)
+                .orElse(() -> Option.of(""))
+                .map(FilenameUtils::getExtension)
+                .map(ext -> getPodcastPath().resolve(id + "." + ext))
+                .getOrElseThrow(() -> new RuntimeException("Cover Path not found for item " + title));
     }
 
     private Path getPodcastPath() {
@@ -234,13 +238,14 @@ public class Item {
 
     @JsonProperty("cover") @JsonView(ItemSearchListView.class)
     public Cover getCoverOfItemOrPodcast() {
-        return isNull(this.cover)
-                ? podcast.getCover()
-                : this.cover.toBuilder().url(String.format(COVER_PROXY_URL, podcast.getId(), id, FilenameUtils.getExtension(this.cover.getUrl()))).build();
+        return Option.of(cover)
+                .map(c -> String.format(COVER_PROXY_URL, podcast.getId(), id, FilenameUtils.getExtension(c.getUrl())))
+                .map(url -> cover.toBuilder().url(url).build())
+                .getOrElse(() -> podcast.getCover());
     }
 
     @JsonProperty("podcastId") @JsonView(ItemSearchListView.class)
-    public UUID getPodcastId() { return isNull(podcast) ? null : podcast.getId();}
+    public UUID getPodcastId() { return Option.of(podcast).map(Podcast::getId).getOrElse(() -> null);}
         
     @AssertTrue
     public boolean hasValidURL() {
