@@ -23,22 +23,39 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StatsControllerTest {
 
-    @Mock StatsBusiness statsBusiness;
-    @InjectMocks StatsController statsController;
+    private @Mock StatsBusiness statsBusiness;
+    private @InjectMocks StatsController statsController;
 
     @Test
-    public void should_find_stats_for_all_podcast() {
+    public void should_find_stats_for_all_podcast_by_download_date() {
         /* Given */
         Integer numberOfMonth = 6;
-        List<StatsPodcastType> statsPodcastTypes = new ArrayList<>();
-        when(statsBusiness.allStatsByTypeAndDownloadDate(eq(6))).thenReturn(statsPodcastTypes);
+        List<StatsPodcastType> stats = new ArrayList<>();
+        when(statsBusiness.allStatsByTypeAndDownloadDate(eq(6))).thenReturn(stats);
 
         /* When */
-        List<StatsPodcastType> statsByType = statsController.byDownloadDate(numberOfMonth);
+        List<StatsPodcastType> statsByDownloadDate = statsController.byDownloadDate(numberOfMonth);
 
         /* Then */
-        assertThat(statsPodcastTypes).isSameAs(statsByType);
+        assertThat(stats).isSameAs(statsByDownloadDate);
         verify(statsBusiness, only()).allStatsByTypeAndDownloadDate(eq(numberOfMonth));
     }
+
+    @Test
+    public void should_find_stats_for_all_podcast_by_creation_date() {
+        /* Given */
+        Integer numberOfMonth = 6;
+        List<StatsPodcastType> stats = new ArrayList<>();
+        when(statsBusiness.allStatsByTypeAndCreationDate(6)).thenReturn(stats);
+
+        /* When */
+        List<StatsPodcastType> statsByCreationDate = statsController.byCreationDate(numberOfMonth);
+
+        /* Then */
+        assertThat(stats).isSameAs(statsByCreationDate);
+        verify(statsBusiness, only()).allStatsByTypeAndCreationDate(eq(numberOfMonth));
+    }
+
+
 
 }
