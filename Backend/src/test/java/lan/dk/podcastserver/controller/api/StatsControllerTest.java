@@ -56,6 +56,21 @@ public class StatsControllerTest {
         verify(statsBusiness, only()).allStatsByTypeAndCreationDate(eq(numberOfMonth));
     }
 
+    @Test
+    public void should_find_stats_for_all_podcast_by_publication_date() {
+        /* Given */
+        Integer numberOfMonth = 6;
+        List<StatsPodcastType> stats = new ArrayList<>();
+        when(statsBusiness.allStatsByTypeAndPubDate(6)).thenReturn(stats);
+
+        /* When */
+        List<StatsPodcastType> statsByCreationDate = statsController.byPubDate(numberOfMonth);
+
+        /* Then */
+        assertThat(stats).isSameAs(statsByCreationDate);
+        verify(statsBusiness, only()).allStatsByTypeAndPubDate(eq(numberOfMonth));
+    }
+
 
 
 }
