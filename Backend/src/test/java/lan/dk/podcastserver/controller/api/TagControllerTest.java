@@ -14,7 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -23,22 +22,22 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TagControllerTest {
 
-    @Mock TagBusiness tagBusiness;
-    @InjectMocks TagController tagController;
+    private @Mock TagBusiness tagBusiness;
+    private @InjectMocks TagController tagController;
 
     @Test
     public void should_find_tag_by_id() {
         /* Given */
         UUID id = UUID.randomUUID();
         Tag value = new Tag();
-        when(tagBusiness.findOne(eq(id))).thenReturn(value);
+        when(tagBusiness.findOne(id)).thenReturn(value);
 
         /* When */
         Tag tagById = tagController.findById(id);
 
         /* Then */
         assertThat(tagById).isSameAs(value);
-        verify(tagBusiness, only()).findOne(eq(id));
+        verify(tagBusiness, only()).findOne(id);
     }
 
     @Test
@@ -60,13 +59,13 @@ public class TagControllerTest {
         /* Given */
         String name = "Foo";
         Set<Tag> tags = HashSet.empty();
-        when(tagBusiness.findByNameLike(eq(name))).thenReturn(tags);
+        when(tagBusiness.findByNameLike(name)).thenReturn(tags);
 
         /* When */
         Set<Tag> tagsFoundByName = tagController.findByNameLike(name);
 
         /* Then */
         assertThat(tagsFoundByName).isSameAs(tags);
-        verify(tagBusiness, only()).findByNameLike(eq(name));
+        verify(tagBusiness, only()).findByNameLike(name);
     }
 }
