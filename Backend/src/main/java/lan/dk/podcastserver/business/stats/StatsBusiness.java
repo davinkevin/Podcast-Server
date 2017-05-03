@@ -75,7 +75,7 @@ public class StatsBusiness {
 
     private List<StatsPodcastType> allStatsByType(Integer numberOfMonth, Selector selector) {
         return updaterSelector
-                .types()
+                .types().toJavaSet()
                 .stream()
                 .map(type -> generateForType(type, numberOfMonth, selector))
                 .filter(stats -> stats.values().size() > 0)

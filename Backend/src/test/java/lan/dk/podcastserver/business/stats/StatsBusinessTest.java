@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.business.stats;
 
-import com.google.common.collect.Sets;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import javaslang.collection.HashSet;
 import lan.dk.podcastserver.business.PodcastBusiness;
@@ -46,7 +45,7 @@ public class StatsBusinessTest {
     @Test
     public void should_stats_all_by_download_date() {
         /* Given */
-        when(updaterSelector.types()).thenReturn(Sets.newHashSet(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE));
+        when(updaterSelector.types()).thenReturn(HashSet.of(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE));
 
         when(itemRepository.findByTypeAndExpression(eq(RSS), any(BooleanExpression.class))).thenReturn(generateItems(5));
         when(itemRepository.findByTypeAndExpression(eq(BE_IN_SPORT), any(BooleanExpression.class))).thenReturn(HashSet.empty());
@@ -66,7 +65,7 @@ public class StatsBusinessTest {
     @Test
     public void should_stats_all_by_creation_date() {
         /* Given */
-        when(updaterSelector.types()).thenReturn(Sets.newHashSet(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE));
+        when(updaterSelector.types()).thenReturn(HashSet.of(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE));
 
         when(itemRepository.findByTypeAndExpression(eq(RSS), any(BooleanExpression.class))).thenReturn(generateItems(5));
         when(itemRepository.findByTypeAndExpression(eq(BE_IN_SPORT), any(BooleanExpression.class))).thenReturn(HashSet.empty());
@@ -86,7 +85,7 @@ public class StatsBusinessTest {
     @Test
     public void should_stats_all_by_publication_date() {
         /* Given */
-        when(updaterSelector.types()).thenReturn(Sets.newHashSet(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE));
+        when(updaterSelector.types()).thenReturn(HashSet.of(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE));
 
         when(itemRepository.findByTypeAndExpression(eq(RSS), any(BooleanExpression.class))).thenReturn(generateItems(5));
         when(itemRepository.findByTypeAndExpression(eq(BE_IN_SPORT), any(BooleanExpression.class))).thenReturn(HashSet.empty());

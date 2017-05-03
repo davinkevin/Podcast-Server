@@ -1,14 +1,13 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import com.google.common.collect.Sets;
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.manager.worker.updater.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -46,9 +45,7 @@ public class UpdaterSelectorTest {
         when(pluzzUpdater.type()).thenCallRealMethod();
         when(dailymotionUpdater.type()).thenCallRealMethod();
 
-        //updaterSelector = new UpdaterSelector();
-        //updaterSelector.setUpdaters(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, parleysUpdater, pluzzUpdater, dailymotionUpdater));
-        updaterSelector = new UpdaterSelector(Sets.newHashSet(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, pluzzUpdater, dailymotionUpdater));
+        updaterSelector = new UpdaterSelector(HashSet.<Updater>of(youtubeUpdater, rssUpdater, beInSportsUpdater, canalPlusUpdater, jeuxVideoComUpdater, pluzzUpdater, dailymotionUpdater).toJavaSet());
     }
     
     @Test

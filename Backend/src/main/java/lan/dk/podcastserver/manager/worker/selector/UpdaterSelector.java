@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
+import javaslang.collection.HashSet;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
@@ -8,9 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Comparator;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by kevin on 06/03/15.
@@ -19,9 +18,9 @@ import static java.util.stream.Collectors.toSet;
 @RequiredArgsConstructor
 public class UpdaterSelector {
 
-    public static final NoOpUpdater NO_OP_UPDATER = new NoOpUpdater();
+    static final NoOpUpdater NO_OP_UPDATER = new NoOpUpdater();
 
-    final private Set<Updater> updaters;
+    private final java.util.Set<Updater> updaters;
     
     public Updater of(String url) {
         if (StringUtils.isEmpty(url)) {
@@ -35,7 +34,7 @@ public class UpdaterSelector {
     }
 
     public Set<AbstractUpdater.Type> types() {
-        return updaters.stream().map(Updater::type).collect(toSet());
+        return HashSet.ofAll(updaters).map(Updater::type);
     }
 
 
