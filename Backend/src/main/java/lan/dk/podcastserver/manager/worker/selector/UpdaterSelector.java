@@ -2,11 +2,12 @@ package lan.dk.podcastserver.manager.worker.selector;
 
 import javaslang.collection.HashSet;
 import javaslang.collection.Set;
+import javaslang.control.Option;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Comparator;
 
@@ -25,11 +26,10 @@ public class UpdaterSelector {
     }
 
     public Updater of(String url) {
-        if (StringUtils.isEmpty(url)) {
-            return NO_OP_UPDATER;
-        }
-        
-        return updaters
+        return Option.of(url)
+                .filter(StringUtils::isNotEmpty)
+                .map(u -> updaters)
+                .getOrElse(HashSet.empty())
                 .minBy(Comparator.comparing(updater -> updater.compatibility(url)))
                 .getOrElse(NO_OP_UPDATER);
     }
