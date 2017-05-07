@@ -142,7 +142,7 @@ public class SixPlayUpdater extends AbstractUpdater {
     }
 
     public static int isFrom6Play(String url) {
-        return nonNull(url) && url.startsWith("http://www.6play.fr/") ? 1 : Integer.MAX_VALUE;
+        return nonNull(url) && url.contains("www.6play.fr/") ? 1 : Integer.MAX_VALUE;
     }
 
     @EqualsAndHashCode
