@@ -125,7 +125,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("script"))
                 .flatMap(this::extractJson)
-                .map(d -> d.read("mainStoreState.video.programVideosBySubCategory"))
+                .map(JsonService.extract("mainStoreState.video.programVideosBySubCategory"))
                 .map(Object::toString)
                 .map(signatureService::generateMD5Signature)
                 .getOrElseThrow(() -> new RuntimeException("Error during signature of podcast " + podcast.getTitle()));
