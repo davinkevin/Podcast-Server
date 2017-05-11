@@ -90,8 +90,8 @@ public class TF1ReplayUpdater extends AbstractUpdater {
 
     private Cover getCover(Element v) {
         String[] sources = v.select("source").first().attr("data-srcset").split(",");
-        String[] source = sources[sources.length - 1].split(" ");
-        return imageService.getCoverFromURL(SCHEME_DEFAULT + source[0]);
+        String url = List.of(List.of(sources).last().split(" ")).get();
+        return imageService.getCoverFromURL(SCHEME_DEFAULT + url);
     }
 
     private ZonedDateTime getDate(Element v) {
