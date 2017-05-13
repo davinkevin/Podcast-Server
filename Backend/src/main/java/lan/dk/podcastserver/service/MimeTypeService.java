@@ -9,6 +9,7 @@ import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+
+import static java.util.Objects.nonNull;
+import static lan.dk.podcastserver.manager.worker.updater.YoutubeUpdater.YOUTUBE;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server
@@ -49,22 +53,22 @@ public class MimeTypeService {
     }
 
     String getExtension(Item item) {
-        if (item.getMimeType() != null) {
+        if (nonNull(item.getMimeType())) {
             return item.getMimeType().replace("audio/", ".").replace("video/", ".");
         }
 
-        if ("Youtube".equals(item.getPodcast().getType()) || item.getUrl().lastIndexOf(".") == -1 ) {
+        if (YOUTUBE.equals(item.getPodcast().getType()) || StringUtils.containsNone(item.getUrl(), ".")) {
             return ".mp4";
-        } else {
-            return "."+FilenameUtils.getExtension(item.getUrl());
         }
+
+        return "."+FilenameUtils.getExtension(item.getUrl());
     }
 
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public String probeContentType(Path file) {
         return filesProbeContentType(file)
                 .orElse(() -> tikaProbeContentType.probeContentType(file))
-                .getOrElse(() -> getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName()))));
+                .getOrElse(() -> getMimeType(FilenameUtils.getExtension(file.getFileName().toString())));
     }
 
     private Option<String> filesProbeContentType(Path file) {

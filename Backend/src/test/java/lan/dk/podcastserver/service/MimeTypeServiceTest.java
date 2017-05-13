@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class MimeTypeServiceTest {
 
-    @Mock TikaProbeContentType tikaProbeContentType;
-    @InjectMocks MimeTypeService mimeTypeService;
+    private @Mock TikaProbeContentType tikaProbeContentType;
+    private @InjectMocks MimeTypeService mimeTypeService;
 
     @Test
     public void should_get_mimeType_if_no_extension() {

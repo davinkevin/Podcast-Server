@@ -47,6 +47,7 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final String PLAYLIST_URL_PART = "www.youtube.com/playlist?list=";
     private static final String URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s";
     private static final String API_PLAYLIST_URL = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=%s&key=%s";
+    public static final String YOUTUBE = "Youtube";
 
     private final JdomService jdomService;
     private final JsonService jsonService;
@@ -212,7 +213,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new Type("Youtube", "Youtube");
+        return new Type(YOUTUBE, YOUTUBE);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
