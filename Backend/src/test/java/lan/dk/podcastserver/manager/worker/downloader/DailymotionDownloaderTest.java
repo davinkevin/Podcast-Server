@@ -35,8 +35,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 22/02/2016 for Podcast Server
@@ -44,17 +43,17 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DailymotionDownloaderTest {
 
-    @Mock PodcastRepository podcastRepository;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock ItemDownloadManager itemDownloadManager;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock UrlService urlService;
-    @Mock WGetFactory wGetFactory;
-    @Mock JsonService jsonService;
-    @Mock M3U8Service m3U8Service;
-    @InjectMocks DailymotionDownloader dailymotionDownloader;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock ItemDownloadManager itemDownloadManager;
+    private @Mock SimpMessagingTemplate template;
+    private @Mock MimeTypeService mimeTypeService;
+    private @Mock UrlService urlService;
+    private @Mock WGetFactory wGetFactory;
+    private @Mock JsonService jsonService;
+    private @Mock M3U8Service m3U8Service;
+    private @InjectMocks DailymotionDownloader dailymotionDownloader;
 
     Item item;
     Podcast podcast;
@@ -102,6 +101,20 @@ public class DailymotionDownloaderTest {
 
         /* Then */
         assertThat(url).isEqualTo(item.getUrl());
+    }
+
+    @Test
+    public void should_warn_when_structure_of_page_change_and_return_null() {
+        /* GIVEN */
+        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/incoherent.dailymotion.html"));
+
+        /* When */
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
+
+        /* Then */
+        assertThat(itemUrl).isNull();
+        verify(jsonService, never()).parse(anyString());
+        verify(m3U8Service, never()).getM3U8UrlFormMultiStreamFile(anyString());
     }
 
     @SuppressWarnings("unchecked")
