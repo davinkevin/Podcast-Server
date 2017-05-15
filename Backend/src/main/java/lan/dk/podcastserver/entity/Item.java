@@ -23,6 +23,7 @@ import javax.validation.constraints.AssertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -249,7 +250,7 @@ public class Item {
         
     @AssertTrue
     public boolean hasValidURL() {
-        return (!StringUtils.isEmpty(this.url)) || UploadUpdater.TYPE.key().equals(this.podcast.getType());
+        return (!StringUtils.isEmpty(this.url)) || Objects.equals(UploadUpdater.TYPE.key(), podcast.getType());
     }
 
     public Item reset() {
