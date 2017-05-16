@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.Function;
 
+import static java.lang.Boolean.*;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -186,7 +188,7 @@ public class JdomService {
     }
 
     private long withNumberOfItem(Podcast podcast, Boolean limit) {
-        return Boolean.TRUE.equals(limit) ? podcastServerParameters.getRssDefaultNumberItem() : podcast.getItems().size();
+        return Objects.equals(TRUE, limit) ? podcastServerParameters.getRssDefaultNumberItem() : podcast.getItems().size();
     }
 
     private String getCoverUrl(Cover cover, String domainName) {

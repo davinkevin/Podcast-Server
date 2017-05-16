@@ -57,7 +57,7 @@ public class MimeTypeService {
             return item.getMimeType().replace("audio/", ".").replace("video/", ".");
         }
 
-        if (YOUTUBE.equals(item.getPodcast().getType()) || StringUtils.containsNone(item.getUrl(), ".")) {
+        if (Objects.equals(YOUTUBE, item.getPodcast().getType()) || StringUtils.containsNone(item.getUrl(), ".")) {
             return ".mp4";
         }
 
