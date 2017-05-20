@@ -3,16 +3,14 @@
  */
 
 /* Entity */
-
-
-export declare interface Cover {
+export interface Cover {
   id: string;
   url: string;
   width: number;
   height: number;
 }
 
-export declare interface Item {
+export interface Item {
   cover: Cover;
   creationDate: string;
   id: string;
@@ -25,12 +23,12 @@ export declare interface Item {
   url: string;
 }
 
-export declare interface Tag {
+export interface Tag {
   id: string;
   name: string;
 }
 
-export declare interface Page<T> {
+export interface Page<T> {
   content: Array<T>;
   first: boolean;
   last: boolean;
@@ -42,29 +40,30 @@ export declare interface Page<T> {
   sort: Array<Sort>;
 }
 
-export declare interface Sort {
+export interface Sort {
   direction: Direction;
   property: string;
 }
 
-export declare enum Direction {
-  ASC, DESC
+export enum Direction {
+  ASC   = <any> "ASC",
+  DESC  = <any> "DESC"
 }
 
-declare enum Status {
-  NOT_DOWNLOADED,
-  DELETED,
-  STARTED,
-  FINISH,
-  STOPPED,
-  PAUSED
+export enum Status {
+  NOT_DOWNLOADED  = <any> "NOT_DOWNLOADED",
+  DELETED = <any> "DELETED",
+  STARTED = <any> "STARTED",
+  FINISH  = <any> "FINISH",
+  STOPPED = <any> "STOPPED",
+  PAUSED  = <any> "PAUSED"
 }
 
-export declare interface SearchItemPageRequest {
+export interface SearchItemPageRequest {
   page: number;
   size: number;
   downloaded: boolean;
   tags?: Array<Tag>;
   term?: string;
-  orders?: Array<Sort>;
+  sort?: Array<Sort>;
 }
