@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {ItemService} from "./shared/service/item/item.service";
-import {Item, Page} from "./shared/entity";
+import {ItemService} from './shared/service/item/item.service';
+import {Item, Page} from './shared/entity';
 
 @Component({
   selector: 'ps-root',
@@ -10,7 +10,7 @@ import {Item, Page} from "./shared/entity";
 export class AppComponent implements OnInit {
   items: Page<Item>;
 
-  constructor(private itemService: ItemService){}
+  constructor(private itemService: ItemService) {}
 
   ngOnInit(): void {
     this.itemService.search()

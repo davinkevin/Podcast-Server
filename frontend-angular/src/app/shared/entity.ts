@@ -46,17 +46,17 @@ export interface Sort {
 }
 
 export enum Direction {
-  ASC   = <any> "ASC",
-  DESC  = <any> "DESC"
+  ASC   = <any> 'ASC',
+  DESC  = <any> 'DESC'
 }
 
 export enum Status {
-  NOT_DOWNLOADED  = <any> "NOT_DOWNLOADED",
-  DELETED = <any> "DELETED",
-  STARTED = <any> "STARTED",
-  FINISH  = <any> "FINISH",
-  STOPPED = <any> "STOPPED",
-  PAUSED  = <any> "PAUSED"
+  NOT_DOWNLOADED  = <any> 'NOT_DOWNLOADED',
+  DELETED = <any> 'DELETED',
+  STARTED = <any> 'STARTED',
+  FINISH  = <any> 'FINISH',
+  STOPPED = <any> 'STOPPED',
+  PAUSED  = <any> 'PAUSED'
 }
 
 export interface SearchItemPageRequest {

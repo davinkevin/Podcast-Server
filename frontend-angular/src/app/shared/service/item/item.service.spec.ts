@@ -3,11 +3,12 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { ItemService } from './item.service';
 import {Http} from '@angular/http';
-import {Observable} from 'rxjs';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 
 describe('Service: Item', () => {
 
-  let http = jasmine.createSpyObj('http', ['post']);
+  const http = jasmine.createSpyObj('http', ['post']);
 
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
@@ -22,8 +23,9 @@ describe('Service: Item', () => {
 
   xit('should get all elements from backend', inject([ItemService], (service: ItemService) => {
     /* Given */
-    let pageItem = {}, response = null;
-    let httpResponse = jasmine.createSpyObj('response', ['json']);
+    const pageItem = {};
+    const httpResponse = jasmine.createSpyObj('response', ['json']);
+    let response = null;
     httpResponse.json.and.returnValue(pageItem);
     http.post.and.returnValue(Observable.of(httpResponse));
 
