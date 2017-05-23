@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import javaslang.collection.List;
 import javaslang.collection.Set;
+import javaslang.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -15,6 +16,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,9 +55,10 @@ public class ItemBusiness {
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByTagsAndFullTextTerm(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
-        return page.getSort().getOrderFor("pertinence") == null
-                ? itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page)
-                : findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page);
+        return Option.of(page.getSort())
+                .flatMap(s -> Option.of(s.getOrderFor("pertinence")))
+                .map(v -> findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page))
+                .getOrElse(() -> itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page));
     }
 
     private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
@@ -63,7 +66,13 @@ public class ItemBusiness {
         List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 
         // Reverse if order is ASC
-        if ("ASC".equals(page.getSort().getOrderFor("pertinence").getDirection().toString())) {
+        String order = Option.of(page.getSort())
+                .flatMap(s -> Option.of(s.getOrderFor("pertinence")))
+                .map(Sort.Order::getDirection)
+                .map(Object::toString)
+                .getOrElse(org.apache.commons.lang3.StringUtils.EMPTY);
+
+        if ("ASC".equals(order)) {
             fullTextIdsWithOrder = fullTextIdsWithOrder.reverse();
         }
         
