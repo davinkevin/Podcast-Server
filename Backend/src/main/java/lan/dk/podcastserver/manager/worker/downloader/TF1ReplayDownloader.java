@@ -2,6 +2,9 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mashape.unirest.http.HttpResponse;
+import javaslang.Tuple;
+import javaslang.Tuple2;
+import javaslang.collection.List;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -28,31 +31,18 @@ import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 @Component("TF1ReplayDownloader")
 public class TF1ReplayDownloader extends M3U8Downloader {
 
-    private static final String APP_NAME = "sdk/Iphone/1.0";
-    private static final String WAT_TIME_SERVER_URL = "http://www.wat.tv/servertime";
-    private static final String SECRET = "W3m0#1mFI";
-    private static final String AUTH_KEY_FORMAT = "%s-%s-%s-%s-%s";
-    private static final String API_WAT_DELIVERY = "http://api.wat.tv/services/Delivery";
-    private static final String HEADER_CONTENT_TYPE = "Content-Type";
-    private static final String HEADER_FORM = "application/x-www-form-urlencoded";
-    private static final String FIELD_MEDIA_ID = "mediaId";
-    private static final String FIELD_APP_NAME = "appName";
-    private static final String FIELD_AUTH_KEY = "authKey";
-    private static final String FIELD_METHOD = "method";
-    private static final String METHOD = "getUrl";
+    private static final String WAT_WEBHTML = "http://www.wat.tv/get/webhtml/%s";
     private static final String USER_AGENT = "User-Agent";
 
     private final HtmlService htmlService;
     private final JsonService jsonService;
-    private final SignatureService signatureService;
 
     String url = null;
 
-    public TF1ReplayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService, SignatureService signatureService) {
+    public TF1ReplayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
         this.htmlService = htmlService;
         this.jsonService = jsonService;
-        this.signatureService = signatureService;
     }
 
     @Override
@@ -83,50 +73,49 @@ public class TF1ReplayDownloader extends M3U8Downloader {
         return id.substring(1);
     }
 
-    private String getAuthKey(String id) {
-        String timestamp = Try.of(() -> urlService.get(WAT_TIME_SERVER_URL).asString())
-                .map(HttpResponse::getBody)
-                .map(s -> StringUtils.substringBefore(s, "|"))
-                .getOrElse(StringUtils.EMPTY);
-
-        String msg = String.format(AUTH_KEY_FORMAT, id, SECRET, APP_NAME, SECRET, timestamp);
-        return signatureService.generateMD5Signature(msg) + "/" + timestamp;
-    }
-
     private String getM3U8url(String id) {
-        return Try.of(() -> urlService.post(API_WAT_DELIVERY)
-                    .header(HEADER_CONTENT_TYPE, HEADER_FORM)
-                    .field(FIELD_MEDIA_ID, id)
-                    .field(FIELD_APP_NAME, APP_NAME)
-                    .field(FIELD_AUTH_KEY, getAuthKey(id))
-                    .field(FIELD_METHOD, METHOD)
-                .asString())
-                    .map(HttpResponse::getBody)
-                    .map(jsonService::parse)
-                    .map(JsonService.to(TF1ReplayVideoUrl.class))
-                    .map(TF1ReplayVideoUrl::getMessage)
-                    .map(this::upgradeBitrate)
+        return Try.of(() -> urlService.get(String.format(WAT_WEBHTML, id))
+                .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
+                .asString()
+        )
+                .map(HttpResponse::getBody)
+                .map(jsonService::parse)
+                .map(JsonService.to(TF1ReplayVideoUrl.class))
+                .map(TF1ReplayVideoUrl::getHls)
+                .map(this::removeBitrate)
                 .onFailure(e -> log.error("Error during fetching", e))
                 .getOrElse("http://wat.tv/get/ipad/"+ id + ".m3u8");
     }
 
-    private String upgradeBitrate(String url) {
-        // bwmin=40000&bwmax=150000
-        // bwmin=400000&bwmax=4900000
-        return url
-                .replaceFirst("bwmin=[0-9]+", "bwmin=400000")
-                .replaceFirst("bwmax=[0-9]+", "bwmax=4900000");
+    private String removeBitrate(String url) {
+        // Url has this format
+        // http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/13315645.m3u8?vk=MTMzMTU2NDUubTN1OA==&st=UycCudlvBB6aTcCG37_Ulw&e=1492276114&t=1492265314&min_bitrate=100000&max_bitrate=1600001
+
+        String queryParams = StringUtils.substringAfter(url, "?");
+
+        String filteredQueryParams = List.of(queryParams.split("&"))
+                .map(this::queryParamsToTuple)
+                .filter(t -> !t._1().contains("bitrate"))
+                .map(t -> t._1() + "=" + t._2())
+                .mkString("&");
+
+        return StringUtils.substringBefore(url, "?") + "?" + filteredQueryParams;
+    }
+
+    private Tuple2<String, String> queryParamsToTuple(String params) {
+        String[] split = params.split("=", 2);
+        return Tuple.of(split[0], split[1]);
     }
 
     private String getHighestQualityUrl(String url) {
         String realUrl = urlService.getRealURL(url, c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
 
         return Try.of(() -> urlService.get(url)
-                    .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
+                .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
                 .asString())
-                    .map(HttpResponse::getRawBody)
-                    .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
-                    .map(u -> urlService.addDomainIfRelative(realUrl, u))
+                .map(HttpResponse::getRawBody)
+                .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
+                .map(u -> urlService.addDomainIfRelative(realUrl, u))
                 .getOrElseThrow((e) -> new RuntimeException("Url not found for TF1 item with m3u8 url " + url, e));
     }
 
@@ -137,7 +126,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class TF1ReplayVideoUrl {
-        @Getter @Setter private String message;
+        @Getter @Setter private String hls;
     }
 
     @Override
