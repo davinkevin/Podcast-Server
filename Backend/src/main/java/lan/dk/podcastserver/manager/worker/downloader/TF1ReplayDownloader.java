@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 import javaslang.collection.List;
+import javaslang.control.Option;
 import javaslang.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -20,7 +21,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import static java.util.Objects.nonNull;
+import java.util.Objects;
+
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 
 /**
@@ -31,13 +33,13 @@ import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 @Component("TF1ReplayDownloader")
 public class TF1ReplayDownloader extends M3U8Downloader {
 
-    private static final String WAT_WEBHTML = "http://www.wat.tv/get/webhtml/%s";
+    private static final String WAT_WEB_HTML = "http://www.wat.tv/get/webhtml/%s";
     private static final String USER_AGENT = "User-Agent";
 
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    String url = null;
+    private Option<String> url = Option.none();
 
     public TF1ReplayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
@@ -48,22 +50,19 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     @Override
     public String getItemUrl(Item item) {
 
-        if (nonNull(this.item) && !this.item.equals(item))
+        if (!Objects.equals(this.item, item)) {
             return item.getUrl();
+        }
 
-        if (nonNull(url))
-            return url;
-
-        url = htmlService.get(item.getUrl())
+        url = url.orElse(() -> htmlService.get(item.getUrl())
                 .map(d -> d.select("#zonePlayer").first())
                 .map(d -> d.attr("data-src"))
                 .map(src -> src.substring(src.length() - 8))
                 .map(this::normalizeId)
                 .map(this::getM3U8url)
-                .map(this::getHighestQualityUrl)
-                .getOrElseThrow(() -> new RuntimeException("Id not found for url " + url));
+                .map(this::getHighestQualityUrl));
 
-        return url;
+        return url.getOrElseThrow(() -> new RuntimeException("Id not found for url " + url));
     }
 
     private String normalizeId(String id) {
@@ -74,7 +73,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     }
 
     private String getM3U8url(String id) {
-        return Try.of(() -> urlService.get(String.format(WAT_WEBHTML, id))
+        return Try.of(() -> urlService.get(String.format(WAT_WEB_HTML, id))
                 .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
                 .asString()
         )
