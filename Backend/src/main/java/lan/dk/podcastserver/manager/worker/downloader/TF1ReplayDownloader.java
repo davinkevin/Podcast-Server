@@ -62,7 +62,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
                 .map(this::getM3U8url)
                 .map(this::getHighestQualityUrl));
 
-        return url.getOrElseThrow(() -> new RuntimeException("Id not found for url " + url));
+        return url.getOrElseThrow(() -> new RuntimeException("Id not found for url " + item.getUrl()));
     }
 
     private String normalizeId(String id) {
