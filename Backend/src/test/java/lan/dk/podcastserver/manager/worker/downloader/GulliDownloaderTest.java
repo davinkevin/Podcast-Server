@@ -1,13 +1,8 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.service.factory.WGetFactory;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,12 +10,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -32,12 +27,14 @@ public class GulliDownloaderTest {
 
     private @Mock HtmlService htmlService;
     private @Mock JsonService jsonService;
+    /*
     private @Mock UrlService urlService;
     private @Mock WGetFactory wGetFactory;
     private @Mock ItemRepository itemRepository;
     private @Mock PodcastRepository podcastRepository;
     private @Mock PodcastServerParameters podcastServerParameters;
     private @Mock SimpMessagingTemplate template;
+    */
     private @InjectMocks GulliDownloader gulliDownloader;
 
     @Before
@@ -90,10 +87,9 @@ public class GulliDownloaderTest {
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/embed.VOD68526621555000.without.position.html"));
 
         /* When */
-        String url = gulliDownloader.getItemUrl(gulliDownloader.getItem());
-
         /* Then */
-        assertThat(url).isEmpty();
+        assertThatThrownBy(() -> gulliDownloader.getItemUrl(gulliDownloader.getItem()))
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test

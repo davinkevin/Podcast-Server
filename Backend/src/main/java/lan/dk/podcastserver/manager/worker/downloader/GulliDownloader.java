@@ -17,15 +17,14 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static java.util.Objects.nonNull;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -44,7 +43,7 @@ public class GulliDownloader extends HTTPDownloader {
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private String url = null;
+    private Option<String> url = Option.none();
 
     public GulliDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, WGetFactory wGetFactory, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, wGetFactory);
@@ -54,19 +53,16 @@ public class GulliDownloader extends HTTPDownloader {
 
     @Override
     public String getItemUrl(Item item) {
-        if (nonNull(this.item) && !this.item.equals(item))
+        if (!Objects.equals(this.item, item)) {
             return item.getUrl();
+        }
 
-        if (nonNull(url))
-            return url;
-
-        url = htmlService.get(item.getUrl())
+        url = url.orElse(() -> htmlService.get(item.getUrl())
                 .map(d -> d.select("script"))
                 .flatMap(scripts -> List.ofAll(scripts).find(e -> e.html().contains("playlist:")))
-                .flatMap(this::getPlaylistFromGulliScript)
-                .getOrElse(StringUtils.EMPTY);
+                .flatMap(this::getPlaylistFromGulliScript));
 
-        return url;
+        return url.getOrElseThrow(() -> new RuntimeException("url not found for " + item.getUrl()));
     }
 
     private Option<String> getPlaylistFromGulliScript(Element element) {
