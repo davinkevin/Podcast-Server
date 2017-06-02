@@ -1,28 +1,28 @@
+import 'rxjs/add/operator/map';
+
 import {Injectable} from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+
 import {Direction, Item, Page, SearchItemPageRequest} from '../../entity';
 
 
 @Injectable()
 export class ItemService {
-
   private static defaultSearch = {
-    page : 0,
-    size : 12,
-    downloaded : true,
+    page: 0,
+    size: 12,
+    downloaded: true,
     tags: [],
     sort: [{property: 'pubDate', direction: Direction.ASC}]
   };
 
   constructor(private http: Http) {}
 
-  search(searchPageRequest: SearchItemPageRequest = ItemService.defaultSearch): Observable<Page<Item>> {
+  search(searchPageRequest: SearchItemPageRequest = ItemService.defaultSearch):
+      Observable<Page<Item>> {
     const params = this.toParams(searchPageRequest);
-    return this.http
-      .get('/api/items/search', {params})
-      .map(res => res.json());
+    return this.http.get('/api/items/search', {params}).map(res => res.json());
   }
 
   private toParams(searchPageRequest: SearchItemPageRequest): URLSearchParams {

@@ -5,17 +5,15 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { ItemService } from './shared/service/item/item.service';
+import { MdToolbarModule, MdIconModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpModule
-  ],
+  declarations: [AppComponent],
+  imports: [BrowserModule, FormsModule, HttpModule,
+    MdToolbarModule, MdIconModule,
+    BrowserAnimationsModule],
   providers: [ItemService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

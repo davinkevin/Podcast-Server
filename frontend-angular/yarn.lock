@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@angular/animations@^4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-4.0.3.tgz#42bb7d0c767137aaca777d27244f4c042d02641b"
+
 "@angular/cli@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-1.0.0.tgz#7bfde1e7c5f28bf5bed4dda1352ee67ee887302f"
@@ -93,6 +97,10 @@
 "@angular/http@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@angular/http/-/http-4.0.0.tgz#45a538eac42a0b13f3744c7e8bafeb17d58da31c"
+
+"@angular/material@^2.0.0-beta.3":
+  version "2.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-2.0.0-beta.3.tgz#ec31dee61d7300ece28fee476852db236ded1e13"
 
 "@angular/platform-browser-dynamic@^4.0.0":
   version "4.0.0"
@@ -778,6 +786,14 @@ cipher-base@^1.0.0, cipher-base@^1.0.1:
   resolved "https://registry.yarnpkg.com/cipher-base/-/cipher-base-1.0.3.tgz#eeabf194419ce900da3018c207d212f2a6df0a07"
   dependencies:
     inherits "^2.0.1"
+
+clang-format@^1.0.49:
+  version "1.0.49"
+  resolved "https://registry.yarnpkg.com/clang-format/-/clang-format-1.0.49.tgz#bf52f42277d41ed3618591f87145acf64aceb7e6"
+  dependencies:
+    async "^1.5.2"
+    glob "^7.0.0"
+    resolve "^1.1.6"
 
 clap@^1.0.9:
   version "1.1.3"
