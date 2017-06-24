@@ -6,13 +6,19 @@ import {AppComponent} from './app.component';
 import {MdIconModule, MdToolbarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SearchModule} from './search/search.module';
+import {RouterModule, Routes} from '@angular/router';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/search', pathMatch: 'full'}
+];
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    BrowserModule, BrowserAnimationsModule,
-    MdToolbarModule, MdIconModule,
-    SearchModule
+    /* std Modules */       BrowserModule, BrowserAnimationsModule,
+    /* Materials Modules */ MdToolbarModule, MdIconModule,
+    /* Router Modules */    RouterModule.forRoot(routes),
+    /* Feature Modules */   SearchModule
   ],
   providers: [],
   bootstrap: [AppComponent]
