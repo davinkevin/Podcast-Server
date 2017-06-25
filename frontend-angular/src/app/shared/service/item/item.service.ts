@@ -14,7 +14,7 @@ export class ItemService {
     size: 12,
     downloaded: true,
     tags: [],
-    sort: [{property: 'pubDate', direction: Direction.ASC}]
+    sort: [{property: 'pubDate', direction: Direction.DESC}]
   };
 
   constructor(private http: Http) {}
