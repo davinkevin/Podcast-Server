@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Item, Page} from '../shared/entity';
-import {ItemService} from '../shared/service/item/item.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'ps-search',
@@ -11,12 +11,12 @@ export class SearchComponent implements OnInit {
 
   items: Page<Item>;
 
-  constructor(private itemService: ItemService) {}
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.itemService
-      .search()
-      .subscribe(v => this.items = v);
+    this.route.data
+      .map(d => (<any> d).search)
+      .subscribe(s => this.items = s)
   }
 
 }

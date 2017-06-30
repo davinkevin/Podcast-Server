@@ -9,7 +9,7 @@ import {Direction, Item, Page, SearchItemPageRequest} from '../../entity';
 
 @Injectable()
 export class ItemService {
-  private static defaultSearch = {
+  static defaultSearch = {
     page: 0,
     size: 12,
     downloaded: true,
@@ -19,8 +19,7 @@ export class ItemService {
 
   constructor(private http: Http) {}
 
-  search(searchPageRequest: SearchItemPageRequest = ItemService.defaultSearch):
-      Observable<Page<Item>> {
+  search(searchPageRequest: SearchItemPageRequest = ItemService.defaultSearch): Observable<Page<Item>> {
     const params = this.toParams(searchPageRequest);
     return this.http.get('/api/items/search', {params}).map(res => res.json());
   }
@@ -37,5 +36,15 @@ export class ItemService {
     params.set('tags', searchPageRequest.tags.join(','));
 
     return params;
+  }
+
+  static extendDefaultSearch(params: any): SearchItemPageRequest {
+    return {
+      page: params.page || ItemService.defaultSearch.page,
+      size: params.size || ItemService.defaultSearch.size,
+      downloaded: params.downloaded || ItemService.defaultSearch.downloaded,
+      tags: params.tags || ItemService.defaultSearch.tags,
+      sort: params.sort || ItemService.defaultSearch.sort,
+    };
   }
 }
