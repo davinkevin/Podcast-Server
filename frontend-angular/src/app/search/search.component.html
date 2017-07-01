@@ -1,3 +1,12 @@
-<pre>
-  {{ items | json }}
-</pre>
+<md-card *ngFor="let item of items.content">
+  <md-card-header>
+    <md-card-title>{{ item.title }}</md-card-title>
+  </md-card-header>
+  <img md-card-image [src]="item.cover?.url">
+  <md-card-actions>
+    <button md-button>
+      <md-icon class="section-icon">play_arrow</md-icon>
+      Play
+    </button>
+  </md-card-actions>
+</md-card>
