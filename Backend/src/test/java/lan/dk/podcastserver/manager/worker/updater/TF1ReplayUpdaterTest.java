@@ -20,10 +20,12 @@ import java.net.URISyntaxException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by kevin on 21/07/2016.
+ * Created by kevin on 21/07/2016
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TF1ReplayUpdaterTest {
@@ -83,12 +85,15 @@ public class TF1ReplayUpdaterTest {
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
         when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
+        when(htmlService.get(anyString())).then(i -> IOUtils.fileAsHtml("/remote/podcast/tf1replay/items.html"));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
 
         /* When */
         Set<Item> items = updater.getItems(podcast);
 
         /* Then */
         assertThat(items).hasSize(8);
+        verify(imageService, atLeast(1)).getCoverFromURL(anyString());
     }
 
     @Test

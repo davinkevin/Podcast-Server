@@ -44,7 +44,7 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final String DOMAIN = "http://www.tf1.fr";
     private static final String REPLAY_CATEGORY = "replay";
     private static final String ALL_CATEGORY = "all";
-    private static final Set<String> TYPES = HashSet.of("replay", "vidéo");
+    private static final Set<String> TYPES = HashSet.of("replay", "vidéo", "");
 
     private final HtmlService htmlService;
     private final ImageService imageService;
@@ -70,12 +70,14 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     }
 
     private Item getItem(Element e) {
+        String url = DOMAIN + e.select(".videoLink").attr("href");
+
         return Item.builder()
-                .title(getTitle(e))
-                .description(e.select("p.stitle").text())
-                .pubDate(getDate(e))
-                .url(DOMAIN + e.select(".videoLink").attr("href"))
-                .cover(getCover(e))
+                    .title(getTitle(e))
+                    .description(e.select("p.stitle").text())
+                    .pubDate(getDate(url))
+                    .url(url)
+                    .cover(getCover(e))
                 .build();
     }
 
@@ -88,19 +90,23 @@ public class TF1ReplayUpdater extends AbstractUpdater {
         return text;
     }
 
-    private Cover getCover(Element v) {
-        String[] sources = v.select("source").first().attr("data-srcset").split(",");
+    private Cover getCover(Element e) {
+        String[] sources = e.select("source").first().attr("data-srcset").split(",");
         String url = List.of(List.of(sources).last().split(" ")).get();
         return imageService.getCoverFromURL(SCHEME_DEFAULT + url);
     }
 
-    private ZonedDateTime getDate(Element v) {
-        return List.ofAll(v.select(".momentDate"))
-                .toStream()
-                .find(e -> !e.hasAttr("data-format"))
-                .map(e -> e.attr("data-date"))
-                .map(ZonedDateTime::parse)
-                .getOrElse(() -> null);
+    private ZonedDateTime getDate(String url) {
+        return htmlService.get(url)
+                .map(d -> d.select("script[type=application/ld+json]"))
+                .map(List::ofAll)
+                .getOrElse(List::empty)
+                .headOption()
+                .map(Element::html)
+                .map(jsonService::parse)
+                .map(JsonService.to(TF1ReplayItem.class))
+                .map(TF1ReplayItem::getUploadDate)
+                .getOrElse(ZonedDateTime::now);
     }
 
     @Override
@@ -159,5 +165,10 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class TF1ReplayResponse {
         @Setter @Getter String html;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class TF1ReplayItem {
+        @Setter @Getter ZonedDateTime uploadDate;
     }
 }
