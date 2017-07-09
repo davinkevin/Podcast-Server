@@ -27,8 +27,8 @@ before_script:
 
 script:
 - mvn -f frontend-angularjs/pom.xml install
-- mvn -f frontend-angular/pom.xml install
 - mvn -f Backend/pom.xml install jacoco:report
+#- mvn -f frontend-angular/pom.xml install
 
 after_success:
 - mvn -f Backend/pom.xml coveralls:report
