@@ -40,8 +40,8 @@ public class SixPlayDownloaderTest {
     @Before
     public void beforeEach() {
         downloader.setItem(Item.builder()
-                .title("Des esquimaux au soleil")
-                .url("http://www.6play.fr/les-p-tits-cuistots-p_5190/Des-esquimaux-au-soleil-c_11506160")
+                .title("Les salariés de Whirlpool peuvent compter sur le soutien de Madénian et VDB")
+                .url("http://www.6play.fr/le-message-de-madenian-et-vdb-p_6730/mm-vdb-28-04-c_11681670")
                 .build()
         );
     }
@@ -49,12 +49,12 @@ public class SixPlayDownloaderTest {
     @Test
     public void should_get_url_for_m6_item() throws IOException, URISyntaxException {
         /* GIVEN */
-        when(htmlService.get(downloader.getItem().getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/Des-esquimaux-au-soleil-c_11506160.html"));
+        when(htmlService.get(downloader.getItem().getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-28-04-c_11681670.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         /* WHEN  */
         String url = downloader.getItemUrl(downloader.getItem());
         /* THEN  */
-        assertThat(url).isEqualToIgnoringCase("http://lb.cdn.m6web.fr/s/cgd/5/dabc9aca36118e0c5e029f4ef690afb4/58d20ccb/QUR8RlJ8R1B8R0Z8TVF8WVR8TUN8TkN8UEZ8UkV8Qkx8TUZ8UE18VEZ8V0Y%3D/usp/mb_sd3/a/b/6/Les-P-tits-cuistots_c11506160_Des-esquimaux-a/Les-P-tits-cuistots_c11506160_Des-esquimaux-a_unpnp.ism/Manifest.m3u8");
+        assertThat(url).isEqualToIgnoringCase("http://lb.cdn.m6web.fr/s/cd/5/7e27d94dce21ef059e1a5ae389e5cafb/59063acb/usp/mb_sd3/6/f/e/Le-Message-de-Maden_c11681670_Les-salaries-de/Le-Message-de-Maden_c11681670_Les-salaries-de_unpnp.ism/Manifest.m3u8");
     }
 
     @Test

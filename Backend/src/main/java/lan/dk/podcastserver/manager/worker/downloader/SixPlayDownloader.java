@@ -31,7 +31,7 @@ import static java.util.Objects.nonNull;
 public class SixPlayDownloader extends M3U8Downloader {
 
     private static final TypeRef<Set<M6PlayItem>> TYPE_ITEMS = new TypeRef<Set<M6PlayItem>>() {};
-    private static final String ITEMS_EXTRACTOR = "mainStoreState.video.currentVideo.clips[*].assets[*]";
+    private static final String ITEMS_EXTRACTOR = "video.currentVideo.clips[*].assets[*]";
 
     private final HtmlService htmlService;
     private final JsonService jsonService;

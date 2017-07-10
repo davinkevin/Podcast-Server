@@ -47,7 +47,7 @@ public class SixPlayUpdater extends AbstractUpdater {
     private static final TypeRef<HashMap<String, Object>> TYPE_KEYS = new TypeRef<HashMap<String, Object>>(){};
     private static final TypeRef<Set<Integer>> TYPE_IDS = new TypeRef<Set<Integer>>(){};
 
-    private static final String VIDEOS_SELECTOR = "mainStoreState.video.programVideosBySubCategory.%d.%d";
+    private static final String VIDEOS_SELECTOR = "video.programVideosBySubCategory.%d.%d";
     private static final String URL_TEMPLATE_PODCAST = "http://www.6play.fr/%s-p_%d/";
     private static final String SUB_CAT_SELECTOR = "context.dispatcher.stores.ProgramStore.subcats.%d[*].id";
     private static final String PROGRAM_CODE_SELECTOR = "context.dispatcher.stores.ProgramStore.programs.%d.code";
@@ -110,7 +110,16 @@ public class SixPlayUpdater extends AbstractUpdater {
 
     private Option<DocumentContext> extractJson(Elements elements) {
         return getRoot6Play(elements)
+                .map(this::removeJS)
                 .map(jsonService::parse);
+    }
+
+    private String removeJS(String s) {
+        return Option.of(s)
+                .map(String::trim)
+                .map(c -> c.replaceAll("function [^}]*", "{}"))
+                .map(c -> StringUtils.removeEnd(c, "};"))
+                .getOrElse(s);
     }
 
     public static Option<String> getRoot6Play(Elements elements) {
@@ -125,7 +134,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("script"))
                 .flatMap(this::extractJson)
-                .map(JsonService.extract("mainStoreState.video.programVideosBySubCategory"))
+                .map(JsonService.extract("video.programVideosBySubCategory"))
                 .map(Object::toString)
                 .map(signatureService::generateMD5Signature)
                 .getOrElseThrow(() -> new RuntimeException("Error during signature of podcast " + podcast.getTitle()));

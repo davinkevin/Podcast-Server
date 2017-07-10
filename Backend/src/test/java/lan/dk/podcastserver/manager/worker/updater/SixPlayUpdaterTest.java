@@ -53,7 +53,7 @@ public class SixPlayUpdaterTest {
         Set<Item> items = updater.getItems(turbo);
 
         /* Then */
-        assertThat(items).hasSize(152).are(allValid());
+        assertThat(items).hasSize(186).are(allValid());
     }
 
     @Test
@@ -95,12 +95,12 @@ public class SixPlayUpdaterTest {
     }
 
     private Condition<Item> allValid() {
-        Predicate<Item> p = v -> StringUtils.isNotEmpty(v.getUrl()) &&
-                StringUtils.isNotEmpty(v.getTitle()) &&
-                nonNull(v.getPubDate()) &&
-                StringUtils.isNotEmpty(v.getUrl()) &&
-                nonNull(v.getLength()) &&
-                nonNull(v.getCover());
+       Predicate<Item> p = ((Predicate<Item>) v -> StringUtils.isNotEmpty(v.getUrl()))
+                .and(v -> StringUtils.isNotEmpty(v.getTitle()))
+                .and(v -> nonNull(v.getPubDate()))
+                .and(v -> StringUtils.isNotEmpty(v.getUrl()))
+                .and(v -> nonNull(v.getLength()))
+                .and(v -> nonNull(v.getCover()));
 
         return new Condition<>(p, "Should have coherent fields");
     }
