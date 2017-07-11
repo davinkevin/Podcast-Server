@@ -2,14 +2,14 @@ package lan.dk.podcastserver.business.stats;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import javaslang.collection.HashSet;
+import javaslang.collection.List;
+import javaslang.collection.Set;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
-import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,8 +18,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -33,10 +31,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StatsBusinessTest {
 
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastBusiness podcastBusiness;
-    @Mock UpdaterSelector updaterSelector;
-    @InjectMocks StatsBusiness statsBusiness;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastBusiness podcastBusiness;
+    private @Mock UpdaterSelector updaterSelector;
+    private @InjectMocks StatsBusiness statsBusiness;
+
     private static final AbstractUpdater.Type YOUTUBE = new AbstractUpdater.Type("Youtube", "Youtube");
     private static final AbstractUpdater.Type CANAL_PLUS = new AbstractUpdater.Type("CanalPlus", "CanalPlus");
     private static final AbstractUpdater.Type BE_IN_SPORT = new AbstractUpdater.Type("BeInSport", "BeInSport");
@@ -57,9 +56,9 @@ public class StatsBusinessTest {
 
         /* Then */
         assertThat(statsPodcastTypes).hasSize(3);
-        assertThat(statsPodcastTypes.get(0).values()).hasSize(10);
-        assertThat(statsPodcastTypes.get(1).values()).hasSize(5);
-        assertThat(statsPodcastTypes.get(2).values()).hasSize(50);
+        assertThat(statsPodcastTypes.get(0).getValues()).hasSize(10);
+        assertThat(statsPodcastTypes.get(1).getValues()).hasSize(5);
+        assertThat(statsPodcastTypes.get(2).getValues()).hasSize(50);
     }
 
     @Test
@@ -77,9 +76,9 @@ public class StatsBusinessTest {
 
         /* Then */
         assertThat(statsPodcastTypes).hasSize(3);
-        assertThat(statsPodcastTypes.get(0).values()).hasSize(10);
-        assertThat(statsPodcastTypes.get(1).values()).hasSize(5);
-        assertThat(statsPodcastTypes.get(2).values()).hasSize(50);
+        assertThat(statsPodcastTypes.get(0).getValues()).hasSize(10);
+        assertThat(statsPodcastTypes.get(1).getValues()).hasSize(5);
+        assertThat(statsPodcastTypes.get(2).getValues()).hasSize(50);
     }
 
     @Test
@@ -97,12 +96,12 @@ public class StatsBusinessTest {
 
         /* Then */
         assertThat(statsPodcastTypes).hasSize(3);
-        assertThat(statsPodcastTypes.get(0).values()).hasSize(10);
-        assertThat(statsPodcastTypes.get(1).values()).hasSize(5);
-        assertThat(statsPodcastTypes.get(2).values()).hasSize(50);
+        assertThat(statsPodcastTypes.get(0).getValues()).hasSize(10);
+        assertThat(statsPodcastTypes.get(1).getValues()).hasSize(5);
+        assertThat(statsPodcastTypes.get(2).getValues()).hasSize(50);
     }
 
-    private javaslang.collection.Set<Item> generateItems(Integer numberOfItem) {
+    private Set<Item> generateItems(Integer numberOfItem) {
         return HashSet.rangeClosed(1, numberOfItem)
                 // FlatMap To object to avoid repartion 1 per date
                 .map(i -> new Item()

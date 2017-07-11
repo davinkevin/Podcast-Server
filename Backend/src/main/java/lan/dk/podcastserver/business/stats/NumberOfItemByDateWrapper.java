@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.utils.facade.stats;
+package lan.dk.podcastserver.business.stats;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class NumberOfItemByDateWrapper {
 
     private LocalDate date;
-    private Long numberOfItems;
+    private Integer numberOfItems;
 
     @Override
     public boolean equals(Object o) {

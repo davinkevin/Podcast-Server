@@ -1,12 +1,14 @@
 package lan.dk.podcastserver.controller.api;
 
+import javaslang.collection.List;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
-import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
+import lan.dk.podcastserver.business.stats.StatsPodcastType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by kevin on 28/04/15 for Podcast-Server

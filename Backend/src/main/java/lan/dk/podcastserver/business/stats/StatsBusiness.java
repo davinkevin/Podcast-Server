@@ -1,14 +1,16 @@
 package lan.dk.podcastserver.business.stats;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import javaslang.collection.HashSet;
+import javaslang.collection.List;
+import javaslang.collection.Set;
+import javaslang.collection.Traversable;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.dsl.ItemDSL;
-import lan.dk.podcastserver.utils.facade.stats.NumberOfItemByDateWrapper;
-import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +18,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
-
-import static java.util.stream.Collectors.*;
 
 /**
  * Created by kevin on 28/04/15 for HackerRank problem
@@ -60,43 +60,38 @@ public class StatsBusiness {
         Set<NumberOfItemByDateWrapper> values =
                 itemRepository
                         .findByTypeAndExpression(type, selector.filter.apply(dateInPast))
-                        .toJavaStream()
-                        .map(selector.getDownloadDate)
+                        .toList()
+                        .map(selector.getDate)
                         .filter(Objects::nonNull)
                         .map(ZonedDateTime::toLocalDate)
-                        .collect(groupingBy(o -> o, counting()))
-                        .entrySet()
-                        .stream()
-                        .map(entry -> new NumberOfItemByDateWrapper(entry.getKey(), entry.getValue()))
-                        .collect(toSet());
+                        .groupBy(Function.identity())
+                        .mapValues(Traversable::size)
+                        .map(entry -> new NumberOfItemByDateWrapper(entry._1(), entry._2()))
+                        .toSet();
 
         return new StatsPodcastType(type.name(), values);
     }
 
     private List<StatsPodcastType> allStatsByType(Integer numberOfMonth, Selector selector) {
         return updaterSelector
-                .types().toJavaSet()
-                .stream()
+                .types().toList()
                 .map(type -> generateForType(type, numberOfMonth, selector))
-                .filter(stats -> stats.values().size() > 0)
-                .sorted(Comparator.comparing(StatsPodcastType::type))
-                .collect(toList());
+                .filter(stats -> !stats.isEmpty())
+                .sortBy(Comparator.comparing(StatsPodcastType::getType), Function.identity());
     }
 
     private Set<NumberOfItemByDateWrapper> statOf(UUID podcastId, Function<Item,ZonedDateTime> mapper, long numberOfMonth) {
         LocalDate dateInPast = LocalDate.now().minusMonths(numberOfMonth);
-        return podcastBusiness.findOne(podcastId)
-                .getItems()
-                .stream()
+        return HashSet.ofAll(podcastBusiness.findOne(podcastId).getItems())
+                .toList()
                 .map(mapper)
                 .filter(Objects::nonNull)
                 .map(ZonedDateTime::toLocalDate)
                 .filter(date -> date.isAfter(dateInPast))
-                .collect(groupingBy(o -> o, counting()))
-                .entrySet()
-                .stream()
-                .map(entry -> new NumberOfItemByDateWrapper(entry.getKey(), entry.getValue()))
-                .collect(toSet());
+                .groupBy(Function.identity())
+                .mapValues(Traversable::size)
+                .map(entry -> new NumberOfItemByDateWrapper(entry._1(), entry._2()))
+                .toSet();
     }
 
     private enum Selector {
@@ -105,12 +100,12 @@ public class StatsBusiness {
         BY_CREATION_DATE(Item::getCreationDate, ItemDSL::hasBeenCreatedAfter),
         BY_PUBLICATION_DATE(Item::getPubDate, ItemDSL::isNewerThan);
 
-        Function<Item, ZonedDateTime> getDownloadDate;
+        Function<Item, ZonedDateTime> getDate;
         Function<ZonedDateTime, BooleanExpression> filter;
 
-        Selector(Function<Item, ZonedDateTime> getDownloadDate, Function<ZonedDateTime, BooleanExpression> filter) {
+        Selector(Function<Item, ZonedDateTime> getDate, Function<ZonedDateTime, BooleanExpression> filter) {
             this.filter = filter;
-            this.getDownloadDate = getDownloadDate;
+            this.getDate = getDate;
         }
     }
 

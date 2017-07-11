@@ -1,21 +1,17 @@
 package lan.dk.podcastserver.controller.api;
 
+import javaslang.collection.List;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
-import lan.dk.podcastserver.utils.facade.stats.StatsPodcastType;
+import lan.dk.podcastserver.business.stats.StatsPodcastType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 21/09/15 for Podcast Server
@@ -30,7 +26,7 @@ public class StatsControllerTest {
     public void should_find_stats_for_all_podcast_by_download_date() {
         /* Given */
         Integer numberOfMonth = 6;
-        List<StatsPodcastType> stats = new ArrayList<>();
+        List<StatsPodcastType> stats = List.empty();
         when(statsBusiness.allStatsByTypeAndDownloadDate(eq(6))).thenReturn(stats);
 
         /* When */
@@ -45,7 +41,7 @@ public class StatsControllerTest {
     public void should_find_stats_for_all_podcast_by_creation_date() {
         /* Given */
         Integer numberOfMonth = 6;
-        List<StatsPodcastType> stats = new ArrayList<>();
+        List<StatsPodcastType> stats = List.empty();
         when(statsBusiness.allStatsByTypeAndCreationDate(6)).thenReturn(stats);
 
         /* When */
@@ -60,7 +56,7 @@ public class StatsControllerTest {
     public void should_find_stats_for_all_podcast_by_publication_date() {
         /* Given */
         Integer numberOfMonth = 6;
-        List<StatsPodcastType> stats = new ArrayList<>();
+        List<StatsPodcastType> stats = List.empty();
         when(statsBusiness.allStatsByTypeAndPubDate(6)).thenReturn(stats);
 
         /* When */
