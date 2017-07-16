@@ -1,32 +1,53 @@
-import { TestBed, async } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component';
+import {MdIconModule, MdToolbarModule} from '@angular/material';
+import {RouterTestingModule} from '@angular/router/testing';
+import {DebugElement} from '@angular/core';
+import {By} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-xdescribe('AppComponent', () => {
+describe('AppComponent', () => {
+
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+  let el: DebugElement;
+
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent
       ],
+      imports: [
+        BrowserAnimationsModule,
+        MdToolbarModule, MdIconModule,
+        RouterTestingModule.withRoutes([])
+      ]
     }).compileComponents();
+
+    fixture = TestBed.createComponent(AppComponent);
+    el = fixture.debugElement;
+    component = el.componentInstance;
+
+    fixture.detectChanges();
   }));
 
   it('should create the app', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy();
   }));
 
-  it(`should have as title 'ps works!'`, async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('ps works!');
-  }));
+  it('should have 5 md-icons for each section in md-toolbar', () => {
+    const icons = el.queryAll(By.css('md-toolbar md-icon'));
+    expect(icons.length).toEqual(5);
+  });
 
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('ps works!');
-  }));
+  it('should have router-outlet at root of component', () => {
+    /* Given */
+    const routerOutlet = el.query(By.css('router-outlet'));
+    /* When  */
+
+    /* Then  */
+    expect(routerOutlet.parent.componentInstance).toBe(component);
+  });
 });
