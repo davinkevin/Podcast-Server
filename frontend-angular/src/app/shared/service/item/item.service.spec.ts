@@ -1,37 +1,59 @@
 /* tslint:disable:no-unused-variable */
 
-import 'rxjs/add/observable/of';
-
 import {inject, TestBed} from '@angular/core/testing';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {BaseRequestOptions, Http, HttpModule, RequestMethod, Response, ResponseOptions, XHRBackend} from '@angular/http';
 
 import {ItemService} from './item.service';
+import {MockBackend, MockConnection} from '@angular/http/testing';
 
-xdescribe('Service: Item', () => {
+describe('Service: Item', () => {
 
-  const http = jasmine.createSpyObj('http', ['post']);
+  const rootUrl = '/api/items';
+  let mockBackend: MockBackend;
+  let itemService: ItemService;
 
-  beforeEach(
-      () => TestBed.configureTestingModule(
-          {providers: [{provide: Http, useValue: http}, ItemService]}));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ItemService, MockBackend, BaseRequestOptions,
+        {
+          provide: Http, deps: [MockBackend, BaseRequestOptions],
+          useFactory: (b: XHRBackend, o: BaseRequestOptions) => new Http(b, o)
+        }
+      ],
+      imports: [HttpModule]
+    });
+    mockBackend = TestBed.get(MockBackend);
+    itemService = TestBed.get(ItemService);
+  });
 
-  it('should be defined',
-     inject([ItemService], (service: ItemService) => { expect(service).toBeTruthy(); }));
+  it('should be defined', inject([ItemService], (service: ItemService) => {
+    expect(service).toBeTruthy();
+  }));
 
-  xit('should get all elements from backend', inject([ItemService], (service: ItemService) => {
-        /* Given */
-        const pageItem = {};
-        const httpResponse = jasmine.createSpyObj('response', ['json']);
-        let response = null;
-        httpResponse.json.and.returnValue(pageItem);
-        http.post.and.returnValue(Observable.of(httpResponse));
+  it('should get all elements from backend with default parameter', () => {
+    /* Given */
+    const body = {};
+    let conn: MockConnection;
 
-        /* When */
-        service.search().subscribe(v => response = v);
+    mockBackend.connections.subscribe((c: MockConnection) => {
+      c.mockRespond(new Response(new ResponseOptions({body})));
+      conn = c;
+    });
 
-        /* Then */
-        expect(response).toEqual(pageItem);
-      }));
+    /* When */
+    itemService.search().subscribe(v => {
+      expect(v).toEqual(body);
+    });
+
+    /* Then */
+    expect(conn.request.method).toEqual(RequestMethod.Get);
+    expect(conn.request.url).toContain(rootUrl + "/search");
+    expect(conn.request.url).toContain("page=0");
+    expect(conn.request.url).toContain("size=12");
+    expect(conn.request.url).toContain("downloaded=true");
+    expect(conn.request.url).toContain("sort=pubDate,DESC");
+    expect(conn.request.url).toContain("tags=");
+  });
 
 });
