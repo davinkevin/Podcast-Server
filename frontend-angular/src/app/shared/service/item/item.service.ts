@@ -33,7 +33,7 @@ export class ItemService {
 
     params.set('downloaded', String(searchPageRequest.downloaded));
     params.set('sort', searchPageRequest.sort.map(s => `${s.property},${s.direction}`).join(','));
-    params.set('tags', searchPageRequest.tags.join(','));
+    params.set('tags', searchPageRequest.tags.map(t => t.name).join(','));
 
     return params;
   }

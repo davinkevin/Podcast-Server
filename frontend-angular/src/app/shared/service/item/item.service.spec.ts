@@ -5,6 +5,7 @@ import {BaseRequestOptions, Http, HttpModule, RequestMethod, Response, ResponseO
 
 import {ItemService} from './item.service';
 import {MockBackend, MockConnection} from '@angular/http/testing';
+import {Direction} from 'app/shared/entity';
 
 describe('Service: Item', () => {
 
@@ -48,12 +49,43 @@ describe('Service: Item', () => {
 
     /* Then */
     expect(conn.request.method).toEqual(RequestMethod.Get);
-    expect(conn.request.url).toContain(rootUrl + "/search");
-    expect(conn.request.url).toContain("page=0");
-    expect(conn.request.url).toContain("size=12");
-    expect(conn.request.url).toContain("downloaded=true");
-    expect(conn.request.url).toContain("sort=pubDate,DESC");
-    expect(conn.request.url).toContain("tags=");
+    expect(conn.request.url).toContain(rootUrl + '/search');
+    expect(conn.request.url).toContain('page=0');
+    expect(conn.request.url).toContain('size=12');
+    expect(conn.request.url).toContain('downloaded=true');
+    expect(conn.request.url).toContain('sort=pubDate,DESC');
+    expect(conn.request.url).toContain('tags=');
+  });
+
+  it('should get all elements from backend with default parameter', () => {
+    /* Given */
+    const body = {};
+    let conn: MockConnection;
+
+    mockBackend.connections.subscribe((c: MockConnection) => {
+      c.mockRespond(new Response(new ResponseOptions({body})));
+      conn = c;
+    });
+
+    /* When */
+    itemService.search({
+      page: 3,
+      size: 10,
+      downloaded: false,
+      sort: [{direction: Direction.ASC, property: 'foo'}],
+      tags: [{id:'id', name: 'bar'}]
+    }).subscribe(v => {
+      expect(v).toEqual(body);
+    });
+
+    /* Then */
+    expect(conn.request.method).toEqual(RequestMethod.Get);
+    expect(conn.request.url).toContain(rootUrl + '/search');
+    expect(conn.request.url).toContain('page=3');
+    expect(conn.request.url).toContain('size=10');
+    expect(conn.request.url).toContain('downloaded=false');
+    expect(conn.request.url).toContain('sort=foo,ASC');
+    expect(conn.request.url).toContain('tags=bar');
   });
 
 });
