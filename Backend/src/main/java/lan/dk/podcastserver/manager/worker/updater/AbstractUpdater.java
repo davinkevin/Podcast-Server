@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Validator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -34,8 +35,17 @@ public abstract class AbstractUpdater implements Updater {
                 .filter(signature -> !StringUtils.equals(signature, podcast.getSignature()))
                 .andThen(podcast::setSignature)
                 .map(s -> Tuple.of(podcast, getItems(podcast), notIn(podcast)))
-                .onFailure(e -> log.error("Error during update : {}", e))
+                .onFailure(e -> logError(e, podcast))
                 .getOrElse(NO_MODIFICATION_TUPLE);
+    }
+
+    private void logError(Throwable e, Podcast podcast) {
+        if (NoSuchElementException.class.isInstance(e)) {
+            log.info("Podcast {} hasn't change", podcast.getTitle());
+            return;
+        }
+
+        log.info("Error during update of {}", podcast.getTitle(), e);
     }
 
     @RequiredArgsConstructor
