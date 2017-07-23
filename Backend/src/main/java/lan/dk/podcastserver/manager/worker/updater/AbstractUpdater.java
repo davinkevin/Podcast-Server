@@ -29,7 +29,7 @@ public abstract class AbstractUpdater implements Updater {
     final Validator validator;
 
     public Tuple3<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
-        log.info("Add podcast \"{}\" to executor", podcast.getTitle());
+        log.info("\"{}\" added to executor", podcast.getTitle());
 
         return Try.of(() -> signatureOf(podcast))
                 .filter(signature -> !StringUtils.equals(signature, podcast.getSignature()))
@@ -41,11 +41,11 @@ public abstract class AbstractUpdater implements Updater {
 
     private void logError(Throwable e, Podcast podcast) {
         if (NoSuchElementException.class.isInstance(e)) {
-            log.info("Podcast {} hasn't change", podcast.getTitle());
+            log.info("\"{}\" hasn't change", podcast.getTitle());
             return;
         }
 
-        log.info("Error during update of {}", podcast.getTitle(), e);
+        log.info("\"{}\" triggered the following error during update", podcast.getTitle(), e);
     }
 
     @RequiredArgsConstructor
