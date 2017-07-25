@@ -2,6 +2,7 @@ package lan.dk.podcastserver.scheduled;
 
 import lan.dk.podcastserver.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty("podcastserver.backup.enabled")
 public class DatabaseScheduled {
 
     private final DatabaseService databaseService;
