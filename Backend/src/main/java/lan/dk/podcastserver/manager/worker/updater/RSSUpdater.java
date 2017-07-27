@@ -102,7 +102,7 @@ public class RSSUpdater extends AbstractUpdater {
         try {
             return ZonedDateTime.parse(item.getChildText("pubDate").replace(" PST", " +0800"), DateTimeFormatter.RFC_1123_DATE_TIME);
         } catch (Exception e) {
-            log.error("Problem during date parsing", e);
+            log.error("Problem during date parsing of {}", item.getChildText("title"), e);
             // No better idea than returning null for unparseable date
             return null;
         }
