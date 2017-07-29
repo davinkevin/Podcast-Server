@@ -17,6 +17,16 @@ export class ItemService {
     sort: [{property: 'pubDate', direction: Direction.DESC}]
   };
 
+  static extendDefaultSearch(params: any): SearchItemPageRequest {
+    return {
+      page: params.page || ItemService.defaultSearch.page,
+      size: params.size || ItemService.defaultSearch.size,
+      downloaded: params.downloaded || ItemService.defaultSearch.downloaded,
+      tags: params.tags || ItemService.defaultSearch.tags,
+      sort: params.sort || ItemService.defaultSearch.sort,
+    };
+  }
+
   constructor(private http: Http) {}
 
   search(searchPageRequest: SearchItemPageRequest = ItemService.defaultSearch): Observable<Page<Item>> {
@@ -38,13 +48,4 @@ export class ItemService {
     return params;
   }
 
-  static extendDefaultSearch(params: any): SearchItemPageRequest {
-    return {
-      page: params.page || ItemService.defaultSearch.page,
-      size: params.size || ItemService.defaultSearch.size,
-      downloaded: params.downloaded || ItemService.defaultSearch.downloaded,
-      tags: params.tags || ItemService.defaultSearch.tags,
-      sort: params.sort || ItemService.defaultSearch.sort,
-    };
-  }
 }

@@ -73,7 +73,7 @@ describe('Service: Item', () => {
       size: 10,
       downloaded: false,
       sort: [{direction: Direction.ASC, property: 'foo'}],
-      tags: [{id:'id', name: 'bar'}]
+      tags: [{id: 'id', name: 'bar'}]
     }).subscribe(v => {
       expect(v).toEqual(body);
     });

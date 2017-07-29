@@ -16,7 +16,7 @@ export class SearchComponent implements OnInit {
   ngOnInit() {
     this.route.data
       .map(d => (<any> d).search)
-      .subscribe(s => this.items = s)
+      .subscribe(s => this.items = s);
   }
 
 }
