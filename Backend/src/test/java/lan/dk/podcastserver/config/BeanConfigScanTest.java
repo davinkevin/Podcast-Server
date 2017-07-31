@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.config;
 
+import javaslang.collection.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.convert.converter.Converter;
@@ -57,5 +58,18 @@ public class BeanConfigScanTest {
 
         /* Then */
         assertThat(convertedPath).isEqualTo(Paths.get(path));
+    }
+
+    @Test
+    public void should_provide_a_converter_from_string_to_vavr_set() {
+        /* GIVEN */
+        Converter<String, Set<String>> converter = beanConfigScan.stringToSet();
+        String multiValueSeparatedByComma = "foo,bar,another";
+
+        /* WHEN  */
+        Set<String> strings = converter.convert(multiValueSeparatedByComma);
+
+        /* THEN  */
+        assertThat(strings).contains("foo", "bar", "another");
     }
 }
