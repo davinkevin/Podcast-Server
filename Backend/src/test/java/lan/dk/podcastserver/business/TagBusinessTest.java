@@ -28,8 +28,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TagBusinessTest {
 
-    @Mock TagRepository tagRepository;
-    @InjectMocks TagBusiness tagBusiness;
+    private @Mock TagRepository tagRepository;
+    private @InjectMocks TagBusiness tagBusiness;
 
     @Test
     public void should_find_all() {
@@ -80,10 +80,10 @@ public class TagBusinessTest {
         /* Given */
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        Tag tag1 = new Tag().setId(id1).setName("tag" + id1);
-        Tag tag2 = new Tag().setId(id2).setName("tag" + id2);
-        Tag tag3 = new Tag().setName("Foo");
-        Tag tag4 = new Tag().setName("Bar");
+        Tag tag1 = Tag.builder().id(id1).name("tag" + id1).build();
+        Tag tag2 = Tag.builder().id(id2).name("tag" + id2).build();
+        Tag tag3 = Tag.builder().name("Foo").build();
+        Tag tag4 = Tag.builder().name("Bar").build();
         Set<Tag> tags = HashSet.of(tag1, tag2, tag3, tag4);
 
         when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Option.of(tag1));
@@ -99,5 +99,23 @@ public class TagBusinessTest {
         assertThat(tagListByName.toJavaSet())
                 .extracting("name", String.class)
                 .contains(tag1.getName(), tag2.getName(), tag3.getName(), tag4.getName());
+    }
+
+    @Test
+    public void should_find_all_by_names() {
+        /* GIVEN */
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        Tag tag1 = Tag.builder().id(id1).name("Super Foo").build();
+        Tag tag2 = Tag.builder().id(id2).name("BarOu !").build();
+        when(tagRepository.findByNameIgnoreCase("foo")).thenReturn(Option.of(tag1));
+        when(tagRepository.findByNameIgnoreCase("bar")).thenReturn(Option.of(tag2));
+        Set<String> names = HashSet.of("foo", "bar");
+
+        /* WHEN  */
+        Set<Tag> tags = tagBusiness.findAllByName(names);
+
+        /* THEN  */
+        assertThat(tags).contains(tag1, tag2);
     }
 }
