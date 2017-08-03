@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
-import javaslang.control.Try;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import lombok.RequiredArgsConstructor;

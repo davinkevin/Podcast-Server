@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import javaslang.collection.Set;
+import io.vavr.collection.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.convert.converter.Converter;

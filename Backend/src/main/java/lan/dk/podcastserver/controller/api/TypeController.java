@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.api;
 
-import javaslang.collection.Set;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lombok.RequiredArgsConstructor;

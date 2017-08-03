@@ -2,11 +2,11 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mashape.unirest.http.HttpResponse;
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.collection.List;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;

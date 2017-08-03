@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.task;
 
 import com.google.common.collect.Queues;
-import javaslang.collection.Set;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.utils.form.MovingItemInQueueForm;

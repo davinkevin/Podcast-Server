@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.business;
 
 import com.mashape.unirest.http.HttpResponse;
-import javaslang.collection.List;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.collection.List;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

@@ -1,13 +1,13 @@
 package lan.dk.podcastserver.manager;
 
 import com.google.common.collect.Queues;
-import javaslang.Tuple2;
-import javaslang.collection.HashMap;
-import javaslang.collection.List;
-import javaslang.collection.Map;
-import javaslang.collection.Queue;
-import javaslang.collection.Set;
-import javaslang.control.Option;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Queue;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;

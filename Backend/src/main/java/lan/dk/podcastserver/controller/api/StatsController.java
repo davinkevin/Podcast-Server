@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.api;
 
-import javaslang.collection.List;
+import io.vavr.collection.List;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.business.stats.StatsPodcastType;
 import lombok.RequiredArgsConstructor;

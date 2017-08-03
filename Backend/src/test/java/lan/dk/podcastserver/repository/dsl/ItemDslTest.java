@@ -176,7 +176,7 @@ public class ItemDslTest {
     public void should_be_in_id_list() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        javaslang.collection.List<UUID> listOfId = javaslang.collection.List.of(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
+        io.vavr.collection.List<UUID> listOfId = io.vavr.collection.List.of(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(isInId(listOfId));
@@ -227,8 +227,8 @@ public class ItemDslTest {
     public void should_result_with_search() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        javaslang.collection.List<UUID> ids = javaslang.collection.List.of(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
-        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        io.vavr.collection.List<UUID> ids = io.vavr.collection.List.of(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
+        io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
@@ -244,7 +244,7 @@ public class ItemDslTest {
     public void should_result_with_search_without_ids() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        javaslang.collection.Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, null));

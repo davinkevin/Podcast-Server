@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.utils.custom.ffmpeg;
 
-import javaslang.collection.List;
+import io.vavr.collection.List;
 import net.bramp.ffmpeg.RunProcessFunction;
 
 import java.io.IOException;

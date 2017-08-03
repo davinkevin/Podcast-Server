@@ -3,12 +3,12 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
-import javaslang.Tuple;
-import javaslang.Value;
-import javaslang.collection.HashMap;
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
-import javaslang.control.Option;
+import io.vavr.Tuple;
+import io.vavr.Value;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -77,7 +77,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         Integer programId = root6Play
                 .map(JsonService.to(PROGRAM_ID_SELECTOR, TYPE_KEYS))
                 .map(HashMap::keySet)
-                .flatMap(Value::getOption)
+                .flatMap(Value::toOption)
                 .map(Integer::valueOf)
                 .getOrElseThrow(() -> new RuntimeException("programId not found in root.__6play"));
 

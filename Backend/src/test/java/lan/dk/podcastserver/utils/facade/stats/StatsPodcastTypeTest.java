@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.utils.facade.stats;
 
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import lan.dk.podcastserver.business.stats.StatsPodcastType;
 import org.junit.Test;

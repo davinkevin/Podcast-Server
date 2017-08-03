@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.service;
 
 import com.mashape.unirest.http.HttpResponse;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;

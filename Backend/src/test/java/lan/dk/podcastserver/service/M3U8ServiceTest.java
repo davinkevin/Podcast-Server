@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.service;
 
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;

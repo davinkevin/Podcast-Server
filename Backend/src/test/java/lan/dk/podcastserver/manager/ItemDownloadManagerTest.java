@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.manager;
 
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;

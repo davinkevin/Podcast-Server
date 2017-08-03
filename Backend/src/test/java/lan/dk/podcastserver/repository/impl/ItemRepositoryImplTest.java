@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.repository.impl;
 
-import javaslang.collection.List;
+import io.vavr.collection.List;
 import lan.dk.podcastserver.entity.Item;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;

@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.repository.impl;
 
-import javaslang.collection.List;
-import javaslang.control.Option;
+import io.vavr.collection.List;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;

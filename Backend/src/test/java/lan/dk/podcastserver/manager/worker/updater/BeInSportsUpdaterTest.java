@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
-import javaslang.collection.Set;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

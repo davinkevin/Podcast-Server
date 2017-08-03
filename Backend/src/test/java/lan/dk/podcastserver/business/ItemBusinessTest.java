@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.business;
 
 import com.querydsl.core.types.Predicate;
-import javaslang.collection.List;
-import javaslang.collection.Set;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -233,7 +233,7 @@ public class ItemBusinessTest {
     public void should_find_by_tags_and_full_text_without_specific_order() {
         /* Given */
         String term = "Foo";
-        Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
@@ -252,7 +252,7 @@ public class ItemBusinessTest {
     @Test
     public void should_find_by_tags() {
         /* Given */
-        Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
@@ -270,7 +270,7 @@ public class ItemBusinessTest {
     public void should_find_by_tags_and_full_text_with_pertinence_order_asc() {
         /* Given */
         String term = "Foo";
-        Set<Tag> tags = javaslang.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
+        Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
         PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("ASC"), "pertinence");
         List<Item> itemsFrom1To20 = IntStream.range(1, 20)
                 .mapToObj(id -> new Item().setId(UUID.randomUUID()))

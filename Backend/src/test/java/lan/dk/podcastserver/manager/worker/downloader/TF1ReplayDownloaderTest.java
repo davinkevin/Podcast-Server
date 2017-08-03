@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;

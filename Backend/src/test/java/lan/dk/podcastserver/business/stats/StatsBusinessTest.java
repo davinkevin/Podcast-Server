@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.business.stats;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import javaslang.collection.HashSet;
-import javaslang.collection.List;
-import javaslang.collection.Set;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.service;
 
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import javaslang.collection.Set;
-import javaslang.control.Option;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;

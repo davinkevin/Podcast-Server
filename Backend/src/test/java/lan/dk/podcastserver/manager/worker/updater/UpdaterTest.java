@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
-import javaslang.Tuple3;
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
+import io.vavr.Tuple3;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;

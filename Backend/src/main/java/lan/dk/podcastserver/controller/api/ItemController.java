@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import javaslang.collection.Set;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;

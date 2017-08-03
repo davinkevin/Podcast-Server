@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.business;
 
-import javaslang.collection.List;
-import javaslang.collection.Set;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.TagRepository;
 import lombok.RequiredArgsConstructor;

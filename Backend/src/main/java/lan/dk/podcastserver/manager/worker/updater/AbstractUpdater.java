@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javaslang.Tuple;
-import javaslang.Tuple3;
-import javaslang.collection.Set;
-import javaslang.control.Try;
+import io.vavr.Tuple;
+import io.vavr.Tuple3;
+import io.vavr.collection.Set;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;

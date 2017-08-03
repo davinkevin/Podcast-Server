@@ -3,7 +3,7 @@ package lan.dk.podcastserver.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

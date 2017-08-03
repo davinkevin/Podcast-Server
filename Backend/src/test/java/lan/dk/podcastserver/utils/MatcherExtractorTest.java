@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.utils;
 
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import org.junit.Test;
 
 import java.util.regex.Pattern;

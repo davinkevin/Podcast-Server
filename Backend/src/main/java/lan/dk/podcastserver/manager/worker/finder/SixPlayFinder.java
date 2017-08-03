@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import javaslang.collection.HashSet;
+import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.updater.SixPlayUpdater;

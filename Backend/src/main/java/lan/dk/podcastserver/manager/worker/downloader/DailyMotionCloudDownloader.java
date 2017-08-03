@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import javaslang.control.Try;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;

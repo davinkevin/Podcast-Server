@@ -2,7 +2,7 @@ package lan.dk.podcastserver.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.Lists;
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;

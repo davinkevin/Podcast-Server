@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.business.stats;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javaslang.collection.Set;
+import io.vavr.collection.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.manager.worker.updater.*;
 import org.junit.Before;
 import org.junit.Test;

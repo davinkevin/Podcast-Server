@@ -2,8 +2,8 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
 import lombok.*;
 import lombok.experimental.Accessors;

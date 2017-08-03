@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.service;
 
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.collection.HashMap;
-import javaslang.collection.Map;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;

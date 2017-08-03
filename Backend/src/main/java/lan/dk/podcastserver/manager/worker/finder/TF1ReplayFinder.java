@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import static javaslang.API.$;
-import static javaslang.API.Case;
-import static javaslang.API.Match;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -59,7 +59,7 @@ public class TF1ReplayFinder implements Finder {
 
     private String getUrl(String url) {
         return Match(url).of(
-                Case(u -> u.startsWith("//"), u -> "http:" + u),
+                Case($(u -> u.startsWith("//")), u -> "http:" + u),
                 Case($(), Function.identity())
         );
     }

@@ -2,9 +2,9 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.TypeRef;
-import javaslang.Tuple;
-import javaslang.collection.List;
-import javaslang.control.Option;
+import io.vavr.Tuple;
+import io.vavr.collection.List;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -73,7 +73,7 @@ public class GulliDownloader extends HTTPDownloader {
                 .flatMap(v -> playlist.map(s -> Tuple.of(v, s)))
                 .map(t -> t.map2(jsonService::parse))
                 .map(t -> t.map2(JsonService.to(GULLI_ITEM_TYPE_REF)))
-                .map(t -> t.transform((v, s) -> s.get(v)))
+                .map(t -> t.apply((v, s) -> s.get(v)))
                 .flatMap(i -> i.getSources().find(s -> s.file.contains("mp4")))
                 .map(GulliItem.GulliSource::getFile);
     }

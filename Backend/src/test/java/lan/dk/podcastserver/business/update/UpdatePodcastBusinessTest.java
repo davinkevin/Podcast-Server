@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.business.update;
 
 
-import javaslang.Tuple;
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
-import javaslang.control.Try;
+import io.vavr.Tuple;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;

@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.service;
 
-import javaslang.control.Try;
+import io.vavr.control.Try;
 import org.junit.Before;
 import org.junit.Test;
 

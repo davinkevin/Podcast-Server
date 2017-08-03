@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.repository;
 
 import com.querydsl.core.types.Predicate;
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;

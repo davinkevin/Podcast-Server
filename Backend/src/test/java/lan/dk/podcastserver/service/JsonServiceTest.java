@@ -3,7 +3,7 @@ package lan.dk.podcastserver.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.manager.worker.updater.DailymotionUpdaterTest;
 import org.junit.Before;
 import org.junit.Test;

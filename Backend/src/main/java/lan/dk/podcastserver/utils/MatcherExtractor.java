@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.utils;
 
-import javaslang.collection.List;
-import javaslang.collection.Stream;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.collection.List;
+import io.vavr.collection.Stream;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.controller.api;
 
-import javaslang.collection.HashSet;
-import javaslang.collection.List;
-import javaslang.collection.Set;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Tag;
 import org.junit.Test;

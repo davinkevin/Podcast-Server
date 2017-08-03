@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.task;
 
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
@@ -32,7 +32,7 @@ public class IDMControllerTest {
     @Test
     public void should_get_download_list() {
         /* Given */
-        javaslang.collection.Queue<Item> waitingQueue = javaslang.collection.Queue.of(
+        io.vavr.collection.Queue<Item> waitingQueue = io.vavr.collection.Queue.of(
                 Item.builder().title("Foo").podcast(PODCAST).build(),
                 Item.builder().title("Bar").podcast(PODCAST).build()
         );

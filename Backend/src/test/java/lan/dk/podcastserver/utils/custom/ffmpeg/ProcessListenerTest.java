@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.utils.custom.ffmpeg;
 
-import javaslang.control.Try;
+import io.vavr.control.Try;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;

@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import javaslang.collection.Set;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

@@ -8,7 +8,7 @@ import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import com.google.common.collect.Sets;
-import javaslang.control.Try;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;

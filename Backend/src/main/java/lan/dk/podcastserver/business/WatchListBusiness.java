@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.business;
 
-import javaslang.collection.HashSet;
-import javaslang.collection.Set;
-import javaslang.control.Option;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.repository.ItemRepository;

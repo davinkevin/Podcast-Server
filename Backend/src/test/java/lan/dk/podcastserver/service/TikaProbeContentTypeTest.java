@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.service;
 
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import org.apache.tika.Tika;
 import org.junit.Before;
 import org.junit.Test;

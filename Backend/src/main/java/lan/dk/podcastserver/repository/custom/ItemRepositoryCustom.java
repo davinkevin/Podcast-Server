@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.repository.custom;
 
-import javaslang.collection.List;
+import io.vavr.collection.List;
 
 import java.util.UUID;
 

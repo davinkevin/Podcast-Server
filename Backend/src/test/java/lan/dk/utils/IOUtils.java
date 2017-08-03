@@ -9,9 +9,9 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import javaslang.control.Option;
-import javaslang.control.Try;
-import javaslang.jackson.datatype.JavaslangModule;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import io.vavr.jackson.datatype.VavrModule;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -42,7 +42,7 @@ public class IOUtils {
                                     .enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING)
                                     .disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION),
                             new JavaTimeModule(),
-                            new JavaslangModule()
+                            new VavrModule()
                     )
     )).build());
 

@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.business;
 
-import javaslang.collection.List;
-import javaslang.collection.Set;
-import javaslang.control.Option;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;

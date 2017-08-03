@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import javaslang.collection.HashSet;
-import javaslang.collection.List;
-import javaslang.collection.Set;
-import javaslang.control.Option;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

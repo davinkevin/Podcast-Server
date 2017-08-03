@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import javaslang.collection.Stream;
-import javaslang.control.Option;
+import io.vavr.collection.Stream;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;

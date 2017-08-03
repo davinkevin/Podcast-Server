@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import javaslang.control.Option;
+import io.vavr.control.Option;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
