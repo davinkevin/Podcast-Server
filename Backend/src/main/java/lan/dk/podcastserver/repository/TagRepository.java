@@ -10,6 +10,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 07/06/2014.
@@ -18,7 +19,7 @@ import java.util.UUID;
 public interface TagRepository extends JpaRepository<Tag, UUID>, QueryDslPredicateExecutor<Tag> {
 
     default Option<Tag> findByNameIgnoreCase(String name) {
-        return Option.of(findOne(QTag.tag.name.equalsIgnoreCase(name)));
+        return Option(findOne(QTag.tag.name.equalsIgnoreCase(name)));
     }
 
     default Set<Tag> findByNameContainsIgnoreCase(String name) {
