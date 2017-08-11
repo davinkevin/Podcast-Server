@@ -34,8 +34,8 @@ public class SixPlayFinderTest {
     @Test
     public void should_find_podcast() throws IOException, URISyntaxException {
         /* GIVEN */
-        String url = "http://www.6play.fr/turbo-p_884";
-        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/turbo-p_884.html"));
+        String url = "http://www.6play.fr/custom-show";
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(imageService.getCoverFromURL(anyString())).thenReturn(Cover.DEFAULT_COVER);
         /* WHEN  */
@@ -43,8 +43,8 @@ public class SixPlayFinderTest {
         System.out.println(podcast.getDescription());
         /* THEN  */
         assertThat(podcast)
-                .hasTitle("Turbo")
-                .hasDescription("Magazine d'actualité automobile présenté par Dominique Chapatte.")
+                .hasTitle("Le Message de Madénian et VDB")
+                .hasDescription("Mathieu Madénian et Thomas VDB ont des choses à leur dire, à vous dire...")
                 .hasType("SixPlay");
         verify(imageService, times(1)).getCoverFromURL(anyString());
     }

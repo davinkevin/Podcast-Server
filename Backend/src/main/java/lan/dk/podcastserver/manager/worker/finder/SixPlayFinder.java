@@ -53,7 +53,7 @@ public class SixPlayFinder implements Finder {
                 .map(Element::html)
                 .map(s -> StringUtils.substringBetween(s, "root.__6play = ", "}(this));"))
                 .map(jsonService::parse)
-                .map(JsonService.<JSONArray>extract("context.dispatcher.stores.ProgramStore.programs.*.description"))
+                .map(JsonService.<JSONArray>extract("mainStoreState.program.programsById.*.description"))
                 .flatMap(r -> HashSet.ofAll(r).headOption())
                 .map(Object::toString)
                 .getOrElse(() -> null);

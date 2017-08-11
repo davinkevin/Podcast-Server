@@ -38,32 +38,32 @@ public class SixPlayUpdaterTest {
     private @Mock ImageService imageService;
     private @InjectMocks SixPlayUpdater updater;
 
-    private final Podcast turbo = Podcast.builder()
-                .title("Turbo")
-                .url("http://www.6play.fr/turbo-p_884")
+    private final Podcast show = Podcast.builder()
+                .title("Custom Show")
+                .url("http://www.6play.fr/custom-show")
             .build();
 
     @Test
     public void should_extract_items() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/turbo-p_884.html"));
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(imageService.getCoverFromURL(anyString())).thenReturn(Cover.DEFAULT_COVER);
         /* When */
-        Set<Item> items = updater.getItems(turbo);
+        Set<Item> items = updater.getItems(show);
 
         /* Then */
-        assertThat(items).hasSize(186).are(allValid());
+        assertThat(items).hasSize(58).are(allValid());
     }
 
     @Test
     public void should_do_signature() throws IOException, URISyntaxException {
         /* GIVEN */
-        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/turbo-p_884.html"));
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
         /* WHEN  */
-        String signature = updater.signatureOf(turbo);
+        String signature = updater.signatureOf(show);
         /* THEN  */
         assertThat(signature).isNotEmpty();
     }
@@ -71,12 +71,12 @@ public class SixPlayUpdaterTest {
     @Test
     public void should_have_the_same_signature_twice() throws IOException, URISyntaxException {
         /* GIVEN */
-        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/turbo-p_884.html"));
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
         /* WHEN  */
-        String s1 = updater.signatureOf(turbo);
-        String s2 = updater.signatureOf(turbo);
+        String s1 = updater.signatureOf(show);
+        String s2 = updater.signatureOf(show);
         /* THEN  */
         assertThat(s1).isEqualToIgnoringCase(s2);
     }

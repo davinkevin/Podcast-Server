@@ -26,22 +26,13 @@ public class SixPlayDownloaderTest {
 
     private @Mock JsonService jsonService;
     private @Mock HtmlService htmlService;
-/*    private @Mock ProcessService processService;
-    private @Mock FfmpegService ffmpegService;
-    private @Mock M3U8Service m3U8Service;
-    private @Mock UrlService urlService;
-    private @Mock MimeTypeService mimeTypeService;
-    private @Mock ItemRepository itemRepository;
-    private @Mock PodcastRepository podcastRepository;
-    private @Mock PodcastServerParameters podcastServerParameters;
-    private @Mock SimpMessagingTemplate template;*/
     private @InjectMocks SixPlayDownloader downloader;
 
     @Before
     public void beforeEach() {
         downloader.setItem(Item.builder()
                 .title("Les salariés de Whirlpool peuvent compter sur le soutien de Madénian et VDB")
-                .url("http://www.6play.fr/le-message-de-madenian-et-vdb-p_6730/mm-vdb-28-04-c_11681670")
+                .url("http://www.6play.fr/le-message-de-madenian-et-vdb-p_6730/mm-vdb-02-06-c_11693282.html")
                 .build()
         );
     }
@@ -49,12 +40,12 @@ public class SixPlayDownloaderTest {
     @Test
     public void should_get_url_for_m6_item() throws IOException, URISyntaxException {
         /* GIVEN */
-        when(htmlService.get(downloader.getItem().getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-28-04-c_11681670.html"));
+        when(htmlService.get(downloader.getItem().getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-02-06-c_11693282.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         /* WHEN  */
         String url = downloader.getItemUrl(downloader.getItem());
         /* THEN  */
-        assertThat(url).isEqualToIgnoringCase("http://lb.cdn.m6web.fr/s/cd/5/7e27d94dce21ef059e1a5ae389e5cafb/59063acb/usp/mb_sd3/6/f/e/Le-Message-de-Maden_c11681670_Les-salaries-de/Le-Message-de-Maden_c11681670_Les-salaries-de_unpnp.ism/Manifest.m3u8");
+        assertThat(url).isEqualToIgnoringCase("http://lb.cdn.m6web.fr/s/cd/5/7b4f83770465c93e0d15b67cfdc1f6d3/5932fafb/usp/mb_sd3/c/0/2/Le-Message-de-Maden_c11693282_Episodes-du-02-/Le-Message-de-Maden_c11693282_Episodes-du-02-_unpnp.ism/Manifest.m3u8");
     }
 
     @Test
