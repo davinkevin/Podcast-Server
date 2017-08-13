@@ -21,8 +21,8 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 02/06/2017 for Podcast Server

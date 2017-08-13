@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
 
+import static io.vavr.API.Option;
+
 /**
  * Created by kevin on 23/07/2016.
  */
@@ -47,10 +49,10 @@ public class IOUtils {
     )).build());
 
     public static Option<org.jdom2.Document> fileAsXml(String path) throws JDOMException, IOException, URISyntaxException {
-        return Option.of(new SAXBuilder().build(Paths.get(IOUtils.class.getResource(path).toURI()).toFile()));
+        return Option(new SAXBuilder().build(Paths.get(IOUtils.class.getResource(path).toURI()).toFile()));
     }
-    public static Option<org.jsoup.nodes.Document> fileAsHtml(String path) throws URISyntaxException, IOException {
-        return Option.of(Jsoup.parse(Paths.get(IOUtils.class.getResource(path).toURI()).toFile(), "UTF-8", ""));
+    public static Option<Document> fileAsHtml(String path) throws URISyntaxException, IOException {
+        return Option(Jsoup.parse(Paths.get(IOUtils.class.getResource(path).toURI()).toFile(), "UTF-8", ""));
     }
     public static String fileAsString(String uri) {
         return Try.of(() -> IOUtils.class.getResource(uri))
@@ -61,7 +63,7 @@ public class IOUtils {
                 .getOrElseThrow(i -> new UncheckedIOException("Error during file fetching", IOException.class.cast(i)));
     }
     public static Option<DocumentContext> fileAsJson(String path) {
-        return Option.of(path)
+        return Option(path)
                 .map(IOUtils.class::getResource)
                 .toTry()
                 .mapTry(URL::toURI)

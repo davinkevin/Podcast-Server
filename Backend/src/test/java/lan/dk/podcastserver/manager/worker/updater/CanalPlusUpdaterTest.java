@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
@@ -22,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -85,7 +85,7 @@ public class CanalPlusUpdaterTest {
     @Test
     public void should_reject_signature_with_empty() throws URISyntaxException, IOException {
         /* Given */
-        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(Option.none());
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(None());
         when(signatureService.generateSignatureFromURL(eq(""))).thenReturn("aSignature");
 
         /* When */
@@ -140,7 +140,7 @@ public class CanalPlusUpdaterTest {
     public void should_not_videos_if_front_tools_failed() throws IOException, JDOMException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal.html"));
-        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).thenReturn(Option.none());
+        when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6515&ztid=6112&nbPlusVideos0=1"))).thenReturn(None());
 
         /* When */
         Set<Item> items = canalPlusUpdater.getItems(podcast);
@@ -156,7 +156,7 @@ public class CanalPlusUpdaterTest {
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/page_with_tabs.html"));
         when(htmlService.get(eq("http://www.canalplus.fr/lib/front_tools/ajax/wwwplus_live_onglet.php?pid=6130&ztid=6112&nbPlusVideos0=1&liste=5")))
                 .thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/page_with_tabs_front_tools.html"));
-        when(jdomService.parse(anyString())).thenReturn(Option.none());
+        when(jdomService.parse(anyString())).thenReturn(None());
 
         /* When */
         Set<Item> items = canalPlusUpdater.getItems(podcast);
@@ -179,6 +179,6 @@ public class CanalPlusUpdaterTest {
         for (String id : Arrays.asList(/*"1344688", */"1345586", "1345804", "1345857", "1345867", "1347250", "1347728", "1348127", "1348490", "1348841", "1348993", "1349772", "1350194", "1350642", "1351047", "1351482")) {
             when(jdomService.parse(eq(String.format(url, id)))).then(i -> IOUtils.fileAsXml(String.format(uri, id)));
         }
-        when(jdomService.parse(eq(String.format(url, "1344688")))).thenReturn(Option.none());
+        when(jdomService.parse(eq(String.format(url, "1344688")))).thenReturn(None());
     }
 }

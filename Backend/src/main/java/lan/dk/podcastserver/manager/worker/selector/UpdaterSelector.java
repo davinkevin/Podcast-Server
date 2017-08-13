@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.selector;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
@@ -10,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 06/03/15.
@@ -26,7 +27,7 @@ public class UpdaterSelector {
     }
 
     public Updater of(String url) {
-        return Option.of(url)
+        return Option(url)
                 .filter(StringUtils::isNotEmpty)
                 .map(u -> updaters)
                 .getOrElse(HashSet.empty())

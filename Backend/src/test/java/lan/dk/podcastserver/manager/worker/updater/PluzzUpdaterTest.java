@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -60,7 +60,7 @@ public class PluzzUpdaterTest {
     @Test
     public void should_return_empty_string_if_signature_fails() throws IOException {
          /* Given */
-        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Option.none());
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(None());
 
         /* When */
         String signature = pluzzUpdater.signatureOf(PODCAST);
@@ -75,7 +75,7 @@ public class PluzzUpdaterTest {
         when(htmlService.get(eq(PLUZZ_URL))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/pluzz.commentcavabien.html"));
         when(jsonService.parseUrl(anyString())).then(i -> {
             String url = i.getArgumentAt(0, String.class);
-            return url.contains("129003962") ? Option.none() : IOUtils.fileAsJson(asResourcePath(getIdFromUrl(url)));
+            return url.contains("129003962") ? None() : IOUtils.fileAsJson(asResourcePath(getIdFromUrl(url)));
         });
         when(m3U8Service.getM3U8UrlFormMultiStreamFile(anyString())).then(i -> "/fake/url/" + UUID.randomUUID());
 
@@ -89,7 +89,7 @@ public class PluzzUpdaterTest {
     @Test
     public void should_get_empty_list_of_item_if_connection_failed() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(Option.none());
+        when(htmlService.get(eq(PLUZZ_URL))).thenReturn(None());
 
         /* When */
         Set<Item> items = pluzzUpdater.getItems(PODCAST);

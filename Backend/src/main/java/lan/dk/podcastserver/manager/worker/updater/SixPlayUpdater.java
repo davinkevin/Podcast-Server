@@ -33,6 +33,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import static io.vavr.API.Option;
 import static java.util.Objects.nonNull;
 
 /**
@@ -115,7 +116,7 @@ public class SixPlayUpdater extends AbstractUpdater {
     }
 
     private String removeJS(String s) {
-        return Option.of(s)
+        return Option(s)
                 .map(String::trim)
                 .map(c -> c.replaceAll("function [^}]*", "{}"))
                 .map(c -> StringUtils.removeEnd(c, ";"))
@@ -167,7 +168,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         @Getter @Setter String id;
 
         ZonedDateTime getLastDiffusion() {
-            return Option.of(lastDiffusion)
+            return Option(lastDiffusion)
                     .map(l -> ZonedDateTime.of(LocalDateTime.parse(l, DATE_FORMATTER), ZoneId.of("Europe/Paris")))
                     .getOrElse(ZonedDateTime::now);
         }

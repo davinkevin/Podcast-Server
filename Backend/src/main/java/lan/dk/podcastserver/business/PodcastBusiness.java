@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
@@ -22,6 +21,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static io.vavr.API.Option;
 
 @Slf4j
 @Component
@@ -45,7 +46,7 @@ public class PodcastBusiness {
     }
 
     public Podcast findOne(UUID id) {
-        return Option.of(podcastRepository.findOne(id)).getOrElseThrow(() -> new PodcastNotFoundException(id));
+        return Option(podcastRepository.findOne(id)).getOrElseThrow(() -> new PodcastNotFoundException(id));
     }
 
     public void delete(UUID id) {

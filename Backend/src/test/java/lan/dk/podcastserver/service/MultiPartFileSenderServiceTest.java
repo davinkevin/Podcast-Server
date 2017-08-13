@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static lan.dk.podcastserver.service.MultiPartFileSenderService.*;
+import static lan.dk.podcastserver.service.MultiPartFileSenderService.MultiPartFileSenderImpl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

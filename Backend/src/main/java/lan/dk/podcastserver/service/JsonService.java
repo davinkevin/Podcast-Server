@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.function.Function;
 
+import static io.vavr.API.None;
+import static io.vavr.API.Option;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -36,10 +38,10 @@ public class JsonService {
 
     public Option<DocumentContext> parseUrl(String url) {
         try (BufferedReader bufferedReader = urlService.asReader(url)) {
-            return Option.of(parse(bufferedReader.lines().collect(joining())));
+            return Option(parse(bufferedReader.lines().collect(joining())));
         } catch (IOException e) {
             log.error("Error during fetching of each items of {}", url, e);
-            return Option.none();
+            return None();
         }
     }
 

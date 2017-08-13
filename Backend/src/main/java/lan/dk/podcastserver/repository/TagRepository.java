@@ -10,7 +10,8 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
-import static io.vavr.API.*;
+
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 07/06/2014.

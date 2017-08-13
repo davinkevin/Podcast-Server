@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -31,6 +30,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import static io.vavr.API.Option;
 import static java.time.ZonedDateTime.now;
 import static java.time.ZonedDateTime.of;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecifications;
@@ -55,8 +55,8 @@ public class ItemBusiness {
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<Item> findByTagsAndFullTextTerm(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
-        return Option.of(page.getSort())
-                .flatMap(s -> Option.of(s.getOrderFor("pertinence")))
+        return Option(page.getSort())
+                .flatMap(s -> Option(s.getOrderFor("pertinence")))
                 .map(v -> findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page))
                 .getOrElse(() -> itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page));
     }
@@ -66,8 +66,8 @@ public class ItemBusiness {
         List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 
         // Reverse if order is ASC
-        String order = Option.of(page.getSort())
-                .flatMap(s -> Option.of(s.getOrderFor("pertinence")))
+        String order = Option(page.getSort())
+                .flatMap(s -> Option(s.getOrderFor("pertinence")))
                 .map(Sort.Order::getDirection)
                 .map(Object::toString)
                 .getOrElse(org.apache.commons.lang3.StringUtils.EMPTY);

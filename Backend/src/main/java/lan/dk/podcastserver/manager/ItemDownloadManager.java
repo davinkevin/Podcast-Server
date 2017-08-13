@@ -2,11 +2,7 @@ package lan.dk.podcastserver.manager;
 
 import com.google.common.collect.Queues;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.List;
-import io.vavr.collection.Map;
-import io.vavr.collection.Queue;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;

@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -15,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static io.vavr.API.None;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -47,7 +47,7 @@ public class YoutubeFinderTest {
     @Test
     public void should_not_find_podcast_for_this_url() throws IOException {
         /* Given */
-        when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel"))).thenReturn(Option.none());
+        when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel"))).thenReturn(None());
 
         /* When */
         Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");

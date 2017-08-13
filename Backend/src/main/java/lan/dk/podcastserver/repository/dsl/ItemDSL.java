@@ -6,7 +6,6 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.QItem;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
@@ -15,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static io.vavr.API.Option;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
@@ -85,9 +85,9 @@ public class ItemDSL {
 
     public static Predicate getSearchSpecifications(List<UUID> ids, Set<Tag> tags, Boolean downloaded) {
         return ExpressionUtils.allOf(
-                Option.of(ids).map(ItemDSL::isInId).getOrElse(() -> null),
+                Option(ids).map(ItemDSL::isInId).getOrElse(() -> null),
                 isInTags(tags),
-                Option.of(downloaded)
+                Option(downloaded)
                     .map(d -> d ? hasStatus(Status.FINISH) : Q_ITEM.status.isNull().or(hasStatus(Status.FINISH).not()))
                     .getOrElse(() -> null)
         );

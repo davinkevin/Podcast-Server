@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+import static io.vavr.API.Option;
+
 /**
  * Created by kevin on 22/02/15
  */
@@ -57,12 +59,12 @@ public class RSSFinder implements Finder {
     }
 
     private Option<String> getItunesImage(Element channelElement) {
-        return Option.of(channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE))
+        return Option(channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE))
                 .map(itunesImage -> itunesImage.getAttributeValue(HREF));
     }
 
     private Option<String> getRssImage(Element channelElement) {
-        return Option.of(channelElement.getChild(IMAGE))
+        return Option(channelElement.getChild(IMAGE))
                 .map(rssImage -> rssImage.getChildText(URL));
     }
 

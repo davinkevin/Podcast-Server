@@ -3,7 +3,7 @@ package lan.dk.podcastserver.service.properties;
 import org.junit.Before;
 import org.junit.Test;
 
-import static lan.dk.podcastserver.service.properties.ExternalToolsAssert.*;
+import static lan.dk.podcastserver.service.properties.ExternalToolsAssert.assertThat;
 
 /**
  * Created by kevin on 13/04/2016 for Podcast Server

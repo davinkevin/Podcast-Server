@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.utils.IOUtils;
@@ -13,6 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static io.vavr.API.None;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -49,7 +49,7 @@ public class JeuxVideoComFinderTest {
     @Test
     public void should_not_find_data_for_this_url() {
         /* Given */
-        when(htmlService.get(any())).thenReturn(Option.none());
+        when(htmlService.get(any())).thenReturn(None());
 
         /* When */
         Podcast podcast = jeuxVideoComFinder.find("foo/bar");

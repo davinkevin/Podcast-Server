@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+import static io.vavr.API.None;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 
 /**
@@ -39,7 +40,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private Option<String> url = Option.none();
+    private Option<String> url = None();
 
     public TF1ReplayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);

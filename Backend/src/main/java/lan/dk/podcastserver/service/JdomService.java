@@ -26,7 +26,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 

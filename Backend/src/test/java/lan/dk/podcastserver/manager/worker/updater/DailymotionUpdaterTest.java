@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
@@ -19,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.validation.Validator;
 import java.net.MalformedURLException;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -75,7 +75,7 @@ public class DailymotionUpdaterTest {
     public void should_get_empty_list_if_error_during_fetching() throws MalformedURLException {
         /* Given */
         String karimdebbache = String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache");
-        when(jsonService.parseUrl(eq(karimdebbache))).thenReturn(Option.none());
+        when(jsonService.parseUrl(eq(karimdebbache))).thenReturn(None());
 
         /* When */
         Set<Item> items = dailymotionUpdater.getItems(podcast);

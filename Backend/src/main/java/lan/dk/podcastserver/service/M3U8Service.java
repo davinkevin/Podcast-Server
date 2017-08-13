@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static io.vavr.API.None;
 import static java.util.Objects.isNull;
 
 /**
@@ -29,7 +30,7 @@ public class M3U8Service {
                     .reduce((u, v) -> v));
         } catch (IOException | RuntimeException ignored) {
             /* RuntimeException added because buffer.lines only throw UncheckedIOException */
-            return Option.none();
+            return None();
         }
     }
 

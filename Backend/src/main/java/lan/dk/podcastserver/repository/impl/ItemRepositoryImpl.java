@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.repository.impl;
 
 import io.vavr.collection.List;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,8 @@ import org.hibernate.transform.ResultTransformer;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.UUID;
+
+import static io.vavr.API.Option;
 
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
@@ -56,7 +57,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .map(subTerm -> qbDsl.keyword().onFields(SEARCH_FIELDS).matching(subTerm).createQuery())
                 .forEach(query::must);
 
-        return Option.of(fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
+        return Option(fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
                 .setProjection("id")
                 .setResultTransformer(RESULT_TRANSFORMER)
                 .<UUID>getResultList())

@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
@@ -21,6 +20,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static io.vavr.API.None;
+import static io.vavr.API.Option;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.*;
@@ -45,8 +46,8 @@ public class RSSUpdaterTest {
         rssAppload = Podcast.builder().url(MOCK_URL).build();
         Path xmlFile = Paths.get(RSSUpdaterTest.class.getResource(PODCAST_APPLOAD_URL).toURI());
 
-        when(jdomService.parse(eq(MOCK_URL))).thenReturn(Option.of(new SAXBuilder().build(xmlFile.toFile())));
-        when(jdomService.parse(not(eq(MOCK_URL)))).thenReturn(Option.none());
+        when(jdomService.parse(eq(MOCK_URL))).thenReturn(Option(new SAXBuilder().build(xmlFile.toFile())));
+        when(jdomService.parse(not(eq(MOCK_URL)))).thenReturn(None());
     }
 
     @Test

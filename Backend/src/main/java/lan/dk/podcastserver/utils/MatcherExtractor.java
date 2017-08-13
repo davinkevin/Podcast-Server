@@ -8,6 +8,8 @@ import io.vavr.control.Try;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.vavr.API.None;
+
 /**
  * Created by kevin on 04/03/2017
  */
@@ -27,7 +29,7 @@ public class MatcherExtractor {
 
     public Option<String> group(Integer group) {
         if (!isFind) {
-            return Option.none();
+            return None();
         }
 
         return Try.of(() -> matcher.group(group)).toOption();
@@ -35,7 +37,7 @@ public class MatcherExtractor {
 
     public Option<List<String>> groups() {
         if (!isFind) {
-            return Option.none();
+            return None();
         }
 
         return Stream.from(1)

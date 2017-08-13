@@ -2,7 +2,6 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
 import lombok.*;
@@ -27,6 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import static io.vavr.API.Option;
 import static java.util.Objects.nonNull;
 
 
@@ -214,9 +214,9 @@ public class Item {
     }
 
     public Path getCoverPath() {
-        return Option.of(cover)
+        return Option(cover)
                 .map(Cover::getUrl)
-                .orElse(() -> Option.of(""))
+                .orElse(() -> Option(""))
                 .map(FilenameUtils::getExtension)
                 .map(ext -> getPodcastPath().resolve(id + "." + ext))
                 .getOrElseThrow(() -> new RuntimeException("Cover Path not found for item " + title));
@@ -231,7 +231,7 @@ public class Item {
     }
 
     private String getExtension() {
-        return Option.of(fileName)
+        return Option(fileName)
                 .map(FilenameUtils::getExtension)
                 .map(ext -> "."+ext)
                 .getOrElse("");
@@ -239,14 +239,14 @@ public class Item {
 
     @JsonProperty("cover") @JsonView(ItemSearchListView.class)
     public Cover getCoverOfItemOrPodcast() {
-        return Option.of(cover)
+        return Option(cover)
                 .map(c -> String.format(COVER_PROXY_URL, podcast.getId(), id, FilenameUtils.getExtension(c.getUrl())))
                 .map(url -> cover.toBuilder().url(url).build())
                 .getOrElse(() -> podcast.getCover());
     }
 
     @JsonProperty("podcastId") @JsonView(ItemSearchListView.class)
-    public UUID getPodcastId() { return Option.of(podcast).map(Podcast::getId).getOrElse(() -> null);}
+    public UUID getPodcastId() { return Option(podcast).map(Podcast::getId).getOrElse(() -> null);}
         
     @AssertTrue
     public boolean hasValidURL() {

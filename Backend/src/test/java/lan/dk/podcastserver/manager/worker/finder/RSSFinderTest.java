@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
@@ -16,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.eq;
@@ -35,7 +35,7 @@ public class RSSFinderTest {
         //Given
         String url = "/remote/podcast/withEmpty.xml";
 
-        when(jdomService.parse(eq(url))).thenReturn(Option.none());
+        when(jdomService.parse(eq(url))).thenReturn(None());
         when(jdomService.parse(not(eq(url)))).then(i -> IOUtils.fileAsXml(i.getArgumentAt(0, String.class)));
         when(imageService.getCoverFromURL(eq(COVER_URL))).thenReturn(Cover.builder().url(COVER_URL).build());
     }

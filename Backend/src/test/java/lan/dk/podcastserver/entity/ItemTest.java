@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 15/06/15 for HackerRank problem

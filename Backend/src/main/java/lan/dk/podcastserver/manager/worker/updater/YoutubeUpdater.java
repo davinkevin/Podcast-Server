@@ -30,6 +30,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import static io.vavr.API.None;
+import static io.vavr.API.Option;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
@@ -243,7 +245,7 @@ public class YoutubeUpdater extends AbstractUpdater {
 
             public Option<Thumbnails.Thumbnail> getCover() {
                 if (isNull(this.snippet.thumbnails))
-                    return Option.none();
+                    return None();
 
                 return this.snippet.getThumbnails().getBetterThumbnail();
             }
@@ -272,21 +274,21 @@ public class YoutubeUpdater extends AbstractUpdater {
 
                 Option<Thumbnail> getBetterThumbnail() {
                     if (nonNull(maxres))
-                        return Option.of(maxres);
+                        return Option(maxres);
 
                     if (nonNull(standard))
-                        return Option.of(standard);
+                        return Option(standard);
 
                     if (nonNull(high))
-                        return Option.of(high);
+                        return Option(high);
 
                     if (nonNull(medium))
-                        return Option.of(medium);
+                        return Option(medium);
 
                     if (nonNull(byDefault))
-                        return Option.of(byDefault);
+                        return Option(byDefault);
 
-                    return Option.none();
+                    return None();
                 }
 
                 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -12,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
+
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 17/01/2016 for PodcastServer
@@ -25,7 +26,7 @@ public class WatchListBusiness {
     private final JdomService jdomService;
 
     public WatchList findOne(UUID id) {
-        return Option.of(watchListRepository.findOne(id))
+        return Option(watchListRepository.findOne(id))
                 .getOrElseThrow(() -> new RuntimeException("Watchlist not found"));
     }
 
@@ -34,7 +35,7 @@ public class WatchListBusiness {
     }
 
     public Set<WatchList> findContainsItem(UUID itemId) {
-        return Option.of(itemRepository.findOne(itemId))
+        return Option(itemRepository.findOne(itemId))
                 .map(watchListRepository::findContainsItem)
                 .getOrElse(HashSet.empty());
     }

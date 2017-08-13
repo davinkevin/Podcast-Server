@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+import static io.vavr.API.None;
+import static io.vavr.API.Option;
 import static java.util.Objects.nonNull;
 
 /**
@@ -73,12 +75,12 @@ public class DailymotionDownloader extends M3U8Downloader {
     private static Option<String> getPlayerConfig(String page) {
         if (!page.contains("var config = ") || !page.contains("}};")) {
             log.error("Structure of Dailymotion page changed");
-            return Option.none();
+            return None();
         }
 
         int begin = page.indexOf("var config = ");
         int end = page.indexOf("};", begin);
-        return Option.of(page.substring(begin+"buildPlayer({".length()-1, end+1));
+        return Option(page.substring(begin+"buildPlayer({".length()-1, end+1));
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static io.vavr.API.None;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -43,7 +44,7 @@ public class GulliDownloader extends HTTPDownloader {
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private Option<String> url = Option.none();
+    private Option<String> url = None();
 
     public GulliDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, WGetFactory wGetFactory, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, wGetFactory);

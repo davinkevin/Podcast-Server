@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.collection.List;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -24,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import static io.vavr.API.Option;
 import static java.util.Objects.isNull;
 
 /**
@@ -46,7 +46,7 @@ public class CoverBusiness {
     public String download(Podcast podcast) {
         Cover cover = podcast.getCover();
 
-        if (Option.of(cover).map(Cover::getUrl).filter(v -> !StringUtils.isEmpty(v)).isEmpty()) {
+        if (Option(cover).map(Cover::getUrl).filter(v -> !StringUtils.isEmpty(v)).isEmpty()) {
             return StringUtils.EMPTY;
         }
 

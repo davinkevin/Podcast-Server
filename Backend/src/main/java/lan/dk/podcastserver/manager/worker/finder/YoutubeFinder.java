@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import io.vavr.collection.Stream;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -12,6 +11,8 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
+
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 22/02/15
@@ -42,13 +43,13 @@ public class YoutubeFinder implements Finder {
     }
 
     private Function<String, String> getMeta(Document page) {
-        return metaName -> Option.of(page.select("meta[name="+ metaName +"]").first())
+        return metaName -> Option(page.select("meta[name="+ metaName +"]").first())
                 .map(e -> e.attr("content"))
                 .getOrElse("");
     }
 
     private Cover getCover(Document page) {
-        return Option.of(page.select("img.channel-header-profile-image").first())
+        return Option(page.select("img.channel-header-profile-image").first())
                 .map(e -> e.attr("src"))
                 .map(e -> Cover
                         .builder()

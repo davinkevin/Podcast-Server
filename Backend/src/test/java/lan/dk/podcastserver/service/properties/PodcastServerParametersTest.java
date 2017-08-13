@@ -8,8 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static java.time.ZonedDateTime.now;
-import static org.assertj.core.api.Assertions.assertThat;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by kevin on 13/07/15 for Podcast Server

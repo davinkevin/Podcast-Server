@@ -21,6 +21,7 @@ import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
+import static io.vavr.API.Option;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -56,7 +57,7 @@ public class GulliUpdater extends AbstractUpdater {
     }
 
     private Item findDetailsInFromPage(Element e) {
-        return Option.of(e.select("a").first())
+        return Option(e.select("a").first())
             .map(elem -> elem.attr("href"))
             .flatMap(htmlService::get)
             .map(d -> d.select(".bloc_streaming").first())
@@ -80,7 +81,7 @@ public class GulliUpdater extends AbstractUpdater {
     }
 
     private Cover getCover(Element block) {
-        return Option.of(block)
+        return Option(block)
                 .map(e -> e.select("img").attr("src"))
                 .map(imageService::getCoverFromURL)
                 .getOrElse(Cover.DEFAULT_COVER);

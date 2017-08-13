@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -66,7 +67,7 @@ public class JeuxVideoComUpdaterTest {
     @Test
     public void should_error_during_sign() throws IOException {
         /* Given */
-        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Option.none());
+        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(None());
 
         /* When */
         String signature = jeuxVideoComUpdater.signatureOf(CHRONIQUE_VIDEO);
@@ -91,7 +92,7 @@ public class JeuxVideoComUpdaterTest {
     @Test
     public void should_return_empty_list_if_not_found() throws IOException {
         /* Given */
-        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(Option.none());
+        when(htmlService.get(eq(CHRONIQUE_VIDEO.getUrl()))).thenReturn(None());
 
         /* When */
         Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);
@@ -105,7 +106,7 @@ public class JeuxVideoComUpdaterTest {
         /* Given */
         configureHtmlServiceWith(CHRONIQUE_VIDEO.getUrl(), "/remote/podcast/JeuxVideoCom/chroniques-video.htm");
         configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm");
-        when(htmlService.get(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))).thenReturn(Option.none());
+        when(htmlService.get(eq("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))).thenReturn(None());
 
         /* When */
         Set<Item> items = jeuxVideoComUpdater.getItems(CHRONIQUE_VIDEO);

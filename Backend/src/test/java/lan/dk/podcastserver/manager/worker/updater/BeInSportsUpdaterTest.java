@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import com.google.common.collect.Sets;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -27,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.anyString;
@@ -79,7 +79,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_do_reject_is_signature_fail() throws IOException, URISyntaxException {
         /* Given */
-        when(htmlService.get(anyString())).thenReturn(Option.none());
+        when(htmlService.get(anyString())).thenReturn(None());
 
         /* When */
         String signature = beInSportsUpdater.signatureOf(podcast);
@@ -91,7 +91,7 @@ public class BeInSportsUpdaterTest {
     @Test
     public void should_return_empty_item_list_if_error() throws IOException {
         /* Given */
-        when(htmlService.get(anyString())).thenReturn(Option.none());
+        when(htmlService.get(anyString())).thenReturn(None());
 
         /* When */
         Set<Item> items = beInSportsUpdater.getItems(podcast);
@@ -138,7 +138,7 @@ public class BeInSportsUpdaterTest {
     public void should_return_default_item_if_exception() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(i -> IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
-        when(htmlService.get(not(eq(podcast.getUrl())))).thenReturn(Option.none());
+        when(htmlService.get(not(eq(podcast.getUrl())))).thenReturn(None());
 
         /* When */
         Set<Item> items = beInSportsUpdater.getItems(podcast);

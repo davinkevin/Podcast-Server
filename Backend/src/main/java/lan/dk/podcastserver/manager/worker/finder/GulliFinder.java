@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -9,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 04/10/2016 for Podcast Server
@@ -42,7 +43,7 @@ public class GulliFinder implements Finder {
     private Cover coverOf(Document d) {
         String pageUrl = d.select("meta[property=og:url]").attr("content");
 
-        return Option.of(d.select(String.format(COVER_SELECTOR, pageUrl)).first())
+        return Option(d.select(String.format(COVER_SELECTOR, pageUrl)).first())
                         .map(e -> e.attr("src"))
                         .map(imageService::getCoverFromURL)
                         .getOrElse(Cover.DEFAULT_COVER);

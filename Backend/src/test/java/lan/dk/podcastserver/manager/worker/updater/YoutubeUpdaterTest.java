@@ -7,7 +7,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static io.vavr.API.None;
 import static java.util.stream.Collectors.toSet;
 import static lan.dk.utils.IOUtils.fileAsXml;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,7 +136,7 @@ public class YoutubeUpdaterTest {
                 .build();
 
         when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
-        when(jdomService.parse(anyString())).thenReturn(Option.none());
+        when(jdomService.parse(anyString())).thenReturn(None());
 
 
         /* When */
@@ -153,8 +153,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D")
                 .build();
 
-        when(htmlService.get(anyString())).thenReturn(Option.none());
-        when(jdomService.parse(anyString())).thenReturn(Option.none());
+        when(htmlService.get(anyString())).thenReturn(None());
+        when(jdomService.parse(anyString())).thenReturn(None());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -170,8 +170,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Option.none());
-        when(jdomService.parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="))).thenReturn(Option.none());
+        when(htmlService.get(any(String.class))).thenReturn(None());
+        when(jdomService.parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="))).thenReturn(None());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -187,8 +187,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(Option.none());
-        when(jdomService.parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="))).thenReturn(Option.none());
+        when(htmlService.get(any(String.class))).thenReturn(None());
+        when(jdomService.parse(eq("https://www.youtube.com/feeds/videos.xml?channel_id="))).thenReturn(None());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -210,7 +210,7 @@ public class YoutubeUpdaterTest {
 
         when(jsonService.parseUrl(eq(page1))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.json"));
         when(jsonService.parseUrl(eq(page2))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json"));
-        when(jsonService.parseUrl(and(not(eq(page1)), not(eq(page2))))).then(i -> Option.none());
+        when(jsonService.parseUrl(and(not(eq(page1)), not(eq(page2))))).then(i -> None());
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"));
 
         /* When */
@@ -231,7 +231,7 @@ public class YoutubeUpdaterTest {
                 .build();
 
         when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
-        when(jsonService.parseUrl(anyString())).thenReturn(Option.none());
+        when(jsonService.parseUrl(anyString())).thenReturn(None());
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);

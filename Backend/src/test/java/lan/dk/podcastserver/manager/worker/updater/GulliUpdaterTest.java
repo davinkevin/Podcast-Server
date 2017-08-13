@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -21,6 +20,7 @@ import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static io.vavr.API.None;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -66,7 +66,7 @@ public class GulliUpdaterTest {
     @Test
     public void should_return_empty_string_if_error_during_signature() {
         /* Given */
-        when(htmlService.get(anyString())).thenReturn(Option.none());
+        when(htmlService.get(anyString())).thenReturn(None());
 
         /* When */
         String signature = gulliUpdater.signatureOf(podcast);

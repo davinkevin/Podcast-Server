@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.regex.Pattern;
 
+import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,7 +36,7 @@ public class MatcherExtractorTest {
         Option<String> v = MatcherExtractor.from(p).on(s).group(1);
 
         /* THEN  */
-        assertThat(v).isEqualTo(Option.none());
+        assertThat(v).isEqualTo(None());
     }
 
 }

@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.function.Consumer;
 
+import static io.vavr.API.Option;
 import static lan.dk.podcastserver.manager.worker.downloader.TF1ReplayDownloader.TF1ReplayVideoUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -82,7 +82,7 @@ public class TF1ReplayDownloaderTest {
 
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
-        when(m3U8Service.findBestQuality(any())).thenReturn(Option.of("foo/bar/video.mp4"));
+        when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
 
         /* When */
@@ -122,7 +122,7 @@ public class TF1ReplayDownloaderTest {
 
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
-        when(m3U8Service.findBestQuality(any())).thenReturn(Option.of("foo/bar/video.mp4"));
+        when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
         String itemUrl = downloader.getItemUrl(item);
 
@@ -165,7 +165,7 @@ public class TF1ReplayDownloaderTest {
 
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
-        when(m3U8Service.findBestQuality(any())).thenReturn(Option.of("foo/bar/video.mp4"));
+        when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
 
         /* When */

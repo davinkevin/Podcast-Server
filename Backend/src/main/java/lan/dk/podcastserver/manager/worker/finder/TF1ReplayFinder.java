@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
@@ -14,9 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
+import static io.vavr.API.*;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -51,7 +48,7 @@ public class TF1ReplayFinder implements Finder {
 
     private Cover getCover(Document p) {
         return PICTURE_EXTRACTOR.on(p.select(".focalImg style").html()).group(1)
-                .orElse(Option.of(p.select("meta[property=og:image]").attr("content")))
+                .orElse(Option(p.select("meta[property=og:image]").attr("content")))
                 .map(this::getUrl)
                 .map(imageService::getCoverFromURL)
                 .getOrElse(Cover.DEFAULT_COVER);
