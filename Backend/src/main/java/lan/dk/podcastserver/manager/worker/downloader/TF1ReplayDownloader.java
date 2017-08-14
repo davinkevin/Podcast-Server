@@ -6,7 +6,6 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -25,6 +24,7 @@ import java.util.Objects;
 
 import static io.vavr.API.None;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 20/07/2016.
@@ -74,7 +74,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     }
 
     private String getM3U8url(String id) {
-        return Try.of(() -> urlService.get(String.format(WAT_WEB_HTML, id))
+        return Try(() -> urlService.get(String.format(WAT_WEB_HTML, id))
                 .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
                 .asString()
         )
@@ -110,7 +110,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     private String getHighestQualityUrl(String url) {
         String realUrl = urlService.getRealURL(url, c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
 
-        return Try.of(() -> urlService.get(url)
+        return Try(() -> urlService.get(url)
                 .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
                 .asString())
                 .map(HttpResponse::getRawBody)

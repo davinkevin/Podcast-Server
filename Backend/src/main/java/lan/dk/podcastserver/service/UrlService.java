@@ -8,7 +8,6 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.function.Consumer;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 21/07/2016.
@@ -58,7 +58,7 @@ public class UrlService {
             throw new RuntimeException("Too many redirects");
         }
 
-        HttpURLConnection con = Try.of(() -> new URL(url))
+        HttpURLConnection con = Try(() -> new URL(url))
                 .mapTry(URL::openConnection)
                 .map(HttpURLConnection.class::cast)
                 .andThen(connectionModifier)
@@ -66,7 +66,7 @@ public class UrlService {
                 .onFailure(e -> log.error("Error during retrieval of the real URL for {} at {} redirection", url, numberOfRedirection, e))
                 .get();
 
-        Option<Integer> isRedirect = Try.of(con::getResponseCode)
+        Option<Integer> isRedirect = Try(con::getResponseCode)
                 .andThenTry(con::disconnect)
                 .filter(this::isARedirection)
                 .toOption();
@@ -87,7 +87,7 @@ public class UrlService {
 
     /* Transform to Stream or Reader */
     public InputStream asStream(String url) throws IOException {
-        return Try.of(() -> get(url))
+        return Try(() -> get(url))
                 .mapTry(BaseRequest::asBinary)
                 .map(HttpResponse::getBody)
                 .getOrElseThrow(e -> new IOException(e));
@@ -105,7 +105,7 @@ public class UrlService {
 
         Boolean isFromRoot = mayBeRelativeUrl.startsWith("/");
 
-        return Try.of(() -> new URL(urlWithDomain))
+        return Try(() -> new URL(urlWithDomain))
                 .map(u -> u.getProtocol() + PROTOCOL_SEPARATOR + u.getAuthority() + (isFromRoot ? "" : StringUtils.substringBeforeLast(u.getPath(), "/")))
                 .map(s -> s + (isFromRoot ? "" : "/") + mayBeRelativeUrl)
                 .getOrElseThrow(e -> new RuntimeException(e));

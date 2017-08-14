@@ -5,7 +5,6 @@ import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
@@ -20,6 +19,7 @@ import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static lan.dk.podcastserver.manager.worker.updater.YoutubeUpdater.YOUTUBE;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server
@@ -72,7 +72,7 @@ public class MimeTypeService {
     }
 
     private Option<String> filesProbeContentType(Path file) {
-        return Try.of(() -> Files.probeContentType(file))
+        return Try(() -> Files.probeContentType(file))
                 .filter(Objects::nonNull)
                 .toOption();
     }
@@ -83,7 +83,7 @@ public class MimeTypeService {
         private final Tika tika;
 
         Option<String> probeContentType(Path file) {
-            return Try.of(() -> tika.detect(file.toFile()))
+            return Try(() -> tika.detect(file.toFile()))
                 .filter(Objects::nonNull)
                 .toOption();
         }

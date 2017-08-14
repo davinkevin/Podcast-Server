@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.service;
 
 import com.google.common.collect.Lists;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.joining;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 19/07/2014 for Podcast Server
@@ -70,7 +70,7 @@ public class FfmpegService {
             log.error("Error during Ffmpeg conversion", e);
         } finally {
             Path finalListOfFiles = listOfFiles;
-            if (nonNull(listOfFiles)) Try.of(() -> Files.deleteIfExists(finalListOfFiles)); }
+            if (nonNull(listOfFiles)) Try(() -> Files.deleteIfExists(finalListOfFiles)); }
     }
 
     /* Merge Audio and Video Files */
@@ -90,8 +90,8 @@ public class FfmpegService {
 
         ffmpegExecutor.createJob(builder).run();
 
-        Try.of(() -> Files.deleteIfExists(convertedAudio));
-        Try.of(() -> Files.move(tmpFile, dest, StandardCopyOption.REPLACE_EXISTING));
+        Try(() -> Files.deleteIfExists(convertedAudio));
+        Try(() -> Files.move(tmpFile, dest, StandardCopyOption.REPLACE_EXISTING));
 
         return dest;
     }
@@ -108,7 +108,7 @@ public class FfmpegService {
     }
 
     private Path generateTempFileFor(Path dest, Path video) {
-        return Try.of(() -> Files.createTempFile(dest.getParent(), dest.getFileName().toString(), "." + FilenameUtils.getExtension(video.getFileName().toString())))
+        return Try(() -> Files.createTempFile(dest.getParent(), dest.getFileName().toString(), "." + FilenameUtils.getExtension(video.getFileName().toString())))
                 .onFailure(e -> log.error("Error during generation of tmp file for {}", video.toAbsolutePath().toString()))
                 .getOrElseThrow(e -> new RuntimeException(e));
     }
@@ -120,7 +120,7 @@ public class FfmpegService {
 
     /* Get duration of a File */
     public double getDurationOf(String url, String userAgent) {
-        return Try.of(() -> ffprobe.probe(url, userAgent).getFormat().duration)
+        return Try(() -> ffprobe.probe(url, userAgent).getFormat().duration)
                 .map(d -> d*1_000_000)
                 .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
     }
@@ -133,7 +133,7 @@ public class FfmpegService {
         runAsync(ffmpegExecutor.createJob(ffmpegBuilder, progressListener));
 
         Future<Process> process = pl.getProcess();
-        return Try.of(() -> process.get(1, TimeUnit.SECONDS))
+        return Try(() -> process.get(1, TimeUnit.SECONDS))
                 .onFailure(e -> process.cancel(true))
                 .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
     }

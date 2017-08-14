@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import io.vavr.control.Try;
+
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
+import static io.vavr.API.*;
 
 @Slf4j
 @Component("RTMPDownloader")
@@ -77,7 +78,7 @@ public class RTMPDownloader extends AbstractDownloader {
     @Override
     public void pauseDownload() {
         ProcessBuilder stopProcess = processService.newProcessBuilder("kill", "-STOP", "" + pid);
-        Try.of(stopProcess::start)
+        Try(stopProcess::start)
             .andThen(super::pauseDownload)
             .onFailure(e -> {
                 log.error("IOException :", e);

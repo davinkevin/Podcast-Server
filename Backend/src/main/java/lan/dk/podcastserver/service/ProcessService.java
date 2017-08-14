@@ -1,9 +1,11 @@
 package lan.dk.podcastserver.service;
 
+
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import static io.vavr.API.*;
 /**
  * Created by kevin on 25/01/2016 for Podcast Server
  */
@@ -14,11 +16,11 @@ public class ProcessService {
     public ProcessBuilder newProcessBuilder(String... command) { return new ProcessBuilder(command); }
 
     public Try<Process> start(ProcessBuilder processBuilder) {
-        return Try.of(processBuilder::start);
+        return Try(processBuilder::start);
     }
 
     public int pidOf(Process p) {
-        return Try.of(() -> p.getClass().getSimpleName())
+        return Try(() -> p.getClass().getSimpleName())
             .filter(className -> className.contains("UNIXProcess"))
             .mapTry(className -> p.getClass().getDeclaredField("pid"))
             .andThenTry(c -> c.setAccessible(true))
@@ -27,6 +29,6 @@ public class ProcessService {
     }
 
     public Try<Integer> waitFor(Process process) {
-        return Try.of(process::waitFor);
+        return Try(process::waitFor);
     }
 }

@@ -2,7 +2,6 @@ package lan.dk.podcastserver.business;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -23,6 +22,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 
 @Slf4j
 @Component
@@ -69,7 +69,7 @@ public class PodcastBusiness {
 
         // Move folder if name has change :
         if (!StringUtils.equals(podcastToUpdate.getTitle(), patchPodcast.getTitle())) {
-            Try.of(() -> Files.move(
+            Try(() -> Files.move(
                     podcastServerParameters.getRootfolder().resolve(podcastToUpdate.getTitle()),
                     podcastServerParameters.getRootfolder().resolve(patchPodcast.getTitle())
             )).getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
@@ -100,7 +100,7 @@ public class PodcastBusiness {
 
     @Transactional(readOnly = true)
     public String getRss(UUID id, Boolean limit, String domainName) {
-        return Try.of(() -> jdomService.podcastToXMLGeneric(findOne(id), domainName, limit))
+        return Try(() -> jdomService.podcastToXMLGeneric(findOne(id), domainName, limit))
             .onFailure(e -> log.error("Unable to generate RSS for podcast {} with limit {}", id, limit, e))
             .getOrElse(StringUtils.EMPTY);
     }

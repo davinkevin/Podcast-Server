@@ -3,7 +3,6 @@ package lan.dk.podcastserver.business.update;
 import io.vavr.Tuple3;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
@@ -35,6 +34,7 @@ import java.util.function.Predicate;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.function.Function.identity;
+import static io.vavr.API.*;
 
 @Slf4j
 @Component
@@ -121,7 +121,7 @@ public class UpdatePodcastBusiness  {
     }
 
     private Tuple3<Podcast, Set<Item>, Predicate<Item>> wait(CompletableFuture<Tuple3<Podcast, Set<Item>, Predicate<Item>>> future) {
-       return Try.of(() -> future.get(timeValue, timeUnit))
+       return Try(() -> future.get(timeValue, timeUnit))
             .onFailure(e -> {
                 log.error("Error during update", e);
                 future.cancel(true);
@@ -174,7 +174,7 @@ public class UpdatePodcastBusiness  {
         itemRepository
                 .findAllToDelete(podcastServerParameters.limitToKeepCoverOnDisk())
                 .map(coverBusiness::getCoverPathOf)
-                .forEach(p -> Try.of(() -> Files.deleteIfExists(p)));
+                .forEach(p -> Try(() -> Files.deleteIfExists(p)));
     }
 
     public Integer getUpdaterActiveCount() {

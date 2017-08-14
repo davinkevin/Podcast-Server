@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -23,6 +22,7 @@ import java.util.Objects;
 import static io.vavr.API.None;
 import static io.vavr.API.Option;
 import static java.util.Objects.nonNull;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 21/02/2016 for Podcast Server
@@ -51,7 +51,7 @@ public class DailymotionDownloader extends M3U8Downloader {
             return url;
         }
 
-        url = Try.of(() -> urlService
+        url = Try(() -> urlService
                 .get(item.getUrl())
                 .asString()
         )

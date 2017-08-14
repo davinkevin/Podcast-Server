@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.service;
 
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -29,6 +28,7 @@ import java.util.function.Function;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static io.vavr.API.*;
 
 @Slf4j
 @Service
@@ -74,7 +74,7 @@ public class JdomService {
     private final UrlService urlService;
 
     public Option<Document> parse(String url) {
-        return Try.of(() -> new SAXBuilder().build(urlService.asStream(url)))
+        return Try(() -> new SAXBuilder().build(urlService.asStream(url)))
                 .onFailure(e -> log.error("Error during parsing of {}", url, e))
                 .toOption();
     }
@@ -181,7 +181,7 @@ public class JdomService {
         rss.addNamespaceDeclaration(ITUNES_NAMESPACE);
         rss.addNamespaceDeclaration(MEDIA_NAMESPACE);
 
-        return Try.of(StringWriter::new)
+        return Try(StringWriter::new)
             .andThenTry(sw -> new XMLOutputter(Format.getPrettyFormat()).output(new Document(rss), sw))
             .map(StringWriter::toString)
             .getOrElseThrow(e -> new RuntimeException("Error during generation of RSS", e));

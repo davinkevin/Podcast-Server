@@ -2,7 +2,6 @@ package lan.dk.podcastserver.service;
 
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collector;
-
+import static io.vavr.API.*;
 /**
  * Created by kevin on 07/06/15 for HackerRank problem
  */
@@ -25,7 +24,7 @@ public class HtmlService {
     private final UrlService urlService;
 
     public Option<Document> get(String url) {
-        return Try.of(() -> urlService.get(url)
+        return Try(() -> urlService.get(url)
                     .header(UrlService.USER_AGENT_KEY, UrlService.USER_AGENT_DESKTOP)
                 .asBinary())
                     .filter(h -> h.getStatus() < 400)

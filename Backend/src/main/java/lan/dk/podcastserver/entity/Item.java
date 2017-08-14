@@ -2,7 +2,6 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -27,8 +26,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
-
 
 @Entity
 @Indexed
@@ -189,7 +188,7 @@ public class Item {
             return;
         }
 
-        Try .of(() -> Files.deleteIfExists(getCoverPath()))
+        Try(() -> Files.deleteIfExists(getCoverPath()))
             .onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
 
         if (isDownloaded()) {
@@ -198,7 +197,7 @@ public class Item {
     }
 
     private void deleteFile() {
-        Try.of(() -> Files.deleteIfExists(getLocalPath())).onFailure(e -> log.error("Error during deletion of {}", this, e));
+        Try(() -> Files.deleteIfExists(getLocalPath())).onFailure(e -> log.error("Error during deletion of {}", this, e));
     }
 
     @Transient @JsonIgnore

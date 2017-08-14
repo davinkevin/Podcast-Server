@@ -41,6 +41,7 @@ import static java.lang.String.valueOf;
 import static java.time.ZonedDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 14/12/2013 for Podcast Server
@@ -159,7 +160,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                 .stream()
                 .filter(v -> nonNull(v.targetFile))
                 .map(v -> v.targetFile.toPath())
-                .forEach(p -> Try.of(() -> Files.deleteIfExists(p)));
+                .forEach(p -> Try(() -> Files.deleteIfExists(p)));
     }
 
     @Override

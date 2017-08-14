@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import io.vavr.control.Try;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import static io.vavr.API.*;
 
 @Slf4j
 @Entity
@@ -123,7 +123,7 @@ public class Podcast implements Serializable {
 
         Path folder = rootFolder.resolve(this.getTitle());
 
-        Try.of(() -> FileSystemUtils.deleteRecursively(folder.toFile()))
+        Try(() -> FileSystemUtils.deleteRecursively(folder.toFile()))
             .onFailure(e -> log.error("Error during deletion of podcast of {}", this, e));
     }
 

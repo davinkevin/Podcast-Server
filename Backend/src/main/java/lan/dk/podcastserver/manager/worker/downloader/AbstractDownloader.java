@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
+
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static io.vavr.API.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         stopDownloading.set(false);
         saveSyncWithPodcast();
         convertAndSaveBroadcast();
-        Try.of(this::download)
+        Try(this::download)
             .onFailure(e -> log.error("Error during download", e))
             .onFailure(e -> this.stopDownload());
     }

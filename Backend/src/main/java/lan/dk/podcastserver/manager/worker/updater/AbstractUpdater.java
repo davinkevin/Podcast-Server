@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.collection.Set;
-import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.SignatureService;
@@ -19,6 +18,8 @@ import javax.validation.Validator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
+import static io.vavr.API.Try;
+
 @Slf4j
 @Transactional(noRollbackFor=Exception.class)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +32,7 @@ public abstract class AbstractUpdater implements Updater {
     public Tuple3<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
         log.info("\"{}\" added to executor", podcast.getTitle());
 
-        return Try.of(() -> signatureOf(podcast))
+        return Try(() -> signatureOf(podcast))
                 .filter(signature -> !StringUtils.equals(signature, podcast.getSignature()))
                 .andThen(podcast::setSignature)
                 .map(s -> Tuple.of(podcast, getItems(podcast), notIn(podcast)))

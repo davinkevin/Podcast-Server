@@ -52,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 13/02/2016 for Podcast Server
@@ -119,7 +120,7 @@ public class YoutubeDownloaderTest {
         List<VideoFileInfo> videoList = generate(1);
         when(videoInfo.getInfo()).thenReturn(videoList);
         doAnswer(i -> {
-            videoList.forEach(f ->  Try.of(() -> Files.createFile(f.targetFile.toPath())));
+            videoList.forEach(f ->  Try(() -> Files.createFile(f.targetFile.toPath())));
             i.getArgumentAt(2, Runnable.class).run();
             return null;
         }).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
@@ -146,7 +147,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
         when(ffmpegService.mergeAudioAndVideo(any(), any(), any())).then(i -> {
-            Try.of(() -> Files.createFile(i.getArgumentAt(2, Path.class)));
+            Try(() -> Files.createFile(i.getArgumentAt(2, Path.class)));
             return i.getArgumentAt(2, Path.class);
         });
         List<VideoFileInfo> videoList = generate(2);
@@ -385,7 +386,7 @@ public class YoutubeDownloaderTest {
 
     private Answer simulateDownload(VideoInfo videoInfo, List<VideoFileInfo> videoList) {
         return i -> {
-            videoList.forEach(f ->  Try.of(() -> Files.createFile(f.targetFile.toPath())));
+            videoList.forEach(f ->  Try(() -> Files.createFile(f.targetFile.toPath())));
             for (int cpt = 0; cpt <= 100; cpt++) {
                 int finalCpt = cpt;
                 when(videoInfo.getState()).thenReturn(finalCpt < 100 ? DOWNLOADING : DONE);

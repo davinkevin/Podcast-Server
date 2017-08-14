@@ -3,12 +3,12 @@ package lan.dk.podcastserver.utils;
 import io.vavr.collection.List;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.None;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 04/03/2017
@@ -32,7 +32,7 @@ public class MatcherExtractor {
             return None();
         }
 
-        return Try.of(() -> matcher.group(group)).toOption();
+        return Try(() -> matcher.group(group)).toOption();
     }
 
     public Option<List<String>> groups() {

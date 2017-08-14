@@ -10,7 +10,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
+
 import io.vavr.jackson.datatype.VavrModule;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jdom2.JDOMException;
@@ -30,7 +30,7 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 import static io.vavr.API.Option;
-
+import static io.vavr.API.*;
 /**
  * Created by kevin on 23/07/2016.
  */
@@ -55,7 +55,7 @@ public class IOUtils {
         return Option(Jsoup.parse(Paths.get(IOUtils.class.getResource(path).toURI()).toFile(), "UTF-8", ""));
     }
     public static String fileAsString(String uri) {
-        return Try.of(() -> IOUtils.class.getResource(uri))
+        return Try(() -> IOUtils.class.getResource(uri))
                 .mapTry(URL::toURI)
                 .map(Paths::get)
                 .mapTry(Files::newInputStream)
@@ -76,14 +76,14 @@ public class IOUtils {
         return IOUtils.class.getResourceAsStream(file);
     }
     public static BufferedReader fileAsReader(String file) {
-        return Try.of(() -> IOUtils.class.getResource(file).toURI())
+        return Try(() -> IOUtils.class.getResource(file).toURI())
                 .map(Paths::get)
                 .mapTry(Files::newBufferedReader)
                 .getOrElseThrow(e -> new UncheckedIOException(new IOException("File " + file + " not found")));
     }
 
     public static InputStream urlAsStream(String url) {
-        return Try.of(() -> new URL(url).openStream())
+        return Try(() -> new URL(url).openStream())
                 .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
     }
 
@@ -91,7 +91,7 @@ public class IOUtils {
         return PARSER.parse(text);
     }
     public static Document stringAsHtml(String html) {
-        return Try.of(() -> Jsoup.parse(html)).getOrElseThrow(e -> new RuntimeException(e));
+        return Try(() -> Jsoup.parse(html)).getOrElseThrow(e -> new RuntimeException(e));
     }
 
     public static Path get(String uri) throws URISyntaxException {

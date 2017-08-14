@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import io.vavr.control.Try;
+
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -14,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import static java.util.Objects.nonNull;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 28/02/15.
@@ -36,7 +37,7 @@ public class DailyMotionCloudDownloader extends M3U8Downloader {
 
         String url = urlService.getRealURL(item.getUrl());
 
-        redirectionUrl = Try.of(() -> urlService.asStream(url))
+        redirectionUrl = Try(() -> urlService.asStream(url))
                 .toOption()
                 .flatMap(m3U8Service::findBestQuality)
                 .map(u -> urlService.addDomainIfRelative(url, u))

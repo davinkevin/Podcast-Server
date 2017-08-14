@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import static io.vavr.API.Option;
+import static io.vavr.API.*;
 import static java.util.Objects.isNull;
 
 /**
@@ -115,7 +115,7 @@ public class CoverBusiness {
     }
 
     private HttpResponse<InputStream> imageRequest(String coverUrl) throws IOException {
-        return Try.of(() -> urlService.get(coverUrl).asBinary())
+        return Try(() -> urlService.get(coverUrl).asBinary())
                 .filter(this::isImage)
                 .getOrElseThrow(() -> new IOException("Not an image in content type"));
     }
