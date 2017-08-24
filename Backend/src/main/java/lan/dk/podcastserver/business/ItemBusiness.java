@@ -54,14 +54,14 @@ public class ItemBusiness {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Page<Item> findByTagsAndFullTextTerm(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
+    public Page<Item> findByTagsAndFullTextTerm(String term, Set<Tag> tags, Set<Status> statuses, Pageable page) {
         return Option(page.getSort())
                 .flatMap(s -> Option(s.getOrderFor("pertinence")))
-                .map(v -> findByTagsAndFullTextTermOrderByPertinence(term, tags, downloaded, page))
-                .getOrElse(() -> itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, downloaded), page));
+                .map(v -> findByTagsAndFullTextTermOrderByPertinence(term, tags, statuses, page))
+                .getOrElse(() -> itemRepository.findAll(getSearchSpecifications((StringUtils.isEmpty(term)) ? null : itemRepository.fullTextSearch(term), tags, statuses), page));
     }
 
-    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, Set<Tag> tags, Boolean downloaded, Pageable page) {
+    private Page<Item> findByTagsAndFullTextTermOrderByPertinence(String term, Set<Tag> tags, Set<Status> state, Pageable page) {
         // List with the order of pertinence of search result :
         List<UUID> fullTextIdsWithOrder = itemRepository.fullTextSearch(term);
 
@@ -77,7 +77,7 @@ public class ItemBusiness {
         }
         
         // List of all the item matching the search result :
-        List<Item> allResult = List.ofAll(itemRepository.findAll(getSearchSpecifications(fullTextIdsWithOrder, tags, downloaded)));
+        List<Item> allResult = List.ofAll(itemRepository.findAll(getSearchSpecifications(fullTextIdsWithOrder, tags, state)));
 
         //Re-order and transform to page :
         return fullTextIdsWithOrder

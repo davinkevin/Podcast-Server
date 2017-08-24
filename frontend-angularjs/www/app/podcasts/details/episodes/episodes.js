@@ -64,7 +64,6 @@ export default class PodcastItemsListComponent {
             .then(itemsResponse => {
                 this.podcast.items = itemsResponse.content;
                 this.totalItems = itemsResponse.totalElements;
-                debugger;
                 this.onChangeNumberOfEpisodes({num: this.totalItems});
             });
     }

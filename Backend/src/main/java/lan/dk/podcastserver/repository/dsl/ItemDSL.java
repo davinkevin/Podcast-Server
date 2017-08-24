@@ -83,13 +83,11 @@ public class ItemDSL {
         return Q_ITEM.podcast.id.eq(podcastId);
     }
 
-    public static Predicate getSearchSpecifications(List<UUID> ids, Set<Tag> tags, Boolean downloaded) {
+    public static Predicate getSearchSpecifications(List<UUID> ids, Set<Tag> tags, Set<Status> statuses) {
         return ExpressionUtils.allOf(
                 Option(ids).map(ItemDSL::isInId).getOrElse(() -> null),
                 isInTags(tags),
-                Option(downloaded)
-                    .map(d -> d ? hasStatus(Status.FINISH) : Q_ITEM.status.isNull().or(hasStatus(Status.FINISH).not()))
-                    .getOrElse(() -> null)
+                hasStatus(statuses.toJavaArray(Status.class))
         );
     }
 

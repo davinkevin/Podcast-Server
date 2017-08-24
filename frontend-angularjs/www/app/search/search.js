@@ -33,13 +33,15 @@ import './search.css!';
     resolve : {
         page : (itemService, $sessionStorage, DefaultItemSearchParameters) => {
             "ngInject";
-            return itemService.search($sessionStorage.searchParameters || DefaultItemSearchParameters);
+            return itemService.search(
+              ItemSearchCtrl.transformSearchParameters($sessionStorage.searchParameters || DefaultItemSearchParameters)
+            );
         }
     }
 })
 @Constant({
     name : 'DefaultItemSearchParameters',
-    value : { page: 0, size: 12, q: undefined, tags: [], sort: [{ direction : 'DESC', property : 'pubDate'}], downloaded : "true"}
+    value : { page: 0, size: 12, q: undefined, tags: [], sort: [{ direction : 'DESC', property : 'pubDate'}], status: 'downloaded'}
 })
 export default class ItemSearchCtrl {
 
@@ -115,7 +117,7 @@ export default class ItemSearchCtrl {
     changePage() {
         this.searchParameters.page = this.calculatePage();
         return this.itemService
-            .search(this.searchParameters)
+            .search(ItemSearchCtrl.transformSearchParameters(this.searchParameters))
             .then((itemsResponse) => this.attachResponse(itemsResponse));
     }
 
@@ -159,6 +161,18 @@ export default class ItemSearchCtrl {
 
     play(item) {
         this.itemService.play(item);
+    }
+
+    static transformSearchParameters(searchParameters) {
+      let status = ['FINISH'];
+
+      if (searchParameters.status === 'all') {
+        status = [];
+      } else if (searchParameters.status === 'not_downloaded') {
+        status = ['NOT_DOWNLOADED', 'DELETED', 'STARTED', 'STOPPED', 'PAUSED'];
+      }
+
+      return Object.assign({}, searchParameters, {status});
     }
 
     set searchParameters(val) {

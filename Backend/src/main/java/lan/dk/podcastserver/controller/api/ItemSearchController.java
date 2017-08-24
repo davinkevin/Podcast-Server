@@ -5,6 +5,7 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.ItemBusiness;
 import lan.dk.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,8 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 23/08/2014.
@@ -34,11 +33,19 @@ public class ItemSearchController {
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestParam(value = "q", required = false, defaultValue = "") String q,
                              @RequestParam(value = "tags", required = false, defaultValue = "") Set<String> tags,
-                             @RequestParam(value = "downloaded", required = false, defaultValue = "") Boolean downloaded,
+                             @RequestParam(value = "status", required = false, defaultValue = "") Set<String> _statuses,
                              Pageable pageable) {
-        return isSearch(q, tags, downloaded)
-                ? itemBusiness.findByTagsAndFullTextTerm(q, tagBusiness.findAllByName(tags), downloaded, pageable)
-                : itemBusiness.findAll(pageable);
+
+        if (!isSearch(q, tags, _statuses)) {
+            return itemBusiness.findAll(pageable);
+        }
+
+        return itemBusiness.findByTagsAndFullTextTerm(
+                q,
+                tagBusiness.findAllByName(tags),
+                _statuses.flatMap(Status::from),
+                pageable
+        );
     }
 
     @GetMapping("reindex")
@@ -47,8 +54,7 @@ public class ItemSearchController {
         itemBusiness.reindex();
     }
 
-    private static Boolean isSearch(String q, Set<String> tags, Boolean downloaded) {
-        return !StringUtils.isEmpty(q) || !tags.isEmpty() || nonNull(downloaded);
+    private static Boolean isSearch(String q, Set<String> tags, Set<String> statuses) {
+        return !(StringUtils.isEmpty(q) && tags.isEmpty() && statuses.isEmpty());
     }
-
 }

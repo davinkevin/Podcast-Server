@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import static io.vavr.API.Set;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -241,7 +242,7 @@ public class ItemBusinessTest {
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
 
         /* When */
-        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, true, pageRequest);
+        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, Set(Status.FINISH), pageRequest);
 
         /* Then */
         PageAssert.assertThat(byTagsAndFullTextTerm).isSameAs(pageResponse);
@@ -259,7 +260,7 @@ public class ItemBusinessTest {
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
 
         /* When */
-        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, true, pageRequest);
+        Page<Item> byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, Set(Status.FINISH), pageRequest);
 
         /* Then */
         PageAssert.assertThat(byTagsAndFullTextTerm).isSameAs(pageResponse);
@@ -280,7 +281,7 @@ public class ItemBusinessTest {
         when(itemRepository.findAll(any(Predicate.class))).thenReturn(itemsFrom1To20);
 
         /* When */
-        Page<Item> pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, true, pageRequest);
+        Page<Item> pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, Set(Status.FINISH), pageRequest);
 
         /* Then */
         assertThat(pageOfItem.getContent()).contains(itemsFrom1To20.get(15),itemsFrom1To20.get(14),itemsFrom1To20.get(13));

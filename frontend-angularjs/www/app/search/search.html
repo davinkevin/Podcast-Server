@@ -20,10 +20,10 @@
         </div>
 
         <div class="form-group col-sm-3 col-md-2 col-lg-2">
-            <select class="form-control" ng-model="isc.searchParameters.downloaded" ng-change="isc.resetSearch()">
-                <option value="">All</option>
-                <option value="true">Downloaded</option>
-                <option value="false">Not Downloaded</option>
+            <select class="form-control" ng-model="isc.searchParameters.status" ng-change="isc.resetSearch()">
+                <option value="all">All</option>
+                <option value="downloaded">Downloaded</option>
+                <option value="not_downloaded">Not Downloaded</option>
             </select>
         </div>
 

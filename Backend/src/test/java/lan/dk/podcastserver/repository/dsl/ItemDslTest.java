@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
+import static io.vavr.API.Set;
 import static java.time.ZonedDateTime.now;
 import static java.util.stream.Collectors.toList;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
@@ -231,7 +232,7 @@ public class ItemDslTest {
         io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, null));
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, Set()));
 
         /* Then */
         assertThat(items)
@@ -247,7 +248,7 @@ public class ItemDslTest {
         io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
 
         /* When */
-        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, null));
+        Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, Set()));
 
         /* Then */
         assertThat(items)
