@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -40,13 +40,13 @@ public class DownloaderTest {
     static final String ROOT_FOLDER = "/tmp/";
     static final String TEMPORARY_EXTENSION = ".psdownload";
 
-    @Mock PodcastRepository podcastRepository;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock ItemDownloadManager itemDownloadManager;
-    @InjectMocks SimpleDownloader simpleDownloader;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    // private @Mock MimeTypeService mimeTypeService;
+    private @Mock ItemDownloadManager itemDownloadManager;
+    private @InjectMocks SimpleDownloader simpleDownloader;
 
 
     Podcast podcast;
@@ -61,7 +61,7 @@ public class DownloaderTest {
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
                 .title("A Fake Podcast")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 

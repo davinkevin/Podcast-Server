@@ -7,7 +7,7 @@ import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -45,6 +45,7 @@ import java.util.stream.IntStream;
 import static com.github.axet.vget.info.VideoInfo.States.DONE;
 import static com.github.axet.vget.info.VideoInfo.States.DOWNLOADING;
 import static com.jayway.awaitility.Awaitility.await;
+import static io.vavr.API.Try;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.ROOT_FOLDER;
 import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.TEMPORARY_EXTENSION;
@@ -52,7 +53,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 13/02/2016 for Podcast Server
@@ -61,18 +61,18 @@ import static io.vavr.API.*;
 @RunWith(MockitoJUnitRunner.class)
 public class YoutubeDownloaderTest {
 
-    @Mock FfmpegService ffmpegService;
-    @Mock PodcastRepository podcastRepository;
-    @Mock ItemRepository itemRepository;
-    @Mock ItemDownloadManager itemDownloadManager;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock WGetFactory wGetFactory;
-    @InjectMocks YoutubeDownloader youtubeDownloader;
+    private @Mock FfmpegService ffmpegService;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock ItemDownloadManager itemDownloadManager;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    // private @Mock MimeTypeService mimeTypeService;
+    private @Mock WGetFactory wGetFactory;
+    private @InjectMocks YoutubeDownloader youtubeDownloader;
 
-    @Mock VideoInfo videoInfo;
-    @Mock VGetParser vGetParser;
+    private @Mock VideoInfo videoInfo;
+    private @Mock VGetParser vGetParser;
 
     VGet vGet;
     Podcast podcast;
@@ -88,7 +88,7 @@ public class YoutubeDownloaderTest {
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
                 .title("A Fake Podcast")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 

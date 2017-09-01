@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.utils.custom.ffmpeg;
 
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import static io.vavr.API.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -20,7 +20,7 @@ public class CustomRunProcessFuncTest {
         ProcessListener pl = new ProcessListener("anUrl");
 
         /* When */
-        Process p = cp.add(pl).run(Lists.newArrayList("/bin/bash", "anUrl", "Foo", "Bar"));
+        Process p = cp.add(pl).run(List("/bin/bash", "anUrl", "Foo", "Bar").toJavaList());
 
         /* Then */
         assertThat(p).isSameAs(pl.process());

@@ -1,11 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ParseContext;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -14,7 +10,6 @@ import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.Api;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Before;
@@ -24,13 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 
+import static io.vavr.API.List;
 import static io.vavr.API.None;
-import static java.util.stream.Collectors.toSet;
 import static lan.dk.utils.IOUtils.fileAsXml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.and;
@@ -46,16 +39,14 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class YoutubeUpdaterTest {
 
-    private static final ParseContext PARSER = JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build());
-
-    @Mock Api api;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @Mock JdomService jdomService;
-    @Mock JsonService jsonService;
-    @Mock HtmlService htmlService;
-    @InjectMocks YoutubeUpdater youtubeUpdater;
+    private @Mock Api api;
+    // private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SignatureService signatureService;
+    // private @Mock Validator validator;
+    private @Mock JdomService jdomService;
+    private @Mock JsonService jsonService;
+    private @Mock HtmlService htmlService;
+    private @InjectMocks YoutubeUpdater youtubeUpdater;
 
     @Before
     public void beforeEach() {
@@ -206,7 +197,7 @@ public class YoutubeUpdaterTest {
         String page2 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA";
 
         when(api.getYoutube()).thenReturn("FOO");
-        Podcast podcast = Podcast.builder().url("https://www.youtube.com/user/joueurdugrenier").items(Sets.newHashSet()).build();
+        Podcast podcast = Podcast.builder().url("https://www.youtube.com/user/joueurdugrenier").items(HashSet.<Item>empty().toJavaSet()).build();
 
         when(jsonService.parseUrl(eq(page1))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.json"));
         when(jsonService.parseUrl(eq(page2))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json"));
@@ -227,7 +218,7 @@ public class YoutubeUpdaterTest {
         when(api.getYoutube()).thenReturn("FOO");
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
         when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
@@ -253,13 +244,14 @@ public class YoutubeUpdaterTest {
     @Test
     public void should_be_compatible() {
         /* Given */
-        List<String> urls = Lists.newArrayList(
+        List<String> urls = List(
                 "http://www.youtube.com/channel/foo",
                 "http://www.youtube.com/user/foo",
                 "http://gdata.youtube.com/feeds/api/playlists/foo"
         );
         /* When */
-        java.util.Set<Integer> results = urls.stream().map(youtubeUpdater::compatibility).distinct().collect(toSet());
+        Set<Integer> results = urls.map(youtubeUpdater::compatibility).distinct().toSet();
+
         /* Then */
         assertThat(results).contains(1);
     }

@@ -20,7 +20,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.function.Consumer;
-import static io.vavr.API.*;
+
+import static io.vavr.API.Try;
 
 /**
  * Created by kevin on 21/07/2016.

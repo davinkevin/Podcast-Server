@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.entity;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.FileSystemUtils;
@@ -43,8 +43,8 @@ public class PodcastTest {
                     .cover(COVER)
                     .description("A long Description")
                     .hasToBeDeleted(true)
-                    .items(Sets.newHashSet())
-                    .tags(Sets.newHashSet())
+                    .items(HashSet.<Item>empty().toJavaSet())
+                    .tags(HashSet.<Tag>empty().toJavaSet())
                 .build();
 
         PODCAST_TO_STRING = "Podcast{id="+ id +", title='PodcastDeTest', url='http://nowhere.com', signature='ae4b93a7e8249d6be591649c936dbe7d', type='Youtube', lastUpdate=%s}";

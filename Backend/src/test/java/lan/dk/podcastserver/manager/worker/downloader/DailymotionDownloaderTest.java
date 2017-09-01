@@ -1,24 +1,19 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import com.google.common.collect.Sets;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
+import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
-import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.service.factory.WGetFactory;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -43,14 +37,14 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DailymotionDownloaderTest {
 
-    private @Mock PodcastRepository podcastRepository;
-    private @Mock ItemRepository itemRepository;
-    private @Mock PodcastServerParameters podcastServerParameters;
+    // private @Mock PodcastRepository podcastRepository;
+    // private @Mock ItemRepository itemRepository;
+    // private @Mock PodcastServerParameters podcastServerParameters;
     private @Mock ItemDownloadManager itemDownloadManager;
-    private @Mock SimpMessagingTemplate template;
-    private @Mock MimeTypeService mimeTypeService;
+    // private @Mock SimpMessagingTemplate template;
+    // private @Mock MimeTypeService mimeTypeService;
     private @Mock UrlService urlService;
-    private @Mock WGetFactory wGetFactory;
+    // private @Mock WGetFactory wGetFactory;
     private @Mock JsonService jsonService;
     private @Mock M3U8Service m3U8Service;
     private @InjectMocks DailymotionDownloader dailymotionDownloader;
@@ -67,7 +61,7 @@ public class DailymotionDownloaderTest {
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
                 .title("A Fake Podcast")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 

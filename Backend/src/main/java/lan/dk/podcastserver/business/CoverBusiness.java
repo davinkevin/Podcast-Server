@@ -23,7 +23,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import static io.vavr.API.*;
+import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 import static java.util.Objects.isNull;
 
 /**

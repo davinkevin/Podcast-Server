@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.manager.worker.downloader.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -23,14 +23,14 @@ public class DownloaderSelectorTest {
 
     private DownloaderSelector downloaderSelector;
 
-    @Mock CanalPlusDownloader canalPlusDownloader;
-    @Mock DailyMotionCloudDownloader dailyMotionCloudDownloader;
-    @Mock DailymotionDownloader dailymotionDownloader;
-    @Mock HTTPDownloader httpDownloader;
-    @Mock M3U8Downloader m3U8Downloader;
-    @Mock RTMPDownloader rtmpDownloader;
-    @Mock YoutubeDownloader youtubeDownloader;
-    @Mock ApplicationContext applicationContext;
+    private @Mock CanalPlusDownloader canalPlusDownloader;
+    private @Mock DailyMotionCloudDownloader dailyMotionCloudDownloader;
+    private @Mock DailymotionDownloader dailymotionDownloader;
+    private @Mock HTTPDownloader httpDownloader;
+    private @Mock M3U8Downloader m3U8Downloader;
+    private @Mock RTMPDownloader rtmpDownloader;
+    private @Mock YoutubeDownloader youtubeDownloader;
+    private @Mock ApplicationContext applicationContext;
     private Set<Downloader> downloaders;
 
     @Before
@@ -44,7 +44,7 @@ public class DownloaderSelectorTest {
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaders = Sets.newHashSet(canalPlusDownloader, dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader);
+        downloaders = HashSet.<Downloader>of(canalPlusDownloader, dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader).toJavaSet();
         downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 

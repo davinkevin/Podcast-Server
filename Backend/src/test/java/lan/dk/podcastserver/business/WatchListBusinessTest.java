@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.business;
 
-import com.google.common.collect.Sets;
+
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
@@ -73,12 +73,12 @@ public class WatchListBusinessTest {
     public void should_add_item_to_playlist() {
         /* Given */
         UUID id = UUID.randomUUID();
-        Item item = new Item().setId(id).setWatchLists(Sets.newHashSet());
+        Item item = new Item().setId(id).setWatchLists(HashSet.<WatchList>empty().toJavaSet());
         WatchList watchList = WatchList
                 .builder()
                 .id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634"))
                 .name("First")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
         when(itemRepository.findOne(eq(id))).thenReturn(item);
@@ -100,12 +100,12 @@ public class WatchListBusinessTest {
     public void should_remove_item_to_playlist() {
         /* Given */
         UUID id = UUID.randomUUID();
-        Item item = new Item().setId(id).setWatchLists(Sets.newHashSet());
+        Item item = new Item().setId(id).setWatchLists(HashSet.<WatchList>empty().toJavaSet());
         WatchList watchList = WatchList
                 .builder()
                     .id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634"))
                     .name("First")
-                    .items(Sets.newHashSet(item))
+                    .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
         when(itemRepository.findOne(eq(id))).thenReturn(item);
@@ -142,7 +142,7 @@ public class WatchListBusinessTest {
                 .builder()
                     .id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634"))
                     .name("First")
-                    .items(Sets.newHashSet())
+                    .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
 
@@ -160,7 +160,7 @@ public class WatchListBusinessTest {
                 .builder()
                     .id(UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634"))
                     .name("First")
-                    .items(Sets.newHashSet())
+                    .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
         when(watchListRepository.findOne(eq(watchList.getId()))).thenReturn(watchList);
@@ -182,7 +182,7 @@ public class WatchListBusinessTest {
                 .builder()
                     .id(id)
                     .name("First")
-                    .items(Sets.newHashSet())
+                    .items(HashSet.<Item>empty().toJavaSet())
                 .build();
         when(jdomService.watchListToXml(eq(watchList), anyString())).thenReturn("anXml");
         when(watchListRepository.findOne(eq(id))).thenReturn(watchList);

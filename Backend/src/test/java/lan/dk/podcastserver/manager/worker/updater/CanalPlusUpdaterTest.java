@@ -1,11 +1,10 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Before;
@@ -15,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.validation.Validator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -33,9 +31,9 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CanalPlusUpdaterTest {
 
-    private @Mock PodcastServerParameters podcastServerParameters;
+    // private @Mock PodcastServerParameters podcastServerParameters;
     private @Mock SignatureService signatureService;
-    private @Mock Validator validator;
+    // private @Mock Validator validator;
     private @Mock JdomService jdomService;
     private @Mock HtmlService htmlService;
     private @Mock ImageService imageService;
@@ -50,7 +48,7 @@ public class CanalPlusUpdaterTest {
                 .id(UUID.randomUUID())
                 .url("http://www.canalplus.com/url/fake")
                 .title("A Canal Plus Podcast")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build();
     }
 

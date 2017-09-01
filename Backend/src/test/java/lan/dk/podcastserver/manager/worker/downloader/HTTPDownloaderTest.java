@@ -4,15 +4,13 @@ import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
@@ -33,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static io.vavr.API.List;
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.HTTPWatcher;
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.WS_TOPIC_DOWNLOAD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,19 +50,15 @@ public class HTTPDownloaderTest {
     private static final String ROOT_FOLDER = "/tmp/";
     private static final String TEMPORARY_EXTENSION = ".psdownload";
 
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastRepository podcastRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-
-    @Mock WGetFactory wGetFactory;
-    @Mock
-    UrlService urlService;
-
-    @Mock ItemDownloadManager itemDownloadManager;
-
-    @InjectMocks HTTPDownloader httpDownloader;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    // @Mock MimeTypeService mimeTypeService;
+    private @Mock WGetFactory wGetFactory;
+    private @Mock UrlService urlService;
+    private @Mock ItemDownloadManager itemDownloadManager;
+    private @InjectMocks HTTPDownloader httpDownloader;
 
     Podcast podcast;
     Item item;
@@ -77,7 +72,7 @@ public class HTTPDownloaderTest {
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
                 .title("A Fake Podcast")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 
@@ -162,7 +157,7 @@ public class HTTPDownloaderTest {
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         when(error.getInfo()).thenReturn(downloadInfo);
-        when(downloadInfo.getParts()).thenReturn(Lists.newArrayList(mock(DownloadInfo.Part.class), mock(DownloadInfo.Part.class), mock(DownloadInfo.Part.class)));
+        when(downloadInfo.getParts()).thenReturn(List(mock(DownloadInfo.Part.class), mock(DownloadInfo.Part.class), mock(DownloadInfo.Part.class)).toJavaList());
         doThrow(error).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
 
         /* When */

@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.Lists;
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -31,6 +30,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
+import static io.vavr.API.*;
 
 /**
  * Created by kevin on 08/09/15 for Podcast Server
@@ -38,12 +38,12 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class JdomServiceTest {
 
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock UrlService urlService;
-    @InjectMocks JdomService jdomService;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    // private @Mock MimeTypeService mimeTypeService;
+    private @Mock UrlService urlService;
+    private @InjectMocks JdomService jdomService;
 
-    private List<String> itemId = Lists.newArrayList(
+    private List<String> itemId = List(
             "789CEC3A-72CB-970A-264A-D5B4BF953183",
             "374EA8C6-2390-EAB6-51D4-D3F5A8F5E7B7",
             "5F6CDA11-24E1-1FC9-8494-17BC9140BC52",

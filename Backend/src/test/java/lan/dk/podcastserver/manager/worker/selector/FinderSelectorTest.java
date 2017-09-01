@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.manager.worker.finder.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,13 +18,13 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FinderSelectorTest {
 
-    @Mock BeInSportsFinder beInSportsFinder;
-    @Mock CanalPlusFinder canalPlusFinder;
-    @Mock DailymotionFinder dailymotionFinder;
-    @Mock JeuxVideoComFinder jeuxVideoComFinder;
-    @Mock PluzzFinder pluzzFinder;
-    @Mock RSSFinder rssFinder;
-    @Mock YoutubeFinder youtubeFinder;
+    private @Mock BeInSportsFinder beInSportsFinder;
+    private @Mock CanalPlusFinder canalPlusFinder;
+    private @Mock DailymotionFinder dailymotionFinder;
+    private @Mock JeuxVideoComFinder jeuxVideoComFinder;
+    private @Mock PluzzFinder pluzzFinder;
+    private @Mock RSSFinder rssFinder;
+    private @Mock YoutubeFinder youtubeFinder;
 
     private FinderSelector finderSelector;
 
@@ -38,7 +38,7 @@ public class FinderSelectorTest {
         when(rssFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
 
-        finderSelector = new FinderSelector(Sets.newHashSet(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, pluzzFinder, rssFinder, youtubeFinder));
+        finderSelector = new FinderSelector(HashSet.of(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, pluzzFinder, rssFinder, youtubeFinder).toJavaSet());
     }
 
     @Test

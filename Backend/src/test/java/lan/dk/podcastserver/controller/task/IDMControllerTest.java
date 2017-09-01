@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.task;
 
 import io.vavr.collection.HashSet;
+import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -11,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Queue;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
@@ -26,13 +26,13 @@ public class IDMControllerTest {
 
     private static final Podcast PODCAST = Podcast.builder().title("Podcast").build();
 
-    @Mock ItemDownloadManager IDM;
-    @InjectMocks IDMController idmController;
+    private @Mock ItemDownloadManager IDM;
+    private @InjectMocks IDMController idmController;
 
     @Test
     public void should_get_download_list() {
         /* Given */
-        io.vavr.collection.Queue<Item> waitingQueue = io.vavr.collection.Queue.of(
+        Queue<Item> waitingQueue = Queue.of(
                 Item.builder().title("Foo").podcast(PODCAST).build(),
                 Item.builder().title("Bar").podcast(PODCAST).build()
         );

@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager;
 
-import com.google.common.collect.Queues;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
@@ -236,7 +235,7 @@ public class ItemDownloadManager {
     }
 
     private void convertAndSendWaitingQueue() {
-        this.template.convertAndSend(WS_TOPIC_WAITING_LIST, Queues.newConcurrentLinkedQueue(this.waitingQueue));
+        this.template.convertAndSend(WS_TOPIC_WAITING_LIST, this.waitingQueue);
     }
 
     public boolean canBeReset(Item item) {

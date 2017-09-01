@@ -17,9 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
 import static lan.dk.podcastserver.manager.worker.updater.YoutubeUpdater.YOUTUBE;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server

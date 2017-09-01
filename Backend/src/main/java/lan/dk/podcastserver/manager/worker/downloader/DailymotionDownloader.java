@@ -19,10 +19,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-import static io.vavr.API.None;
-import static io.vavr.API.Option;
-import static java.util.Objects.nonNull;
 import static io.vavr.API.*;
+import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 21/02/2016 for Podcast Server

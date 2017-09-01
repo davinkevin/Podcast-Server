@@ -19,8 +19,8 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
-import static io.vavr.API.*;
 
 @Slf4j
 @Component("RTMPDownloader")

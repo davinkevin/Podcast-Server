@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.task;
 
-import com.google.common.collect.Queues;
+import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Queue;
 import java.util.UUID;
 
 /**
@@ -26,7 +25,7 @@ public class IDMController {
 
     @GetMapping("/queue")
     public Queue<Item> getDownloadList () {
-        return Queues.newConcurrentLinkedQueue(IDM.getWaitingQueue());
+        return IDM.getWaitingQueue();
     }
 
     @GetMapping("/downloading")

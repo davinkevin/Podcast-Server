@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,7 +29,7 @@ public class WatchList {
 
     @ManyToMany
     @JsonView(WatchListDetailsListView.class)
-    private Set<Item> items = Sets.newHashSet();
+    private Set<Item> items = new HashSet<>();
 
     public WatchList add(Item item) {
         item.getWatchLists().add(this);

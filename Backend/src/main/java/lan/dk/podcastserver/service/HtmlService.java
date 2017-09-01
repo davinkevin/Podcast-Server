@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collector;
-import static io.vavr.API.*;
+
+import static io.vavr.API.Try;
 /**
  * Created by kevin on 07/06/15 for HackerRank problem
  */

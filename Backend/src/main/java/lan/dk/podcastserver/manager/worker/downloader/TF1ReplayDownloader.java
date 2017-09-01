@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 import static io.vavr.API.None;
+import static io.vavr.API.Try;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 20/07/2016.

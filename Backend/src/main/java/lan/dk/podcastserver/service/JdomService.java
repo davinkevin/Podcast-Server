@@ -25,10 +25,10 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static io.vavr.API.Try;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static io.vavr.API.*;
 
 @Slf4j
 @Service

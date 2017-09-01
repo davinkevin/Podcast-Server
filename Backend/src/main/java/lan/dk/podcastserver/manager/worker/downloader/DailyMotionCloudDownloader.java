@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 28/02/15.

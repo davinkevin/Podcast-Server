@@ -5,7 +5,7 @@ import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static io.vavr.API.*;
+import static io.vavr.API.Try;
 /**
  * Created by kevin on 25/01/2016 for Podcast Server
  */

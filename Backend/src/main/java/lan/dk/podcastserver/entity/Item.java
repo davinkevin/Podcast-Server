@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
-import com.google.common.collect.Sets;
 import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -21,8 +20,8 @@ import javax.validation.constraints.AssertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import static io.vavr.API.Option;
@@ -105,7 +104,7 @@ public class Item {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
-    private Set<WatchList> watchLists = Sets.newHashSet();
+    private java.util.Set<WatchList> watchLists = new HashSet<>();
 
 
     public String getLocalUri() {

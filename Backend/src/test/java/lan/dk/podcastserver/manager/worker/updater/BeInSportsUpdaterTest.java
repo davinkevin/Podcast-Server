@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
@@ -59,7 +59,7 @@ public class BeInSportsUpdaterTest {
                 .id(UUID.randomUUID())
                 .url("http://be.in.sports.com/url/fake")
                 .title("aBeInSportPodcast")
-                .items(Sets.newHashSet())
+                .items(HashSet.<Item>empty().toJavaSet())
                 .build();
     }
 

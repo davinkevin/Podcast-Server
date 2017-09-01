@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.entity;
 
-import com.google.common.collect.Sets;
+import io.vavr.collection.HashSet;
 import org.junit.Test;
 
 import java.util.Set;
@@ -17,7 +17,7 @@ public class WatchListTest {
     public void should_have_getters_and_setters() {
         /* Given */
         String uuid = "b4156ceb-ddd8-437f-b822-941bf1c14723";
-        Set<Item> items = Sets.newHashSet();
+        Set<Item> items = HashSet.<Item>empty().toJavaSet();
         String name = "Foo";
 
         /* When */

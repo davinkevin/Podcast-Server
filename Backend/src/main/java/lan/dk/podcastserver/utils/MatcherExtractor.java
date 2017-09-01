@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.None;
-import static io.vavr.API.*;
+import static io.vavr.API.Try;
 
 /**
  * Created by kevin on 04/03/2017

@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
-import com.google.common.collect.Sets;
 import io.vavr.Tuple3;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -29,10 +28,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 public class UpdaterTest {
 
     private static final UUID ERROR_UUID = UUID.randomUUID();
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SignatureService signatureService;
-    @Mock Validator validator;
-    @InjectMocks SimpleUpdater simpleUpdater;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SignatureService signatureService;
+    private @Mock Validator validator;
+    private @InjectMocks SimpleUpdater simpleUpdater;
 
     @Test
     public void should_not_update_because_of_same_signature() {
@@ -84,7 +83,7 @@ public class UpdaterTest {
         Podcast podcast = Podcast.builder()
                     .id(UUID.randomUUID())
                     .url("http://a.fake.url/rss.xml")
-                    .items(Sets.newHashSet())
+                    .items(HashSet.<Item>empty().toJavaSet())
                 .build();
         podcast.add(new Item().setId(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")));
 

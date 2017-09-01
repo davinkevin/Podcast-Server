@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.service;
 
-import com.google.common.collect.Lists;
 import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +19,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static io.vavr.API.List;
+import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static java.util.stream.Collectors.joining;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 19/07/2014 for Podcast Server
@@ -47,11 +46,10 @@ public class FfmpegService {
         try {
             Files.deleteIfExists(target);
 
-            String filesStrings = Lists.newArrayList(files)
-                    .stream()
+            String filesStrings = List(files)
                     .map(f -> f.getFileName().toString())
                     .map(p -> "file '" + p + "'")
-                    .collect(joining(System.getProperty("line.separator")));
+                    .mkString(System.getProperty("line.separator"));
 
             listOfFiles = Files.createTempFile(target.getParent(), "ffmpeg-list-", ".txt");
             Files.write(listOfFiles, filesStrings.getBytes());

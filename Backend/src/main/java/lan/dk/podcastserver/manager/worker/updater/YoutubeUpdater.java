@@ -2,8 +2,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
@@ -30,8 +28,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-import static io.vavr.API.None;
-import static io.vavr.API.Option;
+import static io.vavr.API.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
@@ -66,7 +63,8 @@ public class YoutubeUpdater extends AbstractUpdater {
 
 
     public Set<Item> getItems(Podcast podcast) {
-        return Strings.isNullOrEmpty(api.getYoutube())
+        String string = api.getYoutube();
+        return string == null || string.length() == 0
                 ? getItemsByRss(podcast)
                 : getItemsByAPI(podcast);
     }
@@ -208,9 +206,8 @@ public class YoutubeUpdater extends AbstractUpdater {
 
     @Override
     public Integer compatibility(String url) {
-        return Lists.newArrayList("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
-                .stream()
-                .anyMatch(url::contains) ? 1 : Integer.MAX_VALUE;
+        return List("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
+                .exists(url::contains) ? 1 : Integer.MAX_VALUE;
     }
 
     @Override

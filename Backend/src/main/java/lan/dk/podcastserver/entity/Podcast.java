@@ -21,7 +21,8 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import static io.vavr.API.*;
+
+import static io.vavr.API.Try;
 
 @Slf4j
 @Entity

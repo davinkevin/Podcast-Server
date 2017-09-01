@@ -1,8 +1,5 @@
 package lan.dk.podcastserver.service;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,9 +11,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.vavr.API.List;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -168,7 +167,7 @@ public class MultiPartFileSenderService {
 
             // Prepare some variables. The full Range represents the complete file.
             Range full = new Range(0, length - 1, length);
-            List<Range> ranges = Lists.newArrayList();
+            List<Range> ranges = new ArrayList<>();
 
             // Validate and process Range and If-Range headers.
             String range = request.getHeader(RANGE);
@@ -235,7 +234,7 @@ public class MultiPartFileSenderService {
             response.setDateHeader(EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
 
-            if (!Strings.isNullOrEmpty(disposition)) {
+            if (isNullOrEmpty(disposition)) {
                 if (contentType == null) {
                     contentType = APPLICATION_OCTET_STREAM;
                 } else if (!contentType.startsWith(IMAGE)) {
@@ -306,6 +305,10 @@ public class MultiPartFileSenderService {
             }
 
         }
+
+        private static boolean isNullOrEmpty(String disposition) {
+            return !(disposition == null || disposition.length() == 0);
+        }
     }
 
     private static class Range {
@@ -334,16 +337,16 @@ public class MultiPartFileSenderService {
         
         private static List<Range> relativize(List<Range> ranges) {
 
-            ImmutableList.Builder<Range> builder = ImmutableList.builder();
+            io.vavr.collection.List<Range> builder = List();
 
             Range prevRange = null;
             for (Range r : ranges) {
                 Range newRange = isNull(prevRange) ? r : new Range(r.start - prevRange.end - 1,  r.end - prevRange.end - 1, r.total);
-                builder.add(newRange);
+                builder = builder.push(newRange);
                 prevRange = r;
             }
 
-            return builder.build();
+            return builder.toJavaList();
         }
 
         private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length) throws IOException {

@@ -36,12 +36,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import static io.vavr.API.Try;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.ZonedDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 14/12/2013 for Podcast Server
