@@ -41,7 +41,7 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final PatternExtractor CHANNEL_PROGRAM_EXTRACTOR = from(Pattern.compile("[^:]+://www.tf1.fr/([^/]+)/([^/]+)/videos.*"));
     private static final String AJAX_URL_FORMAT = "http://www.tf1.fr/ajax/%s/%s/videos?filter=%s";
     private static final String SCHEME_DEFAULT = "https:";
-    private static final String DOMAIN = "http://www.tf1.fr";
+    private static final String DOMAIN = "https://www.tf1.fr";
     private static final String REPLAY_CATEGORY = "replay";
     private static final String ALL_CATEGORY = "all";
     private static final Set<String> TYPES = HashSet.of("replay", "vidéo", "");
@@ -70,7 +70,8 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     }
 
     private Item getItem(Element e) {
-        String url = DOMAIN + e.select(".videoLink").attr("href");
+        String link = e.select(".videoLink").attr("href");
+        String url = StringUtils.startsWith(link, "/") ? DOMAIN + link : link;
 
         return Item.builder()
                     .title(getTitle(e))
