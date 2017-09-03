@@ -3,6 +3,7 @@
 ##############################
 
 spring:
+ h2.console.enabled: true
  mvc.view:
   suffix: .html
   prefix: /
