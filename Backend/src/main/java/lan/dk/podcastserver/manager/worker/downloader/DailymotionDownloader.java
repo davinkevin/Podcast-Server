@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mashape.unirest.http.HttpResponse;
+import io.vavr.Lazy;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 import static io.vavr.API.*;
-import static java.util.Objects.nonNull;
 
 /**
  * Created by kevin on 21/02/2016 for Podcast Server
@@ -30,8 +30,7 @@ import static java.util.Objects.nonNull;
 @Component("DailymotionDownloader")
 public class DailymotionDownloader extends M3U8Downloader {
 
-    String url = null;
-
+    private final Lazy<Option<String>> url = Lazy(this::_getItemUrl);
     private final JsonService jsonService;
 
     public DailymotionDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, JsonService jsonService) {
@@ -45,11 +44,11 @@ public class DailymotionDownloader extends M3U8Downloader {
             return super.getItemUrl(item);
         }
 
-        if (nonNull(url)) {
-            return url;
-        }
+        return url.get().getOrElseThrow(() -> new RuntimeException("Url not found for " + item.getUrl()));
+    }
 
-        url = Try(() -> urlService
+    private Option<String> _getItemUrl() {
+        return Try(() -> urlService
                 .get(item.getUrl())
                 .asString()
         )
@@ -60,10 +59,7 @@ public class DailymotionDownloader extends M3U8Downloader {
                 .map(JsonService.to("metadata", DailymotionMetadata.class))
                 .map(DailymotionMetadata::getUrl)
                 .map(m3U8Service::getM3U8UrlFormMultiStreamFile)
-                .map(this::removeHash)
-                .getOrElse(() -> null);
-
-        return url;
+                .map(this::removeHash);
     }
 
     private String removeHash(String s) {

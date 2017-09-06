@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -78,11 +79,11 @@ public class DailymotionDownloaderTest {
 
         /* When */
         String itemUrl = dailymotionDownloader.getItemUrl(item);
-        String anotherItemUrl = dailymotionDownloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("https://proxy-005.dc3.dailymotion.com/sec(c261ed40cc95bcf93923ccd7f1c92a83)/video/574/494/277494475_mp4_h264_aac_fhd.m3u8");
-        assertThat(itemUrl).isSameAs(anotherItemUrl);
+        verify(jsonService, times(1)).parse(anyString());
+        verify(m3U8Service, times(1)).getM3U8UrlFormMultiStreamFile(anyString());
     }
 
     @Test
@@ -103,12 +104,30 @@ public class DailymotionDownloaderTest {
         when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/incoherent.dailymotion.html"));
 
         /* When */
-        String itemUrl = dailymotionDownloader.getItemUrl(item);
+        assertThatThrownBy(() -> dailymotionDownloader.getItemUrl(item)).isInstanceOf(RuntimeException.class)
+            .withFailMessage("Url not found for http://a.fake.url/with/file.mp4?param=1");
 
         /* Then */
-        assertThat(itemUrl).isNull();
         verify(jsonService, never()).parse(anyString());
         verify(m3U8Service, never()).getM3U8UrlFormMultiStreamFile(anyString());
+    }
+
+    @Test
+    public void should_return_same_object_for_two_invocation() {
+        /* Given */
+        when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/karimdebbache.dailymotion.html"));
+        when(jsonService.parse(anyString())).then(i -> JsonPath.using(Configuration.builder().mappingProvider(new JacksonMappingProvider()).build()).parse(i.getArgumentAt(0, String.class)));
+        when(m3U8Service.getM3U8UrlFormMultiStreamFile(anyString())).then(i -> "https://proxy-005.dc3.dailymotion.com/sec(c261ed40cc95bcf93923ccd7f1c92a83)/video/574/494/277494475_mp4_h264_aac_fhd.m3u8#cell=core&comment=QOEABR17&hls_maxMaxBufferLength=105");
+
+        /* When */
+        String itemUrl = dailymotionDownloader.getItemUrl(item);
+        String anotherItemUrl = dailymotionDownloader.getItemUrl(item);
+
+        /* Then */
+        assertThat(itemUrl).isEqualTo("https://proxy-005.dc3.dailymotion.com/sec(c261ed40cc95bcf93923ccd7f1c92a83)/video/574/494/277494475_mp4_h264_aac_fhd.m3u8");
+        assertThat(itemUrl).isSameAs(anotherItemUrl);
+        verify(jsonService, times(1)).parse(anyString());
+        verify(m3U8Service, times(1)).getM3U8UrlFormMultiStreamFile(anyString());
     }
 
     @SuppressWarnings("unchecked")
