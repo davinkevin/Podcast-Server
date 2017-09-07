@@ -16,7 +16,7 @@ import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 22/03/2017 for Podcast Server
@@ -46,6 +46,24 @@ public class SixPlayDownloaderTest {
         String url = downloader.getItemUrl(downloader.getItem());
         /* THEN  */
         assertThat(url).isEqualToIgnoringCase("http://lb.cdn.m6web.fr/s/cd/5/7b4f83770465c93e0d15b67cfdc1f6d3/5932fafb/usp/mb_sd3/c/0/2/Le-Message-de-Maden_c11693282_Episodes-du-02-/Le-Message-de-Maden_c11693282_Episodes-du-02-_unpnp.ism/Manifest.m3u8");
+        verify(jsonService, times(1)).parse(anyString());
+        verify(htmlService, times(1)).get(anyString());
+    }
+
+    @Test
+    public void should_do_the_computation_only_once() throws IOException, URISyntaxException {
+        /* GIVEN */
+        when(htmlService.get(downloader.getItem().getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-02-06-c_11693282.html"));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+
+        /* WHEN  */
+        String url = downloader.getItemUrl(downloader.getItem());
+        String secondUrl = downloader.getItemUrl(downloader.getItem());
+
+        /* THEN  */
+        assertThat(url).isSameAs(secondUrl);
+        verify(jsonService, times(1)).parse(anyString());
+        verify(htmlService, times(1)).get(anyString());
     }
 
     @Test

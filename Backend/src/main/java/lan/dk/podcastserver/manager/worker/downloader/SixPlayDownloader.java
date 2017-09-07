@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
+import io.vavr.Lazy;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
@@ -20,7 +21,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import static io.vavr.API.None;
+import java.util.Objects;
+
+import static io.vavr.API.Lazy;
 import static java.util.Objects.nonNull;
 
 /**
@@ -37,7 +40,7 @@ public class SixPlayDownloader extends M3U8Downloader {
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private Option<String> url = None();
+    private final Lazy<Option<String>> url = Lazy(this::_getItemUrl);
 
     public SixPlayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
@@ -48,13 +51,15 @@ public class SixPlayDownloader extends M3U8Downloader {
     @Override
     public String getItemUrl(Item item) {
 
-        if (nonNull(this.item) && !this.item.equals(item)) {
-            return item.getUrl();
+        if (!Objects.equals(item, this.item)) {
+            return super.getItemUrl(item);
         }
 
-        url = url.orElse(() -> htmlService.get(item.getUrl()).map(d -> this.extractUrl(d.select("script"))));
+        return url.get().getOrElseThrow(() -> new RuntimeException("Url not found for " + item.getUrl()));
+    }
 
-        return url.getOrElseThrow(() -> new RuntimeException("Url not found for " + item.getUrl()));
+    private Option<String> _getItemUrl() {
+        return htmlService.get(item.getUrl()).map(d -> this.extractUrl(d.select("script")));
     }
 
     private String extractUrl(Elements script) {
