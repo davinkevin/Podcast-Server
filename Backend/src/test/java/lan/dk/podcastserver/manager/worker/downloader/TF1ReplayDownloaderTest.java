@@ -124,14 +124,15 @@ public class TF1ReplayDownloaderTest {
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
         when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
-        String itemUrl = downloader.getItemUrl(item);
 
         /* When */
+        String itemUrl = downloader.getItemUrl(item);
         String secondGetItemUrl = downloader.getItemUrl(item);
 
         /* Then */
         assertThat(itemUrl).isEqualTo("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4");
         assertThat(secondGetItemUrl).isEqualTo("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4");
+        assertThat(itemUrl).isSameAs(secondGetItemUrl);
         verify(htmlService, times(1)).get(item.getUrl());
     }
 

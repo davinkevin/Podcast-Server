@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mashape.unirest.http.HttpResponse;
+import io.vavr.Lazy;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+import static io.vavr.API.Lazy;
 import static io.vavr.API.None;
 import static io.vavr.API.Try;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
@@ -40,7 +42,7 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private Option<String> url = None();
+    private final Lazy<Option<String>> _url = Lazy(this::_getItemUrl);
 
     public TF1ReplayDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
@@ -52,18 +54,20 @@ public class TF1ReplayDownloader extends M3U8Downloader {
     public String getItemUrl(Item item) {
 
         if (!Objects.equals(this.item, item)) {
-            return item.getUrl();
+            return super.getItemUrl(item);
         }
 
-        url = url.orElse(() -> htmlService.get(item.getUrl())
+        return _url.get().getOrElseThrow(() -> new RuntimeException("Id not found for url " + item.getUrl()));
+    }
+
+    private Option<String> _getItemUrl() {
+        return htmlService.get(item.getUrl())
                 .map(d -> d.select("#zonePlayer").first())
                 .map(d -> d.attr("data-src"))
                 .map(src -> src.substring(src.length() - 8))
                 .map(this::normalizeId)
                 .map(this::getM3U8url)
-                .map(this::getHighestQualityUrl));
-
-        return url.getOrElseThrow(() -> new RuntimeException("Id not found for url " + item.getUrl()));
+                .map(this::getHighestQualityUrl);
     }
 
     private String normalizeId(String id) {
