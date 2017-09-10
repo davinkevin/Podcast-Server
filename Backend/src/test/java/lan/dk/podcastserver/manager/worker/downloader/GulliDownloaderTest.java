@@ -77,6 +77,7 @@ public class GulliDownloaderTest {
         /* Then */
         assertThat(url).isEqualTo("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4");
         assertThat(secondUrl).isEqualTo("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4");
+        assertThat(url).isSameAs(secondUrl);
         verify(htmlService, times(1)).get(anyString());
         verify(jsonService, times(1)).parse(anyString());
     }

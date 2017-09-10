@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.TypeRef;
+import io.vavr.Lazy;
 import io.vavr.Tuple;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static io.vavr.API.Lazy;
 import static io.vavr.API.None;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
@@ -44,7 +46,7 @@ public class GulliDownloader extends HTTPDownloader {
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private Option<String> url = None();
+    private Lazy<Option<String>> _url = Lazy(this::_getItemUrl);
 
     public GulliDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, WGetFactory wGetFactory, HtmlService htmlService, JsonService jsonService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, wGetFactory);
@@ -58,12 +60,14 @@ public class GulliDownloader extends HTTPDownloader {
             return item.getUrl();
         }
 
-        url = url.orElse(() -> htmlService.get(item.getUrl())
+        return _url.get().getOrElseThrow(() -> new RuntimeException("url not found for " + item.getUrl()));
+    }
+
+    private Option<String> _getItemUrl() {
+        return htmlService.get(item.getUrl())
                 .map(d -> d.select("script"))
                 .flatMap(scripts -> List.ofAll(scripts).find(e -> e.html().contains("playlist:")))
-                .flatMap(this::getPlaylistFromGulliScript));
-
-        return url.getOrElseThrow(() -> new RuntimeException("url not found for " + item.getUrl()));
+                .flatMap(this::getPlaylistFromGulliScript);
     }
 
     private Option<String> getPlaylistFromGulliScript(Element element) {
