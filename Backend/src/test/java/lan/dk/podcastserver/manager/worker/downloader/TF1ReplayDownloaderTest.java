@@ -240,4 +240,26 @@ public class TF1ReplayDownloaderTest {
         assertThat(ua).isEqualTo("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)");
     }
 
+    @Test
+    public void should_transform_title() {
+        /* GIVEN */
+        Item item = Item.builder().url("http://www.tf1.fr/tf1/19h-live/videos/19h-live-20-juillet-2016.html").build();
+
+        /* WHEN  */
+        String fileName = downloader.getFileName(item);
+
+        /* THEN  */
+        assertThat(fileName).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4");
+    }
+
+    @Test
+    public void should_return_an_empty_string_if_url_null() {
+        /* GIVEN */
+        /* WHEN  */
+        String fileName = downloader.getFileName(Item.DEFAULT_ITEM);
+
+        /* THEN  */
+        assertThat(fileName).isEqualToIgnoringCase("");
+    }
+
 }

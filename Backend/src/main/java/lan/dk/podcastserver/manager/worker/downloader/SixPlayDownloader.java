@@ -16,15 +16,15 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 import static io.vavr.API.Lazy;
-import static java.util.Objects.nonNull;
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 22/03/2017 for Podcast Server
@@ -49,12 +49,18 @@ public class SixPlayDownloader extends M3U8Downloader {
     }
 
     @Override
+    public String getFileName(Item item) {
+        // http://www.6play.fr/le-message-de-madenian-et-vdb-p_6730/mm-vdb-22-06-c_11699574
+        return Option(item.getUrl())
+                .map(s -> StringUtils.substringAfterLast(s, "/"))
+                .map(s -> StringUtils.substringBeforeLast(s, "?"))
+                .map(FilenameUtils::getBaseName)
+                .map(s -> s + ".mp4")
+                .getOrElse("");
+    }
+
+    @Override
     public String getItemUrl(Item item) {
-
-        if (!Objects.equals(item, this.item)) {
-            return super.getItemUrl(item);
-        }
-
         return url.get().getOrElseThrow(() -> new RuntimeException("Url not found for " + item.getUrl()));
     }
 

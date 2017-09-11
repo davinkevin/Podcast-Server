@@ -67,16 +67,32 @@ public class SixPlayDownloaderTest {
     }
 
     @Test
-    public void should_not_handle_url_if_not_current_item() {
-        assertThat(downloader.getItemUrl(Item.builder().url("foo").build()))
-                .isEqualTo("foo");
-    }
-
-    @Test
     public void should_be_only_compatible_with_6play_url() {
         assertThat(downloader.compatibility(null)).isGreaterThan(1);
         assertThat(downloader.compatibility("foo")).isGreaterThan(1);
         assertThat(downloader.compatibility("http://www.6play.fr/test")).isEqualTo(1);
+    }
+
+    @Test
+    public void should_transform_title() {
+        /* GIVEN */
+        Item item = Item.builder().url("http://www.6play.fr/le-message-de-madenian-et-vdb-p_6730/mm-vdb-02-06-c_11693282.html?foo=bar").build();
+
+        /* WHEN  */
+        String fileName = downloader.getFileName(item);
+
+        /* THEN  */
+        assertThat(fileName).isEqualToIgnoringCase("mm-vdb-02-06-c_11693282.mp4");
+    }
+
+    @Test
+    public void should_return_an_empty_string_if_url_null() {
+        /* GIVEN */
+        /* WHEN  */
+        String fileName = downloader.getFileName(Item.DEFAULT_ITEM);
+
+        /* THEN  */
+        assertThat(fileName).isEqualToIgnoringCase("");
     }
 
 }

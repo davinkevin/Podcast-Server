@@ -57,7 +57,7 @@ public class CanalPlusDownloaderTest {
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
 
         /* When */
-        Path targetFile = canalPlusDownloader.getTargetFile(canalPlusDownloader.item);
+        Path targetFile = canalPlusDownloader.getTargetFile(canalPlusDownloader.getItem());
 
         /* Then */
         assertThat(targetFile).isEqualTo(Paths.get("/tmp", "Cplus Podcast", "NIP_1960_1500k.mp4.psdownload"));

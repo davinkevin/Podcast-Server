@@ -150,7 +150,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     private Path getDestinationFile(Item item) {
-        String fileName = FilenameUtils.getName(StringUtils.substringBefore(getItemUrl(item), "?"));
+        String fileName = getFileName(item);
         return  podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(fileName);
     }
 

@@ -15,6 +15,7 @@ import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-import static io.vavr.API.Lazy;
-import static io.vavr.API.None;
-import static io.vavr.API.Try;
+import static io.vavr.API.*;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 
 /**
@@ -48,6 +47,17 @@ public class TF1ReplayDownloader extends M3U8Downloader {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
         this.htmlService = htmlService;
         this.jsonService = jsonService;
+    }
+
+    @Override
+    public String getFileName(Item item) {
+        // https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-deuxieme-partie-21-juin-2017.html
+        return Option(item.getUrl())
+                .map(s -> StringUtils.substringAfterLast(s, "/"))
+                .map(s -> StringUtils.substringBeforeLast(s, "?"))
+                .map(FilenameUtils::getBaseName)
+                .map(s -> s + ".mp4")
+                .getOrElse("");
     }
 
     @Override

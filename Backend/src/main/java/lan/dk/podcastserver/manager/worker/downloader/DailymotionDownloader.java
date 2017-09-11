@@ -39,11 +39,6 @@ public class DailymotionDownloader extends M3U8Downloader {
     }
 
     public String getItemUrl(Item item) {
-
-        if (!Objects.equals(this.item, item)) {
-            return super.getItemUrl(item);
-        }
-
         return url.get().getOrElseThrow(() -> new RuntimeException("Url not found for " + item.getUrl()));
     }
 

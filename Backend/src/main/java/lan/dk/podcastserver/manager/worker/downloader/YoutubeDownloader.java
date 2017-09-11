@@ -36,6 +36,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import static io.vavr.API.Option;
 import static io.vavr.API.Try;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -76,10 +77,11 @@ public class YoutubeDownloader extends AbstractDownloader {
 
             v.extract(parser, stopDownloading, watcher);
 
+            target = Option(getTargetFile(item)).getOrElseThrow(() -> new RuntimeException("target is undefined for download of " + item.getUrl()));
             v
                 .getVideo()
                 .getInfo()
-                .forEach(vi -> vi.setTarget(generatePartFile(getTargetFile(item, v.getVideo().getTitle()), vi).toFile()));
+                .forEach(vi -> vi.setTarget(generatePartFile(target, vi).toFile()));
 
             v.download(parser, stopDownloading, watcher);
         } catch (DownloadMultipartError e) {
@@ -113,23 +115,13 @@ public class YoutubeDownloader extends AbstractDownloader {
         return targetFile.resolveSibling(targetFile.getFileName() + v.getContentExt(vi));
     }
 
-    private Path getTargetFile(Item item, String youtubeTitle) {
-
-        if (nonNull(target)) return target;
-
-        try {
-            Path file = podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(youtubeTitle.replaceAll("[^a-zA-Z0-9.-]", "_").concat(temporaryExtension));
-            if (!Files.exists(file.getParent())) {
-                Files.createDirectories(file.getParent());
-            }
-
-            Files.deleteIfExists(file);
-
-            target = Files.createFile(file);
-            return target;
-        } catch (IOException e) {
-            throw new RuntimeException("Error during creation of file", e);
-        }
+    @Override
+    public String getFileName(Item item) {
+        return Option(v)
+                .map(VGet::getVideo)
+                .map(VideoInfo::getTitle)
+                .map(s -> s.replaceAll("[^a-zA-Z0-9.-]", "_"))
+                .getOrElseThrow(() -> new RuntimeException("Error during creation of filename of " + item.getUrl()));
     }
 
     @Override

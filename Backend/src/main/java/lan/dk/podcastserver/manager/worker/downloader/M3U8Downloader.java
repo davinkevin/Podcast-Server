@@ -18,7 +18,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
@@ -54,10 +53,10 @@ public class M3U8Downloader extends AbstractDownloader {
                 .setUserAgent(withUserAgent())
                 .addInput(getItemUrl(item))
                 .addOutput(target.toAbsolutePath().toString())
-                    .setFormat("mp4")
-                    .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
-                    .setVideoCodec(FfmpegService.CODEC_COPY)
-                    .setAudioCodec(FfmpegService.CODEC_COPY)
+                .setFormat("mp4")
+                .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
+                .setVideoCodec(FfmpegService.CODEC_COPY)
+                .setAudioCodec(FfmpegService.CODEC_COPY)
                 .done();
 
 
@@ -91,16 +90,12 @@ public class M3U8Downloader extends AbstractDownloader {
         if (nonNull(target))
             return target;
 
-        if (!Objects.equals(item, this.item))
-            return super.getTargetFile(item);
+        return super.getTargetFile(item);
+    }
 
-
-        Item m3u8Item = Item.builder()
-                .podcast(item.getPodcast())
-                .url(FilenameUtils.getBaseName(StringUtils.substringBeforeLast(getItemUrl(item), "?")).concat(".mp4"))
-            .build();
-
-        return super.getTargetFile(m3u8Item);
+    @Override
+    public String getFileName(Item item) {
+        return FilenameUtils.getBaseName(StringUtils.substringBeforeLast(getItemUrl(item), "?")).concat(".mp4");
     }
 
     @Override
@@ -120,15 +115,15 @@ public class M3U8Downloader extends AbstractDownloader {
         ProcessBuilder restart = new ProcessBuilder("kill", "-SIGCONT", "" + processService.pidOf(process));
 
         processService.start(restart)
-            .andThenTry(() -> {
-                item.setStatus(Status.STARTED);
-                saveSyncWithPodcast();
-                convertAndSaveBroadcast();
-            })
-            .onFailure(e -> {
-                log.error("Error during restart of process :", e);
-                this.stopDownload();
-            });
+                .andThenTry(() -> {
+                    item.setStatus(Status.STARTED);
+                    saveSyncWithPodcast();
+                    convertAndSaveBroadcast();
+                })
+                .onFailure(e -> {
+                    log.error("Error during restart of process :", e);
+                    this.stopDownload();
+                });
     }
 
     @Override

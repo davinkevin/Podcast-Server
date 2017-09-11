@@ -32,6 +32,7 @@ import org.springframework.util.FileSystemUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,6 +51,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.ROOT_FOLDER;
 import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.TEMPORARY_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -74,9 +76,9 @@ public class YoutubeDownloaderTest {
     private @Mock VideoInfo videoInfo;
     private @Mock VGetParser vGetParser;
 
-    VGet vGet;
-    Podcast podcast;
-    Item item;
+    private VGet vGet;
+    private Podcast podcast;
+    private Item item;
     private Path path;
 
     @Before
@@ -220,7 +222,7 @@ public class YoutubeDownloaderTest {
         assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }
     
-    @Test(expected = RuntimeException.class)
+    @Test
     public void should_handle_error_during_merging_of_video_and_audio() throws MalformedURLException {
         /* Given */
         youtubeDownloader.setItem(item.setStatus(Status.STARTED));
@@ -236,10 +238,7 @@ public class YoutubeDownloaderTest {
         doAnswer(simulateDownload(videoInfo, generate(2))).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
-        youtubeDownloader.download();
-
-        /* Then */
-        /* See exception */
+        assertThatThrownBy(() -> youtubeDownloader.download()).isInstanceOfAny(FileSystemException.class, Exception.class);
     }
 
 

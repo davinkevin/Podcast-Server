@@ -87,18 +87,6 @@ public class DailymotionDownloaderTest {
     }
 
     @Test
-    public void should_use_parent_getItem() {
-        /* Given */
-        Item item = Item.builder().url("http://foo.bar.com").build();
-
-        /* When */
-        String url = dailymotionDownloader.getItemUrl(item);
-
-        /* Then */
-        assertThat(url).isEqualTo(item.getUrl());
-    }
-
-    @Test
     public void should_warn_when_structure_of_page_change_and_return_null() {
         /* GIVEN */
         when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequestWithStringResponse("/remote/downloader/dailymotion/incoherent.dailymotion.html"));
