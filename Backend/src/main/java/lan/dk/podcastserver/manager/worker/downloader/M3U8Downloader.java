@@ -85,15 +85,6 @@ public class M3U8Downloader extends AbstractDownloader {
     }
 
     @Override
-    public Path getTargetFile(Item item) {
-
-        if (nonNull(target))
-            return target;
-
-        return super.getTargetFile(item);
-    }
-
-    @Override
     public String getFileName(Item item) {
         return FilenameUtils.getBaseName(StringUtils.substringBeforeLast(getItemUrl(item), "?")).concat(".mp4");
     }
