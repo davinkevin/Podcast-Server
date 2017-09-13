@@ -25,9 +25,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CanalPlusFinderTest {
 
-    @Mock HtmlService htmlService;
-    @Mock ImageService imageService;
-    @InjectMocks CanalPlusFinder canalPlusFinder;
+    private @Mock HtmlService htmlService;
+    private @Mock ImageService imageService;
+    private @InjectMocks CanalPlusFinder canalPlusFinder;
 
     @Test
     public void should_find_podcast() throws IOException, URISyntaxException {
@@ -46,6 +46,24 @@ public class CanalPlusFinderTest {
                 .hasType("CanalPlus")
                 .hasCover(cover)
                 .hasDescription("Yann Barthes présente le petit journal à 20h10 -  CANALPLUS.FR");
+    }
+
+    @Test
+    public void should_find_podcast_with_cover_from_banner() throws IOException, URISyntaxException {
+        /* Given */
+        Cover cover = Cover.builder().url("http://media.canal-plus.com.s0.frz.io/image/82/0/720820.jpg").width(200).height(200).build();
+        when(imageService.getCoverFromURL("http://media.canal-plus.com.s0.frz.io/image/82/0/720820.jpg")).thenReturn(cover);
+        when(htmlService.get("http://www.canalplus.fr/humour/pid8604-canal-bus.html")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/page_with_banner_header.html"));
+
+        /* When */
+        Podcast podcast = canalPlusFinder.find("http://www.canalplus.fr/humour/pid8604-canal-bus.html");
+
+        /* Then */
+        assertThat(podcast)
+                .hasUrl("http://www.canalplus.fr/humour/pid8604-canal-bus.html")
+                .hasTitle("Canal Bus")
+                .hasType("CanalPlus")
+                .hasCover(cover);
     }
 
     @Test
