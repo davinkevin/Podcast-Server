@@ -79,7 +79,7 @@ public class StatsBusiness {
                 .types().toList()
                 .map(type -> generateForType(type, numberOfMonth, selector))
                 .filter(stats -> !stats.isEmpty())
-                .sortBy(Comparator.comparing(StatsPodcastType::getType), Function.identity());
+                .sorted(Comparator.comparing(StatsPodcastType::getType));
     }
 
     private Set<NumberOfItemByDateWrapper> statOf(UUID podcastId, Function<Item,ZonedDateTime> mapper, long numberOfMonth) {
