@@ -6,13 +6,13 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.business.CoverBusiness;
-import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.assertj.core.api.Condition;
 import org.junit.Before;
@@ -45,18 +45,18 @@ import static org.mockito.Mockito.*;
 public class UpdatePodcastBusinessTest {
 
     private static Path rootFolder = Paths.get("/tmp/podcast/");
-    @Captor ArgumentCaptor<Item> ITEM_ARGUMENT_CAPTOR;
+    private @Captor ArgumentCaptor<Item> ITEM_ARGUMENT_CAPTOR;
 
-    @Mock PodcastBusiness podcastBusiness;
-    @Mock ItemRepository itemRepository;
-    @Mock UpdaterSelector updaterSelector;
-    @Mock SimpMessagingTemplate template;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Spy ThreadPoolTaskExecutor updateExecutor = new ThreadPoolTaskExecutor();
-    @Spy ThreadPoolTaskExecutor manualExecutor = new ThreadPoolTaskExecutor();
-    @Mock Validator validator;
-    @Mock CoverBusiness coverBusiness;
-    @InjectMocks UpdatePodcastBusiness updatePodcastBusiness;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock UpdaterSelector updaterSelector;
+    private @Mock SimpMessagingTemplate template;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Spy ThreadPoolTaskExecutor updateExecutor = new ThreadPoolTaskExecutor();
+    private @Spy ThreadPoolTaskExecutor manualExecutor = new ThreadPoolTaskExecutor();
+    private @Mock Validator validator;
+    private @Mock CoverBusiness coverBusiness;
+    private @InjectMocks UpdatePodcastBusiness updatePodcastBusiness;
 
     @Before
     public void beforeEach() {
@@ -112,7 +112,7 @@ public class UpdatePodcastBusinessTest {
         Podcast podcast3 = new Podcast().setTitle("podcast3");
         Updater updater = mock(Updater.class);
         Set<Podcast> podcasts = HashSet.of(podcast1, podcast2, podcast3);
-        when(podcastBusiness.findByUrlIsNotNull()).thenReturn(podcasts);
+        when(podcastRepository.findByUrlIsNotNull()).thenReturn(podcasts);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcast = (Podcast) i.getArguments()[0];
@@ -141,7 +141,7 @@ public class UpdatePodcastBusinessTest {
                 .isAfterOrEqualTo(now);
         assertThat(lastFullUpdate).isNotNull();
 
-        verify(podcastBusiness, times(podcasts.size())).save(any(Podcast.class));
+        verify(podcastRepository, times(podcasts.size())).save(any(Podcast.class));
         verify(validator, times(10)).validate(any(Item.class));
     }
 
@@ -159,7 +159,7 @@ public class UpdatePodcastBusinessTest {
                 .setTitle("a title");
 
         Updater updater = mock(Updater.class);
-        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
@@ -181,7 +181,7 @@ public class UpdatePodcastBusinessTest {
         ZonedDateTime now = ZonedDateTime.now();
         Podcast podcast = new Podcast().setTitle("podcast1");
         Updater updater = mock(Updater.class);
-        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
@@ -202,7 +202,7 @@ public class UpdatePodcastBusinessTest {
                 .isBeforeOrEqualTo(ZonedDateTime.now())
                 .isAfterOrEqualTo(now);
 
-        verify(podcastBusiness, times(1)).save(eq(podcast));
+        verify(podcastRepository, times(1)).save(eq(podcast));
         verify(validator, times(10)).validate(any(Item.class));
     }
 
@@ -210,16 +210,16 @@ public class UpdatePodcastBusinessTest {
     public void should_not_handle_too_long_update() {
         /* Given */
         ThreadPoolTaskExecutor manualExecutor = new ThreadPoolTaskExecutor();
-        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
+        updatePodcastBusiness = new UpdatePodcastBusiness(podcastRepository, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
         updatePodcastBusiness.setTimeOut(1, TimeUnit.MILLISECONDS);
         manualExecutor.initialize();
 
         Podcast podcast1 = new Podcast().setTitle("podcast1");
         podcast1.setId(UUID.randomUUID());
         Updater updater = mock(Updater.class);
-        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast1);
+        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast1);
         when(updaterSelector.of(anyString())).thenReturn(updater);
-        when(podcastBusiness.save(any(Podcast.class))).thenReturn(podcast1);
+        when(podcastRepository.save(any(Podcast.class))).thenReturn(podcast1);
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> !i.getArgumentAt(0, Podcast.class).contains(item));
         when(updater.update(any(Podcast.class))).then(i -> {
             TimeUnit.SECONDS.sleep(15);
@@ -233,8 +233,8 @@ public class UpdatePodcastBusinessTest {
         /* Then */
         assertThat(podcast1).hasLastUpdate(null);
 
-        verify(podcastBusiness, times(2)).findOne(any(UUID.class));
-        verify(podcastBusiness, times(1)).save(any(Podcast.class));
+        verify(podcastRepository, times(2)).findOne(any(UUID.class));
+        verify(podcastRepository, times(1)).save(any(Podcast.class));
     }
 
     @Test
@@ -242,7 +242,7 @@ public class UpdatePodcastBusinessTest {
         /* Given */
         ThreadPoolTaskExecutor updateExecutor = mock(ThreadPoolTaskExecutor.class);
         ThreadPoolTaskExecutor manualExecutor = mock(ThreadPoolTaskExecutor.class);
-        updatePodcastBusiness = new UpdatePodcastBusiness(podcastBusiness, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
+        updatePodcastBusiness = new UpdatePodcastBusiness(podcastRepository, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness);
 
         /* When */
         Integer numberOfActiveThread = updatePodcastBusiness.getUpdaterActiveCount();

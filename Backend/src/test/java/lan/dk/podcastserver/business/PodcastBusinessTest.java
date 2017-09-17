@@ -125,20 +125,6 @@ public class PodcastBusinessTest {
     }
 
     @Test
-    public void should_find_with_url_not_null() {
-       /* Given */
-        Set<Podcast> listOfPodcast = HashSet.empty();
-        when(podcastRepository.findByUrlIsNotNull()).thenReturn(listOfPodcast);
-
-       /* When */
-        Set<Podcast> podcasts = podcastBusiness.findByUrlIsNotNull();
-
-       /* Then */
-        assertThat(podcasts).isSameAs(listOfPodcast);
-        verify(podcastRepository, times(1)).findByUrlIsNotNull();
-    }
-
-    @Test
     public void should_reattach_and_save() {
        /* Given */
         Set<Tag> tags = HashSet.of(

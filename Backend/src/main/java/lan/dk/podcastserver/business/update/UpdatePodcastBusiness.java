@@ -11,6 +11,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
+import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public class UpdatePodcastBusiness  {
 
     private final CoverBusiness coverBusiness;
     private final PodcastServerParameters podcastServerParameters;
-    private final PodcastBusiness podcastBusiness;
+    private final PodcastRepository podcastRepository;
     private final ItemRepository itemRepository;
     private final UpdaterSelector updaterSelector;
     private final SimpMessagingTemplate template;
@@ -60,8 +61,8 @@ public class UpdatePodcastBusiness  {
     private AtomicBoolean isUpdating = new AtomicBoolean(false);
 
     @Autowired
-    public UpdatePodcastBusiness(PodcastBusiness podcastBusiness, ItemRepository itemRepository, UpdaterSelector updaterSelector, SimpMessagingTemplate template, PodcastServerParameters podcastServerParameters, @Qualifier("UpdateExecutor") ThreadPoolTaskExecutor updateExecutor, @Qualifier("ManualUpdater") ThreadPoolTaskExecutor manualExecutor, @Qualifier("Validator") Validator validator, CoverBusiness coverBusiness) {
-        this.podcastBusiness = podcastBusiness;
+    public UpdatePodcastBusiness(PodcastRepository podcastRepository, ItemRepository itemRepository, UpdaterSelector updaterSelector, SimpMessagingTemplate template, PodcastServerParameters podcastServerParameters, @Qualifier("UpdateExecutor") ThreadPoolTaskExecutor updateExecutor, @Qualifier("ManualUpdater") ThreadPoolTaskExecutor manualExecutor, @Qualifier("Validator") Validator validator, CoverBusiness coverBusiness) {
+        this.podcastRepository = podcastRepository;
         this.itemRepository = itemRepository;
         this.updaterSelector = updaterSelector;
         this.template = template;
@@ -74,19 +75,19 @@ public class UpdatePodcastBusiness  {
 
     @Transactional
     public void updatePodcast() {
-        updatePodcast(podcastBusiness.findByUrlIsNotNull(), updateExecutor);
+        updatePodcast(podcastRepository.findByUrlIsNotNull(), updateExecutor);
         lastFullUpdate = ZonedDateTime.now();
     }
 
     @Transactional
-    public void updatePodcast(UUID id) { updatePodcast(HashSet.of(podcastBusiness.findOne(id)), manualExecutor); }
+    public void updatePodcast(UUID id) { updatePodcast(HashSet.of(podcastRepository.findOne(id)), manualExecutor); }
 
     @Transactional
     public void forceUpdatePodcast (UUID id){
         log.info("Lancement de l'update forcé");
-        Podcast podcast = podcastBusiness.findOne(id);
+        Podcast podcast = podcastRepository.findOne(id);
         podcast.setSignature("");
-        podcast = podcastBusiness.save(podcast);
+        podcast = podcastRepository.save(podcast);
         updatePodcast(podcast.getId());
     }
 
@@ -133,7 +134,7 @@ public class UpdatePodcastBusiness  {
 
         if (items == null || items.isEmpty() ) {
             log.info("Reset de la signature afin de forcer le prochain update de : {}", podcast.getTitle());
-            podcastBusiness.save(podcast.setSignature(""));
+            podcastRepository.save(podcast.setSignature(""));
             return HashSet.empty();
         }
 
@@ -151,7 +152,7 @@ public class UpdatePodcastBusiness  {
                 .map(i -> i.setStatus(Status.NOT_DOWNLOADED))
                 .forEach(itemRepository::save);
 
-        podcastBusiness.save(podcast.lastUpdateToNow());
+        podcastRepository.save(podcast.lastUpdateToNow());
 
         return itemsToAdd;
     }

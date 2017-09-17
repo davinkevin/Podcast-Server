@@ -59,10 +59,6 @@ public class PodcastBusiness {
         //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
-    public Set<Podcast> findByUrlIsNotNull() {
-        return podcastRepository.findByUrlIsNotNull();
-    }
-
     //*****//
     public Podcast patchUpdate(Podcast patchPodcast) {
         Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
