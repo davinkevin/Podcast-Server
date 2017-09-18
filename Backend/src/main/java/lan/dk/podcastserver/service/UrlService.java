@@ -122,6 +122,13 @@ public class UrlService {
                 );
     }
 
+    public static String addProtocolIfNecessary(String protocol, String url) {
+        if (url.startsWith("http")) {
+            return url;
+        }
+
+        return protocol + url;
+    }
 
 
 }

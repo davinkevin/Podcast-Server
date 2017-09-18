@@ -22,7 +22,7 @@ public class FinderSelectorTest {
     private @Mock CanalPlusFinder canalPlusFinder;
     private @Mock DailymotionFinder dailymotionFinder;
     private @Mock JeuxVideoComFinder jeuxVideoComFinder;
-    private @Mock PluzzFinder pluzzFinder;
+    private @Mock FranceTvFinder franceTvFinder;
     private @Mock RSSFinder rssFinder;
     private @Mock YoutubeFinder youtubeFinder;
 
@@ -34,11 +34,11 @@ public class FinderSelectorTest {
         when(canalPlusFinder.compatibility(anyString())).thenCallRealMethod();
         when(dailymotionFinder.compatibility(anyString())).thenCallRealMethod();
         when(jeuxVideoComFinder.compatibility(anyString())).thenCallRealMethod();
-        when(pluzzFinder.compatibility(anyString())).thenCallRealMethod();
+        when(franceTvFinder.compatibility(anyString())).thenCallRealMethod();
         when(rssFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
 
-        finderSelector = new FinderSelector(HashSet.of(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, pluzzFinder, rssFinder, youtubeFinder).toJavaSet());
+        finderSelector = new FinderSelector(HashSet.of(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, franceTvFinder, rssFinder, youtubeFinder).toJavaSet());
     }
 
     @Test
@@ -98,13 +98,13 @@ public class FinderSelectorTest {
     @Test
     public void should_find_pluzz() {
         /* Given */
-        String url = "http://pluzz.francetv.fr/videos/comment_ca_va_bien.html";
+        String url = "http://www.france.tv/videos/comment_ca_va_bien.html";
 
         /* When */
         Finder finder = finderSelector.of(url);
 
         /* Then */
-        assertThat(finder).isSameAs(pluzzFinder);
+        assertThat(finder).isSameAs(franceTvFinder);
     }
 
     @Test

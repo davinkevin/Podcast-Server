@@ -1,0 +1,71 @@
+{
+  "id":"006a3008-8f95-52d3-be47-c15cf3640542",
+  "ref_source":"VIDEONI",
+  "code_programme":"secrets_d_histoire",
+  "titre":"Le Divorce Satyrique, fondateur de la l\u00e9gende noire de la Reine Margot",
+  "sous_titre":null,
+  "synopsis":"Dans ce num\u00e9ro in\u00e9dit de Secrets d'histoire, St\u00e9phane Bern vous emm\u00e8ne \u00e0 la d\u00e9couverte de l\u2019une des femmes les plus fascinantes, intrigantes et envo\u00fbtantes de l\u2019histoire de France, Marguerite de Valois. Issue d\u2019une famille illustre, les Valois, la jeune Marguerite va vivre des \u00e9v\u00e9nements tragiques qui vont la d\u00e9tourner d\u2019une destin\u00e9e qui semblait toute trac\u00e9e. Mariage rat\u00e9, conflit avec sa m\u00e8re, rumeurs, fantasmes, d\u00e9bauches, religion et divorce\u2026Tous les ingr\u00e9dients d\u2019une grande saga extraordinaire et unique sont r\u00e9unis.",
+  "genre":"Magazine historique",
+  "genre_pluzz":null,
+  "genre_pluzz_antenne":null,
+  "type":"Extrait",
+  "episode":null,
+  "saison":null,
+  "diffusion":{
+    "timestamp":1498726098,
+    "date_debut":"29\/06\/2017 10:48"
+  },
+  "texte_diffusions":null,
+  "duree":"00:01:16",
+  "real_duration":76,
+  "image":"http:\/\/webservices.francetelevisions.fr\/staticftv\/images_pdm_ni\/2017-06-29\/006a3008-8f95-52d3-be47-c15cf3640542_1498732081.jpeg",
+  "image_secure":"https:\/\/sivideo.webservices.francetelevisions.fr\/staticftv\/images_pdm_ni\/2017-06-29\/006a3008-8f95-52d3-be47-c15cf3640542_1498732081.jpeg",
+  "chaine":"France 2",
+  "mediamat_id_chaine":825,
+  "credit":null,
+  "region":"",
+  "url_site":"http:\/\/www.france2.fr\/emissions\/secrets-dhistoire\/",
+  "url_guidetv":null,
+  "personnes":[
+    {
+      "nom":"Bern",
+      "prenom":"St\u00e9phane",
+      "fonctions":[
+        "Pr\u00e9sentateur"
+      ]
+    }
+  ],
+  "videos":[],
+  "url_reference":null,
+  "direct":null,
+  "id_aedra":"F22252966616460820172906",
+  "semaine_diffusion":null,
+  "droit":{
+    "type":"tvr",
+    "csa":"CSA1"
+  },
+  "subtitles":[
+
+  ],
+  "sequences":[
+
+  ],
+  "lectures":{
+    "id":"006a3008-8f95-52d3-be47-c15cf3640542",
+    "nb_lectures":0
+  },
+  "lectures_groupes":[
+
+  ],
+  "votes":null,
+  "indexes":[
+
+  ],
+  "ordre":"",
+  "tag_OAS":null,
+  "id_emission_plurimedia":117739550,
+  "audiodescription":null,
+  "spritesheet":null,
+  "id_taxo":null,
+  "spritesheet_secure":null
+}

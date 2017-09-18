@@ -23,7 +23,7 @@ public class UpdaterSelectorTest {
     private @Mock DailymotionUpdater dailymotionUpdater;
     private @Mock GulliUpdater gulliUpdater;
     private @Mock JeuxVideoComUpdater jeuxVideoComUpdater;
-    private @Mock PluzzUpdater pluzzUpdater;
+    private @Mock FranceTvUpdater franceTvUpdater;
     private @Mock RSSUpdater rssUpdater;
     private @Mock SixPlayUpdater sixPlayUpdater;
     private @Mock TF1ReplayUpdater tf1ReplayUpdater;
@@ -35,7 +35,7 @@ public class UpdaterSelectorTest {
         /* Given */
         HashSet<Updater> updaters = HashSet.of(
                 beInSportsUpdater, canalPlusUpdater, dailymotionUpdater, gulliUpdater,
-                jeuxVideoComUpdater, pluzzUpdater, rssUpdater, sixPlayUpdater,
+                jeuxVideoComUpdater, franceTvUpdater, rssUpdater, sixPlayUpdater,
                 tf1ReplayUpdater, uploadUpdater, youtubeUpdater
         );
 
@@ -79,9 +79,9 @@ public class UpdaterSelectorTest {
     }
 
     @Test
-    public void should_return_a_PluzzUpdater() {
-        /* When */ Updater updaterClass = updaterSelector.of("http://www.pluzz.francetv.fr/show/for/dummies");
-        /* Then */ assertThat(updaterClass).isEqualTo(pluzzUpdater);
+    public void should_return_a_FranceTvUpdate() {
+        /* When */ Updater updaterClass = updaterSelector.of("http://www.france.tv/show/for/dummies");
+        /* Then */ assertThat(updaterClass).isEqualTo(franceTvUpdater);
     }
 
     @Test
