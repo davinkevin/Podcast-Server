@@ -12,11 +12,13 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -59,6 +61,7 @@ public class Item {
     @JsonBackReference("podcast-item")
     private Podcast podcast;
 
+    @NotNull
     @Field @Boost(2.0F)
     @JsonView(ItemSearchListView.class)
     private String title;
