@@ -14,6 +14,7 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,13 +28,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.vavr.API.List;
+import static io.vavr.API.Try;
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.HTTPWatcher;
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.WS_TOPIC_DOWNLOAD;
+import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -47,7 +49,6 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class HTTPDownloaderTest {
 
-    private static final String ROOT_FOLDER = "/tmp/";
     private static final String TEMPORARY_EXTENSION = ".psdownload";
 
     private @Mock ItemRepository itemRepository;
@@ -71,7 +72,7 @@ public class HTTPDownloaderTest {
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
-                .title("A Fake Podcast")
+                .title("A Fake Http Podcast")
                 .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
@@ -79,8 +80,11 @@ public class HTTPDownloaderTest {
         httpDownloader.setItemDownloadManager(itemDownloadManager);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         httpDownloader.postConstruct();
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
-        FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER, podcast.getTitle()).toFile());
+        when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
+        FileSystemUtils.deleteRecursively(IOUtils.ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());
+
+        FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());
+        Try(() -> Files.createDirectories(ROOT_TEST_PATH));
     }
 
     @Test
@@ -97,7 +101,7 @@ public class HTTPDownloaderTest {
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
         doAnswer(i -> {
-            Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
+            Files.createFile(IOUtils.ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve("file.mp4" + TEMPORARY_EXTENSION));
             item.setStatus(Status.FINISH);
             httpDownloader.finishDownload();
             return null;
@@ -111,7 +115,7 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/file.mp4");
+        assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake Http Podcast/file.mp4");
     }
 
     @Test
@@ -127,7 +131,7 @@ public class HTTPDownloaderTest {
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
-        doAnswer(i -> Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION)))
+        doAnswer(i -> Files.createFile(IOUtils.ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve( "file.mp4" + TEMPORARY_EXTENSION)))
                 .when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
 
         /* When */
@@ -139,7 +143,7 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        assertThat(httpDownloader.target.toString()).isEqualTo(String.format("/tmp/A Fake Podcast/file.mp4%s", TEMPORARY_EXTENSION));
+        assertThat(httpDownloader.target.toString()).isEqualTo(String.format("/tmp/podcast-server-test/A Fake Http Podcast/file.mp4%s", TEMPORARY_EXTENSION));
     }
 
     @Test

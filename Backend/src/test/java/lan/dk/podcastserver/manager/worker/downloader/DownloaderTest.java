@@ -9,6 +9,7 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +26,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import static io.vavr.API.Try;
 import static lan.dk.podcastserver.manager.worker.downloader.AbstractDownloader.WS_TOPIC_DOWNLOAD;
+import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -37,7 +40,6 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DownloaderTest {
 
-    static final String ROOT_FOLDER = "/tmp/";
     static final String TEMPORARY_EXTENSION = ".psdownload";
 
     private @Mock PodcastRepository podcastRepository;
@@ -60,17 +62,18 @@ public class DownloaderTest {
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
-                .title("A Fake Podcast")
+                .title("A Fake typeless Podcast")
                 .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 
         simpleDownloader.setItemDownloadManager(itemDownloadManager);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
+        when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_TEST_PATH);
         simpleDownloader.postConstruct();
 
-        FileSystemUtils.deleteRecursively(Paths.get(ROOT_FOLDER, podcast.getTitle()).toFile());
+        Try(() -> Files.createDirectories(ROOT_TEST_PATH));
+        FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());
     }
 
     @Test
@@ -90,7 +93,7 @@ public class DownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        assertThat(simpleDownloader.target.toString()).isEqualTo(String.format("/tmp/A Fake Podcast/file.mp4%s", TEMPORARY_EXTENSION));
+        assertThat(simpleDownloader.target.toString()).isEqualTo(String.format("/tmp/podcast-server-test/A Fake typeless Podcast/file.mp4%s", TEMPORARY_EXTENSION));
     }
 
     @Test
@@ -145,7 +148,7 @@ public class DownloaderTest {
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
         assertThat(item.getFileName()).isEqualTo("file.mp4");
-        assertThat(simpleDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/file.mp4");
+        assertThat(simpleDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake typeless Podcast/file.mp4");
     }
 
     @Test
@@ -182,14 +185,14 @@ public class DownloaderTest {
     public void should_handle_duplicate_on_file_name() throws IOException {
         /* Given */
         simpleDownloader.setItem(item);
-        Files.createDirectory(Paths.get(ROOT_FOLDER, podcast.getTitle()));
-        Files.createFile(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
+        Files.createDirectory(ROOT_TEST_PATH.resolve(podcast.getTitle()));
+        Files.createFile(ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve( "file.mp4" + TEMPORARY_EXTENSION));
 
         /* When */
         Path targetFile = simpleDownloader.getTargetFile(item);
 
         /* Then */
-        assertThat(targetFile).isNotEqualTo(Paths.get(ROOT_FOLDER, podcast.getTitle(), "file.mp4" + TEMPORARY_EXTENSION).toFile());
+        assertThat(targetFile).isNotEqualTo(ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve( "file.mp4" + TEMPORARY_EXTENSION));
     }
 
     @Test
@@ -248,8 +251,8 @@ public class DownloaderTest {
             try {
                 target = getTargetFile(item);
                 item.setStatus(Status.FINISH);
-                Files.createFile(Paths.get(ROOT_FOLDER, item.getPodcast().getTitle(), "file.mp4" + TEMPORARY_EXTENSION));
-                Files.createFile(Paths.get(ROOT_FOLDER, item.getPodcast().getTitle(), "file.mp4"));
+                Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve( "file.mp4" + TEMPORARY_EXTENSION));
+                Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve( "file.mp4"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

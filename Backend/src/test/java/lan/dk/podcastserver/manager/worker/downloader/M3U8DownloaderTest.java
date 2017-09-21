@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 
+import io.vavr.API;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -10,6 +11,7 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressListener;
@@ -20,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -31,8 +34,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static io.vavr.API.*;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -45,19 +50,19 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class M3U8DownloaderTest {
 
-    @Mock PodcastRepository podcastRepository;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock ItemDownloadManager itemDownloadManager;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    private @Mock MimeTypeService mimeTypeService;
+    private @Mock ItemDownloadManager itemDownloadManager;
 
-    @Mock UrlService urlService;
-    @Mock M3U8Service m3U8Service;
-    @Mock FfmpegService ffmpegService;
-    @Mock ProcessService processService;
+    private @Mock UrlService urlService;
+    private @Mock M3U8Service m3U8Service;
+    private @Mock FfmpegService ffmpegService;
+    private @Mock ProcessService processService;
 
-    @InjectMocks M3U8Downloader m3U8Downloader;
+    private @InjectMocks M3U8Downloader m3U8Downloader;
 
     Podcast podcast;
     Item item;
@@ -76,10 +81,13 @@ public class M3U8DownloaderTest {
 
         m3U8Downloader.setItemDownloadManager(itemDownloadManager);
         m3U8Downloader.setItem(item);
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
+        when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
+
+        FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());
+        Try(() -> Files.createDirectories(ROOT_TEST_PATH));
         m3U8Downloader.postConstruct();
     }
 
@@ -89,7 +97,7 @@ public class M3U8DownloaderTest {
         when(ffmpegService.getDurationOf(anyString(), anyString())).thenReturn(1_000_000D);
         when(ffmpegService.download(anyString(), any(FFmpegBuilder.class), any(ProgressListener.class))).then(i -> {
             FFmpegBuilder builder = i.getArgumentAt(1, FFmpegBuilder.class);
-            String location = builder.build().stream().filter(s -> s.contains("/tmp/" + podcast.getTitle())).findFirst().orElseThrow(RuntimeException::new);
+            String location = builder.build().stream().filter(s -> s.contains("/tmp/podcast-server-test/" + podcast.getTitle())).findFirst().orElseThrow(RuntimeException::new);
             Files.write(Paths.get(location), "".getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING );
             Progress progress = new Progress();
             progress.out_time_ms = 90_000;
@@ -101,7 +109,7 @@ public class M3U8DownloaderTest {
         Item downloaded = m3U8Downloader.download();
 
         /* Then */
-        assertThat(Paths.get("/tmp", podcast.getTitle(), item.getFileName())).exists();
+        assertThat(Paths.get("/tmp/podcast-server-test/", podcast.getTitle(), item.getFileName())).exists();
         assertThat(downloaded).isSameAs(item);
         assertThat(downloaded.getStatus()).isSameAs(Status.FINISH);
         assertThat(item).hasProgression(9);

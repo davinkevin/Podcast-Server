@@ -61,7 +61,7 @@ public class DailymotionDownloaderTest {
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
-                .title("A Fake Podcast")
+                .title("A Fake Dailymotion Podcast")
                 .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);

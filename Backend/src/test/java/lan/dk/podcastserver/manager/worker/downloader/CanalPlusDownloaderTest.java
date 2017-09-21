@@ -7,6 +7,7 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,10 +15,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.util.FileSystemUtils;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static io.vavr.API.Try;
+import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -27,24 +32,27 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CanalPlusDownloaderTest {
 
-    @Mock PodcastRepository podcastRepository;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock ItemDownloadManager itemDownloadManager;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    private @Mock MimeTypeService mimeTypeService;
+    private @Mock ItemDownloadManager itemDownloadManager;
 
-    @Mock UrlService urlService;
-    @Mock M3U8Service m3U8Service;
-    @Mock FfmpegService ffmpegService;
-    @Mock ProcessService processService;
+    private @Mock UrlService urlService;
+    private @Mock M3U8Service m3U8Service;
+    private @Mock FfmpegService ffmpegService;
+    private @Mock ProcessService processService;
 
-    @InjectMocks CanalPlusDownloader canalPlusDownloader;
+    private @InjectMocks CanalPlusDownloader canalPlusDownloader;
 
     @Before
     public void beforeEach() {
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         canalPlusDownloader.postConstruct();
+
+        FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve("Cplus Podcast").toFile());
+        Try(() -> Files.createDirectories(ROOT_TEST_PATH));
     }
 
     @Test
@@ -54,12 +62,12 @@ public class CanalPlusDownloaderTest {
                 .url("http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8")
                 .podcast(Podcast.builder().title("Cplus Podcast").build())
             .build();
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
+        when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
 
         /* When */
         Path targetFile = canalPlusDownloader.getTargetFile(canalPlusDownloader.getItem());
 
         /* Then */
-        assertThat(targetFile).isEqualTo(Paths.get("/tmp", "Cplus Podcast", "NIP_1960_1500k.mp4.psdownload"));
+        assertThat(targetFile).isEqualTo(Paths.get("/tmp","podcast-server-test", "Cplus Podcast", "NIP_1960_1500k.mp4.psdownload"));
     }
 }

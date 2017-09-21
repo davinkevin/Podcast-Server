@@ -16,9 +16,9 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
-import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,8 +48,8 @@ import static com.github.axet.vget.info.VideoInfo.States.DOWNLOADING;
 import static com.jayway.awaitility.Awaitility.await;
 import static io.vavr.API.Try;
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.ROOT_FOLDER;
 import static lan.dk.podcastserver.manager.worker.downloader.DownloaderTest.TEMPORARY_EXTENSION;
+import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.any;
@@ -89,21 +89,22 @@ public class YoutubeDownloaderTest {
                 .setStatus(Status.NOT_DOWNLOADED);
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
-                .title("A Fake Podcast")
+                .title("A Fake Youtube Podcast")
                 .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get(ROOT_FOLDER));
+        when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
         vGet = mock(VGet.class, RETURNS_SMART_NULLS);
         when(vGet.getVideo()).thenReturn(videoInfo);
 
         youtubeDownloader.postConstruct();
         youtubeDownloader.setItemDownloadManager(itemDownloadManager);
 
-        path = Paths.get(ROOT_FOLDER, podcast.getTitle());
+        path = IOUtils.ROOT_TEST_PATH.resolve(podcast.getTitle());
         FileSystemUtils.deleteRecursively(path.toFile());
+        Try(() -> Files.createDirectories(ROOT_TEST_PATH));
     }
 
     @Test
@@ -117,7 +118,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video low");
         when(videoInfo.getState()).thenReturn(DONE);
         List<VideoFileInfo> videoList = generate(1);
         when(videoInfo.getInfo()).thenReturn(videoList);
@@ -132,7 +133,7 @@ public class YoutubeDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
-        assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/A_super_Name_of_Youtube-Video.mp4");
+        assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake Youtube Podcast/A_super_Name_of_Youtube-Video_low.mp4");
         assertThat(Files.exists(youtubeDownloader.target)).isTrue();
         assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }
@@ -147,7 +148,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video multiple");
         when(ffmpegService.mergeAudioAndVideo(any(), any(), any())).then(i -> {
             Try(() -> Files.createFile(i.getArgumentAt(2, Path.class)));
             return i.getArgumentAt(2, Path.class);
@@ -161,7 +162,7 @@ public class YoutubeDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
-        assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/A Fake Podcast/A_super_Name_of_Youtube-Video.mp4");
+        assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake Youtube Podcast/A_super_Name_of_Youtube-Video_multiple.mp4");
         assertThat(Files.exists(youtubeDownloader.target)).isTrue();
         assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }
@@ -177,7 +178,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video stop");
         when(videoInfo.getInfo()).thenReturn(generate(3));
         when(info.getContentType()).thenReturn("video/mp4");
 
@@ -209,7 +210,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video multipart error");
         when(videoInfo.getInfo()).thenReturn(generate(1));
         doThrow(new DownloadMultipartError(info)).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
@@ -252,7 +253,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video pause");
         List<VideoFileInfo> videoList = generate(1);
         when(videoInfo.getInfo()).thenReturn(videoList);
         doAnswer(simulateDownload(videoInfo, videoList)).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
@@ -273,7 +274,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video interruption");
         doThrow(DownloadInterruptedError.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
@@ -292,7 +293,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video reset");
         doThrow(StringIndexOutOfBoundsException.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
@@ -313,7 +314,7 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
-        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video");
+        when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video stop not resetable");
         when(videoInfo.getInfo()).thenReturn(generate(1));
         doThrow(StringIndexOutOfBoundsException.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
