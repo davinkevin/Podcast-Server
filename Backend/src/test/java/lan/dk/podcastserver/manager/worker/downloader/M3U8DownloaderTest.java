@@ -97,7 +97,7 @@ public class M3U8DownloaderTest {
         when(ffmpegService.getDurationOf(anyString(), anyString())).thenReturn(1_000_000D);
         when(ffmpegService.download(anyString(), any(FFmpegBuilder.class), any(ProgressListener.class))).then(i -> {
             FFmpegBuilder builder = i.getArgumentAt(1, FFmpegBuilder.class);
-            String location = builder.build().stream().filter(s -> s.contains("/tmp/podcast-server-test/" + podcast.getTitle())).findFirst().orElseThrow(RuntimeException::new);
+            String location = builder.build().stream().filter(s -> s.contains(ROOT_TEST_PATH.resolve(podcast.getTitle()).toString())).findFirst().orElseThrow(RuntimeException::new);
             Files.write(Paths.get(location), "".getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING );
             Progress progress = new Progress();
             progress.out_time_ms = 90_000;
@@ -109,7 +109,7 @@ public class M3U8DownloaderTest {
         Item downloaded = m3U8Downloader.download();
 
         /* Then */
-        assertThat(Paths.get("/tmp/podcast-server-test/", podcast.getTitle(), item.getFileName())).exists();
+        assertThat(IOUtils.ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve(item.getFileName())).exists();
         assertThat(downloaded).isSameAs(item);
         assertThat(downloaded.getStatus()).isSameAs(Status.FINISH);
         assertThat(item).hasProgression(9);

@@ -48,8 +48,8 @@ public class IOUtils {
                     )
     )).build());
 
-    public static final String ROOT_TEST_FOLDER = "/tmp/podcast-server-test/";
-    public static final Path ROOT_TEST_PATH = Paths.get(ROOT_TEST_FOLDER);
+    public static final String TEMPORARY_EXTENSION = ".psdownload";
+    public static final Path ROOT_TEST_PATH = Paths.get("/tmp/podcast-server-test/");
 
     public static Option<org.jdom2.Document> fileAsXml(String path) throws JDOMException, IOException, URISyntaxException {
         return Option(new SAXBuilder().build(Paths.get(IOUtils.class.getResource(path).toURI()).toFile()));

@@ -36,6 +36,7 @@ import static io.vavr.API.Try;
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.HTTPWatcher;
 import static lan.dk.podcastserver.manager.worker.downloader.HTTPDownloader.WS_TOPIC_DOWNLOAD;
 import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
+import static lan.dk.utils.IOUtils.TEMPORARY_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -48,8 +49,6 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class HTTPDownloaderTest {
-
-    private static final String TEMPORARY_EXTENSION = ".psdownload";
 
     private @Mock ItemRepository itemRepository;
     private @Mock PodcastRepository podcastRepository;
@@ -115,7 +114,7 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        assertThat(httpDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake Http Podcast/file.mp4");
+        assertThat(httpDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4"));
     }
 
     @Test
@@ -143,7 +142,7 @@ public class HTTPDownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        assertThat(httpDownloader.target.toString()).isEqualTo(String.format("/tmp/podcast-server-test/A Fake Http Podcast/file.mp4%s", TEMPORARY_EXTENSION));
+        assertThat(httpDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4" + TEMPORARY_EXTENSION));
     }
 
     @Test

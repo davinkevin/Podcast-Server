@@ -133,7 +133,7 @@ public class YoutubeDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
-        assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake Youtube Podcast/A_super_Name_of_Youtube-Video_low.mp4");
+        assertThat(youtubeDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_low.mp4"));
         assertThat(Files.exists(youtubeDownloader.target)).isTrue();
         assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }
@@ -162,7 +162,7 @@ public class YoutubeDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
-        assertThat(youtubeDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake Youtube Podcast/A_super_Name_of_Youtube-Video_multiple.mp4");
+        assertThat(youtubeDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_multiple.mp4"));
         assertThat(Files.exists(youtubeDownloader.target)).isTrue();
         assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
     }

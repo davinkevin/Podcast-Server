@@ -93,7 +93,7 @@ public class DownloaderTest {
         verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
-        assertThat(simpleDownloader.target.toString()).isEqualTo(String.format("/tmp/podcast-server-test/A Fake typeless Podcast/file.mp4%s", TEMPORARY_EXTENSION));
+        assertThat(simpleDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake typeless Podcast").resolve("file.mp4" + TEMPORARY_EXTENSION));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class DownloaderTest {
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
         assertThat(item.getFileName()).isEqualTo("file.mp4");
-        assertThat(simpleDownloader.target.toString()).isEqualTo("/tmp/podcast-server-test/A Fake typeless Podcast/file.mp4");
+        assertThat(simpleDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake typeless Podcast").resolve("file.mp4"));
     }
 
     @Test

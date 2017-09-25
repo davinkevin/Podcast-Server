@@ -68,6 +68,6 @@ public class CanalPlusDownloaderTest {
         Path targetFile = canalPlusDownloader.getTargetFile(canalPlusDownloader.getItem());
 
         /* Then */
-        assertThat(targetFile).isEqualTo(Paths.get("/tmp","podcast-server-test", "Cplus Podcast", "NIP_1960_1500k.mp4.psdownload"));
+        assertThat(targetFile).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("Cplus Podcast").resolve("NIP_1960_1500k.mp4.psdownload"));
     }
 }
