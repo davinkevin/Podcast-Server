@@ -27,6 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import static io.vavr.API.Try;
+import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
+import static lan.dk.utils.IOUtils.TEMPORARY_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
@@ -39,17 +42,17 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class RTMPDownloaderTest {
 
-    @Mock ExternalTools externalTools;
-    @Mock PodcastRepository podcastRepository;
-    @Mock ItemRepository itemRepository;
-    @Mock ItemDownloadManager itemDownloadManager;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock SimpMessagingTemplate template;
-    @Mock MimeTypeService mimeTypeService;
-    @Mock ProcessService processService;
-    @InjectMocks RTMPDownloader rtmpDownloader;
+    private @Mock ExternalTools externalTools;
+    private @Mock PodcastRepository podcastRepository;
+    private @Mock ItemRepository itemRepository;
+    private @Mock ItemDownloadManager itemDownloadManager;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock SimpMessagingTemplate template;
+    private @Mock MimeTypeService mimeTypeService;
+    private @Mock ProcessService processService;
+    private @InjectMocks RTMPDownloader rtmpDownloader;
 
-    @Captor ArgumentCaptor<String> processParameters;
+    private @Captor ArgumentCaptor<String> processParameters;
 
     private Item item;
 
@@ -66,16 +69,17 @@ public class RTMPDownloaderTest {
                 .podcast(podcast)
                 .progression(0)
                 .build();
-        when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
+        when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         when(externalTools.getRtmpdump()).thenReturn("/usr/local/bin/rtmpdump");
-        when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp"));
+        when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_TEST_PATH);
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
 
         rtmpDownloader.setItem(item);
         rtmpDownloader.setItemDownloadManager(itemDownloadManager);
 
         rtmpDownloader.postConstruct();
-        FileSystemUtils.deleteRecursively(Paths.get("/tmp", podcast.getTitle()).toFile());
+        FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());
+        Try(() -> Files.createDirectories(ROOT_TEST_PATH));
     }
 
     @Test
@@ -89,7 +93,7 @@ public class RTMPDownloaderTest {
         /* Given */
         ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", fileUri("/remote/downloader/rtmpdump/rtmpdump.txt"));
         when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
-            Files.createFile(Paths.get("/tmp", "RTMP Podcast", "bar.mp4.psdownload"));
+            Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4" + TEMPORARY_EXTENSION));
             return processBuilder;
         });
         when(processService.pidOf(any())).thenReturn(1234);
@@ -99,7 +103,7 @@ public class RTMPDownloaderTest {
 
         /* Then */
         assertThat(rtmpDownloader.pid).isEqualTo(0);
-        assertThat(Paths.get("/tmp", "RTMP Podcast", "bar.mp4")).exists();
+        assertThat(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4")).exists();
         verify(processService, times(1)).newProcessBuilder(processParameters.capture());
         assertThat(processParameters.getAllValues())
                 .hasSize(5)
@@ -108,7 +112,7 @@ public class RTMPDownloaderTest {
                         "-r",
                         item.getUrl(),
                         "-o",
-                        Paths.get("/tmp", "RTMP Podcast", "bar.mp4.psdownload").toFile().getAbsolutePath()
+                        ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4" + TEMPORARY_EXTENSION).toFile().getAbsolutePath()
                 );
 
     }
@@ -137,7 +141,7 @@ public class RTMPDownloaderTest {
 
         ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", fileUri("/remote/downloader/rtmpdump/rtmpdump.txt"));
         when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
-            Files.createFile(Paths.get("/tmp", "RTMP Podcast", "bar.mp4.psdownload"));
+            Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4" + TEMPORARY_EXTENSION));
             return processBuilder;
         });
         when(processService.pidOf(any())).thenReturn(1234);
