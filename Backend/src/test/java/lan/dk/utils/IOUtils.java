@@ -11,6 +11,7 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Option;
 
+import io.vavr.control.Try;
 import io.vavr.jackson.datatype.VavrModule;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jdom2.JDOMException;
@@ -51,16 +52,28 @@ public class IOUtils {
     public static final String TEMPORARY_EXTENSION = ".psdownload";
     public static final Path ROOT_TEST_PATH = Paths.get("/tmp/podcast-server-test/");
 
-    public static Option<org.jdom2.Document> fileAsXml(String path) throws JDOMException, IOException, URISyntaxException {
-        return Option(new SAXBuilder().build(Paths.get(IOUtils.class.getResource(path).toURI()).toFile()));
-    }
-    public static Option<Document> fileAsHtml(String path) throws URISyntaxException, IOException {
-        return Option(Jsoup.parse(Paths.get(IOUtils.class.getResource(path).toURI()).toFile(), "UTF-8", ""));
-    }
-    public static String fileAsString(String uri) {
+
+    public static Try<Path> toPath(String uri) {
         return Try(() -> IOUtils.class.getResource(uri))
                 .mapTry(URL::toURI)
-                .map(Paths::get)
+                .map(Paths::get);
+    }
+
+    public static Option<org.jdom2.Document> fileAsXml(String uri) throws JDOMException, IOException, URISyntaxException {
+        return toPath(uri)
+                .map(Path::toFile)
+                .mapTry(f -> new SAXBuilder().build(f))
+                .toOption();
+    }
+
+    public static Option<Document> fileAsHtml(String uri) throws URISyntaxException, IOException {
+        return toPath(uri)
+                .map(Path::toFile)
+                .mapTry(v -> Jsoup.parse(v, "UTF-8", ""))
+                .toOption();
+    }
+    public static String fileAsString(String uri) {
+        return toPath(uri)
                 .mapTry(Files::newInputStream)
                 .mapTry(org.apache.commons.io.IOUtils::toString)
                 .getOrElseThrow(i -> new UncheckedIOException("Error during file fetching", IOException.class.cast(i)));
@@ -79,8 +92,7 @@ public class IOUtils {
         return IOUtils.class.getResourceAsStream(file);
     }
     public static BufferedReader fileAsReader(String file) {
-        return Try(() -> IOUtils.class.getResource(file).toURI())
-                .map(Paths::get)
+        return toPath(file)
                 .mapTry(Files::newBufferedReader)
                 .getOrElseThrow(e -> new UncheckedIOException(new IOException("File " + file + " not found")));
     }
@@ -94,7 +106,7 @@ public class IOUtils {
         return PARSER.parse(text);
     }
     public static Document stringAsHtml(String html) {
-        return Try(() -> Jsoup.parse(html)).getOrElseThrow(e -> new RuntimeException(e));
+        return Try(() -> Jsoup.parse(html)).getOrElseThrow(e -> new RuntimeException("Error during conversion from string to html", e));
     }
 
     public static Path get(String uri) throws URISyntaxException {

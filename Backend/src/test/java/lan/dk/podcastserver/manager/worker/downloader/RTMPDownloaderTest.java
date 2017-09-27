@@ -10,6 +10,7 @@ import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.ExternalTools;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,6 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import static io.vavr.API.Try;
@@ -91,7 +91,7 @@ public class RTMPDownloaderTest {
     @Test
     public void should_download() throws IOException, URISyntaxException {
         /* Given */
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", fileUri("/remote/downloader/rtmpdump/rtmpdump.txt"));
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", IOUtils.toPath("/remote/downloader/rtmpdump/rtmpdump.txt").toString());
         when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
             Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4" + TEMPORARY_EXTENSION));
             return processBuilder;
@@ -139,7 +139,7 @@ public class RTMPDownloaderTest {
         rtmpDownloader.pid = 123;
         rtmpDownloader.p = process;
 
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", fileUri("/remote/downloader/rtmpdump/rtmpdump.txt"));
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", IOUtils.toPath("/remote/downloader/rtmpdump/rtmpdump.txt").toString());
         when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
             Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4" + TEMPORARY_EXTENSION));
             return processBuilder;
@@ -193,9 +193,5 @@ public class RTMPDownloaderTest {
     public void should_be_compatible() {
         assertThat(rtmpDownloader.compatibility("http://foo.bar.com/video")).isGreaterThan(1);
         assertThat(rtmpDownloader.compatibility("rtmp://foo.bar.com/video")).isEqualTo(1);
-    }
-
-    private String fileUri(String relativePath) throws URISyntaxException {
-        return Paths.get(RTMPDownloaderTest.class.getResource(relativePath).toURI()).toString();
     }
 }
