@@ -91,7 +91,7 @@ public class RTMPDownloaderTest {
     @Test
     public void should_download() throws IOException, URISyntaxException {
         /* Given */
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", IOUtils.toPath("/remote/downloader/rtmpdump/rtmpdump.txt").toString());
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/cat", IOUtils.toPath("/remote/downloader/rtmpdump/rtmpdump.txt").get().toString());
         when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> {
             Files.createFile(ROOT_TEST_PATH.resolve(item.getPodcast().getTitle()).resolve("bar.mp4" + TEMPORARY_EXTENSION));
             return processBuilder;
