@@ -26,8 +26,8 @@ before_script:
 - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
 
 script:
-- mvn -f frontend-angularjs/pom.xml install
-- mvn -f Backend/pom.xml install jacoco:report
+- ./mvnw -f frontend-angularjs/pom.xml install
+- ./mvnw -f Backend/pom.xml install jacoco:report
 #- mvn -f frontend-angular/pom.xml install
 
 after_success:
