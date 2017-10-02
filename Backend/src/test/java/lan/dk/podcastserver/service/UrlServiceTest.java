@@ -142,6 +142,33 @@ public class UrlServiceTest {
         assertThat(br.lines().collect(joining())).isEqualTo("A body for testing");
     }
 
+    @Test
+    public void should_not_add_protocol_to_url() {
+        /* GIVEN */
+        String protocol = "http:";
+        String url = "http://foo.bar.com/";
+
+        /* WHEN  */
+        String result = UrlService.addProtocolIfNecessary(protocol, url);
+
+        /* THEN  */
+        assertThat(result).isSameAs(url);
+    }
+
+    @Test
+    public void should_add_protocol_to_url() {
+        /* GIVEN */
+        String protocol = "https:";
+        String url = "//foo.bar.com/";
+
+        /* WHEN  */
+        String result = UrlService.addProtocolIfNecessary(protocol, url);
+
+        /* THEN  */
+        assertThat(result).isNotSameAs(url);
+        assertThat(result).contains("https://").contains("//foo.bar.com/").isEqualTo(protocol + url);
+    }
+
     private void doRedirection(String mockUrl, String redirectionUrl) {
         stubFor(
                 get(urlEqualTo(mockUrl))
