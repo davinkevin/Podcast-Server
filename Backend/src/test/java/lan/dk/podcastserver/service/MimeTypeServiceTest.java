@@ -2,6 +2,7 @@ package lan.dk.podcastserver.service;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -79,7 +80,7 @@ public class MimeTypeServiceTest {
     @Test
     public void should_get_mimeType_with_probeContentType() throws URISyntaxException, IOException {
         /* Given */
-        Path path = Paths.get(MimeTypeServiceTest.class.getResource("/remote/podcast/plain.text.txt").toURI());
+        Path path = IOUtils.toPath("/__files/service/mimeTypeService/plain.text.txt").get();
         when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Option("text/plain"));
 
         /* When */ String type = mimeTypeService.probeContentType(path);
