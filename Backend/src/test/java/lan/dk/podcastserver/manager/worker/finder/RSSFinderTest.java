@@ -24,16 +24,16 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RSSFinderTest {
 
-    @Mock JdomService jdomService;
-    @Mock ImageService imageService;
-    @InjectMocks RSSFinder rssFinder;
+    private @Mock JdomService jdomService;
+    private @Mock ImageService imageService;
+    private @InjectMocks RSSFinder rssFinder;
 
     private static final String COVER_URL = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg";
 
     @Before
     public void beforeEach() throws JDOMException, IOException {
         //Given
-        String url = "/remote/podcast/withEmpty.xml";
+        String url = "/remote/podcast/rss/withEmpty.xml";
 
         when(jdomService.parse(eq(url))).thenReturn(None());
         when(jdomService.parse(not(eq(url)))).then(i -> IOUtils.fileAsXml(i.getArgumentAt(0, String.class)));
@@ -43,7 +43,7 @@ public class RSSFinderTest {
     @Test
     public void should_find_information_about_an_rss_podcast_with_his_url () throws JDOMException, IOException {
         //When
-        Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.xml");
+        Podcast podcast = rssFinder.find("/remote/podcast/rss/rss.lesGrandesGueules.xml");
         Cover cover = podcast.getCover();
 
         //Then
@@ -56,7 +56,7 @@ public class RSSFinderTest {
     @Test
     public void should_find_information_with_itunes_cover() throws IOException, JDOMException {
         //When
-        Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.withItunesCover.xml");
+        Podcast podcast = rssFinder.find("/remote/podcast/rss/rss.lesGrandesGueules.withItunesCover.xml");
 
         //Then
         assertThat(podcast.getCover()).isNotNull();
@@ -66,7 +66,7 @@ public class RSSFinderTest {
     @Test
     public void should_find_information_without_any_cover() throws IOException, JDOMException {
         //When
-        Podcast podcast = rssFinder.find("/remote/podcast/rss.lesGrandesGueules.withoutAnyCover.xml");
+        Podcast podcast = rssFinder.find("/remote/podcast/rss/rss.lesGrandesGueules.withoutAnyCover.xml");
 
         //Then
         assertThat(podcast.getCover()).isEqualTo(Cover.DEFAULT_COVER);
@@ -75,7 +75,7 @@ public class RSSFinderTest {
     @Test
     public void should_reject_if_not_found() throws JDOMException, IOException {
         /* When */
-        Podcast podcast = rssFinder.find("/remote/podcast/withEmpty.xml");
+        Podcast podcast = rssFinder.find("/remote/podcast/rss/withEmpty.xml");
 
         /* Then */
         assertThat(podcast).isSameAs(Podcast.DEFAULT_PODCAST);

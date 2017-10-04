@@ -6,6 +6,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.SignatureService;
+import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Before;
@@ -32,21 +33,20 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class RSSUpdaterTest {
 
-    private static final String PODCAST_APPLOAD_URL = "/remote/podcast/rss.appload.xml";
+    private static final String PODCAST_APPLOAD_URL = "/remote/podcast/rss/rss.appload.xml";
     private static final String MOCK_URL = "http://mockUrl.com/";
     private Podcast rssAppload;
 
-    @Mock SignatureService signatureService;
-    @Mock JdomService jdomService;
-    @Mock ImageService imageService;
-    @InjectMocks RSSUpdater rssUpdater;
+    private @Mock SignatureService signatureService;
+    private @Mock JdomService jdomService;
+    private @Mock ImageService imageService;
+    private @InjectMocks RSSUpdater rssUpdater;
 
     @Before
     public void beforeEach() throws JDOMException, IOException, URISyntaxException {
         rssAppload = Podcast.builder().url(MOCK_URL).build();
-        Path xmlFile = Paths.get(RSSUpdaterTest.class.getResource(PODCAST_APPLOAD_URL).toURI());
 
-        when(jdomService.parse(eq(MOCK_URL))).thenReturn(Option(new SAXBuilder().build(xmlFile.toFile())));
+        when(jdomService.parse(eq(MOCK_URL))).thenReturn(IOUtils.fileAsXml(PODCAST_APPLOAD_URL));
         when(jdomService.parse(not(eq(MOCK_URL)))).thenReturn(None());
     }
 
