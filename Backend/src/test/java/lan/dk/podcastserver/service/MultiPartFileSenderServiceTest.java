@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import lan.dk.utils.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +43,8 @@ public class MultiPartFileSenderServiceTest {
         multiPartFileSenderService = new MultiPartFileSenderService(mimeTypeService);
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
-        binaryPath = Paths.get(MultiPartFileSenderServiceTest.class.getResource("/__files/utils/multipart/outputfile.out").toURI());
-        filePath = Paths.get(MultiPartFileSenderServiceTest.class.getResource(STRING_FILE_PATH).toURI());
+        binaryPath = IOUtils.toPath("/__files/utils/multipart/outputfile.out").get();
+        filePath = IOUtils.toPath(STRING_FILE_PATH).get();
         lastModifiedDate = Files.getLastModifiedTime(filePath).toMillis();
         length = Files.size(filePath);
         fileName = filePath.getFileName().toString();
@@ -64,7 +65,7 @@ public class MultiPartFileSenderServiceTest {
     @Test
     public void should_be_config_with_File() throws URISyntaxException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
         /* Given */
-        File filePath = Paths.get(MultiPartFileSenderServiceTest.class.getResource(STRING_FILE_PATH).toURI()).toFile();
+        File filePath = IOUtils.toPath(STRING_FILE_PATH).map(Path::toFile).get();
 
         /* When */
         MultiPartFileSenderImpl multiPartFileSender = multiPartFileSenderService.fromFile(filePath);

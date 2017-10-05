@@ -28,7 +28,7 @@ public class M3U8ServiceTest {
     @Test
     public void should_select_best_audio_video_url() {
         /* Given */
-        InputStream m3u8FileStream = M3U8ServiceTest.class.getResourceAsStream("/remote/podcast/tf1replay/13184238.m3u8");
+        InputStream m3u8FileStream = IOUtils.fileAsStream("/remote/podcast/tf1replay/13184238.m3u8");
 
         /* When */
         Option<String> bestQuality = m3U8Service.findBestQuality(m3u8FileStream);

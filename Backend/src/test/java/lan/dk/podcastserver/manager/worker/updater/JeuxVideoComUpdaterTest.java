@@ -132,7 +132,7 @@ public class JeuxVideoComUpdaterTest {
     }
 
     private void configureForAllPage(String file) throws URISyntaxException, IOException {
-        Path path = Paths.get(JeuxVideoComUpdaterTest.class.getResource(file).toURI());
+        Path path = IOUtils.toPath(file).get();
         Document page = Jsoup.parse(path.toFile(), "UTF-8", "http://www.jeuxvideo.com");
         page.select("article")
                 .stream()

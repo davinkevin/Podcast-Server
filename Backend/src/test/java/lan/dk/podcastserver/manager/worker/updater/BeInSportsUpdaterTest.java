@@ -180,7 +180,7 @@ public class BeInSportsUpdaterTest {
 
     private void configureHtmlServiceWith(String url, String id) throws IOException, URISyntaxException {
         String page = String.format(FILE_LOCATION_BY_ID, id);
-        Path htmlPage = Paths.get(BeInSportsUpdaterTest.class.getResource(page).toURI());
+        Path htmlPage = IOUtils.toPath(page).get();
         String iFrameUrl = "http:" + Jsoup.parse(htmlPage.toFile(), "UTF-8", "http://www.beinsports.com").select("iframe").attr("src");
         String iframeLocation = String.format(FILE_LOCATION_BY_ID, StringUtils.substringAfterLast(iFrameUrl, "/"));
 
@@ -189,7 +189,7 @@ public class BeInSportsUpdaterTest {
     }
 
     private void configureForAllPage(String file) throws URISyntaxException, IOException {
-        Path path = Paths.get(BeInSportsUpdaterTest.class.getResource(file).toURI());
+        Path path = IOUtils.toPath(file).get();
         Document page = Jsoup.parse(path.toFile(), "UTF-8", "http://www.beinsports.com/");
         page.select("article")
                 .stream()

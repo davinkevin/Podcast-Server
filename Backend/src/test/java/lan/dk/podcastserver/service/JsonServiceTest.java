@@ -5,6 +5,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.manager.worker.updater.DailymotionUpdaterTest;
+import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class JsonServiceTest {
     @Test
     public void should_read_json_from_files() throws URISyntaxException, IOException {
         /* Given */
-        when(urlService.asReader(anyString())).thenReturn(Files.newBufferedReader(Paths.get(DailymotionUpdaterTest.class.getResource("/remote/downloader/dailymotion/user.karimdebbache.json").toURI())));
+        when(urlService.asReader(anyString())).thenReturn(IOUtils.fileAsReader("/remote/downloader/dailymotion/user.karimdebbache.json"));
 
         /* When */
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");
