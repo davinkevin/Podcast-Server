@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static io.vavr.API.Try;
+import static io.vavr.API.*;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -99,20 +99,17 @@ public class JdomService {
             .addContent(new Element(AUTHOR, ITUNES_NAMESPACE).addContent(new Text(podcast.getType())))
             .addContent(new Element(CATEGORY, ITUNES_NAMESPACE));
 
-        if (nonNull(podcast.getLastUpdate())) {
-            channel
-                .addContent(new Element(PUB_DATE)
-                        .addContent(new Text(podcast.getLastUpdate().format(DateTimeFormatter.RFC_1123_DATE_TIME)))
-                );
-        }
+        Option(podcast.getLastUpdate())
+                .map(v -> v.format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                .map(Text::new)
+                .map(v -> new Element(PUB_DATE).addContent(v))
+                .forEach(channel::addContent);
 
         if (podcast.getCover() != null) {
-            Element itunesImage = new Element(IMAGE, ITUNES_NAMESPACE);
-            Element image = new Element(IMAGE);
+            Element itunesImage = new Element(IMAGE, ITUNES_NAMESPACE)
+                    .addContent(new Text(coverUrl));
 
-            itunesImage.addContent(new Text(coverUrl));
-
-            image
+            Element image = new Element(IMAGE)
                     .addContent(new Element(HEIGHT).addContent(String.valueOf(podcast.getCover().getHeight())))
                     .addContent(new Element(URL_STRING).addContent(coverUrl))
                     .addContent(new Element(WIDTH).addContent(String.valueOf(podcast.getCover().getWidth())));
@@ -159,7 +156,11 @@ public class JdomService {
             Element item_enclosure = new Element(ENCLOSURE).setAttribute(URL_STRING, domainName
                     .concat(item.getProxyURLWithoutExtention())
                     .concat((item.isDownloaded()) ? "." + FilenameUtils.getExtension(item.getFileName()) : mimeTypeService.getExtension(item)));
-            if (item.getLength() != null) item_enclosure.setAttribute(LENGTH, String.valueOf(item.getLength()));
+
+            Option(item.getLength())
+                    .map(String::valueOf)
+                    .forEach(l -> item_enclosure.setAttribute(LENGTH, l));
+
             if (!isEmpty(item.getMimeType())) item_enclosure.setAttribute(TYPE, item.getMimeType());
 
             return new Element(ITEM)
