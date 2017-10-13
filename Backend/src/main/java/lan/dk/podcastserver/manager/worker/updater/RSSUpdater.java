@@ -16,9 +16,12 @@ import org.jdom2.Namespace;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Function;
 
+import static io.vavr.API.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -99,13 +102,15 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
     private ZonedDateTime getPubDate(Element item) {
-        try {
-            return ZonedDateTime.parse(item.getChildText("pubDate").replace(" PST", " +0800"), DateTimeFormatter.RFC_1123_DATE_TIME);
-        } catch (Exception e) {
-            log.error("Problem during date parsing of {}", item.getChildText("title"), e);
-            // No better idea than returning null for unparseable date
-            return null;
-        }
+        String date = Match(item.getChildText("pubDate")).of(
+                Case($(s -> s.contains("PST")), s -> s.replaceAll("PST", " +0800")),
+                Case($(s -> s.contains("PST")), s -> s.replaceAll("PDT", " +0900")),
+                Case($(), Function.identity())
+        );
+
+        return Try(() -> ZonedDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME))
+                .onFailure(e -> log.error("Problem during date parsing of {}", item.getChildText("title"), e))
+                .getOrNull();
     }
 
     @Override
