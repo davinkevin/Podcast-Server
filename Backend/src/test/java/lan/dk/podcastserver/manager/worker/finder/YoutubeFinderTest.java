@@ -22,14 +22,14 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class YoutubeFinderTest {
 
-    @Mock HtmlService htmlService;
-    @InjectMocks YoutubeFinder youtubeFinder;
+    private @Mock HtmlService htmlService;
+    private @InjectMocks YoutubeFinder youtubeFinder;
 
     @Test
     public void should_find_information_about_a_youtube_podcast_with_his_url () throws JDOMException, IOException, URISyntaxException {
         //Given
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel")))
-                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube.cauetofficiel.html"));
+                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/youtube.cauetofficiel.html"));
 
         //When
         Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");
@@ -60,7 +60,7 @@ public class YoutubeFinderTest {
     public void should_set_default_value_for_information_not_found() throws JDOMException, IOException, URISyntaxException {
         //Given
         when(htmlService.get(eq("https://www.youtube.com/user/cauetofficiel")))
-                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html"));
+                .thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html"));
 
         //When
         Podcast podcast = youtubeFinder.find("https://www.youtube.com/user/cauetofficiel");

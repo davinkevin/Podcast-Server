@@ -71,7 +71,7 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
-        when(jdomService.parse(anyString())).then(i -> fileAsXml("/remote/podcast/youtube.androiddevelopers.xml"));
+        when(jdomService.parse(anyString())).then(i -> fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -108,7 +108,7 @@ public class YoutubeUpdaterTest {
                 .build();
 
         when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
-        when(jdomService.parse(anyString())).thenReturn(fileAsXml("/remote/podcast/youtube.androiddevelopers.xml"));
+        when(jdomService.parse(anyString())).thenReturn(fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"));
         when(signatureService.generateMD5Signature(anyString())).thenReturn("Signature");
 
         /* When */
