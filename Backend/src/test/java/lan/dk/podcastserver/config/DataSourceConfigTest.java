@@ -32,8 +32,8 @@ public class DataSourceConfigTest {
     private static final String DATA_SOURCE_URL = "jdbc:h2:mem:memoryDatabase";
     private static final String DATA_SOURCE_CLASS_NAME = "org.h2.Driver";
 
-    @Autowired DataSource dataSource;
-    @Autowired DateTimeProvider dateTimeProvider;
+    private @Autowired DataSource dataSource;
+    private @Autowired DateTimeProvider dateTimeProvider;
 
     @Test
     public void should_be_configuration() {
@@ -57,7 +57,7 @@ public class DataSourceConfigTest {
         /* When */
         Calendar now = dateTimeProvider.getNow();
         /* Then */
-        assertThat(now.toInstant()).isLessThanOrEqualTo(Instant.now());
+        assertThat(now.toInstant()).isBeforeOrEqualTo(Instant.now());
     }
 
 
