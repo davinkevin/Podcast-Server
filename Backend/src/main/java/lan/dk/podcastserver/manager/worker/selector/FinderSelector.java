@@ -1,33 +1,36 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.manager.worker.finder.Finder;
 import lan.dk.podcastserver.manager.worker.finder.NoOpFinder;
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Comparator;
-import java.util.Set;
+
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 23/02/2016 for Podcast Server
  */
 @Service
-@RequiredArgsConstructor
 public class FinderSelector {
 
     public static final NoOpFinder NO_OP_FINDER = new NoOpFinder();
 
     private final Set<Finder> finders;
 
-    public Finder of(String url) {
-        if (StringUtils.isEmpty(url)) {
-            return NO_OP_FINDER;
-        }
+    public FinderSelector(java.util.Set<Finder> finders) {
+        this.finders = HashSet.ofAll(finders);
+    }
 
-        return finders
-                .stream()
-                .min(Comparator.comparing(updater -> updater.compatibility(url)))
-                .orElse(NO_OP_FINDER);
+    public Finder of(String url) {
+        return Option(url)
+                .filter(StringUtils::isNotEmpty)
+                .map(u -> finders)
+                .getOrElse(HashSet.empty())
+                .minBy(Comparator.comparing(finder -> finder.compatibility(url)))
+                .getOrElse(NO_OP_FINDER);
     }
 }

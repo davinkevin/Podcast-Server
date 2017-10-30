@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.manager.worker.selector;
 
-import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.manager.worker.finder.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static io.vavr.API.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -38,7 +38,7 @@ public class FinderSelectorTest {
         when(rssFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
 
-        finderSelector = new FinderSelector(HashSet.of(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, franceTvFinder, rssFinder, youtubeFinder).toJavaSet());
+        finderSelector = new FinderSelector(Set(beInSportsFinder, canalPlusFinder, dailymotionFinder, jeuxVideoComFinder, franceTvFinder, rssFinder, youtubeFinder).toJavaSet());
     }
 
     @Test
