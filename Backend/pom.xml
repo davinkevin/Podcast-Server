@@ -172,15 +172,10 @@
             <artifactId>jarchivelib</artifactId>
             <version>0.7.1</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
           <groupId>net.bramp.ffmpeg</groupId>
           <artifactId>ffmpeg</artifactId>
-          <version>0.6-SNAPSHOT</version>
-        </dependency>-->
-        <dependency>
-            <groupId>com.github.davinkevin</groupId>
-            <artifactId>ffmpeg-cli-wrapper</artifactId>
-            <version>0.6-SNAPSHOT</version>
+          <version>0.6.1</version>
         </dependency>
         <!-- Mapper JSON -->
         <dependency>
