@@ -174,13 +174,21 @@ public class SixPlayUpdater extends AbstractUpdater {
         }
 
         String url(String basePath) {
-            return basePath + code + "-c_" + StringUtils.substringAfter(id, "_");
+            return basePath + code + this.shortId();
         }
 
         String cover() {
             return images.headOption()
                     .map(Image::url)
                     .getOrElse(() -> null);
+        }
+
+        private String shortId() {
+            return Option(id)
+                    .map(s -> s.substring(0, 1))
+                    .map(v -> "-" + v + "_")
+                    .map(v -> v + StringUtils.substringAfter(id, "_"))
+                    .getOrElse("");
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
