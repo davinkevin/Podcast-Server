@@ -37,7 +37,7 @@ export default class PodcastsListComponent {
     }
 
     $onInit(){
-        TitleService.title = 'Podcasts';
+        this.TitleService.title = 'Podcasts';
         this.filters = PodcastsListComponent.defaultFilters;
     }
 
