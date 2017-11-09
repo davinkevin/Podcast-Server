@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -140,13 +141,18 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
             }
 
             log.info("Doublon sur le fichier en lien avec {} - {}, {}", item.getPodcast().getTitle(), item.getId(), item.getTitle() );
-            String fileName = finalFile.getFileName().toString();
-            return Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension);
-        } catch (IOException e) {
+            return generateTempFileNextTo(finalFile);
+        } catch (UncheckedIOException | IOException e) {
             log.error("Error during creation of target file", e);
             stopDownload();
             return null;
         }
+    }
+
+    Path generateTempFileNextTo(Path finalFile) {
+        String fileName = finalFile.getFileName().toString();
+        return Try.of(() -> Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension))
+                .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
     }
 
     private Path getDestinationFile(Item item) {

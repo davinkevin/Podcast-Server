@@ -60,6 +60,7 @@ public class FfmpegService {
                     .addOutput(target.toAbsolutePath().toString())
                     .setAudioCodec(CODEC_COPY)
                     .setVideoCodec(CODEC_COPY)
+                    .setFormat("mp4")
                     .done();
 
             ffmpegExecutor.createJob(builder).run();
@@ -131,7 +132,7 @@ public class FfmpegService {
         runAsync(ffmpegExecutor.createJob(ffmpegBuilder, progressListener));
 
         Future<Process> process = pl.getProcess();
-        return Try(() -> process.get(1, TimeUnit.SECONDS))
+        return Try(() -> process.get(2, TimeUnit.SECONDS))
                 .onFailure(e -> process.cancel(true))
                 .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
     }

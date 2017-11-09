@@ -29,9 +29,9 @@ public class M3U8Downloader extends AbstractDownloader {
     protected final UrlService urlService;
     protected final M3U8Service m3U8Service;
     protected final FfmpegService ffmpegService;
-    private final ProcessService processService;
+    protected final ProcessService processService;
 
-    private Process process;
+    protected Process process;
 
     public M3U8Downloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
@@ -60,7 +60,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 .done();
 
 
-        process = ffmpegService.download(getItemUrl(item), command, handleProgression(duration));
+        process = ffmpegService.download(getItemUrl(item), command, handleProgression(0d, duration));
 
         processService.waitFor(process);
 
@@ -74,11 +74,11 @@ public class M3U8Downloader extends AbstractDownloader {
         return UrlService.USER_AGENT_DESKTOP;
     }
 
-    private ProgressListener handleProgression(Double duration) {
-        return p -> broadcastProgression(((Float) (Long.valueOf(p.out_time_ms).floatValue() / duration.floatValue() * 100)).intValue());
+    ProgressListener handleProgression(Double alreadyDoneDuration, Double globalDuration) {
+        return p -> broadcastProgression(((Float) ((Long.valueOf(p.out_time_ms).floatValue() + alreadyDoneDuration.longValue()) / globalDuration.floatValue() * 100)).intValue());
     }
 
-    private void broadcastProgression(int cpt) {
+    void broadcastProgression(int cpt) {
         item.setProgression(cpt);
         log.debug("Progression : {}", item.getProgression());
         convertAndSaveBroadcast();
