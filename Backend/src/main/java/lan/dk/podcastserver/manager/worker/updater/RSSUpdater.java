@@ -103,8 +103,8 @@ public class RSSUpdater extends AbstractUpdater {
 
     private ZonedDateTime getPubDate(Element item) {
         String date = Match(item.getChildText("pubDate")).of(
-                Case($(s -> s.contains("PST")), s -> s.replaceAll("PST", " +0800")),
-                Case($(s -> s.contains("PST")), s -> s.replaceAll("PDT", " +0900")),
+                Case($(s -> s.contains("PST")), s -> s.replaceAll("PST", "+0800")),
+                Case($(s -> s.contains("PDT")), s -> s.replaceAll("PDT", "+0900")),
                 Case($(), Function.identity())
         );
 
