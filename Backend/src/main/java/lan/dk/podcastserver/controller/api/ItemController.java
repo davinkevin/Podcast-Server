@@ -96,7 +96,7 @@ public class ItemController {
     @GetMapping("{id}/cover{ext}")
     public ResponseEntity<?> getCover(@PathVariable UUID id) throws Exception {
         Item item = itemBusiness.findOne(id);
-        Path cover = item.getCoverPath();
+        Path cover = item.getCoverPath().getOrElseThrow(() -> new RuntimeException("File not found for item of id " + id));
 
         if (Files.notExists(cover))
             return ResponseEntity

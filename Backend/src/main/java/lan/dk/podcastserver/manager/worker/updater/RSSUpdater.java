@@ -16,13 +16,11 @@ import org.jdom2.Namespace;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 import static io.vavr.API.*;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
@@ -89,16 +87,10 @@ public class RSSUpdater extends AbstractUpdater {
     }
 
     private Cover coverOf(Element element) {
-        Element thumbnail = element.getChild("thumbnail", MEDIA);
-        if (isNull(thumbnail)) {
-            return null;
-        }
-
-        if (nonNull(thumbnail.getAttributeValue("url"))) {
-            return imageService.getCoverFromURL(thumbnail.getAttributeValue("url"));
-        }
-
-        return imageService.getCoverFromURL(thumbnail.getText());
+        return Option(element.getChild("thumbnail", MEDIA))
+                .flatMap(t -> Option(t.getAttributeValue("url")).orElse(Option(t.getText())))
+                .map(imageService::getCoverFromURL)
+                .getOrElse(() -> null);
     }
 
     private ZonedDateTime getPubDate(Element item) {

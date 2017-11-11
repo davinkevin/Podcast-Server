@@ -147,10 +147,9 @@ public class UpdatePodcastBusiness  {
             return itemsToAdd;
         }
 
-        itemsToAdd
+        itemRepository.save(itemsToAdd
                 .peek(podcast::add)
-                .map(i -> i.setStatus(Status.NOT_DOWNLOADED))
-                .forEach(itemRepository::save);
+                .map(i -> i.setStatus(Status.NOT_DOWNLOADED)));
 
         podcastRepository.save(podcast.lastUpdateToNow());
 

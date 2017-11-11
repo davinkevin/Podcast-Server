@@ -1,13 +1,12 @@
 package lan.dk.podcastserver.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
+import io.vavr.control.Option;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
@@ -22,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static io.vavr.API.Option;
 import static io.vavr.API.Try;
 
 @Slf4j
@@ -140,6 +140,14 @@ public class Podcast implements Serializable {
     public Podcast lastUpdateToNow() {
         this.lastUpdate = ZonedDateTime.now();
         return this;
+    }
+
+    @JsonIgnore
+    public Option<Path> getCoverPath() {
+        return Option(cover)
+                .map(Cover::getUrl)
+                .map(FilenameUtils::getExtension)
+                .map(ext -> rootFolder.resolve(title).resolve("cover." + ext));
     }
 
     public interface PodcastListingView {}

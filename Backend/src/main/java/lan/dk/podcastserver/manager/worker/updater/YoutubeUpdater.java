@@ -124,7 +124,7 @@ public class YoutubeUpdater extends AbstractUpdater {
                     .url(item.getUrl())
                     .cover(item.getCover()
                             .map(t -> Cover.builder().url(t.getUrl()).width(t.getWidth()).height(t.getHeight()).build())
-                            .getOrElse(DEFAULT_COVER)
+                            .getOrElse(() -> null)
                     )
                 .build();
     }

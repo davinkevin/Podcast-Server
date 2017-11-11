@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.updater;
 
 import io.vavr.collection.Set;
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
@@ -52,10 +54,17 @@ public class RSSUpdaterTest {
 
     @Test
     public void should_get_items() throws JDOMException, IOException {
-        /* When */ Set<Item> items = rssUpdater.getItems(rssAppload);
+        /* Given */
+        when(imageService.getCoverFromURL(anyString())).then(this::createCover);
+
+        /* When */
+        Set<Item> items = rssUpdater.getItems(rssAppload);
+
         /* Then */
         verify(jdomService, times(1)).parse(eq(MOCK_URL));
-        assertThat(items).hasSize(217);
+        verify(imageService, times(2)).getCoverFromURL(anyString());
+        assertThat(items).hasSize(217)
+                .anySatisfy(i -> assertThat(i.getCover()).isNotEqualTo(Cover.DEFAULT_COVER));
     }
 
     @Test
@@ -83,5 +92,9 @@ public class RSSUpdaterTest {
         AbstractUpdater.Type type = rssUpdater.type();
         assertThat(type.key()).isEqualTo("RSS");
         assertThat(type.name()).isEqualTo("RSS");
+    }
+
+    private Cover createCover(InvocationOnMock i) {
+        return Cover.builder().url(i.getArgumentAt(0, String.class)).build();
     }
 }

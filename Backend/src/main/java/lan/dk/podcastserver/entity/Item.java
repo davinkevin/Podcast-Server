@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -190,7 +191,8 @@ public class Item {
             return;
         }
 
-        Try(() -> Files.deleteIfExists(getCoverPath()))
+        getCoverPath().toTry()
+            .mapTry(Files::deleteIfExists)
             .onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
 
         if (isDownloaded()) {
@@ -214,13 +216,13 @@ public class Item {
         return getPodcastPath().resolve(fileName);
     }
 
-    public Path getCoverPath() {
+    public Option<Path> getCoverPath() {
         return Option(cover)
                 .map(Cover::getUrl)
-                .orElse(() -> Option(""))
+                .filter(StringUtils::isNotEmpty)
                 .map(FilenameUtils::getExtension)
                 .map(ext -> getPodcastPath().resolve(id + "." + ext))
-                .getOrElseThrow(() -> new RuntimeException("Cover Path not found for item " + title));
+                .orElse(() -> podcast.getCoverPath());
     }
 
     private Path getPodcastPath() {
