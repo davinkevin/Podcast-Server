@@ -134,7 +134,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         log.debug("Creation of file : {}", finalFile.toFile().getAbsolutePath());
 
         try {
-            if (Files.notExists(finalFile.getParent())) Files.createDirectory(finalFile.getParent());
+            if (Files.notExists(finalFile.getParent())) Files.createDirectories(finalFile.getParent());
 
             if (!(Files.exists(finalFile) || Files.exists(finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension)))) {
                 return finalFile.resolveSibling(finalFile.getFileName() + temporaryExtension);

@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
+import com.mashape.unirest.http.HttpResponse;
 import io.vavr.Lazy;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
@@ -16,7 +17,9 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
@@ -145,10 +148,25 @@ public class SixPlayDownloader extends M3U8Downloader {
         Set<M6PlayAssets> assets = item.getAssets();
 
         return assets
-                .find(i -> "usp_hls_h264".equalsIgnoreCase(i.getType()))
+                .find(i -> "sd3-ism".equalsIgnoreCase(i.getVideo_quality()))
+                .flatMap(this::transformSd3Url)
+                .orElse(() -> assets.find(i -> "usp_hls_h264".equalsIgnoreCase(i.getType())))
                 .orElse(() -> assets.find(i -> "hq".equalsIgnoreCase(i.getVideo_quality())))
                 .orElse(() -> assets.find(i -> "hd".equalsIgnoreCase(i.getVideo_quality())))
                 .orElse(() -> assets.find(i -> "sd".equalsIgnoreCase(i.getVideo_quality())));
+    }
+
+    private Option<M6PlayAssets> transformSd3Url(M6PlayAssets asset) {
+        String modifiedUrl = asset.getFull_physical_path().replaceAll("/([^/]+)\\.ism/[^/]*\\.m3u8", "/$1.ism/$1.m3u8");
+
+        return Try(() -> urlService.get(modifiedUrl)
+                .header(UrlService.USER_AGENT_KEY, UrlService.USER_AGENT_MOBILE)
+                .asString())
+                .map(HttpResponse::getRawBody)
+                .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
+                .map(url -> urlService.addDomainIfRelative(modifiedUrl, url))
+                .map(url -> new M6PlayAssets(asset.getVideo_quality(), url, asset.getType()))
+                .toOption();
     }
 
     private Option<DocumentContext> extractJson(Elements elements) {
@@ -166,6 +184,7 @@ public class SixPlayDownloader extends M3U8Downloader {
         @Getter @Setter private Set<M6PlayAssets> assets;
     }
 
+    @AllArgsConstructor @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class M6PlayAssets {
         @Setter @Getter private String video_quality;

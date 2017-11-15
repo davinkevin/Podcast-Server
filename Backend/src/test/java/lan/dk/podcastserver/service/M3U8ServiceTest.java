@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
@@ -10,6 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -21,9 +24,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class M3U8ServiceTest {
 
-    @Mock
-    UrlService urlService;
-    @InjectMocks M3U8Service m3U8Service;
+    private @Mock UrlService urlService;
+    private @InjectMocks M3U8Service m3U8Service;
 
     @Test
     public void should_select_best_audio_video_url() {

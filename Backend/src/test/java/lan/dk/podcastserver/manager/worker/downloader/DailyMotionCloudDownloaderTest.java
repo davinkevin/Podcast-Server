@@ -18,8 +18,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 
+import static io.vavr.API.Option;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.any;
@@ -58,7 +60,7 @@ public class DailyMotionCloudDownloaderTest {
         when(urlService.getRealURL(eq(item.getUrl()))).thenReturn(item.getUrl());
         when(urlService.asStream(eq(item.getUrl()))).then(i -> IOUtils.fileAsStream("/remote/downloader/dailymotion/dailymotion.m3u8"));
         when(urlService.addDomainIfRelative(eq(item.getUrl()), eq(realUrl))).thenCallRealMethod();
-        when(m3U8Service.findBestQuality(any())).thenCallRealMethod();
+        when(m3U8Service.findBestQuality(any())).thenReturn(Option("http://proxy-91.dailymotion.com/video/221/442/9dce76b19072beda39720aa04aa2e47a-video=1404000-audio_AACL_fra_70000_315=70000.m3u8"));
         dailyMotionCloudDownloader.item = item;
 
         /* When */
@@ -89,7 +91,7 @@ public class DailyMotionCloudDownloaderTest {
         when(urlService.getRealURL(eq(item.getUrl()))).thenReturn(item.getUrl());
         when(urlService.asStream(eq(item.getUrl()))).then(i -> IOUtils.fileAsStream("/remote/downloader/dailymotion/dailymotion.m3u8"));
         when(urlService.addDomainIfRelative(eq(item.getUrl()), eq(realUrl))).thenCallRealMethod();
-        when(m3U8Service.findBestQuality(any())).thenCallRealMethod();
+        when(m3U8Service.findBestQuality(any())).thenReturn(Option("http://proxy-91.dailymotion.com/video/221/442/9dce76b19072beda39720aa04aa2e47a-video=1404000-audio_AACL_fra_70000_315=70000.m3u8"));
         dailyMotionCloudDownloader.item = item;
 
         /* When */

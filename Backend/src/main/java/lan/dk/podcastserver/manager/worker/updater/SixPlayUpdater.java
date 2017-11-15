@@ -46,13 +46,11 @@ public class SixPlayUpdater extends AbstractUpdater {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
     private static final TypeRef<Set<SixPlayItem>> TYPE_ITEMS = new TypeRef<Set<SixPlayItem>>(){};
     private static final TypeRef<HashMap<String, Object>> TYPE_KEYS = new TypeRef<HashMap<String, Object>>(){};
-    private static final TypeRef<Set<Integer>> TYPE_IDS = new TypeRef<Set<Integer>>(){};
 
-    private static final String VIDEOS_SELECTOR = "mainStoreState.video.programVideosBySubCategory.%d.%d";
     private static final String URL_TEMPLATE_PODCAST = "http://www.6play.fr/%s-p_%d/";
-    private static final String SUB_CAT_SELECTOR = "mainStoreState.program.programsById.%d.program_subcats[*].id";
     private static final String PROGRAM_CODE_SELECTOR = "mainStoreState.program.programsById.%d.code";
     private static final String PROGRAM_ID_SELECTOR = "mainStoreState.program.programsById";
+    private static final String VIDEO_BY_ID_SELECTOR = "mainStoreState.video.programVideoById[*]";
 
     private final HtmlService htmlService;
     private final JsonService jsonService;
@@ -82,19 +80,15 @@ public class SixPlayUpdater extends AbstractUpdater {
                 .map(Integer::valueOf)
                 .getOrElseThrow(() -> new RuntimeException("programId not found in root.__6play"));
 
-        Set<Integer> subCatIds = root6Play
-                .map(JsonService.to(String.format(SUB_CAT_SELECTOR, programId), TYPE_IDS))
-                .getOrElseThrow(() -> new RuntimeException("subcatId not found in root.__6play"));
-
         String programCode = root6Play
                 .map(JsonService.to(String.format(PROGRAM_CODE_SELECTOR, programId), String.class))
                 .getOrElseThrow(() -> new RuntimeException("programCode not found in root.__6play"));
 
         String basePath = String.format(URL_TEMPLATE_PODCAST, programCode, programId);
 
-        return subCatIds
-                .flatMap(v -> root6Play.map(s -> Tuple.of(s, String.format(VIDEOS_SELECTOR, programId, v))))
-                .flatMap(t -> JsonService.to(t._2(), TYPE_ITEMS).apply(t._1()))
+        return root6Play
+                .map(JsonService.to(VIDEO_BY_ID_SELECTOR, TYPE_ITEMS))
+                .getOrElse(HashSet::empty)
                 .map(s -> this.convertToItem(s, basePath));
     }
 

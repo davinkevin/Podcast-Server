@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.function.Consumer;
 
@@ -82,7 +83,7 @@ public class TF1ReplayDownloaderTest {
 
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
-        when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
+        when(m3U8Service.findBestQuality(any(InputStream.class))).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
 
         /* When */
@@ -122,7 +123,7 @@ public class TF1ReplayDownloaderTest {
 
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
-        when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
+        when(m3U8Service.findBestQuality(any(InputStream.class))).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
 
         /* When */
@@ -166,7 +167,7 @@ public class TF1ReplayDownloaderTest {
 
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
-        when(m3U8Service.findBestQuality(any())).thenReturn(Option("foo/bar/video.mp4"));
+        when(m3U8Service.findBestQuality(any(InputStream.class))).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
 
         /* When */
