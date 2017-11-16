@@ -1,12 +1,59 @@
-<md-card *ngFor="let item of items?.content">
-  <md-card-header>
-    <md-card-title>{{ item.title }}</md-card-title>
-  </md-card-header>
-  <img md-card-image [src]="item.cover?.url">
-  <md-card-actions>
-    <button md-button>
-      <md-icon class="section-icon">play_arrow</md-icon>
-      Play
-    </button>
-  </md-card-actions>
-</md-card>
+<script src="search.module.ts"></script>
+<div class="search__bar">
+
+  <form [formGroup]="form">
+
+    <md-input-container>
+      <input mdInput formControlName="q" name="q">
+    </md-input-container>
+
+    <md-input-container>
+      <input mdInput placeholder="Tags" formControlName="tags" name="tags">
+    </md-input-container>
+
+    <md-select placeholder="Status" formControlName="status" name="status">
+      <md-option *ngFor="let status of statuses" [value]="status.value">
+        {{ status.title }}
+      </md-option>
+    </md-select>
+
+    <span formGroupName="sort">
+
+    <md-select placeholder="Sort on" formControlName="property" name="property">
+      <md-option *ngFor="let property of properties" [value]="property.value">
+        {{ property.title }}
+      </md-option>
+    </md-select>
+
+    <md-select placeholder="Order" formControlName="direction" name="direction">
+      <md-option *ngFor="let direction of directions" [value]="direction.value">
+        {{ direction.title }}
+      </md-option>
+    </md-select>
+
+    </span>
+
+  </form>
+
+</div>
+
+<md-paginator [length]="items.totalElements"
+              [pageSize]="12"
+              [pageSizeOptions]="[4, 12, 36]"
+              (page)="changePage($event)">
+</md-paginator>
+
+<div class="search__results">
+  <md-card *ngFor="let item of items?.content">
+    <md-card-header>
+      <md-card-title>{{ item.title | truncate: 30}}</md-card-title>
+    </md-card-header>
+    <img md-card-image [src]="item.cover?.url">
+    <md-card-actions>
+      <button md-button>
+        <md-icon class="section-icon">play_arrow</md-icon>
+        Play
+      </button>
+    </md-card-actions>
+  </md-card>
+</div>

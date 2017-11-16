@@ -1,17 +1,26 @@
-import {inject, TestBed} from '@angular/core/testing';
+import {async, inject, TestBed} from '@angular/core/testing';
 
 import {SearchResolver} from './search.resolver';
 import {ItemService} from '../../shared/service/item/item.service';
 import {ActivatedRouteSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import Spy = jasmine.Spy;
+import {Item, Page, Direction} from '../../shared/entity';
+import {Store, StoreModule} from '@ngrx/store';
+import * as fromSearch from '../search.reducer';
+import * as SearchActions from '../search.actions';
+
+import {selectResults} from '../search.reducer';
+
 
 describe('SearchResolver', () => {
 
   let itemService: ItemService;
   let route: ActivatedRouteSnapshot;
+  let resolver: SearchResolver;
+  let store;
 
-  const PAGE = {
+  const PAGE : Page<Item> = {
     'content':  [
       {
         'id': '33c98205-51dd-4245-a86b-6c725121684d',
@@ -252,31 +261,54 @@ describe('SearchResolver', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        StoreModule.forRoot([]),
+        StoreModule.forFeature('searchModule', {
+          search: fromSearch.reducer
+        })
+      ],
       providers: [
-        SearchResolver,
-        {provide: ItemService, useValue: itemService},
-        {provide: ActivatedRouteSnapshot, useValue: route},
+        SearchResolver
       ]
     });
+
+    resolver = TestBed.get(SearchResolver);
+  });
+
+  beforeEach(() => {
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
+    spyOn(store, 'select').and.callThrough();
   });
 
   it('should be able to inject service', inject([SearchResolver], (service: SearchResolver) => {
     expect(service).toBeTruthy();
   }));
 
-  it('should trigger search with current page parameter', inject([SearchResolver], (resolver: SearchResolver) => {
+  it('should trigger search if initial response', async(() => {
     /* Given */
     /* When  */
-    resolver.resolve(route, null).subscribe(v => {
-      /* Then  */
-      expect(v).toBe(PAGE);
-      expect(itemService.search).toHaveBeenCalledWith({
-        page: NUM_PAGE,
-        size: 12,
-        downloaded: true,
-        tags: [],
-        sort: [{ property: 'pubDate', direction: 'DESC' }]
-      });
-    });
+    resolver.resolve(route, null).subscribe(() => {});
+    /* Then */
+    expect(store.dispatch).toHaveBeenCalled();
+    expect(store.select).toHaveBeenCalledWith(selectResults);
   }));
+
+  it('should return the results propagated by effects', () => {
+    /* Given */
+    const searchSuccess = new SearchActions.SearchSuccess({
+      content: [],
+      first: true, last: true,
+      totalPages: 1, totalElements: 5, numberOfElements: 5,
+      size:5, number:1,
+      sort:[{direction: Direction.DESC, property: 'pubDate'}]
+    });
+    store.dispatch(searchSuccess);
+
+    /* When  */
+    resolver.resolve(route, null).subscribe(v => {
+    /* Then  */
+      expect(v).toBe(searchSuccess.payload);
+    });
+  });
 });

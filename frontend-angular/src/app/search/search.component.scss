@@ -1,12 +1,26 @@
-:host {
+
+.search__bar {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-around;
+  height: 7vh;
+
+  md-select[name=property] {
+    width: 12vw;
+  }
+
+}
+
+.search__results {
   list-style: none;
   display: flex;
 
   flex-flow: row wrap;
   justify-content: space-around;
-}
 
-md-card {
-  width: 300px;
-  margin: 5px;
+  md-card {
+    width: 300px;
+    margin: 5px;
+  }
 }

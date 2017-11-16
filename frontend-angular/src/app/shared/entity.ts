@@ -11,16 +11,16 @@ export interface Cover {
 }
 
 export interface Item {
-  cover: Cover;
-  creationDate: string;
   id: string;
-  isDownloaded: boolean;
-  mimeType: string;
-  podcastId: string;
-  proxyURL: string;
-  status: Status;
+  cover: Cover;
   title: string;
   url: string;
+  mimeType: string;
+  status: Status | string;
+  creationDate: string;
+  isDownloaded: boolean;
+  proxyURL: string;
+  podcastId: string;
 }
 
 export interface Tag {
@@ -41,8 +41,12 @@ export interface Page<T> {
 }
 
 export interface Sort {
-  direction: Direction;
+  direction: Direction | string;
   property: string;
+  ignoreCase?: boolean;
+  nullHandling?: string,
+  descending?: boolean;
+  ascending?: boolean;
 }
 
 export enum Direction {
@@ -60,10 +64,14 @@ export enum Status {
 }
 
 export interface SearchItemPageRequest {
-  page: number;
-  size: number;
-  downloaded: boolean;
-  tags?: Array<Tag>;
-  term?: string;
-  sort?: Array<Sort>;
+  q?: string;
+  page?: number;
+  size?: number;
+  status?: Status[];
+  tags?: Tag[];
+  sort?: Sort[];
+}
+
+export interface BackendError {
+  message: string;
 }

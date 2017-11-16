@@ -5,7 +5,7 @@ import {BaseRequestOptions, Http, HttpModule, RequestMethod, Response, ResponseO
 
 import {ItemService} from './item.service';
 import {MockBackend, MockConnection} from '@angular/http/testing';
-import {Direction} from 'app/shared/entity';
+import {Direction, Item, Page, Status} from 'app/shared/entity';
 
 describe('Service: Item', () => {
 
@@ -34,7 +34,17 @@ describe('Service: Item', () => {
 
   it('should get all elements from backend with default parameter', () => {
     /* Given */
-    const body = {};
+    const body: Page<Item> = {
+      content:[],
+      first:true,
+      last:true,
+      totalPages:10,
+      totalElements: 100,
+      numberOfElements: 10,
+      size: 10,
+      number: 3,
+      sort: []
+    };
     let conn: MockConnection;
 
     mockBackend.connections.subscribe((c: MockConnection) => {
@@ -43,7 +53,7 @@ describe('Service: Item', () => {
     });
 
     /* When */
-    itemService.search().subscribe(v => {
+    itemService.search(ItemService.defaultSearch).subscribe(v => {
       expect(v).toEqual(body);
     });
 
@@ -52,14 +62,23 @@ describe('Service: Item', () => {
     expect(conn.request.url).toContain(rootUrl + '/search');
     expect(conn.request.url).toContain('page=0');
     expect(conn.request.url).toContain('size=12');
-    expect(conn.request.url).toContain('downloaded=true');
     expect(conn.request.url).toContain('sort=pubDate,DESC');
     expect(conn.request.url).toContain('tags=');
   });
 
   it('should get all elements from backend with default parameter', () => {
     /* Given */
-    const body = {};
+    const body: Page<Item> = {
+      content:[],
+      first:true,
+      last:false,
+      totalPages:10,
+      totalElements: 100,
+      numberOfElements: 10,
+      size: 10,
+      number: 3,
+      sort: [{direction: Direction.ASC, property:"relevance"}]
+    };
     let conn: MockConnection;
 
     mockBackend.connections.subscribe((c: MockConnection) => {
@@ -71,7 +90,7 @@ describe('Service: Item', () => {
     itemService.search({
       page: 3,
       size: 10,
-      downloaded: false,
+      status: [Status.STARTED, Status.FINISH],
       sort: [{direction: Direction.ASC, property: 'foo'}],
       tags: [{id: 'id', name: 'bar'}]
     }).subscribe(v => {
@@ -83,7 +102,7 @@ describe('Service: Item', () => {
     expect(conn.request.url).toContain(rootUrl + '/search');
     expect(conn.request.url).toContain('page=3');
     expect(conn.request.url).toContain('size=10');
-    expect(conn.request.url).toContain('downloaded=false');
+    expect(conn.request.url).toContain('status');
     expect(conn.request.url).toContain('sort=foo,ASC');
     expect(conn.request.url).toContain('tags=bar');
   });
