@@ -7,6 +7,7 @@ import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.service.ByteRangeResourceHandler;
 import lan.dk.podcastserver.service.MultiPartFileSenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +37,11 @@ import java.util.UUID;
 @RequestMapping("/api/podcasts/{idPodcast}/items")
 @RequiredArgsConstructor
 public class ItemController {
-    
+
     private final ItemBusiness itemBusiness;
     private final ItemDownloadManager itemDownloadManager;
     private final MultiPartFileSenderService multiPartFileSenderService;
+    private final ByteRangeResourceHandler handler;
     private final WatchListBusiness watchListBusiness;
 
     @GetMapping
@@ -69,7 +71,7 @@ public class ItemController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void delete (@PathVariable(value = "id") UUID id) {
+    public void delete(@PathVariable(value = "id") UUID id) {
         itemBusiness.delete(id);
     }
 
@@ -78,16 +80,12 @@ public class ItemController {
         itemDownloadManager.addItemToQueue(id);
     }
 
-    @GetMapping("{id}/download{ext}")
+    @GetMapping("{id}/{file}")
     public void getEpisodeFile(@PathVariable UUID id, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        log.debug("Download du fichier d'item {}", id);
         Item item = itemBusiness.findOne(id);
         if (item.isDownloaded()) {
-            log.debug("Récupération en local de l'item {} au chemin {}", id, item.getLocalUri());
-            multiPartFileSenderService.fromPath(item.getLocalPath())
-                    .with(request)
-                    .with(response)
-                .serveResource();
+            request.setAttribute(ByteRangeResourceHandler.ATTR_FILE, item.getLocalPath());
+            handler.handleRequest(request, response);
         } else {
             response.sendRedirect(item.getUrl());
         }

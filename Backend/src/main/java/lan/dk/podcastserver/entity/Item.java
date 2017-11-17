@@ -16,6 +16,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
@@ -46,7 +47,6 @@ public class Item {
 
     public  static Path rootFolder;
     public  static final Item DEFAULT_ITEM = new Item();
-    private static final String PROXY_URL = "/api/podcasts/%s/items/%s/download%s";
     private static final String COVER_PROXY_URL = "/api/podcasts/%s/items/%s/cover.%s";
 
     @Id
@@ -170,7 +170,22 @@ public class Item {
 
     @Transient @JsonProperty("proxyURL") @JsonView(ItemSearchListView.class)
     public String getProxyURL() {
-        return String.format(PROXY_URL, podcast.getId(), id, getExtension());
+        // /api/podcasts/%s/items/%s/%s%s
+        return this.getProxyURLWithoutExtention() + getExtension();
+    }
+
+    public String getProxyURLWithoutExtention() {
+        return UriComponentsBuilder.fromPath("/")
+                .pathSegment(
+                        "api",
+                        "podcasts",
+                        String.valueOf(podcast.getId()),
+                        "items",
+                        String.valueOf(id),
+                        Option(title).map(s -> s.replaceAll("[^a-zA-Z0-9.-]", "_")).getOrElse("null")
+                )
+                .build(true)
+                .toString();
     }
 
     @Transient @JsonProperty("isDownloaded") @JsonView(ItemSearchListView.class)
@@ -229,9 +244,6 @@ public class Item {
         return rootFolder.resolve(podcast.getTitle());
     }
 
-    public String getProxyURLWithoutExtention() {
-        return String.format(PROXY_URL, podcast.getId(), id, "");
-    }
 
     private String getExtension() {
         return Option(fileName)

@@ -149,10 +149,10 @@ public class ItemTest {
     @Test
     public void should_expose_the_API_url() {
         assertThat(ITEM.getProxyURLWithoutExtention())
-                .isEqualTo(String.format("/api/podcasts/%s/items/%s/download", PODCAST_ID, ID));
+                .isEqualTo(String.format("/api/podcasts/%s/items/%s/" + "Fake_Item", PODCAST_ID, ID));
 
         assertThat(ITEM.getProxyURL())
-                .isEqualTo(String.format("/api/podcasts/%s/items/%s/download.mp4", PODCAST_ID, ID));
+                .isEqualTo(String.format("/api/podcasts/%s/items/%s/Fake_Item.mp4", PODCAST_ID, ID));
     }
 
     @Test
