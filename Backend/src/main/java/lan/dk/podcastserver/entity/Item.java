@@ -206,9 +206,11 @@ public class Item {
             return;
         }
 
-        getCoverPath().toTry()
-            .mapTry(Files::deleteIfExists)
-            .onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
+        if (Objects.nonNull(this.getCover()) && !this.getCover().equals(podcast.getCover())) {
+            getCoverPath().toTry()
+                    .mapTry(Files::deleteIfExists)
+                    .onFailure(e -> log.error("Error during deletion of cover of {}", this, e));
+        }
 
         if (isDownloaded()) {
             deleteFile();
