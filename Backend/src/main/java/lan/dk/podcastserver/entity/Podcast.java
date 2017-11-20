@@ -143,7 +143,7 @@ public class Podcast implements Serializable {
     }
 
     @JsonIgnore
-    public Option<Path> getCoverPath() {
+    Option<Path> getCoverPath() {
         return Option(cover)
                 .map(Cover::getUrl)
                 .map(FilenameUtils::getExtension)

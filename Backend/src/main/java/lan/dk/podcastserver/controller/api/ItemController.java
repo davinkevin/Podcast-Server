@@ -8,7 +8,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.service.ByteRangeResourceHandler;
-import lan.dk.podcastserver.service.MultiPartFileSenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -40,7 +39,6 @@ public class ItemController {
 
     private final ItemBusiness itemBusiness;
     private final ItemDownloadManager itemDownloadManager;
-    private final MultiPartFileSenderService multiPartFileSenderService;
     private final ByteRangeResourceHandler handler;
     private final WatchListBusiness watchListBusiness;
 

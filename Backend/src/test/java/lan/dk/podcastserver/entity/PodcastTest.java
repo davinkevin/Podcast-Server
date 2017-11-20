@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import io.vavr.collection.HashSet;
+import io.vavr.control.Option;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.FileSystemUtils;
@@ -156,6 +157,14 @@ public class PodcastTest {
         assertThat(podcastFolder).exists();
     }
 
+    @Test
+    public void should_provide_cover_path() {
+        /* GIVEN */
+        /* WHEN  */
+        Option<Path> coverPath = podcast.getCoverPath();
 
+        /* THEN  */
+        assertThat(coverPath).contains(Podcast.rootFolder.resolve(podcast.getTitle()).resolve("cover.jpg"));
+    }
 
 }
