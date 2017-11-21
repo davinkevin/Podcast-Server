@@ -13,7 +13,7 @@ export class ItemService {
     q: null,
     page: 0,
     size: 12,
-    status: undefined,
+    status: [],
     tags: [],
     sort: [{property: 'pubDate', direction: Direction.DESC}]
   };
