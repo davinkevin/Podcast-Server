@@ -46,7 +46,7 @@
 <div class="search__results">
   <md-card *ngFor="let item of items?.content">
     <md-card-header>
-      <md-card-title>{{ item.title | truncate: 30}}</md-card-title>
+      <md-card-title>{{ item.title | truncate: 20}}</md-card-title>
     </md-card-header>
     <img md-card-image [src]="item.cover?.url">
     <md-card-actions>

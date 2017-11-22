@@ -285,7 +285,7 @@ describe('SearchResolver', () => {
     expect(service).toBeTruthy();
   }));
 
-  it('should trigger search if initial response', async(() => {
+  it('should trigger search', async(() => {
     /* Given */
     /* When  */
     resolver.resolve(route, null).subscribe(() => {});
