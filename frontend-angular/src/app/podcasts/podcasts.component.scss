@@ -1,0 +1,12 @@
+.podcasts__results {
+  list-style: none;
+  display: flex;
+
+  flex-flow: row wrap;
+  justify-content: space-around;
+
+  md-card {
+    width: 200px;
+    margin: 5px;
+  }
+}

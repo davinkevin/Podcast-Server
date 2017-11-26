@@ -23,6 +23,14 @@ export interface Item {
   podcastId: string;
 }
 
+export interface Podcast {
+  id: string;
+  title: string;
+  type: string;
+  lastUpdate: Date | string;
+  cover: Cover;
+}
+
 export interface Tag {
   id: string;
   name: string;

@@ -3,7 +3,7 @@
 import {inject, TestBed} from '@angular/core/testing';
 import {BaseRequestOptions, Http, HttpModule, RequestMethod, Response, ResponseOptions, XHRBackend} from '@angular/http';
 
-import {ItemService} from './item.service';
+import {defaultSearch, ItemService} from './item.service';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 import {Direction, Item, Page, Status} from 'app/shared/entity';
 
@@ -53,7 +53,7 @@ describe('Service: Item', () => {
     });
 
     /* When */
-    itemService.search(ItemService.defaultSearch).subscribe(v => {
+    itemService.search(defaultSearch).subscribe(v => {
       expect(v).toEqual(body);
     });
 
@@ -107,4 +107,44 @@ describe('Service: Item', () => {
     expect(conn.request.url).toContain('tags=bar');
   });
 
+  it('should support query without status', () => {
+    /* Given */
+    const body: Page<Item> = {
+      content:[],
+      first:true,
+      last:false,
+      totalPages:10,
+      totalElements: 100,
+      numberOfElements: 10,
+      size: 10,
+      number: 3,
+      sort: [{direction: Direction.ASC, property:"relevance"}]
+    };
+    let conn: MockConnection;
+
+    mockBackend.connections.subscribe((c: MockConnection) => {
+      c.mockRespond(new Response(new ResponseOptions({body})));
+      conn = c;
+    });
+
+    /* When */
+    itemService.search({
+      page: 3,
+      size: 10,
+      status: [],
+      sort: [{direction: Direction.ASC, property: 'foo'}],
+      tags: [{id: 'id', name: 'bar'}]
+    }).subscribe(v => {
+      expect(v).toEqual(body);
+    });
+
+    /* Then */
+    expect(conn.request.method).toEqual(RequestMethod.Get);
+    expect(conn.request.url).toContain(rootUrl + '/search');
+    expect(conn.request.url).toContain('page=3');
+    expect(conn.request.url).toContain('size=10');
+    expect(conn.request.url).not.toContain('status');
+    expect(conn.request.url).toContain('sort=foo,ASC');
+    expect(conn.request.url).toContain('tags=bar');
+  });
 });

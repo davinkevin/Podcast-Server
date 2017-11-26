@@ -9,6 +9,7 @@ import {SearchModule} from './search/search.module';
 import {RouterModule, Routes} from '@angular/router';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
+import {PodcastsModule} from './podcasts/podcasts.module';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full'}
@@ -20,7 +21,7 @@ const routes: Routes = [
     /* std Modules */       BrowserModule, BrowserAnimationsModule,
     /* Materials Modules */ MdToolbarModule, MdIconModule,
     /* Router Modules */    RouterModule.forRoot(routes),
-    /* Feature Modules */   SearchModule,
+    /* Feature Modules */   SearchModule, PodcastsModule,
     /* @ngrx */             StoreModule.forRoot({}), EffectsModule.forRoot([])
   ],
   providers: [],

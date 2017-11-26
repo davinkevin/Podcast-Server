@@ -9,7 +9,7 @@ import {Store} from '@ngrx/store';
 import {PageEvent} from '@angular/material';
 
 import * as SearchActions from './search.actions';
-import {ItemService} from '../shared/service/item/item.service';
+import {defaultSearch} from '../shared/service/item/item.service';
 import {selectResults} from './search.reducer';
 import {Direction, Item, Page, Sort, Status} from '../shared/entity';
 
@@ -95,7 +95,7 @@ export class SearchComponent implements OnInit {
   }
 
   search(v: any): void {
-    this.store.dispatch(new SearchActions.Search({...ItemService.defaultSearch, ...v }))
+    this.store.dispatch(new SearchActions.Search({...defaultSearch, ...v }))
   }
 
   changePage(e: PageEvent) {
