@@ -1,6 +1,6 @@
 import {async, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 
-import {SearchComponent, StatusesValue} from './search.component';
+import {SearchComponent, StatusesViewValue} from './search.component';
 import {DebugElement} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
@@ -288,7 +288,7 @@ describe('SearchFeature', () => {
 
     describe('with simple request and result', () => {
 
-      const request = {q:'', page: 0, size: 12, status: [], tags: [], sort: [{property: 'pubDate', direction: Direction.DESC}]};
+      const request = {q: '', page: 0, size: 12, status: [], tags: [], sort: [{property: 'pubDate', direction: Direction.DESC}]};
 
       beforeEach(async(() => {
         configureTestingModule(search, request);
@@ -338,7 +338,7 @@ describe('SearchFeature', () => {
           /* Then  */
           expect(q.nativeElement.value).toBe('');
           expect(tags.nativeElement.value).toBe('');
-          expect(status.componentInstance.selected.value).toBe(StatusesValue.ALL);
+          expect(status.componentInstance.selected.value).toBe(StatusesViewValue.ALL);
           expect(property.componentInstance.selected.value).toBe('pubDate');
           expect(direction.componentInstance.selected.value).toBe(Direction.DESC);
         });
@@ -389,7 +389,7 @@ describe('SearchFeature', () => {
         const statusForm = comp.form.get('status');
 
         /* When  */
-        statusForm.setValue(StatusesValue.DOWNLOADED);
+        statusForm.setValue(StatusesViewValue.DOWNLOADED);
         tick(1000);
 
         /* Then  */
@@ -401,7 +401,7 @@ describe('SearchFeature', () => {
         const statusForm = comp.form.get('status');
 
         /* When  */
-        statusForm.setValue(StatusesValue.NOT_DOWNLOADED);
+        statusForm.setValue(StatusesViewValue.NOT_DOWNLOADED);
         tick(1000);
 
         /* Then  */
@@ -427,7 +427,7 @@ describe('SearchFeature', () => {
       let request = undefined;
 
       beforeAll(() => {
-        request = {q:'', page: 0, size: 12, status: [], tags: [], sort: [{property: 'pubDate', direction: Direction.DESC}]}
+        request = {q: '', page: 0, size: 12, status: [], tags: [], sort: [{property: 'pubDate', direction: Direction.DESC}]}
       });
 
       beforeEach(async(() => {
@@ -471,7 +471,7 @@ describe('SearchFeature', () => {
           it('should be initialized with tags list', async(() => {
             fixture.whenStable().then(() => {
               const status = el.query(By.css('md-select[name="status"]'));
-              expect(status.componentInstance.selected.value).toBe(StatusesValue.DOWNLOADED);
+              expect(status.componentInstance.selected.value).toBe(StatusesViewValue.DOWNLOADED);
             });
           }));
         });
@@ -484,7 +484,7 @@ describe('SearchFeature', () => {
           it('should be initialized with tags list', async(() => {
             fixture.whenStable().then(() => {
               const status = el.query(By.css('md-select[name="status"]'));
-              expect(status.componentInstance.selected.value).toBe(StatusesValue.NOT_DOWNLOADED);
+              expect(status.componentInstance.selected.value).toBe(StatusesViewValue.NOT_DOWNLOADED);
             });
           }));
         });
@@ -497,7 +497,7 @@ describe('SearchFeature', () => {
           it('should be initialized with tags list', async(() => {
             fixture.whenStable().then(() => {
               const status = el.query(By.css('md-select[name="status"]'));
-              expect(status.componentInstance.selected.value).toBe(StatusesValue.ALL);
+              expect(status.componentInstance.selected.value).toBe(StatusesViewValue.ALL);
             });
           }));
         })
@@ -529,8 +529,8 @@ describe('SearchFeature', () => {
           content: [],
           first: true, last: true,
           totalPages: 0, totalElements: -1, numberOfElements: 0,
-          size:0, number:0,
-          sort:[{direction: Direction.DESC, property: 'pubDate'}]
+          size: 0, number: 0,
+          sort: [{direction: Direction.DESC, property: 'pubDate'}]
         });
         expect(state.error).toEqual({
           message: 'empty'
@@ -548,8 +548,8 @@ describe('SearchFeature', () => {
             content: [],
             first: true, last: true,
             totalPages: 0, totalElements: -1, numberOfElements: 0,
-            size:1, number:10,
-            sort:[{direction: Direction.DESC, property: 'pubDate'}]
+            size: 1, number: 10,
+            sort: [{direction: Direction.DESC, property: 'pubDate'}]
           },
           error: {
             message: 'error on page 5'
@@ -584,8 +584,8 @@ describe('SearchFeature', () => {
       it('should propagate search success', () => {
         /* Given */
         const searchSuccess: Page<Item> = {
-          content:[], first:true, last:true,
-          totalPages:100, totalElements: 1000, numberOfElements: 10,
+          content: [], first: true, last: true,
+          totalPages: 100, totalElements: 1000, numberOfElements: 10,
           size: 100, number: 3, sort: []
         };
 
@@ -623,8 +623,8 @@ describe('SearchFeature', () => {
               content: [],
               first: true, last: true,
               totalPages: 0, totalElements: -1, numberOfElements: 0,
-              size:0, number:0,
-              sort:[{direction: Direction.DESC, property: 'pubDate'}]
+              size: 0, number: 0,
+              sort: [{direction: Direction.DESC, property: 'pubDate'}]
             },
             error: {
               message: 'empty'
@@ -642,8 +642,8 @@ describe('SearchFeature', () => {
           content: [],
           first: true, last: true,
           totalPages: 0, totalElements: -1, numberOfElements: 0,
-          size:0, number:0,
-          sort:[{direction: Direction.DESC, property: 'pubDate'}]
+          size: 0, number: 0,
+          sort: [{direction: Direction.DESC, property: 'pubDate'}]
         });
       });
 
@@ -669,7 +669,7 @@ describe('SearchFeature', () => {
     let actions: Observable<Action>;
     let itemService: ItemService;
 
-    const PAGE : Page<Item> = {
+    const PAGE: Page<Item> = {
       'content':  [
         {
           'id': '33c98205-51dd-4245-a86b-6c725121684d',
@@ -894,7 +894,7 @@ describe('SearchFeature', () => {
       'size': 12,
       'number': 0
     };
-    const request = {q:'', page: 0, size: 12, status: [], tags: [], sort: [{property: 'pubDate', direction: Direction.DESC}]};
+    const request = {q: '', page: 0, size: 12, status: [], tags: [], sort: [{property: 'pubDate', direction: Direction.DESC}]};
 
     beforeEach(() => {
       itemService = jasmine.createSpyObj('itemService', ['search']);

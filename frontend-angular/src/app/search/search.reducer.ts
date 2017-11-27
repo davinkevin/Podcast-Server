@@ -22,8 +22,8 @@ const initialState: State = {
     content: [],
     first: true, last: true,
     totalPages: 0, totalElements: -1, numberOfElements: 0,
-    size:0, number:0,
-    sort:[{direction: Direction.DESC, property: 'pubDate'}]
+    size: 0, number: 0,
+    sort: [{direction: Direction.DESC, property: 'pubDate'}]
   },
   error: {
     message: 'empty'
@@ -31,7 +31,7 @@ const initialState: State = {
 };
 
 export function reducer(state = initialState, action: SearchActions.All): State {
-  switch(action.type) {
+  switch (action.type) {
 
     case SearchActions.SEARCH: {
       return {...state, request: action.payload};
@@ -45,7 +45,7 @@ export function reducer(state = initialState, action: SearchActions.All): State 
       return {...state, error: action.payload};
     }
 
-    default: {return state;}
+    default: { return state; }
 
   }
 }

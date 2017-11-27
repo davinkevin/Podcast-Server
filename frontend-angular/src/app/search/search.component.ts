@@ -8,21 +8,21 @@ import {ActivatedRoute} from '@angular/router';
 import {Store} from '@ngrx/store';
 import {PageEvent} from '@angular/material';
 
-import * as SearchActions from './search.actions';
 import {defaultSearch} from '../shared/service/item/item.service';
 import {selectResults} from './search.reducer';
-import {Direction, Item, Page, Sort, Status} from '../shared/entity';
+import {Direction, Item, Page, SearchItemPageRequest, Sort, Status} from '../shared/entity';
+import {Search} from './search.actions';
 
 interface SearchItemRequestViewModel {
   q?: string;
   page?: number;
   size?: number;
-  status?: StatusesValue;
+  status?: StatusesViewValue;
   tags?: string;
   sort?: Sort;
 }
 
-export enum StatusesValue {
+export enum StatusesViewValue {
   ALL, DOWNLOADED, NOT_DOWNLOADED
 }
 
@@ -37,20 +37,20 @@ export class SearchComponent implements OnInit {
   doNotEmit = {emitEvent: false};
 
   statuses = [
-    {title: "All", value:StatusesValue.ALL},
-    {title: "Downloaded", value:StatusesValue.DOWNLOADED},
-    {title: "Not Downloaded", value:StatusesValue.NOT_DOWNLOADED}
+    {title: 'All', value: StatusesViewValue.ALL},
+    {title: 'Downloaded', value: StatusesViewValue.DOWNLOADED},
+    {title: 'Not Downloaded', value: StatusesViewValue.NOT_DOWNLOADED}
   ];
 
   properties = [
-    {title: "Relevance", value:"pertinence"},
-    {title: "Publication Date", value:"pubDate"},
-    {title: "Download Date", value:"downloadDate"}
+    {title: 'Relevance', value: 'pertinence'},
+    {title: 'Publication Date', value: 'pubDate'},
+    {title: 'Download Date', value: 'downloadDate'}
   ];
 
   directions = [
-    {title: "Descendant", value:Direction.DESC},
-    {title: "Ascendant", value:Direction.ASC}
+    {title: 'Descendant', value: Direction.DESC},
+    {title: 'Ascendant', value: Direction.ASC}
   ];
 
   form: FormGroup;
@@ -64,7 +64,7 @@ export class SearchComponent implements OnInit {
       tags: [''],
       page: [],
       size: [],
-      status: [StatusesValue.ALL],
+      status: [StatusesViewValue.ALL],
       sort: this.formBuilder.group({
         direction: [Direction.DESC],
         property: ['pubDate']
@@ -73,7 +73,7 @@ export class SearchComponent implements OnInit {
 
     this.form.valueChanges
       .debounceTime(500)
-      .map(v => SearchComponent.toSearchItemRequest(v))
+      .map(toSearchItemRequest)
       .subscribe(v => this.search(v));
 
     this.store.select(selectResults)
@@ -86,7 +86,7 @@ export class SearchComponent implements OnInit {
       .subscribe(r => {
         this.form.get('q').setValue(r.q, this.doNotEmit);
         this.form.get('tags').setValue(r.tags.map(t => t.name).join(', '), this.doNotEmit);
-        this.form.get('status').setValue(SearchComponent.toStatusesValue(r.status), this.doNotEmit);
+        this.form.get('status').setValue(toStatusesValue(r.status), this.doNotEmit);
         this.form.get('size').setValue(r.size, this.doNotEmit);
         this.form.get('page').setValue(r.page, this.doNotEmit);
         this.form.get('sort').get('direction').setValue(r.sort[0].direction, this.doNotEmit);
@@ -94,8 +94,8 @@ export class SearchComponent implements OnInit {
       });
   }
 
-  search(v: any): void {
-    this.store.dispatch(new SearchActions.Search({...defaultSearch, ...v }))
+  search(v: SearchItemPageRequest): void {
+    this.store.dispatch(new Search({...defaultSearch, ...v }))
   }
 
   changePage(e: PageEvent) {
@@ -104,32 +104,33 @@ export class SearchComponent implements OnInit {
     this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
   }
 
-  static toSearchItemRequest(v: SearchItemRequestViewModel) {
-    return {
-      ...v,
-      status: SearchComponent.toStatus(v.status),
-      tags: v.tags.split(',').map(t => ({id: t, name: t})),
-      sort: [v.sort]
-    }
-  }
-
-  static toStatusesValue(v: Status[]) {
-    if (v.includes(Status.FINISH))
-      return StatusesValue.DOWNLOADED;
-
-    if (v.includes(Status.NOT_DOWNLOADED))
-      return StatusesValue.NOT_DOWNLOADED;
-
-    return StatusesValue.ALL;
-  }
-
-  static toStatus(v: StatusesValue): Status[] {
-    if (v === StatusesValue.ALL)
-      return [];
-
-    if (v === StatusesValue.DOWNLOADED)
-      return [Status.FINISH];
-
-    return [Status.NOT_DOWNLOADED, Status.DELETED, Status.STARTED, Status.STOPPED, Status.PAUSED]
-  }
 } /* istanbul ignore next */
+
+function toStatus(v: StatusesViewValue): Status[] {
+  switch (v) {
+    case StatusesViewValue.ALL: return [];
+    case StatusesViewValue.DOWNLOADED: return [Status.FINISH];
+    default: return [Status.NOT_DOWNLOADED, Status.DELETED, Status.STARTED, Status.STOPPED, Status.PAUSED];
+  }
+}
+
+function toStatusesValue(v: Status[]): StatusesViewValue {
+  if (v.includes(Status.FINISH)) {
+    return StatusesViewValue.DOWNLOADED;
+  }
+
+  if (v.includes(Status.NOT_DOWNLOADED)) {
+    return StatusesViewValue.NOT_DOWNLOADED;
+  }
+
+  return StatusesViewValue.ALL;
+}
+
+function toSearchItemRequest(v: SearchItemRequestViewModel): SearchItemPageRequest {
+  return {
+    ...v,
+    status: toStatus(v.status),
+    tags: v.tags.split(',').map(t => ({id: t, name: t})),
+    sort: [v.sort]
+  }
+}

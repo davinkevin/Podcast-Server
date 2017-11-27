@@ -35,10 +35,10 @@ describe('Service: Item', () => {
   it('should get all elements from backend with default parameter', () => {
     /* Given */
     const body: Page<Item> = {
-      content:[],
-      first:true,
-      last:true,
-      totalPages:10,
+      content: [],
+      first: true,
+      last: true,
+      totalPages: 10,
       totalElements: 100,
       numberOfElements: 10,
       size: 10,
@@ -69,15 +69,15 @@ describe('Service: Item', () => {
   it('should get all elements from backend with default parameter', () => {
     /* Given */
     const body: Page<Item> = {
-      content:[],
-      first:true,
-      last:false,
-      totalPages:10,
+      content: [],
+      first: true,
+      last: false,
+      totalPages: 10,
       totalElements: 100,
       numberOfElements: 10,
       size: 10,
       number: 3,
-      sort: [{direction: Direction.ASC, property:"relevance"}]
+      sort: [{direction: Direction.ASC, property: 'relevance'}]
     };
     let conn: MockConnection;
 
@@ -110,15 +110,15 @@ describe('Service: Item', () => {
   it('should support query without status', () => {
     /* Given */
     const body: Page<Item> = {
-      content:[],
-      first:true,
-      last:false,
-      totalPages:10,
+      content: [],
+      first: true,
+      last: false,
+      totalPages: 10,
       totalElements: 100,
       numberOfElements: 10,
       size: 10,
       number: 3,
-      sort: [{direction: Direction.ASC, property:"relevance"}]
+      sort: [{direction: Direction.ASC, property: 'relevance'}]
     };
     let conn: MockConnection;
 

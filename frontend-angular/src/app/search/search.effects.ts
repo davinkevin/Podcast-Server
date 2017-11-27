@@ -12,12 +12,12 @@ import {Item, Page, SearchItemPageRequest} from '../shared/entity';
 @Injectable()
 export class SearchEffects {
 
-  constructor(private actions$: Actions, private itemService: ItemService) {}
-
   @Effect()
   search$: Observable<Action> = this.actions$.ofType(SearchActions.SEARCH)
     .map((action: SearchActions.Search) => action.payload)
     .switchMap((terms: SearchItemPageRequest) => this.itemService.search(terms))
     .map((results: Page<Item>) => new SearchActions.SearchSuccess(results));
+
+  constructor(private actions$: Actions, private itemService: ItemService) {}
 
 } /* istanbul ignore next */

@@ -20,7 +20,7 @@ describe('SearchResolver', () => {
   let resolver: SearchResolver;
   let store;
 
-  const PAGE : Page<Item> = {
+  const PAGE: Page<Item> = {
     'content':  [
       {
         'id': '33c98205-51dd-4245-a86b-6c725121684d',
@@ -300,8 +300,8 @@ describe('SearchResolver', () => {
       content: [],
       first: true, last: true,
       totalPages: 1, totalElements: 5, numberOfElements: 5,
-      size:5, number:1,
-      sort:[{direction: Direction.DESC, property: 'pubDate'}]
+      size: 5, number: 1,
+      sort: [{direction: Direction.DESC, property: 'pubDate'}]
     });
     store.dispatch(searchSuccess);
 

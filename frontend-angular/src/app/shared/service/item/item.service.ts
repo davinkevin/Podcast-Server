@@ -38,7 +38,7 @@ export function toParams(searchPageRequest: SearchItemPageRequest): URLSearchPar
   return params;
 }
 
-export const defaultSearch = {
+export const defaultSearch: SearchItemPageRequest = {
   q: null,
   page: 0,
   size: 12,
