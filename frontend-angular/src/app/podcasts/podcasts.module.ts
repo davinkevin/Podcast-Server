@@ -4,7 +4,7 @@ import { PodcastsComponent } from './podcasts.component';
 import {RouterModule, Routes} from '@angular/router';
 import {SharedModule} from '../shared/shared.module';
 import {StoreModule} from '@ngrx/store';
-import * as fromPodcasts from './podcats.reducer';
+import * as fromPodcasts from './podcasts.reducer';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastsEffects} from './podcasts.effects';
 import {PodcastsResolver} from './resolver/podcasts.resolver';

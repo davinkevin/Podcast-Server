@@ -5,35 +5,33 @@ import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {Direction, Item, Page, SearchItemPageRequest} from '../../entity';
-
-
+import {HttpClient, HttpParams} from '@angular/common/http';
 
 @Injectable()
 export class ItemService {
 
-  constructor(private http: Http) {}
+  constructor(private http: HttpClient) {}
 
   search(searchPageRequest: SearchItemPageRequest): Observable<Page<Item>> {
     const params = toParams(searchPageRequest);
-    return this.http.get('/api/items/search', {params}).map(res => res.json());
+    return this.http.get<Page<Item>>('/api/items/search', {params});
   }
 
 } /* istanbul ignore next */
 
-export function toParams(searchPageRequest: SearchItemPageRequest): URLSearchParams {
+export function toParams(request: SearchItemPageRequest): HttpParams {
   // downloaded=true&page=0&size=12&sort=pubDate,DESC&tags=
 
-  const params = new URLSearchParams();
-  params.set('q', searchPageRequest.q);
-  params.set('page', String(searchPageRequest.page));
-  params.set('size', String(searchPageRequest.size));
+  let params = new HttpParams()
+    .set('q', request.q || '')
+    .set('page', String(request.page))
+    .set('size', String(request.size))
+    .set('sort', request.sort.map(s => `${s.property},${s.direction}`).join(','))
+    .set('tags', request.tags.map(t => t.name).join(','));
 
-  if (searchPageRequest.status && searchPageRequest.status.length > 0) {
-    params.set('status', String(searchPageRequest.status));
+  if (request.status && request.status.length > 0) {
+    params = params.set('status', String(request.status));
   }
-
-  params.set('sort', searchPageRequest.sort.map(s => `${s.property},${s.direction}`).join(','));
-  params.set('tags', searchPageRequest.tags.map(t => t.name).join(','));
 
   return params;
 }
