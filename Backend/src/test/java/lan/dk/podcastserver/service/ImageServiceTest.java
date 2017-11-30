@@ -59,7 +59,7 @@ public class ImageServiceTest {
     
     @Test
     public void should_reject_input_stream() throws IOException {
-        /* Given */ doThrow(new IOException()).when(urlService).asStream(HTTP_LOCALHOST + "/img/image.png");
+        /* Given */ doThrow(new RuntimeException()).when(urlService).asStream(HTTP_LOCALHOST + "/img/image.png");
         /* When */  Cover cover = imageService.getCoverFromURL(HTTP_LOCALHOST + "/img/image.png");
         /* Then */  assertThat(cover).isEqualTo(Cover.DEFAULT_COVER);
     }

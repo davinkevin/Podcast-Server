@@ -5,6 +5,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import io.vavr.API;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
@@ -20,7 +21,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import static io.vavr.API.*;
 import static io.vavr.API.Try;
 
 /**
@@ -36,8 +39,8 @@ public class UrlService {
 
     private static final String PROTOCOL_SEPARATOR = "://";
     private static final Integer MAX_NUMBER_OF_REDIRECTION = 10;
-    private static final Consumer<HttpURLConnection> NO_MODIFICATION = x -> {};
-    private static final Set<Integer> EMPTY_PORT = HashSet.of(80, 443);
+    private static final Consumer<HttpURLConnection> NO_OP = Function.identity()::apply;
+    private static final Set<Integer> EMPTY_PORT = Set(80, 443);
 
     public UrlService() {System.setProperty("http.agent", USER_AGENT_DESKTOP);}
 
@@ -49,7 +52,7 @@ public class UrlService {
 
     /* Real Url business */
     public String getRealURL(String url) {
-        return getRealURL(url, NO_MODIFICATION, 0);
+        return getRealURL(url, NO_OP, 0);
     }
     public String getRealURL(String url, Consumer<HttpURLConnection> connectionModifier) {
         return getRealURL(url, connectionModifier, 0);
@@ -87,14 +90,14 @@ public class UrlService {
     }
 
     /* Transform to Stream or Reader */
-    public InputStream asStream(String url) throws IOException {
+    public InputStream asStream(String url) {
         return Try(() -> get(url))
                 .mapTry(BaseRequest::asBinary)
                 .map(HttpResponse::getBody)
-                .getOrElseThrow(e -> new IOException(e));
+                .getOrElseThrow(e -> new RuntimeException("Error during creation of stream", e));
     }
 
-    public BufferedReader asReader(String url) throws IOException {
+    public BufferedReader asReader(String url) {
         return new BufferedReader(new InputStreamReader(asStream(url)));
     }
 
@@ -109,15 +112,13 @@ public class UrlService {
         return Try(() -> new URL(urlWithDomain))
                 .map(u -> u.getProtocol() + PROTOCOL_SEPARATOR + u.getAuthority() + (isFromRoot ? "" : StringUtils.substringBeforeLast(u.getPath(), "/")))
                 .map(s -> s + (isFromRoot ? "" : "/") + mayBeRelativeUrl)
-                .getOrElseThrow(e -> new RuntimeException(e));
+                .getOrElseThrow(e -> new RuntimeException("Error during add domain if relative", e));
     }
 
     public static String getDomainFromRequest(HttpServletRequest request) {
         return Option
                 .of(request.getHeader("origin"))
-                .getOrElse(() -> request.getScheme() +
-                        "://" +
-                        request.getServerName() +
+                .getOrElse(() -> request.getScheme() + "://" + request.getServerName() +
                         (EMPTY_PORT.contains(request.getServerPort()) ? "" : ":" + request.getServerPort())
                 );
     }

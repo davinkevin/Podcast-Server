@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.service;
 
 
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+
+import static io.vavr.API.Try;
 
 /**
  * Created by kevin on 28/06/15 for Podcast Server
@@ -34,7 +38,7 @@ public class ImageService {
                         .width(image.getWidth())
                         .height(image.getHeight())
                     .build();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error during fetching Cover information for {}", url);
             return Cover.DEFAULT_COVER;
         }
