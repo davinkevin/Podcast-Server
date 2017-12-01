@@ -27,21 +27,15 @@ public class ImageService {
     final UrlService urlService;
 
     public Cover getCoverFromURL(String url) {
-        if (StringUtils.isEmpty(url))
-            return Cover.DEFAULT_COVER;
-
-        try (InputStream urlInputStream = urlService.asStream(url) ){
-            final BufferedImage image = ImageIO.read(ImageIO.createImageInputStream(urlInputStream));
-            return Cover
-                    .builder()
-                        .url(url)
-                        .width(image.getWidth())
-                        .height(image.getHeight())
-                    .build();
-        } catch (Exception e) {
-            log.error("Error during fetching Cover information for {}", url);
+        if (StringUtils.isEmpty(url)) {
             return Cover.DEFAULT_COVER;
         }
+
+        return Try.withResources(() -> urlService.asStream(url))
+                .of(is -> ImageIO.read(ImageIO.createImageInputStream(is)))
+                .map(image -> Cover.builder().url(url).width(image.getWidth()).height(image.getHeight()).build())
+                .onFailure(e -> log.error("Error during fetching Cover information for {}", url, e))
+                .getOrElse(() -> Cover.DEFAULT_COVER);
     }
 
 }

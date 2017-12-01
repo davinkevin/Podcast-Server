@@ -23,12 +23,11 @@ public class ImageServiceTest {
 
     private static final int PORT = 8089;
     private static final String HTTP_LOCALHOST = "http://localhost:" + PORT;
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(PORT); // No-args constructor defaults to port 8080
 
-    @Spy
-    UrlService urlService;
-    @InjectMocks ImageService imageService;
+    @Rule public WireMockRule wireMockRule = new WireMockRule(PORT); // No-args constructor defaults to port 8080
+
+    private @Spy UrlService urlService;
+    private @InjectMocks ImageService imageService;
 
     @Test
     public void should_return_null_or_empty_if_no_url() throws IOException {
