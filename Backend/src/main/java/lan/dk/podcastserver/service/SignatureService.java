@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -22,12 +23,10 @@ public class SignatureService {
     final UrlService urlService;
 
     public String generateSignatureFromURL(String urlAsString) {
-        try(BufferedReader in = urlService.asReader(urlAsString)) {
-            return generateMD5Signature(in.lines().collect(joining()));
-        } catch (IOException e) {
-            log.error("Error during signature of podcast at url {}", urlAsString, e);
-        }
-        return StringUtils.EMPTY;
+        return Try.withResources(() -> urlService.asReader(urlAsString))
+                .of(reader -> generateMD5Signature(reader.lines().collect(joining())))
+                .onFailure(e -> log.error("Error during signature of podcast at url {}", urlAsString, e))
+                .getOrElse(StringUtils.EMPTY);
     }
     
     public String generateMD5Signature(String html){

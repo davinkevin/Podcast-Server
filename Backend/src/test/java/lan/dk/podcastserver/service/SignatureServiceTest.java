@@ -22,9 +22,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SignatureServiceTest {
 
-    @Mock
-    UrlService urlService;
-    @InjectMocks SignatureService signatureService;
+    private @Mock UrlService urlService;
+    private @InjectMocks SignatureService signatureService;
 
     @Test
     public void should_generate_md5_from_stream() throws IOException {

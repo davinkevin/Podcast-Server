@@ -4,6 +4,7 @@ import io.vavr.API;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +31,10 @@ public class M3U8Service {
     private final UrlService urlService;
 
     public Option<String> findBestQuality(InputStream is) {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
-            List<String> lines = buffer.lines().collect(List.collector());
-
-            return _findBestQuality(lines);
-        } catch (IOException | RuntimeException ignored) {
-            /* RuntimeException added because buffer.lines only throw UncheckedIOException */
-            return None();
-        }
+        return Try.withResources(() -> new BufferedReader(new InputStreamReader(is)))
+                .of(buffer -> buffer.lines().collect(List.collector()))
+                .toOption()
+                .flatMap(this::_findBestQuality);
     }
 
     private  Option<String> _findBestQuality(List<String> lines) {
