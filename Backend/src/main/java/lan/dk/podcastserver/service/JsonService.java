@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,12 +38,11 @@ public class JsonService {
     }
 
     public Option<DocumentContext> parseUrl(String url) {
-        try (BufferedReader bufferedReader = urlService.asReader(url)) {
-            return Option(parse(bufferedReader.lines().collect(joining())));
-        } catch (IOException e) {
-            log.error("Error during fetching of each items of {}", url, e);
-            return None();
-        }
+        return Try.withResources(() -> urlService.asReader(url))
+                .of(reader -> reader.lines().collect(joining()))
+                .mapTry(this::parse)
+                .onFailure(e -> log.error("Error during fetching of each items of {}", url, e))
+                .toOption();
     }
 
     public static <T> Function<DocumentContext, T> to(Class<T> clazz) {

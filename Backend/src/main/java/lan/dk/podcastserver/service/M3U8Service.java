@@ -8,6 +8,7 @@ import io.vavr.control.Try;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.h2.expression.Function;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import static java.util.Objects.isNull;
 /**
  * Created by kevin on 21/07/2016.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class M3U8Service {
@@ -69,21 +71,20 @@ public class M3U8Service {
     }
 
     public String getM3U8UrlFormMultiStreamFile(String url) {
-        if (isNull(url))
-            return null;
-
-        try(BufferedReader in = urlService.asReader(url)) {
-            return in
-                    .lines()
-                    .filter(l -> !l.startsWith("#"))
-                    .reduce((acc, val) -> val)
-                    .map(s -> StringUtils.substringBeforeLast(s, "?"))
-                    .map(s -> urlService.addDomainIfRelative(url, s))
-                    .orElse(null);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (isNull(url)) {
             return null;
         }
+
+        return Try.withResources(() -> urlService.asReader(url))
+                .of(r -> r.lines()
+                        .filter(l -> !l.startsWith("#"))
+                        .reduce((acc, val) -> val)
+                        .map(s -> StringUtils.substringBeforeLast(s, "?"))
+                        .map(s -> urlService.addDomainIfRelative(url, s))
+                        .orElse(null)
+                )
+                .onFailure(e -> log.error("Error during finding m3u8 from stream file for url {}", url, e))
+                .getOrElse(() -> null);
     }
 
     @Builder
