@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
+    "build": "ng build --aot true",
     "test": "ng t -w false",
     "lint": "npm run clang-format && ng lint",
     "clang-format": "clang-format -i src/app/**/*.ts",
