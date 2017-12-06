@@ -16,11 +16,11 @@ export interface State {
 
 const initialState: State = {
   podcasts: [],
-  error: {message: "empty"}
+  error: {message: 'empty'}
 };
 
 export function reducer(state = initialState, action: PodcastsActions.All): State {
-  switch(action.type) {
+  switch (action.type) {
 
     case PodcastsActions.FIND_ALL: {
       return { ...state };
@@ -34,7 +34,7 @@ export function reducer(state = initialState, action: PodcastsActions.All): Stat
       return {...state, error: action.payload};
     }
 
-    default: {return state;}
+    default: {return state; }
 
   }
 }

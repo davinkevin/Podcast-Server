@@ -2,9 +2,9 @@
 import {Action} from '@ngrx/store';
 import {BackendError, Podcast} from '../shared/entity';
 
-export const FIND_ALL = "[Podcasts] Find all";
-export const FIND_ALL_SUCCESS = "[Podcasts] Find all Success";
-export const FIND_ALL_ERROR = "[Podcasts] Find all Error";
+export const FIND_ALL = '[Podcasts] Find all';
+export const FIND_ALL_SUCCESS = '[Podcasts] Find all Success';
+export const FIND_ALL_ERROR = '[Podcasts] Find all Error';
 
 export class FindAll implements Action {
   readonly type = FIND_ALL;

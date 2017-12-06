@@ -11,11 +11,10 @@ import {PodcastService} from '../shared/service/podcast/podcast.service';
 @Injectable()
 export class PodcastsEffects {
 
-  constructor(private actions$: Actions, private podcastService: PodcastService) {}
-
   @Effect()
   findAll$: Observable<Action> = this.actions$.ofType(PodcastsActions.FIND_ALL)
     .switchMap(() => this.podcastService.findAll())
     .map((results: Podcast[]) => new PodcastsActions.FindAllSuccess(results));
 
+  constructor(private actions$: Actions, private podcastService: PodcastService) {}
 } /* istanbul ignore next */

@@ -20,9 +20,9 @@ describe('PodcastService', () => {
     service = TestBed.get(PodcastService);
   });
 
-  it('should be created', inject([PodcastService], (service: PodcastService) => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
-  }));
+  });
 
   it('should call for findAll', () => {
     /* Given */
@@ -39,8 +39,8 @@ describe('PodcastService', () => {
     req.flush(resp);
   });
 
-  afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
+  afterEach(() => {
     httpMock.verify();
-  }));
+  });
 
 });

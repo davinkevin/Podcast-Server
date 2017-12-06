@@ -25,16 +25,16 @@ describe('Service: Item', () => {
     service = TestBed.get(ItemService);
   });
 
-  it('should be defined', inject([ItemService], (service: ItemService) => {
+  it('should be defined', () => {
     expect(service).toBeTruthy();
-  }));
+  });
 
   it('should get all elements from backend', () => {
     /* Given */
     const expectedParams = new HttpParams()
       .set('q', 'foo')
       .set('page', '3')
-      .set('size','15')
+      .set('size', '15')
       .set('sort', 'donwloadDate,DESC')
       .set('tags', 'tag')
       .set('status', 'STOPPED,FINISH')
@@ -53,14 +53,14 @@ describe('Service: Item', () => {
 
     /* When */
     service.search({q: 'foo', page: 3, size: 15,
-        status:[Status.STOPPED, Status.FINISH], tags:[{name:'tag', id:'1234'}],
+        status: [Status.STOPPED, Status.FINISH], tags: [{name: 'tag', id: '1234'}],
         sort: [{property: 'donwloadDate', direction: Direction.DESC}]
       }).subscribe(v => {
       expect(v).toEqual(body);
     });
 
     /* Then */
-    const req = httpMock.expectOne(req => req.url === '/api/items/search');
+    const req = httpMock.expectOne(r => r.url === '/api/items/search');
     expect(req.request.method).toEqual('GET');
     expect(req.request.params.toString()).toEqual(expectedParams.toString());
     req.flush(body);
@@ -71,7 +71,7 @@ describe('Service: Item', () => {
     const expectedParams = new HttpParams()
       .set('q', '')
       .set('page', '0')
-      .set('size','12')
+      .set('size', '12')
       .set('sort', 'pubDate,DESC')
       .set('tags', '')
     ;
@@ -94,13 +94,13 @@ describe('Service: Item', () => {
     });
 
     /* Then */
-    const req = httpMock.expectOne(req => req.url === '/api/items/search');
+    const req = httpMock.expectOne(r => r.url === '/api/items/search');
     expect(req.request.method).toEqual('GET');
     expect(req.request.params.toString()).toEqual(expectedParams.toString());
     req.flush(body);
   });
 
-  afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
+  afterEach(() => {
     httpMock.verify();
-  }));
+  });
 });
