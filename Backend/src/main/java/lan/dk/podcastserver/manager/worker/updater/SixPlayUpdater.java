@@ -48,9 +48,9 @@ public class SixPlayUpdater extends AbstractUpdater {
     private static final TypeRef<HashMap<String, Object>> TYPE_KEYS = new TypeRef<HashMap<String, Object>>(){};
 
     private static final String URL_TEMPLATE_PODCAST = "http://www.6play.fr/%s-p_%d/";
-    private static final String PROGRAM_CODE_SELECTOR = "mainStoreState.program.programsById.%d.code";
-    private static final String PROGRAM_ID_SELECTOR = "mainStoreState.program.programsById";
-    private static final String VIDEO_BY_ID_SELECTOR = "mainStoreState.video.programVideoById[*]";
+    private static final String PROGRAM_CODE_SELECTOR = "program.programsById.%d.code";
+    private static final String PROGRAM_ID_SELECTOR = "program.programsById";
+    private static final String VIDEO_BY_ID_SELECTOR = "video.programVideoById[*]";
 
     private final HtmlService htmlService;
     private final JsonService jsonService;
@@ -78,11 +78,11 @@ public class SixPlayUpdater extends AbstractUpdater {
                 .map(HashMap::keySet)
                 .flatMap(Value::toOption)
                 .map(Integer::valueOf)
-                .getOrElseThrow(() -> new RuntimeException("programId not found in root.__6play"));
+                .getOrElseThrow(() -> new RuntimeException("programId not found in react store"));
 
         String programCode = root6Play
                 .map(JsonService.to(String.format(PROGRAM_CODE_SELECTOR, programId), String.class))
-                .getOrElseThrow(() -> new RuntimeException("programCode not found in root.__6play"));
+                .getOrElseThrow(() -> new RuntimeException("programCode not found in react store"));
 
         String basePath = String.format(URL_TEMPLATE_PODCAST, programCode, programId);
 
@@ -119,9 +119,9 @@ public class SixPlayUpdater extends AbstractUpdater {
 
     public static Option<String> getRoot6Play(Elements elements) {
         return HashSet.ofAll(elements)
-                .find(s -> s.html().contains("root.__6play"))
+                .find(s -> s.html().contains("root."))
                 .map(Element::html)
-                .map(s -> StringUtils.substringBetween(s, "root.__6play = ", "}(this));"));
+                .map(s -> StringUtils.substringBetween(s, " = ", "}(this));"));
     }
 
     @Override
@@ -129,7 +129,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("script"))
                 .flatMap(this::extractJson)
-                .map(JsonService.extract("mainStoreState.video.programVideosBySubCategory"))
+                .map(JsonService.extract("video.programVideosBySubCategory"))
                 .map(Object::toString)
                 .map(signatureService::generateMD5Signature)
                 .getOrElseThrow(() -> new RuntimeException("Error during signature of podcast " + podcast.getTitle()));

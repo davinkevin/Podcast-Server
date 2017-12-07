@@ -49,11 +49,11 @@ public class SixPlayFinder implements Finder {
     private String getDescription(Elements script) {
         return HashSet
                 .ofAll(script)
-                .find(s -> s.html().contains("root.__6play"))
+                .find(s -> s.html().contains("root."))
                 .map(Element::html)
-                .map(s -> StringUtils.substringBetween(s, "root.__6play = ", "}(this));"))
+                .map(s -> StringUtils.substringBetween(s, " = ", "}(this));"))
                 .map(jsonService::parse)
-                .map(JsonService.<JSONArray>extract("mainStoreState.program.programsById.*.description"))
+                .map(JsonService.<JSONArray>extract("program.programsById.*.description"))
                 .flatMap(r -> HashSet.ofAll(r).headOption())
                 .map(Object::toString)
                 .getOrElse(() -> null);
