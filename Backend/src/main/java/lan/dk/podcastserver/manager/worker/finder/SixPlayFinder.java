@@ -1,8 +1,10 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import io.vavr.collection.HashSet;
+import io.vavr.control.Either;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
 import lan.dk.podcastserver.manager.worker.updater.SixPlayUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
@@ -16,6 +18,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.Try;
 
 /**
  * Created by kevin on 20/12/2016 for Podcast Server
@@ -31,9 +35,11 @@ public class SixPlayFinder implements Finder {
 
     @Override
     public Podcast find(String url) {
-        return htmlService.get(url)
-                .map(this::htmlToPodcast)
-                .getOrElse(Podcast.DEFAULT_PODCAST);
+        return Try(() ->
+                htmlService.get(url)
+                    .map(this::htmlToPodcast)
+                    .getOrElse(Podcast.DEFAULT_PODCAST)
+        ).getOrElseThrow(SixPlayParsingException::new);
     }
 
     private Podcast htmlToPodcast(Document document) {
