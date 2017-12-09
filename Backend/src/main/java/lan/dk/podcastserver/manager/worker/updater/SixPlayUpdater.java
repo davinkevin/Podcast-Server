@@ -11,6 +11,7 @@ import io.vavr.collection.Set;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
@@ -34,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
 
 /**
@@ -65,9 +67,11 @@ public class SixPlayUpdater extends AbstractUpdater {
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
-        return htmlService.get(podcast.getUrl())
-                .map(d -> this.extractItems(d.select("script")))
-                .getOrElse(HashSet::empty);
+        return Try(() ->
+                htmlService.get(podcast.getUrl())
+                        .map(d -> this.extractItems(d.select("script")))
+                        .getOrElse(HashSet::empty)
+        ).getOrElseThrow(SixPlayParsingException::new);
     }
 
     private Set<Item> extractItems(Elements script) {
@@ -94,12 +98,12 @@ public class SixPlayUpdater extends AbstractUpdater {
 
     private Item convertToItem(SixPlayItem i, String basePath) {
         return Item.builder()
-                    .title(i.getTitle())
-                    .pubDate(i.getLastDiffusion())
-                    .length(i.getDuration())
-                    .url(i.url(basePath))
-                    .description(i.getDescription())
-                    .cover(imageService.getCoverFromURL(i.cover()))
+                .title(i.getTitle())
+                .pubDate(i.getLastDiffusion())
+                .length(i.getDuration())
+                .url(i.url(basePath))
+                .description(i.getDescription())
+                .cover(imageService.getCoverFromURL(i.cover()))
                 .build();
     }
 
@@ -126,13 +130,15 @@ public class SixPlayUpdater extends AbstractUpdater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        return htmlService.get(podcast.getUrl())
-                .map(d -> d.select("script"))
-                .flatMap(this::extractJson)
-                .map(JsonService.extract("video.programVideosBySubCategory"))
-                .map(Object::toString)
-                .map(signatureService::generateMD5Signature)
-                .getOrElseThrow(() -> new RuntimeException("Error during signature of podcast " + podcast.getTitle()));
+        return Try(() ->
+                htmlService.get(podcast.getUrl())
+                        .map(d -> d.select("script"))
+                        .flatMap(this::extractJson)
+                        .map(JsonService.extract("video.programVideosBySubCategory"))
+                        .map(Object::toString)
+                        .map(signatureService::generateMD5Signature)
+                        .getOrElseThrow(() -> new RuntimeException("Error during signature of podcast " + podcast.getTitle()))
+        ).getOrElseThrow(SixPlayParsingException::new);
     }
 
     @Override

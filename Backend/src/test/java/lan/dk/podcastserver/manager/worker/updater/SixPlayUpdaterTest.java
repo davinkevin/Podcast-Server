@@ -4,6 +4,7 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
+import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
@@ -23,6 +24,7 @@ import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +59,20 @@ public class SixPlayUpdaterTest {
     }
 
     @Test
+    public void should_throw_parsing_exception_if_problem_during_get_items() throws IOException, URISyntaxException {
+        /* Given */
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
+        when(jsonService.parse(anyString())).thenThrow(new RuntimeException("Foo Bar"));
+        when(imageService.getCoverFromURL(anyString())).thenReturn(Cover.DEFAULT_COVER);
+
+        /* When */
+        assertThatThrownBy(() -> updater.getItems(show))
+
+        /* Then */
+                .isInstanceOf(SixPlayParsingException.class);
+    }
+
+    @Test
     public void should_do_signature() throws IOException, URISyntaxException {
         /* GIVEN */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
@@ -66,6 +82,20 @@ public class SixPlayUpdaterTest {
         String signature = updater.signatureOf(show);
         /* THEN  */
         assertThat(signature).isNotEmpty();
+    }
+
+    @Test
+    public void should_throw_parsing_exception_if_problem_during_signature() throws IOException, URISyntaxException {
+        /* Given */
+        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
+        when(jsonService.parse(anyString())).thenThrow(new RuntimeException("Foo Bar"));
+        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+
+        /* When */
+        assertThatThrownBy(() -> updater.signatureOf(show))
+
+        /* Then */
+                .isInstanceOf(SixPlayParsingException.class);
     }
 
     @Test
