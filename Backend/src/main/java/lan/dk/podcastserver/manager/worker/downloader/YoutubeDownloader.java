@@ -173,8 +173,9 @@ public class YoutubeDownloader extends AbstractDownloader {
                 Files.deleteIfExists(video);
                 Files.deleteIfExists(audioFile);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error during specific move", e);
+            resetDownload();
             throw new RuntimeException("Error during specific move", e);
         }
 
