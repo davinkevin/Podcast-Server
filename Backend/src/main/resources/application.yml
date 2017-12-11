@@ -34,9 +34,9 @@ server:
   enabled: true
   mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
+endpoints.sensitive: false
 management.context-path: /system
-endpoints.health.sensitive: false
-endpoints.env.sensitive: false
+management.security.enabled: false
 
 logging:
  path: /tmp/podcast-server/podcast-server.log
