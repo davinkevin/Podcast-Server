@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.Option;
@@ -47,6 +48,7 @@ public class GulliUpdater extends AbstractUpdater {
     public Set<Item> getItems(Podcast podcast) {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("div.all-videos ul li.col-md-3"))
+                .filter(Objects::nonNull)
                 .map(this::asItemsSet)
                 .getOrElse(HashSet::empty);
     }
@@ -91,6 +93,7 @@ public class GulliUpdater extends AbstractUpdater {
     public String signatureOf(Podcast podcast) {
         return htmlService.get(podcast.getUrl())
                 .map(d -> d.select("div.all-videos ul").first())
+                .filter(Objects::nonNull)
                 .map(Element::html)
                 .map(signatureService::generateMD5Signature)
                 .getOrElse(StringUtils.EMPTY);
