@@ -20,6 +20,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
+import static io.vavr.API.Option;
+import static io.vavr.API.Some;
 import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
@@ -63,14 +65,18 @@ public class CanalPlusUpdater extends AbstractUpdater {
     }
 
     public Set<Item> getItems(Podcast podcast) {
-        return this.getSetItemToPodcastFromFrontTools(getRealUrl(podcast));
+        return getRealUrl(podcast)
+                .map(this::getSetItemToPodcastFromFrontTools)
+                .getOrElse(HashSet::empty);
     }
 
     public String signatureOf(Podcast podcast) {
-        return signatureService.generateSignatureFromURL(getRealUrl(podcast));
+        return getRealUrl(podcast)
+                .map(signatureService::generateSignatureFromURL)
+                .getOrElse(StringUtils.EMPTY);
     }
 
-    private String getPodcastURLOfFrontTools(String url) {
+    private Option<String> getPodcastURLOfFrontTools(String url) {
         String list = from(TABS_EXTRACTOR).on(url).group(1)
                 .map(Integer::parseInt)
                 .map(v -> v-1)
@@ -79,10 +85,10 @@ public class CanalPlusUpdater extends AbstractUpdater {
 
         return htmlService
                 .get(url)
-                .map(p -> p.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first().attr("onclick"))
+                .flatMap(p -> Option(p.select(SELECTOR_ONCLICK_CONTAINS_LOADVIDEOHISTORY).first()))
+                .map(v -> v.attr("onclick"))
                 .flatMap(s -> ID_EXTRACTOR.on(s).groups())
-                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.get(0)), Integer.parseInt(ids.get(1)), list))
-                .getOrElse("");
+                .map(ids -> String.format(FRONT_TOOLS_URL_PATTERN, Integer.parseInt(ids.get(0)), Integer.parseInt(ids.get(1)), list));
     }
 
     private Set<Element> getHTMLListingEpisodeFromFrontTools(String canalPlusFrontToolsUrl) {
@@ -137,8 +143,10 @@ public class CanalPlusUpdater extends AbstractUpdater {
         return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
     }
 
-    private String getRealUrl(Podcast podcast) {
-        return podcast.getUrl().contains("front_tools") ? podcast.getUrl() : this.getPodcastURLOfFrontTools(podcast.getUrl());
+    private Option<String> getRealUrl(Podcast podcast) {
+        return podcast.getUrl().contains("front_tools")
+                ? Some(podcast.getUrl())
+                : getPodcastURLOfFrontTools(podcast.getUrl());
     }
 
     @Override

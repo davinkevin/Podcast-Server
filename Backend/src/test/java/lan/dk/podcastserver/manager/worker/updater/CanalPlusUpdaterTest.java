@@ -84,26 +84,24 @@ public class CanalPlusUpdaterTest {
     public void should_reject_signature_with_empty() throws URISyntaxException, IOException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(None());
-        when(signatureService.generateSignatureFromURL(eq(""))).thenReturn("aSignature");
 
         /* When */
         String signature = canalPlusUpdater.signatureOf(podcast);
 
         /* Then */
-        assertThat(signature).isEqualTo("aSignature");
+        assertThat(signature).isEqualTo("");
     }
 
     @Test
     public void should_not_find_front_tools_elements_in_page() throws URISyntaxException, IOException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/canalplus/lepetitjournal_without_loadVideoHistory.html"));
-        when(signatureService.generateSignatureFromURL(eq(""))).thenReturn("aSignature");
 
         /* When */
         String signature = canalPlusUpdater.signatureOf(podcast);
 
         /* Then */
-        assertThat(signature).isEqualTo("aSignature");
+        assertThat(signature).isEqualTo("");
     }
 
     @Test
