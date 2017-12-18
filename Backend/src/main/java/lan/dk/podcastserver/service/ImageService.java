@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 
 import static io.vavr.API.Try;
 
@@ -28,14 +29,16 @@ public class ImageService {
 
     public Cover getCoverFromURL(String url) {
         if (StringUtils.isEmpty(url)) {
-            return Cover.DEFAULT_COVER;
+            return null;
         }
 
         return Try.withResources(() -> urlService.asStream(url))
                 .of(is -> ImageIO.read(ImageIO.createImageInputStream(is)))
-                .map(image -> Cover.builder().url(url).width(image.getWidth()).height(image.getHeight()).build())
                 .onFailure(e -> log.error("Error during fetching Cover information for {}", url, e))
-                .getOrElse(() -> Cover.DEFAULT_COVER);
+                .toOption()
+                .filter(Objects::nonNull)
+                .map(image -> Cover.builder().url(url).width(image.getWidth()).height(image.getHeight()).build())
+                .getOrElse(() -> null);
     }
 
 }

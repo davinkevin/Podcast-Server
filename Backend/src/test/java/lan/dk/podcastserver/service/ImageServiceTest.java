@@ -33,7 +33,7 @@ public class ImageServiceTest {
     public void should_return_null_or_empty_if_no_url() throws IOException {
         /* Given */ String url = "";
         /* When */ Cover coverFromURL = imageService.getCoverFromURL(url);
-        /* Then */ assertThat(coverFromURL).isEqualTo(Cover.DEFAULT_COVER);
+        /* Then */ assertThat(coverFromURL).isEqualTo(null);
     }
 
 
@@ -60,11 +60,11 @@ public class ImageServiceTest {
     public void should_reject_input_stream() throws IOException {
         /* Given */ doThrow(new RuntimeException()).when(urlService).asStream(HTTP_LOCALHOST + "/img/image.png");
         /* When */  Cover cover = imageService.getCoverFromURL(HTTP_LOCALHOST + "/img/image.png");
-        /* Then */  assertThat(cover).isEqualTo(Cover.DEFAULT_COVER);
+        /* Then */  assertThat(cover).isEqualTo(null);
     }
     
     @Test
     public void should_throw_exception_if_url_not_valid() {
-        assertThat(imageService.getCoverFromURL("blabla")).isEqualTo(Cover.DEFAULT_COVER);
+        assertThat(imageService.getCoverFromURL("blabla")).isEqualTo(null);
     }
 }
