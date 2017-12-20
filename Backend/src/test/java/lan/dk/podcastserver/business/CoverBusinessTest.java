@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -240,9 +241,9 @@ public class CoverBusinessTest {
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/tmp/"));
 
         /* When */
-        Path path = coverBusiness.getCoverPathOf(item);
+        Option<Path> path = coverBusiness.getCoverPathOf(item);
 
         /* Then */
-        assertThat(path).isEqualTo(Paths.get("/tmp", "FooBarPodcast", item.getId() + ".png"));
+        assertThat(path).contains(Paths.get("/tmp", "FooBarPodcast", item.getId() + ".png"));
     }
 }

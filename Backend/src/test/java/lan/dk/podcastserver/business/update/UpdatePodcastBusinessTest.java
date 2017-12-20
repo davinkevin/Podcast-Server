@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+import static io.vavr.API.Option;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
@@ -267,7 +268,7 @@ public class UpdatePodcastBusinessTest {
             .forEach(t -> Try.run(() -> Files.createFile(Paths.get("/tmp/", t))));
 
         when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items);
-        when(coverBusiness.getCoverPathOf(any())).then(i -> Paths.get("/tmp/", i.getArgumentAt(0, Item.class).getTitle()));
+        when(coverBusiness.getCoverPathOf(any())).then(i -> Option(Paths.get("/tmp/", i.getArgumentAt(0, Item.class).getTitle())));
 
         /* When */
         updatePodcastBusiness.deleteOldCover();

@@ -176,7 +176,7 @@ public class UpdatePodcastBusiness  {
         log.info("Deletion of old covers item");
         itemRepository
                 .findAllToDelete(podcastServerParameters.limitToKeepCoverOnDisk())
-                .map(coverBusiness::getCoverPathOf)
+                .flatMap(coverBusiness::getCoverPathOf)
                 .forEach(p -> Try(() -> Files.deleteIfExists(p)));
     }
 

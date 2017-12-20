@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.collection.List;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -21,8 +22,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.UUID;
 
+import static io.vavr.API.None;
 import static io.vavr.API.Option;
 import static io.vavr.API.Try;
 import static java.util.Objects.isNull;
@@ -106,9 +109,12 @@ public class CoverBusiness {
         return podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(fileName);
     }
 
-    public Path getCoverPathOf(Item i) {
-        String fileName = i.getId() + "." + FilenameUtils.getExtension(i.getCover().getUrl());
-        return podcastServerParameters.getRootfolder().resolve(i.getPodcast().getTitle()).resolve(fileName);
+    public Option<Path> getCoverPathOf(Item i) {
+        return Option(i.getCover())
+                .map(Cover::getUrl)
+                .map(FilenameUtils::getExtension)
+                .map(v -> i.getId() + "." + v)
+                .map(podcastServerParameters.getRootfolder().resolve(i.getPodcast().getTitle())::resolve);
     }
 
     public Cover save(Cover cover) {
