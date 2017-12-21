@@ -59,6 +59,7 @@ podcastserver:
  #rss-default-number-item: 50
  update-and-download.refresh.cron: 0 0 0 * * ?
  backup :
+  enabled: true
   location: /tmp/
   cron: 0 30 4 * * ?
   binary: false

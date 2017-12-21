@@ -51,7 +51,10 @@ public class DatabaseService {
 
     @Transactional
     public Path backupWithDefault() throws IOException {
-        return backup(backup.getLocation(), backup.getBinary());
+        log.info("Doing backup operation");
+        Path result = backup(this.backup.getLocation(), this.backup.getBinary());
+        log.info("End of backup operation");
+        return result;
     }
 
     @Transactional
