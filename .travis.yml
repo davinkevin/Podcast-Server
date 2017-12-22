@@ -28,13 +28,16 @@ before_script:
 script:
 - ./mvnw -f frontend-angularjs/pom.xml install
 - ./mvnw -f Backend/pom.xml install jacoco:report
-#- mvn -f frontend-angular/pom.xml install
+#- ./mvnw -f frontend-angular/pom.xml install
 
 after_success:
-- mvn -f Backend/pom.xml coveralls:report
+- ./mvnw -f Backend/pom.xml coveralls:report
+- ./docker-build.sh
+- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+- docker push davinkevin/podcast-server
 
 before_deploy:
-- mvn install -DskipTests=true
+- ./mvnw install -DskipTests=true
 
 deploy:
   provider: releases
@@ -45,11 +48,6 @@ deploy:
   on:
     repo: davinkevin/Podcast-Server
     tags: true
-
-after_deploy:
-- mvn -f Backend/pom.xml docker:build
-- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-- docker push davinkevin/podcast-server
 
 env:
   global:
