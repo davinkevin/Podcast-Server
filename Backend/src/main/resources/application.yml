@@ -67,5 +67,3 @@ podcastserver:
   #rtmpdump: /usr/local/bin/rtmpdump
   #ffmpeg: /usr/local/bin/ffmpeg
   #ffprobe: /usr/local/bin/ffprobe
- api :
-  youtube: YOUR_API_KEY_OR_EMPTY_IF_NO_ONE
