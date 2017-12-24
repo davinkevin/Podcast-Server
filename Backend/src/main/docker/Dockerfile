@@ -6,8 +6,8 @@ RUN apk add --update ffmpeg
 RUN apk add --update rtmpdump
 
 # Configuration specific for docker container
-ENV podcastserver.externaltools.rtmpdump: "/usr/bin/rtmpdump"
-ENV podcastserver.externaltools.ffmpeg: "/usr/bin/ffmpeg"
+ENV podcastserver.externaltools.rtmpdump "/usr/bin/rtmpdump"
+ENV podcastserver.externaltools.ffmpeg "/usr/bin/ffmpeg"
 ENV podcastserver.backup.location "/opt/podcast-server/backup/"
 ENV podcastserver.rootfolder "/opt/podcast-server/podcasts"
 ENV spring.datasource.url "jdbc:h2:/opt/podcast-server/db;TRACE_LEVEL_FILE=0;MVCC=TRUE"
