@@ -28,7 +28,7 @@ before_script:
 script:
 - ./mvnw -f frontend-angularjs/pom.xml install
 - ./mvnw -f Backend/pom.xml install jacoco:report
-#- ./mvnw -f frontend-angular/pom.xml install
+- ./mvnw -f frontend-angular/pom.xml install
 
 after_success:
 - ./mvnw -f Backend/pom.xml coveralls:report
