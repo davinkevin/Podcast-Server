@@ -1,35 +1,40 @@
-<script src="search.module.ts"></script>
 <div class="search__bar">
 
   <form [formGroup]="form">
 
-    <md-input-container>
-      <input mdInput formControlName="q" name="q">
-    </md-input-container>
+    <mat-input-container>
+      <input matInput placeholder="Search..." formControlName="q" name="q">
+    </mat-input-container>
 
-    <md-input-container>
-      <input mdInput placeholder="Tags" formControlName="tags" name="tags">
-    </md-input-container>
+    <mat-input-container>
+      <input matInput placeholder="Tags" formControlName="tags" name="tags">
+    </mat-input-container>
 
-    <md-select placeholder="Status" formControlName="status" name="status">
-      <md-option *ngFor="let status of statuses" [value]="status.value">
-        {{ status.title }}
-      </md-option>
-    </md-select>
+    <mat-form-field>
+      <mat-select placeholder="Status" formControlName="status" name="status">
+        <mat-option *ngFor="let status of statuses" [value]="status.value">
+          {{ status.title }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <span formGroupName="sort">
 
-    <md-select placeholder="Sort on" formControlName="property" name="property">
-      <md-option *ngFor="let property of properties" [value]="property.value">
-        {{ property.title }}
-      </md-option>
-    </md-select>
+      <mat-form-field>
+        <mat-select placeholder="Sort on" formControlName="property" name="property">
+          <mat-option *ngFor="let property of properties" [value]="property.value">
+            {{ property.title }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <md-select placeholder="Order" formControlName="direction" name="direction">
-      <md-option *ngFor="let direction of directions" [value]="direction.value">
-        {{ direction.title }}
-      </md-option>
-    </md-select>
+      <mat-form-field>
+        <mat-select placeholder="Order" formControlName="direction" name="direction">
+          <mat-option *ngFor="let direction of directions" [value]="direction.value">
+            {{ direction.title }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
     </span>
 
@@ -37,23 +42,23 @@
 
 </div>
 
-<md-paginator [length]="items.totalElements"
-              [pageSize]="12"
-              [pageSizeOptions]="[4, 12, 36]"
-              (page)="changePage($event)">
-</md-paginator>
+<mat-paginator [length]="items.totalElements"
+               [pageSize]="12"
+               [pageSizeOptions]="[4, 12, 36]"
+               (page)="changePage($event)">
+</mat-paginator>
 
 <div class="search__results">
-  <md-card *ngFor="let item of items?.content">
-    <md-card-header>
-      <md-card-title>{{ item.title | truncate: 20}}</md-card-title>
-    </md-card-header>
-    <img md-card-image [src]="item.cover?.url">
-    <md-card-actions>
-      <button md-button>
-        <md-icon class="section-icon">play_arrow</md-icon>
+  <mat-card *ngFor="let item of items?.content">
+    <mat-card-header>
+      <mat-card-title>{{ item.title | truncate: 20}}</mat-card-title>
+    </mat-card-header>
+    <img mat-card-image [src]="item.cover?.url">
+    <mat-card-actions>
+      <button mat-button>
+        <mat-icon class="section-icon">play_arrow</mat-icon>
         Play
       </button>
-    </md-card-actions>
-  </md-card>
+    </mat-card-actions>
+  </mat-card>
 </div>

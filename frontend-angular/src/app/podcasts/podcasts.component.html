@@ -1,9 +1,9 @@
 
 <div class="podcasts__results">
-  <md-card *ngFor="let podcast of podcasts">
-    <img md-card-image [src]="podcast.cover?.url">
-    <md-card-content>
+  <mat-card *ngFor="let podcast of podcasts">
+    <img mat-card-image [src]="podcast.cover?.url">
+    <mat-card-content>
       {{ podcast.title }}
-    </md-card-content>
-  </md-card>
+    </mat-card-content>
+  </mat-card>
 </div>

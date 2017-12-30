@@ -6,7 +6,7 @@
   justify-content: space-around;
   height: 7vh;
 
-  md-select[name=property] {
+  mat-select[name=property] {
     width: 12vw;
   }
 
@@ -19,7 +19,7 @@
   flex-flow: row wrap;
   justify-content: space-around;
 
-  md-card {
+  mat-card {
     width: 215px;
     margin: 5px;
   }

@@ -3,7 +3,7 @@ import {NgModule} from '@angular/core';
 import 'hammerjs';
 
 import {AppComponent} from './app.component';
-import {MdIconModule, MdToolbarModule} from '@angular/material';
+import {MatIconModule, MatToolbarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SearchModule} from './search/search.module';
 import {RouterModule, Routes} from '@angular/router';
@@ -19,7 +19,7 @@ const routes: Routes = [
   declarations: [AppComponent],
   imports: [
     /* std Modules */       BrowserModule, BrowserAnimationsModule,
-    /* Materials Modules */ MdToolbarModule, MdIconModule,
+    /* Materials Modules */ MatToolbarModule, MatIconModule,
     /* Router Modules */    RouterModule.forRoot(routes),
     /* Feature Modules */   SearchModule, PodcastsModule,
     /* @ngrx */             StoreModule.forRoot({}), EffectsModule.forRoot([])

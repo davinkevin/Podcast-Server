@@ -1,7 +1,6 @@
 import 'rxjs/add/operator/map';
 
 import {Injectable} from '@angular/core';
-import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {Direction, Item, Page, SearchItemPageRequest} from '../../entity';
@@ -14,7 +13,7 @@ export class ItemService {
 
   search(searchPageRequest: SearchItemPageRequest): Observable<Page<Item>> {
     const params = toParams(searchPageRequest);
-    return this.http.get<Page<Item>>('/api/items/search', {params});
+    return this.http.get<Page<Item>>('/api/items/search', { params });
   }
 
 } /* istanbul ignore next */

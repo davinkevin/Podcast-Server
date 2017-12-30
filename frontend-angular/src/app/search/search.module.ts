@@ -5,8 +5,8 @@ import {SharedModule} from '../shared/shared.module';
 import {RouterModule, Routes} from '@angular/router';
 import {SearchResolver} from './resolver/search.resolver';
 import {
-  MdButtonModule, MdCardModule, MdIconModule, MdInputModule, MdOptionModule, MdPaginator, MdPaginatorModule,
-  MdSelectModule
+  MatButtonModule, MatCardModule, MatIconModule, MatInputModule, MatOptionModule, MatPaginator, MatPaginatorModule,
+  MatSelectModule
 } from '@angular/material';
 import {StoreModule} from '@ngrx/store';
 import * as fromSearch from './search.reducer';
@@ -38,8 +38,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
 
     /* Material Design */
-    MdCardModule, MdButtonModule, MdIconModule, MdInputModule, MdSelectModule,
-    MdPaginatorModule,
+    MatCardModule, MatButtonModule, MatIconModule, MatInputModule, MatSelectModule,
+    MatPaginatorModule,
 
     /* 3rd party module */
     TruncateModule,

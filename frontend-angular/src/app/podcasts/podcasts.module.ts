@@ -8,7 +8,7 @@ import * as fromPodcasts from './podcasts.reducer';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastsEffects} from './podcasts.effects';
 import {PodcastsResolver} from './resolver/podcasts.resolver';
-import {MdCardModule} from '@angular/material';
+import {MatCardModule} from '@angular/material';
 
 
 const routes: Routes = [
@@ -25,7 +25,7 @@ const routes: Routes = [
     CommonModule, SharedModule,
 
     /* Material Design */
-    MdCardModule,
+    MatCardModule,
 
     /* Routes */
     RouterModule.forChild(routes),
