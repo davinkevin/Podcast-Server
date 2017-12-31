@@ -20,10 +20,7 @@ import {TruncateModule} from 'ng2-truncate';
 const routes: Routes = [
   { path: 'search',
     component: SearchComponent,
-    resolve: {
-      search: SearchResolver,
-      request: SearchQueryResolver
-    }
+    resolve: {search: SearchResolver, request: SearchQueryResolver}
   }
 ];
 
@@ -45,9 +42,7 @@ const routes: Routes = [
     TruncateModule,
 
     /* NgRx */
-    StoreModule.forFeature('searchModule', {
-      search: fromSearch.reducer
-    }),
+    StoreModule.forFeature('search', fromSearch.reducer),
     EffectsModule.forFeature([SearchEffects])
   ],
   providers: [SearchResolver, SearchQueryResolver],

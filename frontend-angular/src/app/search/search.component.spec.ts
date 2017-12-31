@@ -5,29 +5,29 @@ import {DebugElement} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {
-  MdButtonModule,
-  MdCardModule,
-  MdIconModule,
-  MdInputModule,
-  MdPaginatorModule,
-  MdSelectModule
+  MatButtonModule,
+  MatCardModule,
+  MatIconModule,
+  MatInputModule,
+  MatPaginatorModule,
+  MatSelectModule
 } from '@angular/material';
 import {By} from '@angular/platform-browser';
 import {Action, Store, StoreModule} from '@ngrx/store';
 import * as fromSearch from './search.reducer';
-import {ModuleState, selectRequest, selectResults} from './search.reducer';
+import {selectRequest, selectResults} from './search.reducer';
 import 'rxjs/add/observable/of';
-import {BackendError, Direction, Item, Page, Status} from '../shared/entity';
+import {Direction, Item, Page, Status} from '../shared/entity';
 import {TruncateModule} from 'ng2-truncate';
 import {ReactiveFormsModule} from '@angular/forms';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import * as SearchActions from './search.actions';
+import {Search, SearchSuccess} from './search.actions';
 import {SearchEffects} from './search.effects';
 import {ItemService} from '../shared/service/item/item.service';
-import Spy = jasmine.Spy;
 import {provideMockActions} from '@ngrx/effects/testing';
 import {cold, hot} from 'jasmine-marbles';
-import {Search, SearchSuccess} from './search.actions';
+import Spy = jasmine.Spy;
 
 
 describe('SearchFeature', () => {
@@ -38,24 +38,22 @@ describe('SearchFeature', () => {
     let el: DebugElement;
     let store: Store<fromSearch.State>;
 
-    const configureTestingModule = (search, request) => {
+    const configureTestingModule = (s, request) => {
       return TestBed.configureTestingModule({
         declarations: [ SearchComponent ],
         providers: [
-          { provide: ActivatedRoute, useValue: { data: Observable.of({search, request}) } }
+          { provide: ActivatedRoute, useValue: { data: Observable.of({search: s, request}) } }
         ],
         imports: [
           ReactiveFormsModule,
 
           NoopAnimationsModule,
-          MdCardModule, MdButtonModule, MdIconModule, MdInputModule, MdSelectModule, MdPaginatorModule,
+          MatButtonModule, MatCardModule, MatIconModule, MatInputModule, MatPaginatorModule, MatSelectModule,
 
           TruncateModule,
 
           StoreModule.forRoot([]),
-          StoreModule.forFeature('searchModule', {
-            search: fromSearch.reducer
-          }),
+          StoreModule.forFeature('search', fromSearch.reducer),
         ]
       }).compileComponents();
     };
@@ -318,7 +316,7 @@ describe('SearchFeature', () => {
         /* Given */
         fixture.whenStable().then(() => {
           /* When  */
-          const elements = el.queryAll(By.css('md-card'));
+          const elements = el.queryAll(By.css('mat-card'));
           /* Then  */
           expect(elements.length).toBe(12);
         });
@@ -331,9 +329,9 @@ describe('SearchFeature', () => {
           /* When  */
           const q = el.query(By.css('input[name="q"]'));
           const tags = el.query(By.css('input[name="tags"]'));
-          const status = el.query(By.css('md-select[name="status"]'));
-          const property = el.query(By.css('md-select[name="property"]'));
-          const direction = el.query(By.css('md-select[name="direction"]'));
+          const status = el.query(By.css('mat-select[name="status"]'));
+          const property = el.query(By.css('mat-select[name="property"]'));
+          const direction = el.query(By.css('mat-select[name="direction"]'));
 
           /* Then  */
           expect(q.nativeElement.value).toBe('');
@@ -373,7 +371,7 @@ describe('SearchFeature', () => {
       /*
       xit('should generate a search when status form is changed', fakeAsync(() => {
         /!* Given *!/
-        const status = el.query(By.css('md-select[name="status"]'));
+        const status = el.query(By.css('mat-select[name="status"]'));
 
         /!* When  *!/
         status.triggerEventHandler('click', null);
@@ -470,7 +468,7 @@ describe('SearchFeature', () => {
 
           it('should be initialized with tags list', async(() => {
             fixture.whenStable().then(() => {
-              const status = el.query(By.css('md-select[name="status"]'));
+              const status = el.query(By.css('mat-select[name="status"]'));
               expect(status.componentInstance.selected.value).toBe(StatusesViewValue.DOWNLOADED);
             });
           }));
@@ -483,7 +481,7 @@ describe('SearchFeature', () => {
 
           it('should be initialized with tags list', async(() => {
             fixture.whenStable().then(() => {
-              const status = el.query(By.css('md-select[name="status"]'));
+              const status = el.query(By.css('mat-select[name="status"]'));
               expect(status.componentInstance.selected.value).toBe(StatusesViewValue.NOT_DOWNLOADED);
             });
           }));
@@ -496,7 +494,7 @@ describe('SearchFeature', () => {
 
           it('should be initialized with tags list', async(() => {
             fixture.whenStable().then(() => {
-              const status = el.query(By.css('md-select[name="status"]'));
+              const status = el.query(By.css('mat-select[name="status"]'));
               expect(status.componentInstance.selected.value).toBe(StatusesViewValue.ALL);
             });
           }));
@@ -531,9 +529,6 @@ describe('SearchFeature', () => {
           totalPages: 0, totalElements: -1, numberOfElements: 0,
           size: 0, number: 0,
           sort: [{direction: Direction.DESC, property: 'pubDate'}]
-        });
-        expect(state.error).toEqual({
-          message: 'empty'
         });
       });
       it('should have an initial state for request', () => {
@@ -595,25 +590,11 @@ describe('SearchFeature', () => {
         /* Then  */
         expect(state.results).toBe(searchSuccess);
       });
-      it('should propagate search error', () => {
-        /* Given */
-        const error: BackendError = {
-          message: 'Error in backend'
-        };
-
-        /* When  */
-        const state = fromSearch.reducer(undefined, new SearchActions.SearchError(error));
-
-        /* Then  */
-        expect(state.error).toBe(error);
-      });
-
     });
 
     describe('selection on state', () => {
 
-      const s: ModuleState = {
-        searchModule: {
+      const s = {
           search: {
             request: {
               page: 0, size: 12, status: [], tags: [],
@@ -630,7 +611,6 @@ describe('SearchFeature', () => {
               message: 'empty'
             }
           }
-        }
       };
 
       it('should select results', () => {

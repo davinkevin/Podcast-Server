@@ -1,22 +1,14 @@
 
-import {BackendError, Podcast} from '../shared/entity';
+import {Podcast} from '../shared/entity';
 import * as PodcastsActions from './podcasts.actions';
-
-
-export interface ModuleState {
-  podcastsModule: {
-    podcasts: State;
-  }
-}
+import {createFeatureSelector, createSelector} from '@ngrx/store';
 
 export interface State {
   podcasts: Podcast[];
-  error: BackendError;
 }
 
 const initialState: State = {
-  podcasts: [],
-  error: {message: 'empty'}
+  podcasts: []
 };
 
 export function reducer(state = initialState, action: PodcastsActions.All): State {
@@ -30,17 +22,10 @@ export function reducer(state = initialState, action: PodcastsActions.All): Stat
       return {...state, podcasts: action.payload};
     }
 
-    case PodcastsActions.FIND_ALL_ERROR: {
-      return {...state, error: action.payload};
-    }
-
     default: {return state; }
 
   }
 }
 
-
-
-export function selectPodcasts(s: ModuleState) {
-  return s.podcastsModule.podcasts.podcasts;
-}
+const moduleSelector = createFeatureSelector<State>('podcasts');
+export const selectPodcasts = createSelector(moduleSelector, (s: State) => s.podcasts);

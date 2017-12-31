@@ -1,13 +1,13 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PodcastsComponent} from './podcasts.component';
-import {MdCardModule} from '@angular/material';
+import {MatCardModule} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {PodcastsEffects} from './podcasts.effects';
 import {provideMockActions} from '@ngrx/effects/testing';
 import {cold, hot} from 'jasmine-marbles';
-import {FindAll, FindAllError, FindAllSuccess} from 'app/podcasts/podcasts.actions';
+import {FindAll, FindAllSuccess} from 'app/podcasts/podcasts.actions';
 import {PodcastService} from '../shared/service/podcast/podcast.service';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Action} from '@ngrx/store';
@@ -124,7 +124,7 @@ describe('PodcastsFeature', () => {
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({
-        imports: [MdCardModule],
+        imports: [MatCardModule],
         providers: [
           { provide: ActivatedRoute, useValue: { data: Observable.of({ podcasts }) } }
         ],
@@ -149,7 +149,7 @@ describe('PodcastsFeature', () => {
       /* When  */
       fixture.whenStable().then(() => {
         /* Then  */
-        const podcastsCards = el.queryAll(By.css('md-card'));
+        const podcastsCards = el.queryAll(By.css('mat-card'));
         expect(podcastsCards.length).toEqual(8);
       });
     });
@@ -206,7 +206,7 @@ describe('PodcastsFeature', () => {
         const state = reducer(undefined, findAllAction);
 
         /* Then  */
-        expect(state).toEqual({podcasts: [], error: {message: 'empty'}});
+        expect(state).toEqual({podcasts: []});
     });
 
     it('should do nothing when findAllAction triggered', () => {
@@ -227,15 +227,6 @@ describe('PodcastsFeature', () => {
         const state = reducer(previousState, findAllSuccessAction);
         /* Then  */
         expect(state.podcasts).toEqual(podcasts);
-    });
-
-    it('should change error message when findAllError', () => {
-      /* Given */
-      const action = new FindAllError({message: 'something goes wrong'});
-      /* When  */
-      const state = reducer(previousState, action);
-      /* Then  */
-      expect(state.error).toEqual({message: 'something goes wrong'});
     });
 
   });

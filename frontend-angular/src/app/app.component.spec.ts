@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AppComponent} from './app.component';
-import {MdIconModule, MdToolbarModule} from '@angular/material';
+import {MatIconModule, MatToolbarModule} from '@angular/material';
 import {RouterTestingModule} from '@angular/router/testing';
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
@@ -21,7 +21,7 @@ describe('AppComponent', () => {
       ],
       imports: [
         BrowserAnimationsModule,
-        MdToolbarModule, MdIconModule,
+        MatIconModule, MatToolbarModule,
         RouterTestingModule.withRoutes([])
       ]
     }).compileComponents();
@@ -37,8 +37,8 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   }));
 
-  it('should have 5 md-icons for each section in md-toolbar', () => {
-    const icons = el.queryAll(By.css('md-toolbar md-icon'));
+  it('should have 5 mat-icons for each section in mat-toolbar', () => {
+    const icons = el.queryAll(By.css('mat-toolbar mat-icon'));
     expect(icons.length).toEqual(5);
   });
 

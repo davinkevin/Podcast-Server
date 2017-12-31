@@ -1,16 +1,10 @@
-import {BackendError, Direction, Item, Page, SearchItemPageRequest} from '../shared/entity';
+import {Direction, Item, Page, SearchItemPageRequest} from '../shared/entity';
 import * as SearchActions from './search.actions';
-
-export interface ModuleState {
-  searchModule: {
-    search: State;
-  }
-}
+import {createFeatureSelector, createSelector} from '@ngrx/store';
 
 export interface State {
   request: SearchItemPageRequest;
-  results: Page<Item>,
-  error: BackendError
+  results: Page<Item>
 }
 
 const initialState: State = {
@@ -24,9 +18,6 @@ const initialState: State = {
     totalPages: 0, totalElements: -1, numberOfElements: 0,
     size: 0, number: 0,
     sort: [{direction: Direction.DESC, property: 'pubDate'}]
-  },
-  error: {
-    message: 'empty'
   }
 };
 
@@ -41,19 +32,11 @@ export function reducer(state = initialState, action: SearchActions.All): State 
       return {...state, results: action.payload};
     }
 
-    case SearchActions.SEARCH_ERROR: {
-      return {...state, error: action.payload};
-    }
-
     default: { return state; }
 
   }
 }
 
-export function selectResults(s: ModuleState) {
-  return s.searchModule.search.results;
-}
-
-export function selectRequest(s: ModuleState) {
-  return s.searchModule.search.request;
-}
+const moduleSelector = createFeatureSelector<State>('search');
+export const selectResults = createSelector(moduleSelector, (s: State) => s.results);
+export const selectRequest = createSelector(moduleSelector, (s: State) => s.request);

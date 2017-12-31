@@ -79,7 +79,3 @@ export interface SearchItemPageRequest {
   tags?: Tag[];
   sort?: Sort[];
 }
-
-export interface BackendError {
-  message: string;
-}

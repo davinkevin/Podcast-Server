@@ -125,9 +125,7 @@ describe('PodcastsResolver', () => {
     TestBed.configureTestingModule({
       imports: [
         StoreModule.forRoot([]),
-        StoreModule.forFeature('podcastsModule', {
-          podcasts: reducer
-        })
+        StoreModule.forFeature('podcasts', reducer)
       ],
       providers: [
         PodcastsResolver,

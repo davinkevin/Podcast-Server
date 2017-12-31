@@ -31,9 +31,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
 
     /* NgRx */
-    StoreModule.forFeature('podcastsModule', {
-      podcasts: fromPodcasts.reducer
-    }),
+    StoreModule.forFeature('podcasts', fromPodcasts.reducer),
     EffectsModule.forFeature([PodcastsEffects])
   ],
   providers: [PodcastsResolver],

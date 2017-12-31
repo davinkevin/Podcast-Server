@@ -10,10 +10,17 @@ import {RouterModule, Routes} from '@angular/router';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastsModule} from './podcasts/podcasts.module';
+import {environment} from '../environments/environment';
+import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full'}
 ];
+
+const devModules = environment.production
+  ? []
+  : [ StoreDevtoolsModule.instrument({maxAge: 25}) ];
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,7 +29,8 @@ const routes: Routes = [
     /* Materials Modules */ MatToolbarModule, MatIconModule,
     /* Router Modules */    RouterModule.forRoot(routes),
     /* Feature Modules */   SearchModule, PodcastsModule,
-    /* @ngrx */             StoreModule.forRoot({}), EffectsModule.forRoot([])
+    /* @ngrx */             StoreModule.forRoot({}), EffectsModule.forRoot([]),
+    /* Dev Modules */       ...devModules
   ],
   providers: [],
   bootstrap: [AppComponent]
