@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
 import {Store} from '@ngrx/store';
-import {ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
+import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import { Podcast } from '../../shared/entity';
-import {selectPodcasts} from '../podcasts.reducer';
-import * as PodcastsActions from '../podcasts.actions';
+import { Podcast } from '../../../shared/entity';
+import {selectPodcasts} from '../../podcasts.reducer';
+import * as PodcastsActions from '../../podcasts.actions';
 import 'rxjs/add/operator/skip';
 
-
-
 @Injectable()
-export class PodcastsResolver {
+export class PodcastsResolver implements Resolve<Podcast[]> {
 
   constructor(private store: Store<any>) {}
 

@@ -15,6 +15,7 @@ import Spy = jasmine.Spy;
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {reducer} from './podcasts.reducer';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('PodcastsFeature', () => {
 
@@ -124,7 +125,9 @@ describe('PodcastsFeature', () => {
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({
-        imports: [MatCardModule],
+        imports: [
+          MatCardModule, RouterTestingModule
+        ],
         providers: [
           { provide: ActivatedRoute, useValue: { data: Observable.of({ podcasts }) } }
         ],

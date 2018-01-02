@@ -12,4 +12,8 @@ export class PodcastService {
     return this.http.get<Podcast[]>('/api/podcasts')
   }
 
+  findOne(id: string): Observable<Podcast> {
+    return this.http.get<Podcast>(`/api/podcasts/${id}`)
+  }
+
 } /* istanbul ignore next */

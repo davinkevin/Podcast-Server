@@ -1,6 +1,6 @@
 
 <div class="podcasts__results">
-  <mat-card *ngFor="let podcast of podcasts">
+  <mat-card *ngFor="let podcast of podcasts" [routerLink]="[podcast.id]">
     <img mat-card-image [src]="podcast.cover?.url">
     <mat-card-content>
       {{ podcast.title }}

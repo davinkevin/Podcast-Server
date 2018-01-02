@@ -7,16 +7,15 @@ import {StoreModule} from '@ngrx/store';
 import * as fromPodcasts from './podcasts.reducer';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastsEffects} from './podcasts.effects';
-import {PodcastsResolver} from './resolver/podcasts.resolver';
+import {PodcastsResolver} from './core/resolver/podcasts.resolver';
 import {MatCardModule} from '@angular/material';
+import {PodcastModule} from './podcast/podcast.module';
 
 
 const routes: Routes = [
   {
     path: 'podcasts', component: PodcastsComponent,
-    resolve: {
-      podcasts: PodcastsResolver
-    }
+    resolve: {podcasts: PodcastsResolver}
   }
 ];
 
@@ -29,6 +28,9 @@ const routes: Routes = [
 
     /* Routes */
     RouterModule.forChild(routes),
+
+    /* Features */
+    PodcastModule,
 
     /* NgRx */
     StoreModule.forFeature('podcasts', fromPodcasts.reducer),
