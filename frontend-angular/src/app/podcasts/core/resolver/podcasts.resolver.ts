@@ -5,7 +5,7 @@ import {Observable} from 'rxjs/Observable';
 import { Podcast } from '../../../shared/entity';
 import {selectPodcasts} from '../../podcasts.reducer';
 import * as PodcastsActions from '../../podcasts.actions';
-import 'rxjs/add/operator/skip';
+import {skip, take} from 'rxjs/operators';
 
 @Injectable()
 export class PodcastsResolver implements Resolve<Podcast[]> {
@@ -16,7 +16,9 @@ export class PodcastsResolver implements Resolve<Podcast[]> {
     this.store.dispatch(new PodcastsActions.FindAll());
 
     return this.store.select(selectPodcasts)
-      .skip(1)
-      .take(1);
+      .pipe(
+        skip(1),
+        take(1)
+      );
   }
 } /* istanbul ignore next */

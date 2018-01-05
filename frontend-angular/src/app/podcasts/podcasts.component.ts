@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Podcast} from '../shared/entity';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'ps-podcasts',
@@ -14,9 +15,9 @@ export class PodcastsComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.route.data
-      .map(d => d.podcasts as Podcast[])
-      .subscribe(d => this.podcasts = d);
+    this.route.data.pipe(
+      map(d => d.podcasts as Podcast[])
+    ).subscribe(d => this.podcasts = d);
   }
 
 } /* istanbul ignore next */

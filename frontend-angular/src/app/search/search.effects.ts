@@ -1,5 +1,4 @@
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
+import {map, switchMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {Actions, Effect} from '@ngrx/effects';
 import {Observable} from 'rxjs/Observable';
@@ -14,9 +13,11 @@ export class SearchEffects {
 
   @Effect()
   search$: Observable<Action> = this.actions$.ofType(SearchActions.SEARCH)
-    .map((action: SearchActions.Search) => action.payload)
-    .switchMap((terms: SearchItemPageRequest) => this.itemService.search(terms))
-    .map((results: Page<Item>) => new SearchActions.SearchSuccess(results));
+    .pipe(
+      map((action: SearchActions.Search) => action.payload),
+      switchMap((terms: SearchItemPageRequest) => this.itemService.search(terms)),
+      map((results: Page<Item>) => new SearchActions.SearchSuccess(results))
+    );
 
   constructor(private actions$: Actions, private itemService: ItemService) {}
 

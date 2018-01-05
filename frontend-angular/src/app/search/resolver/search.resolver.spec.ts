@@ -11,6 +11,7 @@ import * as fromSearch from '../search.reducer';
 import * as SearchActions from '../search.actions';
 
 import {selectResults} from '../search.reducer';
+import {of} from 'rxjs/observable/of';
 
 
 describe('SearchResolver', () => {
@@ -249,7 +250,7 @@ describe('SearchResolver', () => {
 
   beforeEach(() => {
     itemService = jasmine.createSpyObj('itemService', ['search']);
-    (itemService.search as Spy).and.returnValue(Observable.of(PAGE));
+    (itemService.search as Spy).and.returnValue(of(PAGE));
   });
 
   beforeEach(() => {

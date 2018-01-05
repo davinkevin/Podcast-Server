@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Podcast} from '../../shared/entity';
 import {Store} from '@ngrx/store';
 import {ActivatedRoute} from '@angular/router';
 import {toPodcast} from './core/resolver/podcast.resolver';
-// import {pluck} from 'rxjs/operator/pluck';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'ps-podcast',
@@ -17,9 +17,9 @@ export class PodcastComponent implements OnInit {
   constructor(private store: Store<any>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.data
-      .map(toPodcast)
-      .subscribe(v => this.podcast = v);
+    this.route.data.pipe(
+      map(toPodcast)
+    ).subscribe(v => this.podcast = v);
   }
 
 }

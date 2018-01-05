@@ -4,6 +4,7 @@ import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/rou
 import {Observable} from 'rxjs/Observable';
 import {Store} from '@ngrx/store';
 import {selectRequest} from '../search.reducer';
+import {take} from 'rxjs/operators';
 
 @Injectable()
 export class SearchQueryResolver implements Resolve<SearchItemPageRequest> {
@@ -11,7 +12,9 @@ export class SearchQueryResolver implements Resolve<SearchItemPageRequest> {
   constructor(private store: Store<any>) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<SearchItemPageRequest> {
-    return this.store.select(selectRequest).take(1);
+    return this.store.select(selectRequest).pipe(
+      take(1)
+    );
   }
 
 } /* istanbul ignore next */

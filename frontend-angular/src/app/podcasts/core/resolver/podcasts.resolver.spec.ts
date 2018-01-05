@@ -4,11 +4,11 @@ import { PodcastsResolver } from './podcasts.resolver';
 import {PodcastService} from '../../../shared/service/podcast/podcast.service';
 import {ActivatedRouteSnapshot} from '@angular/router';
 import Spy = jasmine.Spy;
-import {Observable} from 'rxjs/Observable';
 import {Store, StoreModule} from '@ngrx/store';
 import {FindAll, FindAllSuccess} from '../../podcasts.actions';
 import {reducer, selectPodcasts} from '../../podcasts.reducer';
 import {Podcast} from '../../../shared/entity';
+import {of} from 'rxjs/observable/of';
 
 describe('PodcastsResolver', () => {
 
@@ -118,7 +118,7 @@ describe('PodcastsResolver', () => {
 
   beforeEach(() => {
     podcastService = jasmine.createSpyObj('podcastService', ['findAll']);
-    (podcastService.findAll as Spy).and.returnValue(Observable.of(PODCASTS));
+    (podcastService.findAll as Spy).and.returnValue(of(PODCASTS));
   });
 
   beforeEach(() => {

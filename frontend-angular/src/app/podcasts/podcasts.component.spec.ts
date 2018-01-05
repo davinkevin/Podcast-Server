@@ -16,6 +16,7 @@ import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {reducer} from './podcasts.reducer';
 import {RouterTestingModule} from '@angular/router/testing';
+import {of} from 'rxjs/observable/of';
 
 describe('PodcastsFeature', () => {
 
@@ -129,7 +130,7 @@ describe('PodcastsFeature', () => {
           MatCardModule, RouterTestingModule
         ],
         providers: [
-          { provide: ActivatedRoute, useValue: { data: Observable.of({ podcasts }) } }
+          { provide: ActivatedRoute, useValue: { data: of({ podcasts }) } }
         ],
         declarations: [ PodcastsComponent ]
       })
@@ -166,7 +167,7 @@ describe('PodcastsFeature', () => {
 
     beforeEach(() => {
       podcastService = jasmine.createSpyObj('podcastService', ['findAll']);
-      (podcastService.findAll as Spy).and.returnValue(Observable.of([]));
+      (podcastService.findAll as Spy).and.returnValue(of([]));
     });
 
     beforeEach(() => {

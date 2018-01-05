@@ -1,8 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
+import {debounceTime, map} from 'rxjs/operators';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {Store} from '@ngrx/store';
@@ -71,18 +68,22 @@ export class SearchComponent implements OnInit {
       })
     });
 
-    this.form.valueChanges
-      .debounceTime(500)
-      .map(toSearchItemRequest)
-      .subscribe(v => this.search(v));
+    this.form.valueChanges.pipe(
+      debounceTime(500),
+      map(toSearchItemRequest)
+    ).subscribe(v => this.search(v));
 
     this.store.select(selectResults)
       .subscribe(s => this.items = s);
 
-    this.route.data.map(d => d.search)
+    this.route.data.pipe(
+      map(d => d.search)
+    )
       .subscribe(s => this.items = s);
 
-    this.route.data.map(d => d.request)
+    this.route.data.pipe(
+      map(d => d.request)
+    )
       .subscribe(r => {
         this.form.get('q').setValue(r.q, this.doNotEmit);
         this.form.get('tags').setValue(r.tags.map(t => t.name).join(', '), this.doNotEmit);

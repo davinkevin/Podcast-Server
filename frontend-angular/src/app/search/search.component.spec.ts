@@ -16,7 +16,7 @@ import {By} from '@angular/platform-browser';
 import {Action, Store, StoreModule} from '@ngrx/store';
 import * as fromSearch from './search.reducer';
 import {selectRequest, selectResults} from './search.reducer';
-import 'rxjs/add/observable/of';
+import {of} from 'rxjs/observable/of';
 import {Direction, Item, Page, Status} from '../shared/entity';
 import {TruncateModule} from 'ng2-truncate';
 import {ReactiveFormsModule} from '@angular/forms';
@@ -42,7 +42,7 @@ describe('SearchFeature', () => {
       return TestBed.configureTestingModule({
         declarations: [ SearchComponent ],
         providers: [
-          { provide: ActivatedRoute, useValue: { data: Observable.of({search: s, request}) } }
+          { provide: ActivatedRoute, useValue: { data: of({search: s, request}) } }
         ],
         imports: [
           ReactiveFormsModule,
@@ -878,7 +878,7 @@ describe('SearchFeature', () => {
 
     beforeEach(() => {
       itemService = jasmine.createSpyObj('itemService', ['search']);
-      (itemService.search as Spy).and.returnValue(Observable.of(PAGE));
+      (itemService.search as Spy).and.returnValue(of(PAGE));
     });
 
     beforeEach(() => {

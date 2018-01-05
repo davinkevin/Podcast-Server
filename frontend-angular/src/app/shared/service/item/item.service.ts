@@ -1,8 +1,5 @@
-import 'rxjs/add/operator/map';
-
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-
 import {Direction, Item, Page, SearchItemPageRequest} from '../../entity';
 import {HttpClient, HttpParams} from '@angular/common/http';
 
