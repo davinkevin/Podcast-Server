@@ -168,17 +168,17 @@
   dependencies:
     tslib "^1.7.1"
 
-"@ngrx/effects@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-4.1.0.tgz#a67f5abb71bdb2fea1fa9b751a4f38435674a6a8"
+"@ngrx/effects@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-4.1.1.tgz#cb758b8527964b258ea41951f59aa144e3ef9fae"
 
-"@ngrx/store-devtools@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@ngrx/store-devtools/-/store-devtools-4.0.0.tgz#b79c24773217df7fd9735ad21f9cbf2533c96e04"
+"@ngrx/store-devtools@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@ngrx/store-devtools/-/store-devtools-4.1.1.tgz#20745c39c7560fdc05fa4f22638442a7ec7dd676"
 
-"@ngrx/store@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-4.1.0.tgz#8c074cbc6197e259cd9492e85a76c3c67dbea173"
+"@ngrx/store@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-4.1.1.tgz#680e34df2775e8852754ed777ffac95bd81b7de0"
 
 "@ngtools/json-schema@1.1.0", "@ngtools/json-schema@^1.1.0":
   version "1.1.0"
