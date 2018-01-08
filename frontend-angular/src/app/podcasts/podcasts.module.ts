@@ -10,6 +10,7 @@ import {PodcastsEffects} from './podcasts.effects';
 import {PodcastsResolver} from './core/resolver/podcasts.resolver';
 import {MatCardModule} from '@angular/material';
 import {PodcastModule} from './podcast/podcast.module';
+import {PodcastService} from './shared/service/podcast/podcast.service';
 
 
 const routes: Routes = [
@@ -36,7 +37,7 @@ const routes: Routes = [
     StoreModule.forFeature('podcasts', fromPodcasts.reducer),
     EffectsModule.forFeature([PodcastsEffects])
   ],
-  providers: [PodcastsResolver],
+  providers: [PodcastsResolver, PodcastService],
   declarations: [PodcastsComponent]
 })
 export class PodcastsModule { }

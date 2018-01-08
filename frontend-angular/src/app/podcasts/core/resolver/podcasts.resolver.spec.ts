@@ -1,7 +1,7 @@
 import {TestBed, inject, async} from '@angular/core/testing';
 
 import { PodcastsResolver } from './podcasts.resolver';
-import {PodcastService} from '../../../shared/service/podcast/podcast.service';
+import {PodcastService} from '../../shared/service/podcast/podcast.service';
 import {ActivatedRouteSnapshot} from '@angular/router';
 import Spy = jasmine.Spy;
 import {Store, StoreModule} from '@ngrx/store';

@@ -6,7 +6,7 @@ import {Observable} from 'rxjs/Observable';
 import * as PodcastsActions from './podcasts.actions';
 import {Action} from '@ngrx/store';
 import {Podcast} from '../shared/entity';
-import {PodcastService} from '../shared/service/podcast/podcast.service';
+import {PodcastService} from './shared/service/podcast/podcast.service';
 
 
 @Injectable()

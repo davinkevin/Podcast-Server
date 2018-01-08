@@ -4,9 +4,9 @@ import {Injectable} from '@angular/core';
 import {Actions, Effect} from '@ngrx/effects';
 import {Action} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
-import {Podcast} from '../../shared/entity';
-import {PodcastService} from '../../shared/service/podcast/podcast.service';
+import {Podcast} from '../../shared/entity';;
 import {FIND_ONE, FindOne, FindOneSuccess} from './podcast.actions';
+import {PodcastService} from '../shared/service/podcast/podcast.service';
 
 @Injectable()
 export class PodcastEffects {

@@ -8,7 +8,7 @@ import {PodcastsEffects} from './podcasts.effects';
 import {provideMockActions} from '@ngrx/effects/testing';
 import {cold, hot} from 'jasmine-marbles';
 import {FindAll, FindAllSuccess} from 'app/podcasts/podcasts.actions';
-import {PodcastService} from '../shared/service/podcast/podcast.service';
+import {PodcastService} from './shared/service/podcast/podcast.service';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Action} from '@ngrx/store';
 import Spy = jasmine.Spy;
