@@ -1,0 +1,6 @@
+{
+  "/api": {
+    "target": "https://podcast-server.tk",
+    "secure": false
+  }
+}
