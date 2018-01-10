@@ -1,8 +1,24 @@
 
-<div class="jumbotron">
-  <img [src]="podcast.cover.url" alt="" width="100%" height="100%">
+<div class="jumbotron" [ngStyle]="{'background-image': 'url(' + podcast.cover.url + ')' }">
+  <div class="buttons">
+    <button mat-icon-button (click)="goBack()" class="back">
+      <mat-icon color="white">arrow_back</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="menu" class="more">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <a mat-menu-item [href]="'/api/podcasts/' + podcast.id + '/rss'" target="_blank">
+        <mat-icon>rss_feed</mat-icon>
+        <span>RSS Feed</span>
+      </a>
+      <button mat-menu-item (click)="refresh()">
+        <mat-icon>sync</mat-icon>
+        <span>Refresh</span>
+      </button>
+    </mat-menu>
+  </div>
 </div>
-
 <pre><code>
   {{ podcast | json }}
 </code></pre>

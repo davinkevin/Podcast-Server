@@ -16,4 +16,7 @@ export class PodcastService {
     return this.http.get<Podcast>(`/api/podcasts/${id}`)
   }
 
+  refresh(p: Podcast): Observable<void> {
+    return this.http.get<void>(`/api/podcasts/${p.id}/update/force`);
+  }
 } /* istanbul ignore next */
