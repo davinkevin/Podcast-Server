@@ -27,7 +27,7 @@ export interface Podcast {
   id: string;
   title: string;
   type: string;
-  lastUpdate: Date | string;
+  lastUpdate: string;
   cover: Cover;
 }
 

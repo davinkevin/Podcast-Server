@@ -153,7 +153,7 @@ describe('PodcastsFeature', () => {
       /* When  */
       fixture.whenStable().then(() => {
         /* Then  */
-        const podcastsCards = el.queryAll(By.css('mat-card'));
+        const podcastsCards = el.queryAll(By.css('img'));
         expect(podcastsCards.length).toEqual(8);
       });
     });
