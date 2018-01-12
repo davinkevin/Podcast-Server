@@ -1,3 +1,9 @@
+<mat-toolbar color="primary">
+  <div class="toolbar__left">
+    <mat-icon (click)="openSideNav()" class="toolbar__hamburger section-icon">dehaze</mat-icon>
+    <span class="toolbar__title">Podcasts</span>
+  </div>
+</mat-toolbar>
 
 <div class="podcasts__results">
   <img mat-card-image [src]="podcast.cover?.url" *ngFor="let podcast of podcasts" [routerLink]="[podcast.id]">

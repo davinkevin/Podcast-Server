@@ -9,6 +9,7 @@ import {defaultSearch} from '../shared/service/item/item.service';
 import {selectResults} from './search.reducer';
 import {Direction, Item, Page, SearchItemPageRequest, Sort, Status} from '../shared/entity';
 import {Search} from './search.actions';
+import {OpenSideNavAction} from '../app.actions';
 
 interface SearchItemRequestViewModel {
   q?: string;
@@ -103,6 +104,10 @@ export class SearchComponent implements OnInit {
     this.form.get('size').setValue(e.pageSize, this.doNotEmit);
     this.form.get('page').setValue(e.pageIndex, this.doNotEmit);
     this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
+  }
+
+  openSideNav() {
+    this.store.dispatch(new OpenSideNavAction());
   }
 
 } /* istanbul ignore next */

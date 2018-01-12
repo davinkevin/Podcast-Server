@@ -6,6 +6,7 @@ import {toPodcast} from './core/resolver/podcast.resolver';
 import {map} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {RefreshAction} from './podcast.actions';
+import {OpenSideNavAction} from '../../app.actions';
 
 @Component({
   selector: 'ps-podcast',
@@ -30,6 +31,10 @@ export class PodcastComponent implements OnInit {
 
   refresh() {
     this.store.dispatch(new RefreshAction(this.podcast));
+  }
+
+  openSideNav() {
+    this.store.dispatch(new OpenSideNavAction());
   }
 
 }

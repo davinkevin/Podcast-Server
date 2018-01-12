@@ -10,7 +10,7 @@ import {
   MatIconModule,
   MatInputModule,
   MatPaginatorModule,
-  MatSelectModule
+  MatSelectModule, MatToolbarModule
 } from '@angular/material';
 import {By} from '@angular/platform-browser';
 import {Action, Store, StoreModule} from '@ngrx/store';
@@ -28,6 +28,7 @@ import {ItemService} from '../shared/service/item/item.service';
 import {provideMockActions} from '@ngrx/effects/testing';
 import {cold, hot} from 'jasmine-marbles';
 import Spy = jasmine.Spy;
+import {OpenSideNavAction} from '../app.actions';
 
 
 describe('SearchFeature', () => {
@@ -48,7 +49,8 @@ describe('SearchFeature', () => {
           ReactiveFormsModule,
 
           NoopAnimationsModule,
-          MatButtonModule, MatCardModule, MatIconModule, MatInputModule, MatPaginatorModule, MatSelectModule,
+          MatCardModule, MatButtonModule, MatIconModule, MatInputModule, MatSelectModule,
+          MatPaginatorModule, MatToolbarModule,
 
           TruncateModule,
 
@@ -417,6 +419,15 @@ describe('SearchFeature', () => {
         /* Then  */
         expect(store.dispatch).toHaveBeenCalled();
       }));
+
+      it('should open sidenav if click on burger button', () => {
+        /* Given */
+        const button = el.query(By.css('.toolbar__hamburger'));
+        /* When  */
+        button.triggerEventHandler('click', null);
+        /* Then  */
+        expect(store.dispatch).toHaveBeenCalledWith(new OpenSideNavAction());
+      });
 
     });
 

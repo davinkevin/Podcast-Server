@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PodcastsComponent} from './podcasts.component';
-import {MatCardModule} from '@angular/material';
+import {MatIconModule, MatToolbarModule} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {PodcastsEffects} from './podcasts.effects';
@@ -10,13 +10,15 @@ import {cold, hot} from 'jasmine-marbles';
 import {FindAll, FindAllSuccess} from 'app/podcasts/podcasts.actions';
 import {PodcastService} from './shared/service/podcast/podcast.service';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {Action} from '@ngrx/store';
-import Spy = jasmine.Spy;
+import {Action, Store, StoreModule} from '@ngrx/store';
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
+import * as fromPodcasts from './podcasts.reducer';
 import {reducer} from './podcasts.reducer';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs/observable/of';
+import {OpenSideNavAction} from '../app.actions';
+import Spy = jasmine.Spy;
 
 describe('PodcastsFeature', () => {
 
@@ -123,11 +125,16 @@ describe('PodcastsFeature', () => {
     let comp: PodcastsComponent;
     let fixture: ComponentFixture<PodcastsComponent>;
     let el: DebugElement;
+    let store: Store<any>;
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
-          MatCardModule, RouterTestingModule
+          MatToolbarModule, MatIconModule, RouterTestingModule,
+
+          /* NgRx */
+          StoreModule.forRoot({}),
+          StoreModule.forFeature('podcasts', fromPodcasts.reducer)
         ],
         providers: [
           { provide: ActivatedRoute, useValue: { data: of({ podcasts }) } }
@@ -144,6 +151,12 @@ describe('PodcastsFeature', () => {
       fixture.detectChanges();
     });
 
+    beforeEach(() => {
+      store = TestBed.get(Store);
+      spyOn(store, 'dispatch').and.callThrough();
+      spyOn(store, 'select').and.callThrough();
+    });
+
     it('should be created', () => {
       expect(comp).toBeTruthy();
     });
@@ -157,6 +170,16 @@ describe('PodcastsFeature', () => {
         expect(podcastsCards.length).toEqual(8);
       });
     });
+
+    it('should open sidenav if click on burger button', () => {
+      /* Given */
+      const button = el.query(By.css('.toolbar__hamburger'));
+      /* When  */
+      button.triggerEventHandler('click', null);
+      /* Then  */
+      expect(store.dispatch).toHaveBeenCalledWith(new OpenSideNavAction());
+    });
+
   });
 
   describe('PodcastsEffects', () => {
@@ -232,6 +255,5 @@ describe('PodcastsFeature', () => {
         /* Then  */
         expect(state.podcasts).toEqual(podcasts);
     });
-
   });
 });

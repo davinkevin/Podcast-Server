@@ -1,3 +1,27 @@
+mat-toolbar {
+  width: 100%;
+  display:flex;
+  justify-content:flex-end;
+
+  .toolbar__left {
+    margin-right:auto;
+    mat-icon {
+      font-size: 1.3rem;
+      width: inherit;
+      height: 1.4rem;
+      vertical-align: middle;
+    }
+
+    .toolbar__title {
+      margin-left: 1vw;
+    }
+  }
+
+  .more {
+    align-self:end;
+    padding-top: 12px;
+  }
+}
 
 .jumbotron {
   display: block;
@@ -13,19 +37,8 @@
     display:flex;
     justify-content:flex-end;
 
-    .mat-icon-button {
-      color: white;
-    }
-
-    .back {
-      margin-right:auto;
-    }
-
-    .more {
-      align-self:end;
-    }
-
-
   }
 
 }
+
+

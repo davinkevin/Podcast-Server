@@ -1,4 +1,10 @@
 
+mat-toolbar {
+  .toolbar__title {
+    margin-left: 1vw;
+  }
+}
+
 .search__bar {
   display: flex;
   flex-flow: row wrap;
@@ -23,4 +29,11 @@
     width: 215px;
     margin: 5px;
   }
+}
+
+mat-icon {
+  font-size: 1.3rem;
+  width: inherit;
+  height: 1.4rem;
+  vertical-align: middle;
 }

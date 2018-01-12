@@ -6,7 +6,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {SearchResolver} from './resolver/search.resolver';
 import {
   MatButtonModule, MatCardModule, MatIconModule, MatInputModule, MatOptionModule, MatPaginator, MatPaginatorModule,
-  MatSelectModule
+  MatSelectModule, MatToolbarModule
 } from '@angular/material';
 import {StoreModule} from '@ngrx/store';
 import * as fromSearch from './search.reducer';
@@ -36,7 +36,7 @@ const routes: Routes = [
 
     /* Material Design */
     MatCardModule, MatButtonModule, MatIconModule, MatInputModule, MatSelectModule,
-    MatPaginatorModule,
+    MatPaginatorModule, MatToolbarModule,
 
     /* 3rd party module */
     TruncateModule,

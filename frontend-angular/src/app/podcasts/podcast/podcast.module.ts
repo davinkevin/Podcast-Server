@@ -7,7 +7,7 @@ import * as fromPodcast from './podcast.reducer';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastEffects} from 'app/podcasts/podcast/podcast.effects';
-import {MatButtonModule, MatIconModule, MatMenuModule} from '@angular/material';
+import {MatButtonModule, MatIconModule, MatMenuModule, MatToolbarModule} from '@angular/material';
 
 
 const routes: Routes = [
@@ -22,7 +22,7 @@ const routes: Routes = [
     CommonModule,
 
     /* Material */
-    MatIconModule, MatButtonModule, MatMenuModule,
+    MatIconModule, MatButtonModule, MatMenuModule, MatToolbarModule,
 
     /* Routes */
     RouterModule.forChild(routes),
