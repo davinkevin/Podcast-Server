@@ -39,6 +39,56 @@ describe('PodcastService', () => {
     req.flush(resp);
   });
 
+  it('should call for findOne', () => {
+    /* Given */
+    const resp =  {
+      'id': '8ba490ac-8f9a-4e2d-8758-b65e783e783a',
+      'title': 'Comme des poissons dans l\'eau',
+      'type': 'RSS',
+      'lastUpdate': '2016-01-30T18:01:31.919+01:00',
+      'cover': {
+        'id': '26d3b096-e424-42fe-bedc-07943efe2809',
+        'url': '/api/podcasts/8ba490ac-8f9a-4e2d-8758-b65e783e783a/cover.jpg',
+        'width': 200,
+        'height': 200
+      }
+    };
+
+    /* When  */
+    service.findOne('8ba490ac-8f9a-4e2d-8758-b65e783e783a').subscribe((podcast) => {
+      expect(podcast).toBe(resp);
+    });
+
+    /* Then  */
+    const req = httpMock.expectOne(`/api/podcasts/${resp.id}`);
+    expect(req.request.method).toEqual('GET');
+    req.flush(resp);
+  });
+
+  it('should call refresh', () => {
+    /* Given */
+    const podcast =  {
+      'id': '8ba490ac-8f9a-4e2d-8758-b65e783e783a',
+      'title': 'Comme des poissons dans l\'eau',
+      'type': 'RSS',
+      'lastUpdate': '2016-01-30T18:01:31.919+01:00',
+      'cover': {
+        'id': '26d3b096-e424-42fe-bedc-07943efe2809',
+        'url': '/api/podcasts/8ba490ac-8f9a-4e2d-8758-b65e783e783a/cover.jpg',
+        'width': 200,
+        'height': 200
+      }
+    };
+
+    /* When  */
+    service.refresh(podcast).subscribe();
+
+    /* Then  */
+    const req = httpMock.expectOne(`/api/podcasts/${podcast.id}/update/force`);
+    expect(req.request.method).toEqual('GET');
+    req.flush(null);
+  });
+
   afterEach(() => {
     httpMock.verify();
   });
