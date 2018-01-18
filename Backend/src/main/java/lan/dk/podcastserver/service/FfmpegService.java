@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import io.vavr.control.Try;
 import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,16 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static io.vavr.API.List;
 import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.CompletableFuture.runAsync;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 /**
  * Created by kevin on 19/07/2014 for Podcast Server
@@ -119,9 +123,14 @@ public class FfmpegService {
 
     /* Get duration of a File */
     public double getDurationOf(String url, String userAgent) {
-        return Try(() -> ffprobe.probe(url, userAgent).getFormat().duration)
-                .map(d -> d*1_000_000)
-                .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
+
+        CompletableFuture<Double> duration = supplyAsync(() -> Try(() -> ffprobe.probe(url, userAgent).getFormat().duration)
+                .map(d -> d * 1_000_000)
+                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new));
+
+        return Try(() -> duration.get(60, TimeUnit.SECONDS))
+                .onFailure(e -> duration.cancel(true))
+                .getOrElseThrow(e -> new RuntimeException("Error during probe operation", e));
     }
 
     /* Download delegation to ffmpeg-cli-wrapper */

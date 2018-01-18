@@ -130,7 +130,7 @@ public class FfmpegServiceTest {
         verify(ffprobe, only()).probe(eq("foo"), eq("bar"));
     }
 
-    @Test(expected = UncheckedIOException.class)
+    @Test(expected = RuntimeException.class)
     public void should_throw_exception_if_ffprobe_problem() throws IOException {
         /* Given */
         doThrow(IOException.class).when(ffprobe).probe(anyString(), anyString());
