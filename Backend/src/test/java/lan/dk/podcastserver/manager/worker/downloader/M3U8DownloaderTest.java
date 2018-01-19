@@ -77,6 +77,7 @@ public class M3U8DownloaderTest {
                 .podcast(podcast)
                 .url("http://foo.bar/com.m3u8")
                 .status(Status.STARTED)
+                .numberOfFail(0)
                 .build();
 
         m3U8Downloader.setItemDownloadManager(itemDownloadManager);
@@ -165,7 +166,7 @@ public class M3U8DownloaderTest {
 
         /* Then */
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            assertThat(item).hasStatus(Status.STOPPED);
+            assertThat(item).hasStatus(Status.FAILED);
         });
     }
 
@@ -204,7 +205,7 @@ public class M3U8DownloaderTest {
 
         /* Then */
         await().atMost(2, TimeUnit.SECONDS).until(() -> {
-            assertThat(item).hasStatus(Status.STOPPED);
+            assertThat(item).hasStatus(Status.FAILED);
         });
         future.cancel(true);
     }

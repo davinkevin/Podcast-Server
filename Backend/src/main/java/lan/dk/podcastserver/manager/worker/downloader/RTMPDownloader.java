@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -20,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.Try;
+import static io.vavr.API.Option;
 import static java.util.Objects.nonNull;
 
 @Slf4j
@@ -60,8 +62,7 @@ public class RTMPDownloader extends AbstractDownloader {
             p.waitFor();
             pid = 0;
         } catch (IOException | InterruptedException e) {
-            log.error("IOException | InterruptedException :", e);
-            stopDownload();
+            throw new RuntimeException(e);
         }
         return item;
     }
@@ -88,10 +89,20 @@ public class RTMPDownloader extends AbstractDownloader {
 
     @Override
     public void stopDownload() {
+        destroyProcess();
+        super.stopDownload();
+    }
+
+    private void destroyProcess() {
         if (nonNull(p)) {
             p.destroy();
         }
-        super.stopDownload();
+    }
+
+    @Override
+    public void failDownload() {
+        destroyProcess();
+        super.failDownload();
     }
 
     @Override
@@ -140,8 +151,7 @@ public class RTMPDownloader extends AbstractDownloader {
                 log.error("IOException :", e);
             }
             if (Status.FINISH != item.getStatus() && !rtmpDownloader.stopDownloading.get()) {
-                log.debug("Unexpected ending, reset of downloader");
-                rtmpDownloader.resetDownload();
+                throw new RuntimeException("Unexpected ending, failed download");
             }
         }
 

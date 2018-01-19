@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static lan.dk.podcastserver.manager.worker.downloader.RTMPDownloader.RTMPWatcher;
 import static org.mockito.Mockito.*;
 
@@ -84,15 +85,13 @@ public class RTMPWatcherTest {
         rtmpDownloader.stopDownloading = new AtomicBoolean(false);
 
         /* When */
-        rtmpWatcher.run();
+        assertThatThrownBy(() -> rtmpWatcher.run())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageStartingWith("Unexpected ending, failed download");
 
         /* Then */
         verify(rtmpDownloader, never()).convertAndSaveBroadcast();
         verify(rtmpDownloader, never()).finishDownload();
-        verify(rtmpDownloader, times(1)).resetDownload();
-        assertThat(rtmpDownloader.item)
-                .hasProgression(0)
-                .hasStatus(Status.STARTED);
     }
     
     @Test
@@ -106,14 +105,12 @@ public class RTMPWatcherTest {
         rtmpDownloader.stopDownloading = new AtomicBoolean(false);
 
         /* When */
-        rtmpWatcher.run();
+        assertThatThrownBy(() -> rtmpWatcher.run())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageStartingWith("Unexpected ending, failed download");
 
         /* Then */
         verify(rtmpDownloader, never()).convertAndSaveBroadcast();
         verify(rtmpDownloader, never()).finishDownload();
-        verify(rtmpDownloader, times(1)).resetDownload();
-        assertThat(rtmpDownloader.item)
-                .hasProgression(0)
-                .hasStatus(Status.STARTED);
     }
 }

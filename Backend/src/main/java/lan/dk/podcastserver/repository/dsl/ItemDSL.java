@@ -29,15 +29,20 @@ public class ItemDSL {
         throw new AssertionError();
     }
 
-    public static Predicate isDownloaded(Boolean downloaded) {
-        if (isNull(downloaded)) return null;
-        if (downloaded) return hasStatus(Status.FINISH);
+    public static Predicate isFinished() {
+        return hasStatus(Status.FINISH);
+    }
 
+    public static BooleanExpression isNotDownloaded() {
         return Q_ITEM.status.isNull().or(hasStatus(Status.NOT_DOWNLOADED));
     }
 
     public static BooleanExpression isNewerThan(ZonedDateTime dateTime){
         return Q_ITEM.pubDate.gt(dateTime);
+    }
+
+    public static BooleanExpression isFailedWithNotTooManyRetry(Integer maxNumberOfFail) {
+        return Q_ITEM.numberOfFail.lt(maxNumberOfFail).and(hasStatus(Status.FAILED));
     }
 
     public static BooleanExpression hasBeenDownloadedBefore(ZonedDateTime dateTime) {

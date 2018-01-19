@@ -15,7 +15,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +66,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         convertAndSaveBroadcast();
         Try(this::download)
             .onFailure(e -> log.error("Error during download", e))
-            .onFailure(e -> this.stopDownload());
+            .onFailure(e -> this.failDownload());
     }
 
     @Override
@@ -88,13 +87,23 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         convertAndSaveBroadcast();
     }
 
+    public void failDownload() {
+        item.setStatus(Status.FAILED);
+        stopDownloading.set(true);
+        item.addATry();
+        saveSyncWithPodcast();
+        itemDownloadManager.removeACurrentDownload(item);
+        if (nonNull(target)) Try.run(() -> Files.deleteIfExists(target));
+        convertAndSaveBroadcast();
+    }
+
     @Override
     @Transactional
     public void finishDownload() {
         itemDownloadManager.removeACurrentDownload(item);
 
         if (isNull(target)) {
-            resetDownload();
+            failDownload();
             return;
         }
 
@@ -119,10 +128,6 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
         saveSyncWithPodcast();
         convertAndSaveBroadcast();
-    }
-
-    public void resetDownload() {
-        stopDownload();
     }
 
     @Transactional

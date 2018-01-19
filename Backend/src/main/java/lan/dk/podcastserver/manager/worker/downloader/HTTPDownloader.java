@@ -4,6 +4,7 @@ import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
+import com.sun.org.apache.regexp.internal.RE;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -19,6 +20,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Objects;
 
 import static java.util.Objects.isNull;
@@ -59,12 +61,11 @@ public class HTTPDownloader extends AbstractDownloader {
                 .filter(Objects::nonNull)
                 .forEach(Throwable::printStackTrace);
 
-            stopDownload();
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } catch (DownloadInterruptedError e) {
             log.debug("Arrêt du téléchargement");
-        } catch (IOException e) {
-            log.debug("Exception during download", e);
-            stopDownload();
         }
         return item;
     }
@@ -94,9 +95,6 @@ public class HTTPDownloader extends AbstractDownloader {
                 case EXTRACTING:
                 case EXTRACTING_DONE:
                     log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl(item))) + " " + info.getState());
-                    break;
-                case ERROR:
-                    httpDownloader.stopDownload();
                     break;
                 case DONE:
                     log.debug(FilenameUtils.getName(String.valueOf(httpDownloader.getItemUrl(item))) + " - Téléchargement terminé");

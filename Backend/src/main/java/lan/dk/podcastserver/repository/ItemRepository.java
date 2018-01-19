@@ -37,13 +37,24 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Set<Item> findAllNotDownloadedAndNewerThan(ZonedDateTime date) {
-        return HashSet.ofAll(findAll(isNewerThan(date).and(isDownloaded(Boolean.FALSE))));
+    default Set<Item> findAllNotDownloadedAndNewerThanAndNumberOfFailLessThan(ZonedDateTime date, Integer maxNumberOfRetry) {
+        return HashSet.ofAll(findAll(
+                isNewerThan(date).and(
+                        isNotDownloaded().or(isFailedWithNotTooManyRetry(maxNumberOfRetry))
+                )
+        ));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Set<Item> findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(ZonedDateTime date) {
-        return HashSet.ofAll(findAll(allOf(hasBeenDownloadedBefore(date), isDownloaded(Boolean.TRUE), hasToBeDeleted(Boolean.TRUE), isInAnyWatchList().not())));
+        return HashSet.ofAll(findAll(
+                allOf(
+                        hasBeenDownloadedBefore(date),
+                        isFinished(),
+                        hasToBeDeleted(Boolean.TRUE),
+                        isInAnyWatchList().not()
+                )
+        ));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -57,8 +68,8 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Set<Item> findAllToDownload(ZonedDateTime date) {
-        return findAllNotDownloadedAndNewerThan(date);
+    default Set<Item> findAllToDownload(ZonedDateTime date, Integer numberOfFail) {
+        return findAllNotDownloadedAndNewerThanAndNumberOfFailLessThan(date, numberOfFail);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)

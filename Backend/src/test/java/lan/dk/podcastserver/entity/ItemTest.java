@@ -104,13 +104,13 @@ public class ItemTest {
 
     @Test
     public void should_increment_the_number_of_retry() {
-        assertThat(ITEM).hasNumberOfTry(0);
+        assertThat(ITEM).hasNumberOfFail(0);
 
-        ITEM.setNumberOfTry(6);
-        assertThat(ITEM).hasNumberOfTry(6);
+        ITEM.setNumberOfFail(6);
+        assertThat(ITEM).hasNumberOfFail(6);
 
         ITEM.addATry();
-        assertThat(ITEM).hasNumberOfTry(7);
+        assertThat(ITEM).hasNumberOfFail(7);
     }
 
     @Test

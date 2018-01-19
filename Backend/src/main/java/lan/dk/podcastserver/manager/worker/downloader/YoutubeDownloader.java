@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -70,7 +69,6 @@ public class YoutubeDownloader extends AbstractDownloader {
 
     @Override
     public Item download() {
-        log.debug("Download");
         try {
             VGetParser parser = wGetFactory.parser(item.getUrl());
             v = wGetFactory.newVGet(parser.info(new URL(item.getUrl())));
@@ -84,6 +82,8 @@ public class YoutubeDownloader extends AbstractDownloader {
                 .forEach(vi -> vi.setTarget(generatePartFile(target, vi).toFile()));
 
             v.download(parser, stopDownloading, watcher);
+        } catch (DownloadInterruptedError e) {
+            log.debug("Stopped", e);
         } catch (DownloadMultipartError e) {
             e.getInfo()
                 .getParts()
@@ -92,21 +92,11 @@ public class YoutubeDownloader extends AbstractDownloader {
                 .filter(Objects::nonNull)
                 .forEach(Throwable::printStackTrace);
 
-            stopDownload();
-        } catch (DownloadInterruptedError e) {
-            e.printStackTrace();
-            log.debug("Stopped", e);
+            throw new RuntimeException(e);
         } catch (StringIndexOutOfBoundsException | MalformedURLException | NullPointerException | DownloadError e) {
-            log.error("Third part Exception : ", e);
-
-            if (itemDownloadManager.canBeReset(item)) {
-                log.info("Reset of Youtube download {}", item.getTitle());
-                itemDownloadManager.resetDownload(item);
-                return null;
-            }
-
-            stopDownload();
+            throw new RuntimeException(e);
         }
+
         log.debug("Download ended");
         return item;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -175,7 +165,7 @@ public class YoutubeDownloader extends AbstractDownloader {
             }
         } catch (Exception e) {
             log.error("Error during specific move", e);
-            resetDownload();
+            failDownload();
             throw new RuntimeException("Error during specific move", e);
         }
 
@@ -237,7 +227,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                     log.debug(FilenameUtils.getName(valueOf(item.getUrl())) + " " + info.getState());
                     break;
                 case ERROR:
-                    youtubeDownloader.stopDownload();
+                    youtubeDownloader.failDownload();
                     break;
                 case DONE:
                     downloadInfo
@@ -258,7 +248,7 @@ public class YoutubeDownloader extends AbstractDownloader {
                     }
 
                     if (launchDateDownload.isBefore(now().minusHours(MAX_WAITING_MINUTE))) {
-                        youtubeDownloader.stopDownload();
+                        youtubeDownloader.failDownload();
                     }
                     break;
                 case DOWNLOADING:

@@ -8,11 +8,12 @@ import static io.vavr.API.Set;
 
 public enum Status {
     NOT_DOWNLOADED,
-    DELETED,
     STARTED,
-    FINISH,
+    PAUSED,
+    DELETED,
     STOPPED,
-    PAUSED;
+    FAILED,
+    FINISH;
 
     /**
      * Created by kevin on 18/02/15.

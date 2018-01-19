@@ -13,7 +13,6 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,6 +25,7 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static io.vavr.API.Option;
@@ -97,8 +97,8 @@ public class Item {
     @JsonView(ItemDetailsView.class)
     private Integer progression = 0;
 
-    @Transient
-    private Integer numberOfTry = 0;
+    @JsonIgnore
+    private Integer numberOfFail = 0;
 
     @JsonView(ItemDetailsView.class)
     private ZonedDateTime downloadDate;
@@ -110,7 +110,6 @@ public class Item {
     @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
     private java.util.Set<WatchList> watchLists = new HashSet<>();
 
-
     public String getLocalUri() {
         return (fileName == null) ? null : getLocalPath().toString();
     }
@@ -121,7 +120,7 @@ public class Item {
     }
 
     public Item addATry() {
-        this.numberOfTry++;
+        this.numberOfFail++;
         return this;
     }
 
@@ -164,7 +163,7 @@ public class Item {
                 ", progression=" + progression +
                 ", downloaddate=" + downloadDate +
                 ", podcast=" + podcast +
-                ", numberOfTry=" + numberOfTry +
+                ", numberOfTry=" + numberOfFail +
                 '}';
     }
 
@@ -275,6 +274,7 @@ public class Item {
         setStatus(Status.NOT_DOWNLOADED);
         downloadDate = null;
         fileName = null;
+        numberOfFail = 0;
         return this;
     }
 

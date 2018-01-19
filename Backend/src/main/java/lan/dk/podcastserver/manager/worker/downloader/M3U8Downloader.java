@@ -17,10 +17,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
-
-import static java.util.Objects.nonNull;
-
 @Slf4j
 @Scope("prototype")
 @Component("M3U8Downloader")
@@ -97,7 +93,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 .andThenTry(super::pauseDownload)
                 .onFailure(e -> {
                     log.error("Error during pause of process :", e);
-                    this.stopDownload();
+                    this.failDownload();
                 });
     }
 
@@ -113,7 +109,7 @@ public class M3U8Downloader extends AbstractDownloader {
                 })
                 .onFailure(e -> {
                     log.error("Error during restart of process :", e);
-                    this.stopDownload();
+                    this.failDownload();
                 });
     }
 

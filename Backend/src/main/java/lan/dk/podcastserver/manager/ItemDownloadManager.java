@@ -96,7 +96,7 @@ public class ItemDownloadManager {
 
     private void initDownload() {
         waitingQueue = waitingQueue
-                .enqueueAll(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate())
+                .enqueueAll(itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate(), podcastServerParameters.getNumberOfTry())
                 .filter(item -> !waitingQueue.contains(item))
         );
     }
@@ -239,7 +239,7 @@ public class ItemDownloadManager {
     }
 
     public boolean canBeReset(Item item) {
-        return item.getNumberOfTry()+1 <= podcastServerParameters.getNumberOfTry();
+        return item.getNumberOfFail()+1 <= podcastServerParameters.getNumberOfTry();
     }
 
     public Boolean isInDownloadingQueue(Item item) {

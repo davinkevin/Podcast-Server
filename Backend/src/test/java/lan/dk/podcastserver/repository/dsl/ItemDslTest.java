@@ -76,7 +76,7 @@ public class ItemDslTest {
     public void should_find_downloaded() {
         /* When */
         dbSetupTracker.skipNextLaunch();
-        Iterable<Item> one = itemRepository.findAll(isDownloaded(Boolean.TRUE));
+        Iterable<Item> one = itemRepository.findAll(isFinished());
 
         /* Then */
         assertThat(one)
@@ -89,7 +89,7 @@ public class ItemDslTest {
     public void should_find_not_downloaded() {
         /* When */
         dbSetupTracker.skipNextLaunch();
-        Iterable<Item> items = itemRepository.findAll(isDownloaded(Boolean.FALSE));
+        Iterable<Item> items = itemRepository.findAll(isNotDownloaded());
 
         /* Then */
         assertThat(items)

@@ -71,7 +71,7 @@ public class YoutubeWatcherTest {
         /* When */
         watcher.run();
         /* Then */
-        verify(YOUTUBE_DOWNLOADER, times(1)).stopDownload();
+        verify(YOUTUBE_DOWNLOADER, times(1)).failDownload();
     }
 
     @Test
@@ -112,7 +112,7 @@ public class YoutubeWatcherTest {
         watcher.run();
 
         /* Then */
-        verify(YOUTUBE_DOWNLOADER, times(1)).stopDownload();
+        verify(YOUTUBE_DOWNLOADER, times(1)).failDownload();
     }
 
     @Test
@@ -144,7 +144,7 @@ public class YoutubeWatcherTest {
 
         /* Then */
         await().atMost(1, TimeUnit.SECONDS).until(() -> {
-            verify(YOUTUBE_DOWNLOADER, atLeast(1)).stopDownload();
+            verify(YOUTUBE_DOWNLOADER, atLeast(1)).failDownload();
         });
     }
 

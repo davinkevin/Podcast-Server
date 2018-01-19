@@ -20,7 +20,7 @@ public class NoOpDownloaderTest {
         noOpDownloader.restartDownload();
         noOpDownloader.stopDownload();
         noOpDownloader.finishDownload();
-        noOpDownloader.resetDownload();
+        noOpDownloader.failDownload();
         noOpDownloader.run();
 
         /* Then */

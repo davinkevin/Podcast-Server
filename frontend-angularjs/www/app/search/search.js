@@ -169,7 +169,7 @@ export default class ItemSearchCtrl {
       if (searchParameters.status === 'all') {
         status = [];
       } else if (searchParameters.status === 'not_downloaded') {
-        status = ['NOT_DOWNLOADED', 'DELETED', 'STARTED', 'STOPPED', 'PAUSED'];
+        status = ['NOT_DOWNLOADED', 'DELETED', 'STARTED', 'STOPPED', 'PAUSED', 'FAILED'];
       }
 
       return Object.assign({}, searchParameters, {status});

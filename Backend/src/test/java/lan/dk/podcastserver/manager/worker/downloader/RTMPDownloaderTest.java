@@ -31,6 +31,7 @@ import static io.vavr.API.Try;
 import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static lan.dk.utils.IOUtils.TEMPORARY_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
@@ -68,6 +69,7 @@ public class RTMPDownloaderTest {
                 .status(Status.STARTED)
                 .podcast(podcast)
                 .progression(0)
+                .numberOfFail(0)
                 .build();
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         when(externalTools.getRtmpdump()).thenReturn("/usr/local/bin/rtmpdump");
@@ -126,10 +128,24 @@ public class RTMPDownloaderTest {
         rtmpDownloader.p = mock(Process.class);
 
         /* When */
-        rtmpDownloader.download();
+        assertThatThrownBy(() -> rtmpDownloader.download())
 
         /* Then */
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    public void should_stop_process_if_failed() {
+        /* GIVEN */
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin");
+        when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> processBuilder);
+        when(processService.pidOf(any())).thenReturn(1234);
+        rtmpDownloader.p = mock(Process.class);
+        /* WHEN  */
+        rtmpDownloader.failDownload();
+        /* THEN  */
         verify(rtmpDownloader.p, times(1)).destroy();
+        assertThat(rtmpDownloader.item.getStatus()).isEqualByComparingTo(Status.FAILED);
     }
 
     @Test

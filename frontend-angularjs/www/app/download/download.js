@@ -77,6 +77,7 @@ export default class DownloadCtrl {
                 });
                 this.onStoppedFromWS(elemToUpdate);
                 break;
+            case 'FAILED' :
             case 'STOPPED' :
                 this.onStoppedFromWS(elemToUpdate);
                 break;

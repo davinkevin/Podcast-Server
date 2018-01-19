@@ -68,7 +68,8 @@ export enum Status {
   STARTED = <any>'STARTED',
   FINISH = <any>'FINISH',
   STOPPED = <any>'STOPPED',
-  PAUSED = <any>'PAUSED'
+  PAUSED = <any>'PAUSED',
+  FAILED = <any>'FAILED'
 }
 
 export interface SearchItemPageRequest {

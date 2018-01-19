@@ -83,14 +83,17 @@ public class YoutubeDownloaderTest {
 
     @Before
     public void beforeEach() throws MalformedURLException {
-        item = new Item()
-                .setTitle("Title")
-                .setUrl("http://a.fake.url/with/file.mp4?param=1")
-                .setStatus(Status.NOT_DOWNLOADED);
+        item = Item.builder()
+                    .title("Title")
+                    .url("http://a.fake.url/with/file.mp4?param=1")
+                    .status(Status.NOT_DOWNLOADED)
+                    .numberOfFail(0)
+                    .progression(0)
+                .build();
         podcast = Podcast.builder()
-                .id(UUID.randomUUID())
-                .title("A Fake Youtube Podcast")
-                .items(HashSet.<Item>empty().toJavaSet())
+                    .id(UUID.randomUUID())
+                    .title("A Fake Youtube Podcast")
+                    .items(HashSet.<Item>empty().toJavaSet())
                 .build()
                 .add(item);
 
@@ -215,12 +218,9 @@ public class YoutubeDownloaderTest {
         doThrow(new DownloadMultipartError(info)).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
-        youtubeDownloader.download();
-
+        assertThatThrownBy(() -> youtubeDownloader.download())
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
-        assertThat(Files.exists(youtubeDownloader.target)).isFalse();
-        assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
+                .isInstanceOf(RuntimeException.class);
     }
     
     @Test
@@ -297,10 +297,9 @@ public class YoutubeDownloaderTest {
         doThrow(StringIndexOutOfBoundsException.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
-        youtubeDownloader.download();
-
+        assertThatThrownBy(() -> youtubeDownloader.download())
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.STARTED);
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -319,12 +318,9 @@ public class YoutubeDownloaderTest {
         doThrow(StringIndexOutOfBoundsException.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
-        youtubeDownloader.download();
-
+        assertThatThrownBy(() -> youtubeDownloader.download())
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
-        assertThat(youtubeDownloader.target).doesNotExist();
-        assertThat(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION)).doesNotExist();
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test

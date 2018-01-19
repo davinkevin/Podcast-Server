@@ -68,21 +68,6 @@ public class HTTPWatcherTest {
     }
 
     @Test
-    public void should_do_error() {
-        /* Given */
-        when(info.getState()).thenReturn(ERROR);
-
-        /* When */
-        httpWatcher.run();
-
-        /* Then */
-        verify(downloader, times(1)).stopDownload();
-        verify(downloader, never()).convertAndSaveBroadcast();
-        verify(downloader, never()).finishDownload();
-        verify(itemDownloadManager, never()).removeACurrentDownload(any());
-    }
-
-    @Test
     public void should_do_done() {
         /* Given */
         when(info.getState()).thenReturn(DONE);

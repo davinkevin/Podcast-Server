@@ -29,7 +29,8 @@ import static io.vavr.API.Try;
 @Builder
 @Getter @Setter
 @Accessors(chain = true)
-@NoArgsConstructor @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor(onConstructor = @__({@JsonIgnore}))
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"signature", "items", "contains", "add", "lastUpdateToNow" })
 public class Podcast implements Serializable {

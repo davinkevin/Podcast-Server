@@ -30,7 +30,7 @@ public interface Downloader extends Runnable {
     default void restartDownload() { this.startDownload(); }
     void stopDownload();
     void finishDownload();
-    void resetDownload();
+    void failDownload();
 
     Integer compatibility(String url);
 

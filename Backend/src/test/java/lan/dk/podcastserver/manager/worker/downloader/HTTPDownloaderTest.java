@@ -65,10 +65,12 @@ public class HTTPDownloaderTest {
 
     @Before
     public void beforeEach() {
-        item = new Item()
-                .setTitle("Title")
-                .setUrl("http://a.fake.url/with/file.mp4?param=1")
-                .setStatus(Status.NOT_DOWNLOADED);
+        item = Item.builder()
+                    .title("Title")
+                    .url("http://a.fake.url/with/file.mp4?param=1")
+                    .status(Status.NOT_DOWNLOADED)
+                    .numberOfFail(0)
+                .build();
         podcast = Podcast.builder()
                 .id(UUID.randomUUID())
                 .title("A Fake Http Podcast")
@@ -167,7 +169,7 @@ public class HTTPDownloaderTest {
         httpDownloader.run();
 
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+        assertThat(item.getStatus()).isEqualTo(Status.FAILED);
         verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(2)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
@@ -217,7 +219,7 @@ public class HTTPDownloaderTest {
         httpDownloader.run();
 
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
+        assertThat(item.getStatus()).isEqualTo(Status.FAILED);
         verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
         verify(itemRepository, atLeast(2)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));

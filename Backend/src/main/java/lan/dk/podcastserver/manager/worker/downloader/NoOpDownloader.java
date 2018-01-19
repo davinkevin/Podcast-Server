@@ -19,7 +19,7 @@ public class NoOpDownloader implements Downloader {
     @Override public void pauseDownload() {}
     @Override public void stopDownload() {}
     @Override public void finishDownload() {}
-    @Override public void resetDownload() {}
+    @Override public void failDownload() {}
     @Override public Integer compatibility(String url) {
         return -1;
     }
