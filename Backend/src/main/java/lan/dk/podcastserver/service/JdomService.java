@@ -1,5 +1,7 @@
 package lan.dk.podcastserver.service;
 
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -59,15 +61,26 @@ public class JdomService {
     private static final String GUID = "guid";
     private static final String THUMBNAIL = "thumbnail";
     private static final String RSS = "rss";
+    private static final String OPML = "opml";
+    private static final String HEAD = "head";
+    private static final String BODY = "body";
+    private static final String OUTLINE = "outline";
+    private static final String TEXT = "text";
+    private static final String HTML_URL = "htmlUrl";
+    private static final String VERSION = "version";
+    private static final String XML_URL = "xmlUrl";
+    private static final String RSS_2 = "RSS2";
 
     //Useful namespace :
     public static final Namespace ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
     private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
 
     // URL Format
+    private static final String LINK_PODCAST_HTML_FORMAT = "%s/podcasts/%s";
     private static final String LINK_PODCAST_FORMAT = "%s/api/podcasts/%s/rss";
     private static final String LINK_WATCHLIST_FORMAT = "%s/api/watchlists/%s/rss";
     private static final Comparator<Item> PUB_DATE_COMPARATOR = (one, another) -> one.getPubDate().isAfter(another.getPubDate()) ? -1 : 1;
+    private static final Comparator<Podcast> TITLE_COMPARATOR = Comparator.comparing(Podcast::getTitle);
 
     private final PodcastServerParameters podcastServerParameters;
     private final MimeTypeService mimeTypeService;
@@ -194,5 +207,41 @@ public class JdomService {
 
     private String getCoverUrl(Cover cover, String domainName) {
         return cover.getUrl().startsWith("/") ? (domainName + cover.getUrl()) : cover.getUrl();
+    }
+
+    public String podcastsToOpml(Set<Podcast> podcasts, String domaineName) {
+        Element opml = new Element(OPML).setAttribute("version", "2.0");
+
+        Element head = new Element(HEAD)
+                .addContent(new Element(TITLE).addContent("Podcast-Server"));
+
+        List<Element> outlines = podcasts
+                .toList()
+                .sorted(TITLE_COMPARATOR)
+                .map(p -> this.podcastToOutline(p, domaineName));
+
+        Element body = new Element(BODY)
+                .addContent(outlines.toJavaList());
+
+        opml
+            .addContent(head)
+            .addContent(body);
+
+        return Try(StringWriter::new)
+                .andThenTry(sw -> new XMLOutputter(Format.getPrettyFormat()).output(new Document(opml), sw))
+                .map(StringWriter::toString)
+                .getOrElseThrow(e -> new RuntimeException("Error during generation of OPML", e));
+    }
+
+    private Element podcastToOutline(Podcast p, String domaineName) {
+        return new Element(OUTLINE)
+                .setAttribute(TEXT, p.getTitle())
+                .setAttribute(DESCRIPTION, nonNull(p.getDescription()) ? p.getDescription() : "")
+                .setAttribute(HTML_URL, String.format(LINK_PODCAST_HTML_FORMAT, domaineName, p.getId()))
+                .setAttribute(TITLE, p.getTitle())
+                .setAttribute(TYPE, RSS)
+                .setAttribute(VERSION, RSS_2)
+                .setAttribute(XML_URL, String.format(LINK_PODCAST_FORMAT, domaineName, p.getId()))
+                ;
     }
 }

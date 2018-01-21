@@ -252,6 +252,43 @@ public class JdomServiceTest {
         assertThat(xml).isXmlEqualToContentOf(IOUtils.get("/xml/watchlist.output.xml").toFile());
     }
 
+    @Test
+    public void should_generate_opml_from_podcasts() {
+        /* GIVEN */
+        Podcast foo = Podcast.builder()
+                .id(UUID.fromString("05F62DD4-E345-3EEB-3E31-5A8A50A85175"))
+                .title("Foo")
+                .description("DescFoo")
+                .build();
+        Podcast bar = Podcast.builder()
+                .id(UUID.fromString("C24B4DD3-DBE6-76B2-22AA-580D2515184C"))
+                .title("Bar")
+                .description("DescBar")
+                .build();
+        Podcast last = Podcast.builder()
+                .id(UUID.fromString("EDB9627B-F120-EE05-CAE6-1BA28F437D55"))
+                .title("last")
+                .description("Desc Last")
+                .build();
+
+        /* WHEN  */
+        String opml = jdomService.podcastsToOpml(Set(foo, bar, last), "http://fake.url/");
+
+        /* THEN  */
+        assertThat(opml).isEqualToIgnoringWhitespace(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<opml version=\"2.0\">\n" +
+                "  <head>\n" +
+                "    <title>Podcast-Server</title>\n" +
+                "  </head>\n" +
+                "  <body>\n" +
+                "    <outline text=\"Bar\" description=\"DescBar\" htmlUrl=\"http://fake.url//podcasts/c24b4dd3-dbe6-76b2-22aa-580d2515184c\" title=\"Bar\" type=\"rss\" version=\"RSS2\" xmlUrl=\"http://fake.url//api/podcasts/c24b4dd3-dbe6-76b2-22aa-580d2515184c/rss\" />\n" +
+                "    <outline text=\"Foo\" description=\"DescFoo\" htmlUrl=\"http://fake.url//podcasts/05f62dd4-e345-3eeb-3e31-5a8a50a85175\" title=\"Foo\" type=\"rss\" version=\"RSS2\" xmlUrl=\"http://fake.url//api/podcasts/05f62dd4-e345-3eeb-3e31-5a8a50a85175/rss\" />\n" +
+                "    <outline text=\"last\" description=\"Desc Last\" htmlUrl=\"http://fake.url//podcasts/edb9627b-f120-ee05-cae6-1ba28f437d55\" title=\"last\" type=\"rss\" version=\"RSS2\" xmlUrl=\"http://fake.url//api/podcasts/edb9627b-f120-ee05-cae6-1ba28f437d55/rss\" />\n" +
+                "  </body>\n" +
+                "</opml>");
+    }
+
     private Set<Item> generateItems(Podcast podcast, Integer limit) {
         return IntStream.range(0, limit)
                 .mapToObj(i -> new Item()

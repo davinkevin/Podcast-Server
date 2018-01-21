@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static io.vavr.API.Option;
-import static io.vavr.API.Try;
+import static io.vavr.API.*;
 
 @Slf4j
 @Component
@@ -118,5 +117,9 @@ public class PodcastBusiness {
 
     public Path coverOf(UUID id) {
         return coverBusiness.getCoverPathOf(findOne(id));
+    }
+
+    public String asOpml(String domainName) {
+        return jdomService.podcastsToOpml(HashSet.ofAll(this.findAll()), domainName);
     }
 }

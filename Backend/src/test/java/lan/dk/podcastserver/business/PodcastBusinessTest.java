@@ -307,4 +307,16 @@ public class PodcastBusinessTest {
         verify(podcastRepository).findOne(eq(podcastId));
         verify(coverBusiness).getCoverPathOf(eq(podcast));
     }
+
+    @Test
+    public void should_transform_to_opml() {
+        /* GIVEN */
+        when(podcastRepository.findAll()).thenReturn(new ArrayList<>());
+        when(jdomService.podcastsToOpml(any(), anyString())).thenReturn("Foo");
+        /* WHEN  */
+        String v = podcastBusiness.asOpml("http://fake.domain.com/");
+        /* THEN  */
+        assertThat(v).isEqualTo("Foo");
+        verify(podcastRepository, times(1)).findAll();
+    }
 }

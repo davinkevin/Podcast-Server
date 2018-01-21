@@ -39,7 +39,6 @@ public class PodcastController {
     private final PodcastBusiness podcastBusiness;
     private final FindPodcastBusiness findPodcastBusiness;
     private final StatsBusiness statsBusiness;
-    private final PodcastServerParameters podcastServerParameters;
     private final UpdatePodcastBusiness updatePodcastBusiness;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
@@ -79,6 +78,9 @@ public class PodcastController {
     @Cacheable("podcasts")
     @JsonView(Podcast.PodcastListingView.class)
     public List<Podcast> findAll() { return podcastBusiness.findAll(); }
+
+    @GetMapping(value="/opml", produces = "application/xml; charset=utf-8")
+    public String asOpml(HttpServletRequest request) { return podcastBusiness.asOpml(UrlService.getDomainFromRequest(request)); }
 
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, HttpServletRequest request) {
