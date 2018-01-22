@@ -8,6 +8,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
+import lan.dk.podcastserver.manager.worker.selector.ExtractorSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
@@ -37,6 +38,7 @@ public class ItemDownloadManager {
     private final ItemRepository itemRepository;
     private final PodcastServerParameters podcastServerParameters;
     private final DownloaderSelector downloaderSelector;
+    private final ExtractorSelector extractorSelector;
     private final ThreadPoolTaskExecutor downloadExecutor;
     private final ReentrantLock mainLock = new ReentrantLock();
 
@@ -44,11 +46,12 @@ public class ItemDownloadManager {
     private @Getter Map<Item, Downloader> downloadingQueue = HashMap.empty();
 
     @Autowired
-    public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, DownloaderSelector downloaderSelector, @Qualifier("DownloadExecutor") ThreadPoolTaskExecutor downloadExecutor) {
+    public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, DownloaderSelector downloaderSelector, ExtractorSelector extractorSelector, @Qualifier("DownloadExecutor") ThreadPoolTaskExecutor downloadExecutor) {
         this.template = template;
         this.itemRepository = itemRepository;
         this.podcastServerParameters = podcastServerParameters;
         this.downloaderSelector = downloaderSelector;
+        this.extractorSelector = extractorSelector;
         this.downloadExecutor = downloadExecutor;
 
         Item.rootFolder = podcastServerParameters.getRootfolder();
@@ -208,9 +211,9 @@ public class ItemDownloadManager {
     }
 
     private void launchWithNewWorkerFrom(Item item) {
-        Downloader worker = downloaderSelector
-                .of(item.getUrl())
-                .setItem(item)
+        Downloader worker = this.extractorSelector.of(item.getUrl())
+                .extract(item)
+                .apply((i, url) -> downloaderSelector.of(url).setItem(i))
                 .setItemDownloadManager(this);
 
         downloadingQueue = downloadingQueue.put(item, worker);

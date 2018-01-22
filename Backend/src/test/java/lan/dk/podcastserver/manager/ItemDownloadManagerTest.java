@@ -8,7 +8,9 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.worker.downloader.Downloader;
 import lan.dk.podcastserver.manager.worker.downloader.NoOpDownloader;
+import lan.dk.podcastserver.manager.worker.extractor.NoOpExtractor;
 import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
+import lan.dk.podcastserver.manager.worker.selector.ExtractorSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
@@ -42,19 +44,20 @@ public class ItemDownloadManagerTest {
 
     private static final Integer NUMBER_OF_DOWNLOAD = 3;
 
-    @Captor ArgumentCaptor<String> stringArgumentCaptor;
-    @Captor ArgumentCaptor<Queue<Item>> queueArgumentCaptor;
-    @Captor ArgumentCaptor<String> itemUrlArgumentCaptor;
-    @Captor ArgumentCaptor<Item> itemArgumentCaptor;
-    @Captor ArgumentCaptor<UUID> integerArgumentCaptor;
+    private @Captor ArgumentCaptor<String> stringArgumentCaptor;
+    private @Captor ArgumentCaptor<Queue<Item>> queueArgumentCaptor;
+    private @Captor ArgumentCaptor<String> itemUrlArgumentCaptor;
+    private @Captor ArgumentCaptor<Item> itemArgumentCaptor;
+    private @Captor ArgumentCaptor<UUID> integerArgumentCaptor;
 
-    @Mock SimpMessagingTemplate template;
-    @Mock ItemRepository itemRepository;
-    @Mock PodcastServerParameters podcastServerParameters;
-    @Mock DownloaderSelector downloaderSelector;
-    @Mock ThreadPoolTaskExecutor downloaderExecutor;
+    private @Mock SimpMessagingTemplate template;
+    private @Mock ItemRepository itemRepository;
+    private @Mock PodcastServerParameters podcastServerParameters;
+    private @Mock DownloaderSelector downloaderSelector;
+    private @Mock ExtractorSelector extractorSelector;
+    private @Mock ThreadPoolTaskExecutor downloaderExecutor;
 
-    @InjectMocks ItemDownloadManager itemDownloadManager;
+    private @InjectMocks ItemDownloadManager itemDownloadManager;
 
     private static final Item ITEM_1 = Item.builder().id(UUID.randomUUID()).status(Status.NOT_DOWNLOADED).url("http://now.where/" + 1).pubDate(ZonedDateTime.now()).build();
     private static final Item ITEM_2 = Item.builder().id(UUID.randomUUID()).status(Status.STARTED).url("http://now.where/" + 2).pubDate(ZonedDateTime.now()).build();
@@ -134,12 +137,12 @@ public class ItemDownloadManagerTest {
         Set<Item> items = HashSet.of(item1, item2, item3, item4);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(items);
         Downloader downloader = mock(Downloader.class);
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(downloaderSelector.of(anyString())).thenReturn(downloader);
         when(downloader.setItem(any())).thenReturn(downloader);
         when(downloader.setItemDownloadManager(any())).thenReturn(downloader);
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
-
         /* When */
         itemDownloadManager.launchDownload();
 
@@ -148,6 +151,7 @@ public class ItemDownloadManagerTest {
         verify(podcastServerParameters, times(1)).getNumberOfTry();
         verify(itemRepository, times(1)).findAllToDownload(any(), eq(5));
         verify(downloaderSelector, times(3)).of(itemUrlArgumentCaptor.capture());
+        verify(extractorSelector, times(3)).of(anyString());
         assertThat(itemUrlArgumentCaptor.getAllValues()).hasSize(3);
         verifyConvertAndSave(times(1));
     }
@@ -180,6 +184,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(mockDownloader1._1(), mockDownloader2._1(), mockDownloader3._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -211,6 +216,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1()));
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -232,6 +238,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -314,6 +321,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
@@ -332,6 +340,7 @@ public class ItemDownloadManagerTest {
     protected void verifyPostLaunchDownload() {
         verify(itemRepository, atLeast(1)).findAllToDownload(any(), eq(5));
         verify(podcastServerParameters, atLeast(1)).limitDownloadDate();
+        verify(extractorSelector, atLeast(1)).of(anyString());
         verify(downloaderSelector, atLeast(1)).of(anyString());
         verify(podcastServerParameters, atLeast(1)).getNumberOfTry();
         verifyConvertAndSave(atLeast(1));
@@ -346,6 +355,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */ itemDownloadManager.pauseDownload(entry2._1().getId());
@@ -366,6 +376,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -386,6 +397,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         itemDownloadManager.launchDownload();
         entry2._1().setStatus(Status.STARTED);
@@ -410,6 +422,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
         entry2._1().setStatus(Status.PAUSED);
 
@@ -477,6 +490,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -496,6 +510,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(1);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(itemRepository.findAllToDownload(any(), eq(5)))
                 .thenReturn(HashSet.of(entry1._1()))
                 .thenReturn(HashSet.of(entry2._1(), entry3._1()));
@@ -521,6 +536,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
                 
         /* When */
@@ -539,6 +555,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
@@ -561,6 +578,7 @@ public class ItemDownloadManagerTest {
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         itemDownloadManager.launchDownload();
 
         /* When */
@@ -613,6 +631,7 @@ public class ItemDownloadManagerTest {
         Tuple2<Item, Downloader> entry1 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry2 = generateDownloaderAndRegisterIt(UUID.randomUUID());
         Tuple2<Item, Downloader> entry3 = generateDownloaderAndRegisterIt(UUID.randomUUID());
+        when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(downloaderExecutor.getCorePoolSize()).thenReturn(1);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(HashSet.of(entry1._1(), entry2._1(), entry3._1()));
@@ -629,7 +648,7 @@ public class ItemDownloadManagerTest {
     @After
     public void afterEach() {
         verify(podcastServerParameters, atLeast(1)).getRootfolder();
-        verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, downloaderSelector);
+        verifyNoMoreInteractions(template, itemRepository, podcastServerParameters, downloaderSelector, extractorSelector);
     }
 
 }
