@@ -40,7 +40,7 @@ import static java.util.Objects.nonNull;
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
 @Accessors(chain = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-@NoArgsConstructor @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor @AllArgsConstructor(onConstructor = @__({ @JsonIgnore }), access = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset", "coverPath" })
 @EntityListeners(AuditingEntityListener.class)
 public class Item {
