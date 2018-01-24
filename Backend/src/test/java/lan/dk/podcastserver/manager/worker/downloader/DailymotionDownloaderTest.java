@@ -11,6 +11,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.UrlService;
@@ -66,7 +67,7 @@ public class DailymotionDownloaderTest {
                 .build()
                 .add(item);
 
-        dailymotionDownloader.setItem(item);
+        dailymotionDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
         dailymotionDownloader.setItemDownloadManager(itemDownloadManager);
     }
 

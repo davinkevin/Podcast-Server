@@ -13,6 +13,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
@@ -113,7 +114,7 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_run_download_with_low_quality_video() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(vGet.getContentExt(any())).thenCallRealMethod();
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
@@ -144,12 +145,13 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_run_download_with_multiple_files_for_audio_and_video() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+        Item item = this.item.setStatus(Status.STARTED);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video multiple");
         when(ffmpegService.mergeAudioAndVideo(any(), any(), any())).then(i -> {
@@ -164,7 +166,7 @@ public class YoutubeDownloaderTest {
         youtubeDownloader.download();
 
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.FINISH);
+        assertThat(this.item.getStatus()).isEqualTo(Status.FINISH);
         assertThat(youtubeDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_multiple.mp4"));
         assertThat(Files.exists(youtubeDownloader.target)).isTrue();
         assertThat(Files.exists(youtubeDownloader.target.resolveSibling("A_super_Name_of_Youtube-Video" + TEMPORARY_EXTENSION))).isFalse();
@@ -173,7 +175,7 @@ public class YoutubeDownloaderTest {
     @Test(expected = RuntimeException.class)
     public void should_stop_if_get_target_throw_exception() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         DownloadInfo info = mock(DownloadInfo.class);
 
@@ -193,7 +195,8 @@ public class YoutubeDownloaderTest {
     public void should_handle_exception_during_finish_download() throws MalformedURLException {
         /* Given */
         podcast.setTitle("bin");
-        youtubeDownloader.setItem(item.setUrl("http://foo.bar.com/bash"));
+        Item item = this.item.setUrl("http://foo.bar.com/bash");
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
         youtubeDownloader.v = vGet;
         youtubeDownloader.target = Paths.get("/bin/bash");
 
@@ -204,7 +207,7 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_handle_multipart_error() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         DownloadInfo info = mock(DownloadInfo.class);
 
@@ -226,13 +229,14 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_handle_error_during_merging_of_video_and_audio() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+        Item item = this.item.setStatus(Status.STARTED);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast.setTitle("bin"));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/"));
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("bash");
         when(videoInfo.getInfo()).thenReturn(generate(2));
@@ -246,12 +250,13 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_pause() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+        Item item = this.item.setStatus(Status.STARTED);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video pause");
         List<VideoFileInfo> videoList = generate(1);
@@ -263,16 +268,17 @@ public class YoutubeDownloaderTest {
         youtubeDownloader.pauseDownload();
 
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.PAUSED);
+        assertThat(this.item.getStatus()).isEqualTo(Status.PAUSED);
     }
 
     @Test
     public void should_handle_Interruption_error() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+        Item item = this.item.setStatus(Status.STARTED);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video interruption");
         doThrow(DownloadInterruptedError.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
@@ -281,17 +287,18 @@ public class YoutubeDownloaderTest {
         youtubeDownloader.download();
 
         /* Then */
-        assertThat(item.getStatus()).isEqualTo(Status.STARTED);
+        assertThat(this.item.getStatus()).isEqualTo(Status.STARTED);
     }
 
     @Test
     public void should_reset_download_if_exception_happen() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+        Item item = this.item.setStatus(Status.STARTED);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(itemDownloadManager.canBeReset(eq(item))).thenReturn(true);
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(itemDownloadManager.canBeReset(eq(this.item))).thenReturn(true);
+        when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video reset");
         doThrow(StringIndexOutOfBoundsException.class).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
@@ -305,13 +312,14 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_stop_download_if_not_resetable() throws MalformedURLException {
         /* Given */
-        youtubeDownloader.setItem(item.setStatus(Status.STARTED));
+        Item item = this.item.setStatus(Status.STARTED);
+        youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.canBeReset(eq(item))).thenReturn(false);
-        when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
-        when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
+        when(itemDownloadManager.canBeReset(eq(this.item))).thenReturn(false);
+        when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
+        when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video stop not resetable");
         when(videoInfo.getInfo()).thenReturn(generate(1));

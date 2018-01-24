@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
@@ -39,10 +40,15 @@ public class GulliDownloaderTest {
 
     @Before
     public void beforeEach() {
-        gulliDownloader.setItem(Item.builder()
-                    .title("Gulli Item")
-                    .url("http://replay.gulli.fr/")
-                .build()
+        Item item = Item.builder()
+                .title("Gulli Item")
+                .url("http://replay.gulli.fr/")
+                .build();
+
+        gulliDownloader.setDownloadingItem(
+                DownloadingItem.builder()
+                        .item(item)
+                        .build()
         );
 
     }

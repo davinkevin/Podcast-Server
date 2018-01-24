@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.extractor;
 
 import io.vavr.Tuple2;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,11 +28,11 @@ public class NoOpExtractorTest {
                 .build();
 
         /* WHEN  */
-        Tuple2<Item, String> extractedValue = extractor.extract(item);
+        DownloadingItem extractedValue = extractor.extract(item);
 
         /* THEN  */
-        assertThat(extractedValue._1()).isEqualTo(item);
-        assertThat(extractedValue._2()).isEqualTo(item.getUrl());
+        assertThat(extractedValue.getItem()).isEqualTo(item);
+        assertThat(extractedValue.getUrls()).contains(item.getUrl());
     }
 
     @Test

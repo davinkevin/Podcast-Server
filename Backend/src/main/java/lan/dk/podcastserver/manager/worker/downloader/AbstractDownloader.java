@@ -5,6 +5,7 @@ import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -38,7 +39,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
     static final String WS_TOPIC_DOWNLOAD = "/topic/download";
 
-    @Getter @Setter @Accessors(chain = true) protected Item item;
+    @Getter protected Item item;
+    @Getter @Accessors(chain = true) protected DownloadingItem downloadingItem;
     @Setter @Accessors(chain = true) protected ItemDownloadManager itemDownloadManager;
 
     protected final ItemRepository itemRepository;
@@ -51,6 +53,14 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected Path target;
     private PathMatcher hasTempExtensionMatcher;
     AtomicBoolean stopDownloading = new AtomicBoolean(false);
+
+
+    @Override
+    public AbstractDownloader setDownloadingItem(DownloadingItem downloadingItem) {
+        this.downloadingItem = downloadingItem;
+        this.item = downloadingItem.getItem();
+        return this;
+    }
 
     @Override
     public void run() {

@@ -4,6 +4,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -76,7 +77,7 @@ public class RTMPDownloaderTest {
         when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_TEST_PATH);
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
 
-        rtmpDownloader.setItem(item);
+        rtmpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
         rtmpDownloader.setItemDownloadManager(itemDownloadManager);
 
         rtmpDownloader.postConstruct();

@@ -11,6 +11,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static io.vavr.API.Try;
+
 /**
  * Created by kevin on 15/09/15 for Podcast Server
  */
@@ -29,7 +31,9 @@ public class WGetFactory {
         return new WGet(info, targetFile);
     }
 
-    public DownloadInfo newDownloadInfo(String url) throws MalformedURLException {
-        return new DownloadInfo(new URL(url));
+    public DownloadInfo newDownloadInfo(String url) {
+        return Try(() -> new URL(url))
+                .map(DownloadInfo::new)
+                .getOrElseThrow(() -> new RuntimeException("Error during creation of Url from " + url));
     }
 }

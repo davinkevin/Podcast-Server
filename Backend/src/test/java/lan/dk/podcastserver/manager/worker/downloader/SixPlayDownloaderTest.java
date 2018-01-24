@@ -7,6 +7,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.service.*;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
@@ -23,8 +24,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 import static io.vavr.API.Option;
 import static io.vavr.API.Try;
@@ -52,13 +51,13 @@ public class SixPlayDownloaderTest {
 
     @Before
     public void beforeEach() {
-        downloader.setItem(Item.builder()
+        Item item = Item.builder()
                 .title("Les salariés de Whirlpool peuvent compter sur le soutien de Madénian et VDB")
                 .url("http://www.6play.fr/le-message-de-madenian-et-vdb-p_6730/mmvdb-0210-c_11777006")
                 .podcast(Podcast.builder().title("M6Podcast").build())
                 .status(Status.STARTED)
-                .build()
-        );
+                .build();
+        downloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
         downloader.setItemDownloadManager(itemDownloadManager);
     }
 

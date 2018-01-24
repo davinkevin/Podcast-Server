@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 
-import io.vavr.API;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.*;
@@ -81,7 +81,7 @@ public class M3U8DownloaderTest {
                 .build();
 
         m3U8Downloader.setItemDownloadManager(itemDownloadManager);
-        m3U8Downloader.setItem(item);
+        m3U8Downloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
         when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);

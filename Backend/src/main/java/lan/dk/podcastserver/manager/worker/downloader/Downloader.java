@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +12,7 @@ public interface Downloader extends Runnable {
 
     Item download();
 
-    Downloader setItem(Item item);
+    Downloader setDownloadingItem(DownloadingItem item);
     Downloader setItemDownloadManager(ItemDownloadManager itemDownloadManager);
 
     Item getItem();

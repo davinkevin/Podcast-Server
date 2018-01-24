@@ -5,6 +5,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
@@ -81,7 +82,7 @@ public class DownloaderTest {
     @Test
     public void should_stop_download() throws MalformedURLException {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
@@ -101,7 +102,7 @@ public class DownloaderTest {
     @Test
     public void should_handle_finish_download_without_target() {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
@@ -120,7 +121,7 @@ public class DownloaderTest {
     @Test
     public void should_pause_a_download() {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
@@ -138,7 +139,7 @@ public class DownloaderTest {
     @Test
     public void should_save_with_same_file_already_existing() throws MalformedURLException {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
@@ -156,7 +157,7 @@ public class DownloaderTest {
     @Test
     public void should_handle_exception_during_move() throws MalformedURLException {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
@@ -173,7 +174,7 @@ public class DownloaderTest {
     @Test
     public void should_get_the_same_target_file_each_call() throws MalformedURLException {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         /* When */
         simpleDownloader.target = simpleDownloader.getTargetFile(item);
@@ -186,7 +187,7 @@ public class DownloaderTest {
     @Test
     public void should_handle_duplicate_on_file_name() throws IOException {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
         Files.createDirectory(ROOT_TEST_PATH.resolve(podcast.getTitle()));
         Files.createFile(ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve( "file.mp4" + TEMPORARY_EXTENSION));
 
@@ -202,7 +203,8 @@ public class DownloaderTest {
     public void should_handle_error_during_creation_of_temp_file() throws IOException {
         /* Given */
         podcast.setTitle("bin");
-        simpleDownloader.setItem(item.setUrl("http://foo.bar.com/bash"));
+        simpleDownloader.setDownloadingItem(
+                DownloadingItem.builder().item(item.setUrl("http://foo.bar.com/bash")).build());
 
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/"));
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
@@ -218,7 +220,7 @@ public class DownloaderTest {
     @Test
     public void should_save_sync_with_podcast() {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         doThrow(RuntimeException.class).when(podcastRepository).findOne(any(UUID.class));
 
@@ -233,7 +235,7 @@ public class DownloaderTest {
     @Test
     public void should_get_item_standard() {
         /* Given */
-        simpleDownloader.setItem(item);
+        simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         /* When */
         Item itemOfDownloader = simpleDownloader.getItem();

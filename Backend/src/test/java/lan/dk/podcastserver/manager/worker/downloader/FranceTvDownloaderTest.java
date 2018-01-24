@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
@@ -34,11 +35,11 @@ public class FranceTvDownloaderTest {
 
     @Before
     public void beforeEach() {
-        downloader.setItem(Item.builder()
+        Item item = Item.builder()
                 .title("Secrets d'histoire - Jeanne d'Arc, au nom de Dieu")
                 .url(ITEM_URL)
-                .build()
-        );
+                .build();
+        downloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
     }
 
     @Test

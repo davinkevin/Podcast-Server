@@ -25,7 +25,7 @@ public class NoOpDownloaderTest {
 
         /* Then */
         assertThat(noOpDownloader.download()).isNull();
-        assertThat(noOpDownloader.setItem(null)).isSameAs(noOpDownloader);
+        assertThat(noOpDownloader.setDownloadingItem(null)).isSameAs(noOpDownloader);
         assertThat(noOpDownloader.getItem()).isNull();
         assertThat(noOpDownloader.getItemUrl(null)).isNull();
         assertThat(noOpDownloader.compatibility(null)).isEqualTo(-1);

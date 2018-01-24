@@ -1,14 +1,13 @@
 package lan.dk.podcastserver.manager.worker.extractor;
 
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static io.vavr.API.List;
 import static java.lang.Integer.MAX_VALUE;
-import static io.vavr.API.Tuple;
 
 /**
  * Created by kevin on 03/12/2017
@@ -19,8 +18,11 @@ import static io.vavr.API.Tuple;
 public class PassThroughExtractor implements Extractor {
     
     @Override
-    public Tuple2<Item, String> extract(Item item) {
-        return Tuple(item, item.getUrl());
+    public DownloadingItem extract(Item item) {
+        return DownloadingItem.builder()
+                .item(item)
+                .urls(List())
+                .build();
     }
 
     @Override

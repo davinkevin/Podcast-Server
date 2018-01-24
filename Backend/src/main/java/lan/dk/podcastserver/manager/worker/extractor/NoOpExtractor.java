@@ -1,19 +1,23 @@
 package lan.dk.podcastserver.manager.worker.extractor;
 
-import io.vavr.Tuple2;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.vavr.API.Tuple;
+import static io.vavr.API.List;
 
 /**
  * Created by kevin on 03/12/2017
  */
 @Slf4j
 public class NoOpExtractor implements Extractor {
+
     @Override
-    public Tuple2<Item, String> extract(Item item) {
-        return Tuple(item, item.getUrl());
+    public DownloadingItem extract(Item item) {
+        return DownloadingItem.builder()
+                .item(item)
+                .urls(List(item.getUrl()))
+                .build();
     }
 
     @Override

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 
 /**
  * Created by kevin on 10/03/2016 for Podcast Server
@@ -9,7 +10,7 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 public class NoOpDownloader implements Downloader {
 
     @Override public Item download() { return null; }
-    @Override public Downloader setItem(Item item) { return this; }
+    @Override public Downloader setDownloadingItem(DownloadingItem item) { return this; }
     @Override public Downloader setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
         return this;
     }

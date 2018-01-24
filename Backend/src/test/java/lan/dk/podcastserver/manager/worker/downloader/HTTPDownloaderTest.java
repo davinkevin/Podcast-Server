@@ -9,6 +9,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.UrlService;
@@ -91,7 +92,7 @@ public class HTTPDownloaderTest {
     @Test
     public void should_run_download() throws MalformedURLException {
         /* Given */
-        httpDownloader.setItem(item);
+        httpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
 
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
@@ -122,7 +123,7 @@ public class HTTPDownloaderTest {
     @Test
     public void should_stop_download() throws MalformedURLException {
         /* Given */
-        httpDownloader.setItem(item);
+        httpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
 
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
@@ -150,7 +151,7 @@ public class HTTPDownloaderTest {
     @Test
     public void should_handle_multipart_download_error() throws MalformedURLException {
         /* Given */
-        httpDownloader.setItem(item);
+        httpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
 
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
@@ -178,7 +179,7 @@ public class HTTPDownloaderTest {
     @Test
     public void should_handle_downloadunterruptedError() throws MalformedURLException {
         /* Given */
-        httpDownloader.setItem(item);
+        httpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
 
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
@@ -203,7 +204,7 @@ public class HTTPDownloaderTest {
     @Test
     public void should_handle_IOException_during_download() throws MalformedURLException {
         /* Given */
-        httpDownloader.setItem(item);
+        httpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
 
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
