@@ -148,6 +148,7 @@ public class SixPlayDownloader extends M3U8Downloader {
         Set<M6PlayAssets> assets = item.getAssets();
 
         return assets
+                .filter(i -> !i.getFull_physical_path().contains("drmnp."))
                 .find(i -> "sd3-ism".equalsIgnoreCase(i.getVideo_quality()))
                 .flatMap(this::transformSd3Url)
                 .orElse(() -> assets.find(i -> "usp_hls_h264".equalsIgnoreCase(i.getType())))
