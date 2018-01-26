@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.manager.worker.downloader;
+package lan.dk.podcastserver.manager.worker.extractor;
 
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
@@ -21,53 +21,22 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by kevin on 12/10/2016 for Podcast Server
+ * Created by kevin on 11/12/2017
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GulliDownloaderTest {
+public class GulliExtractorTest {
 
     private @Mock HtmlService htmlService;
     private @Mock JsonService jsonService;
-    /*
-    private @Mock UrlService urlService;
-    private @Mock WGetFactory wGetFactory;
-    private @Mock ItemRepository itemRepository;
-    private @Mock PodcastRepository podcastRepository;
-    private @Mock PodcastServerParameters podcastServerParameters;
-    private @Mock SimpMessagingTemplate template;
-    */
-    private @InjectMocks GulliDownloader gulliDownloader;
+    private @InjectMocks GulliExtractor extractor;
+    private Item item;
 
     @Before
     public void beforeEach() {
-        Item item = Item.builder()
+        item = Item.builder()
                 .title("Gulli Item")
                 .url("http://replay.gulli.fr/")
                 .build();
-
-        gulliDownloader.setDownloadingItem(
-                DownloadingItem.builder()
-                        .item(item)
-                        .build()
-        );
-
-    }
-
-    @Test
-    public void should_be_an_http_downloader() {
-        assertThat(gulliDownloader).isInstanceOfAny(HTTPDownloader.class);
-    }
-
-    @Test
-    public void should_get_item_url_for_different_item() {
-        /* Given */
-        Item anotherItem = Item.builder().url("http://foo.bar.com/boo").build();
-
-        /* When */
-        String url = gulliDownloader.getItemUrl(anotherItem);
-
-        /* Then */
-        assertThat(url).isEqualTo(anotherItem.getUrl());
     }
 
     @Test
@@ -77,13 +46,10 @@ public class GulliDownloaderTest {
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
 
         /* When */
-        String url = gulliDownloader.getItemUrl(gulliDownloader.getItem());
-        String secondUrl = gulliDownloader.getItemUrl(gulliDownloader.getItem());
+        DownloadingItem downloadingItem = extractor.extract(item);
 
         /* Then */
-        assertThat(url).isEqualTo("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4");
-        assertThat(secondUrl).isEqualTo("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4");
-        assertThat(url).isSameAs(secondUrl);
+        assertThat(downloadingItem.url()).containsOnly("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4");
         verify(htmlService, times(1)).get(anyString());
         verify(jsonService, times(1)).parse(anyString());
     }
@@ -94,23 +60,22 @@ public class GulliDownloaderTest {
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/embed.VOD68526621555000.without.position.html"));
 
         /* When */
+        assertThatThrownBy(() -> extractor.extract(item))
+
         /* Then */
-        assertThatThrownBy(() -> gulliDownloader.getItemUrl(gulliDownloader.getItem()))
-            .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     public void should_be_compatible() {
-        assertThat(gulliDownloader.compatibility("http://replay.gulli.fr/dessins-animes/Pokemon3"))
+        assertThat(extractor.compatibility("http://replay.gulli.fr/dessins-animes/Pokemon3"))
                 .isEqualTo(1);
     }
 
     @Test
     public void should_not_be_compatible() {
-        assertThat(gulliDownloader.compatibility("http://foo.bar.fr/dessins-animes/Pokemon3"))
+        assertThat(extractor.compatibility("http://foo.bar.fr/dessins-animes/Pokemon3"))
                 .isGreaterThan(1);
     }
-
-
 
 }
