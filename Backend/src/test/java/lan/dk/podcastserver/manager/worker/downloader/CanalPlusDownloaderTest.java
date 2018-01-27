@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.downloader;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.*;
@@ -19,8 +20,8 @@ import org.springframework.util.FileSystemUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
+import static io.vavr.API.List;
 import static io.vavr.API.Try;
 import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,10 +59,15 @@ public class CanalPlusDownloaderTest {
     @Test
     public void should_get_target_file_for_cplus() {
         /* Given */
-        canalPlusDownloader.item = Item.builder()
-                .url("http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8")
-                .podcast(Podcast.builder().title("Cplus Podcast").build())
-            .build();
+        canalPlusDownloader.setDownloadingItem(DownloadingItem.builder()
+                .item(Item.builder()
+                        .url("http://us-cplus-aka.canal-plus.com/i/1401/NIP_1960_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8")
+                        .podcast(Podcast.builder().title("Cplus Podcast").build())
+                        .build()
+                )
+                .urls(List())
+                .build()
+        );
         when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
 
         /* When */

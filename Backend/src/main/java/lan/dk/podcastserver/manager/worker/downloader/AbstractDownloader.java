@@ -29,6 +29,7 @@ import java.nio.file.PathMatcher;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static io.vavr.API.Option;
 import static io.vavr.API.Try;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -171,7 +172,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     private Path getDestinationFile(Item item) {
-        String fileName = getFileName(item);
+        String fileName = Option(downloadingItem.getFilename()).getOrElse(() -> getFileName(item));
         return  podcastServerParameters.getRootfolder().resolve(item.getPodcast().getTitle()).resolve(fileName);
     }
 
@@ -190,7 +191,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     public String getItemUrl(Item item) {
-        return item.getUrl();
+        return downloadingItem.url().getOrElse(item::getUrl);
     }
 
     @PostConstruct

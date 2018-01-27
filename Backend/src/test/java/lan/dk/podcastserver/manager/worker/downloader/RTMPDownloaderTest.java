@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.UUID;
 
+import static io.vavr.API.List;
 import static io.vavr.API.Try;
 import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
 import static lan.dk.utils.IOUtils.TEMPORARY_EXTENSION;
@@ -77,7 +78,7 @@ public class RTMPDownloaderTest {
         when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_TEST_PATH);
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
 
-        rtmpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
+        rtmpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
         rtmpDownloader.setItemDownloadManager(itemDownloadManager);
 
         rtmpDownloader.postConstruct();

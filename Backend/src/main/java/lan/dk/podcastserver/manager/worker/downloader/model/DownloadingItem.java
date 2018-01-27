@@ -15,6 +15,7 @@ public class DownloadingItem {
     private final Item item;
     private final List<String> urls;
     private final String filename;
+    private final String userAgent;
 
     public Option<String> url() {
         return urls.headOption();
