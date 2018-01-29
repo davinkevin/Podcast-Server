@@ -159,7 +159,7 @@ public class SixPlayUpdater extends AbstractUpdater {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class SixPlayItem{
 
-        @Getter @Setter Set<Image> images;
+        @Getter @Setter Image display_image;
         @Getter @Setter String code;
         @Getter @Setter String description;
         @Getter @Setter String title;
@@ -178,7 +178,7 @@ public class SixPlayUpdater extends AbstractUpdater {
         }
 
         String cover() {
-            return images.headOption()
+            return Option(display_image)
                     .map(Image::url)
                     .getOrElse(() -> null);
         }
