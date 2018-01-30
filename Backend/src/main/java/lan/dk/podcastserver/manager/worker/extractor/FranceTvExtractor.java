@@ -1,47 +1,57 @@
-package lan.dk.podcastserver.manager.worker.downloader;
+package lan.dk.podcastserver.manager.worker.extractor;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.vavr.API;
-import io.vavr.Lazy;
 import io.vavr.collection.List;
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.updater.FranceTvUpdater;
-import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.*;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lan.dk.podcastserver.service.HtmlService;
+import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import static io.vavr.API.Option;
+import static io.vavr.API.*;
 
 /**
- * Created by kevin on 01/07/2017.
+ * Created by kevin on 24/12/2017
  */
-@Slf4j
+@Component
 @Scope("prototype")
-@Component("FranceTvDownloader")
-public class FranceTvDownloader extends M3U8Downloader {
+@RequiredArgsConstructor
+public class FranceTvExtractor implements Extractor {
 
     private static final String CATALOG_URL = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s";
 
     private final HtmlService htmlService;
     private final JsonService jsonService;
 
-    private final Lazy<Option<String>> url = API.Lazy(this::_getItemUrl);
+    @Override
+    public DownloadingItem extract(Item item) {
+        return htmlService.get(item.getUrl())
+                .map(d -> d.select("#player").first())
+                .map(e -> e.attr("data-main-video"))
+                .flatMap(id -> jsonService.parseUrl(String.format(CATALOG_URL, id)))
+                .map(JsonService.to(FranceTvItem.class))
+                .map(FranceTvItem::getUrl)
+                .map(url -> Tuple(url, getFileName(item)))
+                .map(info -> DownloadingItem.builder()
+                        .filename(info._2())
+                        .urls(List(info._1()))
+                        .item(item)
+                    .build())
+                .getOrElseThrow(() -> new RuntimeException("Error during extraction of FranceTV item"));
+    }
 
-    public FranceTvDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, UrlService urlService, M3U8Service m3U8Service, FfmpegService ffmpegService, ProcessService processService, HtmlService htmlService, JsonService jsonService) {
-        super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService, urlService, m3U8Service, ffmpegService, processService);
-        this.htmlService = htmlService;
-        this.jsonService = jsonService;
+
+    @Override
+    public Integer compatibility(String url) {
+        return FranceTvUpdater.isFromFranceTv(url);
     }
 
     @Override
@@ -52,25 +62,6 @@ public class FranceTvDownloader extends M3U8Downloader {
                 .map(FilenameUtils::getBaseName)
                 .map(s -> s + ".mp4")
                 .getOrElse("");
-    }
-
-    @Override
-    public String getItemUrl(Item item) {
-        return url.get().getOrElseThrow(() -> new RuntimeException("Url not found for " + item.getUrl()));
-    }
-
-    private Option<String> _getItemUrl() {
-        return htmlService.get(this.item.getUrl())
-                .map(d -> d.select("#player").first())
-                .map(e -> e.attr("data-main-video"))
-                .flatMap(id -> jsonService.parseUrl(String.format(CATALOG_URL, id)))
-                .map(JsonService.to(FranceTvItem.class))
-                .map(FranceTvItem::getUrl);
-    }
-
-    @Override
-    public Integer compatibility(String url) {
-        return FranceTvUpdater.isFromFranceTv(url);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -95,5 +86,6 @@ public class FranceTvDownloader extends M3U8Downloader {
             @JsonProperty("url_secure") @Getter @Setter private String secureUrl;
         }
     }
+
 
 }
