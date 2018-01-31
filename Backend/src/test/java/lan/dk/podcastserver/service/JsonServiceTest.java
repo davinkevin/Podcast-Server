@@ -36,7 +36,7 @@ public class JsonServiceTest {
     @Test
     public void should_read_json_from_files() throws URISyntaxException, IOException {
         /* Given */
-        when(urlService.asReader(anyString())).thenReturn(IOUtils.fileAsReader("/remote/downloader/dailymotion/user.karimdebbache.json"));
+        when(urlService.asReader(anyString())).thenReturn(IOUtils.fileAsReader("/remote/podcast/dailymotion/user.karimdebbache.json"));
 
         /* When */
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");

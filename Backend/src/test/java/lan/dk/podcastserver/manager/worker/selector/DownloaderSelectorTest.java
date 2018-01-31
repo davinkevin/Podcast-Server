@@ -25,7 +25,6 @@ public class DownloaderSelectorTest {
 
     private @Mock CanalPlusDownloader canalPlusDownloader;
     private @Mock DailyMotionCloudDownloader dailyMotionCloudDownloader;
-    private @Mock DailymotionDownloader dailymotionDownloader;
     private @Mock HTTPDownloader httpDownloader;
     private @Mock M3U8Downloader m3U8Downloader;
     private @Mock RTMPDownloader rtmpDownloader;
@@ -37,14 +36,13 @@ public class DownloaderSelectorTest {
     public void setUp() throws Exception {
         when(canalPlusDownloader.compatibility(anyString())).thenCallRealMethod();
         when(dailyMotionCloudDownloader.compatibility(anyString())).thenCallRealMethod();
-        when(dailymotionDownloader.compatibility(anyString())).thenCallRealMethod();
         when(httpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(m3U8Downloader.compatibility(anyString())).thenCallRealMethod();
         when(rtmpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaders = HashSet.<Downloader>of(canalPlusDownloader, dailyMotionCloudDownloader, dailymotionDownloader, httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader).toJavaSet();
+        downloaders = HashSet.<Downloader>of(canalPlusDownloader, dailyMotionCloudDownloader, httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader).toJavaSet();
         downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 
@@ -90,12 +88,6 @@ public class DownloaderSelectorTest {
     public void should_return_a_CanalPlusDownloader() {
         /* When  */ Downloader updaterClass = downloaderSelector.of("http://us-cplus-aka.canal-plus.com/i/1503/17/nip_NIP_47464_,200k,400k,800k,1500k,.mp4.csmil/index_3_av.m3u8");
         /* Then  */ assertThat(updaterClass).isEqualTo(canalPlusDownloader);
-    }
-
-    @Test
-    public void should_return_a_DailymotionDownloader() {
-        /* When  */ Downloader updaterClass = downloaderSelector.of("http://www.dailymotion.com/video/xLif1aca");
-        /* Then  */ assertThat(updaterClass).isEqualTo(dailymotionDownloader);
     }
 
     @Test

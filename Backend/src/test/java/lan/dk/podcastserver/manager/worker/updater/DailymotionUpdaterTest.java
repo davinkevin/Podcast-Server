@@ -59,10 +59,10 @@ public class DailymotionUpdaterTest {
     }
 
     @Test
-    public void should_get_items() throws MalformedURLException {
+    public void should_get_items() {
         /* Given */
         String karimdebbache = String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache");
-        when(jsonService.parseUrl(eq(karimdebbache))).then(i -> IOUtils.fileAsJson("/remote/downloader/dailymotion/user.karimdebbache.json"));
+        when(jsonService.parseUrl(eq(karimdebbache))).then(i -> IOUtils.fileAsJson("/remote/podcast/dailymotion/user.karimdebbache.json"));
 
         /* When */
         Set<Item> items = dailymotionUpdater.getItems(podcast);
@@ -72,7 +72,7 @@ public class DailymotionUpdaterTest {
     }
 
     @Test
-    public void should_get_empty_list_if_error_during_fetching() throws MalformedURLException {
+    public void should_get_empty_list_if_error_during_fetching() {
         /* Given */
         String karimdebbache = String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache");
         when(jsonService.parseUrl(eq(karimdebbache))).thenReturn(None());
