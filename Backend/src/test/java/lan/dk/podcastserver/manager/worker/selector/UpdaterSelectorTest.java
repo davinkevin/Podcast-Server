@@ -19,7 +19,7 @@ public class UpdaterSelectorTest {
     private UpdaterSelector updaterSelector;
 
     private @Mock BeInSportsUpdater beInSportsUpdater;
-    private @Mock CanalPlusUpdater canalPlusUpdater;
+    private @Mock MyCanalUpdater myCanalUpdater;
     private @Mock DailymotionUpdater dailymotionUpdater;
     private @Mock GulliUpdater gulliUpdater;
     private @Mock JeuxVideoComUpdater jeuxVideoComUpdater;
@@ -31,10 +31,10 @@ public class UpdaterSelectorTest {
     private @Mock YoutubeUpdater youtubeUpdater;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         /* Given */
         HashSet<Updater> updaters = HashSet.of(
-                beInSportsUpdater, canalPlusUpdater, dailymotionUpdater, gulliUpdater,
+                beInSportsUpdater, myCanalUpdater, dailymotionUpdater, gulliUpdater,
                 jeuxVideoComUpdater, franceTvUpdater, rssUpdater, sixPlayUpdater,
                 tf1ReplayUpdater, uploadUpdater, youtubeUpdater
         );
@@ -56,8 +56,8 @@ public class UpdaterSelectorTest {
 
     @Test
     public void should_return_a_CanalPlusUpdater() {
-        /* When */ Updater updaterClass = updaterSelector.of("http://www.canalplus.fr/show/for/dummies");
-        /* Then */ assertThat(updaterClass).isEqualTo(canalPlusUpdater);
+        /* When */ Updater updaterClass = updaterSelector.of("http://www.mycanal.fr/show/for/dummies");
+        /* Then */ assertThat(updaterClass).isEqualTo(myCanalUpdater);
     }
 
     @Test

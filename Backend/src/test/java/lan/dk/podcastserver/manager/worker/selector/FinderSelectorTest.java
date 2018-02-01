@@ -19,7 +19,8 @@ import static org.mockito.Mockito.when;
 public class FinderSelectorTest {
 
     private @Mock BeInSportsFinder beInSportsFinder;
-    private @Mock CanalPlusFinder canalPlusFinder;
+    private @Mock
+    MyCanalFinder myCanalFinder;
     private @Mock DailymotionFinder dailymotionFinder;
     private @Mock FranceTvFinder franceTvFinder;
     private @Mock GulliFinder gulliFinder;
@@ -34,7 +35,7 @@ public class FinderSelectorTest {
     @Before
     public void beforeEach() {
         when(beInSportsFinder.compatibility(anyString())).thenCallRealMethod();
-        when(canalPlusFinder.compatibility(anyString())).thenCallRealMethod();
+        when(myCanalFinder.compatibility(anyString())).thenCallRealMethod();
         when(dailymotionFinder.compatibility(anyString())).thenCallRealMethod();
         when(franceTvFinder.compatibility(anyString())).thenCallRealMethod();
         when(gulliFinder.compatibility(anyString())).thenCallRealMethod();
@@ -44,7 +45,7 @@ public class FinderSelectorTest {
         when(tf1ReplayFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
 
-        finderSelector = new FinderSelector(Set(beInSportsFinder, canalPlusFinder, dailymotionFinder, franceTvFinder, gulliFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder).toJavaSet());
+        finderSelector = new FinderSelector(Set(beInSportsFinder, myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder).toJavaSet());
     }
 
     @Test
@@ -67,13 +68,13 @@ public class FinderSelectorTest {
     @Test
     public void should_find_canalplus() {
         /* Given */
-        String url = "http://www.canalplus.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html";
+        String url = "http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html";
 
         /* When */
         Finder finder = finderSelector.of(url);
 
         /* Then */
-        assertThat(finder).isSameAs(canalPlusFinder);
+        assertThat(finder).isSameAs(myCanalFinder);
     }
 
     @Test

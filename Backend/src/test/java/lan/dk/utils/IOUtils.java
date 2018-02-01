@@ -59,14 +59,14 @@ public class IOUtils {
                 .map(Paths::get);
     }
 
-    public static Option<org.jdom2.Document> fileAsXml(String uri) throws JDOMException, IOException, URISyntaxException {
+    public static Option<org.jdom2.Document> fileAsXml(String uri) {
         return toPath(uri)
                 .map(Path::toFile)
                 .mapTry(f -> new SAXBuilder().build(f))
                 .toOption();
     }
 
-    public static Option<Document> fileAsHtml(String uri) throws URISyntaxException, IOException {
+    public static Option<Document> fileAsHtml(String uri) {
         return toPath(uri)
                 .map(Path::toFile)
                 .mapTry(v -> Jsoup.parse(v, "UTF-8", ""))
