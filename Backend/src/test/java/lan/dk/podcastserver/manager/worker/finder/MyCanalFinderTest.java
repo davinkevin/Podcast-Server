@@ -52,6 +52,23 @@ public class MyCanalFinderTest {
     }
 
     @Test
+    public void should_find_podcast_without_landing_page() {
+        /* Given */
+        when(htmlService.get("https://www.mycanal.fr/theme/emissions/pid4936-j-1.html")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/mycanal/j_plus_1.html"));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+
+        /* When */
+        Podcast podcast = finder.find("https://www.mycanal.fr/theme/emissions/pid4936-j-1.html");
+
+        /* Then */
+        assertThat(podcast)
+                .hasUrl("https://www.mycanal.fr/theme/emissions/pid4936-j-1.html")
+                .hasTitle("J+1")
+                .hasType("MyCanal")
+                .hasCover(Cover.DEFAULT_COVER);
+    }
+
+    @Test
     public void should_return_nothing_if_structure_has_change() {
         /* GIVEN */
         when(htmlService.get("https://www.mycanal.fr/emissions/pid1319-le-tube.html")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/mycanal/le-tube_without-data.html"));

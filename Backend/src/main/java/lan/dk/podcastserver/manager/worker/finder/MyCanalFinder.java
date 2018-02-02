@@ -1,8 +1,11 @@
 package lan.dk.podcastserver.manager.worker.finder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jayway.jsonpath.DocumentContext;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
@@ -34,23 +37,33 @@ public class MyCanalFinder implements Finder {
 
     @Override
     public Podcast find(String url) {
-        return htmlService
+        Option<DocumentContext> json = htmlService
                 .get(url)
                 .map(Document::body)
                 .flatMap(es -> List.ofAll(es.select("script")).find(e -> e.html().contains("app_config")))
                 .map(Element::html)
                 .flatMap(MyCanalFinder::extractJsonConfig)
-                .map(jsonService::parse)
-                .map(JsonService.to("landing.cover", MyCanalLandingItem.class))
-                .map(this::asPodcast)
+                .map(jsonService::parse);
+
+        return json.toTry().map(JsonService.to("landing.cover", MyCanalLandingItem.class)).map(this::asPodcast)
+                .orElse(() -> json.toTry().map(JsonService.to("page", MyCanalPageItem.class)).map(this::asPodcast))
                 .getOrElse(Podcast.DEFAULT_PODCAST);
     }
 
-    private Podcast asPodcast(MyCanalLandingItem item) {
+     private Podcast asPodcast(MyCanalLandingItem item) {
         return Podcast.builder()
                 .title(item.getOnClick().getDisplayName())
                 .url(DOMAIN + item.getOnClick().getPath())
                 .cover(imageService.getCoverFromURL(item.getImage()))
+                .type("MyCanal")
+                .build();
+    }
+
+    private Podcast asPodcast(MyCanalPageItem item) {
+        return Podcast.builder()
+                .title(item.getDisplayName())
+                .url(DOMAIN + item.getPathname())
+                .cover(Cover.DEFAULT_COVER)
                 .type("MyCanal")
                 .build();
     }
@@ -82,13 +95,20 @@ public class MyCanalFinder implements Finder {
     private static class MyCanalLandingItem {
         @Getter @Setter String image;
         @Getter @Setter MyCanalOnClick onClick;
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        private static class MyCanalOnClick {
+            @Getter @Setter String displayName;
+            @Getter @Setter String path;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class MyCanalOnClick {
+    private static class MyCanalPageItem {
         @Getter @Setter String displayName;
-        @Getter @Setter String path;
+        @Getter @Setter String pathname;
     }
+
 
 
 }
