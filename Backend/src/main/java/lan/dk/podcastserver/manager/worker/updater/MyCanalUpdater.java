@@ -2,11 +2,13 @@ package lan.dk.podcastserver.manager.worker.updater;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -29,7 +31,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Supplier;
 
+import static io.vavr.API.Function;
 import static io.vavr.API.Option;
 import static io.vavr.API.Tuple;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
@@ -41,6 +45,7 @@ public class MyCanalUpdater extends AbstractUpdater {
 
     private static final String MYCANAL_DATE_PATTERN = "dd/MM/yyyy-HH:mm:ss";
     private static final TypeRef<Set<MyCanalItem>> SET_OF_MY_CANAL_ITEM = new TypeRef<Set<MyCanalItem>>(){};
+    private static final TypeRef<Set<MyCanalDetailsItem>> SET_OF_MY_CANAL_DETAILS_ITEM = new TypeRef<Set<MyCanalDetailsItem>>(){};
     private static final String URL_DETAILS = "https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/%s?format=json";
     private static final String DOMAIN = "https://www.mycanal.fr";
 
@@ -84,14 +89,22 @@ public class MyCanalUpdater extends AbstractUpdater {
                 .map(Element::html)
                 .flatMap(MyCanalFinder::extractJsonConfig)
                 .map(jsonService::parse)
-                .map(JsonService.to("landing.strates[0].contents", SET_OF_MY_CANAL_ITEM))
+                .map(JsonService.to("landing.strates[*].contents[*]", SET_OF_MY_CANAL_ITEM))
                 ;
     }
 
     private Option<MyCanalDetailsItem> findDetails(MyCanalItem item) {
-        return jsonService.parseUrl(String.format(URL_DETAILS, item.getContentID()))
+        Try<DocumentContext> json = jsonService.parseUrl(String.format(URL_DETAILS, item.getContentID())).toTry();
+
+        Supplier<Option<MyCanalDetailsItem>> fromCollection = () -> json
+                .map(JsonService.to(SET_OF_MY_CANAL_DETAILS_ITEM))
+                .getOrElse(HashSet::empty)
+                .find(i -> i.getId().equalsIgnoreCase(item.getContentID()));
+
+        return json
                 .map(JsonService.to(MyCanalDetailsItem.class))
-                ;
+                .toOption()
+                .orElse(fromCollection);
     }
 
     @Override
