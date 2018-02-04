@@ -3,7 +3,7 @@ package lan.dk.podcastserver.controller.api;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,11 +25,11 @@ public class TypeControllerTest {
     @Test
     public void should_return_all_abstract_type() throws NoSuchMethodException {
         /* Given */
-        Set<AbstractUpdater.Type> types = HashSet.empty();
+        Set<Type> types = HashSet.empty();
         when(updaterSelector.types()).thenReturn(types);
 
         /* When */
-        io.vavr.collection.Set<AbstractUpdater.Type> returnTypes = typeController.types();
+        io.vavr.collection.Set<Type> returnTypes = typeController.types();
 
         /* Then */
         assertThat(returnTypes).isSameAs(types);

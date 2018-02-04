@@ -117,7 +117,7 @@ public class UpdaterSelectorTest {
     @Test
     public void should_serve_types() {
         /* When */
-        Set<AbstractUpdater.Type> types = updaterSelector.types();
+        Set<Type> types = updaterSelector.types();
 
         /* Then */
         assertThat(types).isNotEmpty().hasSize(11);

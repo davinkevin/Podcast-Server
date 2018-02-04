@@ -10,7 +10,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -18,7 +18,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -39,7 +38,8 @@ import static lan.dk.podcastserver.utils.MatcherExtractor.from;
  */
 @Slf4j
 @Component("BeInSportsUpdater")
-public class BeInSportsUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class BeInSportsUpdater implements Updater {
 
     /* Patter to extract value from URL */
     private static final String ATTRIBUTE_EXTRACTOR_FROM_JAVASCRIPT_VALUE = ".*\"%s\":\"([^\"]*)\".*";
@@ -52,14 +52,9 @@ public class BeInSportsUpdater extends AbstractUpdater {
     /* December 26, 2015 13:53 */
     private static final DateTimeFormatter BEINSPORTS_PARSER = DateTimeFormatter.ofPattern("MMMM d, y HH:mm", Locale.ENGLISH);
 
-    final HtmlService htmlService;
-    final ImageService imageService;
-
-    public BeInSportsUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.htmlService = htmlService;
-        this.imageService = imageService;
-    }
+    private final SignatureService signatureService;
+    private final HtmlService htmlService;
+    private final ImageService imageService;
 
     public Set<Item> getItems(Podcast podcast) {
         return htmlService

@@ -9,14 +9,13 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -30,7 +29,8 @@ import static lan.dk.podcastserver.utils.MatcherExtractor.from;
  */
 @Slf4j
 @Component("DailymotionUpdater")
-public class DailymotionUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class DailymotionUpdater implements Updater {
 
     static final String API_LIST_OF_ITEMS = "https://api.dailymotion.com/user/%s/videos?fields=created_time,description,id,thumbnail_720_url,title";
     // http://www.dailymotion.com/karimdebbache
@@ -38,14 +38,9 @@ public class DailymotionUpdater extends AbstractUpdater {
     private static final String ITEM_URL = "http://www.dailymotion.com/video/%s";
     private static final TypeRef<Set<DailymotionVideoDetail>> LIST_DAILYMOTIONVIDEODETAIL_TYPE = new TypeRef<Set<DailymotionVideoDetail>>() { };
 
+    private final SignatureService signatureService;
     private final JsonService jsonService;
     private final ImageService imageService;
-
-    public DailymotionUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, ImageService imageService, JsonService jsonService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.imageService = imageService;
-        this.jsonService = jsonService;
-    }
 
     @Override
     public Set<Item> getItems(Podcast podcast) {
@@ -78,7 +73,7 @@ public class DailymotionUpdater extends AbstractUpdater {
 
     @Override
     public Type type() {
-        return new AbstractUpdater.Type("Dailymotion", "Dailymotion");
+        return new Type("Dailymotion", "Dailymotion");
     }
 
     @Override

@@ -11,7 +11,7 @@ public class TypeTest {
 
     @Test
     public void should_have_key_and_name() {
-        /* Given */ AbstractUpdater.Type type = new AbstractUpdater.Type("Key", "Value");
+        /* Given */ Type type = new Type("Key", "Value");
         /* Then */
         assertThat(type.key()).isEqualTo("Key");
         assertThat(type.name()).isEqualTo("Value");

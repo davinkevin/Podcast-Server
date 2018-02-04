@@ -8,7 +8,7 @@ import io.vavr.collection.Traversable;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.dsl.ItemDSL;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,7 @@ public class StatsBusiness {
         return statOf(id, Item::getCreationDate, numberOfMonth);
     }
 
-    private StatsPodcastType generateForType(AbstractUpdater.Type type, Integer numberOfMonth, Selector selector) {
+    private StatsPodcastType generateForType(Type type, Integer numberOfMonth, Selector selector) {
         ZonedDateTime dateInPast = ZonedDateTime.now().minusMonths(numberOfMonth);
 
         Set<NumberOfItemByDateWrapper> values =

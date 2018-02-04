@@ -103,11 +103,7 @@ public class UpdaterTest {
         verifyNoMoreInteractions(podcastServerParameters, signatureService, validator);
     }
 
-    static class SimpleUpdater extends AbstractUpdater {
-
-        public SimpleUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator) {
-            super(podcastServerParameters, signatureService, validator);
-        }
+    static class SimpleUpdater implements Updater {
 
         @Override
         public Set<Item> getItems(Podcast podcast) {

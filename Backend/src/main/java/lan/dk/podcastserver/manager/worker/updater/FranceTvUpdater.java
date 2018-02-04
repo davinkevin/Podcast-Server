@@ -8,16 +8,14 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.*;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -30,20 +28,15 @@ import static java.util.Objects.isNull;
  */
 @Slf4j
 @Component("FranceTvUpdater")
-public class FranceTvUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class FranceTvUpdater implements Updater {
     private static final String LAST_VIDEOS_SELECTOR = "ul.wall";
     private static final String CATALOG_URL = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s";
 
+    private final SignatureService signatureService;
     private final HtmlService htmlService;
     private final ImageService imageService;
     private final JsonService jsonService;
-
-    public FranceTvUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService, JsonService jsonService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.htmlService = htmlService;
-        this.imageService = imageService;
-        this.jsonService = jsonService;
-    }
 
     public Set<Item> getItems(Podcast podcast) {
         return htmlService.get(podcast.getUrl())

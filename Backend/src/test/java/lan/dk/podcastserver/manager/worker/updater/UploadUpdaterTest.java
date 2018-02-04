@@ -55,7 +55,7 @@ public class UploadUpdaterTest {
     
     @Test
     public void should_show_his_type() {
-        AbstractUpdater.Type type = uploadUpdater.type();
+        Type type = uploadUpdater.type();
         assertThat(type.key()).isEqualTo("upload");
         assertThat(type.name()).isEqualTo("Upload");
     }

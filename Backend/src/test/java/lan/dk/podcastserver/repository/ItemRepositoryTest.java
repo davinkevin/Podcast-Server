@@ -8,7 +8,7 @@ import io.vavr.API;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -158,7 +158,7 @@ public class ItemRepositoryTest {
         dbSetupTracker.skipNextLaunch();
 
         /* When */
-        Set<Item> byTypeAndExpression = itemRepository.findByTypeAndExpression(new AbstractUpdater.Type("YOUTUBE", "YOUTUBE"), hasStatus(Status.FINISH));
+        Set<Item> byTypeAndExpression = itemRepository.findByTypeAndExpression(new Type("YOUTUBE", "YOUTUBE"), hasStatus(Status.FINISH));
 
         /* Then */
         assertThat(byTypeAndExpression)

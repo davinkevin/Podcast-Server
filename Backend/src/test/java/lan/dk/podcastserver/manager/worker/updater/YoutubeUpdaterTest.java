@@ -56,7 +56,7 @@ public class YoutubeUpdaterTest {
     @Test
     public void should_be_of_type_youtube() {
         /* Given */
-        AbstractUpdater.Type type = youtubeUpdater.type();
+        Type type = youtubeUpdater.type();
 
         /* Then */
         assertThat(type).isNotNull();

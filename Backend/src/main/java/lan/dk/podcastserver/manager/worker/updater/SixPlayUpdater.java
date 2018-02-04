@@ -3,7 +3,6 @@ package lan.dk.podcastserver.manager.worker.updater;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
-import io.vavr.Tuple;
 import io.vavr.Value;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
@@ -16,9 +15,9 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,7 +26,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -43,7 +41,8 @@ import static java.util.Objects.nonNull;
  */
 @Slf4j
 @Component("SixPlayUpdater")
-public class SixPlayUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class SixPlayUpdater implements Updater {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
     private static final TypeRef<Set<SixPlayItem>> TYPE_ITEMS = new TypeRef<Set<SixPlayItem>>(){};
@@ -54,16 +53,10 @@ public class SixPlayUpdater extends AbstractUpdater {
     private static final String PROGRAM_ID_SELECTOR = "program.programsById";
     private static final String VIDEO_BY_ID_SELECTOR = "video.programVideoById[*]";
 
+    private final SignatureService signatureService;
     private final HtmlService htmlService;
     private final JsonService jsonService;
     private final ImageService imageService;
-
-    protected SixPlayUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, JsonService jsonService, ImageService imageService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.htmlService = htmlService;
-        this.jsonService = jsonService;
-        this.imageService = imageService;
-    }
 
     @Override
     public Set<Item> getItems(Podcast podcast) {

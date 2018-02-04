@@ -12,8 +12,8 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +21,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -36,7 +35,8 @@ import static lan.dk.podcastserver.utils.MatcherExtractor.from;
  */
 @Slf4j
 @Component("TF1ReplayUpdater")
-public class TF1ReplayUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class TF1ReplayUpdater implements Updater {
 
     private static final PatternExtractor CHANNEL_PROGRAM_EXTRACTOR = from(Pattern.compile("[^:]+://www.tf1.fr/([^/]+)/([^/]+)/videos.*"));
     private static final String AJAX_URL_FORMAT = "http://www.tf1.fr/ajax/%s/%s/videos?filter=%s";
@@ -46,17 +46,10 @@ public class TF1ReplayUpdater extends AbstractUpdater {
     private static final String ALL_CATEGORY = "all";
     private static final Set<String> TYPES = HashSet.of("replay", "vidéo", "");
 
+    private final SignatureService signatureService;
     private final HtmlService htmlService;
     private final ImageService imageService;
     private final JsonService jsonService;
-
-    public TF1ReplayUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService, JsonService jsonService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.htmlService = htmlService;
-        this.imageService = imageService;
-        this.jsonService = jsonService;
-    }
-
 
     @Override
     public Set<Item> getItems(Podcast podcast) {

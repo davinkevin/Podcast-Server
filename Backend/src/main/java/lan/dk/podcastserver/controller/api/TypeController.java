@@ -2,7 +2,7 @@ package lan.dk.podcastserver.controller.api;
 
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ public class TypeController {
 
     @GetMapping
     @Cacheable("types")
-    public Set<AbstractUpdater.Type> types() {
+    public Set<Type> types() {
         return updaterSelector.types();
     }
 }

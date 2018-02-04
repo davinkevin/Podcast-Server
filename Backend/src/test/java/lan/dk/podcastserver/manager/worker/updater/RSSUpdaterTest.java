@@ -9,7 +9,6 @@ import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,11 +19,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static io.vavr.API.None;
-import static io.vavr.API.Option;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.*;
@@ -89,7 +85,7 @@ public class RSSUpdaterTest {
 
     @Test
     public void should_return_his_type() {
-        AbstractUpdater.Type type = rssUpdater.type();
+        Type type = rssUpdater.type();
         assertThat(type.key()).isEqualTo("RSS");
         assertThat(type.name()).isEqualTo("RSS");
     }

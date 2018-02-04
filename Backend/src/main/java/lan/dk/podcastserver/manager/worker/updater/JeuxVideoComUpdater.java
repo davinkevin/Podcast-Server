@@ -7,14 +7,13 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,18 +24,14 @@ import java.time.format.DateTimeFormatter;
  */
 @Slf4j
 @Component("JeuxVideoComUpdater")
-public class JeuxVideoComUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class JeuxVideoComUpdater implements Updater {
 
     static final String JEUXVIDEOCOM_HOST = "http://www.jeuxvideo.com";
+
+    private final SignatureService signatureService;
     private final HtmlService htmlService;
     private final ImageService imageService;
-
-    public JeuxVideoComUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.htmlService = htmlService;
-        this.imageService = imageService;
-    }
-
 
     @Override
     public Set<Item> getItems(Podcast podcast) {

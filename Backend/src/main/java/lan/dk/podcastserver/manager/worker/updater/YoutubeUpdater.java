@@ -13,8 +13,8 @@ import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.Api;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,6 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -32,11 +31,11 @@ import static io.vavr.API.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
-import static lan.dk.podcastserver.entity.Cover.DEFAULT_COVER;
 
 @Slf4j
 @Component("YoutubeUpdater")
-public class YoutubeUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class YoutubeUpdater implements Updater {
 
     private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     private static final Integer MAX_PAGE = 10;
@@ -48,19 +47,11 @@ public class YoutubeUpdater extends AbstractUpdater {
     private static final String API_PLAYLIST_URL = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=%s&key=%s";
     public static final String YOUTUBE = "Youtube";
 
+    private final SignatureService signatureService;
     private final JdomService jdomService;
     private final JsonService jsonService;
     private final HtmlService htmlService;
     private final Api api;
-
-    public YoutubeUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, JdomService jdomService, JsonService jsonService, HtmlService htmlService, Api api) {
-        super(podcastServerParameters, signatureService, validator);
-        this.jdomService = jdomService;
-        this.jsonService = jsonService;
-        this.htmlService = htmlService;
-        this.api = api;
-    }
-
 
     public Set<Item> getItems(Podcast podcast) {
         String string = api.getYoutube();

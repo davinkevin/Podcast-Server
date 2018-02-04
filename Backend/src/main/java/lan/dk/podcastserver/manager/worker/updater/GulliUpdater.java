@@ -10,14 +10,13 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -31,18 +30,14 @@ import static lan.dk.podcastserver.utils.MatcherExtractor.from;
  */
 @Slf4j
 @Component("GulliUpdater")
-public class GulliUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class GulliUpdater implements Updater {
 
     private static final PatternExtractor FRAME_EXTRACTOR = from(Pattern.compile(".*\\.html\\(.*<iframe.* src=\"([^\"]*)\".*"));
 
+    private final SignatureService signatureService;
     private final HtmlService htmlService;
     private final ImageService imageService;
-
-    public GulliUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, HtmlService htmlService, ImageService imageService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.htmlService = htmlService;
-        this.imageService = imageService;
-    }
 
     @Override
     public Set<Item> getItems(Podcast podcast) {

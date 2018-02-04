@@ -32,7 +32,7 @@ public class NoOpUpdater implements Updater {
     }
 
     @Override
-    public AbstractUpdater.Type type() { return null; }
+    public Type type() { return null; }
 
     @Override
     public Integer compatibility(String url) { return Integer.MAX_VALUE; }

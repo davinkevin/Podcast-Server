@@ -5,7 +5,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -58,7 +58,7 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Set<Item> findByTypeAndExpression(AbstractUpdater.Type type, Predicate filter) {
+    default Set<Item> findByTypeAndExpression(Type type, Predicate filter) {
         return HashSet.ofAll(findAll(isOfType(type.key()).and(filter)));
     }
 

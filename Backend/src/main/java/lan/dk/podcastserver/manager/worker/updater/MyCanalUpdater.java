@@ -17,8 +17,8 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.SignatureService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -26,7 +26,6 @@ import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -41,7 +40,8 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Slf4j
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class MyCanalUpdater extends AbstractUpdater {
+@RequiredArgsConstructor
+public class MyCanalUpdater implements Updater {
 
     private static final String MYCANAL_DATE_PATTERN = "dd/MM/yyyy-HH:mm:ss";
     private static final TypeRef<Set<MyCanalItem>> SET_OF_MY_CANAL_ITEM = new TypeRef<Set<MyCanalItem>>(){};
@@ -49,16 +49,10 @@ public class MyCanalUpdater extends AbstractUpdater {
     private static final String URL_DETAILS = "https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/%s?format=json";
     private static final String DOMAIN = "https://www.mycanal.fr";
 
+    private final SignatureService signatureService;
     private final JsonService jsonService;
     private final ImageService imageService;
     private final HtmlService htmlService;
-
-    protected MyCanalUpdater(PodcastServerParameters podcastServerParameters, SignatureService signatureService, Validator validator, JsonService jsonService, ImageService imageService, HtmlService htmlService) {
-        super(podcastServerParameters, signatureService, validator);
-        this.jsonService = jsonService;
-        this.imageService = imageService;
-        this.htmlService = htmlService;
-    }
 
     @Override
     public Set<Item> getItems(Podcast p) {

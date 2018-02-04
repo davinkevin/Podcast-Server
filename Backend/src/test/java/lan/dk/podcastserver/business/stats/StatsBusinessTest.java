@@ -8,7 +8,7 @@ import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.selector.UpdaterSelector;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import lan.dk.podcastserver.repository.ItemRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,10 +36,10 @@ public class StatsBusinessTest {
     private @Mock UpdaterSelector updaterSelector;
     private @InjectMocks StatsBusiness statsBusiness;
 
-    private static final AbstractUpdater.Type YOUTUBE = new AbstractUpdater.Type("Youtube", "Youtube");
-    private static final AbstractUpdater.Type CANAL_PLUS = new AbstractUpdater.Type("CanalPlus", "CanalPlus");
-    private static final AbstractUpdater.Type BE_IN_SPORT = new AbstractUpdater.Type("BeInSport", "BeInSport");
-    private static final AbstractUpdater.Type RSS = new AbstractUpdater.Type("RSS", "RSS");
+    private static final Type YOUTUBE = new Type("Youtube", "Youtube");
+    private static final Type CANAL_PLUS = new Type("CanalPlus", "CanalPlus");
+    private static final Type BE_IN_SPORT = new Type("BeInSport", "BeInSport");
+    private static final Type RSS = new Type("RSS", "RSS");
 
     @Test
     public void should_stats_all_by_download_date() {

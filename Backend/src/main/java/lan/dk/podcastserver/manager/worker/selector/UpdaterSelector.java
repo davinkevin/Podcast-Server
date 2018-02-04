@@ -2,8 +2,8 @@ package lan.dk.podcastserver.manager.worker.selector;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.manager.worker.updater.AbstractUpdater;
 import lan.dk.podcastserver.manager.worker.updater.NoOpUpdater;
+import lan.dk.podcastserver.manager.worker.updater.Type;
 import lan.dk.podcastserver.manager.worker.updater.Updater;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ public class UpdaterSelector {
                 .getOrElse(NO_OP_UPDATER);
     }
 
-    public Set<AbstractUpdater.Type> types() {
+    public Set<Type> types() {
         return updaters.map(Updater::type);
     }
 
