@@ -8,7 +8,7 @@ import io.vavr.API;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.worker.updater.Type;
+import lan.dk.podcastserver.manager.worker.Type;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

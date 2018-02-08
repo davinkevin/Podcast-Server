@@ -2,7 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import io.vavr.control.Option;
-import lan.dk.podcastserver.manager.worker.updater.UploadUpdater;
+import lan.dk.podcastserver.manager.worker.upload.UploadUpdater;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import static io.vavr.API.Option;

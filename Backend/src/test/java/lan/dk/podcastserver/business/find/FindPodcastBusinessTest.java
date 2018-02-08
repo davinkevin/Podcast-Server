@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.business.find;
 
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.finder.Finder;
-import lan.dk.podcastserver.manager.worker.selector.FinderSelector;
+import lan.dk.podcastserver.manager.worker.Finder;
+import lan.dk.podcastserver.manager.selector.FinderSelector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import static io.vavr.API.Try;
 import static java.util.Objects.nonNull;
-import static lan.dk.podcastserver.manager.worker.updater.YoutubeUpdater.YOUTUBE;
+import static lan.dk.podcastserver.manager.worker.youtube.YoutubeUpdater.YOUTUBE;
 
 /**
  * Created by kevin on 16/07/15 for Podcast Server

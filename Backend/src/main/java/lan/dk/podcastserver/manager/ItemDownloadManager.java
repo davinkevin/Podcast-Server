@@ -6,10 +6,10 @@ import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.worker.downloader.Downloader;
-import lan.dk.podcastserver.manager.worker.downloader.model.DownloadingItem;
-import lan.dk.podcastserver.manager.worker.selector.DownloaderSelector;
-import lan.dk.podcastserver.manager.worker.selector.ExtractorSelector;
+import lan.dk.podcastserver.manager.downloader.Downloader;
+import lan.dk.podcastserver.manager.downloader.DownloadingItem;
+import lan.dk.podcastserver.manager.selector.DownloaderSelector;
+import lan.dk.podcastserver.manager.selector.ExtractorSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.Getter;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static io.vavr.API.*;
-import static lan.dk.podcastserver.manager.worker.selector.DownloaderSelector.NO_OP_DOWNLOADER;
+import static lan.dk.podcastserver.manager.selector.DownloaderSelector.NO_OP_DOWNLOADER;
 
 @Slf4j
 @Service
