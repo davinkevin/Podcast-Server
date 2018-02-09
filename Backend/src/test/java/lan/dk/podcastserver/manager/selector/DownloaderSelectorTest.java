@@ -23,7 +23,6 @@ public class DownloaderSelectorTest {
 
     private DownloaderSelector downloaderSelector;
 
-    private @Mock DailyMotionCloudDownloader dailyMotionCloudDownloader;
     private @Mock HTTPDownloader httpDownloader;
     private @Mock M3U8Downloader m3U8Downloader;
     private @Mock RTMPDownloader rtmpDownloader;
@@ -32,15 +31,14 @@ public class DownloaderSelectorTest {
     private Set<Downloader> downloaders;
 
     @Before
-    public void setUp() throws Exception {
-        when(dailyMotionCloudDownloader.compatibility(anyString())).thenCallRealMethod();
+    public void setUp() {
         when(httpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(m3U8Downloader.compatibility(anyString())).thenCallRealMethod();
         when(rtmpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaders = HashSet.<Downloader>of(dailyMotionCloudDownloader, httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader).toJavaSet();
+        downloaders = HashSet.<Downloader>of(httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader).toJavaSet();
         downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 
@@ -62,12 +60,6 @@ public class DownloaderSelectorTest {
     public void should_return_an_RTMPDownloader () {
         /* When  */ Downloader updaterClass = downloaderSelector.of("rtmp://ma.video.free.fr/video.mp4");
         /* Then  */ assertThat(updaterClass).isEqualTo(rtmpDownloader);
-    }
-
-    @Test
-    public void should_return_an_DailyMotionCloudDownloader() {
-        /* When  */ Downloader updaterClass = downloaderSelector.of("http://cdn.dmcloud.net/route/hls/52f0ce9994a6f65ac1125958/5507e32e94739940f5d479f2/abs-1426578247.m3u8?auth=1741946475-1-ruuv9t9k-67c31693f9ecc4fd8d14a89329705ef1&cells=current");
-        /* Then  */ assertThat(updaterClass).isEqualTo(dailyMotionCloudDownloader);
     }
 
     @Test
