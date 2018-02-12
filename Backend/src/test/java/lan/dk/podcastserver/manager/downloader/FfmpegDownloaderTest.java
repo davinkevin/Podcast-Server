@@ -47,7 +47,7 @@ import static org.mockito.Mockito.*;
  * Created by kevin on 20/02/2016 for Podcast Server
  */
 @RunWith(MockitoJUnitRunner.class)
-public class M3U8DownloaderTest {
+public class FfmpegDownloaderTest {
 
     private @Mock PodcastRepository podcastRepository;
     private @Mock ItemRepository itemRepository;
@@ -61,7 +61,8 @@ public class M3U8DownloaderTest {
     private @Mock FfmpegService ffmpegService;
     private @Mock ProcessService processService;
 
-    private @InjectMocks M3U8Downloader m3U8Downloader;
+    private @InjectMocks
+    FfmpegDownloader ffmpegDownloader;
 
     Podcast podcast;
     Item item;
@@ -79,8 +80,8 @@ public class M3U8DownloaderTest {
                 .numberOfFail(0)
                 .build();
 
-        m3U8Downloader.setItemDownloadManager(itemDownloadManager);
-        m3U8Downloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
+        ffmpegDownloader.setItemDownloadManager(itemDownloadManager);
+        ffmpegDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
         when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
@@ -88,11 +89,11 @@ public class M3U8DownloaderTest {
 
         FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());
         Try(() -> Files.createDirectories(ROOT_TEST_PATH));
-        m3U8Downloader.postConstruct();
+        ffmpegDownloader.postConstruct();
     }
 
     @Test
-    public void should_download_file() throws IOException, URISyntaxException {
+    public void should_download_file() {
         /* Given */
         when(ffmpegService.getDurationOf(anyString(), anyString())).thenReturn(1_000_000D);
         when(ffmpegService.download(anyString(), any(FFmpegBuilder.class), any(ProgressListener.class))).then(i -> {
@@ -104,9 +105,15 @@ public class M3U8DownloaderTest {
             i.getArgumentAt(2, ProgressListener.class).progress(progress);
             return mock(Process.class);
         });
+        when(processService.waitFor(any())).thenReturn(Try(() -> 1));
+        doAnswer(i -> {
+            Path targetLocation = i.getArgumentAt(0, Path.class);
+            Files.write(targetLocation, "".getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            return null;
+        }).when(ffmpegService).concat(any(Path.class), anyVararg());
 
         /* When */
-        Item downloaded = m3U8Downloader.download();
+        Item downloaded = ffmpegDownloader.download();
 
         /* Then */
         assertThat(IOUtils.ROOT_TEST_PATH.resolve(podcast.getTitle()).resolve(item.getFileName())).exists();
@@ -117,13 +124,13 @@ public class M3U8DownloaderTest {
 
     @Test
     public void should_be_compatible() {
-        assertThat(m3U8Downloader.compatibility(item.getUrl())).isLessThan(Integer.MAX_VALUE/2);
-        assertThat(m3U8Downloader.compatibility("http://foo.bar/things.rss")).isEqualTo(Integer.MAX_VALUE);
+        assertThat(ffmpegDownloader.compatibility(item.getUrl())).isLessThan(Integer.MAX_VALUE/2);
+        assertThat(ffmpegDownloader.compatibility("http://foo.bar/things.rss")).isEqualTo(Integer.MAX_VALUE);
     }
 
     @Test
     public void should_not_be_compatible() {
-        assertThat(m3U8Downloader.compatibility("http://foo.bar/things.rss")).isEqualTo(Integer.MAX_VALUE);
+        assertThat(ffmpegDownloader.compatibility("http://foo.bar/things.rss")).isEqualTo(Integer.MAX_VALUE);
     }
 
     @Test
@@ -139,9 +146,9 @@ public class M3U8DownloaderTest {
         when(processService.start(any())).then(i -> Try.run(() -> {}));
 
         /* When */
-        runAsync(() -> m3U8Downloader.download());
+        runAsync(() -> ffmpegDownloader.download());
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
-        m3U8Downloader.restartDownload();
+        ffmpegDownloader.restartDownload();
 
         /* Then */
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
@@ -159,9 +166,9 @@ public class M3U8DownloaderTest {
         when(processService.start(any())).then(i -> Try.failure(new IOException("Unable to restart download")));
 
         /* When */
-        runAsync(() -> m3U8Downloader.download());
+        runAsync(() -> ffmpegDownloader.download());
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
-        m3U8Downloader.restartDownload();
+        ffmpegDownloader.restartDownload();
 
         /* Then */
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
@@ -178,9 +185,9 @@ public class M3U8DownloaderTest {
         when(processService.start(any())).then(i -> Try.run(() -> {}));
 
         /* When */
-        CompletableFuture<Void> future = runAsync(() -> m3U8Downloader.download());
+        CompletableFuture<Void> future = runAsync(() -> ffmpegDownloader.download());
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
-        m3U8Downloader.pauseDownload();
+        ffmpegDownloader.pauseDownload();
 
         /* Then */
         await().atMost(2, TimeUnit.SECONDS).until(() -> {
@@ -198,9 +205,9 @@ public class M3U8DownloaderTest {
         when(processService.start(any())).then(i -> Try.failure(new IOException("Error during process")));
 
         /* When */
-        CompletableFuture<Void> future = runAsync(() -> m3U8Downloader.download());
+        CompletableFuture<Void> future = runAsync(() -> ffmpegDownloader.download());
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
-        m3U8Downloader.pauseDownload();
+        ffmpegDownloader.pauseDownload();
 
         /* Then */
         await().atMost(2, TimeUnit.SECONDS).until(() -> {
@@ -217,9 +224,9 @@ public class M3U8DownloaderTest {
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(process);
 
         /* When */
-        CompletableFuture<Void> future = runAsync(() -> m3U8Downloader.download());
+        CompletableFuture<Void> future = runAsync(() -> ffmpegDownloader.download());
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
-        m3U8Downloader.stopDownload();
+        ffmpegDownloader.stopDownload();
 
         /* Then */
         await().atMost(2, TimeUnit.SECONDS).until(() -> {
@@ -235,9 +242,9 @@ public class M3U8DownloaderTest {
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(process);
 
         /* When */
-        runAsync(() -> m3U8Downloader.download());
+        runAsync(() -> ffmpegDownloader.download());
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(500L));
-        m3U8Downloader.stopDownload();
+        ffmpegDownloader.stopDownload();
 
         /* Then */
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
@@ -249,10 +256,10 @@ public class M3U8DownloaderTest {
     @Test
     public void should_return_target_if_already_set() {
         /* Given */
-        m3U8Downloader.target = Paths.get("/tmp/podcast/file.m3u8");
+        ffmpegDownloader.target = Paths.get("/tmp/podcast/file.m3u8");
         /* When */
-        Path targetFile = m3U8Downloader.getTargetFile(Item.DEFAULT_ITEM);
+        Path targetFile = ffmpegDownloader.getTargetFile(Item.DEFAULT_ITEM);
         /* Then */
-        assertThat(targetFile).isSameAs(m3U8Downloader.target);
+        assertThat(targetFile).isSameAs(ffmpegDownloader.target);
     }
 }

@@ -24,7 +24,8 @@ public class DownloaderSelectorTest {
     private DownloaderSelector downloaderSelector;
 
     private @Mock HTTPDownloader httpDownloader;
-    private @Mock M3U8Downloader m3U8Downloader;
+    private @Mock
+    FfmpegDownloader ffmpegDownloader;
     private @Mock RTMPDownloader rtmpDownloader;
     private @Mock YoutubeDownloader youtubeDownloader;
     private @Mock ApplicationContext applicationContext;
@@ -33,12 +34,12 @@ public class DownloaderSelectorTest {
     @Before
     public void setUp() {
         when(httpDownloader.compatibility(anyString())).thenCallRealMethod();
-        when(m3U8Downloader.compatibility(anyString())).thenCallRealMethod();
+        when(ffmpegDownloader.compatibility(anyString())).thenCallRealMethod();
         when(rtmpDownloader.compatibility(anyString())).thenCallRealMethod();
         when(youtubeDownloader.compatibility(anyString())).thenCallRealMethod();
         when(applicationContext.getBean(anyString(), eq(Downloader.class))).then(findBean());
 
-        downloaders = HashSet.<Downloader>of(httpDownloader, m3U8Downloader, rtmpDownloader, youtubeDownloader).toJavaSet();
+        downloaders = HashSet.<Downloader>of(httpDownloader, ffmpegDownloader, rtmpDownloader, youtubeDownloader).toJavaSet();
         downloaderSelector = new DownloaderSelector(applicationContext, downloaders);
     }
 
@@ -71,7 +72,7 @@ public class DownloaderSelectorTest {
     @Test
     public void should_return_a_M3U8Downloader() {
         /* When  */ Downloader updaterClass = downloaderSelector.of("http://foo.bar.com/a/path/with/file.m3u8");
-        /* Then  */ assertThat(updaterClass).isEqualTo(m3U8Downloader);
+        /* Then  */ assertThat(updaterClass).isEqualTo(ffmpegDownloader);
     }
 
     @Test

@@ -26,8 +26,8 @@ import static io.vavr.API.Option;
 
 @Slf4j
 @Scope("prototype")
-@Component("M3U8Downloader")
-public class M3U8Downloader extends AbstractDownloader {
+@Component("FfmpegDownloader")
+public class FfmpegDownloader extends AbstractDownloader {
 
     private final FfmpegService ffmpegService;
     private final ProcessService processService;
@@ -36,7 +36,7 @@ public class M3U8Downloader extends AbstractDownloader {
     private Double globalDuration = 0d;
     private Double alreadyDoneDuration = 0d;
 
-    public M3U8Downloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, FfmpegService ffmpegService, ProcessService processService) {
+    public FfmpegDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService, FfmpegService ffmpegService, ProcessService processService) {
         super(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService);
         this.ffmpegService = ffmpegService;
         this.processService = processService;
@@ -44,7 +44,7 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public Item download() {
-        log.debug("Download {} from {}", item.getTitle(), downloadingItem.url().get());
+        log.debug("Download {}", item.getTitle());
 
         target = getTargetFile(this.downloadingItem.getItem());
 
@@ -137,6 +137,8 @@ public class M3U8Downloader extends AbstractDownloader {
 
     @Override
     public Integer compatibility(String url) {
-        return url.contains("m3u8") ? 10 : Integer.MAX_VALUE;
+        return url.contains("m3u8") || url.contains("mp4")
+                ? 10
+                : Integer.MAX_VALUE;
     }
 }
