@@ -208,7 +208,7 @@ public class RTMPDownloaderTest {
 
     @Test
     public void should_be_compatible() {
-        assertThat(rtmpDownloader.compatibility("http://foo.bar.com/video")).isGreaterThan(1);
-        assertThat(rtmpDownloader.compatibility("rtmp://foo.bar.com/video")).isEqualTo(1);
+        assertThat(rtmpDownloader.compatibility(DownloadingItem.builder().urls(List("http://foo.bar.com/video")).build())).isGreaterThan(1);
+        assertThat(rtmpDownloader.compatibility(DownloadingItem.builder().urls(List("rtmp://foo.bar.com/video")).build())).isEqualTo(1);
     }
 }

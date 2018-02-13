@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.selector;
 
 import lan.dk.podcastserver.manager.downloader.Downloader;
+import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.downloader.NoOpDownloader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.TargetClassAware;
@@ -23,14 +24,14 @@ public class DownloaderSelector {
     private final ApplicationContext applicationContext;
     private final Set<Downloader> downloaders;
 
-    public Downloader of(String url) {
-        if (StringUtils.isEmpty(url)) {
+    public Downloader of(DownloadingItem item) {
+        if (item.getUrls().isEmpty()) {
             return NO_OP_DOWNLOADER;
         }
 
         return downloaders
                 .stream()
-                .min(Comparator.comparing(downloader -> downloader.compatibility(url)))
+                .min(Comparator.comparing(downloader -> downloader.compatibility(item)))
                 .map(d -> TargetClassAware.class.isInstance(d) ? TargetClassAware.class.cast(d).getTargetClass() : d.getClass())
                 .map(Class::getSimpleName)
                 .map(clazz -> applicationContext.getBean(clazz, Downloader.class))

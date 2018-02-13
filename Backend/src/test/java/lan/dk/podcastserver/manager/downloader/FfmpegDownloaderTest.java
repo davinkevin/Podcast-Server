@@ -124,13 +124,13 @@ public class FfmpegDownloaderTest {
 
     @Test
     public void should_be_compatible() {
-        assertThat(ffmpegDownloader.compatibility(item.getUrl())).isLessThan(Integer.MAX_VALUE/2);
-        assertThat(ffmpegDownloader.compatibility("http://foo.bar/things.rss")).isEqualTo(Integer.MAX_VALUE);
+        assertThat(ffmpegDownloader.compatibility(DownloadingItem.builder().urls(List(item.getUrl())).build())).isLessThan(Integer.MAX_VALUE/2);
+        assertThat(ffmpegDownloader.compatibility(DownloadingItem.builder().urls(List("http://foo.bar/things.rss")).build())).isEqualTo(Integer.MAX_VALUE);
     }
 
     @Test
     public void should_not_be_compatible() {
-        assertThat(ffmpegDownloader.compatibility("http://foo.bar/things.rss")).isEqualTo(Integer.MAX_VALUE);
+        assertThat(ffmpegDownloader.compatibility(DownloadingItem.builder().urls(List("http://foo.bar/things.rss")).build())).isEqualTo(Integer.MAX_VALUE);
     }
 
     @Test

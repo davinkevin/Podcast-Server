@@ -264,7 +264,7 @@ public class DownloaderTest {
         }
 
         @Override
-        public Integer compatibility(String url) {
+        public Integer compatibility(DownloadingItem url) {
             return null;
         }
     }

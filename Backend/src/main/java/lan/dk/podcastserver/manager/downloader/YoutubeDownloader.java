@@ -185,8 +185,10 @@ public class YoutubeDownloader extends AbstractDownloader {
     }
 
     @Override
-    public Integer compatibility(String url) {
-        return url.contains("www.youtube.com") ? 1 : Integer.MAX_VALUE;
+    public Integer compatibility(DownloadingItem ditem) {
+        return ditem.getUrls().length() == 1 && ditem.getUrls().head().contains("www.youtube.com")
+                ? 1
+                : Integer.MAX_VALUE;
     }
 
     private String getDefinitiveFileName() {

@@ -136,8 +136,8 @@ public class FfmpegDownloader extends AbstractDownloader {
     }
 
     @Override
-    public Integer compatibility(String url) {
-        return url.contains("m3u8") || url.contains("mp4")
+    public Integer compatibility(DownloadingItem downloadingItem) {
+        return downloadingItem.getUrls().forAll(url -> url.contains("m3u8") || url.contains("mp4"))
                 ? 10
                 : Integer.MAX_VALUE;
     }

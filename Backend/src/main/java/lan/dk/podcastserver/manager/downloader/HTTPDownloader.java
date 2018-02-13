@@ -75,8 +75,10 @@ public class HTTPDownloader extends AbstractDownloader {
     }
 
     @Override
-    public Integer compatibility(String url) {
-        return url.startsWith("http") ? Integer.MAX_VALUE-1 : Integer.MAX_VALUE;
+    public Integer compatibility(DownloadingItem ditem) {
+        return ditem.getUrls().length() == 1 && ditem.getUrls().head().startsWith("http")
+                ? Integer.MAX_VALUE-1
+                : Integer.MAX_VALUE;
     }
 
     @Slf4j

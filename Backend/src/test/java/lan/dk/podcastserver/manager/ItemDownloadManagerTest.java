@@ -7,6 +7,7 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.downloader.Downloader;
+import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.downloader.NoOpDownloader;
 import lan.dk.podcastserver.manager.worker.noop.NoOpExtractor;
 import lan.dk.podcastserver.manager.selector.DownloaderSelector;
@@ -32,6 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static io.vavr.API.List;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -46,7 +48,7 @@ public class ItemDownloadManagerTest {
 
     private @Captor ArgumentCaptor<String> stringArgumentCaptor;
     private @Captor ArgumentCaptor<Queue<Item>> queueArgumentCaptor;
-    private @Captor ArgumentCaptor<String> itemUrlArgumentCaptor;
+    private @Captor ArgumentCaptor<DownloadingItem> downloadingItemArgumentCaptor;
     private @Captor ArgumentCaptor<Item> itemArgumentCaptor;
     private @Captor ArgumentCaptor<UUID> integerArgumentCaptor;
 
@@ -138,7 +140,7 @@ public class ItemDownloadManagerTest {
         when(itemRepository.findAllToDownload(any(), eq(5))).thenReturn(items);
         Downloader downloader = mock(Downloader.class);
         when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
-        when(downloaderSelector.of(anyString())).thenReturn(downloader);
+        when(downloaderSelector.of(any(DownloadingItem.class))).thenReturn(downloader);
         when(downloader.setDownloadingItem(any())).thenReturn(downloader);
         when(downloader.setItemDownloadManager(any())).thenReturn(downloader);
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
@@ -150,9 +152,9 @@ public class ItemDownloadManagerTest {
         verify(podcastServerParameters, times(1)).limitDownloadDate();
         verify(podcastServerParameters, times(1)).getNumberOfTry();
         verify(itemRepository, times(1)).findAllToDownload(any(), eq(5));
-        verify(downloaderSelector, times(3)).of(itemUrlArgumentCaptor.capture());
+        verify(downloaderSelector, times(3)).of(downloadingItemArgumentCaptor.capture());
         verify(extractorSelector, times(3)).of(anyString());
-        assertThat(itemUrlArgumentCaptor.getAllValues()).hasSize(3);
+        assertThat(downloadingItemArgumentCaptor.getAllValues()).hasSize(3);
         verifyConvertAndSave(times(1));
     }
 
@@ -201,7 +203,7 @@ public class ItemDownloadManagerTest {
         final Downloader mockDownloader = mock(Downloader.class);
         Item item = Item.builder().id(id).url(id.toString()).numberOfFail(0).build();
         when(mockDownloader.getItem()).thenReturn(item);
-        when(downloaderSelector.of(eq(id.toString()))).thenReturn(mockDownloader);
+        when(downloaderSelector.of(eq(DownloadingItem.builder().item(item).urls(List(id.toString())).build()))).thenReturn(mockDownloader);
         when(mockDownloader.setDownloadingItem(any())).thenReturn(mockDownloader);
         when(mockDownloader.setItemDownloadManager(any())).thenReturn(mockDownloader);
         when(mockDownloader.getItem()).thenReturn(item);
@@ -341,7 +343,7 @@ public class ItemDownloadManagerTest {
         verify(itemRepository, atLeast(1)).findAllToDownload(any(), eq(5));
         verify(podcastServerParameters, atLeast(1)).limitDownloadDate();
         verify(extractorSelector, atLeast(1)).of(anyString());
-        verify(downloaderSelector, atLeast(1)).of(anyString());
+        verify(downloaderSelector, atLeast(1)).of(any(DownloadingItem.class));
         verify(podcastServerParameters, atLeast(1)).getNumberOfTry();
         verifyConvertAndSave(atLeast(1));
     }
@@ -498,7 +500,7 @@ public class ItemDownloadManagerTest {
 
         /* Then */
         assertThat(entry1._1().getNumberOfFail()).isEqualTo(1);
-        verify(downloaderSelector, times(2)).of(eq(entry1._1().getUrl()));
+        verify(downloaderSelector, times(2)).of(eq(DownloadingItem.builder().item(entry1._1()).urls(List(entry1._1().getUrl())).build()));
         verifyPostLaunchDownload();
     }
 

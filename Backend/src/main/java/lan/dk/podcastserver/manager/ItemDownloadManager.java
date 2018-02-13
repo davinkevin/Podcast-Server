@@ -215,8 +215,7 @@ public class ItemDownloadManager {
     private void launchWithNewWorkerFrom(Item item) {
         DownloadingItem downloadingItem = this.extractorSelector.of(item.getUrl()).extract(item);
 
-        Downloader downloader = downloadingItem.url()
-                .orElse(() -> Option(downloadingItem.getItem().getUrl()))
+        Downloader downloader = Option(downloadingItem)
                 .map(downloaderSelector::of)
                 .map(d -> d.setDownloadingItem(downloadingItem).setItemDownloadManager(this))
                 .getOrElseThrow(() -> new RuntimeException("Error during selection of downloader"));

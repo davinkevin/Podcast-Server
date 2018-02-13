@@ -31,6 +31,6 @@ public interface Downloader extends Runnable {
     void finishDownload();
     void failDownload();
 
-    Integer compatibility(String url);
+    Integer compatibility(DownloadingItem downloadingItem);
 
 }
