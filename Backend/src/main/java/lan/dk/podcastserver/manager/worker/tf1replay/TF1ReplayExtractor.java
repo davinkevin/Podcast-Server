@@ -22,7 +22,10 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Function;
+
 import static io.vavr.API.*;
+import static lan.dk.podcastserver.service.UrlService.*;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
 
 /**
@@ -58,18 +61,23 @@ public class TF1ReplayExtractor implements Extractor {
         return htmlService.get(item.getUrl())
                 .map(d -> d.select("#zonePlayer").first())
                 .map(d -> d.attr("data-src"))
-                .map(src -> src.substring(src.length() - 8))
+                .map(UrlService::removeQueryParameters)
+                .map(TF1ReplayExtractor::extractId)
                 .map(this::normalizeId)
                 .map(this::getM3U8url)
                 .map(this::getHighestQualityUrl)
                 .map(v -> DownloadingItem.builder()
                         .item(item)
                         .urls(List(v))
-                        .userAgent(UrlService.USER_AGENT_MOBILE)
+                        .userAgent(USER_AGENT_MOBILE)
                         .filename(getFileName(item))
                         .build()
                 )
                 .getOrElseThrow(() -> new RuntimeException("Url not extracted for " + item.getUrl()));
+    }
+
+    private static String extractId(String src) {
+        return src.substring(src.length() - 8);
     }
 
     private String normalizeId(String id) {
@@ -79,11 +87,11 @@ public class TF1ReplayExtractor implements Extractor {
 
     private String getM3U8url(String id) {
         return Try(() -> urlService.get(String.format(WAT_WEB_HTML, id))
-                .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
+                .header(USER_AGENT, USER_AGENT_MOBILE)
                 .asString()
         )
                 .map(HttpResponse::getBody)
-                .map(jsonService::parse)
+                .map(json -> jsonService.parse(json))
                 .map(JsonService.to(TF1ReplayExtractor.TF1ReplayVideoUrl.class))
                 .map(TF1ReplayExtractor.TF1ReplayVideoUrl::getHls)
                 .map(this::removeBitrate)
@@ -115,7 +123,7 @@ public class TF1ReplayExtractor implements Extractor {
         String realUrl = urlService.getRealURL(url, c -> c.setRequestProperty("User-Agent", USER_AGENT_DESKTOP));
 
         return Try(() -> urlService.get(url)
-                .header(USER_AGENT, UrlService.USER_AGENT_MOBILE)
+                .header(USER_AGENT, USER_AGENT_MOBILE)
                 .asString())
                 .map(HttpResponse::getRawBody)
                 .flatMap(is -> m3U8Service.findBestQuality(is).toTry())

@@ -131,5 +131,9 @@ public class UrlService {
         return protocol + url;
     }
 
+    public static String removeQueryParameters(String url) {
+        return StringUtils.substringBeforeLast(url, "?");
+    }
+
 
 }

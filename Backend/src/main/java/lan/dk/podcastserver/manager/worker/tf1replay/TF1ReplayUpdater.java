@@ -128,7 +128,7 @@ public class TF1ReplayUpdater implements Updater {
     private Option<Elements> getElementsFrom(String url, @NotNull  String inCategory) {
         return CHANNEL_PROGRAM_EXTRACTOR.on(url).groups()
                 .map(l -> String.format(AJAX_URL_FORMAT, l.get(0), l.get(1), inCategory))
-                .flatMap(jsonService::parseUrl)
+                .flatMap(url1 -> jsonService.parseUrl(url1))
                 .map(JsonService.to(TF1ReplayResponse.class))
                 .map(TF1ReplayResponse::getHtml)
                 .map(htmlService::parse)
