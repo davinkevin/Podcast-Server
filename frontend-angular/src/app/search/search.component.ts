@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {debounceTime, map} from 'rxjs/operators';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
@@ -10,6 +10,7 @@ import {selectResults} from './search.reducer';
 import {Direction, Item, Page, SearchItemPageRequest, Sort, Status} from '../shared/entity';
 import {Search} from './search.actions';
 import {OpenSideNavAction} from '../app.actions';
+import {ComponentDestroyCompanion} from '../shared/component.utils';
 
 interface SearchItemRequestViewModel {
   q?: string;
@@ -30,7 +31,7 @@ export enum StatusesViewValue {
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
 
   doNotEmit = {emitEvent: false};
 
@@ -54,9 +55,14 @@ export class SearchComponent implements OnInit {
   form: FormGroup;
   items: Page<Item>;
 
+  companion: ComponentDestroyCompanion;
+
   constructor(private route: ActivatedRoute, private store: Store<any>, private formBuilder: FormBuilder) {}
 
   ngOnInit() {
+    this.companion = new ComponentDestroyCompanion();
+    const untilDestroy = () => this.companion.untilDestroy();
+
     this.form = this.formBuilder.group({
       q: [''],
       tags: [''],
@@ -70,19 +76,23 @@ export class SearchComponent implements OnInit {
     });
 
     this.form.valueChanges.pipe(
+      untilDestroy(),
       debounceTime(500),
       map(toSearchItemRequest)
     ).subscribe(v => this.search(v));
 
     this.store.select(selectResults)
+      .pipe(untilDestroy())
       .subscribe(s => this.items = s);
 
     this.route.data.pipe(
+      untilDestroy(),
       map(d => d.search)
     )
       .subscribe(s => this.items = s);
 
     this.route.data.pipe(
+      untilDestroy(),
       map(d => d.request)
     )
       .subscribe(r => {
@@ -110,6 +120,9 @@ export class SearchComponent implements OnInit {
     this.store.dispatch(new OpenSideNavAction());
   }
 
+  ngOnDestroy(): void {
+    this.companion.destroy();
+  }
 } /* istanbul ignore next */
 
 function toStatus(v: StatusesViewValue): Status[] {
