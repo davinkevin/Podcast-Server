@@ -28,6 +28,12 @@ mat-toolbar {
   mat-card {
     width: 215px;
     margin: 5px;
+
+    [mat-card-image] {
+      height: 263px;
+      object-fit: cover;
+    }
+
   }
 }
 
