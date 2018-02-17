@@ -11,11 +11,6 @@ mat-toolbar {
   align-items: center;
   justify-content: space-around;
   height: 7vh;
-
-  mat-select[name=property] {
-    width: 12vw;
-  }
-
 }
 
 .search__results {
