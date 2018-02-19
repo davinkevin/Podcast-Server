@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Podcast} from '../../shared/entity';
 import {Store} from '@ngrx/store';
 import {ActivatedRoute} from '@angular/router';
@@ -7,20 +7,27 @@ import {map} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {RefreshAction} from './podcast.actions';
 import {OpenSideNavAction} from '../../app.actions';
+import {ComponentDestroyCompanion} from '../../shared/component.utils';
 
 @Component({
   selector: 'ps-podcast',
   templateUrl: './podcast.component.html',
   styleUrls: ['./podcast.component.scss']
 })
-export class PodcastComponent implements OnInit {
+export class PodcastComponent implements OnInit, OnDestroy {
 
   podcast: Podcast;
+  private companion: ComponentDestroyCompanion;
 
   constructor(private store: Store<any>, private route: ActivatedRoute, private location: Location) {}
 
   ngOnInit() {
+
+    this.companion = new ComponentDestroyCompanion();
+    const untilDestroy = this.companion.untilDestroy();
+
     this.route.data.pipe(
+      untilDestroy(),
       map(toPodcast)
     ).subscribe(v => this.podcast = v);
   }
@@ -37,4 +44,8 @@ export class PodcastComponent implements OnInit {
     this.store.dispatch(new OpenSideNavAction());
   }
 
+
+  ngOnDestroy(): void {
+    this.companion.destroy();
+  }
 }

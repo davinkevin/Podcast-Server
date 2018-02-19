@@ -12,7 +12,7 @@ export class ComponentDestroyCompanion {
   }
 
   untilDestroy() {
-    return this.takeUntil;
+    return () => this.takeUntil;
   }
 
   destroy() {
