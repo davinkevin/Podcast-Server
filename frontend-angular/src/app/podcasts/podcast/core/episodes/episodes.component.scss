@@ -1,0 +1,26 @@
+.mat-list-item {
+
+  &.mat-list-item-avatar {
+    height: 100px;
+    padding-bottom: 8px;
+
+    .mat-list-avatar {
+      height: 100px;
+      width: 100px;
+      border-radius: 0;
+    }
+
+    h3.mat-line {
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 19.8px;
+      color: inherit;
+      font-size: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+  }
+
+}

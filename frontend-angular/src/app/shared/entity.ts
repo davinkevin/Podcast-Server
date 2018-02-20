@@ -72,11 +72,14 @@ export enum Status {
   FAILED = <any>'FAILED'
 }
 
-export interface SearchItemPageRequest {
-  q?: string;
+export interface Pageable {
   page?: number;
   size?: number;
+  sort?: Sort[];
+}
+
+export interface SearchItemPageRequest extends Pageable {
+  q?: string;
   status?: Status[];
   tags?: Tag[];
-  sort?: Sort[];
 }

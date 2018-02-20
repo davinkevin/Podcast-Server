@@ -2,12 +2,13 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Podcast} from '../../shared/entity';
 import {Store} from '@ngrx/store';
 import {ActivatedRoute} from '@angular/router';
-import {toPodcast} from './core/resolver/podcast.resolver';
+import {toPodcast} from './core/podcast.resolver';
 import {map} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {RefreshAction} from './podcast.actions';
 import {OpenSideNavAction} from '../../app.actions';
 import {ComponentDestroyCompanion} from '../../shared/component.utils';
+import {PodcastState} from './podcast.reducer';
 
 @Component({
   selector: 'ps-podcast',
@@ -19,7 +20,7 @@ export class PodcastComponent implements OnInit, OnDestroy {
   podcast: Podcast;
   private companion: ComponentDestroyCompanion;
 
-  constructor(private store: Store<any>, private route: ActivatedRoute, private location: Location) {}
+  constructor(private store: Store<PodcastState>, private route: ActivatedRoute, private location: Location) {}
 
   ngOnInit() {
 

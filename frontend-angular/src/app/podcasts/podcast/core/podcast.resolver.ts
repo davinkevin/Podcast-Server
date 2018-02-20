@@ -1,11 +1,11 @@
-import {Podcast} from '../../../../shared/entity';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {Store} from '@ngrx/store';
-import {FindOne} from '../../podcast.actions';
-import {selectPodcast} from '../../podcast.reducer';
+import {FindOne} from '../podcast.actions';
+import {selectPodcast} from '../podcast.reducer';
 import {Injectable} from '@angular/core';
 import {skip, take} from 'rxjs/operators';
+import {Podcast} from '../../../shared/entity';
 
 
 @Injectable()

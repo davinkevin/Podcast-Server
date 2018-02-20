@@ -32,10 +32,10 @@ describe('Service: Item', () => {
   it('should get all elements from backend', () => {
     /* Given */
     const expectedParams = new HttpParams()
-      .set('q', 'foo')
       .set('page', '3')
       .set('size', '15')
       .set('sort', 'donwloadDate,DESC')
+      .set('q', 'foo')
       .set('tags', 'tag')
       .set('status', 'STOPPED,FINISH')
     ;
@@ -69,10 +69,10 @@ describe('Service: Item', () => {
   it('should support query without status', () => {
     /* Given */
     const expectedParams = new HttpParams()
-      .set('q', '')
       .set('page', '0')
       .set('size', '12')
       .set('sort', 'pubDate,DESC')
+      .set('q', '')
       .set('tags', '')
     ;
 

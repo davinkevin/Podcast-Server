@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {Direction, Item, Page, SearchItemPageRequest} from '../../entity';
+import {Direction, Item, Page, Pageable, SearchItemPageRequest} from '../../entity';
 import {HttpClient, HttpParams} from '@angular/common/http';
 
 @Injectable()
@@ -9,20 +9,22 @@ export class ItemService {
   constructor(private http: HttpClient) {}
 
   search(searchPageRequest: SearchItemPageRequest): Observable<Page<Item>> {
-    const params = toParams(searchPageRequest);
+    const params = toSearchParams(searchPageRequest);
     return this.http.get<Page<Item>>('/api/items/search', { params });
   }
 
-} /* istanbul ignore next */
+  findByPodcastAndPage(id: string, page: Pageable): Observable<Page<Item>> {
+    const params = toParams(page);
+    return this.http.get<Page<Item>>(`/api/podcasts/${id}/items`, { params });
+  }
 
-export function toParams(request: SearchItemPageRequest): HttpParams {
+}
+
+function toSearchParams(request: SearchItemPageRequest): HttpParams {
   // downloaded=true&page=0&size=12&sort=pubDate,DESC&tags=
 
-  let params = new HttpParams()
+  let params = toParams(request)
     .set('q', request.q || '')
-    .set('page', String(request.page))
-    .set('size', String(request.size))
-    .set('sort', request.sort.map(s => `${s.property},${s.direction}`).join(','))
     .set('tags', request.tags.map(t => t.name).join(','));
 
   if (request.status && request.status.length > 0) {
@@ -31,6 +33,14 @@ export function toParams(request: SearchItemPageRequest): HttpParams {
 
   return params;
 }
+
+function toParams(page: Pageable) {
+  return new HttpParams()
+    .set('page', String(page.page))
+    .set('size', String(page.size))
+    .set('sort', page.sort.map(s => `${s.property},${s.direction}`).join(','));
+}
+
 
 export const defaultSearch: SearchItemPageRequest = {
   q: null,

@@ -4,9 +4,14 @@ import {Injectable} from '@angular/core';
 import {Actions, Effect} from '@ngrx/effects';
 import {Action} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
-import {Podcast} from '../../shared/entity';;
-import {FIND_ONE, FindOne, FindOneSuccess, REFRESH, RefreshAction, RefreshSuccessAction} from './podcast.actions';
+import {Item, Page, Podcast} from '../../shared/entity';;
+import {
+  FIND_ITEMS, FIND_ONE, FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction, FindOne,
+  FindOneSuccess, REFRESH, RefreshAction,
+  RefreshSuccessAction
+} from './podcast.actions';
 import {PodcastService} from '../shared/service/podcast/podcast.service';
+import {ItemService} from '../../shared/service/item/item.service';
 
 @Injectable()
 export class PodcastEffects {
@@ -19,12 +24,21 @@ export class PodcastEffects {
   );
 
   @Effect()
+  findItemByPodcastAndPage$: Observable<Action> = this.actions$.ofType(FIND_ITEMS).pipe(
+    switchMap(({id, page}: FindItemsByPodcastsAndPageAction) => this.itemService.findByPodcastAndPage(id, page)),
+    map((i: Page<Item>) => new FindItemsByPodcastsAndPageSuccessAction(i))
+  );
+
+  @Effect()
   refresh: Observable<Action> = this.actions$.ofType(REFRESH).pipe(
     map((a: RefreshAction) => a.payload),
     switchMap(p => this.podcastService.refresh(p)),
     map(_ => new RefreshSuccessAction())
   );
 
-  constructor(private actions$: Actions, private podcastService: PodcastService) {}
+  constructor(private actions$: Actions,
+              private podcastService: PodcastService,
+              private itemService: ItemService
+  ) {}
 
 } /* istanbul ignore next */

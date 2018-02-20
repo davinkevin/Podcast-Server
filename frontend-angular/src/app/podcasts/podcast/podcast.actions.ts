@@ -1,11 +1,13 @@
 
 import {Action} from '@ngrx/store';
-import {Podcast} from '../../shared/entity';
+import {Item, Page, Pageable, Podcast} from '../../shared/entity';
 
 export const FIND_ONE = '[Podcast] Find One';
 export const FIND_ONE_SUCCESS = '[Podcast] Find One Success';
 export const REFRESH = '[Podcast] Manually refresh podcast';
 export const REFRESH_SUCCESS = '[Podcast] Manually refresh podcast success';
+export const FIND_ITEMS = '[Podcast] Find Items for podcast';
+export const FIND_ITEMS_SUCCESS = '[Podcast] Find Items for podcast success';
 
 export class FindOne implements Action {
   readonly type = FIND_ONE;
@@ -26,9 +28,21 @@ export class RefreshSuccessAction implements Action {
   readonly type = REFRESH_SUCCESS;
 }
 
+export class FindItemsByPodcastsAndPageAction implements Action {
+  readonly type = FIND_ITEMS;
+  constructor(public id: string, public page: Pageable) {}
+}
+
+export class FindItemsByPodcastsAndPageSuccessAction implements Action {
+  readonly type = FIND_ITEMS_SUCCESS;
+  constructor(public items: Page<Item>) {}
+}
+
 export type All
   = FindOne
   | FindOneSuccess
   | RefreshAction
   | RefreshSuccessAction
+  | FindItemsByPodcastsAndPageAction
+  | FindItemsByPodcastsAndPageSuccessAction
   ;
