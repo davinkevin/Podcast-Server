@@ -55,12 +55,11 @@ export class SearchComponent implements OnInit, OnDestroy {
   form: FormGroup;
   items: Page<Item>;
 
-  companion: ComponentDestroyCompanion;
+  companion = new ComponentDestroyCompanion();
 
   constructor(private route: ActivatedRoute, private store: Store<any>, private formBuilder: FormBuilder) {}
 
   ngOnInit() {
-    this.companion = new ComponentDestroyCompanion();
     const untilDestroy = this.companion.untilDestroy();
 
     this.form = this.formBuilder.group({

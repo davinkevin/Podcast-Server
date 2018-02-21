@@ -18,13 +18,11 @@ import {PodcastState} from './podcast.reducer';
 export class PodcastComponent implements OnInit, OnDestroy {
 
   podcast: Podcast;
-  private companion: ComponentDestroyCompanion;
+  private companion = new ComponentDestroyCompanion();
 
   constructor(private store: Store<PodcastState>, private route: ActivatedRoute, private location: Location) {}
 
   ngOnInit() {
-
-    this.companion = new ComponentDestroyCompanion();
     const untilDestroy = this.companion.untilDestroy();
 
     this.route.data.pipe(

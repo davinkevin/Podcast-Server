@@ -15,12 +15,11 @@ import {toPodcastPageOfItems} from '../podcast-items.resolver';
 export class EpisodesComponent implements OnInit, OnDestroy {
 
   items: Page<Item>;
-  private companion: ComponentDestroyCompanion;
+  private companion = new ComponentDestroyCompanion();
 
   constructor(private store: Store<PodcastState>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.companion = new ComponentDestroyCompanion();
     const untilDestroy = this.companion.untilDestroy();
 
     this.route.data.pipe(
