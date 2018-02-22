@@ -6,12 +6,13 @@ import {selectPodcast} from '../podcast.reducer';
 import {Injectable} from '@angular/core';
 import {skip, take} from 'rxjs/operators';
 import {Podcast} from '../../../shared/entity';
+import {AppState} from '../../../app.reducer';
 
 
 @Injectable()
 export class PodcastResolver implements Resolve<Podcast> {
 
-  constructor(private store: Store<any>) {}
+  constructor(private store: Store<AppState>) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Podcast> {
     this.store.dispatch(new FindOne(route.params.id));

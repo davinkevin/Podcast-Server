@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {selectSideNavOpen} from './app.reducer';
+import {AppState, selectSideNavOpen} from './app.reducer';
 import {CloseSideNavAction, OpenSideNavAction} from './app.actions';
 
 @Component({
@@ -12,7 +12,7 @@ export class AppComponent implements OnInit{
 
   sideNavOpen = false;
 
-  constructor(private store: Store<any>) {}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.store.select(selectSideNavOpen)

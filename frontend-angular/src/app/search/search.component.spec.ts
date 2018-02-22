@@ -37,7 +37,7 @@ describe('SearchFeature', () => {
     let comp: SearchComponent;
     let fixture: ComponentFixture<SearchComponent>;
     let el: DebugElement;
-    let store: Store<fromSearch.State>;
+    let store: Store<fromSearch.SearchState>;
 
     const configureTestingModule = (s, request) => {
       return TestBed.configureTestingModule({

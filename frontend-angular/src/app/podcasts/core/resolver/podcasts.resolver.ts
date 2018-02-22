@@ -6,11 +6,12 @@ import { Podcast } from '../../../shared/entity';
 import {selectPodcasts} from '../../podcasts.reducer';
 import * as PodcastsActions from '../../podcasts.actions';
 import {skip, take} from 'rxjs/operators';
+import {AppState} from '../../../app.reducer';
 
 @Injectable()
 export class PodcastsResolver implements Resolve<Podcast[]> {
 
-  constructor(private store: Store<any>) {}
+  constructor(private store: Store<AppState>) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Podcast[]> {
     this.store.dispatch(new PodcastsActions.FindAll());

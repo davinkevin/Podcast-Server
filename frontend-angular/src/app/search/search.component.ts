@@ -11,6 +11,7 @@ import {Direction, Item, Page, SearchItemPageRequest, Sort, Status} from '../sha
 import {Search} from './search.actions';
 import {OpenSideNavAction} from '../app.actions';
 import {ComponentDestroyCompanion} from '../shared/component.utils';
+import {AppState} from '../app.reducer';
 
 interface SearchItemRequestViewModel {
   q?: string;
@@ -57,7 +58,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   companion = new ComponentDestroyCompanion();
 
-  constructor(private route: ActivatedRoute, private store: Store<any>, private formBuilder: FormBuilder) {}
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder) {}
 
   ngOnInit() {
     const untilDestroy = this.companion.untilDestroy();

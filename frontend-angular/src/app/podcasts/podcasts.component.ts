@@ -4,6 +4,7 @@ import {Podcast} from '../shared/entity';
 import {map} from 'rxjs/operators';
 import {OpenSideNavAction} from '../app.actions';
 import {Store} from '@ngrx/store';
+import {AppState} from '../app.reducer';
 
 @Component({
   selector: 'ps-podcasts',
@@ -14,7 +15,7 @@ export class PodcastsComponent implements OnInit {
 
   podcasts: Podcast[];
 
-  constructor(private store: Store<any>, private route: ActivatedRoute) {}
+  constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.route.data.pipe(

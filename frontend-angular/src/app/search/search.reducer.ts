@@ -2,12 +2,12 @@ import {Direction, Item, Page, SearchItemPageRequest} from '../shared/entity';
 import * as SearchActions from './search.actions';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 
-export interface State {
+export interface SearchState {
   request: SearchItemPageRequest;
   results: Page<Item>
 }
 
-const initialState: State = {
+const initialState: SearchState = {
   request: {
     page: 0, size: 12, status: [], tags: [],
     sort: [{property: 'pubDate', direction: Direction.DESC}]
@@ -21,7 +21,7 @@ const initialState: State = {
   }
 };
 
-export function reducer(state = initialState, action: SearchActions.All): State {
+export function reducer(state = initialState, action: SearchActions.All): SearchState {
   switch (action.type) {
 
     case SearchActions.SEARCH: {
@@ -37,6 +37,6 @@ export function reducer(state = initialState, action: SearchActions.All): State 
   }
 }
 
-const moduleSelector = createFeatureSelector<State>('search');
-export const selectResults = createSelector(moduleSelector, (s: State) => s.results);
-export const selectRequest = createSelector(moduleSelector, (s: State) => s.request);
+const moduleSelector = createFeatureSelector<SearchState>('search');
+export const selectResults = createSelector(moduleSelector, (s: SearchState) => s.results);
+export const selectRequest = createSelector(moduleSelector, (s: SearchState) => s.request);

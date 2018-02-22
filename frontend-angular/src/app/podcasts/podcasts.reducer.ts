@@ -3,15 +3,15 @@ import {Podcast} from '../shared/entity';
 import * as PodcastsActions from './podcasts.actions';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 
-export interface State {
+export interface PodcastsState {
   podcasts: Podcast[];
 }
 
-const initialState: State = {
+const initialState: PodcastsState = {
   podcasts: []
 };
 
-export function reducer(state = initialState, action: PodcastsActions.All): State {
+export function reducer(state = initialState, action: PodcastsActions.All): PodcastsState {
   switch (action.type) {
 
     case PodcastsActions.FIND_ALL: {
@@ -27,5 +27,5 @@ export function reducer(state = initialState, action: PodcastsActions.All): Stat
   }
 }
 
-const moduleSelector = createFeatureSelector<State>('podcasts');
-export const selectPodcasts = createSelector(moduleSelector, (s: State) => s.podcasts);
+const moduleSelector = createFeatureSelector<PodcastsState>('podcasts');
+export const selectPodcasts = createSelector(moduleSelector, (s: PodcastsState) => s.podcasts);

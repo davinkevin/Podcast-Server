@@ -19,6 +19,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs/observable/of';
 import {OpenSideNavAction} from '../app.actions';
 import Spy = jasmine.Spy;
+import {AppState} from '../app.reducer';
 
 describe('PodcastsFeature', () => {
 
@@ -125,7 +126,7 @@ describe('PodcastsFeature', () => {
     let comp: PodcastsComponent;
     let fixture: ComponentFixture<PodcastsComponent>;
     let el: DebugElement;
-    let store: Store<any>;
+    let store: Store<AppState>;
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({

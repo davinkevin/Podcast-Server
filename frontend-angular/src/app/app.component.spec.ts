@@ -8,7 +8,7 @@ import {By} from '@angular/platform-browser';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {StoreModule, Store} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
-import {sidenav} from './app.reducer';
+import {AppState, sidenav} from './app.reducer';
 import {CloseSideNavAction, OpenSideNavAction} from './app.actions';
 
 describe('AppComponent', () => {
@@ -16,7 +16,7 @@ describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let el: DebugElement;
-  let store: Store<any>;
+  let store: Store<AppState>;
 
 
   beforeEach(async(() => {
