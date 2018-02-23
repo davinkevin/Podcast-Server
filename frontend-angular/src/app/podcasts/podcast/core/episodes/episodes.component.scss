@@ -4,6 +4,10 @@
     height: 100px;
     padding-bottom: 8px;
 
+    img {
+      object-fit: cover;
+    }
+
     .mat-list-avatar {
       height: 100px;
       width: 100px;
