@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
-import {Podcast} from '../../../../shared/entity';
+import {Podcast} from '../../entity';
 
 @Injectable()
 export class PodcastService {

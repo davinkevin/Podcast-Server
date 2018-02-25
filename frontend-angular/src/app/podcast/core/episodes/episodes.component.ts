@@ -3,8 +3,8 @@ import {Store} from '@ngrx/store';
 import {PodcastState} from '../../podcast.reducer';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
-import {ComponentDestroyCompanion} from '../../../../shared/component.utils';
-import {Item, Page} from '../../../../shared/entity';
+import {ComponentDestroyCompanion} from '../../../shared/component.utils';
+import {Item, Page} from '../../../shared/entity';
 import {toPodcastPageOfItems} from '../podcast-items.resolver';
 
 @Component({

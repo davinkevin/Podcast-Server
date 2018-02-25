@@ -5,8 +5,8 @@ import {FindOne} from '../podcast.actions';
 import {selectPodcast} from '../podcast.reducer';
 import {Injectable} from '@angular/core';
 import {skip, take} from 'rxjs/operators';
-import {Podcast} from '../../../shared/entity';
-import {AppState} from '../../../app.reducer';
+import {Podcast} from '../../shared/entity';
+import {AppState} from '../../app.reducer';
 
 
 @Injectable()

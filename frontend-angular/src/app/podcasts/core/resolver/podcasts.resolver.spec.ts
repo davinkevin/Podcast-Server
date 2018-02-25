@@ -1,7 +1,6 @@
 import {TestBed, inject, async} from '@angular/core/testing';
 
 import { PodcastsResolver } from './podcasts.resolver';
-import {PodcastService} from '../../shared/service/podcast/podcast.service';
 import {ActivatedRouteSnapshot} from '@angular/router';
 import Spy = jasmine.Spy;
 import {Store, StoreModule} from '@ngrx/store';
@@ -9,6 +8,7 @@ import {FindAll, FindAllSuccess} from '../../podcasts.actions';
 import {reducer, selectPodcasts} from '../../podcasts.reducer';
 import {Podcast} from '../../../shared/entity';
 import {of} from 'rxjs/observable/of';
+import {PodcastService} from '../../../shared/service/podcast/podcast.service';
 
 describe('PodcastsResolver', () => {
 

@@ -2,7 +2,7 @@ import * as AppAction from './app.actions';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 import {SearchState} from './search/search.reducer';
 import {PodcastsState} from './podcasts/podcasts.reducer';
-import {PodcastState} from './podcasts/podcast/podcast.reducer';
+import {PodcastState} from './podcast/podcast.reducer';
 
 export interface AppState {
   search: SearchState;

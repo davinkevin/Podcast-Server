@@ -13,6 +13,7 @@ import {PodcastsModule} from './podcasts/podcasts.module';
 import {environment} from '../environments/environment';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {sidenav} from './app.reducer';
+import {PodcastModule} from './podcast/podcast.module';
 
 
 const routes: Routes = [
@@ -30,7 +31,7 @@ const devModules = environment.production
     /* std Modules */       BrowserModule, BrowserAnimationsModule,
     /* Materials Modules */ MatToolbarModule, MatIconModule, MatSidenavModule, MatListModule,
     /* Router Modules */    RouterModule.forRoot(routes),
-    /* Feature Modules */   SearchModule, PodcastsModule,
+    /* Feature Modules */   SearchModule, PodcastsModule, PodcastModule,
     /* @ngrx */
     StoreModule.forRoot({sidenav}),
     EffectsModule.forRoot([]),

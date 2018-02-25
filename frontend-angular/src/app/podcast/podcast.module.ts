@@ -6,10 +6,11 @@ import {PodcastResolver} from './core/podcast.resolver';
 import * as fromPodcast from './podcast.reducer';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
-import {PodcastEffects} from 'app/podcasts/podcast/podcast.effects';
+import {PodcastEffects} from './podcast.effects';
 import {MatButtonModule, MatIconModule, MatListModule, MatMenuModule, MatToolbarModule} from '@angular/material';
 import {PodcastItemsResolver} from './core/podcast-items.resolver';
 import {EpisodesComponent} from './core/episodes/episodes.component';
+import {SharedModule} from '../shared/shared.module';
 
 
 const routes: Routes = [
@@ -30,7 +31,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    CommonModule,
+    CommonModule, SharedModule,
 
     /* Material */
     MatIconModule, MatButtonModule, MatMenuModule, MatToolbarModule, MatListModule,

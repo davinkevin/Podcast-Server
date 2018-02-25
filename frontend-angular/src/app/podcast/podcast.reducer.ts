@@ -1,4 +1,4 @@
-import {Item, Page, Podcast} from '../../shared/entity';
+import {Item, Page, Podcast} from '../shared/entity';
 import * as PodcastActions from './podcast.actions';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 

@@ -4,14 +4,14 @@ import {Injectable} from '@angular/core';
 import {Actions, Effect} from '@ngrx/effects';
 import {Action} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
-import {Item, Page, Podcast} from '../../shared/entity';;
+import {Item, Page, Podcast} from '../shared/entity';
 import {
   FIND_ITEMS, FIND_ONE, FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction, FindOne,
   FindOneSuccess, REFRESH, RefreshAction,
   RefreshSuccessAction
 } from './podcast.actions';
 import {PodcastService} from '../shared/service/podcast/podcast.service';
-import {ItemService} from '../../shared/service/item/item.service';
+import {ItemService} from '../shared/service/item/item.service';
 
 @Injectable()
 export class PodcastEffects {

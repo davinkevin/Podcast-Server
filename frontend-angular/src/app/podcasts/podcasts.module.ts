@@ -9,8 +9,6 @@ import {EffectsModule} from '@ngrx/effects';
 import {PodcastsEffects} from './podcasts.effects';
 import {PodcastsResolver} from './core/resolver/podcasts.resolver';
 import {MatIconModule, MatToolbarModule} from '@angular/material';
-import {PodcastModule} from './podcast/podcast.module';
-import {PodcastService} from './shared/service/podcast/podcast.service';
 
 const routes: Routes = [
   {
@@ -29,14 +27,11 @@ const routes: Routes = [
     /* Routes */
     RouterModule.forChild(routes),
 
-    /* Features */
-    PodcastModule,
-
     /* NgRx */
     StoreModule.forFeature('podcasts', fromPodcasts.reducer),
     EffectsModule.forFeature([PodcastsEffects])
   ],
-  providers: [PodcastsResolver, PodcastService],
+  providers: [PodcastsResolver],
   declarations: [PodcastsComponent]
 })
 export class PodcastsModule { }

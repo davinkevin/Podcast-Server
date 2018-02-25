@@ -4,9 +4,9 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {selectPodcastItems} from '../podcast.reducer';
 import {skip, take} from 'rxjs/operators';
-import {Direction, Item, Page} from '../../../shared/entity';
+import {Direction, Item, Page} from '../../shared/entity';
 import {FindItemsByPodcastsAndPageAction} from '../podcast.actions';
-import {AppState} from '../../../app.reducer';
+import {AppState} from '../../app.reducer';
 
 @Injectable()
 export class PodcastItemsResolver implements Resolve<Page<Item>> {

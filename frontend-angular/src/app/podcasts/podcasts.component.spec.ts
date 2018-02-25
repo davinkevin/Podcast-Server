@@ -8,7 +8,6 @@ import {PodcastsEffects} from './podcasts.effects';
 import {provideMockActions} from '@ngrx/effects/testing';
 import {cold, hot} from 'jasmine-marbles';
 import {FindAll, FindAllSuccess} from 'app/podcasts/podcasts.actions';
-import {PodcastService} from './shared/service/podcast/podcast.service';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Action, Store, StoreModule} from '@ngrx/store';
 import {DebugElement} from '@angular/core';
@@ -20,6 +19,7 @@ import {of} from 'rxjs/observable/of';
 import {OpenSideNavAction} from '../app.actions';
 import Spy = jasmine.Spy;
 import {AppState} from '../app.reducer';
+import {PodcastService} from '../shared/service/podcast/podcast.service';
 
 describe('PodcastsFeature', () => {
 

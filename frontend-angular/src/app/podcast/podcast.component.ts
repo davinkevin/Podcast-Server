@@ -1,13 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Podcast} from '../../shared/entity';
+import {Podcast} from '../shared/entity';
 import {Store} from '@ngrx/store';
 import {ActivatedRoute} from '@angular/router';
 import {toPodcast} from './core/podcast.resolver';
 import {map} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {RefreshAction} from './podcast.actions';
-import {OpenSideNavAction} from '../../app.actions';
-import {ComponentDestroyCompanion} from '../../shared/component.utils';
+import {OpenSideNavAction} from '../app.actions';
+import {ComponentDestroyCompanion} from '../shared/component.utils';
 import {PodcastState} from './podcast.reducer';
 
 @Component({

@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start:local": "ng serve --proxy-config proxy.conf.json --aot --build-optimizer",
-    "start": "ng serve --proxy-config proxy-prod.conf.json --aot --build-optimizer",
+    "start": "ng serve --proxy-config proxy-prod.conf.json --aot --build-optimizer -sm=false",
     "build": "ng build --aot true",
     "test": "ng t -w false",
     "lint": "npm run clang-format && ng lint",

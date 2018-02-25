@@ -1,6 +1,6 @@
 
 import {Action} from '@ngrx/store';
-import {Item, Page, Pageable, Podcast} from '../../shared/entity';
+import {Item, Page, Pageable, Podcast} from '../shared/entity';
 
 export const FIND_ONE = '[Podcast] Find One';
 export const FIND_ONE_SUCCESS = '[Podcast] Find One Success';
