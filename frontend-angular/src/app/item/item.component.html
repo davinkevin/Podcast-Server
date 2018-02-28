@@ -1,0 +1,52 @@
+
+<mat-toolbar color="primary">
+  <div class="toolbar__left">
+    <mat-icon (click)="openSideNav()" class="toolbar__hamburger section-icon">dehaze</mat-icon>
+    <span class="toolbar__title">{{item.title}}</span>
+  </div>
+</mat-toolbar>
+
+<div [ngSwitch]="mediaType()">
+
+  <div *ngSwitchCase="'video'">
+    <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }" (click)="togglePlayer()" *ngIf="!showPlayer">
+    </div>
+    <div class="item__video" *ngIf="showPlayer" (click)="togglePlayer()">
+      <video controls style="width: 100%; height: 100%">
+        <source [src]="item.proxyURL" [type]="item.mimeType">
+      </video>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'audio'">
+    <div class="item__audio">
+      <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }">
+        <audio controls style="width: 100%; height: 100%">
+          <source [src]="item.proxyURL" [type]="item.mimeType">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'unknown'">
+    <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }"></div>
+  </div>
+</div>
+
+<p class="item__description">
+  {{item.description}}
+</p>
+
+<ul>
+  <li>Publication Date : {{ item.pubDate | date: 'medium'}}</li>
+  <li>Creation Date : {{ item.creationDate | date: 'medium'}}</li>
+  <li>Download Date : {{ item.downloadDate | date: 'medium'}}</li>
+  <li>Status : {{ item.status }}</li>
+</ul>
+
+<pre>
+  <code>
+    {{ item | json }}
+  </code>
+</pre>

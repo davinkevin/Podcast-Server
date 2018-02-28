@@ -29,6 +29,7 @@ import {provideMockActions} from '@ngrx/effects/testing';
 import {cold, hot} from 'jasmine-marbles';
 import Spy = jasmine.Spy;
 import {OpenSideNavAction} from '../app.actions';
+import {RouterTestingModule} from '@angular/router/testing';
 
 
 describe('SearchFeature', () => {
@@ -46,7 +47,7 @@ describe('SearchFeature', () => {
           { provide: ActivatedRoute, useValue: { data: of({search: s, request}) } }
         ],
         imports: [
-          ReactiveFormsModule,
+          ReactiveFormsModule, RouterTestingModule,
 
           NoopAnimationsModule,
           MatCardModule, MatButtonModule, MatIconModule, MatInputModule, MatSelectModule,

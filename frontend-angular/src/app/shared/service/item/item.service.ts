@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {Direction, Item, Page, Pageable, SearchItemPageRequest} from '../../entity';
+import {Direction, Item, Page, Pageable, SearchItemPageRequest, uuid} from '../../entity';
 import {HttpClient, HttpParams} from '@angular/common/http';
 
 @Injectable()
@@ -16,6 +16,10 @@ export class ItemService {
   findByPodcastAndPage(id: string, page: Pageable): Observable<Page<Item>> {
     const params = toParams(page);
     return this.http.get<Page<Item>>(`/api/podcasts/${id}/items`, { params });
+  }
+
+  findById(itemId: uuid, podcastId: uuid): Observable<Item> {
+    return this.http.get<Item>(`/api/podcasts/${podcastId}/items/${itemId}`);
   }
 
 }

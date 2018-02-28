@@ -2,29 +2,34 @@
  * Created by kevin on 16/10/2016.
  */
 
+export type uuid = string;
+
 /* Entity */
 export interface Cover {
-  id: string;
+  id: uuid;
   url: string;
   width: number;
   height: number;
 }
 
 export interface Item {
-  id: string;
+  id: uuid;
   cover: Cover;
+  description?: string;
+  pubDate?: string|Date;
+  downloadDate?: string|Date;
+  creationDate: string|Date;
   title: string;
   url: string;
   mimeType: string;
   status: Status | string;
-  creationDate: string;
   isDownloaded: boolean;
   proxyURL: string;
   podcastId: string;
 }
 
 export interface Podcast {
-  id: string;
+  id: uuid;
   title: string;
   type: string;
   lastUpdate: string;
@@ -32,7 +37,7 @@ export interface Podcast {
 }
 
 export interface Tag {
-  id: string;
+  id: uuid;
   name: string;
 }
 

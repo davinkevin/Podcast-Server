@@ -22,7 +22,7 @@ describe('EpisodesComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ EpisodesComponent ],
       imports: [
-        MatListModule,
+        MatListModule, RouterTestingModule,
 
         StoreModule.forRoot({}),
         StoreModule.forFeature('podcast', fromPodcast.reducer),
