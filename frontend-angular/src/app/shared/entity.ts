@@ -26,6 +26,9 @@ export interface Item {
   isDownloaded: boolean;
   proxyURL: string;
   podcastId: string;
+  length?: number;
+  fileName?: string;
+  progression?: number;
 }
 
 export interface Podcast {

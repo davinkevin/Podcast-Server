@@ -19,4 +19,4 @@ export class PodcastService {
   refresh(p: Podcast): Observable<void> {
     return this.http.get<void>(`/api/podcasts/${p.id}/update/force`);
   }
-} /* istanbul ignore next */
+}
