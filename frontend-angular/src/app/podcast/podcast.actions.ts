@@ -9,12 +9,12 @@ export const REFRESH_SUCCESS = '[Podcast] Manually refresh podcast success';
 export const FIND_ITEMS = '[Podcast] Find Items for podcast';
 export const FIND_ITEMS_SUCCESS = '[Podcast] Find Items for podcast success';
 
-export class FindOne implements Action {
+export class FindOneAction implements Action {
   readonly type = FIND_ONE;
   constructor(public payload: string) {}
 }
 
-export class FindOneSuccess implements Action {
+export class FindOneSuccessAction implements Action {
   readonly type = FIND_ONE_SUCCESS;
   constructor(public payload: Podcast) {}
 }
@@ -39,8 +39,8 @@ export class FindItemsByPodcastsAndPageSuccessAction implements Action {
 }
 
 export type All
-  = FindOne
-  | FindOneSuccess
+  = FindOneAction
+  | FindOneSuccessAction
   | RefreshAction
   | RefreshSuccessAction
   | FindItemsByPodcastsAndPageAction

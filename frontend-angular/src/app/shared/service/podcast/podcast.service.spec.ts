@@ -1,4 +1,4 @@
-import {inject, TestBed} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
 import {PodcastService} from './podcast.service';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';

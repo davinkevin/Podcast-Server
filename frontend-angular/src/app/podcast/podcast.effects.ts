@@ -6,8 +6,8 @@ import {Action} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
 import {Item, Page, Podcast} from '../shared/entity';
 import {
-  FIND_ITEMS, FIND_ONE, FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction, FindOne,
-  FindOneSuccess, REFRESH, RefreshAction,
+  FIND_ITEMS, FIND_ONE, FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction, FindOneAction,
+  FindOneSuccessAction, REFRESH, RefreshAction,
   RefreshSuccessAction
 } from './podcast.actions';
 import {PodcastService} from '../shared/service/podcast/podcast.service';
@@ -18,9 +18,9 @@ export class PodcastEffects {
 
   @Effect()
   findOne$: Observable<Action> = this.actions$.ofType(FIND_ONE).pipe(
-    map((v: FindOne) => v.payload),
+    map((v: FindOneAction) => v.payload),
     switchMap(id => this.podcastService.findOne(id)),
-    map((p: Podcast) => new FindOneSuccess(p))
+    map((p: Podcast) => new FindOneSuccessAction(p))
   );
 
   @Effect()

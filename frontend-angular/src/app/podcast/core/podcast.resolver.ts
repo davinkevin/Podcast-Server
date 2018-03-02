@@ -1,7 +1,7 @@
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {Store} from '@ngrx/store';
-import {FindOne} from '../podcast.actions';
+import {FindOneAction} from '../podcast.actions';
 import {selectPodcast} from '../podcast.reducer';
 import {Injectable} from '@angular/core';
 import {skip, take} from 'rxjs/operators';
@@ -15,7 +15,7 @@ export class PodcastResolver implements Resolve<Podcast> {
   constructor(private store: Store<AppState>) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Podcast> {
-    this.store.dispatch(new FindOne(route.params.id));
+    this.store.dispatch(new FindOneAction(route.params.id));
 
     return this.store.select(selectPodcast).pipe(
       skip(1),

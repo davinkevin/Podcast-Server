@@ -37,6 +37,11 @@ export interface Podcast {
   type: string;
   lastUpdate: string;
   cover: Cover;
+  creationDate?: Date | string;
+  description?: string;
+  hasToBeDeleted?: boolean;
+  tags?: Tag[];
+  url?: string;
 }
 
 export interface Tag {
