@@ -31,10 +31,6 @@ export class PodcastComponent implements OnInit, OnDestroy {
     ).subscribe(v => this.podcast = v);
   }
 
-  goBack() {
-    this.location.back();
-  }
-
   refresh() {
     this.store.dispatch(new RefreshAction(this.podcast));
   }
