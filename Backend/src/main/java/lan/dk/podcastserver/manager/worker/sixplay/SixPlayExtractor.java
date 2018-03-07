@@ -14,6 +14,8 @@ import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.UrlService;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 /**
  * Created by kevin on 26/12/2017
  */
+@Slf4j
 @Component
 @Scope(SCOPE_PROTOTYPE)
 @RequiredArgsConstructor
@@ -67,8 +70,8 @@ public class SixPlayExtractor implements Extractor {
         List<M6PlayAssets> assets = item.getAssets();
 
         return assets
-                .filter(i -> !i.getFull_physical_path().contains("drmnp."))
-                .find(i -> "sd3-ism".equalsIgnoreCase(i.getVideo_quality()))
+                .filter(i -> !i.getProtocol().equalsIgnoreCase("primetime"))
+                .find(i -> StringUtils.contains(i.getVideo_quality(), "sd3"))
                 .flatMap(this::transformSd3Url)
                 .orElse(() -> assets.find(i -> "usp_hls_h264".equalsIgnoreCase(i.getType())))
                 .orElse(() -> assets.find(i -> "hq".equalsIgnoreCase(i.getVideo_quality())))
@@ -77,15 +80,15 @@ public class SixPlayExtractor implements Extractor {
     }
 
     private Option<M6PlayAssets> transformSd3Url(M6PlayAssets asset) {
-        String modifiedUrl = asset.getFull_physical_path().replaceAll("/([^/]+)\\.ism/[^/]*\\.m3u8", "/$1.ism/$1.m3u8");
+        String realURL = urlService.getRealURL(asset.getFull_physical_path());
 
-        return Try(() -> urlService.get(modifiedUrl)
+        return Try(() -> urlService.get(realURL)
                 .header(UrlService.USER_AGENT_KEY, UrlService.USER_AGENT_MOBILE)
                 .asString())
                 .map(HttpResponse::getRawBody)
                 .flatMap(is -> m3U8Service.findBestQuality(is).toTry())
-                .map(url -> urlService.addDomainIfRelative(modifiedUrl, url))
-                .map(url -> new M6PlayAssets(asset.getVideo_quality(), url, asset.getType()))
+                .map(url -> urlService.addDomainIfRelative(realURL, url))
+                .map(url -> new M6PlayAssets(asset.getVideo_quality(), url, asset.getType(), asset.getProtocol()))
                 .toOption();
     }
 
@@ -110,5 +113,6 @@ public class SixPlayExtractor implements Extractor {
         @Setter @Getter private String video_quality;
         @Setter @Getter private String full_physical_path;
         @Setter @Getter private String type;
+        @Setter @Getter private String protocol;
     }
 }
