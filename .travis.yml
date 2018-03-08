@@ -33,7 +33,7 @@ script:
 after_success:
 - ./mvnw -f Backend/pom.xml coveralls:report
 - ./docker-build.sh
-- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
 - docker push davinkevin/podcast-server
 
 before_deploy:
