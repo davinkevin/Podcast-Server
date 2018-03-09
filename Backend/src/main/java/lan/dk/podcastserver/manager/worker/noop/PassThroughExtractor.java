@@ -22,7 +22,7 @@ public class PassThroughExtractor implements Extractor {
     public DownloadingItem extract(Item item) {
         return DownloadingItem.builder()
                 .item(item)
-                .urls(List())
+                .urls(List(item.getUrl()))
                 .build();
     }
 

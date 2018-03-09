@@ -33,7 +33,7 @@ public class PassThroughExtractorTest {
 
         /* THEN  */
         assertThat(extractedValue.getItem()).isEqualTo(item);
-        assertThat(extractedValue.getUrls()).isEqualTo(List());
+        assertThat(extractedValue.getUrls()).containsOnly(item.getUrl());
     }
 
     @Test
