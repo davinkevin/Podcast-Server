@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import com.mashape.unirest.http.HttpResponse;
+import io.vavr.API;
+import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
@@ -13,6 +15,7 @@ import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.UrlService;
+import lan.dk.podcastserver.utils.MatcherExtractor;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +23,11 @@ import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import static io.vavr.API.Try;
+import java.util.regex.Pattern;
+
+import static io.vavr.API.*;
+import static lan.dk.podcastserver.utils.MatcherExtractor.*;
+import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**
@@ -33,37 +40,46 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 public class SixPlayExtractor implements Extractor {
 
     private static final TypeRef<List<M6PlayItem>> TYPE_ITEMS = new TypeRef<List<M6PlayItem>>(){};
-    private static final String ITEMS_EXTRACTOR = "video.currentVideo.clips[*]";
+    private static final String ITEMS_EXTRACTOR = "clips[*]";
+    private static final String INFO_URL = "https://pc.middleware.6play.fr/6play/v2/platforms/m6group_web/services/6play/videos/%s_%s?with=clips&csa=5";
+    private static final PatternExtractor URL_EXTRACTOR = from(Pattern.compile("^.+6play\\.fr/.+-([a-z])_([0-9]*)"));
 
-    private final HtmlService htmlService;
     private final JsonService jsonService;
     private final M3U8Service m3U8Service;
     private final UrlService urlService;
 
     @Override
     public DownloadingItem extract(Item item) {
-        List<String> videos = htmlService.get(item.getUrl())
-                .map(d -> d.select("script"))
-                .map(this::extractUrl)
-                .getOrElse(List::empty);
 
-        return DownloadingItem.builder()
-                .item(item)
-                .urls(videos)
-                .filename(getFileName(item))
-                .build();
-    }
+        MatcherExtractor m = URL_EXTRACTOR.on(item.getUrl());
 
-    private List<String> extractUrl(Elements script) {
-        return extractJson(script)
+        List<String> urls = Option.sequence(List(m.group(1), m.group(2)))
+                .map(s -> Tuple(s.get(0), s.get(1)))
+                .map(t -> t.map1(SixPlayExtractor::expandType))
+                .map(SixPlayExtractor::toJsonUrl)
+                .flatMap(jsonService::parseUrl)
                 .map(JsonService.to(ITEMS_EXTRACTOR, TYPE_ITEMS))
                 .getOrElse(List::empty)
                 .flatMap(this::keepBestQuality)
                 .map(M6PlayAssets::getFull_physical_path);
+
+
+        return DownloadingItem.builder()
+                .item(item)
+                .urls(urls)
+                .filename(getFileName(item))
+                .build();
     }
 
-    private Option<DocumentContext> extractJson(Elements elements) {
-        return SixPlayUpdater.getRoot6Play(elements).map(jsonService::parse);
+    private static String expandType(String type) {
+        return Match(type).of(
+            Case($("p"), "playlist"),
+            Case($("c"), "clip")
+        );
+    }
+
+    private static String toJsonUrl(Tuple2<String, String> params) {
+        return String.format(INFO_URL, params._1(), params._2());
     }
 
     private Option<M6PlayAssets> keepBestQuality(M6PlayItem item) {

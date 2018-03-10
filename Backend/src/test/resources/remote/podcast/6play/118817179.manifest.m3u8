@@ -1,0 +1,9 @@
+#EXTM3U
+#EXT-X-FAXS-CM:URI="Scenes-de-menages_c11887179_Episodes-du-09-fe_sd1.mp4..drm"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio_group",LANGUAGE="français",NAME="VF",AUTOSELECT=YES,DEFAULT=YES,URI="Scenes-de-menages_c11887179_Episodes-du-09-fe_vf.mp4.m3u8"
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=300079,AUDIO="audio_group"
+Scenes-de-menages_c11887179_Episodes-du-09-fe_sd1.mp4.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=800103,AUDIO="audio_group"
+Scenes-de-menages_c11887179_Episodes-du-09-fe_sd2.mp4.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1500089,AUDIO="audio_group"
+Scenes-de-menages_c11887179_Episodes-du-09-fe_sd3.mp4.m3u8
