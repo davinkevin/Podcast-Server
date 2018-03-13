@@ -6,7 +6,7 @@
   </div>
 </mat-toolbar>
 
-<div [ngSwitch]="mediaType()">
+<div [ngSwitch]="mediaType">
 
   <div *ngSwitchCase="'video'">
     <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }" (click)="togglePlayer()" *ngIf="!showPlayer">

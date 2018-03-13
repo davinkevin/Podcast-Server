@@ -36,9 +36,13 @@ export class ItemComponent implements OnInit, OnDestroy {
     this.showPlayer = !this.showPlayer;
   }
 
-  mediaType() {
-    return this.item.mimeType.substr(0, this.item.mimeType.indexOf('/'));
+  get mediaType() {
+    console.log(this.item.mimeType);
+    if (this.item.mimeType == null) {
+      return 'unknown';
+    }
 
+    return this.item.mimeType.substr(0, this.item.mimeType.indexOf('/'))
   }
 
   openSideNav() {
