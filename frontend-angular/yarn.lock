@@ -33,7 +33,7 @@
   dependencies:
     tslib "^1.7.1"
 
-"@angular/cdk@^5.0.0-rc0":
+"@angular/cdk@^5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-5.2.0.tgz#4368f6749e915cdcc75d325ae33fdb3f85a88108"
   dependencies:
@@ -145,7 +145,7 @@
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-5.2.4.tgz#281631793671844ae8f6f9c0ec80b91d064db2d8"
 
-"@angular/material@^5.0.0-rc0":
+"@angular/material@^5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@angular/material/-/material-5.2.0.tgz#8599e3149d48487e3e92e941fa9dc55176e3a0cf"
   dependencies:
@@ -169,17 +169,17 @@
   dependencies:
     tslib "^1.7.1"
 
-"@ngrx/effects@^4.1.1":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-4.1.1.tgz#cb758b8527964b258ea41951f59aa144e3ef9fae"
+"@ngrx/effects@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-5.0.1.tgz#cf970a6b8e2f3d3647e795e7040e09a2e7d157ed"
 
-"@ngrx/store-devtools@^4.1.1":
+"@ngrx/store-devtools@4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@ngrx/store-devtools/-/store-devtools-4.1.1.tgz#20745c39c7560fdc05fa4f22638442a7ec7dd676"
 
-"@ngrx/store@^4.1.1":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-4.1.1.tgz#680e34df2775e8852754ed777ffac95bd81b7de0"
+"@ngrx/store@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-5.0.0.tgz#483a955ea99a63ee083675ce0596d505e5501747"
 
 "@ngtools/json-schema@1.1.0", "@ngtools/json-schema@^1.1.0":
   version "1.1.0"
