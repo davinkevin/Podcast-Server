@@ -1,5 +1,5 @@
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
-import {Store} from '@ngrx/store';
+import {select, Store} from '@ngrx/store';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {selectPodcastItems} from '../podcast.reducer';
@@ -16,7 +16,8 @@ export class PodcastItemsResolver implements Resolve<Page<Item>> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Page<Item>> {
     this.store.dispatch(new FindItemsByPodcastsAndPageAction(route.params.id, {page: 0, size: 10, sort: [{property: 'pubDate', direction: Direction.DESC}] }));
 
-    return this.store.select(selectPodcastItems).pipe(
+    return this.store.pipe(
+      select(selectPodcastItems),
       skip(1),
       take(1)
     );

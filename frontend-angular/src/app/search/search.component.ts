@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {debounceTime, map} from 'rxjs/operators';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
-import {Store} from '@ngrx/store';
+import {select, Store} from '@ngrx/store';
 import {PageEvent} from '@angular/material';
 
 import {defaultSearch} from '../shared/service/item/item.service';
@@ -81,8 +81,11 @@ export class SearchComponent implements OnInit, OnDestroy {
       map(toSearchItemRequest)
     ).subscribe(v => this.search(v));
 
-    this.store.select(selectResults)
-      .pipe(untilDestroy())
+    this.store
+      .pipe(
+        select(selectResults),
+        untilDestroy()
+      )
       .subscribe(s => this.items = s);
 
     this.route.data.pipe(

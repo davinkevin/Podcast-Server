@@ -30,13 +30,4 @@ describe('SearchQueryResolver', () => {
   it('should be created', inject([SearchQueryResolver], (service: SearchQueryResolver) => {
     expect(service).toBeTruthy();
   }));
-
-  it('should trigger search if initial response', async(() => {
-    /* Given */
-    /* When  */
-    resolver.resolve(null, null).subscribe(() => {});
-    /* Then */
-    expect(store.select).toHaveBeenCalledWith(selectRequest);
-  }));
-
 });

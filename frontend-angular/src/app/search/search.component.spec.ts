@@ -309,11 +309,7 @@ describe('SearchFeature', () => {
 
       it('should create', () => {
         expect(comp).toBeTruthy();
-      });
-
-      it('should register to store state for the result of research', () => {
-        expect(store.select).toHaveBeenCalledWith(selectResults);
-      });
+      });;
 
       it('should have resolver value attached after init', () => {
         /* Given */
@@ -370,20 +366,6 @@ describe('SearchFeature', () => {
         /* Then  */
         expect(store.dispatch).toHaveBeenCalled();
       }));
-
-      /*
-      xit('should generate a search when status form is changed', fakeAsync(() => {
-        /!* Given *!/
-        const status = el.query(By.css('mat-select[name="status"]'));
-
-        /!* When  *!/
-        status.triggerEventHandler('click', null);
-        tick(1000);
-
-        /!* Then  *!/
-        expect(store.dispatch).toHaveBeenCalled();
-      }));
-      */
 
       it('should map to FINISH status if DOWNLOADED is selected in the UI', fakeAsync(() => {
         /* Given */

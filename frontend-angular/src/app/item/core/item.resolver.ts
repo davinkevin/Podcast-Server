@@ -1,6 +1,6 @@
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {Store} from '@ngrx/store';
+import {select, Store} from '@ngrx/store';
 import {Injectable} from '@angular/core';
 import {skip, take} from 'rxjs/operators';
 import {Item} from '../../shared/entity';
@@ -17,7 +17,8 @@ export class ItemResolver implements Resolve<Item> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Item> {
     this.store.dispatch(new FindOneAction(route.params.id, route.params.podcastId));
 
-    return this.store.select(selectItem).pipe(
+    return this.store.pipe(
+      select(selectItem),
       skip(1),
       take(1)
     );

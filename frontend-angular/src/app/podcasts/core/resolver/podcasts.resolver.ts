@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Store} from '@ngrx/store';
+import {select, Store} from '@ngrx/store';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import { Podcast } from '../../../shared/entity';
@@ -16,8 +16,9 @@ export class PodcastsResolver implements Resolve<Podcast[]> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Podcast[]> {
     this.store.dispatch(new PodcastsActions.FindAll());
 
-    return this.store.select(selectPodcasts)
+    return this.store
       .pipe(
+        select(selectPodcasts),
         skip(1),
         take(1)
       );

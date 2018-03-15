@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {Store} from '@ngrx/store';
+import {select, Store} from '@ngrx/store';
 import {AppState, selectSideNavOpen} from './app.reducer';
-import {CloseSideNavAction, OpenSideNavAction} from './app.actions';
+import {CloseSideNavAction} from './app.actions';
 
 @Component({
   selector: 'ps-root',
@@ -15,8 +15,9 @@ export class AppComponent implements OnInit{
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.store.select(selectSideNavOpen)
-      .subscribe(v => this.sideNavOpen = v);
+    this.store.pipe(
+      select(selectSideNavOpen)
+    ).subscribe(v => this.sideNavOpen = v);
   }
 
   onOpenChange($event: boolean) {

@@ -26,7 +26,6 @@ describe('PodcastResolver', () => {
   beforeEach(() => {
     store = TestBed.get(Store);
     spyOn(store, 'dispatch').and.callThrough();
-    spyOn(store, 'select').and.callThrough();
   });
 
   it('should be created', inject([PodcastResolver], (service: PodcastResolver) => {
@@ -41,7 +40,6 @@ describe('PodcastResolver', () => {
     resolver.resolve(route, null).subscribe(() => {});
     /* Then  */
     expect(store.dispatch).toHaveBeenCalledWith(new FindOneAction(route.params.id));
-    expect(store.select).toHaveBeenCalledWith(selectPodcast);
   });
 
 

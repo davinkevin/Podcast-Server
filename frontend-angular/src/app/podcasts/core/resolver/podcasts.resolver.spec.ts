@@ -140,7 +140,6 @@ describe('PodcastsResolver', () => {
   beforeEach(() => {
     store = TestBed.get(Store);
     spyOn(store, 'dispatch').and.callThrough();
-    spyOn(store, 'select').and.callThrough();
   });
 
   it('should be created', inject([PodcastsResolver], (service: PodcastsResolver) => {
@@ -153,7 +152,6 @@ describe('PodcastsResolver', () => {
     resolver.resolve(route, null).subscribe(() => {});
     /* Then  */
     expect(store.dispatch).toHaveBeenCalledWith(new FindAll());
-    expect(store.select).toHaveBeenCalledWith(selectPodcasts);
   });
 
   it('should ignore the store state and get the new value from service', async(() => {

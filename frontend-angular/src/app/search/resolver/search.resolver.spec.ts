@@ -277,7 +277,6 @@ describe('SearchResolver', () => {
   beforeEach(() => {
     store = TestBed.get(Store);
     spyOn(store, 'dispatch').and.callThrough();
-    spyOn(store, 'select').and.callThrough();
   });
 
   it('should be able to inject service', inject([SearchResolver], (service: SearchResolver) => {
@@ -290,7 +289,6 @@ describe('SearchResolver', () => {
     resolver.resolve(route, null).subscribe(() => {});
     /* Then */
     expect(store.dispatch).toHaveBeenCalled();
-    expect(store.select).toHaveBeenCalledWith(selectResults);
   }));
 
   it('should return the results propagated by effects', () => {
