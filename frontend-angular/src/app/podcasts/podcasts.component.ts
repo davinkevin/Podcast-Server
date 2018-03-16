@@ -28,7 +28,7 @@ export class PodcastsComponent implements OnInit {
     this.store.dispatch(new OpenSideNavAction());
   }
 
-} /* istanbul ignore next */
+}
 
 function byDate(a: Podcast, b: Podcast) {
   return new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime();

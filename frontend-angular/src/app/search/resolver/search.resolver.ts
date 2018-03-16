@@ -24,4 +24,4 @@ export class SearchResolver implements Resolve<Page<Item>> {
         take(1)
       );
   }
-} /* istanbul ignore next */
+}

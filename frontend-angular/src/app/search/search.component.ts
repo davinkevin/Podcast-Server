@@ -126,7 +126,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.companion.destroy();
   }
-} /* istanbul ignore next */
+}
 
 function toStatus(v: StatusesViewValue): Status[] {
   switch (v) {

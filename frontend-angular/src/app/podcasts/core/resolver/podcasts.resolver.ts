@@ -23,4 +23,4 @@ export class PodcastsResolver implements Resolve<Podcast[]> {
         take(1)
       );
   }
-} /* istanbul ignore next */
+}

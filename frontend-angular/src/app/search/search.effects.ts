@@ -22,4 +22,4 @@ export class SearchEffects {
 
   constructor(private actions$: Actions, private itemService: ItemService) {}
 
-} /* istanbul ignore next */
+}

@@ -19,4 +19,4 @@ export class SearchQueryResolver implements Resolve<SearchItemPageRequest> {
     );
   }
 
-} /* istanbul ignore next */
+}

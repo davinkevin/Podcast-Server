@@ -21,4 +21,4 @@ export class PodcastsEffects {
     );
 
   constructor(private actions$: Actions, private podcastService: PodcastService) {}
-} /* istanbul ignore next */
+}
