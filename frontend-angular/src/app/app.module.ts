@@ -6,7 +6,7 @@ import {AppComponent} from './app.component';
 import {MatIconModule, MatListModule, MatSidenavModule, MatToolbarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SearchModule} from './search/search.module';
-import {RouterModule, Routes} from '@angular/router';
+import {RouterModule, RouterStateSnapshot, Routes} from '@angular/router';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastsModule} from './podcasts/podcasts.module';
@@ -15,6 +15,8 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {sidenav} from './app.reducer';
 import {PodcastModule} from './podcast/podcast.module';
 import {ItemModule} from './item/item.module';
+import {StoreRouterConnectingModule, routerReducer as router, RouterStateSerializer} from '@ngrx/router-store';
+import {AppEffects} from './app.effects';
 
 
 const routes: Routes = [
@@ -25,6 +27,21 @@ const devModules = environment.production
   ? []
   : [ StoreDevtoolsModule.instrument({maxAge: 25}) ];
 
+export class CustomSerializer implements RouterStateSerializer<RouterStateUrl> {
+  serialize(routerState: RouterStateSnapshot): RouterStateUrl {
+    let route = routerState.root;
+
+    while (route.firstChild) {
+      route = route.firstChild;
+    }
+
+    const { url, root: { queryParams } } = routerState;
+    const { params } = route;
+
+    return { url, params, queryParams };
+  }
+}
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -34,12 +51,15 @@ const devModules = environment.production
     /* Router Modules */    RouterModule.forRoot(routes),
     /* Feature Modules */   SearchModule, PodcastsModule, PodcastModule, ItemModule,
     /* @ngrx */
-    StoreModule.forRoot({sidenav}),
-    EffectsModule.forRoot([]),
+    StoreModule.forRoot({sidenav, router}),
+    EffectsModule.forRoot([AppEffects]),
+    StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
     /* Dev Modules */
     ...devModules
   ],
-  providers: [],
+  providers: [
+    { provide: RouterStateSerializer, useClass: CustomSerializer }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

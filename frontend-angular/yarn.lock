@@ -173,6 +173,10 @@
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-5.0.1.tgz#cf970a6b8e2f3d3647e795e7040e09a2e7d157ed"
 
+"@ngrx/router-store@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@ngrx/router-store/-/router-store-5.0.1.tgz#db872327bb958a2ebf296734c97de68672ec628a"
+
 "@ngrx/store-devtools@4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@ngrx/store-devtools/-/store-devtools-4.1.1.tgz#20745c39c7560fdc05fa4f22638442a7ec7dd676"
