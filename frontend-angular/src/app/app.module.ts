@@ -10,22 +10,17 @@ import {RouterModule, RouterStateSnapshot, Routes} from '@angular/router';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {PodcastsModule} from './podcasts/podcasts.module';
-import {environment} from '../environments/environment';
-import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import {devTools} from '../environments/environment';
 import {sidenav} from './app.reducer';
 import {PodcastModule} from './podcast/podcast.module';
 import {ItemModule} from './item/item.module';
-import {StoreRouterConnectingModule, routerReducer as router, RouterStateSerializer} from '@ngrx/router-store';
+import {RouterStateSerializer, StoreRouterConnectingModule, routerReducer as router} from '@ngrx/router-store';
 import {AppEffects} from './app.effects';
 
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full'}
 ];
-
-const devModules = environment.production
-  ? []
-  : [ StoreDevtoolsModule.instrument({maxAge: 25}) ];
 
 export class CustomSerializer implements RouterStateSerializer<RouterStateUrl> {
   serialize(routerState: RouterStateSnapshot): RouterStateUrl {
@@ -55,7 +50,7 @@ export class CustomSerializer implements RouterStateSerializer<RouterStateUrl> {
     EffectsModule.forRoot([AppEffects]),
     StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
     /* Dev Modules */
-    ...devModules
+    ...devTools
   ],
   providers: [
     { provide: RouterStateSerializer, useClass: CustomSerializer }
