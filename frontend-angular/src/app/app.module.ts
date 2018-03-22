@@ -17,7 +17,6 @@ import {ItemModule} from './item/item.module';
 import {RouterStateSerializer, StoreRouterConnectingModule, routerReducer as router} from '@ngrx/router-store';
 import {AppEffects} from './app.effects';
 
-
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full'}
 ];

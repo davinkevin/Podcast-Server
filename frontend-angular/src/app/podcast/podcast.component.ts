@@ -6,7 +6,7 @@ import {toPodcast} from './core/podcast.resolver';
 import {map} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {RefreshAction} from './podcast.actions';
-import {OpenSideNavAction} from '../app.actions';
+import {LocationBackAction, OpenSideNavAction} from '../app.actions';
 import {ComponentDestroyCompanion} from '../shared/component.utils';
 import {PodcastState} from './podcast.reducer';
 
@@ -37,6 +37,10 @@ export class PodcastComponent implements OnInit, OnDestroy {
 
   openSideNav() {
     this.store.dispatch(new OpenSideNavAction());
+  }
+
+  back() {
+    this.store.dispatch(new LocationBackAction());
   }
 
 
