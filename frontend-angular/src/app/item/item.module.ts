@@ -8,6 +8,7 @@ import {itemReducer} from './item.reducer';
 import {EffectsModule} from '@ngrx/effects';
 import {ItemEffects} from './item.effects';
 import {MatIconModule, MatToolbarModule} from '@angular/material';
+import {SharedModule} from '../shared/shared.module';
 
 const routes: Routes = [
   {
@@ -21,7 +22,8 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    MatToolbarModule, MatIconModule,
+    MatIconModule,
+    SharedModule,
 
     StoreModule.forFeature('item', itemReducer),
     EffectsModule.forFeature([ItemEffects])

@@ -1,0 +1,13 @@
+<mat-toolbar color="primary">
+
+  <div class="toolbar__left">
+    <mat-icon (click)="openSideNav()" class="toolbar__hamburger section-icon">dehaze</mat-icon>
+    <span class="toolbar__title">
+      <ng-content select=".title"></ng-content>
+    </span>
+  </div>
+
+  <div class="toolbar__right">
+    <ng-content select=".right"></ng-content>
+  </div>
+</mat-toolbar>

@@ -1,10 +1,7 @@
 
-<mat-toolbar color="primary">
-  <div class="toolbar__left">
-    <mat-icon (click)="openSideNav()" class="toolbar__hamburger section-icon">dehaze</mat-icon>
-    <span class="toolbar__title">{{item.title}}</span>
-  </div>
-</mat-toolbar>
+<ps-toolbar>
+  <span class="title">{{item.title}}</span>
+</ps-toolbar>
 
 <div [ngSwitch]="mediaType">
 

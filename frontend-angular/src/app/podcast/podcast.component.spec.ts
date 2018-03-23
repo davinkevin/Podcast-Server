@@ -11,6 +11,7 @@ import {of} from 'rxjs/observable/of';
 import {DebugElement} from '@angular/core';
 import {LocationBackAction} from '../app.actions';
 import {AppState} from '../app.reducer';
+import {ToolbarModule} from '../shared/toolbar/toolbar.module';
 
 describe('PodcastComponent', () => {
   let component: PodcastComponent;
@@ -23,6 +24,8 @@ describe('PodcastComponent', () => {
       declarations: [ PodcastComponent ],
       imports: [
         MatIconModule, MatButtonModule, MatMenuModule, MatToolbarModule,
+
+        ToolbarModule,
 
         StoreModule.forRoot({}),
         StoreModule.forFeature('podcast', fromPodcast.reducer),

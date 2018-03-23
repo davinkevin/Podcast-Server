@@ -1,4 +1,5 @@
 <mat-sidenav-container>
+
   <mat-sidenav mode="over" [opened]="sideNavOpen" (openedChange)="onOpenChange($event)">
     <mat-list>
       <mat-list-item routerLink="/search">
@@ -17,8 +18,9 @@
         <mat-icon class="section-icon">ondemand_video</mat-icon>
         <h4 mat-line>Player</h4>
       </mat-list-item>
-
     </mat-list>
   </mat-sidenav>
+
   <router-outlet></router-outlet>
+
 </mat-sidenav-container>

@@ -1,0 +1,24 @@
+mat-toolbar {
+  width: 100%;
+  display:flex;
+  justify-content:flex-end;
+
+  mat-icon {
+    font-size: 1.3rem;
+    width: inherit;
+    height: 1.4rem;
+    vertical-align: middle;
+  }
+
+  .toolbar__left {
+    margin-right:auto;
+    .toolbar__title {
+      margin-left: 1vw;
+    }
+  }
+
+  .toolbar__right {
+    align-self:end;
+    padding-top: 12px;
+  }
+}

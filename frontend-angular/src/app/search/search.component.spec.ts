@@ -30,6 +30,9 @@ import {cold, hot} from 'jasmine-marbles';
 import Spy = jasmine.Spy;
 import {OpenSideNavAction} from '../app.actions';
 import {RouterTestingModule} from '@angular/router/testing';
+import {ToolbarComponent} from '../shared/toolbar/toolbar.component';
+import {SharedModule} from '../shared/shared.module';
+import {ToolbarModule} from '../shared/toolbar/toolbar.module';
 
 
 describe('SearchFeature', () => {
@@ -52,6 +55,8 @@ describe('SearchFeature', () => {
           NoopAnimationsModule,
           MatCardModule, MatButtonModule, MatIconModule, MatInputModule, MatSelectModule,
           MatPaginatorModule, MatToolbarModule,
+
+          ToolbarModule,
 
           TruncateModule,
 

@@ -34,7 +34,7 @@ const routes: Routes = [
     CommonModule, SharedModule,
 
     /* Material */
-    MatIconModule, MatButtonModule, MatMenuModule, MatToolbarModule, MatListModule,
+    MatIconModule, MatButtonModule, MatMenuModule, MatListModule,
 
     /* Routes */
     RouterModule.forChild(routes),

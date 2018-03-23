@@ -1,28 +1,3 @@
-mat-toolbar {
-  width: 100%;
-  display:flex;
-  justify-content:flex-end;
-
-  .toolbar__left {
-    margin-right:auto;
-    mat-icon {
-      font-size: 1.3rem;
-      width: inherit;
-      height: 1.4rem;
-      vertical-align: middle;
-    }
-
-    .toolbar__title {
-      margin-left: 1vw;
-    }
-  }
-
-  .more {
-    align-self:end;
-    padding-top: 12px;
-  }
-}
-
 .item__cover, .item__video, .item__audio {
     display: block;
     width:100%;

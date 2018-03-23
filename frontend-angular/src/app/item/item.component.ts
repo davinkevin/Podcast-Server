@@ -45,10 +45,6 @@ export class ItemComponent implements OnInit, OnDestroy {
     return this.item.mimeType.substr(0, this.item.mimeType.indexOf('/'))
   }
 
-  openSideNav() {
-    this.store.dispatch(new OpenSideNavAction());
-  }
-
   ngOnDestroy(): void {
     this.companion.destroy();
   }

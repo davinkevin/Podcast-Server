@@ -41,7 +41,7 @@ export class CustomSerializer implements RouterStateSerializer<RouterStateUrl> {
   declarations: [AppComponent],
   imports: [
     /* std Modules */       BrowserModule, BrowserAnimationsModule,
-    /* Materials Modules */ MatToolbarModule, MatIconModule, MatSidenavModule, MatListModule,
+    /* Materials Modules */ MatIconModule, MatSidenavModule, MatListModule,
     /* Router Modules */    RouterModule.forRoot(routes),
     /* Feature Modules */   SearchModule, PodcastsModule, PodcastModule, ItemModule,
     /* @ngrx */

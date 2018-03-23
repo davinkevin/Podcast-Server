@@ -24,10 +24,6 @@ export class PodcastsComponent implements OnInit {
     ).subscribe(d => this.podcasts = d);
   }
 
-  openSideNav() {
-    this.store.dispatch(new OpenSideNavAction());
-  }
-
 }
 
 function byDate(a: Podcast, b: Podcast) {

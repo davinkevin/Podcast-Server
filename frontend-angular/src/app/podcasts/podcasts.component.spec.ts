@@ -20,6 +20,7 @@ import {OpenSideNavAction} from '../app.actions';
 import Spy = jasmine.Spy;
 import {AppState} from '../app.reducer';
 import {PodcastService} from '../shared/service/podcast/podcast.service';
+import {ToolbarModule} from '../shared/toolbar/toolbar.module';
 
 describe('PodcastsFeature', () => {
 
@@ -133,6 +134,7 @@ describe('PodcastsFeature', () => {
         imports: [
           MatToolbarModule, MatIconModule, RouterTestingModule,
 
+          ToolbarModule,
           /* NgRx */
           StoreModule.forRoot({}),
           StoreModule.forFeature('podcasts', fromPodcasts.reducer)

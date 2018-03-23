@@ -1,33 +1,31 @@
-<mat-toolbar color="primary">
-  <div class="toolbar__left">
-    <mat-icon (click)="openSideNav()" class="toolbar__hamburger section-icon">dehaze</mat-icon>
-    <span class="toolbar__title"> {{ podcast.title }}</span>
-  </div>
+<ps-toolbar>
+  <span class="title">{{ podcast.title }}</span>
 
-  <button mat-icon-button [matMenuTriggerFor]="menu" class="more">
-    <mat-icon>more_vert</mat-icon>
-  </button>
-  <mat-menu #menu="matMenu">
-    <a mat-menu-item [href]="'/api/podcasts/' + podcast.id + '/rss'" target="_blank">
-      <mat-icon>rss_feed</mat-icon>
-      <span>RSS Feed</span>
-    </a>
-    <button mat-menu-item (click)="refresh()">
-      <mat-icon>sync</mat-icon>
-      <span>Refresh</span>
-    </button>
+  <span class="right">
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="more">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <a mat-menu-item [href]="'/api/podcasts/' + podcast.id + '/rss'" target="_blank">
+          <mat-icon>rss_feed</mat-icon>
+          <span>RSS Feed</span>
+        </a>
+        <button mat-menu-item (click)="refresh()">
+          <mat-icon>sync</mat-icon>
+          <span>Refresh</span>
+        </button>
 
-    <button mat-menu-item>
-      <mat-icon>mode_edit</mat-icon>
-      <span>Edit</span>
-    </button>
-    <button mat-menu-item>
-      <mat-icon>timeline</mat-icon>
-      <span>Stats</span>
-    </button>
-
-  </mat-menu>
-</mat-toolbar>
+        <button mat-menu-item>
+          <mat-icon>mode_edit</mat-icon>
+          <span>Edit</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>timeline</mat-icon>
+          <span>Stats</span>
+        </button>
+      </mat-menu>
+  </span>
+</ps-toolbar>
 
 <div class="jumbotron" [ngStyle]="{'background-image': 'url(' + podcast.cover.url + ')' }">
   <div class="buttons">

@@ -35,10 +35,6 @@ export class PodcastComponent implements OnInit, OnDestroy {
     this.store.dispatch(new RefreshAction(this.podcast));
   }
 
-  openSideNav() {
-    this.store.dispatch(new OpenSideNavAction());
-  }
-
   back() {
     this.store.dispatch(new LocationBackAction());
   }
