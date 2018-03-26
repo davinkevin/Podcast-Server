@@ -37,7 +37,6 @@ export class ItemComponent implements OnInit, OnDestroy {
   }
 
   get mediaType() {
-    console.log(this.item.mimeType);
     if (this.item.mimeType == null) {
       return 'unknown';
     }
