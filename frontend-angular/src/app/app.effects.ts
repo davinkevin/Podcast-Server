@@ -14,11 +14,5 @@ export class AppEffects {
     map(() => new CloseSideNavAction())
   );
 
-  @Effect({dispatch: false})
-  locationBack = this.actions$.pipe(
-    ofType(LOCATION_BACK),
-    tap(() => this.location.back())
-  );
-
-  constructor(private actions$: Actions, private location: Location) {}
+  constructor(private actions$: Actions) {}
 }

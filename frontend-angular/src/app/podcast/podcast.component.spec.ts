@@ -9,9 +9,9 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {ActivatedRoute} from '@angular/router';
 import {of} from 'rxjs/observable/of';
 import {DebugElement} from '@angular/core';
-import {LocationBackAction} from '../app.actions';
 import {AppState} from '../app.reducer';
 import {ToolbarModule} from '../shared/toolbar/toolbar.module';
+import {LocationBackAction} from '@davinkevin/router-store-helper';
 
 describe('PodcastComponent', () => {
   let component: PodcastComponent;

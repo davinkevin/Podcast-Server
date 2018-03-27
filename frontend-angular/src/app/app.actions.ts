@@ -10,13 +10,7 @@ export class CloseSideNavAction implements Action {
   readonly type = CLOSE_SIDE_NAV;
 }
 
-export const LOCATION_BACK = '[LOCATION] back';
-export class LocationBackAction implements Action {
-  readonly type = LOCATION_BACK;
-}
-
 export type all
   = OpenSideNavAction
   | CloseSideNavAction
-  | LocationBackAction
   ;

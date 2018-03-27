@@ -6,9 +6,9 @@ import {toPodcast} from './core/podcast.resolver';
 import {map} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {RefreshAction} from './podcast.actions';
-import {LocationBackAction, OpenSideNavAction} from '../app.actions';
 import {ComponentDestroyCompanion} from '../shared/component.utils';
 import {PodcastState} from './podcast.reducer';
+import {LocationBackAction} from '@davinkevin/router-store-helper';
 
 @Component({
   selector: 'ps-podcast',
