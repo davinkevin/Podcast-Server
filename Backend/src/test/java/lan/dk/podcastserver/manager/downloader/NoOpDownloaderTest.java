@@ -22,7 +22,6 @@ public class NoOpDownloaderTest {
         noOpDownloader.restartDownload();
         noOpDownloader.stopDownload();
         noOpDownloader.finishDownload();
-        noOpDownloader.run();
 
         /* Then */
         assertThat(noOpDownloader.download()).isNull();
