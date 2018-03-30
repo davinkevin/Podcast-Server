@@ -1,29 +1,30 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-
-import {PodcastsComponent} from './podcasts.component';
-import {MatIconModule, MatToolbarModule} from '@angular/material';
-import {ActivatedRoute} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
-import {PodcastsEffects} from './podcasts.effects';
-import {provideMockActions} from '@ngrx/effects/testing';
-import {cold, hot} from 'jasmine-marbles';
-import {FindAll, FindAllSuccess} from 'app/podcasts/podcasts.actions';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {Action, Store, StoreModule} from '@ngrx/store';
 import {DebugElement} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MatIconModule, MatToolbarModule} from '@angular/material';
 import {By} from '@angular/platform-browser';
-import * as fromPodcasts from './podcasts.reducer';
-import {reducer} from './podcasts.reducer';
+import {ActivatedRoute} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
+import {provideMockActions} from '@ngrx/effects/testing';
+import {Action, Store, StoreModule} from '@ngrx/store';
+import {FindAll, FindAllSuccess} from 'app/podcasts/podcasts.actions';
+import {cold, hot} from 'jasmine-marbles';
+import {Observable} from 'rxjs/Observable';
 import {of} from 'rxjs/observable/of';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
+
 import {OpenSideNavAction} from '../app.actions';
-import Spy = jasmine.Spy;
 import {AppState} from '../app.reducer';
 import {PodcastService} from '../shared/service/podcast/podcast.service';
 import {ToolbarModule} from '../shared/toolbar/toolbar.module';
 
-describe('PodcastsFeature', () => {
+import {PodcastsComponent} from './podcasts.component';
+import {PodcastsEffects} from './podcasts.effects';
+import * as fromPodcasts from './podcasts.reducer';
+import {reducer} from './podcasts.reducer';
 
+import Spy = jasmine.Spy;
+
+describe('PodcastsFeature', () => {
   const podcasts = [
     {
       'id': '8ba490ac-8f9a-4e2d-8758-b65e783e783a',
@@ -130,21 +131,19 @@ describe('PodcastsFeature', () => {
     let store: Store<AppState>;
 
     beforeEach(async(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          MatToolbarModule, MatIconModule, RouterTestingModule,
+      TestBed
+          .configureTestingModule({
+            imports: [
+              MatToolbarModule, MatIconModule, RouterTestingModule,
 
-          ToolbarModule,
-          /* NgRx */
-          StoreModule.forRoot({}),
-          StoreModule.forFeature('podcasts', fromPodcasts.reducer)
-        ],
-        providers: [
-          { provide: ActivatedRoute, useValue: { data: of({ podcasts }) } }
-        ],
-        declarations: [ PodcastsComponent ]
-      })
-        .compileComponents();
+              ToolbarModule,
+              /* NgRx */
+              StoreModule.forRoot({}), StoreModule.forFeature('podcasts', fromPodcasts.reducer)
+            ],
+            providers: [{provide: ActivatedRoute, useValue: {data: of({podcasts})}}],
+            declarations: [PodcastsComponent]
+          })
+          .compileComponents();
     }));
 
     beforeEach(() => {
@@ -182,11 +181,9 @@ describe('PodcastsFeature', () => {
       /* Then  */
       expect(store.dispatch).toHaveBeenCalledWith(new OpenSideNavAction());
     });
-
   });
 
   describe('PodcastsEffects', () => {
-
     let effects: PodcastsEffects;
     let podcastService: PodcastService;
     let actions: Observable<Action>;
@@ -201,62 +198,61 @@ describe('PodcastsFeature', () => {
     });
 
     beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [
-          PodcastsEffects,
-          provideMockActions(() => actions),
-          { provide: PodcastService, useValue: podcastService }
-        ],
-      }).compileComponents();
+      TestBed
+          .configureTestingModule({
+            providers: [
+              PodcastsEffects, provideMockActions(() => actions),
+              {provide: PodcastService, useValue: podcastService}
+            ],
+          })
+          .compileComponents();
 
       effects = TestBed.get(PodcastsEffects);
     });
 
     it('should transform FindAll action to FindAllSuccess', () => {
       /* Given */
-      actions = hot('--a-', { a: new FindAll() });
+      actions = hot('--a-', {a: new FindAll()});
 
-      const expected = cold('--b', { b: new FindAllSuccess([]) });
+      const expected = cold('--b', {b: new FindAllSuccess([])});
 
       expect(effects.findAll$).toBeObservable(expected);
       expect(podcastService.findAll).toHaveBeenCalled();
     });
-
   });
 
   describe('PodcastsReducers', () => {
-
     const previousState = {podcasts: [], error: {message: 'foo'}};
 
     it('should have an initial state', () => {
-        /* Given */
-        const findAllAction = new FindAll();
+      /* Given */
+      const findAllAction = new FindAll();
 
-        /* When  */
-        const state = reducer(undefined, findAllAction);
+      /* When  */
+      const state = reducer(undefined, findAllAction);
 
-        /* Then  */
-        expect(state).toEqual({podcasts: []});
+      /* Then  */
+      expect(state).toEqual({podcasts: []});
     });
 
     it('should do nothing when findAllAction triggered', () => {
-        /* Given */
-        const findAllAction = new FindAll();
+      /* Given */
+      const findAllAction = new FindAll();
 
-        /* When  */
-        const state = reducer(previousState, findAllAction);
+      /* When  */
+      const state = reducer(previousState, findAllAction);
 
-        /* Then  */
-        expect(state).toEqual(previousState);
+      /* Then  */
+      expect(state).toEqual(previousState);
     });
 
     it('should change podcasts when findAllSuccess', () => {
-        /* Given */
-        const findAllSuccessAction = new FindAllSuccess(podcasts);
-        /* When  */
-        const state = reducer(previousState, findAllSuccessAction);
-        /* Then  */
-        expect(state.podcasts).toEqual(podcasts);
+      /* Given */
+      const findAllSuccessAction = new FindAllSuccess(podcasts);
+      /* When  */
+      const state = reducer(previousState, findAllSuccessAction);
+      /* Then  */
+      expect(state.podcasts).toEqual(podcasts);
     });
   });
 });

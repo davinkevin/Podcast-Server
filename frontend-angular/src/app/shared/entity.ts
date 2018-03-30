@@ -22,7 +22,7 @@ export interface Item {
   title: string;
   url: string;
   mimeType: string;
-  status: Status | string;
+  status: Status| string;
   isDownloaded: boolean;
   proxyURL: string;
   podcastId: string;
@@ -37,7 +37,7 @@ export interface Podcast {
   type: string;
   lastUpdate: string;
   cover: Cover;
-  creationDate?: Date | string;
+  creationDate?: Date| string;
   description?: string;
   hasToBeDeleted?: boolean;
   tags?: Tag[];
@@ -62,11 +62,10 @@ export interface Page<T> {
 }
 
 export interface Sort {
-  direction: Direction | string;
+  direction: Direction| string;
   property: string;
   ignoreCase?: boolean;
-  nullHandling?: string,
-  descending?: boolean;
+  nullHandling?: string, descending?: boolean;
   ascending?: boolean;
 }
 

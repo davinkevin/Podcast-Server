@@ -1,7 +1,8 @@
-import {NgModule} from '@angular/core';
-import {ItemService} from './service/item/item.service';
-import {HttpModule} from '@angular/http';
 import {HttpClientModule} from '@angular/common/http';
+import {NgModule} from '@angular/core';
+import {HttpModule} from '@angular/http';
+
+import {ItemService} from './service/item/item.service';
 import {PodcastService} from './service/podcast/podcast.service';
 import {ToolbarModule} from './toolbar/toolbar.module';
 
@@ -10,4 +11,4 @@ import {ToolbarModule} from './toolbar/toolbar.module';
   exports: [ToolbarModule],
   providers: [ItemService, PodcastService]
 })
-export class SharedModule { }
+export class SharedModule {}

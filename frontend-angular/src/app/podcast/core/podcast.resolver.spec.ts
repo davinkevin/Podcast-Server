@@ -2,7 +2,7 @@ import {PodcastResolver} from './podcast.resolver';
 import {ActivatedRouteSnapshot} from '@angular/router';
 import {Store, StoreModule} from '@ngrx/store';
 import {async, inject, TestBed} from '@angular/core/testing';
-import {reducer, selectPodcast} from '../podcast.reducer';
+import {reducer} from '../podcast.reducer';
 import {FindOneAction, FindOneSuccessAction} from '../podcast.actions';
 import {Podcast} from '../../shared/entity';
 

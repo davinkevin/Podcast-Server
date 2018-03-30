@@ -8,7 +8,7 @@ import {CloseSideNavAction} from './app.actions';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
 
   sideNavOpen = false;
 
@@ -21,7 +21,7 @@ export class AppComponent implements OnInit{
   }
 
   onOpenChange($event: boolean) {
-    if ($event === true){
+    if ($event === true) {
       return;
     }
 

@@ -1,12 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {Store} from '@ngrx/store';
+import {map} from 'rxjs/operators';
+
 import {AppState} from '../app.reducer';
 import {ComponentDestroyCompanion} from '../shared/component.utils';
-import {Store} from '@ngrx/store';
-import {ActivatedRoute} from '@angular/router';
-import {toItem} from './core/item.resolver';
 import {Item} from '../shared/entity';
-import {map} from 'rxjs/operators';
-import {OpenSideNavAction} from '../app.actions';
+
+import {toItem} from './core/item.resolver';
 
 @Component({
   selector: 'ps-item',
@@ -14,7 +15,6 @@ import {OpenSideNavAction} from '../app.actions';
   styleUrls: ['./item.component.scss']
 })
 export class ItemComponent implements OnInit, OnDestroy {
-
   item: Item;
   showPlayer = false;
 
@@ -25,11 +25,7 @@ export class ItemComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const untilDestroy = this.companion.untilDestroy();
 
-    this.route.data
-      .pipe(
-        untilDestroy(),
-        map(toItem)
-      ).subscribe(item => this.item = item)
+    this.route.data.pipe(untilDestroy(), map(toItem)).subscribe(item => this.item = item)
   }
 
   togglePlayer() {
@@ -47,5 +43,4 @@ export class ItemComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.companion.destroy();
   }
-
 }

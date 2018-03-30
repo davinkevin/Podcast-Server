@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {OpenSideNavAction} from '../../app.actions';
 import {AppState} from '../../app.reducer';
 import {Store} from '@ngrx/store';

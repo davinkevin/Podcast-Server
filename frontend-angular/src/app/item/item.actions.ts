@@ -14,7 +14,4 @@ export class FindOneSuccessAction implements Action {
   constructor(public item: Item) {}
 }
 
-export type All
-  = FindOneAction
-  | FindOneSuccessAction
-  ;
+export type All = FindOneAction|FindOneSuccessAction;

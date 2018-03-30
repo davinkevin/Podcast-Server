@@ -1,10 +1,9 @@
 ///<reference path="../../../../node_modules/@ngrx/store/src/store_module.d.ts"/>
-import {TestBed, inject, async} from '@angular/core/testing';
+import {inject, TestBed} from '@angular/core/testing';
 
-import { SearchQueryResolver } from './search-query.resolver';
+import {SearchQueryResolver} from './search-query.resolver';
 import {Store, StoreModule} from '@ngrx/store';
 import * as fromSearch from '../search.reducer';
-import {selectRequest} from '../search.reducer';
 
 describe('SearchQueryResolver', () => {
 

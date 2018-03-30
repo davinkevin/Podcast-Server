@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import {inject, TestBed} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
 import {defaultSearch, ItemService} from './item.service';
 import {Direction, Item, Page, Status} from 'app/shared/entity';

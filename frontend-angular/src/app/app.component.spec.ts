@@ -6,7 +6,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {StoreModule, Store} from '@ngrx/store';
+import {Store, StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {AppState, sidenav} from './app.reducer';
 import {CloseSideNavAction, OpenSideNavAction} from './app.actions';

@@ -1,4 +1,3 @@
-
 import {Action} from '@ngrx/store';
 import {Item, Page, Pageable, Podcast} from '../shared/entity';
 
@@ -24,9 +23,7 @@ export class RefreshAction implements Action {
   constructor(public payload: Podcast) {}
 }
 
-export class RefreshSuccessAction implements Action {
-  readonly type = REFRESH_SUCCESS;
-}
+export class RefreshSuccessAction implements Action { readonly type = REFRESH_SUCCESS; }
 
 export class FindItemsByPodcastsAndPageAction implements Action {
   readonly type = FIND_ITEMS;
@@ -38,11 +35,5 @@ export class FindItemsByPodcastsAndPageSuccessAction implements Action {
   constructor(public items: Page<Item>) {}
 }
 
-export type All
-  = FindOneAction
-  | FindOneSuccessAction
-  | RefreshAction
-  | RefreshSuccessAction
-  | FindItemsByPodcastsAndPageAction
-  | FindItemsByPodcastsAndPageSuccessAction
-  ;
+export type All = FindOneAction|FindOneSuccessAction|RefreshAction|RefreshSuccessAction|
+    FindItemsByPodcastsAndPageAction|FindItemsByPodcastsAndPageSuccessAction;

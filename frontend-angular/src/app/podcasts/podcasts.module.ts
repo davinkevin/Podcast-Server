@@ -1,21 +1,19 @@
-import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {PodcastsComponent} from './podcasts.component';
-import {RouterModule, Routes} from '@angular/router';
-import {SharedModule} from '../shared/shared.module';
-import {StoreModule} from '@ngrx/store';
-import * as fromPodcasts from './podcasts.reducer';
-import {EffectsModule} from '@ngrx/effects';
-import {PodcastsEffects} from './podcasts.effects';
-import {PodcastsResolver} from './core/resolver/podcasts.resolver';
+import {NgModule} from '@angular/core';
 import {MatIconModule, MatToolbarModule} from '@angular/material';
+import {RouterModule, Routes} from '@angular/router';
+import {EffectsModule} from '@ngrx/effects';
+import {StoreModule} from '@ngrx/store';
 
-const routes: Routes = [
-  {
-    path: 'podcasts', component: PodcastsComponent,
-    resolve: {podcasts: PodcastsResolver}
-  }
-];
+import {SharedModule} from '../shared/shared.module';
+
+import {PodcastsResolver} from './core/resolver/podcasts.resolver';
+import {PodcastsComponent} from './podcasts.component';
+import {PodcastsEffects} from './podcasts.effects';
+import * as fromPodcasts from './podcasts.reducer';
+
+const routes: Routes =
+    [{path: 'podcasts', component: PodcastsComponent, resolve: {podcasts: PodcastsResolver}}];
 
 @NgModule({
   imports: [
@@ -34,4 +32,4 @@ const routes: Routes = [
   providers: [PodcastsResolver],
   declarations: [PodcastsComponent]
 })
-export class PodcastsModule { }
+export class PodcastsModule {}

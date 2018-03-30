@@ -1,4 +1,3 @@
-
 import {Action} from '@ngrx/store';
 import {Podcast} from '../shared/entity';
 
@@ -16,7 +15,4 @@ export class FindAllSuccess implements Action {
   constructor(public payload: Podcast[]) {}
 }
 
-export type All
-  = FindAll
-  | FindAllSuccess
-  ;
+export type All = FindAll|FindAllSuccess;

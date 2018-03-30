@@ -1,6 +1,6 @@
+import {MonoTypeOperatorFunction} from 'rxjs/interfaces';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs/Subject';
-import {MonoTypeOperatorFunction} from 'rxjs/interfaces';
 
 export class ComponentDestroyCompanion {
   private observable: Subject<any>;
@@ -19,5 +19,4 @@ export class ComponentDestroyCompanion {
     this.observable.next();
     this.observable.complete();
   }
-
 }

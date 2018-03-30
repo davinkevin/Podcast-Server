@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { EpisodesComponent } from './episodes.component';
+import {EpisodesComponent} from './episodes.component';
 import {MatListModule} from '@angular/material';
 import * as fromPodcast from '../../podcast.reducer';
 import {RouterTestingModule} from '@angular/router/testing';

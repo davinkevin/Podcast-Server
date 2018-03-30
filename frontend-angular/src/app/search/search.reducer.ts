@@ -1,6 +1,8 @@
-import {Direction, Item, Page, SearchItemPageRequest} from '../shared/entity';
-import * as SearchActions from './search.actions';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
+
+import {Direction, Item, Page, SearchItemPageRequest} from '../shared/entity';
+
+import * as SearchActions from './search.actions';
 
 export interface SearchState {
   request: SearchItemPageRequest;
@@ -9,21 +11,27 @@ export interface SearchState {
 
 const initialState: SearchState = {
   request: {
-    page: 0, size: 12, status: [], tags: [],
+    page: 0,
+    size: 12,
+    status: [],
+    tags: [],
     sort: [{property: 'pubDate', direction: Direction.DESC}]
   },
   results: {
     content: [],
-    first: true, last: true,
-    totalPages: 0, totalElements: -1, numberOfElements: 0,
-    size: 0, number: 0,
+    first: true,
+    last: true,
+    totalPages: 0,
+    totalElements: -1,
+    numberOfElements: 0,
+    size: 0,
+    number: 0,
     sort: [{direction: Direction.DESC, property: 'pubDate'}]
   }
 };
 
 export function reducer(state = initialState, action: SearchActions.All): SearchState {
   switch (action.type) {
-
     case SearchActions.SEARCH: {
       return {...state, request: action.payload};
     }
@@ -33,7 +41,6 @@ export function reducer(state = initialState, action: SearchActions.All): Search
     }
 
     default: { return state; }
-
   }
 }
 

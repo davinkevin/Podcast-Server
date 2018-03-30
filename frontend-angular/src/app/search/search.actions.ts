@@ -1,7 +1,7 @@
-import { Action } from '@ngrx/store'
+import {Action} from '@ngrx/store'
 import {Item, Page, SearchItemPageRequest} from '../shared/entity';
 
-export const SEARCH =         '[Items] Search';
+export const SEARCH = '[Items] Search';
 export const SEARCH_SUCCESS = '[Items] Search Success';
 
 export class Search implements Action {
@@ -15,8 +15,4 @@ export class SearchSuccess implements Action {
   constructor(public payload: Page<Item>) {}
 }
 
-export type All
-  = Search
-  | SearchSuccess
-  ;
-
+export type All = Search|SearchSuccess;

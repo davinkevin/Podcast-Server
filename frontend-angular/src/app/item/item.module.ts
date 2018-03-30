@@ -1,34 +1,29 @@
-import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {ItemComponent} from './item.component';
+import {NgModule} from '@angular/core';
+import {MatIconModule} from '@angular/material';
 import {RouterModule, Routes} from '@angular/router';
-import {ItemResolver} from './core/item.resolver';
-import {StoreModule} from '@ngrx/store';
-import {itemReducer} from './item.reducer';
 import {EffectsModule} from '@ngrx/effects';
-import {ItemEffects} from './item.effects';
-import {MatIconModule, MatToolbarModule} from '@angular/material';
+import {StoreModule} from '@ngrx/store';
+
 import {SharedModule} from '../shared/shared.module';
 
+import {ItemResolver} from './core/item.resolver';
+import {ItemComponent} from './item.component';
+import {ItemEffects} from './item.effects';
+import {itemReducer} from './item.reducer';
+
 const routes: Routes = [
-  {
-    path: 'podcasts/:podcastId/items/:id', component: ItemComponent,
-    resolve: {item: ItemResolver}
-  }
+  {path: 'podcasts/:podcastId/items/:id', component: ItemComponent, resolve: {item: ItemResolver}}
 ];
 
 
 @NgModule({
   imports: [
-    CommonModule,
-    RouterModule.forChild(routes),
-    MatIconModule,
-    SharedModule,
+    CommonModule, RouterModule.forChild(routes), MatIconModule, SharedModule,
 
-    StoreModule.forFeature('item', itemReducer),
-    EffectsModule.forFeature([ItemEffects])
+    StoreModule.forFeature('item', itemReducer), EffectsModule.forFeature([ItemEffects])
   ],
   providers: [ItemResolver],
   declarations: [ItemComponent]
 })
-export class ItemModule { }
+export class ItemModule {}

@@ -1,5 +1,5 @@
 import {Store, StoreModule} from '@ngrx/store';
-import {reducer, selectPodcastItems} from '../podcast.reducer';
+import {reducer} from '../podcast.reducer';
 import {async, inject, TestBed} from '@angular/core/testing';
 import {PodcastItemsResolver, toPodcastPageOfItems} from './podcast-items.resolver';
 import {FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction} from '../podcast.actions';
