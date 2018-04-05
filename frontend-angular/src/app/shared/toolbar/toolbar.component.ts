@@ -1,23 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {OpenSideNavAction} from '../../app.actions';
-import {AppState} from '../../app.reducer';
-import {Store} from '@ngrx/store';
+import { Component, OnInit } from '@angular/core';
+import { OpenSideNavAction } from '../../app.actions';
+import { AppState } from '../../app.reducer';
+import { Store } from '@ngrx/store';
 
 @Component({
-  selector: 'ps-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss']
+	selector: 'ps-toolbar',
+	templateUrl: './toolbar.component.html',
+	styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
+	constructor(private store: Store<AppState>) {}
 
-  constructor(private store: Store<AppState>) { }
+	ngOnInit() {}
 
-  ngOnInit() {
-
-  }
-
-  openSideNav() {
-    this.store.dispatch(new OpenSideNavAction());
-  }
-
+	openSideNav() {
+		this.store.dispatch(new OpenSideNavAction());
+	}
 }

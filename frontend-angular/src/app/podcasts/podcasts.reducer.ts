@@ -1,27 +1,31 @@
-import {createFeatureSelector, createSelector} from '@ngrx/store';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
 
-import {Podcast} from '../shared/entity';
+import { Podcast } from '../shared/entity';
 
 import * as PodcastsActions from './podcasts.actions';
 
-export interface PodcastsState { podcasts: Podcast[]; }
+export interface PodcastsState {
+	podcasts: Podcast[];
+}
 
 const initialState: PodcastsState = {
-  podcasts: []
+	podcasts: []
 };
 
 export function reducer(state = initialState, action: PodcastsActions.All): PodcastsState {
-  switch (action.type) {
-    case PodcastsActions.FIND_ALL: {
-      return {...state};
-    }
+	switch (action.type) {
+		case PodcastsActions.FIND_ALL: {
+			return { ...state };
+		}
 
-    case PodcastsActions.FIND_ALL_SUCCESS: {
-      return {...state, podcasts: action.payload};
-    }
+		case PodcastsActions.FIND_ALL_SUCCESS: {
+			return { ...state, podcasts: action.payload };
+		}
 
-    default: { return state; }
-  }
+		default: {
+			return state;
+		}
+	}
 }
 
 const moduleSelector = createFeatureSelector<PodcastsState>('podcasts');
