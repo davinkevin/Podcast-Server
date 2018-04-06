@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>lan.dk.PodcastServer</groupId>
-  <artifactId>frontend</artifactId>
-  <version>2.0.0</version>
+  <artifactId>frontend-angular</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <properties>

@@ -65,7 +65,7 @@
       "font-awesome": "github:components/font-awesome@4.5.0",
       "highcharts": "github:highcharts/highcharts-dist@4.2.3",
       "highcharts-ng": "github:pablojim/highcharts-ng@^0.0.11",
-      "ionicons": "github:driftyco/ionicons@2.0.1",
+      "ionicons": "github:ionic-team/ionicons?access_token=d016ed03db6cebd33b8a722a35b9cc51cf3f0b0b@2.0.1",
       "ng-file-upload": "github:danialfarid/ng-file-upload@^9.1.1",
       "ng-tags-input": "github:mbenford/ngTagsInput@^3.0.0",
       "ngstorage": "github:gsklee/ngStorage@^0.3.9",

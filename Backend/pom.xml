@@ -106,7 +106,12 @@
         <!-- Front-end -->
         <dependency>
             <groupId>lan.dk.PodcastServer</groupId>
-            <artifactId>frontend</artifactId>
+            <artifactId>frontend-angularjs</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>lan.dk.PodcastServer</groupId>
+            <artifactId>frontend-angular</artifactId>
             <version>1.0.0</version>
         </dependency>
         <!-- Utilities -->
