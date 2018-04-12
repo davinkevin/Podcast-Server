@@ -5,12 +5,12 @@ import { LocationBackAction } from '@davinkevin/router-store-helper';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
-import { ComponentDestroyCompanion } from '../shared/component.utils';
 import { Podcast } from '../shared/entity';
 
 import { toPodcast } from './core/podcast.resolver';
 import { RefreshAction } from './podcast.actions';
 import { PodcastState } from './podcast.reducer';
+import { CompanionComponent } from '@davinkevin/companion-component';
 
 @Component({
 	selector: 'ps-podcast',
@@ -19,7 +19,7 @@ import { PodcastState } from './podcast.reducer';
 })
 export class PodcastComponent implements OnInit, OnDestroy {
 	podcast: Podcast;
-	private companion = new ComponentDestroyCompanion();
+	private companion = new CompanionComponent();
 
 	constructor(private store: Store<PodcastState>, private route: ActivatedRoute, private location: Location) {}
 

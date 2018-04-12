@@ -7,12 +7,12 @@ import { debounceTime, map } from 'rxjs/operators';
 
 import { OpenSideNavAction } from '../app.actions';
 import { AppState } from '../app.reducer';
-import { ComponentDestroyCompanion } from '../shared/component.utils';
 import { Direction, Item, Page, SearchItemPageRequest, Sort, Status } from '../shared/entity';
 import { defaultSearch } from '../shared/service/item/item.service';
 
 import { Search } from './search.actions';
 import { selectResults } from './search.reducer';
+import { CompanionComponent } from '@davinkevin/companion-component';
 
 interface SearchItemRequestViewModel {
 	q?: string;
@@ -54,7 +54,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 	form: FormGroup;
 	items: Page<Item>;
 
-	companion = new ComponentDestroyCompanion();
+	companion = new CompanionComponent();
 
 	constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder) {}
 

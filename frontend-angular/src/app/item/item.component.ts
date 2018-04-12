@@ -4,10 +4,10 @@ import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
 import { AppState } from '../app.reducer';
-import { ComponentDestroyCompanion } from '../shared/component.utils';
 import { Item } from '../shared/entity';
 
 import { toItem } from './core/item.resolver';
+import { CompanionComponent } from '@davinkevin/companion-component';
 
 @Component({
 	selector: 'ps-item',
@@ -18,7 +18,7 @@ export class ItemComponent implements OnInit, OnDestroy {
 	item: Item;
 	showPlayer = false;
 
-	companion = new ComponentDestroyCompanion();
+  private companion = new CompanionComponent();
 
 	constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
 

@@ -169,6 +169,10 @@
   dependencies:
     tslib "^1.7.1"
 
+"@davinkevin/companion-component@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@davinkevin/companion-component/-/companion-component-0.2.0.tgz#a8deef96e03c67f43fe120230eee78fdf5d53bc9"
+
 "@davinkevin/router-store-helper@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@davinkevin/router-store-helper/-/router-store-helper-0.2.0.tgz#3ab89623079f643eead7436dabf4cd122eb1e0fa"

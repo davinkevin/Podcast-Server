@@ -25,6 +25,7 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "@davinkevin/companion-component": "^0.2.0",
     "@davinkevin/router-store-helper": "^0.2.0",
     "@ngrx/effects": "^5.0.1",
     "@ngrx/router-store": "^5.0.1",

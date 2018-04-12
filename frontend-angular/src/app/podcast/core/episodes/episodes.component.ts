@@ -3,9 +3,9 @@ import { Store } from '@ngrx/store';
 import { PodcastState } from '../../podcast.reducer';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { ComponentDestroyCompanion } from '../../../shared/component.utils';
 import { Item, Page } from '../../../shared/entity';
 import { toPodcastPageOfItems } from '../podcast-items.resolver';
+import { CompanionComponent } from '@davinkevin/companion-component';
 
 @Component({
 	selector: 'ps-episodes',
@@ -14,7 +14,7 @@ import { toPodcastPageOfItems } from '../podcast-items.resolver';
 })
 export class EpisodesComponent implements OnInit, OnDestroy {
 	items: Page<Item>;
-	private companion = new ComponentDestroyCompanion();
+	private companion = new CompanionComponent();
 
 	constructor(private store: Store<PodcastState>, private route: ActivatedRoute) {}
 
