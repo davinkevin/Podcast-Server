@@ -29,8 +29,8 @@
         <version>1.6</version>
         <configuration>
           <installDirectory>target</installDirectory>
-          <nodeVersion>v8.9.0</nodeVersion>
-          <yarnVersion>v1.2.1</yarnVersion>
+          <nodeVersion>v9.6.1</nodeVersion>
+          <yarnVersion>v1.3.2</yarnVersion>
         </configuration>
 
         <executions>
