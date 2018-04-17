@@ -7,13 +7,13 @@ import { map, switchMap } from 'rxjs/operators';
 import { Item } from '../shared/entity';
 import { ItemService } from '../shared/service/item/item.service';
 
-import { FIND_ONE, FindOneAction, FindOneSuccessAction } from './item.actions';
+import { ItemAction, FindOneAction, FindOneSuccessAction } from './item.actions';
 
 @Injectable()
 export class ItemEffects {
 	@Effect()
 	findOne$: Observable<Action> = this.actions$.pipe(
-		ofType(FIND_ONE),
+		ofType(ItemAction.FIND_ONE),
 		switchMap((a: FindOneAction) => this.itemService.findById(a.itemId, a.podcastId)),
 		map((i: Item) => new FindOneSuccessAction(i))
 	);

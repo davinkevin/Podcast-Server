@@ -18,7 +18,7 @@ export class ItemComponent implements OnInit, OnDestroy {
 	item: Item;
 	showPlayer = false;
 
-  private companion = new CompanionComponent();
+	private companion = new CompanionComponent();
 
 	constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
 

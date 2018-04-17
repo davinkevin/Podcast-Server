@@ -26,8 +26,7 @@ import { Direction, Item, Page, Status } from '../shared/entity';
 import { ItemService } from '../shared/service/item/item.service';
 import { ToolbarModule } from '../shared/toolbar/toolbar.module';
 
-import * as SearchActions from './search.actions';
-import { Search, SearchSuccess } from './search.actions';
+import { SearchActions, Search, SearchSuccess } from './search.actions';
 import { SearchComponent, StatusesViewValue } from './search.component';
 import { SearchEffects } from './search.effects';
 import * as fromSearch from './search.reducer';
@@ -543,7 +542,7 @@ describe('SearchFeature', () => {
 				const fakeAction = {};
 
 				/* When  */
-				const state = fromSearch.reducer(undefined, fakeAction as SearchActions.All);
+				const state = fromSearch.reducer(undefined, fakeAction as SearchActions);
 
 				/* Then  */
 				expect(state.request).toEqual({
@@ -591,7 +590,7 @@ describe('SearchFeature', () => {
 				};
 
 				/* When  */
-				const state = fromSearch.reducer(modifiedState, fakeAction as SearchActions.All);
+				const state = fromSearch.reducer(modifiedState, fakeAction as SearchActions);
 
 				/* Then  */
 				expect(state).toEqual(modifiedState);
@@ -610,7 +609,7 @@ describe('SearchFeature', () => {
 				};
 
 				/* When  */
-				const state = fromSearch.reducer(undefined, new SearchActions.Search(request));
+				const state = fromSearch.reducer(undefined, new Search(request));
 
 				/* Then  */
 				expect(state.request).toBe(request);
@@ -630,7 +629,7 @@ describe('SearchFeature', () => {
 				};
 
 				/* When  */
-				const state = fromSearch.reducer(undefined, new SearchActions.SearchSuccess(searchSuccess));
+				const state = fromSearch.reducer(undefined, new SearchSuccess(searchSuccess));
 
 				/* Then  */
 				expect(state.results).toBe(searchSuccess);

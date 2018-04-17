@@ -7,15 +7,15 @@ import { map, switchMap } from 'rxjs/operators';
 import { Podcast } from '../shared/entity';
 import { PodcastService } from '../shared/service/podcast/podcast.service';
 
-import * as PodcastsActions from './podcasts.actions';
+import { FindAllSuccess, PodcastsAction } from './podcasts.actions';
 
 @Injectable()
 export class PodcastsEffects {
 	@Effect()
 	findAll$: Observable<Action> = this.actions$.pipe(
-		ofType(PodcastsActions.FIND_ALL),
+		ofType(PodcastsAction.FIND_ALL),
 		switchMap(() => this.podcastService.findAll()),
-		map((results: Podcast[]) => new PodcastsActions.FindAllSuccess(results))
+		map((results: Podcast[]) => new FindAllSuccess(results))
 	);
 
 	constructor(private actions$: Actions, private podcastService: PodcastService) {}

@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 import { Item } from '../shared/entity';
 
-import * as ItemActions from './item.actions';
+import { ItemActions, ItemAction } from './item.actions';
 
 export interface ItemState {
 	item: Item;
@@ -12,9 +12,9 @@ const initialState: ItemState = {
 	item: null
 };
 
-export function itemReducer(state = initialState, action: ItemActions.All): ItemState {
+export function itemReducer(state = initialState, action: ItemActions): ItemState {
 	switch (action.type) {
-		case ItemActions.FIND_ONE_SUCCESS: {
+		case ItemAction.FIND_ONE_SUCCESS: {
 			return { ...state, item: action.item };
 		}
 

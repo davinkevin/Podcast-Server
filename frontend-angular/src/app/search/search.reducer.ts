@@ -1,8 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-
 import { Direction, Item, Page, SearchItemPageRequest } from '../shared/entity';
-
-import * as SearchActions from './search.actions';
+import { SearchAction, SearchActions } from './search.actions';
 
 export interface SearchState {
 	request: SearchItemPageRequest;
@@ -30,13 +28,13 @@ const initialState: SearchState = {
 	}
 };
 
-export function reducer(state = initialState, action: SearchActions.All): SearchState {
+export function reducer(state = initialState, action: SearchActions): SearchState {
 	switch (action.type) {
-		case SearchActions.SEARCH: {
+		case SearchAction.SEARCH: {
 			return { ...state, request: action.payload };
 		}
 
-		case SearchActions.SEARCH_SUCCESS: {
+		case SearchAction.SEARCH_SUCCESS: {
 			return { ...state, results: action.payload };
 		}
 

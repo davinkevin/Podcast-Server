@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 import { Item, Page, Podcast } from '../shared/entity';
 
-import * as PodcastActions from './podcast.actions';
+import { PodcastActions, PodcastAction } from './podcast.actions';
 
 export interface PodcastState {
 	podcast: Podcast;
@@ -14,13 +14,13 @@ const initialState: PodcastState = {
 	items: null
 };
 
-export function reducer(state = initialState, action: PodcastActions.All): PodcastState {
+export function reducer(state = initialState, action: PodcastActions): PodcastState {
 	switch (action.type) {
-		case PodcastActions.FIND_ONE_SUCCESS: {
+		case PodcastAction.FIND_ONE_SUCCESS: {
 			return { ...state, podcast: action.payload };
 		}
 
-		case PodcastActions.FIND_ITEMS_SUCCESS: {
+		case PodcastAction.FIND_ITEMS_SUCCESS: {
 			return { ...state, items: action.items };
 		}
 

@@ -9,13 +9,11 @@ import { ItemService } from '../shared/service/item/item.service';
 import { PodcastService } from '../shared/service/podcast/podcast.service';
 
 import {
-	FIND_ITEMS,
-	FIND_ONE,
+	PodcastAction,
 	FindItemsByPodcastsAndPageAction,
 	FindItemsByPodcastsAndPageSuccessAction,
 	FindOneAction,
 	FindOneSuccessAction,
-	REFRESH,
 	RefreshAction,
 	RefreshSuccessAction
 } from './podcast.actions';
@@ -24,7 +22,7 @@ import {
 export class PodcastEffects {
 	@Effect()
 	findOne$: Observable<Action> = this.actions$.pipe(
-		ofType(FIND_ONE),
+		ofType(PodcastAction.FIND_ONE),
 		map((v: FindOneAction) => v.payload),
 		switchMap(id => this.podcastService.findOne(id)),
 		map((p: Podcast) => new FindOneSuccessAction(p))
@@ -32,14 +30,14 @@ export class PodcastEffects {
 
 	@Effect()
 	findItemByPodcastAndPage$: Observable<Action> = this.actions$.pipe(
-		ofType(FIND_ITEMS),
+		ofType(PodcastAction.FIND_ITEMS),
 		switchMap(({ id, page }: FindItemsByPodcastsAndPageAction) => this.itemService.findByPodcastAndPage(id, page)),
 		map((i: Page<Item>) => new FindItemsByPodcastsAndPageSuccessAction(i))
 	);
 
 	@Effect()
 	refresh: Observable<Action> = this.actions$.pipe(
-		ofType(REFRESH),
+		ofType(PodcastAction.REFRESH),
 		map((a: RefreshAction) => a.payload),
 		switchMap(p => this.podcastService.refresh(p)),
 		map(_ => new RefreshSuccessAction())
