@@ -30,7 +30,7 @@
         <configuration>
           <installDirectory>target</installDirectory>
           <nodeVersion>v9.6.1</nodeVersion>
-          <yarnVersion>v1.3.2</yarnVersion>
+          <yarnVersion>v1.5.1</yarnVersion>
         </configuration>
 
         <executions>
