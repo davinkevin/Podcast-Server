@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { OpenSideNavAction } from '../../app.actions';
-import { AppState } from '../../app.reducer';
+import { OpenSideNavAction } from '#app/app.actions';
+import { AppState } from '#app/app.reducer';
 import { Store } from '@ngrx/store';
 
 @Component({

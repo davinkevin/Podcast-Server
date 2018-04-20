@@ -5,9 +5,9 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { Store, StoreModule } from '@ngrx/store';
 import { FindAll, FindAllSuccess } from '../../podcasts.actions';
 import { reducer } from '../../podcasts.reducer';
-import { Podcast } from '../../../shared/entity';
+import { Podcast } from '#app/shared/entity';
 import { of } from 'rxjs/observable/of';
-import { PodcastService } from '../../../shared/service/podcast/podcast.service';
+import { PodcastService } from '#app/shared/service/podcast/podcast.service';
 import Spy = jasmine.Spy;
 
 describe('PodcastsResolver', () => {

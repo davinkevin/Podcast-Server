@@ -3,8 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { select, Store } from '@ngrx/store';
 import { Injectable } from '@angular/core';
 import { skip, take } from 'rxjs/operators';
-import { Item } from '../../shared/entity';
-import { AppState } from '../../app.reducer';
+import { Item } from '#app/shared/entity';
+import { AppState } from '#app/app.reducer';
 import { FindOneAction } from '../item.actions';
 import { selectItem } from '../item.reducer';
 

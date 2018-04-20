@@ -4,7 +4,7 @@ import { async, inject, TestBed } from '@angular/core/testing';
 import { PodcastItemsResolver, toPodcastPageOfItems } from './podcast-items.resolver';
 import { FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction } from '../podcast.actions';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { Direction, Item, Page, Pageable } from '../../shared/entity';
+import { Direction, Item, Page, Pageable } from '#app/shared/entity';
 
 const PAGE_ITEMS: Page<Item> = {
   content: [

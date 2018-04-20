@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { SearchItemPageRequest } from '../../shared/entity';
+import { SearchItemPageRequest } from '#app/shared/entity';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { select, Store } from '@ngrx/store';
 import { selectRequest } from '../search.reducer';
 import { take } from 'rxjs/operators';
-import { AppState } from '../../app.reducer';
+import { AppState } from '#app/app.reducer';
 
 @Injectable()
 export class SearchQueryResolver implements Resolve<SearchItemPageRequest> {

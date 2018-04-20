@@ -1,9 +1,9 @@
 import { async, inject, TestBed } from '@angular/core/testing';
 
 import { SearchResolver } from './search.resolver';
-import { ItemService } from '../../shared/service/item/item.service';
+import { ItemService } from '#app/shared/service/item/item.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { Direction, Item, Page } from '../../shared/entity';
+import { Direction, Item, Page } from '#app/shared/entity';
 import { Store, StoreModule } from '@ngrx/store';
 import * as fromSearch from '../search.reducer';
 import * as SearchActions from '../search.actions';

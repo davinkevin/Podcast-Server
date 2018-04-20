@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { skip, take } from 'rxjs/operators';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Item, Page } from '../../shared/entity';
+import { Item, Page } from '#app/shared/entity';
 import { Observable } from 'rxjs/Observable';
 import { select, Store } from '@ngrx/store';
 import * as SearchActions from '../search.actions';
 import { selectResults } from '../search.reducer';
-import { defaultSearch } from '../../shared/service/item/item.service';
-import { AppState } from '../../app.reducer';
+import { defaultSearch } from '#app/shared/service/item/item.service';
+import { AppState } from '#app/app.reducer';
 
 @Injectable()
 export class SearchResolver implements Resolve<Page<Item>> {

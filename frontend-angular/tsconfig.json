@@ -9,6 +9,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
+    "paths": {
+      "#app/*": ["app/*"]
+    },
     "typeRoots": [
       "node_modules/@types"
     ],

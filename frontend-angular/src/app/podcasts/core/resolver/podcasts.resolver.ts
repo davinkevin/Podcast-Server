@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Podcast } from '../../../shared/entity';
+import { Podcast } from '#app/shared/entity';
 import { selectPodcasts } from '../../podcasts.reducer';
 import * as PodcastsActions from '../../podcasts.actions';
 import { skip, take } from 'rxjs/operators';
-import { AppState } from '../../../app.reducer';
+import { AppState } from '#app/app.reducer';
 
 @Injectable()
 export class PodcastsResolver implements Resolve<Podcast[]> {

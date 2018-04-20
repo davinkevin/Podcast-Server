@@ -4,7 +4,7 @@ import { Store, StoreModule } from '@ngrx/store';
 import { async, inject, TestBed } from '@angular/core/testing';
 import { reducer } from '../podcast.reducer';
 import { FindOneAction, FindOneSuccessAction } from '../podcast.actions';
-import { Podcast } from '../../shared/entity';
+import { Podcast } from '#app/shared/entity';
 
 const PODCAST: Podcast = {
   id: '1f64b3a3-aaba-4282-a709-073299e3ef52',

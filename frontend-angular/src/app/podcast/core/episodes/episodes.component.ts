@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { PodcastState } from '../../podcast.reducer';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { Item, Page } from '../../../shared/entity';
+import { Item, Page } from '#app/shared/entity';
 import { toPodcastPageOfItems } from '../podcast-items.resolver';
 import { CompanionComponent } from '@davinkevin/companion-component';
 

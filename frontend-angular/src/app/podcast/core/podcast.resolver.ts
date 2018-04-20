@@ -5,8 +5,8 @@ import { FindOneAction } from '../podcast.actions';
 import { selectPodcast } from '../podcast.reducer';
 import { Injectable } from '@angular/core';
 import { skip, take } from 'rxjs/operators';
-import { Podcast } from '../../shared/entity';
-import { AppState } from '../../app.reducer';
+import { Podcast } from '#app/shared/entity';
+import { AppState } from '#app/app.reducer';
 
 @Injectable()
 export class PodcastResolver implements Resolve<Podcast> {
