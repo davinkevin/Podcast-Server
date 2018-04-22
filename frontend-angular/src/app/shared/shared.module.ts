@@ -1,6 +1,5 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
 
 import { ItemService } from './service/item/item.service';
 import { PodcastService } from './service/podcast/podcast.service';
