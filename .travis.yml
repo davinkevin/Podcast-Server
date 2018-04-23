@@ -27,11 +27,11 @@ before_script:
 
 script:
 - ./mvnw -f frontend-angularjs/pom.xml install
-- ./mvnw -f Backend/pom.xml install jacoco:report
+- ./mvnw -f backend/pom.xml install jacoco:report
 - ./mvnw -f frontend-angular/pom.xml install
 
 after_success:
-- ./mvnw -f Backend/pom.xml coveralls:report
+- ./mvnw -f backend/pom.xml coveralls:report
 - ./docker-build.sh
 - docker login -u $DOCKER_USER -p $DOCKER_PASS
 - docker push davinkevin/podcast-server
@@ -44,7 +44,7 @@ deploy:
   skip_cleanup: true
   api_key:
     secure: X9W0MGueni+7ly75mS+NtEAWzJWaD1CZxOtf2OBYQ0wDVABzTO2gztSQjSwgttThrwEVWeAKS7TUE8WUHSpqGoD5pkfKwOMgyiX2angPWuvtWvBgguzuxdNAiQxMVVC+0KOVcXdeuvSMt69HjoVQVa0IKOqkRDwle6U2bQXSrOk=
-  file: Backend/target/Podcast-Server.jar
+  file: backend/target/Podcast-Server.jar
   on:
     repo: davinkevin/Podcast-Server
     tags: true
