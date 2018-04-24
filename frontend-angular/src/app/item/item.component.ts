@@ -28,18 +28,6 @@ export class ItemComponent implements OnInit, OnDestroy {
 		this.route.data.pipe(untilDestroy(), map(toItem)).subscribe(item => (this.item = item));
 	}
 
-	togglePlayer() {
-		this.showPlayer = !this.showPlayer;
-	}
-
-	get mediaType() {
-		if (this.item.mimeType == null) {
-			return 'unknown';
-		}
-
-		return this.item.mimeType.substr(0, this.item.mimeType.indexOf('/'));
-	}
-
 	ngOnDestroy(): void {
 		this.companion.destroy();
 	}

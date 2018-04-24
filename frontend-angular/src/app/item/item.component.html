@@ -3,33 +3,7 @@
   <span class="title">{{item.title}}</span>
 </ps-toolbar>
 
-<div [ngSwitch]="mediaType">
-
-  <div *ngSwitchCase="'video'">
-    <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }" (click)="togglePlayer()" *ngIf="!showPlayer">
-    </div>
-    <div class="item__video" *ngIf="showPlayer" (click)="togglePlayer()">
-      <video controls style="width: 100%; height: 100%">
-        <source [src]="item.proxyURL" [type]="item.mimeType">
-      </video>
-    </div>
-  </div>
-
-  <div *ngSwitchCase="'audio'">
-    <div class="item__audio">
-      <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }">
-        <audio controls style="width: 100%; height: 100%">
-          <source [src]="item.proxyURL" [type]="item.mimeType">
-          Your browser does not support the audio element.
-        </audio>
-      </div>
-    </div>
-  </div>
-
-  <div *ngSwitchCase="'unknown'">
-    <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }"></div>
-  </div>
-</div>
+<div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }"></div>
 
 <p class="item__description">
   {{item.description}}
@@ -42,8 +16,6 @@
   <li>Status : {{ item.status }}</li>
 </ul>
 
-<pre>
-  <code>
+<pre><code>
     {{ item | json }}
-  </code>
-</pre>
+</code></pre>
