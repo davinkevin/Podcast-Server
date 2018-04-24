@@ -4,9 +4,9 @@ set -euo pipefail
 
 docker_build () {
    echo "build docker image davinkevin/podcast-server:$1"
-   mkdir -p Backend/target/docker
-   cp Backend/target/Podcast-Server.jar Backend/src/main/docker/Dockerfile Backend/target/docker
-   cd Backend/target/docker
+   mkdir -p backend/target/docker
+   cp backend/target/Podcast-Server.jar backend/src/main/docker/Dockerfile backend/target/docker
+   cd backend/target/docker
    docker build . -t davinkevin/podcast-server:$1
    return
 }
