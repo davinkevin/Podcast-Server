@@ -6,7 +6,7 @@ import { skip, take } from 'rxjs/operators';
 import { Item } from '#app/shared/entity';
 import { AppState } from '#app/app.reducer';
 import { FindOneAction } from '../item.actions';
-import { selectItem } from '../item.reducer';
+import { item } from '../item.reducer';
 
 @Injectable()
 export class ItemResolver implements Resolve<Item> {
@@ -15,7 +15,7 @@ export class ItemResolver implements Resolve<Item> {
 	resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Item> {
 		this.store.dispatch(new FindOneAction(route.params.id, route.params.podcastId));
 
-		return this.store.pipe(select(selectItem), skip(1), take(1));
+		return this.store.pipe(select(item), skip(1), take(1));
 	}
 }
 

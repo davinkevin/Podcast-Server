@@ -25,4 +25,4 @@ export function itemReducer(state = initialState, action: ItemActions): ItemStat
 }
 
 const moduleSelector = createFeatureSelector<ItemState>('item');
-export const selectItem = createSelector(moduleSelector, (s: ItemState) => s.item);
+export const item = createSelector(moduleSelector, (s: ItemState) => s.item);

@@ -1,13 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators';
+import { select, Store } from '@ngrx/store';
 
 import { AppState } from '../app.reducer';
 import { Item } from '../shared/entity';
-
-import { toItem } from './core/item.resolver';
 import { CompanionComponent } from '@davinkevin/companion-component';
+import { item } from '#app/item/item.reducer';
 
 @Component({
 	selector: 'ps-item',
@@ -16,16 +14,15 @@ import { CompanionComponent } from '@davinkevin/companion-component';
 })
 export class ItemComponent implements OnInit, OnDestroy {
 	item: Item;
-	showPlayer = false;
 
 	private companion = new CompanionComponent();
 
-	constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
+	constructor(private store: Store<AppState>) {}
 
 	ngOnInit() {
 		const untilDestroy = this.companion.untilDestroy();
 
-		this.route.data.pipe(untilDestroy(), map(toItem)).subscribe(item => (this.item = item));
+		this.store.pipe(select(item), untilDestroy()).subscribe(v => (this.item = v));
 	}
 
 	ngOnDestroy(): void {
