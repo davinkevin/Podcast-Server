@@ -13,10 +13,8 @@ export class ItemResolver implements Resolve<Item> {
 	constructor(private store: Store<AppState>) {}
 
 	resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Item> {
-		this.store.dispatch(new FindOneAction(route.params.id, route.params.podcastId));
+		this.store.dispatch(new FindOneAction({itemId: route.params.id, podcastId: route.params.podcastId}));
 
 		return this.store.pipe(select(item), skip(1), take(1));
 	}
 }
-
-export const toItem = (d: any) => d.item;
