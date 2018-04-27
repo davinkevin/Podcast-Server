@@ -1,0 +1,30 @@
+
+<div *ngIf="display === 'OPENED'" class="player">
+  <mat-toolbar color="primary">
+    <span class="title">Player</span>
+    <span class="spacer"></span>
+    <mat-icon class="icon" (click)="close()">close</mat-icon>
+  </mat-toolbar>
+  <div class="player-wrapper">
+
+    <div [ngSwitch]="mediaType">
+
+      <video #video *ngSwitchCase="'video'" controls autoplay style="width: 100%; height: 100%">
+        <source [src]="item.proxyURL" [type]="item.mimeType">
+      </video>
+
+      <div *ngSwitchCase="'audio'" class="audio-player">
+        <img [src]="item.cover.url" alt="cover">
+        <audio #audio controls autoplay style="width: 100%; height: 100%">
+          <source [src]="item.proxyURL" [type]="item.mimeType">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+
+      <div *ngSwitchCase="'unknown'">
+        <p>This item isn't readable inside your browser...</p>
+      </div>
+
+    </div>
+  </div>
+</div>

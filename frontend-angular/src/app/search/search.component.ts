@@ -13,6 +13,7 @@ import { defaultSearch } from '../shared/service/item/item.service';
 import { Search } from './search.actions';
 import { selectResults } from './search.reducer';
 import { CompanionComponent } from '@davinkevin/companion-component';
+import { PlayAction } from '#app/floating-player/floating-player.actions';
 
 interface SearchItemRequestViewModel {
 	q?: string;
@@ -105,6 +106,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 	openSideNav() {
 		this.store.dispatch(new OpenSideNavAction());
+	}
+
+	play(item: Item) {
+		this.store.dispatch(new PlayAction(item));
 	}
 
 	ngOnDestroy(): void {

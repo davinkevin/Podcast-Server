@@ -10,6 +10,8 @@ import {Store, StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {AppState, sidenav} from './app.reducer';
 import {CloseSideNavAction, OpenSideNavAction} from './app.actions';
+import { FloatingPlayerModule } from '#app/floating-player/floating-player.module';
+import { floatingPlayer } from '#app/floating-player/floating-player.reducer';
 
 describe('AppComponent', () => {
 
@@ -28,8 +30,9 @@ describe('AppComponent', () => {
         NoopAnimationsModule,
         MatToolbarModule, MatIconModule, MatSidenavModule, MatListModule,
         RouterTestingModule.withRoutes([]),
-        StoreModule.forRoot({sidenav}),
+        StoreModule.forRoot({sidenav, floatingPlayer}),
         EffectsModule.forRoot([]),
+        FloatingPlayerModule
       ]
     }).compileComponents();
 

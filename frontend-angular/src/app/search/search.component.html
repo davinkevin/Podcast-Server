@@ -59,7 +59,7 @@
     </mat-card-header>
     <img mat-card-image [routerLink]="['/podcasts', item.podcastId, 'items', item.id]" [src]="item.cover?.url">
     <mat-card-actions>
-      <button mat-button>
+      <button mat-button (click)="play(item)">
         <mat-icon class="section-icon">play_arrow</mat-icon>
         Play
       </button>

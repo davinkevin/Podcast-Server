@@ -1,0 +1,38 @@
+:host {
+  position:fixed;
+  bottom:0;
+  right:0;
+  z-index: 999;
+  background-color: white;
+  max-width: 512px;
+  max-height: 512px;
+
+  ::ng-deep .mat-toolbar-single-row {
+    height: 48px;
+  }
+}
+
+.title {
+  font-size: 1.3vw;
+}
+
+mat-icon {
+  padding: 0 14px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.player-wrapper {
+  background-color: black;
+  max-width: 512px;
+}
+
+.audio-player {
+  img {
+    object-fit: cover;
+    width: 100%;
+    max-height: 448px;
+  }
+}
