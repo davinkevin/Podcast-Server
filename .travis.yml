@@ -43,7 +43,7 @@ deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: X9W0MGueni+7ly75mS+NtEAWzJWaD1CZxOtf2OBYQ0wDVABzTO2gztSQjSwgttThrwEVWeAKS7TUE8WUHSpqGoD5pkfKwOMgyiX2angPWuvtWvBgguzuxdNAiQxMVVC+0KOVcXdeuvSMt69HjoVQVa0IKOqkRDwle6U2bQXSrOk=
+    secure: YALoE2x37JTbyOOhlv0xpfiopE7/T1PhozBYLaOd0o1qiaUTIsP+ccrRTFU+QMM2ST+NW4inpsNZv74Vp6tNyVvsaV7It59KHZcOmLXNXN6yXsQkkj3gC41dm8tIMe4bi9K1omChIcc2BomUFAFOX8R9FRTIr0cocAmTp7M69nc=
   file: backend/target/Podcast-Server.jar
   on:
     repo: davinkevin/Podcast-Server
