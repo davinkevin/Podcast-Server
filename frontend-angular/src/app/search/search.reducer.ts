@@ -31,11 +31,11 @@ const initialState: SearchState = {
 export function reducer(state = initialState, action: SearchActions): SearchState {
 	switch (action.type) {
 		case SearchAction.SEARCH: {
-			return { ...state, request: action.payload };
+			return { ...state, request: action.pageRequest };
 		}
 
 		case SearchAction.SEARCH_SUCCESS: {
-			return { ...state, results: action.payload };
+			return { ...state, results: action.results };
 		}
 
 		default: {

@@ -23,7 +23,7 @@ export class PodcastEffects {
 	@Effect()
 	findOne$: Observable<Action> = this.actions$.pipe(
 		ofType(PodcastAction.FIND_ONE),
-		map((v: FindOneAction) => v.payload),
+		map((v: FindOneAction) => v.id),
 		switchMap(id => this.podcastService.findOne(id)),
 		map((p: Podcast) => new FindOneSuccessAction(p))
 	);
@@ -38,7 +38,7 @@ export class PodcastEffects {
 	@Effect()
 	refresh: Observable<Action> = this.actions$.pipe(
 		ofType(PodcastAction.REFRESH),
-		map((a: RefreshAction) => a.payload),
+		map((a: RefreshAction) => a.podcast),
 		switchMap(p => this.podcastService.refresh(p)),
 		map(_ => new RefreshSuccessAction())
 	);

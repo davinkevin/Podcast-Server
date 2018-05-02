@@ -17,7 +17,7 @@ const initialState: PodcastState = {
 export function reducer(state = initialState, action: PodcastActions): PodcastState {
 	switch (action.type) {
 		case PodcastAction.FIND_ONE_SUCCESS: {
-			return { ...state, podcast: action.payload };
+			return { ...state, podcast: action.podcast };
 		}
 
 		case PodcastAction.FIND_ITEMS_SUCCESS: {

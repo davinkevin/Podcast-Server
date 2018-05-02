@@ -8,13 +8,13 @@ export enum SearchAction {
 
 export class Search implements Action {
 	readonly type = SearchAction.SEARCH;
-	constructor(public payload: SearchItemPageRequest) {}
+	constructor(public pageRequest: SearchItemPageRequest) {}
 }
 
 export class SearchSuccess implements Action {
 	readonly type = SearchAction.SEARCH_SUCCESS;
 
-	constructor(public payload: Page<Item>) {}
+	constructor(public results: Page<Item>) {}
 }
 
 export type SearchActions = Search | SearchSuccess;

@@ -15,7 +15,7 @@ const initialState: ItemState = {
 export function itemReducer(state = initialState, action: ItemActions): ItemState {
 	switch (action.type) {
 		case ItemAction.FIND_ONE_SUCCESS: {
-			return { ...state, item: action.payload };
+			return { ...state, item: action.item };
 		}
 
 		default: {

@@ -8,12 +8,12 @@ export enum ItemAction {
 
 export class FindOneAction implements Action {
 	readonly type = ItemAction.FIND_ONE;
-	constructor(public payload: { itemId: uuid; podcastId: uuid }) {}
+	constructor(public itemId: uuid, public podcastId: uuid) {}
 }
 
 export class FindOneSuccessAction implements Action {
 	readonly type = ItemAction.FIND_ONE_SUCCESS;
-	constructor(public payload: Item) {}
+	constructor(public item: Item) {}
 }
 
 export type ItemActions = FindOneAction | FindOneSuccessAction;

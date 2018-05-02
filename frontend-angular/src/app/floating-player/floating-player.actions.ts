@@ -8,7 +8,7 @@ export enum FloatingPlayerAction {
 
 export class PlayAction implements Action {
 	readonly type = FloatingPlayerAction.PLAY;
-	constructor(public payload: Item) {}
+	constructor(public item: Item) {}
 }
 export class CloseAction implements Action {
 	readonly type = FloatingPlayerAction.CLOSE;

@@ -305,7 +305,7 @@ describe('SearchResolver', () => {
 		/* When  */
 		resolver.resolve(route, null).subscribe(v => {
 			/* Then  */
-			expect(v).toBe(searchSuccess.payload);
+			expect(v).toBe(searchSuccess.results);
 		});
 	});
 });

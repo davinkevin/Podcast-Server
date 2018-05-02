@@ -13,7 +13,7 @@ export class SearchEffects {
 	@Effect()
 	search$: Observable<Action> = this.actions$.pipe(
 		ofType(SearchAction.SEARCH),
-		map((action: Search) => action.payload),
+		map((action: Search) => action.pageRequest),
 		switchMap((terms: SearchItemPageRequest) => this.itemService.search(terms)),
 		map((results: Page<Item>) => new SearchSuccess(results))
 	);

@@ -14,12 +14,8 @@ const initialState: PodcastsState = {
 
 export function reducer(state = initialState, action: PodcastsActions): PodcastsState {
 	switch (action.type) {
-		case PodcastsAction.FIND_ALL: {
-			return { ...state };
-		}
-
 		case PodcastsAction.FIND_ALL_SUCCESS: {
-			return { ...state, podcasts: action.payload };
+			return { ...state, podcasts: action.podcasts };
 		}
 
 		default: {

@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { Item, Page, Pageable, Podcast } from '../shared/entity';
+import { Item, Page, Pageable, Podcast, uuid } from '../shared/entity';
 
 export enum PodcastAction {
 	FIND_ONE = '[Podcast] Find One',
@@ -12,17 +12,17 @@ export enum PodcastAction {
 
 export class FindOneAction implements Action {
 	readonly type = PodcastAction.FIND_ONE;
-	constructor(public payload: string) {}
+	constructor(public id: uuid) {}
 }
 
 export class FindOneSuccessAction implements Action {
 	readonly type = PodcastAction.FIND_ONE_SUCCESS;
-	constructor(public payload: Podcast) {}
+	constructor(public podcast: Podcast) {}
 }
 
 export class RefreshAction implements Action {
 	readonly type = PodcastAction.REFRESH;
-	constructor(public payload: Podcast) {}
+	constructor(public podcast: Podcast) {}
 }
 
 export class RefreshSuccessAction implements Action {

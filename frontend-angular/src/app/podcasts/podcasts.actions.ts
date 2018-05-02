@@ -8,13 +8,12 @@ export enum PodcastsAction {
 
 export class FindAll implements Action {
 	readonly type = PodcastsAction.FIND_ALL;
-	readonly payload = null;
 }
 
 export class FindAllSuccess implements Action {
 	readonly type = PodcastsAction.FIND_ALL_SUCCESS;
 
-	constructor(public payload: Podcast[]) {}
+	constructor(public podcasts: Podcast[]) {}
 }
 
 export type PodcastsActions = FindAll | FindAllSuccess;

@@ -17,7 +17,7 @@ const initialState: FloatingPlayerState = {
 export function floatingPlayer(state = initialState, action: FloatingPlayerActions): FloatingPlayerState {
 	switch (action.type) {
 		case FloatingPlayerAction.PLAY: {
-			return { ...state, item: action.payload, display: 'OPENED' };
+			return { ...state, item: action.item, display: 'OPENED' };
 		}
 
 		case FloatingPlayerAction.CLOSE: {

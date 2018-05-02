@@ -15,8 +15,7 @@ export class ItemEffects {
 	@Effect()
 	findOne$: Observable<Action> = this.actions$.pipe(
 		ofType(ItemAction.FIND_ONE),
-		map((a: FindOneAction) => a.payload),
-		concatMap(({ itemId, podcastId }: { itemId: uuid; podcastId: uuid }) => this.itemService.findById(itemId, podcastId)),
+		concatMap(({ itemId, podcastId }: FindOneAction) => this.itemService.findById(itemId, podcastId)),
 		map((i: Item) => new FindOneSuccessAction(i))
 	);
 
