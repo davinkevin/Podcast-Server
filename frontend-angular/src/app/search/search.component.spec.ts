@@ -2,13 +2,13 @@ import { DebugElement } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
-	MatButtonModule,
-	MatCardModule,
-	MatIconModule,
-	MatInputModule,
-	MatPaginatorModule,
-	MatSelectModule,
-	MatToolbarModule
+  MatButtonModule,
+  MatCardModule,
+  MatIconModule,
+  MatInputModule,
+  MatPaginatorModule,
+  MatSelectModule,
+  MatToolbarModule
 } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -17,7 +17,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Action, Store, StoreModule } from '@ngrx/store';
 import { cold, hot } from 'jasmine-marbles';
-import { TruncateModule } from 'ng2-truncate';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 
@@ -31,8 +30,7 @@ import { SearchComponent, StatusesViewValue } from './search.component';
 import { SearchEffects } from './search.effects';
 import * as fromSearch from './search.reducer';
 import { selectRequest, selectResults } from './search.reducer';
-
-import Spy = jasmine.Spy;
+import { TruncateModule } from 'ng2-truncate';
 
 describe('SearchFeature', () => {
 	describe('SearchComponent', () => {
@@ -935,8 +933,8 @@ describe('SearchFeature', () => {
 		};
 
 		beforeEach(() => {
-			itemService = jasmine.createSpyObj('itemService', ['search']);
-			(itemService.search as Spy).and.returnValue(of(PAGE));
+			itemService = { search: jest.fn() };
+      (itemService.search as jest.Mock<Page<Item>>).mockReturnValue(of(PAGE));
 		});
 
 		beforeEach(() => {

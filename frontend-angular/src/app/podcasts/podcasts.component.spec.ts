@@ -22,8 +22,6 @@ import { PodcastsEffects } from './podcasts.effects';
 import * as fromPodcasts from './podcasts.reducer';
 import { reducer } from './podcasts.reducer';
 
-import Spy = jasmine.Spy;
-
 describe('PodcastsFeature', () => {
 	const podcasts = [
 		{
@@ -192,8 +190,8 @@ describe('PodcastsFeature', () => {
 		let actions: Observable<Action>;
 
 		beforeEach(() => {
-			podcastService = jasmine.createSpyObj('podcastService', ['findAll']);
-			(podcastService.findAll as Spy).and.returnValue(of([]));
+			podcastService = { findAll: jest.fn() } ;
+      podcastService.findAll.mockReturnValue(of([]));
 		});
 
 		beforeEach(() => {

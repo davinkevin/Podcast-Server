@@ -1,17 +1,40 @@
-// This file is required by karma.conf.js and loads recursively all the .spec and framework files
+import 'jest-preset-angular';
 
-import 'zone.js/dist/zone-testing';
-import {getTestBed} from '@angular/core/testing';
-import {BrowserDynamicTestingModule, platformBrowserDynamicTesting} from '@angular/platform-browser-dynamic/testing';
+// @ts-ignore
+global.CSS = null;
 
-declare var require: any;
+const webStorageMock = () => {
+  let storage: Record<string, any> = {};
+  return {
+    getItem: (key: string) => (key in storage ? storage[key] : null),
+    setItem: (key: string, value: any) => (storage[key] = value || ''),
+    removeItem: (key: string) => delete storage[key],
+    clear: () => (storage = {}),
+  };
+};
 
-// First, initialize the Angular testing environment.
-getTestBed().initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
-);
-// Then we find all the tests.
-const context = require.context('./', true, /\.spec\.ts$/);
-// And load the modules.
-context.keys().map(context);
+Object.defineProperty(window, 'localStorage', { value: webStorageMock() });
+Object.defineProperty(window, 'sessionStorage', { value: webStorageMock() });
+Object.defineProperty(document, 'doctype', {
+  value: '<!DOCTYPE html>',
+});
+Object.defineProperty(window, 'getComputedStyle', {
+  value: () => {
+    return {
+      display: 'none',
+      appearance: ['-webkit-appearance'],
+    };
+  },
+});
+/**
+ * ISSUE: https://github.com/angular/material2/issues/7101
+ * Workaround for JSDOM missing transform property
+ */
+Object.defineProperty(document.body.style, 'transform', {
+  value: () => {
+    return {
+      enumerable: true,
+      configurable: true,
+    };
+  },
+});

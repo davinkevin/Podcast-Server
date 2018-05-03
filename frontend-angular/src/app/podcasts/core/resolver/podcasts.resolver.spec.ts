@@ -116,8 +116,8 @@ describe('PodcastsResolver', () => {
 	];
 
 	beforeEach(() => {
-		podcastService = jasmine.createSpyObj('podcastService', ['findAll']);
-		(podcastService.findAll as Spy).and.returnValue(of(PODCASTS));
+		podcastService = { findAll: jest.fn() };
+		podcastService.findAll.mockReturnValue(of(PODCASTS));
 	});
 
 	beforeEach(() => {

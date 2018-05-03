@@ -309,6 +309,6 @@ describe('EpisodesComponent', () => {
 	});
 
 	function asText(v: DebugElement) {
-		return v.nativeElement.innerText;
+		return v.nativeElement.textContent.trim();
 	}
 });

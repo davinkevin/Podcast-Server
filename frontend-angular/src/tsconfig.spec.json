@@ -1,11 +1,12 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "../out-tsc/spec",
+    "baseUrl": "./",
     "module": "commonjs",
-    "baseUrl": "",
     "types": [
-      "jasmine",
+      "jest",
       "node"
     ]
   },

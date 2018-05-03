@@ -244,15 +244,15 @@ describe('SearchResolver', () => {
 	const NUM_PAGE = 3;
 
 	beforeEach(() => {
-		itemService = jasmine.createSpyObj('itemService', ['search']);
-		(itemService.search as Spy).and.returnValue(of(PAGE));
+		itemService = { search: jest.fn() };
+    itemService.search.mockReturnValue(of(PAGE));
 	});
 
 	beforeEach(() => {
 		route = <ActivatedRouteSnapshot>{
-			queryParamMap: jasmine.createSpyObj('queryParamMap', ['get'])
+			queryParamMap: { get: jest.fn() }
 		};
-		(route.queryParamMap.get as Spy).and.returnValue(NUM_PAGE);
+    route.queryParamMap.get.mockReturnValue(NUM_PAGE);
 	});
 
 	beforeEach(() => {

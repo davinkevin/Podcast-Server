@@ -79,7 +79,7 @@ describe('PodcastComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should have title in the nav-bar', async () => {
+	it('should have title in the nav-bar', () => {
 		/* Given */
 		/* When  */
 		const title = el.query(By.css('.toolbar__title'));
@@ -105,6 +105,6 @@ describe('PodcastComponent', () => {
 	});
 
 	function asText(d: DebugElement) {
-		return d.nativeElement.innerText;
+		return d.nativeElement.textContent.trim();
 	}
 });
