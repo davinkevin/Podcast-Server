@@ -32,7 +32,7 @@ const routes: Routes = [
     /* Router Modules */    RouterModule.forRoot(routes),
     /* Feature Modules */   SearchModule, PodcastsModule, PodcastModule, ItemModule, FloatingPlayerModule,
     /* @ngrx */
-    StoreModule.forRoot({sidenav, router, floatingPlayer}),
+    StoreModule.forRoot({sidenav, router}),
     EffectsModule.forRoot([AppEffects]),
     StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
     LocationStoreHelperModule, RouterStoreHelperModule,

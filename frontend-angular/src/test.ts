@@ -1,5 +1,9 @@
 import 'jest-preset-angular';
 
+// Media Elements
+// @ts-ignore
+window.HTMLMediaElement.prototype.load = () => {};
+
 // @ts-ignore
 global.CSS = null;
 
