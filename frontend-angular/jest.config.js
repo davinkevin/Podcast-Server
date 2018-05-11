@@ -30,5 +30,9 @@ module.exports = {
     "<rootDir>/node_modules/jest-preset-angular/HTMLCommentSerializer.js"
   ],
   "preset": "jest-preset-angular",
-  "setupTestFrameworkScriptFile": "<rootDir>/src/test.ts"
+  "setupTestFrameworkScriptFile": "<rootDir>/src/test.ts",
+  "coveragePathIgnorePatterns": [
+    "/node_modules/",
+    "<rootDir>/src/test.ts"
+  ]
 };
