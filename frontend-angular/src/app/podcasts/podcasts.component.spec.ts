@@ -21,6 +21,7 @@ import { PodcastsComponent } from './podcasts.component';
 import { PodcastsEffects } from './podcasts.effects';
 import * as fromPodcasts from './podcasts.reducer';
 import { reducer } from './podcasts.reducer';
+import Mock = jest.Mock;
 
 describe('PodcastsFeature', () => {
 	const podcasts = [
@@ -190,8 +191,8 @@ describe('PodcastsFeature', () => {
 		let actions: Observable<Action>;
 
 		beforeEach(() => {
-			podcastService = { findAll: jest.fn() } ;
-      podcastService.findAll.mockReturnValue(of([]));
+      const findAll = jest.fn().mockReturnValue(of([]));
+			podcastService = jest.fn<PodcastService>(() => ({ findAll }))();
 		});
 
 		beforeEach(() => {
