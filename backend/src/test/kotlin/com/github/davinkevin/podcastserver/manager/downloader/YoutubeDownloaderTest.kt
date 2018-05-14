@@ -398,7 +398,7 @@ class YoutubeDownloaderTest {
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
-            assertThat(compatibility).isEqualTo(1)
+            assertThat(compatibility).isEqualTo(10)
         }
 
         @Test

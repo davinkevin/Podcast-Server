@@ -131,6 +131,11 @@
             <artifactId>vget</artifactId>
             <version>1.2.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.sapher</groupId>
+            <artifactId>youtubedl-java</artifactId>
+            <version>ef1bdc8c2e3e7eac134bc4ea9fae37318e79771a</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
         <dependency>
             <groupId>com.mashape.unirest</groupId>

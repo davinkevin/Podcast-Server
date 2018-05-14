@@ -4,6 +4,7 @@ MAINTAINER Kevin DAVIN  <https://github.com/davinkevin/Podcast-Server/issues>
 #Installation of native dependencies :
 RUN apk add --update ffmpeg
 RUN apk add --update rtmpdump
+RUN apk add --update youtube-dl
 
 # Configuration specific for docker container
 ENV podcastserver.backup.location "/opt/podcast-server/backup/"

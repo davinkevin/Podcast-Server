@@ -162,7 +162,7 @@ class YoutubeDownloader(
                     .firstOrNull() ?: throw RuntimeException(format(ERROR_NO_CONTENT_TYPE, type, item.title, item.url))
 
     override fun compatibility(downloadingItem: DownloadingItem) =
-            if (downloadingItem.urls.size == 1 && "youtube.com" in downloadingItem.urls.first()) 1
+            if (downloadingItem.urls.size == 1 && "youtube.com" in downloadingItem.urls.first()) 10
             else Integer.MAX_VALUE
 
     internal class YoutubeWatcher(private val youtubeDownloader: YoutubeDownloader, private val maxWaitingTime: TemporalAmount = Duration.ofMinutes(5)) : Runnable {
