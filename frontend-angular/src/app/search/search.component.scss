@@ -3,7 +3,14 @@
   flex-flow: row wrap;
   align-items: center;
   justify-content: space-around;
-  height: 7vh;
+  min-height: 7vh;
+
+  .search__sort {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-around;
+  }
 }
 
 .search__results {

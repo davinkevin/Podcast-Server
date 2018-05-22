@@ -4,7 +4,7 @@
 
 <div class="search__bar">
 
-  <form [formGroup]="form">
+  <form [formGroup]="form" class="search__sort">
 
     <mat-input-container>
       <input matInput placeholder="Search..." formControlName="q" name="q">
@@ -22,9 +22,7 @@
       </mat-select>
     </mat-form-field>
 
-    <span formGroupName="sort">
-
-      <mat-form-field>
+      <mat-form-field formGroupName="sort">
         <mat-select placeholder="Sort on" formControlName="property" name="property">
           <mat-option *ngFor="let property of properties" [value]="property.value">
             {{ property.title }}
@@ -32,15 +30,13 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field formGroupName="sort">
         <mat-select placeholder="Order" formControlName="direction" name="direction">
           <mat-option *ngFor="let direction of directions" [value]="direction.value">
             {{ direction.title }}
           </mat-option>
         </mat-select>
       </mat-form-field>
-
-    </span>
 
   </form>
 
