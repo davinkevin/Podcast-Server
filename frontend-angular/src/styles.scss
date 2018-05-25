@@ -2,8 +2,10 @@
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '~font-awesome/css/font-awesome.css';
 @import '~material-design-icons/iconfont/material-icons.css';
+@import "variables";
 
 body {
   margin: 0;
   font-family: Roboto, sans-serif;
+  background-color: $global-background-color;
 }
