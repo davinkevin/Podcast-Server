@@ -6,13 +6,13 @@ node_modules
 logs
 target
 .gradle
+yarn-error.log
 
 # Front End in AngularJS :
 frontend-angularjs/www/fonts/
 frontend-angularjs/www/jspm_packages
 frontend-angularjs/node
 frontend-angularjs/**/*.css
-
 
 # Front End in Angular :
 frontend-angular/dist
@@ -28,4 +28,3 @@ Backend/etc
 
 
 /lan.dk.podcastserver.entity.Item/
-
