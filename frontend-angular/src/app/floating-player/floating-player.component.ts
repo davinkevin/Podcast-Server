@@ -31,7 +31,7 @@ export class FloatingPlayerComponent implements OnInit, OnDestroy {
 
 		this.store.pipe(untilDestroy(), select(display)).subscribe(v => {
 			this.display = v;
-    });
+		});
 	}
 
 	get mediaType() {

@@ -2,13 +2,13 @@ import { DebugElement } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule,
-  MatCardModule,
-  MatIconModule,
-  MatInputModule,
-  MatPaginatorModule,
-  MatSelectModule,
-  MatToolbarModule
+	MatButtonModule,
+	MatCardModule,
+	MatIconModule,
+	MatInputModule,
+	MatPaginatorModule,
+	MatSelectModule,
+	MatToolbarModule
 } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -934,7 +934,7 @@ describe('SearchFeature', () => {
 
 		beforeEach(() => {
 			itemService = { search: jest.fn() };
-      (itemService.search as jest.Mock<Page<Item>>).mockReturnValue(of(PAGE));
+			(itemService.search as jest.Mock<Page<Item>>).mockReturnValue(of(PAGE));
 		});
 
 		beforeEach(() => {

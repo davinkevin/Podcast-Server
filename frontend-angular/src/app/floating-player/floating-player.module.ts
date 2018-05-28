@@ -7,10 +7,11 @@ import { StoreModule } from '@ngrx/store';
 
 @NgModule({
 	imports: [
-	  /* Core */ CommonModule,
-    /* Material */ MatToolbarModule, MatIconModule,
-    /* NgRx */ StoreModule.forFeature('floatingPlayer', floatingPlayer)
-  ],
+		/* Core */ CommonModule,
+		/* Material */ MatToolbarModule,
+		MatIconModule,
+		/* NgRx */ StoreModule.forFeature('floatingPlayer', floatingPlayer)
+	],
 	exports: [FloatingPlayerComponent],
 	declarations: [FloatingPlayerComponent]
 })

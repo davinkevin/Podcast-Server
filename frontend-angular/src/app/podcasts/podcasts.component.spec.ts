@@ -191,7 +191,7 @@ describe('PodcastsFeature', () => {
 		let actions: Observable<Action>;
 
 		beforeEach(() => {
-      const findAll = jest.fn().mockReturnValue(of([]));
+			const findAll = jest.fn().mockReturnValue(of([]));
 			podcastService = jest.fn<PodcastService>(() => ({ findAll }))();
 		});
 
