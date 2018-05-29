@@ -1,20 +1,24 @@
-.item__cover, .item__video, .item__audio {
-    display: block;
-    width:100%;
-    height:400px;
-    margin: auto;
-    background-color: black;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+.item__cover {
+  display: block;
+  width:100%;
+  height:400px;
+  margin: auto;
+  background-color: black;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 
-    .buttons {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
+  .buttons {
+    width: 100%;
+    display:flex;
+    justify-content:flex-start;
+    color: white;
+    padding: 1vh 1vh;
 
+    & mat-icon {
+      cursor: pointer;
     }
-}
+  }}
 
 .item__description {
   padding-left: 8px;

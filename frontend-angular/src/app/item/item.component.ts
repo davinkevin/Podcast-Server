@@ -6,6 +6,7 @@ import { AppState } from '../app.reducer';
 import { Item } from '../shared/entity';
 import { CompanionComponent } from '@davinkevin/companion-component';
 import { item } from '#app/item/item.reducer';
+import { LocationBackAction } from '@davinkevin/router-store-helper';
 
 @Component({
 	selector: 'ps-item',
@@ -24,6 +25,10 @@ export class ItemComponent implements OnInit, OnDestroy {
 
 		this.store.pipe(select(item), untilDestroy()).subscribe(v => (this.item = v));
 	}
+
+	back(): void {
+	  this.store.dispatch(new LocationBackAction());
+  }
 
 	ngOnDestroy(): void {
 		this.companion.destroy();
