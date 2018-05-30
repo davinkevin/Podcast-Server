@@ -13,13 +13,28 @@
   {{item.description}}
 </p>
 
-<ul>
-  <li>Publication Date : {{ item.pubDate | date: 'medium'}}</li>
-  <li>Creation Date : {{ item.creationDate | date: 'medium'}}</li>
-  <li>Download Date : {{ item.downloadDate | date: 'medium'}}</li>
-  <li>Status : {{ item.status }}</li>
-</ul>
+<mat-divider></mat-divider>
 
-<pre><code>
-    {{ item | json }}
-</code></pre>
+<div class="item__date">
+  <div class="item__date__box publication_date" *ngIf="item.pubDate">
+    <mat-icon mat-list-icon>today</mat-icon>
+    <div class="item__date_text">
+      <span class="item_date_text_date">{{ item.pubDate | date: 'mediumDate'}}</span>
+      <span class="item_date_text_time">{{ item.pubDate | date: 'mediumTime'}}</span>
+    </div>
+  </div>
+  <div class="item__date__box creation_date" *ngIf="item.creationDate">
+    <mat-icon mat-list-icon>add_box</mat-icon>
+    <div class="item__date_text">
+      <span class="item_date_text_date">{{ item.creationDate | date: 'mediumDate'}}</span>
+      <span class="item_date_text_time">{{ item.creationDate | date: 'mediumTime'}}</span>
+    </div>
+  </div>
+  <div class="item__date__box download_date" *ngIf="item.downloadDate">
+    <mat-icon mat-list-icon>file_download</mat-icon>
+    <div class="item__date_text">
+      <span class="item_date_text_date">{{ item.downloadDate | date: 'mediumDate'}}</span>
+      <span class="item_date_text_time">{{ item.downloadDate | date: 'mediumTime'}}</span>
+    </div>
+  </div>
+</div>
