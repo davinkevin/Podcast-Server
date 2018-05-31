@@ -9,6 +9,20 @@
   </div>
 </div>
 
+<div class="item__actions_button">
+  <button mat-raised-button color="primary" (click)="play()" *ngIf="isPlayable(item)">
+    <mat-icon>play_arrow</mat-icon>
+    Play
+  </button>
+  <button mat-raised-button color="primary" (click)="download()" *ngIf="isDownloadable(item)"  >
+    <mat-icon>file_download</mat-icon>
+    Download
+  </button>
+
+</div>
+
+<mat-divider></mat-divider>
+
 <p class="item__description">
   {{item.description}}
 </p>

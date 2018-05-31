@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Direction, Item, Page, Pageable, SearchItemPageRequest, uuid } from '../../entity';
+import { Direction, Item, Page, Pageable, SearchItemPageRequest, Status, uuid } from '../../entity';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable()
@@ -20,6 +20,10 @@ export class ItemService {
 	findById(itemId: uuid, podcastId: uuid): Observable<Item> {
 		return this.http.get<Item>(`/api/podcasts/${podcastId}/items/${itemId}`);
 	}
+
+	download(itemId: uuid, podcastId: uuid): Observable<void> {
+    return this.http.get<void>(`/api/podcasts/${podcastId}/items/${itemId}/addtoqueue`);
+  }
 }
 
 function toSearchParams(request: SearchItemPageRequest): HttpParams {
@@ -51,3 +55,14 @@ export const defaultSearch: SearchItemPageRequest = {
 	tags: [],
 	sort: [{ property: 'pubDate', direction: Direction.DESC }]
 };
+
+export function isDownloadable(item: Item): boolean {
+  return item.status === Status.NOT_DOWNLOADED
+    || item.status === Status.DELETED
+    || item.status === Status.STOPPED
+    || item.status === Status.FAILED
+}
+
+export function isPlayable(item: Item): boolean {
+  return item.status === Status.FINISH;
+}

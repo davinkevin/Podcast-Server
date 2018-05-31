@@ -18,7 +18,17 @@
     & mat-icon {
       cursor: pointer;
     }
-  }}
+  }
+}
+
+.item__actions_button {
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  align-content: center;
+}
 
 .item__description {
   text-align: justify;
