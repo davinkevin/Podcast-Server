@@ -55,9 +55,13 @@
     </mat-card-header>
     <img mat-card-image [routerLink]="['/podcasts', item.podcastId, 'items', item.id]" [src]="item.cover?.url">
     <mat-card-actions>
-      <button mat-button (click)="play(item)">
+      <button mat-button (click)="play(item)" *ngIf="isPlayable(item)">
         <mat-icon class="section-icon">play_arrow</mat-icon>
         Play
+      </button>
+      <button mat-button (click)="download(item)" *ngIf="isDownloadable(item)"  >
+        <mat-icon>file_download</mat-icon>
+        Download
       </button>
     </mat-card-actions>
   </mat-card>

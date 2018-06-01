@@ -14,6 +14,8 @@ import { Search } from './search.actions';
 import { selectResults } from './search.reducer';
 import { CompanionComponent } from '@davinkevin/companion-component';
 import { PlayAction } from '#app/floating-player/floating-player.actions';
+import { isDownloadable as IsDownloadable, isPlayable as IsPlayable } from '#app/shared/service/item/item.service';
+import { DownloadItemAction } from '#app/app.actions';
 
 interface SearchItemRequestViewModel {
 	q?: string;
@@ -54,6 +56,9 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 	form: FormGroup;
 	items: Page<Item>;
+
+	isDownloadable: (item: Item) => boolean = IsDownloadable;
+	isPlayable: (item: Item) => boolean = IsPlayable;
 
 	companion = new CompanionComponent();
 
@@ -104,12 +109,12 @@ export class SearchComponent implements OnInit, OnDestroy {
 		this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
 	}
 
-	openSideNav() {
-		this.store.dispatch(new OpenSideNavAction());
-	}
-
 	play(item: Item) {
 		this.store.dispatch(new PlayAction(item));
+	}
+
+	download(item: Item): void {
+		this.store.dispatch(new DownloadItemAction(item.id, item.podcastId));
 	}
 
 	ngOnDestroy(): void {
