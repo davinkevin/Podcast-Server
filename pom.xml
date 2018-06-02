@@ -6,7 +6,7 @@
 
     <groupId>lan.dk</groupId>
     <artifactId>PodcastServer</artifactId>
-    <version>2018.5.0</version>
+    <version>2018.6.0</version>
     <packaging>pom</packaging>
 
     <modules>

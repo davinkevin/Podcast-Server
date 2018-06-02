@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>lan.dk.PodcastServer</groupId>
     <artifactId>Backend</artifactId>
-    <version>2018.5.0</version>
+    <version>2018.6.0</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -107,12 +107,12 @@
         <dependency>
             <groupId>lan.dk.PodcastServer</groupId>
             <artifactId>frontend-angularjs</artifactId>
-            <version>1.0.0</version>
+            <version>2018.6.0</version>
         </dependency>
         <dependency>
             <groupId>lan.dk.PodcastServer</groupId>
             <artifactId>frontend-angular</artifactId>
-            <version>1.0.0</version>
+            <version>2018.6.0</version>
         </dependency>
         <!-- Utilities -->
         <dependency>
