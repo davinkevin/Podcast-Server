@@ -71,18 +71,18 @@ export interface Sort {
 }
 
 export enum Direction {
-	ASC = <any>'ASC',
-	DESC = <any>'DESC'
+	ASC = 'ASC',
+	DESC = 'DESC'
 }
 
 export enum Status {
-	NOT_DOWNLOADED = <any>'NOT_DOWNLOADED',
-	DELETED = <any>'DELETED',
-	STARTED = <any>'STARTED',
-	FINISH = <any>'FINISH',
-	STOPPED = <any>'STOPPED',
-	PAUSED = <any>'PAUSED',
-	FAILED = <any>'FAILED'
+	NOT_DOWNLOADED = 'NOT_DOWNLOADED',
+	DELETED = 'DELETED',
+	STARTED = 'STARTED',
+	FINISH = 'FINISH',
+	STOPPED = 'STOPPED',
+	PAUSED = 'PAUSED',
+	FAILED = 'FAILED'
 }
 
 export interface Pageable {
