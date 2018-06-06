@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>backend</module>
         <module>frontend-angularjs</module>
         <module>frontend-angular</module>
+        <module>backend</module>
     </modules>
 </project>
