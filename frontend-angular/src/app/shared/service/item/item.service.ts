@@ -28,8 +28,7 @@ export class ItemService {
 
 function toSearchParams(request: SearchItemPageRequest): HttpParams {
 	// downloaded=true&page=0&size=12&sort=pubDate,DESC&tags=
-
-	let params = toParams(request)
+  let params = toParams(request)
 		.set('q', request.q || '')
 		.set('tags', request.tags.map(t => t.name).join(','));
 

@@ -4,14 +4,12 @@ import { PageEvent } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, map } from 'rxjs/operators';
-
-import { OpenSideNavAction } from '../app.actions';
 import { AppState } from '../app.reducer';
 import { Direction, Item, Page, SearchItemPageRequest, Sort, Status } from '../shared/entity';
 import { defaultSearch } from '../shared/service/item/item.service';
 
 import { Search } from './search.actions';
-import { selectResults } from './search.reducer';
+import { searchResults } from './search.reducer';
 import { CompanionComponent } from '@davinkevin/companion-component';
 import { PlayAction } from '#app/floating-player/floating-player.actions';
 import { isDownloadable as IsDownloadable, isPlayable as IsPlayable } from '#app/shared/service/item/item.service';
@@ -62,23 +60,23 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 	companion = new CompanionComponent();
 
-	constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder) {}
+	constructor(private route: ActivatedRoute, private store: Store<AppState>, private fb: FormBuilder) {}
 
 	ngOnInit() {
 		const untilDestroy = this.companion.untilDestroy();
 
-		this.form = this.formBuilder.group({
+		this.form = this.fb.group({
 			q: [''],
 			tags: [''],
 			page: [],
 			size: [],
-			status: [StatusesViewValue.ALL],
-			sort: this.formBuilder.group({ direction: [Direction.DESC], property: ['pubDate'] })
+			status: [],
+			sort: this.fb.group({ direction: [], property: [] })
 		});
 
 		this.form.valueChanges.pipe(untilDestroy(), debounceTime(500), map(toSearchItemRequest)).subscribe(v => this.search(v));
 
-		this.store.pipe(select(selectResults), untilDestroy()).subscribe(s => (this.items = s));
+		this.store.pipe(select(searchResults), untilDestroy()).subscribe(s => (this.items = s));
 
 		this.route.data.pipe(untilDestroy(), map(d => d.search)).subscribe(s => (this.items = s));
 

@@ -29,7 +29,7 @@ import { SearchActions, Search, SearchSuccess } from './search.actions';
 import { SearchComponent, StatusesViewValue } from './search.component';
 import { SearchEffects } from './search.effects';
 import * as fromSearch from './search.reducer';
-import { selectRequest, selectResults } from './search.reducer';
+import { searchRequest, searchResults } from './search.reducer';
 import { TruncateModule } from 'ng2-truncate';
 
 describe('SearchFeature', () => {
@@ -544,6 +544,7 @@ describe('SearchFeature', () => {
 
 				/* Then  */
 				expect(state.request).toEqual({
+					q: null,
 					page: 0,
 					size: 12,
 					status: [],
@@ -662,7 +663,7 @@ describe('SearchFeature', () => {
 			it('should select results', () => {
 				/* Given */
 				/* When  */
-				const r = selectResults(s);
+				const r = searchResults(s);
 				/* Then  */
 				expect(r).toEqual({
 					content: [],
@@ -680,7 +681,7 @@ describe('SearchFeature', () => {
 			it('should select results', () => {
 				/* Given */
 				/* When  */
-				const r = selectRequest(s);
+				const r = searchRequest(s);
 				/* Then  */
 				expect(r).toEqual({
 					page: 0,

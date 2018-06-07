@@ -9,6 +9,7 @@ export interface SearchState {
 
 const initialState: SearchState = {
 	request: {
+		q: null,
 		page: 0,
 		size: 12,
 		status: [],
@@ -45,5 +46,5 @@ export function reducer(state = initialState, action: SearchActions): SearchStat
 }
 
 const moduleSelector = createFeatureSelector<SearchState>('search');
-export const selectResults = createSelector(moduleSelector, (s: SearchState) => s.results);
-export const selectRequest = createSelector(moduleSelector, (s: SearchState) => s.request);
+export const searchResults = createSelector(moduleSelector, (s: SearchState) => s.results);
+export const searchRequest = createSelector(moduleSelector, (s: SearchState) => s.request);
