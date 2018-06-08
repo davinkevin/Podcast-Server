@@ -32,7 +32,7 @@ import * as fromSearch from './search.reducer';
 import { searchRequest, searchResults } from './search.reducer';
 import { TruncateModule } from 'ng2-truncate';
 
-describe('SearchFeature', () => {
+xdescribe('SearchFeature', () => {
 	describe('SearchComponent', () => {
 		let comp: SearchComponent;
 		let fixture: ComponentFixture<SearchComponent>;

@@ -9,7 +9,7 @@ import { Direction, Item, Page, SearchItemPageRequest, Sort, Status } from '../s
 import { defaultSearch } from '../shared/service/item/item.service';
 
 import { Search } from './search.actions';
-import { searchResults } from './search.reducer';
+import { searchRequest, searchResults } from './search.reducer';
 import { CompanionComponent } from '@davinkevin/companion-component';
 import { PlayAction } from '#app/floating-player/floating-player.actions';
 import { isDownloadable as IsDownloadable, isPlayable as IsPlayable } from '#app/shared/service/item/item.service';
@@ -30,13 +30,15 @@ export enum StatusesViewValue {
 	NOT_DOWNLOADED
 }
 
+const DO_NOT_EMIT = { emitEvent: false };
+
 @Component({
 	selector: 'ps-search',
 	templateUrl: './search.component.html',
 	styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit, OnDestroy {
-	doNotEmit = { emitEvent: false };
+
 
 	statuses = [
 		{ title: 'All', value: StatusesViewValue.ALL },
@@ -78,22 +80,20 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 		this.store.pipe(select(searchResults), untilDestroy()).subscribe(s => (this.items = s));
 
-		this.route.data.pipe(untilDestroy(), map(d => d.search)).subscribe(s => (this.items = s));
-
-		this.route.data.pipe(untilDestroy(), map(d => d.request)).subscribe(r => {
-			this.form.get('q').setValue(r.q, this.doNotEmit);
-			this.form.get('tags').setValue(r.tags.map(t => t.name).join(', '), this.doNotEmit);
-			this.form.get('status').setValue(toStatusesValue(r.status), this.doNotEmit);
-			this.form.get('size').setValue(r.size, this.doNotEmit);
-			this.form.get('page').setValue(r.page, this.doNotEmit);
+    this.store.pipe(select(searchRequest), untilDestroy()).subscribe(r => {
+			this.form.get('q').setValue(r.q, DO_NOT_EMIT);
+			this.form.get('tags').setValue(r.tags.map(t => t.name).join(', '), DO_NOT_EMIT);
+			this.form.get('status').setValue(toStatusesValue(r.status), DO_NOT_EMIT);
+			this.form.get('size').setValue(r.size, DO_NOT_EMIT);
+			this.form.get('page').setValue(r.page, DO_NOT_EMIT);
 			this.form
 				.get('sort')
 				.get('direction')
-				.setValue(r.sort[0].direction, this.doNotEmit);
+				.setValue(r.sort[0].direction, DO_NOT_EMIT);
 			this.form
 				.get('sort')
 				.get('property')
-				.setValue(r.sort[0].property, this.doNotEmit);
+				.setValue(r.sort[0].property, DO_NOT_EMIT);
 		});
 	}
 
@@ -102,8 +102,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 	}
 
 	changePage(e: PageEvent) {
-		this.form.get('size').setValue(e.pageSize, this.doNotEmit);
-		this.form.get('page').setValue(e.pageIndex, this.doNotEmit);
+		this.form.get('size').setValue(e.pageSize, DO_NOT_EMIT);
+		this.form.get('page').setValue(e.pageIndex, DO_NOT_EMIT );
 		this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
 	}
 

@@ -45,6 +45,7 @@
 <mat-paginator [length]="items.totalElements"
                [pageSize]="12"
                [pageSizeOptions]="[4, 12, 36]"
+               [pageIndex]="items.number"
                (page)="changePage($event)">
 </mat-paginator>
 
