@@ -1,6 +1,25 @@
 
 <ps-toolbar>
   <span class="title">{{item.title}}</span>
+
+  <span class="right">
+      <a mat-icon-button [href]="item.proxyURL" target="_blank">
+        <mat-icon>share</mat-icon>
+      </a>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="more">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <a mat-menu-item [href]="item.url" target="_blank">
+          <mat-icon>public</mat-icon>
+          <span>Play online</span>
+        </a>
+      </mat-menu>
+
+  </span>
+
 </ps-toolbar>
 
 <div class="item__cover" [ngStyle]="{'background-image': 'url(' + item.cover.url + ')' }">
@@ -23,7 +42,7 @@
 
 <mat-divider></mat-divider>
 
-<p class="item__description">
+<p class="item__description" *ngIf="item.description">
   {{item.description}}
 </p>
 

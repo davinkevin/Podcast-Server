@@ -38,8 +38,6 @@ const DO_NOT_EMIT = { emitEvent: false };
 	styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit, OnDestroy {
-
-
 	statuses = [
 		{ title: 'All', value: StatusesViewValue.ALL },
 		{ title: 'Downloaded', value: StatusesViewValue.DOWNLOADED },
@@ -80,7 +78,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 		this.store.pipe(select(searchResults), untilDestroy()).subscribe(s => (this.items = s));
 
-    this.store.pipe(select(searchRequest), untilDestroy()).subscribe(r => {
+		this.store.pipe(select(searchRequest), untilDestroy()).subscribe(r => {
 			this.form.get('q').setValue(r.q, DO_NOT_EMIT);
 			this.form.get('tags').setValue(r.tags.map(t => t.name).join(', '), DO_NOT_EMIT);
 			this.form.get('status').setValue(toStatusesValue(r.status), DO_NOT_EMIT);
@@ -103,7 +101,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 	changePage(e: PageEvent) {
 		this.form.get('size').setValue(e.pageSize, DO_NOT_EMIT);
-		this.form.get('page').setValue(e.pageIndex, DO_NOT_EMIT );
+		this.form.get('page').setValue(e.pageIndex, DO_NOT_EMIT);
 		this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
 	}
 

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatButtonModule, MatDividerModule, MatIconModule, MatListModule } from '@angular/material';
+import { MatButtonModule, MatDividerModule, MatIconModule, MatListModule, MatMenuModule } from '@angular/material';
 import { RouterModule, Routes } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
@@ -22,6 +22,7 @@ const routes: Routes = [{ path: 'podcasts/:podcastId/items/:id', component: Item
 		MatDividerModule,
 		MatListModule,
 		MatButtonModule,
+		MatMenuModule,
 		SharedModule,
 
 		StoreModule.forFeature('item', itemReducer),
