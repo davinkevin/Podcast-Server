@@ -21,6 +21,10 @@ export class ItemService {
 		return this.http.get<Item>(`/api/podcasts/${podcastId}/items/${itemId}`);
 	}
 
+	delete(itemId: uuid, podcastId: uuid): Observable<void> {
+    return this.http.delete<void>(`/api/podcasts/${podcastId}/items/${itemId}`);
+  }
+
 	download(itemId: uuid, podcastId: uuid): Observable<void> {
     return this.http.get<void>(`/api/podcasts/${podcastId}/items/${itemId}/addtoqueue`);
   }
