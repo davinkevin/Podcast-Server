@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { map, switchMap } from 'rxjs/operators';
+import { concatMap, flatMap, map, switchMap } from 'rxjs/operators';
 
 import { Item, Page, Podcast } from '../shared/entity';
 import { ItemService } from '../shared/service/item/item.service';
@@ -39,8 +39,8 @@ export class PodcastEffects {
 	refresh: Observable<Action> = this.actions$.pipe(
 		ofType(PodcastAction.REFRESH),
 		map((a: RefreshAction) => a.podcast),
-		switchMap(p => this.podcastService.refresh(p)),
-		map(_ => new RefreshSuccessAction())
+		concatMap((p: Podcast) => this.podcastService.refresh(p), p => p),
+		flatMap(p => [new RefreshSuccessAction(), new FindItemsByPodcastsAndPageAction(p.id)])
 	);
 
 	constructor(private actions$: Actions, private podcastService: PodcastService, private itemService: ItemService) {}

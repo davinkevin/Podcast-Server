@@ -14,17 +14,9 @@ export class PodcastItemsResolver implements Resolve<Page<Item>> {
 
 	resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Page<Item>> {
 		this.store.dispatch(
-			new FindItemsByPodcastsAndPageAction(route.params.id, {
-				page: 0,
-				size: 10,
-				sort: [{ property: 'pubDate', direction: Direction.DESC }]
-			})
+			new FindItemsByPodcastsAndPageAction(route.params.id)
 		);
 
 		return this.store.pipe(select(selectPodcastItems), skip(1), take(1));
 	}
-}
-
-export function toPodcastPageOfItems(d: any) {
-	return d.items;
 }

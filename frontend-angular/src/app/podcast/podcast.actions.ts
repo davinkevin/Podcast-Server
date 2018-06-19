@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store';
 import { Item, Page, Pageable, Podcast, uuid } from '../shared/entity';
+import { Direction } from '#app/shared/entity';
 
 export enum PodcastAction {
 	FIND_ONE = '[Podcast] Find One',
@@ -31,7 +32,10 @@ export class RefreshSuccessAction implements Action {
 
 export class FindItemsByPodcastsAndPageAction implements Action {
 	readonly type = PodcastAction.FIND_ITEMS;
-	constructor(public id: string, public page: Pageable) {}
+	constructor(
+		public id: string,
+		public page: Pageable = { page: 0, size: 10, sort: [{ property: 'pubDate', direction: Direction.DESC }] }
+	) {}
 }
 
 export class FindItemsByPodcastsAndPageSuccessAction implements Action {

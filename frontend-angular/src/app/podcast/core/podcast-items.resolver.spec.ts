@@ -268,8 +268,4 @@ describe('PodcastItemsResolver', () => {
 			store.dispatch(new FindItemsByPodcastsAndPageSuccessAction(PAGE_ITEMS));
 		})
 	);
-
-	it('should provide an extractor for root params', () => {
-		expect(toPodcastPageOfItems({ items: 'i' })).toEqual('i');
-	});
 });

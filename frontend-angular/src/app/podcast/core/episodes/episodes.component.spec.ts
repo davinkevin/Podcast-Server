@@ -4,12 +4,14 @@ import { EpisodesComponent } from './episodes.component';
 import { MatListModule } from '@angular/material';
 import * as fromPodcast from '../../podcast.reducer';
 import { RouterTestingModule } from '@angular/router/testing';
-import { StoreModule } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs/observable/of';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
+import { PodcastState } from '#app/podcast/podcast.reducer';
+import { FindItemsByPodcastsAndPageSuccessAction } from '#app/podcast/podcast.actions';
 
 const items = {
   content: [
@@ -238,7 +240,7 @@ describe('EpisodesComponent', () => {
 	let component: EpisodesComponent;
 	let fixture: ComponentFixture<EpisodesComponent>;
 	let el: DebugElement;
-
+  let store: Store<PodcastState>;
 	let datePipe: DatePipe;
 
 	beforeEach(
@@ -261,7 +263,13 @@ describe('EpisodesComponent', () => {
 		})
 	);
 
+  beforeEach(async () => {
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
+  });
+
 	beforeEach(async () => {
+	  store.dispatch(new FindItemsByPodcastsAndPageSuccessAction(items));
 		fixture = TestBed.createComponent(EpisodesComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
@@ -270,6 +278,9 @@ describe('EpisodesComponent', () => {
 	});
 
 	it('should create', () => {
+	  /* Given */
+    /* When */
+    /* Then */
 		expect(component).toBeTruthy();
 	});
 
