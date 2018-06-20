@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EpisodesComponent } from './episodes.component';
-import { MatListModule } from '@angular/material';
+import { MatListModule, MatPaginatorModule } from '@angular/material';
 import * as fromPodcast from '../../podcast.reducer';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Store, StoreModule } from '@ngrx/store';
@@ -249,6 +249,7 @@ describe('EpisodesComponent', () => {
 				declarations: [EpisodesComponent],
 				imports: [
 					MatListModule,
+          MatPaginatorModule,
 					RouterTestingModule,
 
 					StoreModule.forRoot({}),

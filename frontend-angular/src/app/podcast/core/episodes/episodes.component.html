@@ -1,4 +1,11 @@
 
+<mat-paginator
+  [hidePageSize]="true"
+  [length]="items.totalElements"
+  [pageSize]="12"
+  [pageIndex]="items.number"
+  (page)="changePage($event)">
+</mat-paginator>
 
 <mat-list>
   <mat-list-item *ngFor="let item of items.content" [routerLink]="['items', item.id]">
@@ -7,3 +14,11 @@
     <p matLine>{{ item.pubDate | date: 'dd/MM/yyyy à HH:mm'}}</p>
   </mat-list-item>
 </mat-list>
+
+<mat-paginator
+  [hidePageSize]="true"
+  [length]="items.totalElements"
+  [pageSize]="10"
+  [pageIndex]="items.number"
+  (page)="changePage($event)">
+</mat-paginator>

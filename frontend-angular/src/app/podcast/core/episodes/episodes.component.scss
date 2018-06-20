@@ -1,3 +1,5 @@
+@import "../../../../variables";
+
 .mat-list-item {
 
   &.mat-list-item-avatar {
@@ -27,4 +29,8 @@
 
   }
 
+}
+
+mat-paginator {
+  background-color: $global-background-color;
 }

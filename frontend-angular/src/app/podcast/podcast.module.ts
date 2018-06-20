@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatButtonModule, MatIconModule, MatListModule, MatMenuModule } from '@angular/material';
+import { MatButtonModule, MatIconModule, MatListModule, MatMenuModule, MatPaginatorModule } from '@angular/material';
 import { RouterModule, Routes } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
@@ -41,6 +41,7 @@ const routes: Routes = [
 		MatButtonModule,
 		MatMenuModule,
 		MatListModule,
+		MatPaginatorModule,
 
 		/* Routes */
 		RouterModule.forChild(routes),
