@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LocationBackAction } from '@davinkevin/router-store-helper';
+import { LocationBackAction, RouterNavigateAction } from '@davinkevin/router-store-helper';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
@@ -34,7 +34,7 @@ export class PodcastComponent implements OnInit, OnDestroy {
 	}
 
 	back() {
-		this.store.dispatch(new LocationBackAction());
+		this.store.dispatch(new RouterNavigateAction(['podcasts']));
 	}
 
 	ngOnDestroy(): void {

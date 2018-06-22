@@ -4,7 +4,7 @@ import { MatButtonModule, MatIconModule, MatMenuModule, MatToolbarModule } from 
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { LocationBackAction } from '@davinkevin/router-store-helper';
+import { LocationBackAction, RouterNavigateAction } from '@davinkevin/router-store-helper';
 import { Store, StoreModule } from '@ngrx/store';
 import { of } from 'rxjs/observable/of';
 
@@ -101,7 +101,7 @@ describe('PodcastComponent', () => {
 		/* When  */
 		back.triggerEventHandler('click', null);
 		/* Then  */
-		expect(store.dispatch).toHaveBeenCalledWith(new LocationBackAction());
+		expect(store.dispatch).toHaveBeenCalledWith(new RouterNavigateAction(['podcasts']));
 	});
 
 	function asText(d: DebugElement) {
