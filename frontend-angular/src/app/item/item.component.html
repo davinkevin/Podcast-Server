@@ -46,9 +46,17 @@
 
 <mat-divider></mat-divider>
 
-<p class="item__description" *ngIf="item.description">
+<h6 class="item__description__podcast_link">In <a class="item__description_link" [routerLink]="['/', 'podcasts', podcast.id]">{{ podcast.title }}</a></h6>
+
+<p class="item__description" *ngIf="!isEmpty(item.description); else emptyDescription">
   {{item.description}}
 </p>
+
+<ng-template #emptyDescription>
+  <p class="item__description" >
+    No description for this item
+  </p>
+</ng-template>
 
 <mat-divider></mat-divider>
 

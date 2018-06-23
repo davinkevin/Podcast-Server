@@ -11,8 +11,18 @@ import { ItemResolver } from './core/item.resolver';
 import { ItemComponent } from './item.component';
 import { ItemEffects } from './item.effects';
 import { itemReducer } from './item.reducer';
+import { PodcastResolver } from '#app/item/core/podcast.resolver';
 
-const routes: Routes = [{ path: 'podcasts/:podcastId/items/:id', component: ItemComponent, resolve: { item: ItemResolver } }];
+const routes: Routes = [
+	{
+		path: 'podcasts/:podcastId/items/:id',
+		component: ItemComponent,
+		resolve: {
+			item: ItemResolver,
+			podcast: PodcastResolver
+		}
+	}
+];
 
 @NgModule({
 	imports: [
@@ -28,7 +38,7 @@ const routes: Routes = [{ path: 'podcasts/:podcastId/items/:id', component: Item
 		StoreModule.forFeature('item', itemReducer),
 		EffectsModule.forFeature([ItemEffects])
 	],
-	providers: [ItemResolver],
+	providers: [ItemResolver, PodcastResolver],
 	declarations: [ItemComponent]
 })
 export class ItemModule {}

@@ -1,10 +1,11 @@
 import { Action } from '@ngrx/store';
-import { Item, uuid } from '../shared/entity';
-import { AppAction } from '#app/app.actions';
+import { Item, Podcast, uuid } from '../shared/entity';
 
 export enum ItemAction {
 	FIND_ONE = '[Item] Find One',
 	FIND_ONE_SUCCESS = '[Item] Find One Success',
+	FIND_PARENT_PODCAST = '[Item] Find parent podcast',
+	FIND_PARENT_PODCAST_SUCCESS = '[Item] Find parent podcast Success',
 	DELETE = '[Item] Delete item'
 }
 
@@ -18,9 +19,24 @@ export class FindOneSuccessAction implements Action {
 	constructor(public item: Item) {}
 }
 
+export class FindParentPodcastAction implements Action {
+	readonly type = ItemAction.FIND_PARENT_PODCAST;
+	constructor(public id: uuid) {}
+}
+
+export class FindParentPodcastSuccessAction implements Action {
+	readonly type = ItemAction.FIND_PARENT_PODCAST_SUCCESS;
+	constructor(public podcast: Podcast) {}
+}
+
 export class DeleteItemAction implements Action {
 	readonly type = ItemAction.DELETE;
 	constructor(public itemId: uuid, public podcastId: uuid) {}
 }
 
-export type ItemActions = FindOneAction | FindOneSuccessAction | DeleteItemAction;
+export type ItemActions =
+	| FindOneAction
+	| FindOneSuccessAction
+	| FindParentPodcastAction
+	| FindParentPodcastSuccessAction
+	| DeleteItemAction;

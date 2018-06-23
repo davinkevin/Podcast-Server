@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 
 import { AppState } from '../app.reducer';
-import { Item } from '../shared/entity';
+import { Item, Podcast } from '../shared/entity';
 import { CompanionComponent } from '@davinkevin/companion-component';
-import { item } from '#app/item/item.reducer';
+import { item, podcast } from '#app/item/item.reducer';
 import { LocationBackAction } from '@davinkevin/router-store-helper';
 import { PlayAction } from '#app/floating-player/floating-player.actions';
 import { DownloadItemAction } from '#app/app.actions';
@@ -18,6 +18,8 @@ import { DeleteItemAction } from '#app/item/item.actions';
 })
 export class ItemComponent implements OnInit, OnDestroy {
 	item: Item;
+	podcast: Podcast;
+
 	isDownloadable: (item: Item) => boolean = IsDownloadable;
 	isPlayable: (item: Item) => boolean = IsPlayable;
 
@@ -29,6 +31,7 @@ export class ItemComponent implements OnInit, OnDestroy {
 		const untilDestroy = this.companion.untilDestroy();
 
 		this.store.pipe(select(item), untilDestroy()).subscribe(v => (this.item = v));
+		this.store.pipe(select(podcast), untilDestroy()).subscribe(v => (this.podcast = v));
 	}
 
 	play(): void {
@@ -45,6 +48,10 @@ export class ItemComponent implements OnInit, OnDestroy {
 
 	back(): void {
 		this.store.dispatch(new LocationBackAction());
+	}
+
+	isEmpty(s: string) {
+		return s == null || s === '';
 	}
 
 	ngOnDestroy(): void {

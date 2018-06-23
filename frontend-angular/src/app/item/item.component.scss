@@ -38,6 +38,16 @@
   color: #7f7f7f;
 }
 
+.item__description__podcast_link {
+  color: #7f7f7f;
+  padding-left: 16px;
+  padding-right: 16px;
+  a.item__description_link {
+    color: #7f7f7f;
+    text-decoration: none;
+  }
+}
+
 .item__date {
   padding-top: 8px;
   display: flex;
