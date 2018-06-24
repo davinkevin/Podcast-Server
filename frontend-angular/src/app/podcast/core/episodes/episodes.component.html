@@ -8,11 +8,13 @@
 </mat-paginator>
 
 <mat-list>
-  <mat-list-item *ngFor="let item of items.content" [routerLink]="['items', item.id]">
-    <img matListAvatar [src]="item.cover.url" width="100" height="100">
-    <h3 matLine> {{ item.title }} </h3>
-    <p matLine>{{ item.pubDate | date: 'dd/MM/yyyy à HH:mm'}}</p>
-  </mat-list-item>
+  <a *ngFor="let item of items.content" [routerLink]="['items', item.id]">
+    <mat-list-item>
+      <img matListAvatar [src]="item.cover.url" width="100" height="100">
+      <h3 matLine> {{ item.title }} </h3>
+      <p matLine>{{ item.pubDate | date: 'dd/MM/yyyy à HH:mm'}}</p>
+    </mat-list-item>
+  </a>
 </mat-list>
 
 <mat-paginator

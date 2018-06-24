@@ -250,14 +250,13 @@ describe('EpisodesComponent', () => {
 				imports: [
 					MatListModule,
           MatPaginatorModule,
-					RouterTestingModule,
+          RouterTestingModule.withRoutes([]),
 
 					StoreModule.forRoot({}),
 					StoreModule.forFeature('podcast', fromPodcast.reducer),
 
 					RouterTestingModule
 				],
-				providers: [{ provide: ActivatedRoute, useValue: { data: of({ items }) } }]
 			}).compileComponents();
 
 			datePipe = new DatePipe('en-US');

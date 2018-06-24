@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
 import { AppState } from '../app.reducer';
 import { Podcast } from '../shared/entity';
+import { podcasts } from '#app/podcasts/podcasts.reducer';
 
 @Component({
 	selector: 'ps-podcasts',
@@ -14,13 +14,13 @@ import { Podcast } from '../shared/entity';
 export class PodcastsComponent implements OnInit {
 	podcasts: Podcast[];
 
-	constructor(private store: Store<AppState>, private route: ActivatedRoute) {}
+	constructor(private store: Store<AppState>) {}
 
 	ngOnInit() {
-		this.route.data.pipe(map(d => d.podcasts as Podcast[]), map(ps => ps.sort(byDate))).subscribe(d => (this.podcasts = d));
+		this.store.pipe(select(podcasts), map(toPodcastOrderedByDate)).subscribe(d => (this.podcasts = d));
 	}
 }
 
-function byDate(a: Podcast, b: Podcast) {
-	return new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime();
+function toPodcastOrderedByDate(p: Podcast[]) {
+	return p.sort((a: Podcast, b: Podcast) => new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime());
 }

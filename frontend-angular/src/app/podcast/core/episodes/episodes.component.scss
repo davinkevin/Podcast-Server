@@ -1,7 +1,10 @@
 @import "../../../../variables";
 
-.mat-list-item {
+a {
+  text-decoration: none;
+}
 
+.mat-list-item {
   &.mat-list-item-avatar {
     height: 100px;
     padding-bottom: 8px;

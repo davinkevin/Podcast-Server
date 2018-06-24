@@ -3,5 +3,7 @@
 </ps-toolbar>
 
 <div class="podcasts__results">
-  <img mat-card-image [src]="podcast.cover?.url" *ngFor="let podcast of podcasts" [routerLink]="[podcast.id]">
+  <a *ngFor="let podcast of podcasts" [routerLink]="podcast.id">
+    <img mat-card-image [src]="podcast.cover?.url">
+  </a>
 </div>

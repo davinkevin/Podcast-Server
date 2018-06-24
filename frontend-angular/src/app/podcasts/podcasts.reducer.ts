@@ -25,4 +25,4 @@ export function reducer(state = initialState, action: PodcastsActions): Podcasts
 }
 
 const moduleSelector = createFeatureSelector<PodcastsState>('podcasts');
-export const selectPodcasts = createSelector(moduleSelector, (s: PodcastsState) => s.podcasts);
+export const podcasts = createSelector(moduleSelector, (s: PodcastsState) => s.podcasts);

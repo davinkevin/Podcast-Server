@@ -14,8 +14,11 @@
     color: white;
     padding: 1vh 1vh;
 
-    & mat-icon {
-      cursor: pointer;
+    & a {
+      color: white;
+      mat-icon {
+        cursor: pointer;
+      }
     }
   }
 

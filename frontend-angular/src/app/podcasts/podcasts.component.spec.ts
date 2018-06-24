@@ -2,7 +2,6 @@ import { DebugElement } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule, MatToolbarModule } from '@angular/material';
 import { By } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Action, Store, StoreModule } from '@ngrx/store';
@@ -21,7 +20,7 @@ import { PodcastsComponent } from './podcasts.component';
 import { PodcastsEffects } from './podcasts.effects';
 import * as fromPodcasts from './podcasts.reducer';
 import { reducer } from './podcasts.reducer';
-import Mock = jest.Mock;
+import { APP_BASE_HREF } from '@angular/common';
 
 describe('PodcastsFeature', () => {
 	const podcasts = [
@@ -142,23 +141,23 @@ describe('PodcastsFeature', () => {
 						StoreModule.forRoot({}),
 						StoreModule.forFeature('podcasts', fromPodcasts.reducer)
 					],
-					providers: [{ provide: ActivatedRoute, useValue: { data: of({ podcasts }) } }],
 					declarations: [PodcastsComponent]
 				}).compileComponents();
 			})
 		);
 
 		beforeEach(() => {
+			store = TestBed.get(Store);
+			spyOn(store, 'dispatch').and.callThrough();
+			spyOn(store, 'select').and.callThrough();
+		});
+
+		beforeEach(() => {
+			store.dispatch(new FindAllSuccess(podcasts));
 			fixture = TestBed.createComponent(PodcastsComponent);
 			comp = fixture.componentInstance;
 			el = fixture.debugElement;
 			fixture.detectChanges();
-		});
-
-		beforeEach(() => {
-			store = TestBed.get(Store);
-			spyOn(store, 'dispatch').and.callThrough();
-			spyOn(store, 'select').and.callThrough();
 		});
 
 		it('should be created', () => {

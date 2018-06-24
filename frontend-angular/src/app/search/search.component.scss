@@ -33,6 +33,9 @@ mat-paginator {
     [mat-card-image] {
       height: 263px;
       object-fit: cover;
+      &:first-child {
+        margin-top: 0;
+      }
     }
 
   }

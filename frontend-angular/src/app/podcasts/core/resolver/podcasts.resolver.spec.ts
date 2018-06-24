@@ -8,7 +8,6 @@ import { reducer } from '../../podcasts.reducer';
 import { Podcast } from '#app/shared/entity';
 import { of } from 'rxjs/observable/of';
 import { PodcastService } from '#app/shared/service/podcast/podcast.service';
-import Spy = jasmine.Spy;
 
 describe('PodcastsResolver', () => {
 	let podcastService: PodcastService;
