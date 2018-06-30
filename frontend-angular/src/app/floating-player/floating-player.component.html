@@ -9,7 +9,7 @@
 
     <div [ngSwitch]="mediaType">
 
-      <video #video *ngSwitchCase="'video'" controls autoplay style="width: 100%; height: 100%">
+      <video #video *ngSwitchCase="'video'" controls autoplay>
         <source [src]="item.proxyURL" [type]="item.mimeType">
       </video>
 
