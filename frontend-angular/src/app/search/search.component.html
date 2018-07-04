@@ -70,3 +70,11 @@
     </mat-card-actions>
   </mat-card>
 </div>
+
+
+<mat-paginator [length]="items.totalElements"
+               [hidePageSize]="true"
+               [pageSize]="12"
+               [pageIndex]="items.number"
+               (page)="changePage($event)">
+</mat-paginator>
