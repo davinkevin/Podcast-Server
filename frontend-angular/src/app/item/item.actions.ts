@@ -6,7 +6,8 @@ export enum ItemAction {
 	FIND_ONE_SUCCESS = '[Item] Find One Success',
 	FIND_PARENT_PODCAST = '[Item] Find parent podcast',
 	FIND_PARENT_PODCAST_SUCCESS = '[Item] Find parent podcast Success',
-	DELETE = '[Item] Delete item'
+	DELETE = '[Item] Delete item',
+	RESET = '[Item] Reset item'
 }
 
 export class FindOneAction implements Action {
@@ -31,6 +32,11 @@ export class FindParentPodcastSuccessAction implements Action {
 
 export class DeleteItemAction implements Action {
 	readonly type = ItemAction.DELETE;
+	constructor(public itemId: uuid, public podcastId: uuid) {}
+}
+
+export class ResetAction implements Action {
+	readonly type = ItemAction.RESET;
 	constructor(public itemId: uuid, public podcastId: uuid) {}
 }
 

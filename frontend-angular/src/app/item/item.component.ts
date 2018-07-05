@@ -9,7 +9,7 @@ import { LocationBackAction } from '@davinkevin/router-store-helper';
 import { PlayAction } from '#app/floating-player/floating-player.actions';
 import { DownloadItemAction } from '#app/app.actions';
 import { isDownloadable as IsDownloadable, isPlayable as IsPlayable } from '#app/shared/service/item/item.service';
-import { DeleteItemAction } from '#app/item/item.actions';
+import { DeleteItemAction, ResetAction } from '#app/item/item.actions';
 
 @Component({
 	selector: 'ps-item',
@@ -44,6 +44,10 @@ export class ItemComponent implements OnInit, OnDestroy {
 
 	download(): void {
 		this.store.dispatch(new DownloadItemAction(this.item.id, this.item.podcastId));
+	}
+
+	reset(): void {
+		this.store.dispatch(new ResetAction(this.item.id, this.item.podcastId));
 	}
 
 	back(): void {

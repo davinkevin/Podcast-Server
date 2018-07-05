@@ -13,7 +13,8 @@ import {
 	FindOneSuccessAction,
 	FindParentPodcastAction,
 	FindParentPodcastSuccessAction,
-	ItemAction
+	ItemAction,
+	ResetAction
 } from './item.actions';
 import { RouterNavigateAction } from '@davinkevin/router-store-helper';
 import { PodcastService } from '#app/shared/service/podcast/podcast.service';
@@ -39,6 +40,13 @@ export class ItemEffects {
 		ofType(ItemAction.DELETE),
 		concatMap(({ itemId, podcastId }: DeleteItemAction) => this.itemService.delete(itemId, podcastId), id => id),
 		map(podcastId => new RouterNavigateAction(['podcasts', podcastId]))
+	);
+
+	@Effect()
+	resetItem = this.actions$.pipe(
+		ofType(ItemAction.RESET),
+		concatMap(({ itemId, podcastId }: ResetAction) => this.itemService.reset(itemId, podcastId), id => id),
+		map(({ itemId, podcastId }: ResetAction) => new FindOneAction(itemId, podcastId))
 	);
 
 	constructor(private actions$: Actions, private itemService: ItemService, private podcastService: PodcastService) {}
