@@ -48,6 +48,5 @@ public class WebSocketConfigTest {
 
         /* Then */
         verify(registry, times(1)).addEndpoint(eq("/ws"));
-        verify(registration, times(1)).withSockJS();
     }
 }

@@ -6,5 +6,5 @@ import AngularStompDKModule from 'AngularStompDK/core/ngStomp';
     name : 'ps.config.ngstomp',
     modules : [ AngularStompDKModule ]
 })
-@Config(ngstompProvider => {"ngInject"; ngstompProvider.url('/ws').credential('login', 'password').class(SockJS);} )
+@Config(ngstompProvider => {"ngInject"; ngstompProvider.url('/ws/sockjs').credential('login', 'password').class(SockJS);} )
 export default class AngularStompDK {}
