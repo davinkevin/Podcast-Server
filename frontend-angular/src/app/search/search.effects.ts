@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { map, switchMap } from 'rxjs/operators';
+import { concatMap, filter, map, switchMap } from 'rxjs/operators';
 
 import { Item, Page, SearchItemPageRequest } from '../shared/entity';
 import { ItemService } from '../shared/service/item/item.service';
 import { Search, SearchAction, SearchSuccess } from './search.actions';
+import { AppState } from '#app/app.reducer';
+import { AppAction, DownloadProgressAction } from '#app/app.actions';
+import { searchRequest } from '#app/search/search.reducer';
 
 @Injectable()
 export class SearchEffects {
@@ -18,5 +21,14 @@ export class SearchEffects {
 		map((results: Page<Item>) => new SearchSuccess(results))
 	);
 
-	constructor(private actions$: Actions, private itemService: ItemService) {}
+	@Effect()
+	updateSearchResultsAfterDownloadComplete = this.actions$.pipe(
+		ofType(AppAction.DOWNLOAD_PROGRESS),
+		map((a: DownloadProgressAction) => a.item),
+		filter((item: Item) => item.isDownloaded),
+		concatMap(() => this.store.select(searchRequest)),
+		map((sr: SearchItemPageRequest) => new Search(sr))
+	);
+
+	constructor(private actions$: Actions, private store: Store<AppState>, private itemService: ItemService) {}
 }

@@ -18,16 +18,27 @@ import { routerReducer as router, StoreRouterConnectingModule } from '@ngrx/rout
 import { AppEffects } from './app.effects';
 import { LocationStoreHelperModule, RouterStoreHelperModule } from '@davinkevin/router-store-helper';
 import { FloatingPlayerModule } from '#app/floating-player/floating-player.module';
-import { floatingPlayer } from '#app/floating-player/floating-player.reducer';
+import { NgxStompModule } from '@davinkevin/ngx-stomp';
+import { StompConfiguration } from '@davinkevin/ngx-stomp/src/lib/configuration';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full'}
 ];
 
+const stompConfig: StompConfiguration = {
+  login: 'login',
+  password: 'password',
+  url: '/ws',
+  debug: true,
+  vhost: '',
+  headers: {}
+};
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
     /* std Modules */       BrowserModule, BrowserAnimationsModule,
+    /* 3rd part Moduls */   NgxStompModule.withConfig(stompConfig),
     /* Materials Modules */ MatIconModule, MatSidenavModule, MatListModule,
     /* Router Modules */    RouterModule.forRoot(routes),
     /* Feature Modules */   SearchModule, PodcastsModule, PodcastModule, ItemModule, FloatingPlayerModule,

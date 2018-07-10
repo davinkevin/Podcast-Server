@@ -19,10 +19,10 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class WebSocketConfigTest {
 
-    @Mock MessageBrokerRegistry config;
-    @Mock StompEndpointRegistry registry;
-    @Mock StompWebSocketEndpointRegistration registration;
-    @InjectMocks WebSocketConfig webSocketConfig;
+    private @Mock MessageBrokerRegistry config;
+    private @Mock StompEndpointRegistry registry;
+    private @Mock StompWebSocketEndpointRegistration registration;
+    private @InjectMocks WebSocketConfig webSocketConfig;
     
     @Test
     public void should_add_broker() {
@@ -41,12 +41,15 @@ public class WebSocketConfigTest {
     @Test
     public void should_add_endpoint() {
         /* Given */
-        when(registry.addEndpoint(anyString())).thenReturn(registration);
+        when(registry.addEndpoint("/ws/sockjs")).thenReturn(registration);
+        when(registration.setAllowedOrigins("*")).thenReturn(registration);
+        when(registry.addEndpoint("/ws")).thenReturn(registration);
 
         /* When */
         webSocketConfig.registerStompEndpoints(registry);
 
         /* Then */
         verify(registry, times(1)).addEndpoint(eq("/ws"));
+        verify(registry, times(1)).addEndpoint(eq("/ws/sockjs"));
     }
 }
