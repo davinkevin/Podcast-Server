@@ -29,7 +29,7 @@ const stompConfig: StompConfiguration = {
   login: 'login',
   password: 'password',
   url: '/ws',
-  debug: true,
+  debug: false,
   vhost: '',
   headers: {}
 };

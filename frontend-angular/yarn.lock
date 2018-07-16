@@ -189,9 +189,9 @@
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@davinkevin/companion-component/-/companion-component-0.2.0.tgz#a8deef96e03c67f43fe120230eee78fdf5d53bc9"
 
-"@davinkevin/ngx-stomp@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@davinkevin/ngx-stomp/-/ngx-stomp-1.1.0.tgz#8810194466a0f2bb0ca1f972e2ca5e1b73b1508c"
+"@davinkevin/ngx-stomp@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@davinkevin/ngx-stomp/-/ngx-stomp-1.1.1.tgz#2f8e899058b90e2b8f35113f2f43a58f233b7993"
   dependencies:
     "@types/stompjs" "^2.3.0"
     stompjs "^2.3.3"
