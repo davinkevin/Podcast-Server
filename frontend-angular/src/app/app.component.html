@@ -2,22 +2,24 @@
 
   <mat-sidenav mode="over" [opened]="sideNavOpen" (openedChange)="onOpenChange($event)">
     <mat-list>
-      <mat-list-item routerLink="/search">
+      <a mat-list-item routerLink="/search">
         <mat-icon class="section-icon">search</mat-icon>
         <h4 mat-line>Search</h4>
-      </mat-list-item>
-      <mat-list-item routerLink="/podcasts">
+      </a>
+      <a routerLink="/podcasts" mat-list-item>
         <mat-icon class="section-icon" fontSet="fa" fontIcon="fa-podcast"></mat-icon>
-        <h4 mat-line>Podcasts</h4>
-      </mat-list-item>
-      <mat-list-item>
+        <h4 mat-line>
+          Podcasts
+        </h4>
+      </a>
+      <a mat-list-item>
         <mat-icon class="section-icon">timeline</mat-icon>
         <h4 mat-line>Stats</h4>
-      </mat-list-item>
-      <mat-list-item>
+      </a>
+      <a mat-list-item>
         <mat-icon class="section-icon">ondemand_video</mat-icon>
         <h4 mat-line>Player</h4>
-      </mat-list-item>
+      </a>
     </mat-list>
   </mat-sidenav>
 
