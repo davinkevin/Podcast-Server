@@ -287,7 +287,7 @@ describe('EpisodesComponent', () => {
 	it('should have coherent number of items', () => {
 		/* Given */
 		/* When  */
-		const itemsElement = el.queryAll(By.css('mat-list-item'));
+		const itemsElement = el.queryAll(By.css('[mat-list-item]'));
 		/* Then  */
 		expect(itemsElement.length).toEqual(10);
 	});
