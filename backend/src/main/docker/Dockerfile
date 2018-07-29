@@ -7,11 +7,10 @@ RUN apk add --update rtmpdump
 
 # Configuration specific for docker container
 ENV podcastserver.backup.location "/opt/podcast-server/backup/"
-ENV logging.path "/opt/podcast-server/podcast-server.log"
 ENV podcastserver.externaltools.rtmpdump "/usr/bin/rtmpdump"
 ENV podcastserver.externaltools.ffmpeg "/usr/bin/ffmpeg"
-ENV podcastserver.backup.location "/opt/podcast-server/backup/"
 ENV podcastserver.rootfolder "/opt/podcast-server/podcasts/"
+ENV logging.path "/opt/podcast-server/podcast-server.log"
 ENV spring.datasource.url "jdbc:h2:/opt/podcast-server/db;TRACE_LEVEL_FILE=0;MVCC=TRUE"
 
 # Exposed port for Web Part and Crash Shell
