@@ -1,0 +1,7 @@
+{
+  "web": {
+    "port": 4000,
+    "bindAddress": "0.0.0.0",
+    "sessionTimeoutMinutes": 30
+  }
+}
