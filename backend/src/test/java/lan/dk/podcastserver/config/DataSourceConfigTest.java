@@ -15,7 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.Calendar;
+import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,9 +56,9 @@ public class DataSourceConfigTest {
     public void should_have_a_now_date_time_provider() {
         /* Given */
         /* When */
-        Calendar now = dateTimeProvider.getNow();
+        Optional<TemporalAccessor> now = dateTimeProvider.getNow();
         /* Then */
-        assertThat(now.toInstant()).isBeforeOrEqualTo(Instant.now());
+        assertThat(Instant.from(now.get())).isBeforeOrEqualTo(Instant.now());
     }
 
 

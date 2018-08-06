@@ -22,6 +22,7 @@ import org.springframework.util.FileSystemUtils;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
@@ -53,13 +54,13 @@ public class CoverBusinessTest {
     @Test
     public void should_find_one() {
         /* Given */
-        when(coverRepository.findOne(any(UUID.class))).then(invocation -> new Cover().setId((UUID) invocation.getArguments()[0]));
+        when(coverRepository.findById(any(UUID.class))).then(invocation -> Optional.of(new Cover().setId((UUID) invocation.getArguments()[0])));
         UUID id = UUID.randomUUID();
         /* When */
         Cover cover = coverBusiness.findOne(id);
         /* Then */
         assertThat(cover).hasId(id);
-        verify(coverRepository, times(1)).findOne(eq(id));
+        verify(coverRepository, times(1)).findById(eq(id));
     }
 
     @Test

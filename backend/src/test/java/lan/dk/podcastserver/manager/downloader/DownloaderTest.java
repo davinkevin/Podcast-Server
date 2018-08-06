@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.UUID;
 
 import static io.vavr.API.List;
@@ -84,7 +85,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -93,7 +94,7 @@ public class DownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
-        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(1)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
         assertThat(simpleDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake typeless Podcast").resolve("file.mp4" + TEMPORARY_EXTENSION));
@@ -104,7 +105,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -112,7 +113,7 @@ public class DownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FAILED);
-        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(1)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
         assertThat(simpleDownloader.target).isNull();
@@ -123,7 +124,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -131,7 +132,7 @@ public class DownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.PAUSED);
-        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(1)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
     }
@@ -141,7 +142,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -159,7 +160,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -207,7 +208,7 @@ public class DownloaderTest {
                 DownloadingItem.builder().item(item.setUrl("http://foo.bar.com/bash")).urls(List()).build());
 
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/"));
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -222,7 +223,7 @@ public class DownloaderTest {
         /* Given */
         simpleDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
 
-        doThrow(RuntimeException.class).when(podcastRepository).findOne(any(UUID.class));
+        doThrow(RuntimeException.class).when(podcastRepository).findById(any(UUID.class));
 
         /* When */
         simpleDownloader.saveSyncWithPodcast();

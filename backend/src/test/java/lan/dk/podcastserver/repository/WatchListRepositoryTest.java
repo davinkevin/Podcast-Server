@@ -80,7 +80,7 @@ public class WatchListRepositoryTest {
         UUID id = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66");
 
         /* When */
-        WatchList watchList = watchListRepository.findOne(id);
+        WatchList watchList = watchListRepository.findById(id).get();
 
         /* Then */
         assertThat(watchList).isNotNull();
@@ -104,13 +104,13 @@ public class WatchListRepositoryTest {
     @Test
     public void should_add_a_item_to_playlist() {
         /* Given */
-        Item item = itemRepository.findOne(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
-        WatchList watchList = watchListRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
+        Item item = itemRepository.findById(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53")).get();
+        WatchList watchList = watchListRepository.findById(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66")).get();
 
         /* When */
         watchListRepository.save(watchList.add(item));
         watchListRepository.flush();
-        WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66"));
+        WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66")).get();
 
         /* Then */
         assertThat(fetchedWatchList.getItems()).hasSize(2);
@@ -119,13 +119,13 @@ public class WatchListRepositoryTest {
     @Test
     public void should_remove_item_from_playlist() {
         /* Given */
-        Item thirdItem = itemRepository.findOne(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"));
-        WatchList watchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+        Item thirdItem = itemRepository.findById(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")).get();
+        WatchList watchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
 
         /* When */
         watchListRepository.save(watchList.remove(thirdItem));
         watchListRepository.flush();
-        WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+        WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
 
         /* Then */
         assertThat(fetchedWatchList.getItems()).hasSize(1);
@@ -136,9 +136,9 @@ public class WatchListRepositoryTest {
         /* Given */
 
         /* When */
-        itemRepository.delete(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"));
+        itemRepository.deleteById(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"));
         itemRepository.flush();
-        WatchList fetchedWatchList = watchListRepository.findOne(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"));
+        WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
 
         /* Then */
         assertThat(fetchedWatchList.getItems()).hasSize(1);

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -11,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
-
-import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 17/01/2016 for PodcastServer
@@ -26,7 +25,7 @@ public class WatchListBusiness {
     private final JdomService jdomService;
 
     public WatchList findOne(UUID id) {
-        return Option(watchListRepository.findOne(id))
+        return Option.ofOptional(watchListRepository.findById(id))
                 .getOrElseThrow(() -> new RuntimeException("Watchlist not found"));
     }
 
@@ -35,27 +34,27 @@ public class WatchListBusiness {
     }
 
     public Set<WatchList> findContainsItem(UUID itemId) {
-        return Option(itemRepository.findOne(itemId))
+        return Option.ofOptional(itemRepository.findById(itemId))
                 .map(watchListRepository::findContainsItem)
                 .getOrElse(HashSet.empty());
     }
 
     public WatchList add(UUID watchListId, UUID itemId) {
-        WatchList watchList = watchListRepository.findOne(watchListId);
-        Item item = itemRepository.findOne(itemId);
+        WatchList watchList = findOne(watchListId);
+        Item item = Option.ofOptional(itemRepository.findById(itemId)).getOrElseThrow(() -> new Error("Item with ID "+ itemId +" not found"));
 
         return watchListRepository.save(watchList.add(item));
     }
 
     public WatchList remove(UUID watchListId, UUID itemId) {
-        WatchList watchList = watchListRepository.findOne(watchListId);
-        Item item = itemRepository.findOne(itemId);
+        WatchList watchList = findOne(watchListId);
+        Item item = Option.ofOptional(itemRepository.findById(itemId)).getOrElseThrow(() -> new Error("Item with ID "+ itemId +" not found"));
 
         return watchListRepository.save(watchList.remove(item));
     }
 
     public void delete(UUID uuid) {
-        watchListRepository.delete(uuid);
+        watchListRepository.deleteById(uuid);
     }
 
     public WatchList save(WatchList watchList) {

@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static io.vavr.API.None;
@@ -51,14 +52,14 @@ public class TagBusinessTest {
         /* Given */
         UUID tagId = UUID.randomUUID();
         Tag tag = new Tag().setId(tagId);
-        when(tagRepository.findOne(any(UUID.class))).thenReturn(tag);
+        when(tagRepository.findById(any(UUID.class))).thenReturn(Optional.of(tag));
 
         /* When */
         Tag tagToFind = tagBusiness.findOne(tagId);
 
         /* Then */
         assertThat(tagToFind).isSameAs(tag);
-        verify(tagRepository, times(1)).findOne(eq(tagId));
+        verify(tagRepository, times(1)).findById(eq(tagId));
     }
 
     @Test

@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -84,7 +85,7 @@ public class FfmpegDownloaderTest {
         ffmpegDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
         when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
 
         FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.getTitle()).toFile());

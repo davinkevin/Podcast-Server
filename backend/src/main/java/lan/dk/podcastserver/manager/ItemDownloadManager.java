@@ -19,14 +19,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static io.vavr.API.Option;
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static io.vavr.API.*;
 import static lan.dk.podcastserver.manager.selector.DownloaderSelector.NO_OP_DOWNLOADER;
 
 @Slf4j
@@ -162,7 +162,7 @@ public class ItemDownloadManager {
     }
 
     public void addItemToQueue(UUID id) {
-        this.addItemToQueue(itemRepository.findOne(id));
+        this.addItemToQueue(itemRepository.findById(id).orElseThrow(() -> new Error("Item with ID "+ id +" not found")));
     }
 
     void addItemToQueue(Item item) {
@@ -176,7 +176,7 @@ public class ItemDownloadManager {
 
     @Transactional
     public void removeItemFromQueue(UUID id, Boolean stopItem) {
-        Item item = itemRepository.findOne(id);
+        Item item = itemRepository.findById(id).orElseThrow(() -> new Error("Item with ID "+ id +" not found"));
         this.removeItemFromQueue(item);
 
         if (stopItem)

@@ -28,6 +28,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -258,7 +259,7 @@ public class ItemDownloadManagerTest {
     public void should_add_item_to_queue() throws URISyntaxException {
         /* Given */
         Item item = Item.builder().id(UUID.randomUUID()).status(Status.FINISH).build();
-        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
+        when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
 
         /* When */
@@ -266,7 +267,7 @@ public class ItemDownloadManagerTest {
 
         /* Then */
         verifyConvertAndSave(times(1));
-        verify(itemRepository, times(1)).findOne(eq(item.getId()));
+        verify(itemRepository, times(1)).findById(eq(item.getId()));
         assertThat(itemDownloadManager.getWaitingQueue()).isEmpty();
     }
 
@@ -287,11 +288,11 @@ public class ItemDownloadManagerTest {
     public void should_remove_from_queue() {
         /* Given */
         final Item item = new Item().setId(UUID.randomUUID());
-        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
+        when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
 
         /* When */ itemDownloadManager.removeItemFromQueue(item.getId(), true);
         /* Then */
-        verify(itemRepository, times(1)).findOne(integerArgumentCaptor.capture());
+        verify(itemRepository, times(1)).findById(integerArgumentCaptor.capture());
         assertThat(integerArgumentCaptor.getValue()).isEqualTo(item.getId());
         verify(itemRepository, times(1)).save(eq(item));
         verifyConvertAndSave(times(1));

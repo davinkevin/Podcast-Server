@@ -10,6 +10,7 @@ spring:
  datasource:
   url: jdbc:h2:/tmp/podcast-server
   username: sa
+
   driver-class-name: org.h2.Driver
  jpa:
   database-platform: org.hibernate.dialect.H2Dialect
@@ -21,12 +22,12 @@ spring:
     format_sql: true
     search.default:
       indexmanager: near-real-time
-      directory_provider: ram
+      directory_provider: local-heap
       indexBase: /tmp/podcast-server/lucene
- http.multipart:
+ servlet.multipart:
+  location: /tmp/podcast-server/
   max-file-size: 512MB
   max-request-size: 512MB
-  location: /tmp/podcast-server/
 
 server:
  port: 8080
@@ -34,14 +35,12 @@ server:
   enabled: true
   mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
-endpoints.sensitive: false
-management.context-path: /system
-management.security.enabled: false
-
 logging:
  path: /tmp/podcast-server/podcast-server.log
  level:
   lan.dk.podcastserver : DEBUG
+
+management.endpoint.health.show-details: always
 
 ##############################
 #    Application Specific    #

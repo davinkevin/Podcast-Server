@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import static io.vavr.API.Set;
 import static io.vavr.API.Try;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.function.Function.identity;
@@ -79,12 +80,14 @@ public class UpdatePodcastBusiness  {
     }
 
     @Transactional
-    public void updatePodcast(UUID id) { updatePodcast(HashSet.of(podcastRepository.findOne(id)), manualExecutor); }
+    public void updatePodcast(UUID id) {
+        Podcast podcast = podcastRepository.findById(id).orElseThrow(() -> new Error("Podcast with ID "+ id +" not found"));
+        updatePodcast(Set(podcast), manualExecutor); }
 
     @Transactional
     public void forceUpdatePodcast (UUID id){
         log.info("Lancement de l'update forcé");
-        Podcast podcast = podcastRepository.findOne(id);
+        Podcast podcast = podcastRepository.findById(id).orElseThrow(() -> new Error("Podcast with ID "+ id +" not found"));
         podcast.setSignature("");
         podcast = podcastRepository.save(podcast);
         updatePodcast(podcast.getId());
@@ -146,7 +149,7 @@ public class UpdatePodcastBusiness  {
             return itemsToAdd;
         }
 
-        itemRepository.save(itemsToAdd
+        itemRepository.saveAll(itemsToAdd
                 .peek(podcast::add)
                 .map(i -> i.setStatus(Status.NOT_DOWNLOADED))
                 .map(i -> i.setNumberOfFail(0))

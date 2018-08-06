@@ -15,17 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.UUID;
 
-import static io.vavr.API.None;
 import static io.vavr.API.Option;
 import static io.vavr.API.Try;
 import static java.util.Objects.isNull;
@@ -44,7 +42,7 @@ public class CoverBusiness {
     private final UrlService urlService;
 
     public Cover findOne(UUID id) {
-        return coverRepository.findOne(id);
+        return coverRepository.findById(id).orElseThrow(() -> new Error("Cover with ID "+ id +" not found"));
     }
 
     public String download(Podcast podcast) {

@@ -24,10 +24,10 @@ spring:
       indexmanager: near-real-time
       directory_provider: ram
       indexBase: /tmp/lucene
- http.multipart:
+ servlet.multipart:
+  location: /tmp/podcast-server/
   max-file-size: 512MB
   max-request-size: 512MB
-  location : /tmp/
 
 server:
  port: 8080
@@ -35,13 +35,12 @@ server:
   enabled: true
   mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
-management.context-path: /system
-endpoints.health.sensitive: false
-
 logging:
  path: /tmp/podcastserver.log
  level:
   lan.dk.podcastserver : DEBUG
+
+management.endpoint.health.show-details: always
 
 ##############################
 #    Application Specific    #

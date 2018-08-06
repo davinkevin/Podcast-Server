@@ -17,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
@@ -57,7 +58,7 @@ public class WatchListBusinessTest {
         WatchList p2 = WatchList.builder().id(UUID.fromString("86faa982-f462-400a-bc9b-91eb299910b6")).name("Second").build();
         Set<WatchList> watchLists = HashSet.of(p1, p2);
 
-        when(itemRepository.findOne(eq(id))).thenReturn(item);
+        when(itemRepository.findById(eq(id))).thenReturn(Optional.of(item));
         when(watchListRepository.findContainsItem(eq(item))).thenReturn(watchLists);
 
         /* When */
@@ -65,7 +66,7 @@ public class WatchListBusinessTest {
 
         /* Then */
         assertThat(watchListOfItem).isSameAs(watchLists);
-        verify(itemRepository, only()).findOne(eq(id));
+        verify(itemRepository, only()).findById(eq(id));
         verify(watchListRepository, only()).findContainsItem(eq(item));
     }
 
@@ -81,8 +82,8 @@ public class WatchListBusinessTest {
                 .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
-        when(itemRepository.findOne(eq(id))).thenReturn(item);
-        when(watchListRepository.findOne(eq(watchList.getId()))).thenReturn(watchList);
+        when(itemRepository.findById(eq(id))).thenReturn(Optional.of(item));
+        when(watchListRepository.findById(eq(watchList.getId()))).thenReturn(Optional.of(watchList));
         when(watchListRepository.save(any(WatchList.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -91,8 +92,8 @@ public class WatchListBusinessTest {
         /* Then */
         assertThat(watchListOfItem).isSameAs(watchList);
         assertThat(watchListOfItem).hasItems(item);
-        verify(itemRepository, only()).findOne(eq(id));
-        verify(watchListRepository, times(1)).findOne(eq(watchList.getId()));
+        verify(itemRepository, only()).findById(eq(id));
+        verify(watchListRepository, times(1)).findById(eq(watchList.getId()));
         verify(watchListRepository, times(1)).save(eq(watchList));
     }
 
@@ -108,8 +109,8 @@ public class WatchListBusinessTest {
                     .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
-        when(itemRepository.findOne(eq(id))).thenReturn(item);
-        when(watchListRepository.findOne(eq(watchList.getId()))).thenReturn(watchList);
+        when(itemRepository.findById(eq(id))).thenReturn(Optional.of(item));
+        when(watchListRepository.findById(eq(watchList.getId()))).thenReturn(Optional.of(watchList));
         when(watchListRepository.save(any(WatchList.class))).then(i -> i.getArguments()[0]);
 
         /* When */
@@ -118,8 +119,8 @@ public class WatchListBusinessTest {
         /* Then */
         assertThat(watchListOfItem).isSameAs(watchList);
         assertThat(watchListOfItem).doesNotHaveItems(item);
-        verify(itemRepository, only()).findOne(eq(id));
-        verify(watchListRepository, times(1)).findOne(eq(watchList.getId()));
+        verify(itemRepository, only()).findById(eq(id));
+        verify(watchListRepository, times(1)).findById(eq(watchList.getId()));
         verify(watchListRepository, times(1)).save(eq(watchList));
     }
 
@@ -132,7 +133,7 @@ public class WatchListBusinessTest {
         watchListBusiness.delete(id);
 
         /* Then */
-        verify(watchListRepository, only()).delete(eq(id));
+        verify(watchListRepository, only()).deleteById(eq(id));
     }
 
     @Test
@@ -163,14 +164,14 @@ public class WatchListBusinessTest {
                     .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
-        when(watchListRepository.findOne(eq(watchList.getId()))).thenReturn(watchList);
+        when(watchListRepository.findById(eq(watchList.getId()))).thenReturn(Optional.of(watchList));
 
         /* When */
         WatchList aWatchList = watchListBusiness.findOne(watchList.getId());
 
         /* Then */
         assertThat(aWatchList).isSameAs(watchList);
-        verify(watchListRepository, only()).findOne(eq(watchList.getId()));
+        verify(watchListRepository, only()).findById(eq(watchList.getId()));
     }
 
     @Test
@@ -185,14 +186,14 @@ public class WatchListBusinessTest {
                     .items(HashSet.<Item>empty().toJavaSet())
                 .build();
         when(jdomService.watchListToXml(eq(watchList), anyString())).thenReturn("anXml");
-        when(watchListRepository.findOne(eq(id))).thenReturn(watchList);
+        when(watchListRepository.findById(eq(id))).thenReturn(Optional.of(watchList));
 
         /* When */
         String s = watchListBusiness.asRss(id, domain);
 
         /* Then */
         assertThat(s).isEqualTo("anXml");
-        verify(watchListRepository).findOne(eq(id));
+        verify(watchListRepository).findById(eq(id));
         verify(jdomService).watchListToXml(same(watchList), eq(domain));
     }
 

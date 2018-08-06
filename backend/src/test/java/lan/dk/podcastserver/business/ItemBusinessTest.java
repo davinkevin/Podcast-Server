@@ -30,6 +30,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -90,12 +91,12 @@ public class ItemBusinessTest {
         /* Given */
         UUID idOfItem = UUID.randomUUID();
         Item item = new Item();
-        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
+        when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
         /* When */
         Item savedItem = itemBusiness.findOne(idOfItem);
         /* Then */
         assertThat(savedItem).isSameAs(item);
-        verify(itemRepository, times(1)).findOne(idOfItem);
+        verify(itemRepository, times(1)).findById(idOfItem);
     }
 
     @Test
@@ -108,13 +109,13 @@ public class ItemBusinessTest {
         item.setPodcast(podcast);
         podcast.getItems().add(item);
 
-        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
+        when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
 
         /* When */
         itemBusiness.delete(idOfItem);
         /* Then */
 
-        verify(itemRepository, times(1)).findOne(idOfItem);
+        verify(itemRepository, times(1)).findById(idOfItem);
         verify(itemDownloadManager, times(1)).removeItemFromQueueAndDownload(eq(item));
         verify(itemRepository, times(1)).delete(eq(item));
         assertThat(podcast.getItems()).isEmpty();
@@ -135,7 +136,7 @@ public class ItemBusinessTest {
         UUID itemId = UUID.randomUUID();
         Item item = mock(Item.class);
         when(item.reset()).thenReturn(item);
-        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
+        when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
         when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(false);
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
@@ -144,7 +145,7 @@ public class ItemBusinessTest {
 
         /* Then */
         assertThat(resetedItem).isSameAs(item);
-        verify(itemRepository, times(1)).findOne(eq(itemId));
+        verify(itemRepository, times(1)).findById(eq(itemId));
         verify(itemDownloadManager, times(1)).isInDownloadingQueue(eq(item));
         verify(item, times(1)).reset();
         verify(itemRepository, times(1)).save(eq(item));
@@ -156,7 +157,7 @@ public class ItemBusinessTest {
         UUID itemId = UUID.randomUUID();
         Item item = mock(Item.class);
         when(item.reset()).thenReturn(item);
-        when(itemRepository.findOne(any(UUID.class))).thenReturn(item);
+        when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
         when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(true);
 
         /* When */
@@ -164,7 +165,7 @@ public class ItemBusinessTest {
 
         /* Then */
         assertThat(resetedItem).isNull();
-        verify(itemRepository, times(1)).findOne(eq(itemId));
+        verify(itemRepository, times(1)).findById(eq(itemId));
         verify(itemDownloadManager, times(1)).isInDownloadingQueue(eq(item));
     }
 

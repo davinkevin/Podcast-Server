@@ -83,7 +83,7 @@ public class ItemBusiness {
         return fullTextIdsWithOrder
                 .flatMap(id -> allResult.find(item -> id.equals(item.getId())))
                 // Keep only the needed element for the page
-                .drop(page.getOffset())
+                .drop(Long.valueOf(page.getOffset()).intValue())
                 .take(page.getPageSize())
                 .transform(v -> new PageImpl<>(v.toJavaList(), page, v.length()));
     }
@@ -94,7 +94,7 @@ public class ItemBusiness {
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Item findOne(UUID id) {
-        return itemRepository.findOne(id);
+        return itemRepository.findById(id).orElseThrow(() -> new Error("Item with ID "+ id +" not found"));
     }
 
     public void delete(UUID id) {
@@ -132,7 +132,6 @@ public class ItemBusiness {
         //TODO utiliser BEAN_UTIL pour faire du dynamique :
         // 1er temps : Template en dure : {title} - {date} - {title}.mp3
 
-        Item item = new Item();
         String originalFilename = uploadedFile.getOriginalFilename();
 
         Path fileToSave = podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(originalFilename);
@@ -141,15 +140,17 @@ public class ItemBusiness {
 
         uploadedFile.transferTo(fileToSave.toFile());
 
-        item.setTitle(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
-                .setPubDate(fromFileName(originalFilename.split(" - ")[1]))
-                .setLength(uploadedFile.getSize())
-                .setMimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(originalFilename)))
-                .setDescription(podcast.getDescription())
-                .setFileName(originalFilename)
-                .setDownloadDate(of(LocalDateTime.now(), ZoneId.systemDefault()))
-                .setPodcast(podcast)
-                .setStatus(Status.FINISH);
+        Item item = Item.builder()
+                    .title(FilenameUtils.removeExtension(originalFilename.split(" - ")[2]))
+                    .pubDate(fromFileName(originalFilename.split(" - ")[1]))
+                    .length(uploadedFile.getSize())
+                    .mimeType(mimeTypeService.getMimeType(FilenameUtils.getExtension(originalFilename)))
+                    .description(podcast.getDescription())
+                    .fileName(originalFilename)
+                    .downloadDate(of(LocalDateTime.now(), ZoneId.systemDefault()))
+                    .podcast(podcast)
+                    .status(Status.FINISH)
+                .build();
 
         podcast.getItems().add(item);
         podcast.setLastUpdate(now());

@@ -87,7 +87,7 @@ public class ItemRepositoryImplTest {
         when(termMatchingContext.matching(anyString())).thenReturn(termTermination);
         when(termTermination.createQuery()).thenReturn(mock(Query.class));
         when(booleanJunction.must(any())).thenReturn(mock(MustJunction.class));
-        when(fullTextEntityManager.createFullTextQuery(any(), any())).thenReturn(fullTextQuery);
+        when(fullTextEntityManager.createFullTextQuery(any(Query.class), any())).thenReturn(fullTextQuery);
         when(booleanJunction.createQuery()).thenReturn(mock(Query.class));
         when(fullTextQuery.setProjection(anyString())).thenReturn(fullTextQuery);
         when(fullTextQuery.setResultTransformer(any(ResultTransformer.class))).thenReturn(fullTextQuery);
@@ -127,7 +127,7 @@ public class ItemRepositoryImplTest {
         when(termMatchingContext.matching(anyString())).thenReturn(termTermination);
         when(termTermination.createQuery()).thenReturn(mock(Query.class));
         when(booleanJunction.must(any())).thenReturn(mock(MustJunction.class));
-        when(fullTextEntityManager.createFullTextQuery(any(), any())).thenReturn(fullTextQuery);
+        when(fullTextEntityManager.createFullTextQuery(any(Query.class), any())).thenReturn(fullTextQuery);
         when(booleanJunction.createQuery()).thenReturn(mock(Query.class));
         when(fullTextQuery.setProjection(anyString())).thenReturn(fullTextQuery);
         when(fullTextQuery.setResultTransformer(any(ResultTransformer.class))).thenReturn(fullTextQuery);

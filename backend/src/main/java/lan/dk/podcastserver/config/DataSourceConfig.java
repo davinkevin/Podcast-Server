@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.GregorianCalendar;
+import java.util.Optional;
 
 import static java.time.ZonedDateTime.now;
 
@@ -43,6 +43,6 @@ public class DataSourceConfig {
 
     @Bean
     DateTimeProvider dateTimeProvider() {
-        return () -> GregorianCalendar.from(now());
+        return () -> Optional.of(now());
     }
 }

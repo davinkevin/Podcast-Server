@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.downloader;
 
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -178,7 +179,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     @Transactional
     protected void saveSyncWithPodcast() {
         Try.run(() -> {
-            item.setPodcast(podcastRepository.findOne(item.getPodcast().getId()));
+            Podcast podcast = podcastRepository.findById(item.getPodcast().getId()).orElseThrow(() -> new Error("Item with ID "+ item.getPodcast().getId() +" not found"));
+            item.setPodcast(podcast);
             itemRepository.save(item);
         })
             .onFailure(e -> log.error("Error during save and Sync of the item {}", item, e));

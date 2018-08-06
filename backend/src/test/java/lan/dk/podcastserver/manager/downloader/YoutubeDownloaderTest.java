@@ -37,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -116,7 +117,7 @@ public class YoutubeDownloaderTest {
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
         when(vGet.getContentExt(any())).thenCallRealMethod();
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
@@ -147,7 +148,7 @@ public class YoutubeDownloaderTest {
         Item item = this.item.setStatus(Status.STARTED);
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
@@ -210,7 +211,7 @@ public class YoutubeDownloaderTest {
 
         DownloadInfo info = mock(DownloadInfo.class);
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
@@ -231,7 +232,7 @@ public class YoutubeDownloaderTest {
         Item item = this.item.setStatus(Status.STARTED);
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast.setTitle("bin"));
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast.setTitle("bin")));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(podcastServerParameters.getRootfolder()).thenReturn(Paths.get("/"));
         when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
@@ -252,7 +253,7 @@ public class YoutubeDownloaderTest {
         Item item = this.item.setStatus(Status.STARTED);
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
@@ -314,7 +315,7 @@ public class YoutubeDownloaderTest {
         Item item = this.item.setStatus(Status.STARTED);
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(itemDownloadManager.canBeReset(eq(this.item))).thenReturn(false);
         when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);

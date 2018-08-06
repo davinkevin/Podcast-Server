@@ -25,7 +25,7 @@ public class TagBusiness {
     }
 
     public Tag findOne(UUID id) {
-        return tagRepository.findOne(id);
+        return tagRepository.findById(id).orElseThrow(() -> new Error("Tag with ID "+ id +" not found"));
     }
 
     public Set<Tag> findByNameLike(String name) {

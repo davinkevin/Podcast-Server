@@ -25,6 +25,7 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.UUID;
 
 import static io.vavr.API.List;
@@ -75,7 +76,7 @@ public class RTMPDownloaderTest {
         when(podcastServerParameters.getDownloadExtension()).thenReturn(TEMPORARY_EXTENSION);
         when(externalTools.getRtmpdump()).thenReturn("/usr/local/bin/rtmpdump");
         when(podcastServerParameters.getRootfolder()).thenReturn(ROOT_TEST_PATH);
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
 
         rtmpDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List()).build());
         rtmpDownloader.setItemDownloadManager(itemDownloadManager);

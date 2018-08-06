@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -160,7 +161,7 @@ public class UpdatePodcastBusinessTest {
                 .setTitle("a title");
 
         Updater updater = mock(Updater.class);
-        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
+        when(podcastRepository.findById(any(UUID.class))).thenReturn(Optional.of(podcast));
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> false);
         when(updater.update(any(Podcast.class))).then(i -> {
@@ -182,7 +183,7 @@ public class UpdatePodcastBusinessTest {
         ZonedDateTime now = ZonedDateTime.now();
         Podcast podcast = new Podcast().setTitle("podcast1");
         Updater updater = mock(Updater.class);
-        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast);
+        when(podcastRepository.findById(any(UUID.class))).thenReturn(Optional.of(podcast));
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(updater.notIn(any(Podcast.class))).then(i -> {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
@@ -218,7 +219,7 @@ public class UpdatePodcastBusinessTest {
         Podcast podcast1 = new Podcast().setTitle("podcast1");
         podcast1.setId(UUID.randomUUID());
         Updater updater = mock(Updater.class);
-        when(podcastRepository.findOne(any(UUID.class))).thenReturn(podcast1);
+        when(podcastRepository.findById(any(UUID.class))).thenReturn(Optional.of(podcast1));
         when(updaterSelector.of(anyString())).thenReturn(updater);
         when(podcastRepository.save(any(Podcast.class))).thenReturn(podcast1);
         when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> !i.getArgumentAt(0, Podcast.class).contains(item));
@@ -234,7 +235,7 @@ public class UpdatePodcastBusinessTest {
         /* Then */
         assertThat(podcast1).hasLastUpdate(null);
 
-        verify(podcastRepository, times(2)).findOne(any(UUID.class));
+        verify(podcastRepository, times(2)).findById(any(UUID.class));
         verify(podcastRepository, times(1)).save(any(Podcast.class));
     }
 

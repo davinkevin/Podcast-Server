@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -96,7 +97,7 @@ public class HTTPDownloaderTest {
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
@@ -113,7 +114,7 @@ public class HTTPDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FINISH);
-        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(1)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
         assertThat(httpDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4"));
@@ -127,7 +128,7 @@ public class HTTPDownloaderTest {
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
@@ -141,7 +142,7 @@ public class HTTPDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.STOPPED);
-        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(1)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
         assertThat(httpDownloader.target).isEqualTo(IOUtils.ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4" + TEMPORARY_EXTENSION));
@@ -156,7 +157,7 @@ public class HTTPDownloaderTest {
         WGet wGet = mock(WGet.class);
         DownloadMultipartError error = mock(DownloadMultipartError.class);
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
@@ -170,7 +171,7 @@ public class HTTPDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FAILED);
-        verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(2)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(2)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
     }
@@ -183,7 +184,7 @@ public class HTTPDownloaderTest {
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
@@ -195,7 +196,7 @@ public class HTTPDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.STARTED);
-        verify(podcastRepository, atLeast(1)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(1)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(1)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
     }
@@ -208,7 +209,7 @@ public class HTTPDownloaderTest {
         DownloadInfo downloadInfo = mock(DownloadInfo.class);
         WGet wGet = mock(WGet.class);
 
-        when(podcastRepository.findOne(eq(podcast.getId()))).thenReturn(podcast);
+        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
         when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
@@ -220,7 +221,7 @@ public class HTTPDownloaderTest {
 
         /* Then */
         assertThat(item.getStatus()).isEqualTo(Status.FAILED);
-        verify(podcastRepository, atLeast(2)).findOne(eq(podcast.getId()));
+        verify(podcastRepository, atLeast(2)).findById(eq(podcast.getId()));
         verify(itemRepository, atLeast(2)).save(eq(item));
         verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item));
     }

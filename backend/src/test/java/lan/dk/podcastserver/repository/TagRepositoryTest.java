@@ -59,7 +59,7 @@ public class TagRepositoryTest {
         dbSetupTracker.skipNextLaunch();
         UUID id = UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08");
         /* WHEN  */
-        Tag tag = tagRepository.findOne(id);
+        Tag tag = tagRepository.findById(id).get();
         /* THEN  */
         assertThat(tag)
                 .hasId(id)

@@ -3,36 +3,37 @@ package lan.dk.podcastserver.repository.impl;
 import io.vavr.collection.List;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.transform.ResultTransformer;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.UUID;
 
 import static io.vavr.API.Option;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
     private static final HibernateIdExtractor RESULT_TRANSFORMER = new HibernateIdExtractor();
 
-    private final FullTextEntityManager fullTextEntityManager;
-
-    public ItemRepositoryImpl(FullTextEntityManager fem) {
-        this.fullTextEntityManager = fem;
-    }
+    private final EntityManager entityManager;
 
     @Override
+    @Transactional
     public void reindex() throws InterruptedException {
-        fullTextEntityManager
+        Search.getFullTextEntityManager(entityManager)
                 .createIndexer(Item.class)
                     .batchSizeToLoadObjects(25)
                     .cacheMode(CacheMode.NORMAL)
@@ -46,6 +47,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<UUID> fullTextSearch(String term) {
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         if (StringUtils.isEmpty(term))
             return List.empty();
 

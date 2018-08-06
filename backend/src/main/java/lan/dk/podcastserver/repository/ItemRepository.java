@@ -11,7 +11,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +23,13 @@ import static com.querydsl.core.types.ExpressionUtils.allOf;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositoryCustom, QueryDslPredicateExecutor<Item> {
+public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositoryCustom, QuerydslPredicateExecutor<Item> {
 
     @CacheEvict(value = {"search", "stats"}, allEntries = true)
     Item save(Item item);
 
     @CacheEvict(value = {"search", "stats"}, allEntries = true)
-    void delete(Item item);
+    void deleteById(Item item);
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Page<Item> findByPodcast(UUID idPodcast, Pageable pageRequest) {

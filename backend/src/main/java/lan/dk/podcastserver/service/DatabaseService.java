@@ -3,7 +3,6 @@ package lan.dk.podcastserver.service;
 import lan.dk.podcastserver.service.properties.Backup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.search.jpa.FullTextEntityManager;
 import org.rauschig.jarchivelib.ArchiveFormat;
 import org.rauschig.jarchivelib.Archiver;
 import org.rauschig.jarchivelib.ArchiverFactory;
@@ -12,6 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +47,7 @@ public class DatabaseService {
     private static final String QUERY_BACKUP_BINARY = "BACKUP TO '%s'";
 
     private final Backup backup;
-    private final FullTextEntityManager em;
+    private final EntityManager em;
 
     @Transactional
     public Path backupWithDefault() throws IOException {

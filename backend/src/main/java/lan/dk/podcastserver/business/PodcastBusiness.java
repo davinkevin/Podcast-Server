@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.business;
 
 import io.vavr.collection.HashSet;
-import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static io.vavr.API.*;
+import static io.vavr.API.Try;
 
 @Slf4j
 @Component
@@ -45,11 +45,11 @@ public class PodcastBusiness {
     }
 
     public Podcast findOne(UUID id) {
-        return Option(podcastRepository.findOne(id)).getOrElseThrow(() -> new PodcastNotFoundException(id));
+        return Option.ofOptional(podcastRepository.findById(id)).getOrElseThrow(() -> new PodcastNotFoundException(id));
     }
 
     public void delete(UUID id) {
-        podcastRepository.delete(id);
+        podcastRepository.deleteById(id);
         //TODO : Delete the folder with java.nio.PATH and java.nio.FILES
     }
 
@@ -60,7 +60,7 @@ public class PodcastBusiness {
 
     //*****//
     public Podcast patchUpdate(Podcast patchPodcast) {
-        Podcast podcastToUpdate = this.findOne(patchPodcast.getId());
+        Podcast podcastToUpdate = findOne(patchPodcast.getId());
 
         // Move folder if name has change :
         if (!StringUtils.equals(podcastToUpdate.getTitle(), patchPodcast.getTitle())) {
