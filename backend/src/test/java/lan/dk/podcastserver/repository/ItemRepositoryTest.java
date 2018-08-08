@@ -87,7 +87,7 @@ public class ItemRepositoryTest {
         /* Given */
         dbSetupTracker.skipNextLaunch();
         UUID podcastId = UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561");
-        PageRequest pageRequest = new PageRequest(1, 1, Sort.Direction.ASC, "id");
+        PageRequest pageRequest = PageRequest.of(1, 1, Sort.Direction.ASC, "id");
 
         /* When */
         Page<Item> itemByPodcast = itemRepository.findByPodcast(podcastId, pageRequest);

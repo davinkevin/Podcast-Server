@@ -62,7 +62,7 @@ public class ItemBusinessTest {
     @Test
     public void should_find_all_by_page() {
         /* Given */
-        PageRequest pageRequest = new PageRequest(1, 3);
+        PageRequest pageRequest = PageRequest.of(1, 3);
         PageImpl<Item> page = new PageImpl<>(new ArrayList<>());
         when(itemRepository.findAll(any(Pageable.class))).thenReturn(page);
 
@@ -173,7 +173,7 @@ public class ItemBusinessTest {
     public void should_find_page_in_podcast() {
         /* Given */
         UUID idPodcast = UUID.randomUUID();
-        PageRequest pageRequest = new PageRequest(0, 20);
+        PageRequest pageRequest = PageRequest.of(0, 20);
         PageImpl<Item> pageOfItem = new PageImpl<>(new ArrayList<>());
         when(itemRepository.findByPodcast(any(UUID.class), any(PageRequest.class))).thenReturn(pageOfItem);
 
@@ -236,7 +236,7 @@ public class ItemBusinessTest {
         /* Given */
         String term = "Foo";
         Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
-        PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
+        PageRequest pageRequest = PageRequest.of(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
         when(itemRepository.fullTextSearch(eq(term))).thenReturn(List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
@@ -255,7 +255,7 @@ public class ItemBusinessTest {
     public void should_find_by_tags() {
         /* Given */
         Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
-        PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("DESC"), "title");
+        PageRequest pageRequest = PageRequest.of(1, 3, Sort.Direction.fromString("DESC"), "title");
         PageImpl<Item> pageResponse = new PageImpl<>(new ArrayList<>());
 
         when(itemRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(pageResponse);
@@ -273,7 +273,7 @@ public class ItemBusinessTest {
         /* Given */
         String term = "Foo";
         Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setName("Discovery"), new Tag().setName("Fun"));
-        PageRequest pageRequest = new PageRequest(1, 3, Sort.Direction.fromString("ASC"), "pertinence");
+        PageRequest pageRequest = PageRequest.of(1, 3, Sort.Direction.fromString("ASC"), "pertinence");
         List<Item> itemsFrom1To20 = IntStream.range(1, 20)
                 .mapToObj(id -> new Item().setId(UUID.randomUUID()))
                 .collect(List.collector());
