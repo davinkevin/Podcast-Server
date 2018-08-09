@@ -7,7 +7,7 @@ import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.jdom2.Element;
 import org.springframework.stereotype.Service;
 

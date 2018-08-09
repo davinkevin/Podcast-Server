@@ -6,7 +6,7 @@ import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lombok.AllArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 

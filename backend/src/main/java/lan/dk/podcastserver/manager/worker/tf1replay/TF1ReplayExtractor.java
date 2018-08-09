@@ -18,15 +18,14 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
+import javax.validation.constraints.NotEmpty;
 
 import static io.vavr.API.*;
-import static lan.dk.podcastserver.service.UrlService.*;
 import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
+import static lan.dk.podcastserver.service.UrlService.USER_AGENT_MOBILE;
 
 /**
  * Created by kevin on 12/12/2017

@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.worker.mycanal;
 import io.vavr.control.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import static io.vavr.API.None;
 import static io.vavr.API.Option;

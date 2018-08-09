@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.noop;
 
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Created by kevin on 08/03/2016 for Podcast Server

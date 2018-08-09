@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.manager.worker;
 
 import lan.dk.podcastserver.entity.Podcast;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Created by kevin on 22/02/15.

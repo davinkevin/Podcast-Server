@@ -9,7 +9,7 @@ import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
