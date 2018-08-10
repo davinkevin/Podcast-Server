@@ -83,7 +83,9 @@ public class ItemRepositoryImplTest {
         when(entityContext.get()).thenReturn(queryBuilder);
         when(queryBuilder.bool()).thenReturn(booleanJunction);
         when(queryBuilder.keyword()).thenReturn(termContext);
-        when(termContext.onFields(anyVararg())).thenReturn(termMatchingContext);
+        when(termContext.onField(anyString())).thenReturn(termMatchingContext);
+        when(termMatchingContext.boostedTo(anyFloat())).thenReturn(termMatchingContext);
+        when(termMatchingContext.andField(anyString())).thenReturn(termMatchingContext);
         when(termMatchingContext.matching(anyString())).thenReturn(termTermination);
         when(termTermination.createQuery()).thenReturn(mock(Query.class));
         when(booleanJunction.must(any())).thenReturn(mock(MustJunction.class));
@@ -123,7 +125,9 @@ public class ItemRepositoryImplTest {
         when(entityContext.get()).thenReturn(queryBuilder);
         when(queryBuilder.bool()).thenReturn(booleanJunction);
         when(queryBuilder.keyword()).thenReturn(termContext);
-        when(termContext.onFields(anyVararg())).thenReturn(termMatchingContext);
+        when(termContext.onField(anyString())).thenReturn(termMatchingContext);
+        when(termMatchingContext.boostedTo(anyFloat())).thenReturn(termMatchingContext);
+        when(termMatchingContext.andField(anyString())).thenReturn(termMatchingContext);
         when(termMatchingContext.matching(anyString())).thenReturn(termTermination);
         when(termTermination.createQuery()).thenReturn(mock(Query.class));
         when(booleanJunction.must(any())).thenReturn(mock(MustJunction.class));

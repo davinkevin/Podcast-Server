@@ -56,7 +56,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         final BooleanJunction<BooleanJunction> query = qbDsl.bool();
         Arrays.stream(term.split("\\s+"))
-                .map(subTerm -> qbDsl.keyword().onFields(SEARCH_FIELDS).matching(subTerm).createQuery())
+                .map(subTerm -> qbDsl.keyword()
+                        .onField("description").boostedTo(2F)
+                        .andField("title").matching(subTerm)
+                        .createQuery()
+                )
                 .forEach(query::must);
 
         return Option(fullTextEntityManager.createFullTextQuery(query.createQuery(), Item.class)
