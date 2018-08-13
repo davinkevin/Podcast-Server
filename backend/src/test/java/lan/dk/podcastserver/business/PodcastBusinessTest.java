@@ -233,6 +233,7 @@ public class PodcastBusinessTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void should_patch_podcast() throws IOException {
         /* Given */
         UUID id = UUID.randomUUID();
@@ -264,7 +265,7 @@ public class PodcastBusinessTest {
         when(podcastRepository.findById(eq(patchPodcast.getId()))).thenReturn(Optional.of(retrievePodcast));
         when(coverBusiness.hasSameCoverURL(any(Podcast.class), any(Podcast.class))).thenReturn(false);
         when(coverBusiness.findOne(any(UUID.class))).then(i -> new Cover().setId((UUID) i.getArguments()[0]).setHeight(100).setWidth(100).setUrl("http://a.pretty.url.com/image.png"));
-        when(tagBusiness.getTagListByName(any())).then(i -> HashSet.ofAll(i.getArgumentAt(0, java.util.Set.class)));
+        when(tagBusiness.getTagListByName(any())).then(i -> HashSet.<Tag>ofAll(i.getArgumentAt(0, java.util.Set.class)));
         when(podcastRepository.save(any(Podcast.class))).then(i -> i.getArguments()[0]);
 
         /* When */

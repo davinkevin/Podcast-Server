@@ -1,7 +1,9 @@
 package lan.dk.podcastserver.repository;
 
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
@@ -19,11 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import static com.querydsl.core.types.ExpressionUtils.allOf;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.*;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositoryCustom, QuerydslPredicateExecutor<Item> {
+
 
     @CacheEvict(value = {"search", "stats"}, allEntries = true)
     Item save(Item item);
@@ -47,14 +49,12 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Set<Item> findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(ZonedDateTime date) {
-        return HashSet.ofAll(findAll(
-                allOf(
-                        hasBeenDownloadedBefore(date),
-                        isFinished(),
-                        hasToBeDeleted(Boolean.TRUE),
-                        isInAnyWatchList().not()
-                )
-        ));
+
+        Predicate downloadedAndDownloadedBeforeAndHasToBeDeleted = List.of(
+                hasBeenDownloadedBefore(date), isFinished(), hasToBeDeleted(Boolean.TRUE), isInAnyWatchList().not()
+        ).reduce(ExpressionUtils::and);
+
+        return HashSet.ofAll(findAll(downloadedAndDownloadedBeforeAndHasToBeDeleted));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
