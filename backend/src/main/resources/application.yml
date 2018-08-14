@@ -25,7 +25,7 @@ spring:
       directory_provider: local-heap
       indexBase: /tmp/podcast-server/lucene
  servlet.multipart:
-  location: /tmp/podcast-server/
+  location: ${java.io.tmpdir}
   max-file-size: 512MB
   max-request-size: 512MB
 
