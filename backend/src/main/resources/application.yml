@@ -40,7 +40,11 @@ logging:
  level:
   lan.dk.podcastserver : DEBUG
 
-management.endpoint.health.show-details: always
+management:
+  endpoint:
+    health.show-details: always
+  endpoints.web.exposure.include: ['health', 'info', 'env']
+
 
 ##############################
 #    Application Specific    #
