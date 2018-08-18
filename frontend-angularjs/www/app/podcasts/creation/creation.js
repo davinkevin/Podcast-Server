@@ -41,6 +41,7 @@ export default class PodcastCreationController {
                 this.podcast.title = podcastFetched.title;
                 this.podcast.description = podcastFetched.description;
                 this.podcast.type = podcastFetched.type;
+                this.podcast.url = podcastFetched.url;
                 this.podcast.cover = podcastFetched.cover;
             });
     }
