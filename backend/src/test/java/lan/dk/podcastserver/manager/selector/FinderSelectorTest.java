@@ -5,6 +5,7 @@ import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsFinder;
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionFinder;
 import lan.dk.podcastserver.manager.worker.francetv.FranceTvFinder;
 import lan.dk.podcastserver.manager.worker.gulli.GulliFinder;
+import lan.dk.podcastserver.manager.worker.itunes.ItunesFinder;
 import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder;
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalFinder;
 import lan.dk.podcastserver.manager.worker.rss.RSSFinder;
@@ -28,26 +29,17 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FinderSelectorTest {
 
-    private @Mock
-    BeInSportsFinder beInSportsFinder;
-    private @Mock
-    MyCanalFinder myCanalFinder;
-    private @Mock
-    DailymotionFinder dailymotionFinder;
-    private @Mock
-    FranceTvFinder franceTvFinder;
-    private @Mock
-    GulliFinder gulliFinder;
-    private @Mock
-    JeuxVideoComFinder jeuxVideoComFinder;
-    private @Mock
-    RSSFinder rssFinder;
-    private @Mock
-    SixPlayFinder sixPlayFinder;
-    private @Mock
-    TF1ReplayFinder tf1ReplayFinder;
-    private @Mock
-    YoutubeFinder youtubeFinder;
+    private @Mock BeInSportsFinder beInSportsFinder;
+    private @Mock MyCanalFinder myCanalFinder;
+    private @Mock DailymotionFinder dailymotionFinder;
+    private @Mock FranceTvFinder franceTvFinder;
+    private @Mock GulliFinder gulliFinder;
+    private @Mock ItunesFinder itunesFinder;
+    private @Mock JeuxVideoComFinder jeuxVideoComFinder;
+    private @Mock RSSFinder rssFinder;
+    private @Mock SixPlayFinder sixPlayFinder;
+    private @Mock TF1ReplayFinder tf1ReplayFinder;
+    private @Mock YoutubeFinder youtubeFinder;
 
     private FinderSelector finderSelector;
 
@@ -58,13 +50,14 @@ public class FinderSelectorTest {
         when(dailymotionFinder.compatibility(anyString())).thenCallRealMethod();
         when(franceTvFinder.compatibility(anyString())).thenCallRealMethod();
         when(gulliFinder.compatibility(anyString())).thenCallRealMethod();
+        when(itunesFinder.compatibility(anyString())).thenCallRealMethod();
         when(jeuxVideoComFinder.compatibility(anyString())).thenCallRealMethod();
         when(rssFinder.compatibility(anyString())).thenCallRealMethod();
         when(sixPlayFinder.compatibility(anyString())).thenCallRealMethod();
         when(tf1ReplayFinder.compatibility(anyString())).thenCallRealMethod();
         when(youtubeFinder.compatibility(anyString())).thenCallRealMethod();
 
-        finderSelector = new FinderSelector(Set(beInSportsFinder, myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder).toJavaSet());
+        finderSelector = new FinderSelector(Set(beInSportsFinder, myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, itunesFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder).toJavaSet());
     }
 
     @Test
@@ -130,6 +123,18 @@ public class FinderSelectorTest {
 
         /* Then */
         assertThat(finder).isSameAs(gulliFinder);
+    }
+
+    @Test
+    public void should_find_itunes() {
+        /* Given */
+        String url = "https://itunes.apple.com/fr/podcast/cauet-sl%C3%A2che/id1278255446?l=en&mt=2";
+
+        /* When */
+        Finder finder = finderSelector.of(url);
+
+        /* Then */
+        assertThat(finder).isSameAs(itunesFinder);
     }
 
     @Test

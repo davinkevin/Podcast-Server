@@ -65,6 +65,17 @@ public class JsonServiceTest {
         assertThat(parse.read("foo", String.class)).isEqualTo("bar");
     }
 
+    @Test
+    public void should_parse_from_string_into_array() {
+        /* Given */
+        String object = "{ \"foo\" : [{\"bar\":\"bar\"}]}";
+        /* When */
+        DocumentContext parse = jsonService.parse(object);
+
+        /* Then */
+        assertThat(parse.read("foo[0].bar", String.class)).isEqualTo("bar");
+    }
+
     @Test(expected = InvalidJsonException.class)
     public void should_return_empty_if_error_during_parsing_string() {
         /* Given */
