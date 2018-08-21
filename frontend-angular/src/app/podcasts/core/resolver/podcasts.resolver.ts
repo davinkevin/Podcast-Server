@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Podcast } from '#app/shared/entity';
 import { podcasts } from '../../podcasts.reducer';
 import * as PodcastsActions from '../../podcasts.actions';

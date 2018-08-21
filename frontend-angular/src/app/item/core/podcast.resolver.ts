@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { AppState } from '#app/app.reducer';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { skip, take } from 'rxjs/operators';
 import { Podcast } from '#app/shared/entity';
 import { FindParentPodcastAction } from '#app/item/item.actions';

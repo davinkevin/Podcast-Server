@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Direction, Item, Page, Pageable, SearchItemPageRequest, Status, uuid } from '../../entity';
 import { HttpClient, HttpParams } from '@angular/common/http';
 

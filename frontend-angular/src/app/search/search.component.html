@@ -6,13 +6,13 @@
 
   <form [formGroup]="form" class="search__sort">
 
-    <mat-input-container>
+    <mat-form-field>
       <input matInput placeholder="Search..." formControlName="q" name="q">
-    </mat-input-container>
+    </mat-form-field>
 
-    <mat-input-container>
+    <mat-form-field>
       <input matInput placeholder="Tags" formControlName="tags" name="tags">
-    </mat-input-container>
+    </mat-form-field>
 
     <mat-form-field>
       <mat-select placeholder="Status" formControlName="status" name="status">

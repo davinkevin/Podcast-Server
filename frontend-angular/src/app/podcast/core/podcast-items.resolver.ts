@@ -1,7 +1,7 @@
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { selectPodcastItems } from '../podcast.reducer';
 import { skip, take } from 'rxjs/operators';
 import { Direction, Item, Page } from '#app/shared/entity';

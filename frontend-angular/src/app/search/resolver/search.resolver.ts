@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { map, skip, take } from 'rxjs/operators';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { Item, Page } from '#app/shared/entity';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { searchRequest, searchResults } from '../search.reducer';
 import { AppState } from '#app/app.reducer';

@@ -18,8 +18,7 @@ import { routerReducer as router, StoreRouterConnectingModule } from '@ngrx/rout
 import { AppEffects } from './app.effects';
 import { LocationStoreHelperModule, RouterStoreHelperModule } from '@davinkevin/router-store-helper';
 import { FloatingPlayerModule } from '#app/floating-player/floating-player.module';
-import { NgxStompModule } from '@davinkevin/ngx-stomp';
-import { StompConfiguration } from '@davinkevin/ngx-stomp/src/lib/configuration';
+import { NgxStompModule, StompConfiguration } from '@davinkevin/ngx-stomp';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full'}

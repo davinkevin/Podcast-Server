@@ -1,5 +1,5 @@
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { Injectable } from '@angular/core';
 import { skip, take } from 'rxjs/operators';

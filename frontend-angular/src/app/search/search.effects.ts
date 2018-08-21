@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { concatMap, filter, map, switchMap } from 'rxjs/operators';
 
 import { Item, Page, SearchItemPageRequest } from '../shared/entity';

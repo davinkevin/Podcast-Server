@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SearchItemPageRequest } from '#app/shared/entity';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { searchRequest } from '../search.reducer';
 import { take } from 'rxjs/operators';
