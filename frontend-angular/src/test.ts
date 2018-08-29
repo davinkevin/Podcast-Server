@@ -1,8 +1,11 @@
 import 'jest-preset-angular';
+import { speculoosMatchers } from 'ngx-speculoos';
 
 // Media Elements
 // @ts-ignore
 window.HTMLMediaElement.prototype.load = () => {};
+
+expect.extend(speculoosMatchers);
 
 // @ts-ignore
 global.CSS = null;

@@ -10,7 +10,7 @@ describe('SearchQueryResolver', () => {
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
-			imports: [StoreModule.forRoot([]), StoreModule.forFeature('search', fromSearch.reducer)],
+			imports: [StoreModule.forRoot([]), StoreModule.forFeature('search', fromSearch.search)],
 			providers: [SearchQueryResolver]
 		});
 		resolver = TestBed.get(SearchQueryResolver);

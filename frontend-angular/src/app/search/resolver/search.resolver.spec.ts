@@ -257,7 +257,7 @@ describe('SearchResolver', () => {
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
-			imports: [StoreModule.forRoot([]), StoreModule.forFeature('search', fromSearch.reducer)],
+			imports: [StoreModule.forRoot([]), StoreModule.forFeature('search', fromSearch.search)],
 			providers: [SearchResolver]
 		});
 

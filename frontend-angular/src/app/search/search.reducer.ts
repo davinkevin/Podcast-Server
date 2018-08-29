@@ -29,7 +29,7 @@ const initialState: SearchState = {
 	}
 };
 
-export function reducer(state = initialState, action: SearchActions): SearchState {
+export function search(state = initialState, action: SearchActions): SearchState {
 	switch (action.type) {
 		case SearchAction.SEARCH: {
 			return { ...state, request: action.pageRequest };

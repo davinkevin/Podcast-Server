@@ -21,7 +21,7 @@ import { SharedModule } from '../shared/shared.module';
 import { SearchQueryResolver } from './resolver/search-query.resolver';
 import { SearchResolver } from './resolver/search.resolver';
 import { SearchComponent } from './search.component';
-import * as fromSearch from './search.reducer';
+import { search } from '#app/search/search.reducer';
 
 const routes: Routes = [
 	{
@@ -55,7 +55,7 @@ const routes: Routes = [
 		TruncateModule,
 
 		/* NgRx */
-		StoreModule.forFeature('search', fromSearch.reducer),
+		StoreModule.forFeature('search', search),
 		EffectsModule.forFeature([SearchEffects])
 	],
 	providers: [SearchResolver, SearchQueryResolver],

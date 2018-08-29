@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { PageEvent } from '@angular/material';
-import { ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, map } from 'rxjs/operators';
 import { AppState } from '../app.reducer';
@@ -60,7 +59,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 	companion = new CompanionComponent();
 
-	constructor(private route: ActivatedRoute, private store: Store<AppState>, private fb: FormBuilder) {}
+	constructor(private store: Store<AppState>, private fb: FormBuilder) {}
 
 	ngOnInit() {
 		const untilDestroy = this.companion.untilDestroy();
@@ -79,7 +78,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 		this.store.pipe(select(searchResults), untilDestroy()).subscribe(s => (this.items = s));
 
 		this.store.pipe(select(searchRequest), untilDestroy()).subscribe(r => {
-			this.form.get('q').setValue(r.q, DO_NOT_EMIT);
+      this.form.get('q').setValue(r.q, DO_NOT_EMIT);
 			this.form.get('tags').setValue(r.tags.map(t => t.name).join(', '), DO_NOT_EMIT);
 			this.form.get('status').setValue(toStatusesValue(r.status), DO_NOT_EMIT);
 			this.form.get('size').setValue(r.size, DO_NOT_EMIT);
