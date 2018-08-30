@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -61,6 +62,7 @@ public class Item {
     private Podcast podcast;
 
     @NotNull @Field
+    @Size(min = 1, max = 254)
     @JsonView(ItemSearchListView.class)
     private String title;
 
