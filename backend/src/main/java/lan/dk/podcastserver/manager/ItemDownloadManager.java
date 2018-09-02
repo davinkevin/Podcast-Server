@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
@@ -25,7 +26,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static lan.dk.podcastserver.manager.selector.DownloaderSelector.NO_OP_DOWNLOADER;
 
@@ -213,11 +214,17 @@ public class ItemDownloadManager {
     }
 
     private void launchWithNewWorkerFrom(Item item) {
-        DownloadingItem downloadingItem = this.extractorSelector.of(item.getUrl()).extract(item);
+        Try<DownloadingItem> downloadingItem = Try(() -> this.extractorSelector.of(item.getUrl()).extract(item));
 
-        Downloader downloader = Option(downloadingItem)
+        if(downloadingItem.isFailure()) {
+            manageDownload();
+            return;
+        }
+
+        Downloader downloader = downloadingItem
+                .toOption()
                 .map(downloaderSelector::of)
-                .map(d -> d.setDownloadingItem(downloadingItem).setItemDownloadManager(this))
+                .map(d -> d.setDownloadingItem(downloadingItem.get()).setItemDownloadManager(this))
                 .getOrElseThrow(() -> new RuntimeException("Error during selection of downloader"));
 
         downloadingQueue = downloadingQueue.put(item, downloader);
