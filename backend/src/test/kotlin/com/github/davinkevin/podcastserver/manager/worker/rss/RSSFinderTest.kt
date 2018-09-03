@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.worker.rss
 
 import arrow.core.None
-import arrow.core.Option
 import com.github.davinkevin.podcastserver.IOUtils.fileAsXml
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
@@ -10,7 +9,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
-import org.jdom2.Document
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
