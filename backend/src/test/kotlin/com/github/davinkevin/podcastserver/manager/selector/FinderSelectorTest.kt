@@ -7,7 +7,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsFinder
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionFinder
-import lan.dk.podcastserver.manager.worker.gulli.GulliFinder
+import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliFinder
 import com.github.davinkevin.podcastserver.manager.worker.itunes.ItunesFinder
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalFinder
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
