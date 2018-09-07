@@ -42,7 +42,7 @@ public class MyCanalExtractorTest {
     public void should_extract() {
         /* GIVEN */
         when(htmlService.get("https://www.mycanal.fr/divertissement/le-tube-du-23-12-best-of/p/1474195")).thenReturn(IOUtils.fileAsHtml(from("1474195.html")));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(jsonService.parseUrl(anyString())).then(i -> IOUtils.fileAsJson(withId(i)));
         /* WHEN  */
         DownloadingItem downloadingItem = extractor.extract(item);
@@ -53,7 +53,8 @@ public class MyCanalExtractorTest {
     }
 
     private static String withId(InvocationOnMock i) {
-        return Some(i.getArgumentAt(0, String.class))
+        return Some(i.getArgument(0))
+                .map(String.class::cast)
                 .map(v -> v.replace("https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/", ""))
                 .map(v -> v.replace("?format=json", ""))
                 .map(MyCanalExtractorTest::from)

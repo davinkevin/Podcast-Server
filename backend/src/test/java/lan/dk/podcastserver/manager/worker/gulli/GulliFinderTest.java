@@ -35,7 +35,7 @@ public class GulliFinderTest {
     public void should_find_a_podcast_for_valid_url() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/pokemon.html"));
-        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).height(250).width(250).build());
+        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgument(0)).height(250).width(250).build());
 
         /* When */
         Podcast podcast = gulliFinder.find("http://replay.gulli.fr/dessins-animes/Pokemon3");

@@ -94,6 +94,6 @@ public class RSSUpdaterTest {
     }
 
     private Cover createCover(InvocationOnMock i) {
-        return Cover.builder().url(i.getArgumentAt(0, String.class)).build();
+        return Cover.builder().url(i.getArgument(0)).build();
     }
 }

@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.service;
 
-import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
@@ -11,8 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.UncheckedIOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
@@ -44,7 +42,6 @@ public class M3U8ServiceTest {
     public void should_not_select_video_url() throws IOException {
         /* Given */
         InputStream is = mock(InputStream.class);
-        doThrow(IOException.class).when(is).read();
 
         /* When */
         Option<String> bestQuality = m3U8Service.findBestQuality(is);
@@ -82,7 +79,7 @@ public class M3U8ServiceTest {
     public void should_return_null_if_exception() throws IOException {
         /* Given */
         String resourcePath = "/__files/service/urlService/canalplus.lepetitjournal.20150707.m3u8";
-        doThrow(IOException.class).when(urlService).asReader(eq(resourcePath));
+        doThrow(UncheckedIOException.class).when(urlService).asReader(eq(resourcePath));
 
         /* When */
         String lastUrl = m3U8Service.getM3U8UrlFormMultiStreamFile(resourcePath);

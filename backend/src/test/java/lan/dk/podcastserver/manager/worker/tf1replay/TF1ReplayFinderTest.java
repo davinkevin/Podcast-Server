@@ -37,7 +37,7 @@ public class TF1ReplayFinderTest {
         /* Given */
         String url = "www.tf1.fr/tf1/19h-live/videos";
         when(htmlService.get(eq(url))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/tf1replay/19h-live.html"));
-        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
+        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgument(0)).build());
 
         /* When */
         Podcast podcast = finder.find(url);
@@ -57,7 +57,7 @@ public class TF1ReplayFinderTest {
         /* Given */
         String url = "www.tf1.fr/tf1/19h-live/videos";
         when(htmlService.get(eq(url))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/tf1replay/19h-live.withoutpicture.html"));
-        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
+        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgument(0)).build());
 
         /* When */
         Podcast podcast = finder.find(url);

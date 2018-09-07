@@ -4,7 +4,6 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.francetv.FranceTvUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
@@ -118,7 +117,7 @@ public class FranceTvUpdaterTest {
     }
 
     private Object loadJsonCatalog(InvocationOnMock i) {
-        String url = i.getArgumentAt(0, String.class).replace("https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=", "") + ".json";
+        String url = ((String) i.getArgument(0)).replace("https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=", "") + ".json";
         return IOUtils.fileAsJson(from(url));
     }
 

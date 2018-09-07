@@ -28,7 +28,6 @@ public class WebMvcConfigTest {
         ResourceHandlerRegistration resourceHandlerRegistration = mock(ResourceHandlerRegistration.class);
         ResourceChainRegistration resourceChainRegistration = mock(ResourceChainRegistration.class);
 
-        when(registry.addResourceHandler(anyString())).thenReturn(resourceHandlerRegistration);
         when(registry.addResourceHandler(anyVararg())).thenReturn(resourceHandlerRegistration);
         when(resourceHandlerRegistration.addResourceLocations(anyString())).thenReturn(resourceHandlerRegistration);
         when(resourceHandlerRegistration.setCachePeriod(anyInt())).thenReturn(resourceHandlerRegistration);

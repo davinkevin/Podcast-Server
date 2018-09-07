@@ -25,7 +25,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.util.Optional;
@@ -214,7 +214,7 @@ public class HTTPDownloaderTest {
         when(urlService.getRealURL(anyString())).then(i -> i.getArguments()[0]);
         when(wGetFactory.newDownloadInfo(anyString())).thenReturn(downloadInfo);
         when(wGetFactory.newWGet(any(DownloadInfo.class), any(File.class))).thenReturn(wGet);
-        doThrow(IOException.class).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
+        doThrow(UncheckedIOException.class).when(wGet).download(any(AtomicBoolean.class), any(HTTPWatcher.class));
 
         /* When */
         httpDownloader.run();

@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by kevin on 16/07/15 for Podcast Server
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class MimeTypeServiceTest {
 
     private @Mock TikaProbeContentType tikaProbeContentType;
@@ -81,6 +81,7 @@ public class MimeTypeServiceTest {
     public void should_get_mimeType_with_probeContentType() throws URISyntaxException, IOException {
         /* Given */
         Path path = IOUtils.toPath("/__files/service/mimeTypeService/plain.text.txt").get();
+        when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Option("text/plain"));
         when(tikaProbeContentType.probeContentType(any(Path.class))).thenReturn(Option("text/plain"));
 
         /* When */ String type = mimeTypeService.probeContentType(path);

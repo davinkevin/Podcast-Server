@@ -109,9 +109,9 @@ public class UpdatePodcastBusinessTest {
     public void should_update_podcasts() {
         /* Given */
         ZonedDateTime now = ZonedDateTime.now();
-        Podcast podcast1 = new Podcast().setTitle("podcast1");
-        Podcast podcast2 = new Podcast().setTitle("podcast2");
-        Podcast podcast3 = new Podcast().setTitle("podcast3");
+        Podcast podcast1 = new Podcast().setTitle("podcast1").setUrl("http://foo.bar.com/foo1.xml");
+        Podcast podcast2 = new Podcast().setTitle("podcast2").setUrl("http://foo.bar.com/foo2.xml");
+        Podcast podcast3 = new Podcast().setTitle("podcast3").setUrl("http://foo.bar.com/foo3.xml");
         Updater updater = mock(Updater.class);
         Set<Podcast> podcasts = HashSet.of(podcast1, podcast2, podcast3);
         when(podcastRepository.findByUrlIsNotNull()).thenReturn(podcasts);
@@ -168,7 +168,6 @@ public class UpdatePodcastBusinessTest {
             Podcast podcastArgument = (Podcast) i.getArguments()[0];
             return Tuple.of(podcastArgument, generateItems(10, podcastArgument), updater.notIn(podcastArgument));
         });
-        when(validator.validate(any(Item.class))).thenReturn(HashSet.<ConstraintViolation<Item>>empty().toJavaSet());
 
         /* When */
         updatePodcastBusiness.updatePodcast(UUID.randomUUID());
@@ -181,7 +180,7 @@ public class UpdatePodcastBusinessTest {
     public void should_update_a_podcast() {
         /* Given */
         ZonedDateTime now = ZonedDateTime.now();
-        Podcast podcast = new Podcast().setTitle("podcast1");
+        Podcast podcast = new Podcast().setTitle("podcast1").setUrl("https://foo.bar.com/");
         Updater updater = mock(Updater.class);
         when(podcastRepository.findById(any(UUID.class))).thenReturn(Optional.of(podcast));
         when(updaterSelector.of(anyString())).thenReturn(updater);
@@ -220,14 +219,7 @@ public class UpdatePodcastBusinessTest {
         podcast1.setId(UUID.randomUUID());
         Updater updater = mock(Updater.class);
         when(podcastRepository.findById(any(UUID.class))).thenReturn(Optional.of(podcast1));
-        when(updaterSelector.of(anyString())).thenReturn(updater);
         when(podcastRepository.save(any(Podcast.class))).thenReturn(podcast1);
-        when(updater.notIn(any(Podcast.class))).then(i -> (Predicate<Item>) item -> !i.getArgumentAt(0, Podcast.class).contains(item));
-        when(updater.update(any(Podcast.class))).then(i -> {
-            TimeUnit.SECONDS.sleep(15);
-            Podcast podcast = i.getArgumentAt(0, Podcast.class);
-            return Tuple.of(podcast, generateItems(10, podcast).toJavaSet(), updater.notIn(podcast));
-        });
 
         /* When */
         updatePodcastBusiness.forceUpdatePodcast(UUID.randomUUID());
@@ -268,8 +260,12 @@ public class UpdatePodcastBusinessTest {
             .map(Item::getTitle)
             .forEach(t -> Try.run(() -> Files.createFile(Paths.get("/tmp/", t))));
 
-        when(itemRepository.findAllToDelete(any(ZonedDateTime.class))).thenReturn(items);
-        when(coverBusiness.getCoverPathOf(any())).then(i -> Option(Paths.get("/tmp/", i.getArgumentAt(0, Item.class).getTitle())));
+        when(itemRepository.findAllToDelete(any())).thenReturn(items);
+        when(coverBusiness.getCoverPathOf(any()))
+                .then(i -> {
+                    Item v = i.getArgument(0);
+                    return Option(Paths.get("/tmp/", v.getTitle()));
+                });
 
         /* When */
         updatePodcastBusiness.deleteOldCover();

@@ -146,7 +146,7 @@ public class FfmpegServiceTest {
         /* Given */
         FFmpegJob job = mock(FFmpegJob.class);
         when(runFunc.add(any(ProcessListener.class))).then(i -> {
-            ProcessListener pl = i.getArgumentAt(0, ProcessListener.class);
+            ProcessListener pl = i.getArgument(0);
             pl.process(mock(Process.class));
             return runFunc;
         });

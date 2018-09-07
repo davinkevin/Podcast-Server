@@ -52,7 +52,7 @@ public class DailymotionExtractorTest {
     public void should_load_chromecast_stream() {
         /* Given */
         when(urlService.get(eq(item.getUrl()))).then(i -> mockGetRequest(WithResponseFrom("karimdebbache.dailymotion.html")));
-        when(jsonService.parse(anyString())).then(i -> stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> stringAsJson(i.getArgument(0)));
         when(m3U8Service.getM3U8UrlFormMultiStreamFile(anyString())).then(i -> "https://proxy-005.dc3.dailymotion.com/sec(c261ed40cc95bcf93923ccd7f1c92a83)/video/574/494/277494475_mp4_h264_aac_fhd.m3u8#cell=core&comment=QOEABR17&hls_maxMaxBufferLength=105");
 
         /* When */

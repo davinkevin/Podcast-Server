@@ -40,7 +40,7 @@ public class SixPlayFinderTest {
         /* GIVEN */
         String url = "http://www.6play.fr/custom-show";
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(imageService.getCoverFromURL(anyString())).thenReturn(Cover.DEFAULT_COVER);
 
         /* WHEN  */

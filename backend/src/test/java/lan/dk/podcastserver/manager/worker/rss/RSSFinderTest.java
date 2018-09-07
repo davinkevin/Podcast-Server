@@ -2,7 +2,6 @@ package lan.dk.podcastserver.manager.worker.rss;
 
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.rss.RSSFinder;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.utils.IOUtils;
@@ -38,7 +37,7 @@ public class RSSFinderTest {
         String url = "/remote/podcast/rss/withEmpty.xml";
 
         when(jdomService.parse(eq(url))).thenReturn(None());
-        when(jdomService.parse(not(eq(url)))).then(i -> IOUtils.fileAsXml(i.getArgumentAt(0, String.class)));
+        when(jdomService.parse(not(eq(url)))).then(i -> IOUtils.fileAsXml(i.getArgument(0)));
         when(imageService.getCoverFromURL(eq(COVER_URL))).thenReturn(Cover.builder().url(COVER_URL).build());
     }
 

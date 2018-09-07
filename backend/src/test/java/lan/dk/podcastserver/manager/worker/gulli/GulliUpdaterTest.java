@@ -4,7 +4,6 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.gulli.GulliUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.SignatureService;
@@ -83,9 +82,7 @@ public class GulliUpdaterTest {
         when(htmlService.get(podcast.getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/pokemon.html"));
         when(htmlService.get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/VOD68526621555000.html"));
         when(htmlService.get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/VOD68526621609000.html"));
-        when(htmlService.get("http://replay.gulli.fr/jwplayer/embed/VOD68526621555000")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/embed.VOD68526621555000.html"));
-        when(htmlService.get("http://replay.gulli.fr/jwplayer/embed/VOD68526621609000")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/embed.VOD68526621609000.html"));
-        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).height(200).width(200).build());
+        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgument(0)).height(200).width(200).build());
 
         /* When */
         Set<Item> items = gulliUpdater.getItems(podcast);

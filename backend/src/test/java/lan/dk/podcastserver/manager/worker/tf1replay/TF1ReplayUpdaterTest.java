@@ -41,8 +41,8 @@ public class TF1ReplayUpdaterTest {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
-        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgumentAt(0, String.class)));
+        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgument(0)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
@@ -57,8 +57,8 @@ public class TF1ReplayUpdaterTest {
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/xtra/olive-et-tom/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.replay.json"));
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=all"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.json"));
-        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgumentAt(0, String.class)));
+        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgument(0)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
@@ -84,9 +84,9 @@ public class TF1ReplayUpdaterTest {
         /* Given */
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
-        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgumentAt(0, String.class)));
+        when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgument(0)));
         when(htmlService.get(anyString())).then(i -> IOUtils.fileAsHtml("/remote/podcast/tf1replay/items.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
 
         /* When */
         Set<Item> items = updater.getItems(podcast);

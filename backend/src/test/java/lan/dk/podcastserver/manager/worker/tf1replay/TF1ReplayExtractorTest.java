@@ -70,7 +70,7 @@ public class TF1ReplayExtractorTest {
         when(m3u8request.asString()).thenReturn(m3u8Response);
         when(m3u8Response.getRawBody()).thenReturn(new NullInputStream(1L));
 
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
         when(m3U8Service.findBestQuality(any(InputStream.class))).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();
@@ -113,7 +113,7 @@ public class TF1ReplayExtractorTest {
         when(m3u8request.asString()).thenReturn(m3u8Response);
         when(m3u8Response.getRawBody()).thenReturn(new NullInputStream(1L));
 
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(urlService.getRealURL(anyString(), any(Consumer.class))).thenReturn(url);
         when(m3U8Service.findBestQuality(any(InputStream.class))).thenReturn(Option("foo/bar/video.mp4"));
         when(urlService.addDomainIfRelative(anyString(), anyString())).thenCallRealMethod();

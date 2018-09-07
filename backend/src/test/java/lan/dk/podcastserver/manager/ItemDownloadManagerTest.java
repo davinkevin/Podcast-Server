@@ -8,10 +8,9 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
-import lan.dk.podcastserver.manager.downloader.NoOpDownloader;
-import lan.dk.podcastserver.manager.worker.noop.NoOpExtractor;
 import lan.dk.podcastserver.manager.selector.DownloaderSelector;
 import lan.dk.podcastserver.manager.selector.ExtractorSelector;
+import lan.dk.podcastserver.manager.worker.noop.NoOpExtractor;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
@@ -31,11 +30,11 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
 import static io.vavr.API.List;
 import static java.util.concurrent.CompletableFuture.runAsync;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -248,7 +247,7 @@ public class ItemDownloadManagerTest {
         itemDownloadManager.restartAllDownload();
 
         /* Then */
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        await().atMost(5, SECONDS).until(() -> {
             verify(entry2._2(), atLeast(1)).restartDownload();
             verify(entry2._2(), atLeast(1)).restartDownload();
         });
@@ -613,18 +612,13 @@ public class ItemDownloadManagerTest {
     @Test
     public void should_not_allowed_parallel_update() {
         /* Given */
-        when(downloaderSelector.of(any())).then(i -> {
-            TimeUnit.SECONDS.sleep(1);
-            return new NoOpDownloader();
-        });
-
         /* When */
         itemDownloadManager.setLimitParallelDownload(5);
         runAsync(() -> itemDownloadManager.setLimitParallelDownload(10));
 
         /* Then */
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            verify(template, atLeast(2)).convertAndSend(eq("/topic/waiting"), anyCollection());
+        await().atMost(5, SECONDS).until(() -> {
+            verify(template, atLeast(2)).convertAndSend(eq("/topic/waiting"), any(io.vavr.collection.Queue.class));
         });
     }
 

@@ -6,7 +6,6 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
-import lan.dk.podcastserver.manager.worker.youtube.YoutubeUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
@@ -28,8 +27,6 @@ import static io.vavr.API.List;
 import static io.vavr.API.None;
 import static lan.dk.utils.IOUtils.fileAsXml;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.AdditionalMatchers.and;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -204,7 +201,6 @@ public class YoutubeUpdaterTest {
 
         when(jsonService.parseUrl(eq(page1))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.json"));
         when(jsonService.parseUrl(eq(page2))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json"));
-        when(jsonService.parseUrl(and(not(eq(page1)), not(eq(page2))))).then(i -> None());
         when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"));
 
         /* When */

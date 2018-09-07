@@ -5,7 +5,6 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
-import lan.dk.podcastserver.manager.worker.sixplay.SixPlayUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
@@ -51,7 +50,7 @@ public class SixPlayUpdaterTest {
     public void should_extract_items() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(imageService.getCoverFromURL(anyString())).thenReturn(Cover.DEFAULT_COVER);
         /* When */
         Set<Item> items = updater.getItems(show);
@@ -65,7 +64,6 @@ public class SixPlayUpdaterTest {
         /* Given */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).thenThrow(new RuntimeException("Foo Bar"));
-        when(imageService.getCoverFromURL(anyString())).thenReturn(Cover.DEFAULT_COVER);
 
         /* When */
         assertThatThrownBy(() -> updater.getItems(show))
@@ -78,7 +76,7 @@ public class SixPlayUpdaterTest {
     public void should_do_signature() throws IOException, URISyntaxException {
         /* GIVEN */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
         /* WHEN  */
         String signature = updater.signatureOf(show);
@@ -91,7 +89,6 @@ public class SixPlayUpdaterTest {
         /* Given */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).thenThrow(new RuntimeException("Foo Bar"));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
 
         /* When */
         assertThatThrownBy(() -> updater.signatureOf(show))
@@ -104,7 +101,7 @@ public class SixPlayUpdaterTest {
     public void should_have_the_same_signature_twice() throws IOException, URISyntaxException {
         /* GIVEN */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
         /* WHEN  */
         String s1 = updater.signatureOf(show);

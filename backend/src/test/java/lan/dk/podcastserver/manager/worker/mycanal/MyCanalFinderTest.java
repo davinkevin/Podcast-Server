@@ -37,7 +37,7 @@ public class MyCanalFinderTest {
         Cover cover = Cover.builder().url("https://thumb.canalplus.pro/http/unsafe/1920x665/top/secure-media.mycanal.fr/image/56/9/mycanal_cover_logotypee_1920x665.25569.jpg").width(200).height(200).build();
         when(imageService.getCoverFromURL("https://thumb.canalplus.pro/http/unsafe/1920x665/top/secure-media.mycanal.fr/image/56/9/mycanal_cover_logotypee_1920x665.25569.jpg")).thenReturn(cover);
         when(htmlService.get("https://www.mycanal.fr/emissions/pid1319-le-tube.html")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/mycanal/le-tube.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
 
         /* When */
         Podcast podcast = finder.find("https://www.mycanal.fr/emissions/pid1319-le-tube.html");
@@ -54,7 +54,7 @@ public class MyCanalFinderTest {
     public void should_find_podcast_without_landing_page() {
         /* Given */
         when(htmlService.get("https://www.mycanal.fr/theme/emissions/pid4936-j-1.html")).thenReturn(IOUtils.fileAsHtml("/remote/podcast/mycanal/j_plus_1.html"));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
 
         /* When */
         Podcast podcast = finder.find("https://www.mycanal.fr/theme/emissions/pid4936-j-1.html");

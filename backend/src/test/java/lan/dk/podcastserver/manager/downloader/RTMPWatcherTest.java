@@ -99,7 +99,6 @@ public class RTMPWatcherTest {
         /* Given */
         InputStream errorStream = mock(InputStream.class);
         when(process.getInputStream()).thenReturn(errorStream);
-        doThrow(IOException.class).when(errorStream).read();
 
         rtmpDownloader.pid = 1234;
         rtmpDownloader.stopDownloading = new AtomicBoolean(false);

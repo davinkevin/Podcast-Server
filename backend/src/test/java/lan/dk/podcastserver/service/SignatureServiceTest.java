@@ -10,6 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -41,7 +42,7 @@ public class SignatureServiceTest {
     @Test
     public void should_return_empty_string_if_error_during_connection() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(urlService).asReader(anyString());
+        doThrow(UncheckedIOException.class).when(urlService).asReader(anyString());
 
         /* When */
         String s = signatureService.generateSignatureFromURL("");

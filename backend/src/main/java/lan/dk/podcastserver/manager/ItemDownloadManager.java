@@ -249,6 +249,7 @@ public class ItemDownloadManager {
     }
 
     private void convertAndSendWaitingQueue() {
+        log.info("Call here " + WS_TOPIC_WAITING_LIST);
         this.template.convertAndSend(WS_TOPIC_WAITING_LIST, this.waitingQueue);
     }
 

@@ -156,7 +156,6 @@ public class ItemBusinessTest {
         /* Given */
         UUID itemId = UUID.randomUUID();
         Item item = mock(Item.class);
-        when(item.reset()).thenReturn(item);
         when(itemRepository.findById(any(UUID.class))).thenReturn(Optional.of(item));
         when(itemDownloadManager.isInDownloadingQueue(any(Item.class))).thenReturn(true);
 

@@ -126,7 +126,6 @@ public class RTMPDownloaderTest {
         /* Given */
         ProcessBuilder processBuilder = new ProcessBuilder("/bin");
         when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> processBuilder);
-        when(processService.pidOf(any())).thenReturn(1234);
         rtmpDownloader.p = mock(Process.class);
 
         /* When */
@@ -140,8 +139,6 @@ public class RTMPDownloaderTest {
     public void should_stop_process_if_failed() {
         /* GIVEN */
         ProcessBuilder processBuilder = new ProcessBuilder("/bin");
-        when(processService.newProcessBuilder((String[]) anyVararg())).then(i -> processBuilder);
-        when(processService.pidOf(any())).thenReturn(1234);
         rtmpDownloader.p = mock(Process.class);
         /* WHEN  */
         rtmpDownloader.failDownload();

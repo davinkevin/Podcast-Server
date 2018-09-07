@@ -44,7 +44,7 @@ public class ExtractorSelectorTest {
     private Answer<Extractor> findBean() {
         return i -> extractors
                 .stream()
-                .filter(d -> i.getArgumentAt(0, Class.class) == d.getClass())
+                .filter(d -> i.getArgument(0) == d.getClass())
                 .findFirst()
                 .orElse(NO_OP_EXTRACTOR);
     }

@@ -89,10 +89,9 @@ public class TagBusinessTest {
         Set<Tag> tags = HashSet.of(tag1, tag2, tag3, tag4);
 
         when(tagRepository.findByNameIgnoreCase(eq(tag1.getName()))).thenReturn(Option(tag1));
-        when(tagRepository.findByNameIgnoreCase(eq(tag2.getName()))).thenReturn(Option(tag2));
         when(tagRepository.findByNameIgnoreCase(and(not(eq(tag1.getName())), not(eq(tag1.getName()))))).thenReturn(None());
 
-        when(tagRepository.save(any(Tag.class))).then(t -> t.getArgumentAt(0, Tag.class).setId(UUID.randomUUID()));
+        when(tagRepository.save(any(Tag.class))).then(t -> ((Tag) t.getArgument(0)).setId(UUID.randomUUID()));
 
         /* When */
         Set<Tag> tagListByName = tagBusiness.getTagListByName(tags);

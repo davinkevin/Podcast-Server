@@ -105,7 +105,7 @@ public class BeInSportsUpdaterTest {
     public void should_get_all_items() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(i1 -> IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
-        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgumentAt(0, String.class)).build());
+        when(imageService.getCoverFromURL(anyString())).then(i -> Cover.builder().url(i.getArgument(0)).build());
         configureForAllPage("/remote/podcast/beinsports/lexpresso.html");
 
         /* When */

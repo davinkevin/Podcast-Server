@@ -82,7 +82,7 @@ public class FfmpegDownloaderTest {
                 .build();
 
         ffmpegDownloader.setItemDownloadManager(itemDownloadManager);
-        ffmpegDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).build());
+        ffmpegDownloader.setDownloadingItem(DownloadingItem.builder().item(item).urls(List(item.getUrl())).userAgent("Fake UserAgent").build());
         when(podcastServerParameters.getRootfolder()).thenReturn(IOUtils.ROOT_TEST_PATH);
         when(podcastServerParameters.getDownloadExtension()).thenReturn(".psdownload");
         when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
@@ -98,17 +98,17 @@ public class FfmpegDownloaderTest {
         /* Given */
         when(ffmpegService.getDurationOf(anyString(), anyString())).thenReturn(1_000_000D);
         when(ffmpegService.download(anyString(), any(FFmpegBuilder.class), any(ProgressListener.class))).then(i -> {
-            FFmpegBuilder builder = i.getArgumentAt(1, FFmpegBuilder.class);
+            FFmpegBuilder builder = i.getArgument(1);
             String location = builder.build().stream().filter(s -> s.contains(ROOT_TEST_PATH.resolve(podcast.getTitle()).toString())).findFirst().orElseThrow(RuntimeException::new);
             Files.write(Paths.get(location), "".getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING );
             Progress progress = new Progress();
             progress.out_time_ms = 90_000;
-            i.getArgumentAt(2, ProgressListener.class).progress(progress);
+            ((ProgressListener) i.getArgument(2)).progress(progress);
             return mock(Process.class);
         });
         when(processService.waitFor(any())).thenReturn(Try(() -> 1));
         doAnswer(i -> {
-            Path targetLocation = i.getArgumentAt(0, Path.class);
+            Path targetLocation = i.getArgument(0);
             Files.write(targetLocation, "".getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             return null;
         }).when(ffmpegService).concat(any(Path.class), anyVararg());
@@ -140,10 +140,10 @@ public class FfmpegDownloaderTest {
         Process downloadProcess = mock(Process.class);
         item.setStatus(Status.PAUSED);
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(downloadProcess);
-        when(downloadProcess.waitFor()).then(i -> {
+/*        when(downloadProcess.waitFor()).then(i -> {
             TimeUnit.SECONDS.sleep(10L);
             return 1;
-        });
+        });*/
         when(processService.start(any())).then(i -> Try.run(() -> {}));
 
         /* When */
@@ -163,7 +163,6 @@ public class FfmpegDownloaderTest {
         Process downloadProcess = mock(Process.class);
         item.setStatus(Status.PAUSED);
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(downloadProcess);
-        when(downloadProcess.waitFor()).then(i -> Try.run(() -> TimeUnit.SECONDS.sleep(10L)));
         when(processService.start(any())).then(i -> Try.failure(new IOException("Unable to restart download")));
 
         /* When */

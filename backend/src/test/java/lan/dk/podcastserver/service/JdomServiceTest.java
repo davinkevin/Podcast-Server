@@ -153,7 +153,7 @@ public class JdomServiceTest {
     public void should_parse() throws IOException {
         /* Given */
         String url = "http://localhost:8181/a/valid.xml";
-        when(urlService.asStream(anyString())).then(i -> IOUtils.urlAsStream(i.getArgumentAt(0, String.class)));
+        when(urlService.asStream(anyString())).then(i -> IOUtils.urlAsStream(i.getArgument(0)));
         stubFor(get(urlEqualTo("/a/valid.xml"))
                 .willReturn(aResponse()
                         .withStatus(200)

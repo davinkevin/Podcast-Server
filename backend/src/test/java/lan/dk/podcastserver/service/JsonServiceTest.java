@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -45,7 +46,7 @@ public class JsonServiceTest {
     @Test
     public void should_return_empty_if_error_during_parsing() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(urlService).asReader(anyString());
+        doThrow(UncheckedIOException.class).when(urlService).asReader(anyString());
 
         /* When */
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");

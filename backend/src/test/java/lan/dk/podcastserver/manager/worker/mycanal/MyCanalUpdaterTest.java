@@ -53,8 +53,8 @@ public class MyCanalUpdaterTest {
     public void should_sign_podcast() {
         /* Given */
         when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("le-tube.html")));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
+        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
@@ -68,7 +68,7 @@ public class MyCanalUpdaterTest {
     public void should_get_items_from_podcast() {
         /* Given */
         when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("le-tube.html")));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
         when(jsonService.parseUrl(anyString())).then(i -> IOUtils.fileAsJson(withId(i)));
         List("http://media.canal-plus.com/image/76/0/738760.jpg", "http://media.canal-plus.com/image/40/9/732409.jpg",
                 "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_733871_H.jpg", "http://media.canal-plus.com/image/76/1/735761.jpg",
@@ -91,7 +91,7 @@ public class MyCanalUpdaterTest {
     public void should_get_items_from_podcasts_with_multi_value_return_for_details() {
         /* Given */
         when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("l-info-du-vrai.html")));
-        when(jsonService.parse(anyString())).then((InvocationOnMock i) -> IOUtils.stringAsJson(i.getArgumentAt(0, String.class)));
+        when(jsonService.parse(anyString())).then((InvocationOnMock i) -> IOUtils.stringAsJson(i.getArgument(0)));
         when(jsonService.parseUrl(anyString())).then(i -> IOUtils.fileAsJson(withId(i)));
         List(
                 "http://media.canal-plus.com/image/73/4/738734.jpg",
@@ -254,7 +254,8 @@ public class MyCanalUpdaterTest {
     }
 
     private static String withId(InvocationOnMock i) {
-        return Some(i.getArgumentAt(0, String.class))
+        return Some(i.getArgument(0))
+                .map(String.class::cast)
                 .map(v -> v.replace("https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/", ""))
                 .map(v -> v.replace("?format=json", ""))
                 .map(MyCanalUpdaterTest::from)

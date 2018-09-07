@@ -128,7 +128,7 @@ public class YoutubeDownloaderTest {
         when(videoInfo.getInfo()).thenReturn(videoList);
         doAnswer(i -> {
             videoList.forEach(f ->  Try(() -> Files.createFile(f.targetFile.toPath())));
-            i.getArgumentAt(2, Runnable.class).run();
+            ((Runnable) i.getArgument(2)).run();
             return null;
         }).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
@@ -155,8 +155,8 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video multiple");
         when(ffmpegService.mergeAudioAndVideo(any(), any(), any())).then(i -> {
-            Try(() -> Files.createFile(i.getArgumentAt(2, Path.class)));
-            return i.getArgumentAt(2, Path.class);
+            Try(() -> Files.createFile(i.getArgument(2)));
+            return i.getArgument(2);
         });
         List<VideoFileInfo> videoList = generate(2);
         when(videoInfo.getInfo()).thenReturn(videoList);
@@ -185,7 +185,6 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("A super Name of Youtube-Video stop");
         when(videoInfo.getInfo()).thenReturn(generate(3));
-        when(info.getContentType()).thenReturn("video/mp4");
 
         /* When */
         youtubeDownloader.download();
@@ -211,8 +210,6 @@ public class YoutubeDownloaderTest {
 
         DownloadInfo info = mock(DownloadInfo.class);
 
-        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
-        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
         when(wGetFactory.parser(eq(item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -240,7 +237,6 @@ public class YoutubeDownloaderTest {
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
         when(videoInfo.getTitle()).thenReturn("bash");
         when(videoInfo.getInfo()).thenReturn(generate(2));
-        doAnswer(simulateDownload(videoInfo, generate(2))).when(vGet).download(eq(vGetParser), any(AtomicBoolean.class), any(Runnable.class));
 
         /* When */
         assertThatThrownBy(() -> youtubeDownloader.download()).isInstanceOfAny(FileSystemException.class, Exception.class);
@@ -296,7 +292,6 @@ public class YoutubeDownloaderTest {
         Item item = this.item.setStatus(Status.STARTED);
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(itemDownloadManager.canBeReset(eq(this.item))).thenReturn(true);
         when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -315,9 +310,6 @@ public class YoutubeDownloaderTest {
         Item item = this.item.setStatus(Status.STARTED);
         youtubeDownloader.setDownloadingItem(DownloadingItem.builder().item(item).build());
 
-        when(podcastRepository.findById(eq(podcast.getId()))).thenReturn(Optional.of(podcast));
-        when(itemRepository.save(any(Item.class))).then(i -> i.getArguments()[0]);
-        when(itemDownloadManager.canBeReset(eq(this.item))).thenReturn(false);
         when(wGetFactory.parser(eq(this.item.getUrl()))).thenReturn(vGetParser);
         when(vGetParser.info(eq(new URL(this.item.getUrl())))).thenReturn(videoInfo);
         when(wGetFactory.newVGet(eq(videoInfo))).thenReturn(vGet);
@@ -334,7 +326,6 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_delete_all_files_if_stopped_during_pause() {
         /* Given */
-        when(videoInfo.getInfo()).thenReturn(generate(1));
         youtubeDownloader.item = item.setStatus(Status.PAUSED);
 
         /* When */
@@ -355,7 +346,6 @@ public class YoutubeDownloaderTest {
     @Test
     public void should_restart_download() {
         /* Given */
-        when(videoInfo.getInfo()).thenReturn(generate(1));
         youtubeDownloader.item = item.setStatus(Status.PAUSED);
 
         /* When */
@@ -395,7 +385,7 @@ public class YoutubeDownloaderTest {
                 int finalCpt = cpt;
                 when(videoInfo.getState()).thenReturn(finalCpt < 100 ? DOWNLOADING : DONE);
                 videoList.stream().forEach(v -> v.setCount((v.getLength() / 100)*finalCpt));
-                i.getArgumentAt(2, Runnable.class).run();
+                ((Runnable) i.getArgument(2)).run();
             }
             return null;
         };
