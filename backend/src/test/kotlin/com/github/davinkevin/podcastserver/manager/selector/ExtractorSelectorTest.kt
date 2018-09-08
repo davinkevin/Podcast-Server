@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvExtra
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayExtractor
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.manager.worker.gulli.GulliExtractor
+import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliExtractor
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalExtractor
 import lan.dk.podcastserver.manager.worker.noop.PassThroughExtractor
 import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayExtractor
