@@ -17,7 +17,7 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 
 ## License
 
-Copyright 2016 DAVIN KEVIN
+Copyright 2018 DAVIN KEVIN
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
