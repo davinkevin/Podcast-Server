@@ -2,7 +2,7 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import io.vavr.control.Option;
-import lan.dk.podcastserver.manager.worker.upload.UploadUpdater;
+import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -268,7 +268,7 @@ public class Item {
         
     @AssertTrue
     public boolean hasValidURL() {
-        return (!StringUtils.isEmpty(this.url)) || Objects.equals(UploadUpdater.TYPE.key(), podcast.getType());
+        return (!StringUtils.isEmpty(this.url)) || Objects.equals(UploadUpdater.Companion.getTYPE().key(), podcast.getType());
     }
 
     public Item reset() {
