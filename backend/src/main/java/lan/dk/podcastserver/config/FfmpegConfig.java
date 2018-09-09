@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
+import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;

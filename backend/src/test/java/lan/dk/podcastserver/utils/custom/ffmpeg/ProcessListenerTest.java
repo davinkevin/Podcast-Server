@@ -26,10 +26,10 @@ public class ProcessListenerTest {
 
         /* When */
         runAsync(() -> {
-            try { process[0] = pl.getProcess().get(); } catch (InterruptedException | ExecutionException ignored) {}
+            try { process[0] = pl.findProcess().get(); } catch (InterruptedException | ExecutionException ignored) {}
         });
         Try.run(() -> TimeUnit.MILLISECONDS.sleep(200));
-        pl.process(aProcess);
+        pl.setProcess(aProcess);
 
         /* Then */
         await().atMost(5, TimeUnit.SECONDS).until(() -> {

@@ -1,9 +1,6 @@
 package lan.dk.podcastserver.utils.custom.ffmpeg;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,8 +15,6 @@ import static java.util.Objects.nonNull;
  * Created by kevin on 24/07/2016.
  */
 @Slf4j
-@Setter @Getter
-@Accessors(fluent = true, chain = true)
 @RequiredArgsConstructor
 public class ProcessListener {
 
@@ -27,10 +22,10 @@ public class ProcessListener {
 
     public static final ProcessListener DEFAULT_PROCESS_LISTENER = new ProcessListener(StringUtils.EMPTY);
 
-    private final String url;
+    public final String url;
     private Process process;
 
-    public Future<Process> getProcess() {
+    public Future<Process> findProcess() {
         return pool.submit(() -> {
             while (true) {
                 if(nonNull(process)) return process;
@@ -38,4 +33,13 @@ public class ProcessListener {
             }
         });
     }
+
+    public void setProcess(Process process) {
+        this.process = process;
+    }
+
+    public String getUrl() {
+        return this.url;
+    }
+    public Process getProcess() { return process; }
 }

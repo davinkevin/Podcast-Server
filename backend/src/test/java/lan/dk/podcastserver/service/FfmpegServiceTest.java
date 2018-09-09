@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.service;
 
-import lan.dk.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
+import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
 import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -147,7 +146,7 @@ public class FfmpegServiceTest {
         FFmpegJob job = mock(FFmpegJob.class);
         when(runFunc.add(any(ProcessListener.class))).then(i -> {
             ProcessListener pl = i.getArgument(0);
-            pl.process(mock(Process.class));
+            pl.setProcess(mock(Process.class));
             return runFunc;
         });
         when(ffmpegExecutor.createJob(any(), any())).then(i -> job);
