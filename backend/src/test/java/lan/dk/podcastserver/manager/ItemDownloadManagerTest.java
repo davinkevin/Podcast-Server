@@ -10,7 +10,7 @@ import lan.dk.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector;
-import lan.dk.podcastserver.manager.worker.noop.NoOpExtractor;
+import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpExtractor;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
