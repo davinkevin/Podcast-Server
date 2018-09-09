@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import lan.dk.podcastserver.manager.worker.Finder
-import lan.dk.podcastserver.manager.worker.noop.NoOpFinder
+import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpFinder
 import org.springframework.stereotype.Service
 
 /**
