@@ -19,7 +19,7 @@ public class FfmpegConfigTest {
     private FfmpegConfig ffmpegConfig = new FfmpegConfig();
 
     @Test
-    public void should_have_a_bean_for_executor() throws IOException {
+    public void should_have_a_bean_for_executor() {
         /* Given */
         FFmpeg ffmpeg = mock(FFmpeg.class);
         FFprobe ffprobe = mock(FFprobe.class);
@@ -44,7 +44,7 @@ public class FfmpegConfigTest {
     }
 
     @Test
-    public void should_generate_ffprobe() throws IOException {
+    public void should_generate_ffprobe() {
         /* Given */
         String binary = "/bin/bash";
 

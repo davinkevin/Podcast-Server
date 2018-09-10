@@ -14,7 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,12 +29,12 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class FfmpegServiceTest {
 
-    @Mock CustomRunProcessFunc runFunc;
-    @Mock FFprobe ffprobe;
-    @Mock FFmpegExecutor ffmpegExecutor;
-    @InjectMocks FfmpegService ffmpegService;
+    private @Mock CustomRunProcessFunc runFunc;
+    private @Mock FFprobe ffprobe;
+    private @Mock FFmpegExecutor ffmpegExecutor;
+    private @InjectMocks FfmpegService ffmpegService;
 
-    @Captor ArgumentCaptor<FFmpegBuilder> executorBuilderCaptor;
+    private @Captor ArgumentCaptor<FFmpegBuilder> executorBuilderCaptor;
 
     @Test
     public void should_concat_files() {

@@ -112,7 +112,7 @@ public class FfmpegService {
     private Path generateTempFileFor(Path dest, Path video) {
         return Try(() -> Files.createTempFile(dest.getParent(), dest.getFileName().toString(), "." + FilenameUtils.getExtension(video.getFileName().toString())))
                 .onFailure(e -> log.error("Error during generation of tmp file for {}", video.toAbsolutePath().toString()))
-                .getOrElseThrow(e -> new RuntimeException(e));
+                .getOrElseThrow((Function<Throwable, RuntimeException>) RuntimeException::new);
     }
 
     private Path changeExtension(Path audioFile, String ext) {

@@ -27,7 +27,7 @@ public class FfmpegConfig {
     }
 
     @Bean
-    public FFprobe ffprobe(@Value("${podcastserver.externaltools.ffprobe:/usr/local/bin/ffprobe}") String ffprobeLocation, CustomRunProcessFunc runProcessFunc) throws IOException {
+    public FFprobe ffprobe(@Value("${podcastserver.externaltools.ffprobe:/usr/local/bin/ffprobe}") String ffprobeLocation, CustomRunProcessFunc runProcessFunc) {
         return new FFprobe(ffprobeLocation, runProcessFunc);
     }
 

@@ -32,9 +32,7 @@ public class ProcessListenerTest {
         pl.setProcess(aProcess);
 
         /* Then */
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            assertThat(process[0]).isNotNull();
-        });
+        await().atMost(5, TimeUnit.SECONDS).until(() -> assertThat(process[0]).isNotNull());
     }
 
 }
