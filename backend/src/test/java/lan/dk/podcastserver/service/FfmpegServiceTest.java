@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
-import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
+import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;

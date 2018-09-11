@@ -1,14 +1,13 @@
 package com.github.davinkevin.podcastserver.utils.custom.ffmpeg
 
 import io.vavr.API
-import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener
 import org.assertj.core.api.Java6Assertions.assertThat
 import org.junit.Test
 
 internal class CustomRunProcessFuncTest {
 
     @Test
-    fun should_get_process_from_listener() {
+    fun `should get process from listener`() {
         /* Given */
         val cp = CustomRunProcessFunc()
         val pl = ProcessListener("anUrl")

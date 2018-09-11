@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc;
-import lan.dk.podcastserver.utils.custom.ffmpeg.ProcessListener;
+import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -135,13 +135,16 @@ public class FfmpegService {
     /* Download delegation to ffmpeg-cli-wrapper */
     public Process download(String url, FFmpegBuilder ffmpegBuilder, ProgressListener progressListener) {
         ProcessListener pl = new ProcessListener(url);
-        runProcessFunc.plus(pl);
+        runProcessFunc.add(pl);
 
         runAsync(ffmpegExecutor.createJob(ffmpegBuilder, progressListener));
 
         Future<Process> process = pl.findProcess();
         return Try(() -> process.get(2, TimeUnit.SECONDS))
                 .onFailure(e -> process.cancel(true))
-                .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
+                .getOrElseThrow(e -> {
+                    log.error("error with", e);
+                    return new UncheckedIOException(IOException.class.cast(e));
+                });
     }
 }
