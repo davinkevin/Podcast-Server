@@ -25,7 +25,6 @@
   <media:group>
    <media:title>Android Studio support for VectorDrawable</media:title>
    <media:content url="https://www.youtube.com/v/8e3I-PYJNHg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i1.ytimg.com/vi/8e3I-PYJNHg/hqdefault.jpg" width="480" height="360"/>
    <media:description>Tenghui Zhu introduces new tool supports for VectorDrawable in Android Studio 1.4.
 
 In Android Studio 1.4, developers can create VectorDrawable assets either from the Material library or converted from SVG files. Moreover, for backward compatibility, all the VectorDrawable assets will be converted into PNG files at build time automatically.

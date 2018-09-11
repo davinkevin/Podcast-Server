@@ -3,6 +3,7 @@ package lan.dk.podcastserver.manager.worker.youtube;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.davinkevin.podcastserver.service.HtmlService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -12,17 +13,13 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
-import com.github.davinkevin.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.properties.Api;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -32,14 +29,11 @@ import java.util.Objects;
 import static io.vavr.API.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.joining;
 
 @Slf4j
 @Component("YoutubeUpdater")
-@RequiredArgsConstructor
 public class YoutubeUpdater implements Updater {
 
-    private static final Namespace MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/");
     private static final Integer MAX_PAGE = 10;
 
     private static final String CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s";
@@ -55,11 +49,25 @@ public class YoutubeUpdater implements Updater {
     private final HtmlService htmlService;
     private final Api api;
 
+    private final YoutubeByXmlUpdater youtubeByXmlUpdater;
+    private final YoutubeByApiUpdater byApiUpdater;
+
+    public YoutubeUpdater(SignatureService signatureService, JdomService jdomService, JsonService jsonService, HtmlService htmlService, Api api) {
+        this.signatureService = signatureService;
+        this.jdomService = jdomService;
+        this.jsonService = jsonService;
+        this.htmlService = htmlService;
+        this.api = api;
+
+        youtubeByXmlUpdater = new YoutubeByXmlUpdater(jdomService, htmlService, signatureService);
+        byApiUpdater = new YoutubeByApiUpdater(htmlService, jsonService, api);
+    }
+
     public Set<Item> getItems(Podcast podcast) {
         String string = api.getYoutube();
         return string == null || string.length() == 0
-                ? getItemsByRss(podcast)
-                : getItemsByAPI(podcast);
+                ? youtubeByXmlUpdater.getItems(podcast)
+                : byApiUpdater.getItems(podcast);
     }
 
     private Set<Item> getItemsByAPI(Podcast podcast) {
@@ -122,57 +130,9 @@ public class YoutubeUpdater implements Updater {
                 .build();
     }
 
-    private Set<Item> getItemsByRss(Podcast podcast) {
-        log.info("Youtube Update by RSS");
-
-        Option<Element> element = xmlOf(podcast.getUrl()).map(Document::getRootElement);
-
-        return element
-            .map(d -> d.getChildren("entry", d.getNamespace()))
-            .map(HashSet::ofAll)
-            .map(entry -> this.xmlToItems(entry, element.map(Element::getNamespace).getOrElse(Namespace.NO_NAMESPACE)))
-            .getOrElse(HashSet::empty);
-    }
-
-    private Set<Item> xmlToItems(Set<Element> entry, Namespace defaultNamespace) {
-        return entry.map(elem -> generateItemFromElement(elem, defaultNamespace));
-    }
-
     @Override
     public String signatureOf(Podcast podcast) {
-        Option<Element> element = xmlOf(podcast.getUrl()).map(Document::getRootElement);
-
-        return element
-                .map(d -> d.getChildren("entry", d.getNamespace()))
-                .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).getOrElse(Namespace.NO_NAMESPACE))).collect(joining()))
-                .map(signatureService::fromText)
-                .getOrElse(StringUtils.EMPTY);
-    }
-
-    private Item generateItemFromElement(Element entry, Namespace defaultNamespace) {
-        Element mediaGroup = entry.getChild("group", MEDIA_NAMESPACE);
-        return Item.builder()
-                    .title(entry.getChildText("title", defaultNamespace))
-                    .description(mediaGroup.getChildText("description", MEDIA_NAMESPACE))
-                    .pubDate(pubDateOf(entry.getChildText("published", defaultNamespace)))
-                    .url(urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")))
-                    .cover(coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)))
-                .build();
-    }
-
-    private ZonedDateTime pubDateOf(String pubDate) {
-        return ZonedDateTime.parse(pubDate, DateTimeFormatter.ISO_DATE_TIME); //2013-12-20T22:30:01.000Z
-    }
-
-    private Cover coverOf(Element thumbnail) {
-        return nonNull(thumbnail)
-                ? Cover.builder().url(thumbnail.getAttributeValue("url")).width(Integer.valueOf(thumbnail.getAttributeValue("width"))).height(Integer.valueOf(thumbnail.getAttributeValue("height"))).build()
-                : null;
-    }
-
-    private String urlOf(String embeddedVideoPage) {
-        String idVideo = StringUtils.substringBefore(StringUtils.substringAfterLast(embeddedVideoPage, "/"), "?");
-        return String.format(URL_PAGE_BASE, idVideo);
+        return youtubeByXmlUpdater.signatureOf(podcast);
     }
 
     private Option<Document> xmlOf(String url) {

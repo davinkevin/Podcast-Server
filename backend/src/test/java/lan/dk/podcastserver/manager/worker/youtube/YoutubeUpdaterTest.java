@@ -1,6 +1,8 @@
 package lan.dk.podcastserver.manager.worker.youtube;
 
+import com.github.davinkevin.podcastserver.IOUtils;
 import com.github.davinkevin.podcastserver.service.HtmlService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
@@ -8,10 +10,8 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
-import com.github.davinkevin.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.properties.Api;
-import com.github.davinkevin.podcastserver.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,9 +23,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static com.github.davinkevin.podcastserver.IOUtils.fileAsHtml;
+import static com.github.davinkevin.podcastserver.IOUtils.fileAsXml;
 import static io.vavr.API.List;
 import static io.vavr.API.None;
-import static com.github.davinkevin.podcastserver.IOUtils.fileAsXml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -70,7 +71,7 @@ public class YoutubeUpdaterTest {
         Podcast podcast = Podcast.builder()
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
-        when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(htmlService.get(anyString())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
         when(jdomService.parse(anyString())).then(i -> fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"));
 
         /* When */
@@ -107,7 +108,7 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(htmlService.get(any(String.class))).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
         when(jdomService.parse(anyString())).thenReturn(fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"));
         when(signatureService.fromText(anyString())).thenReturn("Signature");
 
@@ -126,9 +127,8 @@ public class YoutubeUpdaterTest {
                 .url("https://www.youtube.com/user/androiddevelopers")
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(htmlService.get(any(String.class))).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
         when(jdomService.parse(anyString())).thenReturn(None());
-
 
         /* When */
         String signature = youtubeUpdater.signatureOf(podcast);
@@ -201,7 +201,7 @@ public class YoutubeUpdaterTest {
 
         when(jsonService.parseUrl(eq(page1))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.json"));
         when(jsonService.parseUrl(eq(page2))).then(i -> IOUtils.fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json"));
-        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"));
+        when(htmlService.get(eq(podcast.getUrl()))).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"));
 
         /* When */
         Set<Item> items = youtubeUpdater.getItems(podcast);
@@ -220,7 +220,7 @@ public class YoutubeUpdaterTest {
                 .items(HashSet.<Item>empty().toJavaSet())
                 .build();
 
-        when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
+        when(htmlService.get(any(String.class))).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
         when(jsonService.parseUrl(anyString())).thenReturn(None());
 
         /* When */
