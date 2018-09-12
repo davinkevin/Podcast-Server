@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.utils.custom.ffmpeg
 
-import io.vavr.API
 import org.assertj.core.api.Java6Assertions.assertThat
 import org.junit.Test
 
@@ -13,7 +12,8 @@ internal class CustomRunProcessFuncTest {
         val pl = ProcessListener("anUrl")
 
         /* When */
-        val p = cp.plus(pl).run(API.List("/bin/bash", "anUrl", "Foo", "Bar").toJavaList())
+        val p = (cp + pl)
+                .run(listOf("/bin/bash", "anUrl", "Foo", "Bar"))
 
         /* Then */
         assertThat(p).isSameAs(pl.process)

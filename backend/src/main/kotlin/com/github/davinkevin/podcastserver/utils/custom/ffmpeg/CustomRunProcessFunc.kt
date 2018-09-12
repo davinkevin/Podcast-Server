@@ -25,11 +25,7 @@ class CustomRunProcessFunc(private var listeners: List<ProcessListener> = listOf
         return p
     }
 
-    fun add(pl: ProcessListener?): CustomRunProcessFunc {
-        if (pl === null) {
-            println("Is Null !")
-            return this
-        }
+    fun add(pl: ProcessListener): CustomRunProcessFunc {
         this.listeners = listeners + pl
         return this
     }
