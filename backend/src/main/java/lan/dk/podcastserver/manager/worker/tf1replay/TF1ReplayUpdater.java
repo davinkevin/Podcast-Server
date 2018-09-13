@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import static lan.dk.podcastserver.service.HtmlService.toElements;
-import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 20/07/2016

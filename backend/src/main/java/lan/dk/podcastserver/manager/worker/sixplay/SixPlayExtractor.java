@@ -1,33 +1,29 @@
 package lan.dk.podcastserver.manager.worker.sixplay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.jayway.jsonpath.DocumentContext;
+import com.github.davinkevin.podcastserver.utils.MatcherExtractor;
 import com.jayway.jsonpath.TypeRef;
 import com.mashape.unirest.http.HttpResponse;
-import io.vavr.API;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.utils.MatcherExtractor;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
 
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 import static io.vavr.API.*;
-import static lan.dk.podcastserver.utils.MatcherExtractor.*;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**

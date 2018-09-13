@@ -29,8 +29,8 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
-import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 22/02/2014.

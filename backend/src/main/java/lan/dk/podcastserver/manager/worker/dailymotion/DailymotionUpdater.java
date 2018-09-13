@@ -23,8 +23,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
-import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
+
 
 /**
  * Created by kevin on 21/02/2016 for Podcast Server

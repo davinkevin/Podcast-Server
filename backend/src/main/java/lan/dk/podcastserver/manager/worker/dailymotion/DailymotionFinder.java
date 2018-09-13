@@ -9,14 +9,14 @@ import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import javax.validation.constraints.NotEmpty;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.regex.Pattern;
 
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 import static java.util.Objects.nonNull;
-import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 23/02/2016 for Podcast Server

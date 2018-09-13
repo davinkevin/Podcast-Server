@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.utils.MatcherExtractor;
 import com.jayway.jsonpath.TypeRef;
 import io.vavr.Tuple;
 import io.vavr.collection.List;
@@ -10,7 +11,6 @@ import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.utils.MatcherExtractor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
 
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 import static io.vavr.API.List;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 03/12/2017

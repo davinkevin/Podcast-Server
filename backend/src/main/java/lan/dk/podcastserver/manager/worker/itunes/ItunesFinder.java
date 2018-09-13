@@ -1,17 +1,17 @@
 package lan.dk.podcastserver.manager.worker.itunes;
 
+import com.github.davinkevin.podcastserver.utils.MatcherExtractor;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.manager.worker.rss.RSSFinder;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.utils.MatcherExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.regex.Pattern;
 
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 12/05/2018

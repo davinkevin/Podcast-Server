@@ -24,8 +24,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.Option;
-import static lan.dk.podcastserver.utils.MatcherExtractor.PatternExtractor;
-import static lan.dk.podcastserver.utils.MatcherExtractor.from;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
+import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
 
 /**
  * Created by kevin on 05/10/2016 for Podcast Server
