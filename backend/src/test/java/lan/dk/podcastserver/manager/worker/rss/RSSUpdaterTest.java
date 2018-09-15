@@ -1,14 +1,13 @@
 package lan.dk.podcastserver.manager.worker.rss;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
-import lan.dk.podcastserver.manager.worker.rss.RSSUpdater;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Before;
@@ -83,7 +82,7 @@ public class RSSUpdaterTest {
     @Test
     public void should_call_signature_from_url() {
         /* When */ rssUpdater.signatureOf(rssAppload);
-        /* Then */ verify(signatureService, times(1)).generateSignatureFromURL(eq(MOCK_URL));
+        /* Then */ verify(signatureService, times(1)).fromUrl(eq(MOCK_URL));
     }
 
     @Test

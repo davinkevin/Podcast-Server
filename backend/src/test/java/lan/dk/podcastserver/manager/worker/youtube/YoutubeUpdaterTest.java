@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.youtube;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -9,7 +10,6 @@ import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.Api;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
@@ -109,7 +109,7 @@ public class YoutubeUpdaterTest {
 
         when(htmlService.get(any(String.class))).thenReturn(IOUtils.fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"));
         when(jdomService.parse(anyString())).thenReturn(fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"));
-        when(signatureService.generateMD5Signature(anyString())).thenReturn("Signature");
+        when(signatureService.fromText(anyString())).thenReturn("Signature");
 
         /* When */
         String signature = youtubeUpdater.signatureOf(podcast);

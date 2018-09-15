@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.tf1replay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -13,7 +14,6 @@ import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,9 +28,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import static lan.dk.podcastserver.service.HtmlService.toElements;
 import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
+import static lan.dk.podcastserver.service.HtmlService.toElements;
 
 /**
  * Created by kevin on 20/07/2016
@@ -111,7 +111,7 @@ public class TF1ReplayUpdater implements Updater {
         // Url replay : http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay
         return getHtmlFromStandardOrReplay(podcast.getUrl())
                 .map(Elements::html)
-                .map(signatureService::generateMD5Signature)
+                .map(signatureService::fromText)
                 .getOrElse(StringUtils.EMPTY);
     }
 

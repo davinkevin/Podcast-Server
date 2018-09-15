@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -11,7 +12,6 @@ import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,9 +23,9 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static io.vavr.API.Option;
 import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
+import static io.vavr.API.Option;
 
 /**
  * Created by kevin on 05/10/2016 for Podcast Server
@@ -92,7 +92,7 @@ public class GulliUpdater implements Updater {
                 .map(d -> d.select("div.all-videos ul").first())
                 .filter(Objects::nonNull)
                 .map(Element::html)
-                .map(signatureService::generateMD5Signature)
+                .map(signatureService::fromText)
                 .getOrElse(StringUtils.EMPTY);
     }
 

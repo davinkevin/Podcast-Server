@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;
@@ -55,7 +55,7 @@ public class GulliUpdaterTest {
     public void should_get_signature() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(podcast.getUrl())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/gulli/pokemon.html"));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+        when(signatureService.fromText(anyString())).thenCallRealMethod();
 
         /* When */
         String signature = gulliUpdater.signatureOf(podcast);

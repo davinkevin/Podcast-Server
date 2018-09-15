@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.francetv;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -9,7 +10,10 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.HtmlService;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JsonService;
+import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -85,7 +89,7 @@ public class FranceTvUpdater implements Updater {
                 .map(e -> e.attr("data-video"))
                 .toList().sorted().mkString("-");
 
-        return signatureService.generateMD5Signature(listOfIds);
+        return signatureService.fromText(listOfIds);
     }
 
     @Override

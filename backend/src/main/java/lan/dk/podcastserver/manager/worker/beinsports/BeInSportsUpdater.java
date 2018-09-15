@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.beinsports;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -11,7 +12,6 @@ import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +28,9 @@ import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import static java.util.Objects.isNull;
 import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.PatternExtractor;
 import static com.github.davinkevin.podcastserver.utils.MatcherExtractor.from;
+import static java.util.Objects.isNull;
 
 /**
  * Created by kevin on 22/02/2014.
@@ -132,7 +132,7 @@ public class BeInSportsUpdater implements Updater {
         return htmlService
                 .get(podcast.getUrl())
                 .map(p -> p.select(".cluster_video").html())
-                .map(signatureService::generateMD5Signature)
+                .map(signatureService::fromText)
                 .getOrElse(StringUtils.EMPTY);
     }
 

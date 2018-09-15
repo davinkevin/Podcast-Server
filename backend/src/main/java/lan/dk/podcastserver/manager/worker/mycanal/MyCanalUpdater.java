@@ -1,7 +1,6 @@
 package lan.dk.podcastserver.manager.worker.mycanal;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import io.vavr.collection.HashSet;
@@ -17,24 +16,15 @@ import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
-import static io.vavr.API.Function;
-import static io.vavr.API.Option;
 import static io.vavr.API.Tuple;
 import static lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
@@ -70,7 +60,7 @@ public class MyCanalUpdater implements Updater {
     public String signatureOf(Podcast p) {
         return itemsAsJsonFrom(p)
                 .map(items -> items.toList().map(MyCanalItem::getContentID).sorted().mkString())
-                .map(signatureService::generateMD5Signature)
+                .map(signatureService::fromText)
                 .getOrElseThrow(() -> new RuntimeException("Error during signature of " + p.getTitle() + " with url " + p.getUrl()));
     }
 

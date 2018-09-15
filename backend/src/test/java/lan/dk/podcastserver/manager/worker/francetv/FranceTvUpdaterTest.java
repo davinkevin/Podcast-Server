@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.francetv;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -7,7 +8,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class FranceTvUpdaterTest {
     public void should_sign_the_podcast() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(FRANCETV_URL)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.html")));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+        when(signatureService.fromText(anyString())).thenCallRealMethod();
 
         /* When */
         String signature = franceTvUpdater.signatureOf(PODCAST);
@@ -62,7 +62,7 @@ public class FranceTvUpdaterTest {
     public void should_have_same_signature_even_if_date_change() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(FRANCETV_URL)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire_changed.html")));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+        when(signatureService.fromText(anyString())).thenCallRealMethod();
 
         /* When */
         String signature = franceTvUpdater.signatureOf(PODCAST);
@@ -77,7 +77,7 @@ public class FranceTvUpdaterTest {
     public void should_have_different_sign_if_new_item_in_podcast() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(FRANCETV_URL)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire_with_new_items.html")));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+        when(signatureService.fromText(anyString())).thenCallRealMethod();
 
         /* When */
         String signature = franceTvUpdater.signatureOf(PODCAST);

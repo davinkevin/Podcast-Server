@@ -1,13 +1,12 @@
 package lan.dk.podcastserver.manager.worker.tf1replay;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +28,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TF1ReplayUpdaterTest {
 
-    private @Mock SignatureService signatureService;
+    private @Mock
+    SignatureService signatureService;
     private @Mock HtmlService htmlService;
     private @Mock ImageService imageService;
     private @Mock JsonService jsonService;
@@ -42,7 +42,7 @@ public class TF1ReplayUpdaterTest {
         Podcast podcast = Podcast.builder().url("http://www.tf1.fr/tf1/19h-live/videos").build();
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/tf1/19h-live/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/19h-live.ajax.replay.json"));
         when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgument(0)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
+        when(signatureService.fromText(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
@@ -58,7 +58,7 @@ public class TF1ReplayUpdaterTest {
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=replay"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.replay.json"));
         when(jsonService.parseUrl(eq("http://www.tf1.fr/ajax/xtra/olive-et-tom/videos?filter=all"))).then(i -> IOUtils.fileAsJson("/remote/podcast/tf1replay/olive-et-tom.ajax.json"));
         when(htmlService.parse(anyString())).then(i -> IOUtils.stringAsHtml(i.getArgument(0)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
+        when(signatureService.fromText(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
 
         /* When */
         String signature = updater.signatureOf(podcast);

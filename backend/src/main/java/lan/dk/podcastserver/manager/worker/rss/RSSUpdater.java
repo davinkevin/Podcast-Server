@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.rss;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
@@ -9,7 +10,6 @@ import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -105,7 +105,7 @@ public class RSSUpdater implements Updater {
 
     @Override
     public String signatureOf(Podcast podcast) {
-        return signatureService.generateSignatureFromURL(podcast.getUrl());
+        return signatureService.fromUrl(podcast.getUrl());
     }
 
     @Override

@@ -1,11 +1,14 @@
 package lan.dk.podcastserver.manager.worker.mycanal;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.HtmlService;
+import lan.dk.podcastserver.service.ImageService;
+import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
 import org.assertj.core.api.Condition;
 import org.junit.Before;
@@ -18,7 +21,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.UUID;
 
-import static io.vavr.API.*;
+import static io.vavr.API.List;
+import static io.vavr.API.Some;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -54,14 +58,14 @@ public class MyCanalUpdaterTest {
         /* Given */
         when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("le-tube.html")));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
-        when(signatureService.generateMD5Signature(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
+        when(signatureService.fromText(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
 
         /* When */
         String signature = updater.signatureOf(podcast);
 
         /* Then */
         assertThat(signature).isEqualTo("b9444aa69c2642760a18858455dd77eb");
-        verify(signatureService, only()).generateMD5Signature(anyString());
+        verify(signatureService, only()).fromText(anyString());
     }
 
     @Test

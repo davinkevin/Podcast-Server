@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.sixplay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import io.vavr.Value;
@@ -11,12 +12,11 @@ import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
-import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.manager.worker.Type;
+import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -131,7 +131,7 @@ public class SixPlayUpdater implements Updater {
                         .flatMap(this::extractJson)
                         .map(JsonService.extract("video.programVideosBySubCategory"))
                         .map(Object::toString)
-                        .map(signatureService::generateMD5Signature)
+                        .map(signatureService::fromText)
                         .getOrElseThrow(() -> new RuntimeException("Error during signature of podcast " + podcast.getTitle()))
         ).getOrElseThrow(SixPlayParsingException::new);
     }

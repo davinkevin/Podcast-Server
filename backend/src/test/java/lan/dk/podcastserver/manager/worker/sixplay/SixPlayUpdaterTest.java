@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.sixplay;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
@@ -8,7 +9,6 @@ import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Condition;
@@ -77,7 +77,7 @@ public class SixPlayUpdaterTest {
         /* GIVEN */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+        when(signatureService.fromText(anyString())).thenCallRealMethod();
         /* WHEN  */
         String signature = updater.signatureOf(show);
         /* THEN  */
@@ -102,7 +102,7 @@ public class SixPlayUpdaterTest {
         /* GIVEN */
         when(htmlService.get(anyString())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"));
         when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
-        when(signatureService.generateMD5Signature(anyString())).thenCallRealMethod();
+        when(signatureService.fromText(anyString())).thenCallRealMethod();
         /* WHEN  */
         String s1 = updater.signatureOf(show);
         String s2 = updater.signatureOf(show);

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.youtube;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
@@ -13,7 +14,6 @@ import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.Api;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -145,7 +145,7 @@ public class YoutubeUpdater implements Updater {
         return element
                 .map(d -> d.getChildren("entry", d.getNamespace()))
                 .map(entries -> entries.stream().map(elem -> elem.getChildText("id", element.map(Element::getNamespace).getOrElse(Namespace.NO_NAMESPACE))).collect(joining()))
-                .map(signatureService::generateMD5Signature)
+                .map(signatureService::fromText)
                 .getOrElse(StringUtils.EMPTY);
     }
 

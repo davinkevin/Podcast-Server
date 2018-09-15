@@ -1,13 +1,11 @@
 package lan.dk.podcastserver.manager.worker;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.Tuple3;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.Type;
-import lan.dk.podcastserver.manager.worker.Updater;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
 import org.junit.Test;

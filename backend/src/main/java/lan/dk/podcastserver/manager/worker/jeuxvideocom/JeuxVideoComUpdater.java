@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.jeuxvideocom;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
@@ -8,7 +9,6 @@ import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -71,7 +71,7 @@ public class JeuxVideoComUpdater implements Updater {
         return htmlService
                 .get(podcast.getUrl())
                 .map(p -> p.select("article").html())
-                .map(signatureService::generateMD5Signature)
+                .map(signatureService::fromText)
                 .getOrElse("");
     }
 

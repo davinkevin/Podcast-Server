@@ -1,12 +1,11 @@
 package lan.dk.podcastserver.manager.worker.dailymotion;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionUpdater;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;
@@ -50,7 +49,7 @@ public class DailymotionUpdaterTest {
     @Test
     public void should_sign_from_url() {
         /* Given */
-        when(signatureService.generateSignatureFromURL(eq(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache")))).thenReturn("aSignature");
+        when(signatureService.fromUrl(eq(String.format(DailymotionUpdater.API_LIST_OF_ITEMS, "karimdebbache")))).thenReturn("aSignature");
 
         /* When */
         String s = dailymotionUpdater.signatureOf(podcast);

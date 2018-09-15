@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.dailymotion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import com.jayway.jsonpath.TypeRef;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -10,7 +11,6 @@ import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.SignatureService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -70,7 +70,7 @@ public class DailymotionUpdater implements Updater {
     @Override
     public String signatureOf(Podcast podcast) {
         return USER_NAME_EXTRACTOR.on(podcast.getUrl()).group(1)
-                .map(u -> signatureService.generateSignatureFromURL(String.format(API_LIST_OF_ITEMS, u)))
+                .map(u -> signatureService.fromUrl(String.format(API_LIST_OF_ITEMS, u)))
                 .getOrElseThrow(() -> new RuntimeException("Username not Found"));
     }
 

@@ -27,7 +27,7 @@ import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 @EnableCaching
 @Configuration
 @EnableConfigurationProperties({PodcastServerParameters.class, Api.class, Backup.class, ExternalTools.class})
-@ComponentScan(basePackages = { "lan.dk.podcastserver.utils", "lan.dk.podcastserver.service", "lan.dk.podcastserver.business"})
+@ComponentScan(basePackages = { "com.github.davinkevin.podcastserver.service", "lan.dk.podcastserver.service", "lan.dk.podcastserver.business"})
 public class BeanConfigScan {
 
     @Bean(name="Validator")

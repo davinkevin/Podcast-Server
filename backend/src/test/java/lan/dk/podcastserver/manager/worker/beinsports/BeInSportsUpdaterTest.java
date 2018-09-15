@@ -1,15 +1,14 @@
 package lan.dk.podcastserver.manager.worker.beinsports;
 
+import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.ImageService;
-import lan.dk.podcastserver.service.SignatureService;
 import lan.dk.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -68,7 +67,7 @@ public class BeInSportsUpdaterTest {
     public void should_do_singature_of_podcast() throws IOException, URISyntaxException {
         /* Given */
         when(htmlService.get(eq(podcast.getUrl()))).then(i -> IOUtils.fileAsHtml("/remote/podcast/beinsports/lexpresso.html"));
-        when(signatureService.generateMD5Signature(anyString())).thenReturn("aSignature");
+        when(signatureService.fromText(anyString())).thenReturn("aSignature");
 
         /* When */
         String signature = beInSportsUpdater.signatureOf(podcast);
