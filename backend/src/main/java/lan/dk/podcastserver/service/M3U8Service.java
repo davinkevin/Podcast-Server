@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.API;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
@@ -10,11 +11,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.h2.expression.Function;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Comparator;

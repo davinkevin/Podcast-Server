@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import io.vavr.control.Option;
 import org.jsoup.nodes.Document;

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.downloader;
 
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
@@ -10,7 +11,6 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.ProcessService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;

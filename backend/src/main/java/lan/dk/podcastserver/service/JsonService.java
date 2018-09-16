@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Option;
@@ -9,12 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.function.Function;
 
-import static io.vavr.API.None;
-import static io.vavr.API.Option;
 import static java.util.stream.Collectors.joining;
 
 /**

@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.service
 
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.service.UrlService
 import org.apache.commons.codec.digest.DigestUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach

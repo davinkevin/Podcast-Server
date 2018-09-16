@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
 import io.vavr.control.Option;

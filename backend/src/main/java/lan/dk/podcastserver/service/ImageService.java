@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.service;
 
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Cover;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Objects;
-
-import static io.vavr.API.Try;
 
 /**
  * Created by kevin on 28/06/15 for Podcast Server

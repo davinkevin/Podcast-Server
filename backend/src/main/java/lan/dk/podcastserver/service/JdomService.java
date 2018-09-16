@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
@@ -27,7 +28,8 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static io.vavr.API.*;
+import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;

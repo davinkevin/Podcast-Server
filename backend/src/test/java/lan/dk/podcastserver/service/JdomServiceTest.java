@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -24,13 +25,14 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static io.vavr.API.List;
+import static io.vavr.API.Set;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
-import static io.vavr.API.*;
 
 /**
  * Created by kevin on 08/09/15 for Podcast Server
@@ -40,7 +42,8 @@ public class JdomServiceTest {
 
     private @Mock PodcastServerParameters podcastServerParameters;
     // private @Mock MimeTypeService mimeTypeService;
-    private @Mock UrlService urlService;
+    private @Mock
+    UrlService urlService;
     private @InjectMocks JdomService jdomService;
 
     private List<String> itemId = List(

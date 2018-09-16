@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.tf1replay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -11,7 +12,6 @@ import lan.dk.podcastserver.manager.worker.Extractor;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -23,9 +23,9 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotEmpty;
 
+import static com.github.davinkevin.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
+import static com.github.davinkevin.podcastserver.service.UrlService.USER_AGENT_MOBILE;
 import static io.vavr.API.*;
-import static lan.dk.podcastserver.service.UrlService.USER_AGENT_DESKTOP;
-import static lan.dk.podcastserver.service.UrlService.USER_AGENT_MOBILE;
 
 /**
  * Created by kevin on 12/12/2017

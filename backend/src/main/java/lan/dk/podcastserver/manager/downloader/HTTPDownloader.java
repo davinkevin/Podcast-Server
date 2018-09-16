@@ -4,12 +4,12 @@ import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +18,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Objects;
 
 import static io.vavr.API.Option;
@@ -31,7 +29,7 @@ import static java.util.Objects.nonNull;
 @Component("HTTPDownloader")
 public class HTTPDownloader extends AbstractDownloader {
 
-    final UrlService urlService;
+    private final UrlService urlService;
     private final WGetFactory wGetFactory;
 
     DownloadInfo info = null;
@@ -52,7 +50,7 @@ public class HTTPDownloader extends AbstractDownloader {
 
             info = this.downloadingItem.url()
                     .orElse(() -> Option(getItemUrl(getItem())))
-                    .map(urlService::getRealURL)
+                    .map((String url) -> urlService.getRealURL(url))
                     .map(wGetFactory::newDownloadInfo)
                     .getOrElseThrow(() -> new RuntimeException("Error during creation of download of " + this.downloadingItem.getItem().getTitle()));
 

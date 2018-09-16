@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -8,7 +9,6 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
-import lan.dk.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.service
 
 import arrow.core.Try
 import arrow.core.getOrElse
-import lan.dk.podcastserver.service.UrlService
 import org.apache.commons.codec.digest.DigestUtils
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service

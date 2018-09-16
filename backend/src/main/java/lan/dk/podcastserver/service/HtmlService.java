@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;

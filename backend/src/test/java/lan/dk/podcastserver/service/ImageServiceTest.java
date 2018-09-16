@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.service;
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import lan.dk.podcastserver.entity.Cover;
 import org.junit.Rule;

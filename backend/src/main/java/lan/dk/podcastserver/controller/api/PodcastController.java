@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.business.find.FindPodcastBusiness;
@@ -9,8 +10,6 @@ import lan.dk.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
-import lan.dk.podcastserver.service.UrlService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

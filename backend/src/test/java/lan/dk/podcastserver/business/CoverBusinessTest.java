@@ -6,7 +6,7 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.repository.CoverRepository;
-import lan.dk.podcastserver.service.UrlService;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.ClassRule;

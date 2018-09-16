@@ -9,7 +9,7 @@ import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayExtractor;
 import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
-import lan.dk.podcastserver.service.UrlService;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import lan.dk.utils.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.junit.Test;

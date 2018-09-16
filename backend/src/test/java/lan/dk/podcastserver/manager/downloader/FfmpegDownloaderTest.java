@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.downloader;
 
 
+import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -8,7 +9,10 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.*;
+import lan.dk.podcastserver.service.FfmpegService;
+import lan.dk.podcastserver.service.M3U8Service;
+import lan.dk.podcastserver.service.MimeTypeService;
+import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
@@ -34,7 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static io.vavr.API.*;
+import static io.vavr.API.List;
+import static io.vavr.API.Try;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.utils.IOUtils.ROOT_TEST_PATH;
@@ -42,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyVararg;
 import static org.mockito.Mockito.*;
 
 /**

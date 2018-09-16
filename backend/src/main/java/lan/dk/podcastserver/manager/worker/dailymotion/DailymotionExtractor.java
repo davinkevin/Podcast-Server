@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.dailymotion;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
@@ -9,7 +10,6 @@ import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.M3U8Service;
-import lan.dk.podcastserver.service.UrlService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
