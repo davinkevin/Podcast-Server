@@ -1,17 +1,19 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
-import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater
-import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSUpdater
-import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
+import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
-import lan.dk.podcastserver.manager.worker.youtube.YoutubeUpdater
+import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByApiUpdater
+import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByXmlUpdater
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.whenever
+import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater
+import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionUpdater
+import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUpdater
+import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -20,7 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
@@ -43,7 +44,8 @@ class UpdaterSelectorTest {
     @Mock lateinit var sixPlayUpdater: SixPlayUpdater
     @Mock lateinit var tf1ReplayUpdater: TF1ReplayUpdater
     @Mock lateinit var uploadUpdater: UploadUpdater
-    @Mock lateinit var youtubeUpdater: YoutubeUpdater
+    @Mock lateinit var youtubeByXmlUpdater: YoutubeByXmlUpdater
+    @Mock lateinit var youtubeByApiUpdater: YoutubeByApiUpdater
 
     @BeforeEach
     fun beforeEach() {
@@ -59,11 +61,12 @@ class UpdaterSelectorTest {
                 sixPlayUpdater,
                 tf1ReplayUpdater, 
                 uploadUpdater, 
-                youtubeUpdater
+                youtubeByXmlUpdater,
+                youtubeByApiUpdater
         )
 
         updaters.forEach {
-            whenever(it.compatibility(ArgumentMatchers.anyString())).thenCallRealMethod()
+            whenever(it.compatibility(any())).thenCallRealMethod()
             whenever(it.type()).thenCallRealMethod()
         }
 
@@ -100,7 +103,8 @@ class UpdaterSelectorTest {
                 rssUpdater,
                 sixPlayUpdater,
                 tf1ReplayUpdater,
-                youtubeUpdater
+                youtubeByXmlUpdater,
+                youtubeByApiUpdater
         )
                 .map { it.type() }
 

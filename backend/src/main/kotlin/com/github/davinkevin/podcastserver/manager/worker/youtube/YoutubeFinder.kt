@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import io.vavr.collection.Stream
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.manager.worker.Finder
@@ -42,13 +41,7 @@ class YoutubeFinder(val htmlService: HtmlService) : Finder {
         }
     }
 
-    override fun compatibility(url: String?) =
-            if (isYoutubeUrl(url)) 1
-            else Integer.MAX_VALUE
-
-    private fun isYoutubeUrl(url: String?) =
-            Stream.of("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
-                    .any { url?.contains(it) == true }
+    override fun compatibility(url: String?) = _compatibility(url)
 }
 
 private fun Document.meta(s: String) =

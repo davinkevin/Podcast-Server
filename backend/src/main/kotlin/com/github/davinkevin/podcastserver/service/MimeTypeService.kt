@@ -5,7 +5,7 @@ import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.core.toOption
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.worker.youtube.YoutubeUpdater.YOUTUBE
+import com.github.davinkevin.podcastserver.manager.worker.youtube.YOUTUBE
 import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika
 import org.springframework.stereotype.Service

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import io.vavr.jackson.datatype.VavrModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,8 @@ public class JacksonConfig {
                             .enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING)
                             .disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION),
                         new JavaTimeModule(),
-                        new VavrModule()
+                        new VavrModule(),
+                        new KotlinModule()
                 )
         ;
     }

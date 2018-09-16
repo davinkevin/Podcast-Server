@@ -1,8 +1,7 @@
-package lan.dk.podcastserver.manager.worker.youtube
+package com.github.davinkevin.podcastserver.manager.worker.youtube
 
 import arrow.core.Option
 import arrow.core.getOrElse
-import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -11,18 +10,20 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.manager.worker.Updater
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Component
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Objects.nonNull
 
 /**
  * Created by kevin on 11/09/2018
  */
+@Component
+@ConditionalOnProperty(name = ["podcastserver.api.youtube"], matchIfMissing = true)
 class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlService, val signatureService: SignatureService) : Updater {
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
@@ -30,7 +31,7 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
     override fun getItems(podcast: Podcast): io.vavr.collection.Set<Item> {
         log.info("Youtube Update by RSS")
 
-        val url = xmlUrlOf(podcast.url)
+        val url = playlistUrlOf(podcast.url)
         val parsedXml = jdomService.parse(url).k()
 
         val dn = parsedXml
@@ -47,20 +48,9 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
                 .toVΛVΓ()
     }
 
-    private fun isPlaylist(url: String) =
-            url.contains(PLAYLIST_URL_PART)
-
-    private fun xmlUrlOf(url: String): String =
+    private fun playlistUrlOf(url: String): String =
             if (isPlaylist(url)) PLAYLIST_RSS_BASE.format(playlistIdOf(url))
-            else CHANNEL_RSS_BASE.format(channelIdOf(url))
-
-    private fun channelIdOf(url: String) =
-            htmlService
-                    .get(url).k()
-                    .flatMap { it.select("[data-channel-external-id]").firstOption() }
-                    .filter { nonNull(it) }
-                    .map { it.attr("data-channel-external-id") }
-                    .getOrElse { "" }
+            else CHANNEL_RSS_BASE.format(channelIdOf(htmlService, url))
 
     private fun toItem(e: Element, dn: Namespace): Item {
         val mediaGroup = e.getChild("group", MEDIA_NAMESPACE)
@@ -93,14 +83,8 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
         return URL_PAGE_BASE.format(idVideo)
     }
 
-
-    private fun playlistIdOf(url: String): String {
-        // TODO  : Use Pattern Match to extract PlaylistID in Feed case and url case
-        return url.substringAfter("list=")
-    }
-
     override fun signatureOf(podcast: Podcast): String {
-        val url = xmlUrlOf(podcast.url)
+        val url = playlistUrlOf(podcast.url)
         val parsedXml = jdomService.parse(url).k()
 
         val dn = parsedXml
@@ -118,17 +102,10 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
         else signatureService.fromText(joinedIds)
     }
 
-
-    override fun type(): Type {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun compatibility(url: String?): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun type() = _type()
+    override fun compatibility(url: String?) = _compatibility(url)
 
     companion object {
-        private const val PLAYLIST_URL_PART = "www.youtube.com/playlist?list="
         private const val PLAYLIST_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?playlist_id=%s"
         private const val CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
         private const val URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s"
