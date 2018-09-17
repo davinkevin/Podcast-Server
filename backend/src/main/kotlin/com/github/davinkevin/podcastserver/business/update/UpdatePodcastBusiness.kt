@@ -3,12 +3,13 @@ package com.github.davinkevin.podcastserver.business.update
 import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.business.CoverBusiness
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.utils.k
 import io.vavr.Tuple3
+import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import lan.dk.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -127,6 +128,7 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
                 .filter(filter)
                 .map { item -> item.setPodcast(podcast) }
                 .filter { item -> validator.validate(item).isEmpty() }
+                .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) null else it.cover } }
 
         if (itemsToAdd.isEmpty()) {
             return itemsToAdd
