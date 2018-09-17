@@ -1,13 +1,12 @@
 package lan.dk.podcastserver.manager.downloader;
 
 
-import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.ProcessService;
+import com.github.davinkevin.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.ExternalTools;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.Try;
-import static io.vavr.API.Option;
 import static java.util.Objects.nonNull;
 
 @Slf4j

@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.downloader;
 
 
+import com.github.davinkevin.podcastserver.service.ProcessService;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
@@ -10,7 +11,6 @@ import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static io.vavr.API.Option;
+import static io.vavr.API.Try;
 
 @Slf4j
 @Scope("prototype")
@@ -104,8 +105,7 @@ public class FfmpegDownloader extends AbstractDownloader {
     @Override
     public void pauseDownload() {
         ProcessBuilder pauseProcess = processService.newProcessBuilder("kill", "-STOP", "" + processService.pidOf(process));
-        processService
-                .start(pauseProcess)
+        Try(() -> processService.start(pauseProcess))
                 .andThenTry(super::pauseDownload)
                 .onFailure(e -> {
                     log.error("Error during pause of process :", e);
@@ -117,7 +117,7 @@ public class FfmpegDownloader extends AbstractDownloader {
     public void restartDownload() {
         ProcessBuilder restart = new ProcessBuilder("kill", "-SIGCONT", "" + processService.pidOf(process));
 
-        processService.start(restart)
+        Try(() -> processService.start(restart))
                 .andThenTry(() -> {
                     item.setStatus(Status.STARTED);
                     saveSyncWithPodcast();

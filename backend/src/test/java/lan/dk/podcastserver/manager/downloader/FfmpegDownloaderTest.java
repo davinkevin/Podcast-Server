@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.downloader;
 
 
+import com.github.davinkevin.podcastserver.service.ProcessService;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
@@ -12,7 +13,6 @@ import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.M3U8Service;
 import lan.dk.podcastserver.service.MimeTypeService;
-import lan.dk.podcastserver.service.ProcessService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
@@ -112,7 +112,7 @@ public class FfmpegDownloaderTest {
             ((ProgressListener) i.getArgument(2)).progress(progress);
             return mock(Process.class);
         });
-        when(processService.waitFor(any())).thenReturn(Try(() -> 1));
+        when(processService.waitFor(any())).thenReturn(new arrow.core.Try.Success<>(1));
         doAnswer(i -> {
             Path targetLocation = i.getArgument(0);
             Files.write(targetLocation, "".getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -141,16 +141,12 @@ public class FfmpegDownloaderTest {
     }
 
     @Test
-    public void should_restart_a_current_download() throws IOException, URISyntaxException, InterruptedException {
+    public void should_restart_a_current_download() throws InterruptedException {
         /* Given */
         Process downloadProcess = mock(Process.class);
         item.setStatus(Status.PAUSED);
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(downloadProcess);
-/*        when(downloadProcess.waitFor()).then(i -> {
-            TimeUnit.SECONDS.sleep(10L);
-            return 1;
-        });*/
-        when(processService.start(any())).then(i -> Try.run(() -> {}));
+        when(processService.start(any())).thenReturn(mock(Process.class));
 
         /* When */
         runAsync(() -> ffmpegDownloader.download());
@@ -164,12 +160,12 @@ public class FfmpegDownloaderTest {
     }
 
     @Test
-    public void should_failed_to_restart() throws InterruptedException {
+    public void should_failed_to_restart() {
         /* Given */
         Process downloadProcess = mock(Process.class);
         item.setStatus(Status.PAUSED);
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(downloadProcess);
-        when(processService.start(any())).then(i -> Try.failure(new IOException("Unable to restart download")));
+        doThrow(RuntimeException.class).when(processService).start(any());
 
         /* When */
         runAsync(() -> ffmpegDownloader.download());
@@ -187,8 +183,11 @@ public class FfmpegDownloaderTest {
         /* Given */
         Process process = mock(Process.class);
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(process);
-        when(processService.waitFor(any())).then(i -> Try.run(() -> TimeUnit.SECONDS.sleep(20L)));
-        when(processService.start(any())).then(i -> Try.run(() -> {}));
+        when(processService.waitFor(any())).then(i -> {
+            TimeUnit.SECONDS.sleep(20L);
+            return new arrow.core.Try.Success<>(10);
+        });
+        when(processService.start(any())).thenReturn(mock(Process.class));
 
         /* When */
         CompletableFuture<Void> future = runAsync(() -> ffmpegDownloader.download());
@@ -207,12 +206,15 @@ public class FfmpegDownloaderTest {
         /* Given */
         Process process = mock(Process.class);
         when(ffmpegService.download(anyString(), any(), any())).thenReturn(process);
-        when(processService.waitFor(any())).then(i -> Try.run(() -> TimeUnit.SECONDS.sleep(20L)));
-        when(processService.start(any())).then(i -> Try.failure(new IOException("Error during process")));
+        when(processService.waitFor(any())).then(i -> {
+            TimeUnit.SECONDS.sleep(20L);
+            return new arrow.core.Try.Success<>(1);
+        });
+        doThrow(RuntimeException.class).when(processService).start(any());
 
         /* When */
         CompletableFuture<Void> future = runAsync(() -> ffmpegDownloader.download());
-        Try.run(() -> TimeUnit.MILLISECONDS.sleep(50));
+        Try.run(() -> TimeUnit.MILLISECONDS.sleep(150));
         ffmpegDownloader.pauseDownload();
 
         /* Then */
