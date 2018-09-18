@@ -52,8 +52,10 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
     private fun keepBestQuality(item: M6PlayItem): Option<M6PlayAssets> =
             item.assets
                     .filterNot { it.protocol == "primetime" }
-                    .firstOption { (it.video_quality ?: "").contains("sd3") }
-                    .flatMap { transformSd3Url(it) }
+                    .filterNot { it.type == "usp_dashcenc_h264" }
+                    .asSequence()
+                    .flatMap { transformSd3Url(it).toList().asSequence() }
+                    .firstOption()
                     .orElse { item.assets.firstOption { i -> "usp_hls_h264" == i.type } }
                     .orElse { item.assets.firstOption { i -> "hq" == i.video_quality } }
                     .orElse { item.assets.firstOption { i -> "hd" == i.video_quality } }
