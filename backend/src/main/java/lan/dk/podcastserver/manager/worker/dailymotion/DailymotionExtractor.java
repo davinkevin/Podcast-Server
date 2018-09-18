@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.dailymotion;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.M3U8Service;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
 import io.vavr.control.Option;
@@ -9,7 +10,6 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.M3U8Service;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 import static io.vavr.API.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
@@ -46,6 +48,7 @@ public class DailymotionExtractor implements Extractor {
                 .map(jsonService::parse)
                 .map(JsonService.to("metadata", DailymotionMetadata.class))
                 .map(DailymotionMetadata::getUrl)
+                .filter(Objects::nonNull)
                 .map(m3U8Service::getM3U8UrlFormMultiStreamFile)
                 .map(this::removeHash)
                 .map(url -> Tuple(url, getFileName(item)))

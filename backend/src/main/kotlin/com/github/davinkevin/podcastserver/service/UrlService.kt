@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest
  * Created by kevin on 21/07/2016.
  */
 @Service
-class UrlService {
+open class UrlService {
 
     val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
@@ -72,21 +72,11 @@ class UrlService {
                 .getOrElse { e -> throw RuntimeException("Error during creation of stream", e) }
     }
 
-    fun asReader(url: String): BufferedReader = asStream(url).bufferedReader()
+    open fun asReader(url: String): BufferedReader = asStream(url).bufferedReader()
 
     /* Relative and absolute URL transformation */
     fun addDomainIfRelative(urlWithDomain: String, mayBeRelativeUrl: String): String {
-        if (mayBeRelativeUrl.contains(PROTOCOL_SEPARATOR)) {
-            return mayBeRelativeUrl
-        }
-
-        val isFromRoot = mayBeRelativeUrl.startsWith("/")
-
-        val (protocol, authority, path) = URL(urlWithDomain)
-        val lastSlash = if (isFromRoot) "" else StringUtils.substringBeforeLast(path, "/")
-        val firstSlash = if (isFromRoot) "" else "/"
-
-        return "$protocol$PROTOCOL_SEPARATOR$authority$lastSlash$firstSlash$mayBeRelativeUrl"
+        return mayBeRelativeUrl.addDomainIfRelative(urlWithDomain)
     }
 
     companion object {
@@ -95,7 +85,7 @@ class UrlService {
         const val USER_AGENT_MOBILE = "AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)"
         const val USER_AGENT_KEY = "User-agent"
 
-        private const val PROTOCOL_SEPARATOR = "://"
+        const val PROTOCOL_SEPARATOR = "://"
         private const val MAX_NUMBER_OF_REDIRECTION = 10
         private val NO_OP = Consumer<HttpURLConnection> { Function.identity<Any>().apply(it) }
         private val EMPTY_PORT = Set(80, 443)
@@ -133,3 +123,17 @@ private fun URL.connectOverHttp(): HttpURLConnection {
 private operator fun URL.component1() = this.protocol
 private operator fun URL.component2() = this.authority
 private operator fun URL.component3() = this.path
+
+fun String.addDomainIfRelative(basedOn: String): String {
+    if (this.contains(UrlService.PROTOCOL_SEPARATOR)) {
+        return this
+    }
+
+    val isFromRoot = this.startsWith("/")
+
+    val (protocol, authority, path) = URL(basedOn)
+    val lastSlash = if (isFromRoot) "" else StringUtils.substringBeforeLast(path, "/")
+    val firstSlash = if (isFromRoot) "" else "/"
+
+    return "$protocol${UrlService.PROTOCOL_SEPARATOR}$authority$lastSlash$firstSlash$this"
+}

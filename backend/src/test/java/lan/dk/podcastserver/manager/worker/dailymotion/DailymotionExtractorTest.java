@@ -1,15 +1,14 @@
 package lan.dk.podcastserver.manager.worker.dailymotion;
 
+import com.github.davinkevin.podcastserver.service.M3U8Service;
+import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionExtractor;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.podcastserver.service.M3U8Service;
-import com.github.davinkevin.podcastserver.service.UrlService;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
