@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.None
+import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
+import com.github.davinkevin.podcastserver.IOUtils.fileAsStream
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
@@ -11,7 +13,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
-import com.github.davinkevin.podcastserver.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -37,9 +38,9 @@ class SixPlayExtractorTest {
     private val itemPlaylist = Item().apply { url = "https://www.6play.fr/scenes-de-menages-p_829/psychologie-du-couple-p_2372" }
 
     @Test
-    fun `should extract real url for clip`() {
+    fun `should extract real url for clip from sd3 format`() {
         /* GIVEN */
-        whenever(jsonService.parseUrl(ITEM_6PLAY_URL)).thenReturn(IOUtils.fileAsJson(of("c_11887179.json")))
+        whenever(jsonService.parseUrl(ITEM_6PLAY_URL)).thenReturn(fileAsJson(of("c_11887179.json")))
         whenever(urlService.getRealURL(ITEM_PHYSICAL_URL, UrlService.NO_OP, 0)).thenReturn(REAL_URL)
 
         val request = mock<GetRequest>()
@@ -47,7 +48,7 @@ class SixPlayExtractorTest {
         whenever(urlService.get(REAL_URL)).thenReturn(request)
         whenever(request.header(any(), any())).thenReturn(request)
         whenever(request.asString()).thenReturn(response)
-        whenever(response.rawBody).thenReturn(IOUtils.fileAsStream(of("118817179.manifest.m3u8")))
+        whenever(response.rawBody).thenReturn(fileAsStream(of("118817179.manifest.m3u8")))
 
         whenever(m3U8Service.findBestQuality(any())).thenCallRealMethod()
         whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
@@ -58,6 +59,40 @@ class SixPlayExtractorTest {
         /* THEN  */
         assertThat(downloadingItem.item).isSameAs(itemClip)
         assertThat(downloadingItem.urls).containsOnly("https://cdn-m6web.akamaized.net/prime/vod/protected/d/a/6/Scenes-de-menages_c11887179_Episodes-du-09-fe/Scenes-de-menages_c11887179_Episodes-du-09-fe_sd3.mp4.m3u8")
+    }
+
+    @Test
+    fun `should extract real url for clip from sd1-ism`() {
+        /* GIVEN */
+        val item = Item().apply {
+            id = UUID.randomUUID()
+            url = "http://www.6play.fr/scenes-de-menages-p_829/episodes-du-19-septembre-a-1330-c_12142481"
+        }
+        val sixPlayUrlJson = "https://pc.middleware.6play.fr/6play/v2/platforms/m6group_web/services/6play/videos/clip_12142481?with=clips&csa=5"
+        val physicalUrl = "https://lbv2.cdn.m6web.fr/v1/resource/s/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Manifest.m3u8?expiration=1537415521&scheme=https&groups%5B0%5D=m6web&customerName=m6web&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczNzk1MjAsIm5iZiI6MTUzNzM3OTUyMCwiZXhwIjoxNTM3NDE1NTIxLCJyX2hhc2giOiIzMmFiMGRkZjZlMGU5ZWI1NjVlZTUzMWVmZWFmZjNjNTdmODVjZjMzIn0.yQfEckAljunifrAj6g75IU6j-DrrbWzTd9d9QEHMKno"
+        val realUrl = "https://vod-m6w.global.ssl.fastly.net/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Manifest.m3u8"
+        val realUrlTransformed = "https://vod-m6w.global.ssl.fastly.net/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.m3u8"
+        whenever(jsonService.parseUrl(sixPlayUrlJson)).thenReturn(fileAsJson(of("c_12142481.json")))
+        whenever(urlService.getRealURL(physicalUrl, UrlService.NO_OP, 0)).thenReturn(realUrl)
+
+        val request = mock<GetRequest>()
+        val response = mock<HttpResponse<String>>()
+        whenever(urlService.get(realUrlTransformed)).thenReturn(request)
+        whenever(request.header(any(), any())).thenReturn(request)
+        whenever(request.asString()).thenReturn(response)
+        whenever(response.rawBody).thenReturn(fileAsStream(of("12142481.manifest.m3u8")))
+
+        whenever(m3U8Service.findBestQuality(any())).thenCallRealMethod()
+        whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
+
+        /* WHEN  */
+        val downloadingItem = extractor.extract(item)
+
+        /* THEN  */
+        assertThat(downloadingItem.item).isSameAs(item)
+        assertThat(downloadingItem.urls)
+                .containsOnly("https://vod-m6w.global.ssl.fastly.net/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp-audio1=93468-video_eng=3152000.m3u8")
+
     }
 
     @Test
@@ -86,7 +121,7 @@ class SixPlayExtractorTest {
     @Test
     fun `should extract urls from playlist`() {
         /* GIVEN */
-        whenever(jsonService.parseUrl(PLAYLIST_6PLAY_URL)).thenReturn(IOUtils.fileAsJson(of("p_2372.json")))
+        whenever(jsonService.parseUrl(PLAYLIST_6PLAY_URL)).thenReturn(fileAsJson(of("p_2372.json")))
         /* WHEN  */
         val downloadingItem = extractor.extract(itemPlaylist)
         /* THEN  */
@@ -118,7 +153,6 @@ class SixPlayExtractorTest {
         assertThat(extractor.compatibility("foo")).isGreaterThan(1)
         assertThat(extractor.compatibility("http://www.6play.fr/test")).isEqualTo(1)
     }
-
 
     companion object {
         private const val ITEM_PHYSICAL_URL = "https://lbv2.cdn.m6web.fr/v1/resource/s/usp/mb_sd3/d/a/6/Scenes-de-menages_c11887179_Episodes-du-09-fe/Scenes-de-menages_c11887179_Episodes-du-09-fe_unpnp.ism/Manifest.m3u8?expiration=1518300931&scheme=https&groups%5B0%5D=m6web&customerName=m6web&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MTgyNjQ5MzAsIm5iZiI6MTUxODI2NDkzMCwiZXhwIjoxNTE4MzAwOTMxLCJyX2hhc2giOiJkN2I2M2ExMmRlMmVmOTYxY2Y4NTk2NjU1OTE0NWI0YjUxMmM2ZjFjIn0.lCbr5KE3dX6X7Ic3c8s9SYsJiZcDCYszmo-cGJYoG28"

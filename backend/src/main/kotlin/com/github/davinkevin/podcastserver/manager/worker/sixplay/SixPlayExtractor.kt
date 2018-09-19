@@ -49,21 +49,25 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
         )
     }
 
-    private fun keepBestQuality(item: M6PlayItem): Option<M6PlayAssets> =
-            item.assets
-                    .filterNot { it.protocol == "primetime" }
-                    .filterNot { it.type == "usp_dashcenc_h264" }
-                    .asSequence()
-                    .flatMap { transformSd3Url(it).toList().asSequence() }
-                    .firstOption()
-                    .orElse { item.assets.firstOption { i -> "usp_hls_h264" == i.type } }
-                    .orElse { item.assets.firstOption { i -> "hq" == i.video_quality } }
-                    .orElse { item.assets.firstOption { i -> "hd" == i.video_quality } }
-                    .orElse { item.assets.firstOption { i -> "sd" == i.video_quality } }
+    private fun keepBestQuality(item: M6PlayItem): Option<M6PlayAssets> {
+        val a = item.assets
+                .filterNot { it.protocol == "primetime" }
 
-    private fun transformSd3Url(asset: M6PlayAssets): Option<M6PlayAssets> =
-            urlService.getRealURL(asset.full_physical_path!!)
-                    .toOption()
+        return a
+                .firstOption{ (it.video_quality ?: "").contains("sd1") }.flatMap { transformSD1Ism(it) }
+                .orElse { a.firstOption{ (it.video_quality ?: "").contains("sd3") }.flatMap { transformSd3Url(it) } }
+                .orElse { a.firstOption { i -> "usp_hls_h264" == i.type } }
+                .orElse { a.firstOption { i -> "hq" == i.video_quality } }
+                .orElse { a.firstOption { i -> "hd" == i.video_quality } }
+                .orElse { a.firstOption { i -> "sd" == i.video_quality } }
+    }
+
+    private fun transformSd3Url(asset: M6PlayAssets): Option<M6PlayAssets> = transformUrl(asset)
+    private fun transformSD1Ism(asset: M6PlayAssets): Option<M6PlayAssets> = transformUrl(asset) { toFullQualityPlaylistUrl(it) }
+
+    private fun transformUrl(asset: M6PlayAssets, urlMapper: (String) -> String = { it }): Option<M6PlayAssets> =
+            urlService.getRealURL(asset.full_physical_path!!).toOption()
+                    .map { urlMapper(it) }
                     .map { urlService.get(it)
                             .header(UrlService.USER_AGENT_KEY, UrlService.USER_AGENT_MOBILE)
                             .asString() }
@@ -73,8 +77,13 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
                     .map { M6PlayAssets(asset.video_quality, it, asset.type, asset.protocol) }
 
     override fun getFileName(item: Item) = super.getFileName(item) + ".mp4"
-
     override fun compatibility(url: String?) = SixPlayUpdater.isFrom6Play(url)
+
+    private fun toFullQualityPlaylistUrl(t: String): String {
+        val base = t.substringBeforeLast("/")
+        val name = base.substringAfterLast("/").replace(".ism", ".m3u8")
+        return "$base/$name"
+    }
 
     companion object {
 
