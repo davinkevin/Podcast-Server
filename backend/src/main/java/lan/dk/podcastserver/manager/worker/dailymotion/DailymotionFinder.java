@@ -1,10 +1,10 @@
 package lan.dk.podcastserver.manager.worker.dailymotion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.ImageService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

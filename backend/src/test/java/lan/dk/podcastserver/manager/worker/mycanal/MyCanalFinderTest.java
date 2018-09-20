@@ -1,10 +1,9 @@
 package lan.dk.podcastserver.manager.worker.mycanal;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalFinder;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
@@ -16,7 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 /**

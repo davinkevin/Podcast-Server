@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.beinsports;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -8,7 +9,6 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;

@@ -1,14 +1,15 @@
 package lan.dk.podcastserver.manager.worker.beinsports;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import javax.validation.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Created by kevin on 18/03/2016 for Podcast Server

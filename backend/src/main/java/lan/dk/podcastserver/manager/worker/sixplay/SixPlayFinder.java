@@ -1,22 +1,23 @@
 package lan.dk.podcastserver.manager.worker.sixplay;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import io.vavr.collection.HashSet;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
 import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
-import javax.validation.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotEmpty;
 
 import static io.vavr.API.Try;
 

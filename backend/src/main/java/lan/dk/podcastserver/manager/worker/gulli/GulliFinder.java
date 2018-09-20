@@ -1,14 +1,15 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lombok.AllArgsConstructor;
-import javax.validation.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotEmpty;
 
 import static io.vavr.API.Option;
 

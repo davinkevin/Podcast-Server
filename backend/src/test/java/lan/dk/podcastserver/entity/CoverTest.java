@@ -36,7 +36,7 @@ public class CoverTest {
 
     @Test
     public void should_create_and_init_after() {
-        assertThat(new Cover().setUrl(NOWHERE_URL).setWidth(100).setHeight(200))
+        assertThat(Cover.builder().url(NOWHERE_URL).width(100).height(200).build())
                 .hasUrl(NOWHERE_URL)
                 .hasWidth(100)
                 .hasHeight(200)
@@ -45,11 +45,15 @@ public class CoverTest {
 
     @Test
     public void should_interact_with_id() {
-        /* Given */ Cover cover = new Cover();
-        /* When */
+        /* Given */
+        Cover cover = new Cover();
         UUID id = UUID.randomUUID();
+
+        /* When */
         cover.setId(id);
-        /* Then */  assertThat(cover).hasId(id);
+
+        /* Then */
+        assertThat(cover).hasId(id);
     }
 
     @Test

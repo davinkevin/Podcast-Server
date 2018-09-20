@@ -1,9 +1,8 @@
 package lan.dk.podcastserver.manager.worker.dailymotion;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionFinder;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;

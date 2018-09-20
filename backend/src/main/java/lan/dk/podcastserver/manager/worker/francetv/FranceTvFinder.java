@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.manager.worker.francetv;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;

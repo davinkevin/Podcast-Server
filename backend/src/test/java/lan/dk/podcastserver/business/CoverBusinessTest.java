@@ -54,7 +54,7 @@ public class CoverBusinessTest {
     @Test
     public void should_find_one() {
         /* Given */
-        when(coverRepository.findById(any(UUID.class))).then(invocation -> Optional.of(new Cover().setId((UUID) invocation.getArguments()[0])));
+        when(coverRepository.findById(any(UUID.class))).then(invocation -> Optional.of(Cover.builder().id((UUID) invocation.getArguments()[0]).build()));
         UUID id = UUID.randomUUID();
         /* When */
         Cover cover = coverBusiness.findOne(id);
@@ -157,16 +157,15 @@ public class CoverBusinessTest {
     @Test
     public void should_save_cover() {
         /* Given */
-        Cover cover = new Cover().setUrl("http://anUrl.jiz/foo/bar");
+        Cover cover = Cover.builder().url("http://anUrl.jiz/foo/bar").build();
         UUID createdId = UUID.randomUUID();
-        when(coverRepository.save(eq(cover))).thenReturn(cover.setId(createdId));
+        when(coverRepository.save(eq(cover))).thenReturn(cover.toBuilder().id(createdId).build());
 
         /* When */
         Cover savedCover = coverBusiness.save(cover);
 
         /* Then */
         assertThat(savedCover).hasId(createdId);
-        assertThat(cover).isSameAs(savedCover);
         verify(coverRepository, only()).save(eq(cover));
     }
 

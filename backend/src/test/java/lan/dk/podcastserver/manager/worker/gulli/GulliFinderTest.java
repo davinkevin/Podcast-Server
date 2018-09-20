@@ -1,10 +1,9 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.gulli.GulliFinder;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;

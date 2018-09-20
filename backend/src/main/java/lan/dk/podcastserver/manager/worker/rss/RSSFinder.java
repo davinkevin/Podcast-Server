@@ -1,16 +1,16 @@
 package lan.dk.podcastserver.manager.worker.rss;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
-import javax.validation.constraints.NotEmpty;
 import org.jdom2.Element;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 import static io.vavr.API.Option;

@@ -2,6 +2,7 @@ package lan.dk.podcastserver.business;
 
 import io.vavr.collection.HashSet;
 import io.vavr.control.Option;
+import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
@@ -74,6 +75,12 @@ public class PodcastBusiness {
             patchPodcast.getCover().setUrl(coverBusiness.download(patchPodcast));
         }
 
+        Cover cover = coverBusiness.findOne(patchPodcast.getCover().getId()).toBuilder()
+                .height(patchPodcast.getCover().getHeight())
+                .url(patchPodcast.getCover().getUrl())
+                .width(patchPodcast.getCover().getWidth())
+                .build();
+
         podcastToUpdate
                 .setTitle(patchPodcast.getTitle())
                 .setUrl(patchPodcast.getUrl())
@@ -82,12 +89,7 @@ public class PodcastBusiness {
                 .setDescription(patchPodcast.getDescription())
                 .setHasToBeDeleted(patchPodcast.getHasToBeDeleted())
                 .setTags(tagBusiness.getTagListByName(HashSet.ofAll(patchPodcast.getTags())).toJavaSet())
-                .setCover(
-                    coverBusiness.findOne(patchPodcast.getCover().getId())
-                        .setHeight(patchPodcast.getCover().getHeight())
-                        .setUrl(patchPodcast.getCover().getUrl())
-                        .setWidth(patchPodcast.getCover().getWidth())
-                );
+                .setCover(cover);
 
 
         return save(podcastToUpdate);
@@ -109,7 +111,9 @@ public class PodcastBusiness {
         Podcast podcastSaved = reatachAndSave(podcast);
 
         if (!Objects.isNull(podcast.getCover())) {
-            coverBusiness.save(podcast.getCover().setUrl(coverBusiness.download(podcast)));
+            Cover cover = podcast.getCover();
+            cover.setUrl(coverBusiness.download(podcast));
+            coverBusiness.save(cover);
         }
 
         return podcastSaved;

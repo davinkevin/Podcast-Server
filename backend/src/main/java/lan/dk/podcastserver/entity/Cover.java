@@ -1,7 +1,9 @@
 package lan.dk.podcastserver.entity;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -14,10 +16,8 @@ import java.util.UUID;
 
 @Entity
 @Builder(toBuilder = true)
-@Setter @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(chain = true)
 public class Cover {
 
     public static final Cover DEFAULT_COVER = new Cover();
@@ -46,5 +46,37 @@ public class Cover {
         return new HashCodeBuilder(17, 37)
                 .append(StringUtils.lowerCase(url))
                 .toHashCode();
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setWidth(Integer width) {
+        this.width = width;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getUrl() {
+        return this.url;
+    }
+
+    public Integer getWidth() {
+        return this.width;
+    }
+
+    public Integer getHeight() {
+        return this.height;
     }
 }

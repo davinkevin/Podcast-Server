@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.francetv;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.ImageService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.HashSet;
@@ -12,7 +13,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

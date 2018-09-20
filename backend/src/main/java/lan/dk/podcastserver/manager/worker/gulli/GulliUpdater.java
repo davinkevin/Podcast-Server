@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
+import com.github.davinkevin.podcastserver.service.ImageService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
@@ -11,7 +12,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.service.HtmlService;
-import lan.dk.podcastserver.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
