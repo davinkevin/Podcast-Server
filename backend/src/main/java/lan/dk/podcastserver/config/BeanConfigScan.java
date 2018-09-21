@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.config;
 
+import com.github.davinkevin.podcastserver.service.TikaProbeContentType;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.service.properties.Api;
@@ -18,8 +19,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 
 /**
  * Created by kevin on 26/12/2013.

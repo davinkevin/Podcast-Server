@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static io.vavr.API.Option;
@@ -35,7 +36,7 @@ import static java.util.Objects.nonNull;
 @Indexed
 @Slf4j
 @Builder
-@Getter @Setter
+@Setter
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
 @Accessors(chain = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -275,6 +276,70 @@ public class Item {
         fileName = null;
         numberOfFail = 0;
         return this;
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public Cover getCover() {
+        return this.cover;
+    }
+
+    public Podcast getPodcast() {
+        return this.podcast;
+    }
+
+    public @NotNull @Size(min = 1, max = 254) String getTitle() {
+        return this.title;
+    }
+
+    public String getUrl() {
+        return this.url;
+    }
+
+    public ZonedDateTime getPubDate() {
+        return this.pubDate;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public String getMimeType() {
+        return this.mimeType;
+    }
+
+    public Long getLength() {
+        return this.length;
+    }
+
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    public Status getStatus() {
+        return this.status;
+    }
+
+    public Integer getProgression() {
+        return this.progression;
+    }
+
+    public Integer getNumberOfFail() {
+        return this.numberOfFail;
+    }
+
+    public ZonedDateTime getDownloadDate() {
+        return this.downloadDate;
+    }
+
+    public ZonedDateTime getCreationDate() {
+        return this.creationDate;
+    }
+
+    public Set<WatchList> getWatchLists() {
+        return this.watchLists;
     }
 
     public interface ItemSearchListView {}

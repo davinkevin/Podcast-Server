@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.github.davinkevin.podcastserver.service.MimeTypeService;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
@@ -8,7 +9,6 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.MimeTypeService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;

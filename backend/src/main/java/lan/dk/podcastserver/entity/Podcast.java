@@ -3,7 +3,10 @@ package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import io.vavr.control.Option;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -27,7 +30,7 @@ import static io.vavr.API.Try;
 @Slf4j
 @Entity
 @Builder
-@Getter @Setter
+@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor(onConstructor = @__({@JsonIgnore}))
@@ -149,6 +152,50 @@ public class Podcast implements Serializable {
                 .map(Cover::getUrl)
                 .map(FilenameUtils::getExtension)
                 .map(ext -> rootFolder.resolve(title).resolve("cover." + ext));
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getUrl() {
+        return this.url;
+    }
+
+    public String getSignature() {
+        return this.signature;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public ZonedDateTime getLastUpdate() {
+        return this.lastUpdate;
+    }
+
+    public Set<Item> getItems() {
+        return this.items;
+    }
+
+    public Cover getCover() {
+        return this.cover;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public Boolean getHasToBeDeleted() {
+        return this.hasToBeDeleted;
+    }
+
+    public Set<Tag> getTags() {
+        return this.tags;
     }
 
     public interface PodcastListingView {}

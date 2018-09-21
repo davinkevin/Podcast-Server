@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.config;
 
+import com.github.davinkevin.podcastserver.service.TikaProbeContentType;
 import io.vavr.collection.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +10,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static lan.dk.podcastserver.service.MimeTypeService.TikaProbeContentType;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
