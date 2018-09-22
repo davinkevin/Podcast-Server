@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.youtube;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
@@ -7,7 +8,6 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.properties.Api;

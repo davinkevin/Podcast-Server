@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.tf1replay;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.service.M3U8Service;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
@@ -7,7 +8,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
 import org.apache.commons.io.input.NullInputStream;

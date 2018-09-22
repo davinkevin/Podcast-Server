@@ -1,24 +1,20 @@
 package lan.dk.podcastserver.manager.worker.mycanal;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import static io.vavr.API.List;
-import static lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel.*;
+import static lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel.MyCanalVideoItem;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**

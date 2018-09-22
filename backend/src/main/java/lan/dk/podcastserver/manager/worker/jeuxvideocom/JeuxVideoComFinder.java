@@ -1,8 +1,8 @@
 package lan.dk.podcastserver.manager.worker.jeuxvideocom;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import lan.dk.podcastserver.service.HtmlService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;

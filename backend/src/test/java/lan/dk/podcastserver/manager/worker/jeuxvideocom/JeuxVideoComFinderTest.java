@@ -1,8 +1,7 @@
 package lan.dk.podcastserver.manager.worker.jeuxvideocom;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.utils.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;

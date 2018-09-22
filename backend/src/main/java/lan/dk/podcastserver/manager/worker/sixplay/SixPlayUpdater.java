@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.sixplay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.service.ImageService;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import com.jayway.jsonpath.DocumentContext;
@@ -15,7 +16,6 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.parser.SixPlayParsingException;
 import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -1,9 +1,8 @@
 package lan.dk.podcastserver.manager.worker.francetv;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
-import lan.dk.podcastserver.manager.worker.francetv.FranceTvExtractor;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;
@@ -17,9 +16,7 @@ import static io.vavr.API.None;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by kevin on 24/12/2017

@@ -1,9 +1,8 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
-import lan.dk.podcastserver.manager.worker.gulli.GulliExtractor;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.utils.IOUtils;
 import org.junit.Before;

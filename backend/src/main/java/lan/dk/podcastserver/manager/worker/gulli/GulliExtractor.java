@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.gulli;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor;
 import com.jayway.jsonpath.TypeRef;
 import io.vavr.Tuple;
@@ -9,7 +10,6 @@ import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

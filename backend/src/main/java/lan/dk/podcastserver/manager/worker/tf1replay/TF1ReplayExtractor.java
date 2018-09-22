@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.manager.worker.tf1replay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.service.M3U8Service;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.mashape.unirest.http.HttpResponse;
@@ -10,7 +11,6 @@ import io.vavr.collection.List;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.worker.Extractor;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

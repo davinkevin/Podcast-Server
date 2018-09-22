@@ -1,16 +1,16 @@
 package lan.dk.podcastserver.manager.worker.youtube;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import io.vavr.collection.Stream;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import lan.dk.podcastserver.service.HtmlService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import javax.validation.constraints.NotEmpty;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.function.Function;
 
 import static io.vavr.API.Option;

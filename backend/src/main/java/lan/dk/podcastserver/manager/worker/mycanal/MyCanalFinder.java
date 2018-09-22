@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.mycanal;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.service.ImageService;
 import com.jayway.jsonpath.DocumentContext;
 import io.vavr.collection.List;
@@ -7,7 +8,6 @@ import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.service.JsonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

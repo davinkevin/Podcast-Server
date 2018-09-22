@@ -1,9 +1,8 @@
 package lan.dk.podcastserver.manager.worker.youtube;
 
+import com.github.davinkevin.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.worker.youtube.YoutubeFinder;
-import lan.dk.podcastserver.service.HtmlService;
 import lan.dk.utils.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Test;
