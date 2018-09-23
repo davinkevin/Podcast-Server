@@ -7,7 +7,7 @@ import lan.dk.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
-import lan.dk.podcastserver.service.ByteRangeResourceHandler;
+import com.github.davinkevin.podcastserver.service.ByteRangeResourceHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -82,7 +82,7 @@ public class ItemController {
     public void getEpisodeFile(@PathVariable UUID id, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Item item = itemBusiness.findOne(id);
         if (item.isDownloaded()) {
-            request.setAttribute(ByteRangeResourceHandler.ATTR_FILE, item.getLocalPath());
+            request.setAttribute(ByteRangeResourceHandler.Companion.getATTR_FILE(), item.getLocalPath());
             handler.handleRequest(request, response);
         } else {
             response.sendRedirect(item.getUrl());
