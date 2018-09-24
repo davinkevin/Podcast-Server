@@ -8,7 +8,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.JdomService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -216,7 +217,7 @@ public class PodcastBusinessTest {
     @Test
     public void should_return_empty_string_for_exception() throws IOException {
         /* Given */
-        doThrow(IOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyString(), anyBoolean());
+        doThrow(UncheckedIOException.class).when(jdomService).podcastToXMLGeneric(any(Podcast.class), anyString(), anyBoolean());
         when(podcastRepository.findById(any(UUID.class))).thenReturn(Optional.of(Podcast.DEFAULT_PODCAST));
 
         /* When */

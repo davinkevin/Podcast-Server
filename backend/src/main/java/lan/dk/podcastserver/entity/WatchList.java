@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 @Entity
 @Builder
-@Getter @Setter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(chain = true)
@@ -41,6 +41,18 @@ public class WatchList {
         item.getWatchLists().remove(this);
         items.remove(item);
         return this;
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Set<Item> getItems() {
+        return this.items;
     }
 
     public interface WatchListDetailsListView {}

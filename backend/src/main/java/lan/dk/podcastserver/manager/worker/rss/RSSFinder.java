@@ -5,7 +5,7 @@ import io.vavr.control.Option;
 import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Finder;
-import lan.dk.podcastserver.service.JdomService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
 import org.jdom2.Element;
 import org.springframework.stereotype.Service;
@@ -60,7 +60,7 @@ public class RSSFinder implements Finder {
     }
 
     private Option<String> getItunesImage(Element channelElement) {
-        return Option(channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE))
+        return Option(channelElement.getChild(IMAGE, JdomService.Companion.getITUNES_NAMESPACE()))
                 .map(itunesImage -> itunesImage.getAttributeValue(HREF));
     }
 

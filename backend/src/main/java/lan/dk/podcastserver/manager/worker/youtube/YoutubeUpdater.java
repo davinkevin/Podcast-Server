@@ -12,7 +12,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
 import lan.dk.podcastserver.manager.worker.Updater;
-import lan.dk.podcastserver.service.JdomService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.properties.Api;
 import lombok.Getter;

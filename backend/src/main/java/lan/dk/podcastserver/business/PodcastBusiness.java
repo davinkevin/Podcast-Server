@@ -6,7 +6,7 @@ import lan.dk.podcastserver.entity.Cover;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.JdomService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -124,6 +124,6 @@ public class PodcastBusiness {
     }
 
     public String asOpml(String domainName) {
-        return jdomService.podcastsToOpml(HashSet.ofAll(this.findAll()), domainName);
+        return jdomService.podcastsToOpml(findAll(), domainName);
     }
 }

@@ -7,7 +7,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.WatchListRepository;
-import lan.dk.podcastserver.service.JdomService;
+import com.github.davinkevin.podcastserver.service.JdomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
