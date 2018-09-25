@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.scheduled;
 
-import lan.dk.podcastserver.service.DatabaseService;
+import com.github.davinkevin.podcastserver.service.DatabaseService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

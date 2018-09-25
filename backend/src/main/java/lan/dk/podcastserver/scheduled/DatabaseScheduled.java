@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.scheduled;
 
-import lan.dk.podcastserver.service.DatabaseService;
+import com.github.davinkevin.podcastserver.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
