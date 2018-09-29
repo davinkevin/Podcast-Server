@@ -7,7 +7,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliExtractor
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalExtractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.PassThroughExtractor
-import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayExtractor
+import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayExtractor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
