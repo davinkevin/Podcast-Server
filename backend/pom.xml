@@ -17,7 +17,7 @@
         <start-class>lan.dk.podcastserver.Application</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <kotlin.version>1.2.51</kotlin.version>
+        <kotlin.version>1.2.71</kotlin.version>
     </properties>
 
     <repositories>
