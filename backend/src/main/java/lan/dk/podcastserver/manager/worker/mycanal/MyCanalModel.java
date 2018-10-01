@@ -277,7 +277,7 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalVideoItem {
+    public static class MyCanalVideoItem {
         @JsonProperty("BAS_DEBIT")
         String bas_debit;
         @JsonProperty("HAUT_DEBIT")
