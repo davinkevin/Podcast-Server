@@ -9,7 +9,7 @@ import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsFinder
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionFinder
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliFinder
 import com.github.davinkevin.podcastserver.manager.worker.itunes.ItunesFinder
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalFinder
+import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalFinder
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayFinder
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeFinder

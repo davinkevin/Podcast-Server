@@ -14,7 +14,7 @@ import static io.vavr.API.Option;
 @Slf4j
 public class MyCanalUtils {
 
-    static Option<String> extractJsonConfig(String text) {
+    public static Option<String> extractJsonConfig(String text) {
         String startToken = "__data=";
         String endToken = "};";
 
@@ -28,7 +28,7 @@ public class MyCanalUtils {
         return Option(text.substring(begin + startToken.length(), end + 1));
     }
 
-    static int compatibility(@NotEmpty String url) {
+    public static int compatibility(@NotEmpty String url) {
         return StringUtils.contains(url, "www.mycanal.fr") ? 1 : Integer.MAX_VALUE;
     }
 
