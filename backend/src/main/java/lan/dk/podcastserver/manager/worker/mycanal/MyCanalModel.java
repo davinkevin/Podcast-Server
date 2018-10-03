@@ -94,7 +94,7 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalDetailsItem {
+    public static class MyCanalDetailsItem {
         @JsonProperty("ID")
         String id;
         @JsonProperty("DURATION")
@@ -148,7 +148,7 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalInfosItem {
+    public static class MyCanalInfosItem {
         @JsonProperty("DESCRIPTION")
         String description;
         @JsonProperty("PUBLICATION")
@@ -182,13 +182,13 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalPublicationItem {
+    public static class MyCanalPublicationItem {
         @JsonProperty("DATE")
         String date;
         @JsonProperty("HEURE")
         String heure;
 
-        ZonedDateTime asZonedDateTime() {
+        public ZonedDateTime asZonedDateTime() {
             LocalDateTime localDateTime = LocalDateTime.parse(date.concat("-").concat(heure), DateTimeFormatter.ofPattern(MYCANAL_DATE_PATTERN));
             return ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Paris"));
         }
@@ -211,7 +211,7 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalTitrageItem {
+    public static class MyCanalTitrageItem {
         @JsonProperty("TITRE")
         String titre;
         @JsonProperty("SOUS_TITRE")
@@ -235,7 +235,7 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalMediaItem {
+    public static class MyCanalMediaItem {
         @JsonProperty("IMAGES")
         MyCanalImageItem images;
 
@@ -249,13 +249,13 @@ public class MyCanalModel {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MyCanalImageItem {
+    public static class MyCanalImageItem {
         @JsonProperty("GRAND")
         String grand;
         @JsonProperty("PETIT")
         String petit;
 
-        Option<String> cover() {
+        public Option<String> cover() {
             return Option(grand).orElse(Option(petit));
         }
 

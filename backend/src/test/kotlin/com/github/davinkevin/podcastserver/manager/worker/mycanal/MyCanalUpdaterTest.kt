@@ -1,80 +1,83 @@
-package lan.dk.podcastserver.manager.worker.mycanal;
+package com.github.davinkevin.podcastserver.manager.worker.mycanal
 
-import com.github.davinkevin.podcastserver.service.HtmlService;
-import com.github.davinkevin.podcastserver.service.ImageService;
-import com.github.davinkevin.podcastserver.service.SignatureService;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Cover;
-import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.JsonService;
-import com.github.davinkevin.podcastserver.IOUtils;
-import org.assertj.core.api.Condition;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.UUID;
-
-import static io.vavr.API.List;
-import static io.vavr.API.Some;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import arrow.core.None
+import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
+import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
+import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
+import com.github.davinkevin.podcastserver.service.HtmlService
+import com.github.davinkevin.podcastserver.service.ImageService
+import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.nhaarman.mockitokotlin2.*
+import lan.dk.podcastserver.entity.Cover
+import lan.dk.podcastserver.entity.Item
+import lan.dk.podcastserver.entity.Podcast
+import lan.dk.podcastserver.service.JsonService
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Condition
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito.only
+import org.mockito.Mockito.verify
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.junit.jupiter.MockitoExtension
+import java.util.*
 
 /**
  * Created by kevin on 25/12/2017
  */
-@RunWith(MockitoJUnitRunner.class)
-public class MyCanalUpdaterTest {
+@ExtendWith(MockitoExtension::class)
+class MyCanalUpdaterTest {
 
-    private @Mock SignatureService signatureService;
-    private @Mock JsonService jsonService;
-    private @Mock HtmlService htmlService;
-    private @Mock ImageService imageService;
-    private @InjectMocks
-    MyCanalUpdater updater;
+    @Mock lateinit var signatureService: SignatureService
+    @Mock lateinit var jsonService: JsonService
+    @Mock lateinit var htmlService: HtmlService
+    @Mock lateinit var imageService: ImageService
+    @InjectMocks lateinit var updater: MyCanalUpdater
 
-    private Podcast podcast;
-
-    @Before
-    public void beforeEach() {
-        podcast = Podcast
-                .builder()
-                .id(UUID.randomUUID())
-                .url("https://www.mycanal.fr/url/fake")
-                .title("A MyCanal Podcast")
-                .items(HashSet.<Item>empty().toJavaSet())
-                .build();
+    private val podcast = Podcast().apply {
+        id = UUID.randomUUID()
+        url = "https://www.mycanal.fr/url/fake"
+        title = "A MyCanal Podcast"
+        items = setOf()
     }
 
     @Test
-    public void should_sign_podcast() {
+    fun `should sign podcast`() {
         /* Given */
-        when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("le-tube.html")));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
-        when(signatureService.fromText(anyString())).then(i -> IOUtils.digest(i.getArgument(0)));
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(fileAsHtml(from("le-tube.html")))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
+        whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        String signature = updater.signatureOf(podcast);
+        val signature = updater.signatureOf(podcast)
 
         /* Then */
-        assertThat(signature).isEqualTo("b9444aa69c2642760a18858455dd77eb");
-        verify(signatureService, only()).fromText(anyString());
+        assertThat(signature).isEqualTo("6ca1b384c76f88ae24d6bfd423333333")
+        verify(signatureService, only()).fromText(any())
     }
 
     @Test
-    public void should_get_items_from_podcast() {
+    fun `should throw error if fetch operation is empty`() {
         /* Given */
-        when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("le-tube.html")));
-        when(jsonService.parse(anyString())).then(i -> IOUtils.stringAsJson(i.getArgument(0)));
-        when(jsonService.parseUrl(anyString())).then(i -> IOUtils.fileAsJson(withId(i)));
-        List("http://media.canal-plus.com/image/76/0/738760.jpg", "http://media.canal-plus.com/image/40/9/732409.jpg",
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
+
+        /* When */
+        assertThatThrownBy { updater.signatureOf(podcast) }
+                .isInstanceOf(RuntimeException::class.java)
+                .hasMessage("Error during signature of ${podcast.title} with url ${podcast.url}")
+    }
+
+    @Test
+    fun `should get items from podcast`() {
+        /* Given */
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(fileAsHtml(from("le-tube.html")))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(withId(it)) }
+        listOf("http://media.canal-plus.com/image/76/0/738760.jpg", "http://media.canal-plus.com/image/40/9/732409.jpg",
                 "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_733871_H.jpg", "http://media.canal-plus.com/image/76/1/735761.jpg",
                 "http://media.canal-plus.com/image/97/4/731974.png", "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_734608_H.jpg",
                 "http://media.canal-plus.com/image/31/4/738314.jpg", "http://media.canal-plus.com/image/93/4/737934.jpg",
@@ -82,22 +85,84 @@ public class MyCanalUpdaterTest {
                 "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_736856_H.jpg", "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_736309_H.jpg",
                 "http://media.canal-plus.com/image/23/0/734230.jpg", "http://media.canal-plus.com/image/36/8/737368.jpg",
                 "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_733381_H.jpg", "http://media.canal-plus.com/image/89/4/732894.jpg")
-                .forEach(i -> when(imageService.getCoverFromURL(i)).thenReturn(Cover.builder().url(i).height(200).width(200).build()));
+                .forEach { it -> doReturn(Cover().apply { url = it; height = 200; width = 200 }).whenever(imageService).getCoverFromURL(it) }
 
         /* When */
-        Set<Item> items = updater.getItems(podcast);
+        val items = updater.getItems(podcast)
 
         /* Then */
-        assertThat(items).hasSize(16).are(coherent());
+        assertThat(items).hasSize(16).are(coherent())
     }
 
     @Test
-    public void should_get_items_from_podcasts_with_multi_value_return_for_details() {
+    fun `should get items from podcasts with multi value return for details`() {
         /* Given */
-        when(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(IOUtils.fileAsHtml(from("l-info-du-vrai.html")));
-        when(jsonService.parse(anyString())).then((InvocationOnMock i) -> IOUtils.stringAsJson(i.getArgument(0)));
-        when(jsonService.parseUrl(anyString())).then(i -> IOUtils.fileAsJson(withId(i)));
-        List(
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(fileAsHtml(from("l-info-du-vrai.html")))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(withId(it)) }
+        doAnswer { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
+                .whenever(imageService).getCoverFromURL(argWhere { it in imageUrls })
+
+        /* When */
+        val items = updater.getItems(podcast)
+
+        /* Then */
+        assertThat(items).hasSize(120).are(coherent())
+    }
+
+    @Test
+    fun `should return empty set if fetch operation return no elements`() {
+        /* Given */
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
+
+        /* When */
+        val items = updater.getItems(podcast)
+
+        /* Then */
+        assertThat(items).isEmpty()
+
+    }
+
+    @Test
+    fun `should have a type`() {
+        assertThat(updater.type().key()).isEqualTo("MyCanal")
+        assertThat(updater.type().name()).isEqualTo("MyCanal")
+    }
+
+    @Test
+    fun `should be compatible`() {
+        assertThat(updater.compatibility("https://www.mycanal.fr/emissions/pid1319-le-tube.html")).isEqualTo(1)
+    }
+
+    @Test
+    fun `should not be compatible`() {
+        assertThat(updater.compatibility("http://www.foo.fr/bar/to.html")).isGreaterThan(1)
+    }
+
+    companion object {
+
+        private fun coherent(): Condition<Item> {
+            return object : Condition<Item>() {
+                override fun matches(value: Item): Boolean {
+                    assertThat(value.url).isNotEmpty()
+                    assertThat(value.cover).isNotNull()
+                    assertThat(value.pubDate).isNotNull()
+                    assertThat(value.title).isNotEmpty()
+                    assertThat(value.description).isNotEmpty()
+                    return true
+                }
+            }
+        }
+
+        private fun withId(i: InvocationOnMock) = from(
+                i.getArgument<String>(0)
+                        .replace("https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/", "")
+                        .replace("?format=json", "")
+        ) + ".json"
+
+        private fun from(name: String) = "/remote/podcast/mycanal/$name"
+
+        private val imageUrls = listOf(
                 "http://media.canal-plus.com/image/73/4/738734.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/2/nip-nip-142383-640x360-qw81a.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/1/VIGNETTE_AUTO_737930_H.jpg",
@@ -111,7 +176,6 @@ public class MyCanalUpdaterTest {
                 "http://media.canal-plus.com/wwwplus/image/6/91/1/nip-nip-143239-640x360-ulpyb.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/3/nip-nip-141926-640x360-z2lhe.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/2/VIGNETTE_AUTO_738599_H.jpg",
-                "http://media.canal-plus.com/wwwplus/image/6/91/2/infoduvrai-640x360-wuuzs.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/1/nip-nip-143555-640x360-sze2c.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/1/nip-nip-143383-640x360-d01hv.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/3/nip-nip-143554-640x360-ewrvc.jpg",
@@ -218,58 +282,7 @@ public class MyCanalUpdaterTest {
                 "http://media.canal-plus.com/wwwplus/image/6/91/2/VIGNETTE_AUTO_738259_H.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/3/nip-nip-138614-640x360-vhbpw.jpg",
                 "http://media.canal-plus.com/wwwplus/image/6/91/2/VIGNETTE_AUTO_738257_H.jpg"
-        ).forEach(i -> when(imageService.getCoverFromURL(i)).thenReturn(Cover.builder().url(i).height(200).width(200).build()));
-
-        /* When */
-        Set<Item> items = updater.getItems(podcast);
-
-        /* Then */
-        assertThat(items).hasSize(120).are(coherent());
+        )
     }
-
-    @Test
-    public void should_have_a_type() {
-        assertThat(updater.type().key()).isEqualTo("MyCanal");
-        assertThat(updater.type().name()).isEqualTo("MyCanal");
-    }
-
-    @Test
-    public void should_be_compatible() {
-        assertThat(updater.compatibility("https://www.mycanal.fr/emissions/pid1319-le-tube.html")).isEqualTo(1);
-    }
-
-    @Test
-    public void should_not_be_compatible() {
-        assertThat(updater.compatibility("http://www.foo.fr/bar/to.html")).isGreaterThan(1);
-    }
-
-    public Condition<Item> coherent() {
-        return new Condition<Item>() {
-            @Override
-            public boolean matches(Item value) {
-                assertThat(value.getUrl()).isNotEmpty();
-                assertThat(value.getCover()).isNotNull();
-                assertThat(value.getPubDate()).isNotNull();
-                assertThat(value.getTitle()).isNotEmpty();
-                assertThat(value.getDescription()).isNotEmpty();
-                return true;
-            }
-        };
-    }
-
-    private static String withId(InvocationOnMock i) {
-        return Some(i.getArgument(0))
-                .map(String.class::cast)
-                .map(v -> v.replace("https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/", ""))
-                .map(v -> v.replace("?format=json", ""))
-                .map(MyCanalUpdaterTest::from)
-                .map(v -> v + ".json")
-                .get();
-    }
-
-    private static String from(String name) {
-        return "/remote/podcast/mycanal/" + name;
-    }
-
 
 }

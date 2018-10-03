@@ -12,7 +12,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionUpdater
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUpdater
+import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
