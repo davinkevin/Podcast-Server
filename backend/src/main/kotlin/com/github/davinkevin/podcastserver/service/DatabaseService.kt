@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.service
 
-import lan.dk.podcastserver.service.properties.Backup
+import com.github.davinkevin.podcastserver.service.properties.Backup
 import org.rauschig.jarchivelib.ArchiveFormat
 import org.rauschig.jarchivelib.ArchiverFactory
 import org.rauschig.jarchivelib.CompressionType

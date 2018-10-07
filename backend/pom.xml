@@ -518,7 +518,6 @@
                         <param>lan.dk.podcastserver.entity.Podcast</param>
                         <param>lan.dk.podcastserver.entity.Tag</param>
                         <param>lan.dk.podcastserver.entity.Status</param>
-                        <param>lan.dk.podcastserver.service.properties.Backup</param>
                         <param>lan.dk.podcastserver.service.properties.PodcastServerParameters</param>
                         <param>org.springframework.data.domain.Page</param>
                     </classes>

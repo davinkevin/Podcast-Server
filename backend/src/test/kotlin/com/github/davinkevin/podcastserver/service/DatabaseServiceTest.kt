@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.service
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.service.properties.Backup
+import com.github.davinkevin.podcastserver.service.properties.Backup
 import org.assertj.core.api.Assertions.assertThat
 import org.hibernate.search.jpa.FullTextEntityManager
 import org.junit.jupiter.api.AfterEach

@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.service.TikaProbeContentType;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.service.properties.Api;
-import lan.dk.podcastserver.service.properties.Backup;
+import com.github.davinkevin.podcastserver.service.properties.Backup;
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import org.apache.tika.Tika;
