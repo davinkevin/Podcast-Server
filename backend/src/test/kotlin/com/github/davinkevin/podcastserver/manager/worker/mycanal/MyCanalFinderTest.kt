@@ -30,13 +30,13 @@ class MyCanalFinderTest {
     @Test
     fun should_find_podcast() {
         /* Given */
+        val coverUrl = "https://thumb.canalplus.pro/http/unsafe/1920x665/top/secure-media.mycanal.fr/image/56/9/mycanal_cover_logotypee_1920x665.25569.jpg"
         val cover = Cover().apply {
-            url = "https://thumb.canalplus.pro/http/unsafe/1920x665/top/secure-media.mycanal.fr/image/56/9/mycanal_cover_logotypee_1920x665.25569.jpg"
+            url = coverUrl
             width = 200
             height = 200
         }
-        whenever(imageService.getCoverFromURL("https://thumb.canalplus.pro/http/unsafe/1920x665/top/secure-media.mycanal.fr/image/56/9/mycanal_cover_logotypee_1920x665.25569.jpg"))
-                .thenReturn(cover)
+        whenever(imageService.getCoverFromURL(coverUrl)).thenReturn(cover)
         whenever(htmlService.get("https://www.mycanal.fr/emissions/pid1319-le-tube.html"))
                 .thenReturn(fileAsHtml("/remote/podcast/mycanal/le-tube.html"))
         whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }

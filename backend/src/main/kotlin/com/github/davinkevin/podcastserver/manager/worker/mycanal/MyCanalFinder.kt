@@ -10,8 +10,6 @@ import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.manager.worker.Finder
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUtils
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Service
 
@@ -27,22 +25,22 @@ class MyCanalFinder(val htmlService: HtmlService, val imageService: ImageService
                     .map { it.body() }
                     .flatMap { es -> es.select("script").firstOption { it.html().contains("app_config") } }
                     .map { it.html() }
-                    .flatMap { MyCanalUtils.extractJsonConfig(it).k() }
+                    .flatMap { extractJsonConfig(it).k() }
                     .map { jsonService.parse(it) }
                     .getOrElse { throw RuntimeException("Extraction of app_config ends up in error") }
         }
 
         return json
-                .flatMap { Try { JsonService.to("landing.cover", MyCanalModel.MyCanalItem::class.java).apply(it) } }
+                .flatMap { Try { JsonService.to("landing.cover", MyCanalItem::class.java).apply(it) } }
                 .map { toPodcast(it) }
                 .orElse { json
-                        .flatMap { Try { JsonService.to ("page", MyCanalModel.MyCanalPageItem::class.java).apply(it) } }
+                        .flatMap { Try { JsonService.to ("page", MyCanalPageItem::class.java).apply(it) } }
                         .map { toPodcast(it) }
                 }
                 .getOrElse { Podcast.DEFAULT_PODCAST }
     }
 
-    private fun toPodcast(item: MyCanalModel.MyCanalItem) =
+    private fun toPodcast(item: MyCanalItem) =
             Podcast().apply {
                 title = item.onClick.displayName
                 url = DOMAIN + item.onClick.path
@@ -50,7 +48,7 @@ class MyCanalFinder(val htmlService: HtmlService, val imageService: ImageService
                 type = "MyCanal"
             }
 
-    private fun toPodcast(item: MyCanalModel.MyCanalPageItem) =
+    private fun toPodcast(item: MyCanalPageItem) =
             Podcast().apply {
                 title = item.displayName
                 url = DOMAIN + item.pathname
@@ -58,7 +56,7 @@ class MyCanalFinder(val htmlService: HtmlService, val imageService: ImageService
                 type = "MyCanal"
             }
 
-    override fun compatibility(url: String?) = MyCanalUtils.compatibility(url)
+    override fun compatibility(url: String?) = myCanalCompatibility(url)
 
     companion object {
         private const val DOMAIN = "https://www.mycanal.fr"

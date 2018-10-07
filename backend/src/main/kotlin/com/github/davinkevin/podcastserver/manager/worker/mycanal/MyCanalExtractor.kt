@@ -8,8 +8,6 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.manager.worker.Extractor
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel.MyCanalVideoItem
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUtils
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -30,17 +28,17 @@ class MyCanalExtractor(val htmlService: HtmlService, val jsonService: JsonServic
                     .getOrElse { Elements() }
                     .firstOption { it.html().contains("__data") }
                     .map { it.html() }
-                    .flatMap { MyCanalUtils.extractJsonConfig(it).k() }
+                    .flatMap { extractJsonConfig(it).k() }
                     .map { jsonService.parse(it) }
                     .map { JsonService.to("detailPage.body.contentID", String::class.java).apply(it) }
                     .flatMap { jsonService.parseUrl(URL_DETAILS.format(it)).k() }
                     .map { JsonService.to("MEDIA.VIDEOS", MyCanalVideoItem::class.java).apply(it) }
-                    .map { DownloadingItem(item, listOf(it.getHls()).toVΛVΓ(), getFileName(item), null) }
+                    .map { DownloadingItem(item, listOf(it.hls).toVΛVΓ(), getFileName(item), null) }
                     .getOrElse { throw RuntimeException("Error during extraction of ${item.title} at url ${item.url}") }
 
     override fun getFileName(item: Item) = "${super.getFileName(item)}.mp4"
 
-    override fun compatibility(url: String?) = MyCanalUtils.compatibility(url)
+    override fun compatibility(url: String?) = myCanalCompatibility(url)
 
     companion object {
         private const val URL_DETAILS = "https://secure-service.canal-plus.com/video/rest/getVideosLiees/cplus/%s?format=json"

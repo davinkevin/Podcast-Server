@@ -17,9 +17,6 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.manager.worker.Updater
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel.MyCanalDetailsItem
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalModel.MyCanalItem
-import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUtils
 import lan.dk.podcastserver.service.JsonService
 import lan.dk.podcastserver.service.JsonService.to
 import org.jsoup.select.Elements
@@ -55,7 +52,7 @@ class MyCanalUpdater(val signatureService: SignatureService, val jsonService: Js
                     .asSequence()
                     .map { it.html() }
                     .firstOption { "__data" in it }
-                    .flatMap { MyCanalUtils.extractJsonConfig(it).k() }
+                    .flatMap { extractJsonConfig(it).k() }
                     .map { jsonService.parse(it) }
                     .map { to("landing.strates[*].contents[*]", SET_OF_MY_CANAL_ITEM).apply(it) }
 
@@ -79,7 +76,7 @@ class MyCanalUpdater(val signatureService: SignatureService, val jsonService: Js
 
     override fun type() = Type("MyCanal", "MyCanal")
 
-    override fun compatibility(url: String?) = MyCanalUtils.compatibility(url)
+    override fun compatibility(url: String?) = myCanalCompatibility(url)
 
     private fun toItem(i: MyCanalDetailsItem): Item {
         val infos = i.infos
@@ -90,7 +87,7 @@ class MyCanalUpdater(val signatureService: SignatureService, val jsonService: Js
             title = titrage.titre
             description = titrage.sous_titre
             length = i.duration
-            cover = i.media.images.cover().map { imageService.getCoverFromURL(it) }.getOrElse(Cover.DEFAULT_COVER)
+            cover = i.media.images.cover().map { imageService.getCoverFromURL(it) }.getOrElse { Cover.DEFAULT_COVER }
             pubDate = publication.asZonedDateTime()
         }
     }
