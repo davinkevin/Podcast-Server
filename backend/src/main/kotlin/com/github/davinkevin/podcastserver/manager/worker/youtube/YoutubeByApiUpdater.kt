@@ -14,7 +14,7 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
-import lan.dk.podcastserver.service.properties.Api
+import com.github.davinkevin.podcastserver.service.properties.Api
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component

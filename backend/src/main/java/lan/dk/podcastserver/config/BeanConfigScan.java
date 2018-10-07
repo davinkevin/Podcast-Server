@@ -3,7 +3,7 @@ package lan.dk.podcastserver.config;
 import com.github.davinkevin.podcastserver.service.TikaProbeContentType;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.service.properties.Api;
+import com.github.davinkevin.podcastserver.service.properties.Api;
 import lan.dk.podcastserver.service.properties.Backup;
 import lan.dk.podcastserver.service.properties.ExternalTools;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;

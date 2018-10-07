@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
-import lan.dk.podcastserver.service.properties.Api
+import com.github.davinkevin.podcastserver.service.properties.Api
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
