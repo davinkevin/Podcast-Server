@@ -215,6 +215,7 @@ public class ItemDownloadManager {
         Try<DownloadingItem> downloadingItem = Try(() -> this.extractorSelector.of(item.getUrl()).extract(item));
 
         if(downloadingItem.isFailure()) {
+            log.error("Error during extraction of {}", item.getUrl(), downloadingItem.getCause());
             manageDownload();
             return;
         }
