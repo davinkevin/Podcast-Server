@@ -10,7 +10,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import lan.dk.podcastserver.service.FfmpegService;
+import com.github.davinkevin.podcastserver.service.FfmpegService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
@@ -77,9 +77,9 @@ public class FfmpegDownloader extends AbstractDownloader {
                 .addInput(url)
                 .addOutput(subTarget.toAbsolutePath().toString())
                 .setFormat("mp4")
-                .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
-                .setVideoCodec(FfmpegService.CODEC_COPY)
-                .setAudioCodec(FfmpegService.CODEC_COPY)
+                .setAudioBitStreamFilter(FfmpegService.Companion.getAUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC())
+                .setVideoCodec(FfmpegService.Companion.getCODEC_COPY())
+                .setAudioCodec(FfmpegService.Companion.getCODEC_COPY())
                 .done();
 
 

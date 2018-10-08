@@ -9,7 +9,7 @@ import java.io.IOException
 /**
  * Created by kevin on 24/07/2016.
  */
-class CustomRunProcessFunc(private var listeners: List<ProcessListener> = listOf()) : RunProcessFunction() {
+open class CustomRunProcessFunc(private var listeners: List<ProcessListener> = listOf()) : RunProcessFunction() {
 
     @Throws(IOException::class)
     override fun run(args: List<String>): Process {
@@ -25,7 +25,7 @@ class CustomRunProcessFunc(private var listeners: List<ProcessListener> = listOf
         return p
     }
 
-    fun add(pl: ProcessListener): CustomRunProcessFunc {
+    open fun add(pl: ProcessListener): CustomRunProcessFunc {
         this.listeners = listeners + pl
         return this
     }
