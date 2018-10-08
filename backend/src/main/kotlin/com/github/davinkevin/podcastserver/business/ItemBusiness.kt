@@ -11,7 +11,7 @@ import lan.dk.podcastserver.entity.Tag
 import lan.dk.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecifications
-import lan.dk.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl

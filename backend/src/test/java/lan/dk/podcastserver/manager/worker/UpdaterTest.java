@@ -6,7 +6,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;

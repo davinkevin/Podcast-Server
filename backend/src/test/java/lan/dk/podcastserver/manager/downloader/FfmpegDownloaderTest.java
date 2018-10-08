@@ -13,7 +13,7 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import com.github.davinkevin.podcastserver.service.FfmpegService;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import com.github.davinkevin.podcastserver.IOUtils;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.Progress;

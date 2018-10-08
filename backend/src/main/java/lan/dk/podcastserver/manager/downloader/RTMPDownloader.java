@@ -8,7 +8,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;

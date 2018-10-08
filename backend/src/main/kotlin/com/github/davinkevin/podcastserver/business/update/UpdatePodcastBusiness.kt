@@ -13,7 +13,7 @@ import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
-import lan.dk.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.messaging.simp.SimpMessagingTemplate

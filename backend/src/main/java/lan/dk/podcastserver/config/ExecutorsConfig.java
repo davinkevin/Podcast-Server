@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.config;
 
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;

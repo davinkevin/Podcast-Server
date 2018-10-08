@@ -12,7 +12,7 @@ import lan.dk.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

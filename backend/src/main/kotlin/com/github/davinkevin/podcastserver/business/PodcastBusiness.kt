@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.PodcastRepository
-import lan.dk.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files

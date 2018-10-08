@@ -6,7 +6,7 @@ import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.service.properties.Api;
 import com.github.davinkevin.podcastserver.service.properties.Backup;
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools;
-import lan.dk.podcastserver.service.properties.PodcastServerParameters;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import org.apache.tika.Tika;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

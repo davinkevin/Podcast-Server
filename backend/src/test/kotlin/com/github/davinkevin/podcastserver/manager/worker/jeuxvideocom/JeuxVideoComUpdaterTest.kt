@@ -15,7 +15,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
