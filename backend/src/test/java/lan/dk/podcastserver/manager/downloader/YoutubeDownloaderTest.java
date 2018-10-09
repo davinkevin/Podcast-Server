@@ -16,7 +16,7 @@ import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import com.github.davinkevin.podcastserver.service.FfmpegService;
-import lan.dk.podcastserver.service.factory.WGetFactory;
+import com.github.davinkevin.podcastserver.service.factory.WGetFactory;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lan.dk.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
