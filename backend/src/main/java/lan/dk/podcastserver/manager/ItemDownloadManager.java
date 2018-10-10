@@ -13,7 +13,6 @@ import lan.dk.podcastserver.manager.selector.DownloaderSelector;
 import lan.dk.podcastserver.manager.selector.ExtractorSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,8 +44,8 @@ public class ItemDownloadManager {
     private final ThreadPoolTaskExecutor downloadExecutor;
     private final ReentrantLock mainLock = new ReentrantLock();
 
-    private @Getter Queue<Item> waitingQueue = Queue.empty();
-    private @Getter Map<Item, Downloader> downloadingQueue = HashMap.empty();
+    private Queue<Item> waitingQueue = Queue.empty();
+    private Map<Item, Downloader> downloadingQueue = HashMap.empty();
 
     @Autowired
     public ItemDownloadManager(SimpMessagingTemplate template, ItemRepository itemRepository, PodcastServerParameters podcastServerParameters, DownloaderSelector downloaderSelector, ExtractorSelector extractorSelector, @Qualifier("DownloadExecutor") ThreadPoolTaskExecutor downloadExecutor) {
@@ -282,5 +281,13 @@ public class ItemDownloadManager {
 
     public void clearWaitingQueue() {
         waitingQueue = Queue.empty();
+    }
+
+    public Queue<Item> getWaitingQueue() {
+        return this.waitingQueue;
+    }
+
+    public Map<Item, Downloader> getDownloadingQueue() {
+        return this.downloadingQueue;
     }
 }
