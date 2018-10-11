@@ -12,7 +12,6 @@ import lan.dk.podcastserver.manager.worker.Updater;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +44,7 @@ public class UpdatePodcastBusiness  {
 
     private TimeUnit timeUnit = TimeUnit.MINUTES;
     private Integer timeValue = 5;
-    private @Getter ZonedDateTime lastFullUpdate;
+    private ZonedDateTime lastFullUpdate;
 
     private final CoverBusiness coverBusiness;
     private final PodcastServerParameters podcastServerParameters;
@@ -195,5 +194,9 @@ public class UpdatePodcastBusiness  {
         itemRepository.findByStatus(Status.STARTED, Status.PAUSED)
                 .map(i -> i.setStatus(Status.NOT_DOWNLOADED))
                 .forEach(itemRepository::save);
+    }
+
+    public ZonedDateTime getLastFullUpdate() {
+        return this.lastFullUpdate;
     }
 }
