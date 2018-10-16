@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business.stats;
 
+import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;

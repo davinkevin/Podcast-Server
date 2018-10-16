@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.business.stats;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import io.vavr.collection.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
