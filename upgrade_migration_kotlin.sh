@@ -9,7 +9,7 @@ LAST_JAVA_COMMIT=4b123dfe
 NUMBER_OF_JAVA_START=22569
 
 #git co wip-migration-kotlin
-NUMBER_OF_JAVA_END=`find backend/src -name '*.java' | xargs wc -l | tail -n 1 | sed -e 's@[[:blank:]]\([0-9]*\).*@\1@g'`
+NUMBER_OF_JAVA_END=`find backend/src -name '*.java' | xargs wc -l | tail -n 1 | sed -e 's@[^0-9]*\([0-9]*\).*@\1@g'`
 
 STAGE_JAVA=`echo "($NUMBER_OF_JAVA_END * 100) / $NUMBER_OF_JAVA_START" | bc`
 STAGE_KOTLIN=`echo "100 - $STAGE_JAVA" | bc`
