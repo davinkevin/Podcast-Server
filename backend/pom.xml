@@ -510,7 +510,6 @@
                         <param>lan.dk.podcastserver.service.properties.Backup</param>
                         <param>lan.dk.podcastserver.service.properties.ExternalTools</param>
                         <param>lan.dk.podcastserver.service.properties.PodcastServerParameters</param>
-                        <param>lan.dk.podcastserver.business.stats.StatsPodcastType</param>
                         <param>org.springframework.data.domain.Page</param>
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>

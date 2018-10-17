@@ -2,7 +2,7 @@ package lan.dk.podcastserver.controller.api;
 
 import io.vavr.collection.List;
 import lan.dk.podcastserver.business.stats.StatsBusiness;
-import lan.dk.podcastserver.business.stats.StatsPodcastType;
+import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.PostMapping;
