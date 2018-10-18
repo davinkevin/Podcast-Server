@@ -14,7 +14,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.worker.Extractor
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope

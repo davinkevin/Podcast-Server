@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.manager.worker.noop
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.worker.Extractor
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.lang.Integer.MAX_VALUE

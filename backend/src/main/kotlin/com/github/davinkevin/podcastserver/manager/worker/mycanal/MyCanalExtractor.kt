@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.worker.Extractor
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE

@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.worker.Extractor
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -49,11 +49,11 @@ class DailymotionExtractor(val json: JsonService, val html: HtmlService, val m3u
             .substringAfterLast("/")
             .substringBeforeLast("?")
 
-    override fun compatibility(url: String) =
-            if (url.contains("dailymotion.com/video")) 1
+    override fun compatibility(url: String?) =
+            if ("dailymotion.com/video" in (url ?: "")) 1
             else Integer.MAX_VALUE
 
-    override fun getFileName(item: Item?) = super.getFileName(item) + ".mp4"
+    override fun getFileName(item: Item) = super.getFileName(item) + ".mp4"
 
     private fun getPlayerConfig(page: String): Option<String> {
         val startToken = "var __PLAYER_CONFIG__ = "

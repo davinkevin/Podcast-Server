@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import lan.dk.podcastserver.manager.worker.Extractor
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpExtractor
 import org.springframework.aop.TargetClassAware
 import org.springframework.context.ApplicationContext

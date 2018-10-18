@@ -4,6 +4,7 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.service.UrlService
@@ -14,14 +15,12 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.util.function.Consumer
-import javax.validation.constraints.NotEmpty
 
 /**
  * Created by kevin on 12/12/2017
@@ -99,8 +98,8 @@ class TF1ReplayExtractor(val htmlService: HtmlService, val jsonService: JsonServ
                 .getOrElse { throw RuntimeException("No m3u8 url found in $url") }
     }
 
-    override fun compatibility(@NotEmpty url: String) =
-            if (url.contains("www.tf1.fr")) 1
+    override fun compatibility(url: String?) =
+            if ("www.tf1.fr" in (url ?: "")) 1
             else Integer.MAX_VALUE
 
     companion object {

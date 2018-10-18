@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.worker.Extractor
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.nodes.Element
 import org.springframework.context.annotation.Scope
@@ -52,9 +52,9 @@ class GulliExtractor(val htmlService: HtmlService, val jsonService: JsonService)
     @JsonIgnoreProperties(ignoreUnknown = true)
     class GulliSource(val file: String = "")
 
-    override fun compatibility(url: String): Int? {
-        return if (url.contains("replay.gulli.fr")) 1 else Integer.MAX_VALUE
-    }
+    override fun compatibility(url: String?): Int =
+            if ("replay.gulli.fr" in (url ?: "")) 1
+            else Integer.MAX_VALUE
 
     companion object {
         private val NUMBER_IN_PLAYLIST_EXTRACTOR = from("playlistItem\\(([^)]*)\\);")
