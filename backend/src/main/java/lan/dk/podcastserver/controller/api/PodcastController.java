@@ -6,7 +6,7 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
-import lan.dk.podcastserver.business.stats.StatsBusiness;
+import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;

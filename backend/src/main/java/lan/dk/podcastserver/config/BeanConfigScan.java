@@ -26,7 +26,10 @@ import java.nio.file.Paths;
 @EnableCaching
 @Configuration
 @EnableConfigurationProperties({PodcastServerParameters.class, Api.class, Backup.class, ExternalTools.class})
-@ComponentScan(basePackages = { "com.github.davinkevin.podcastserver.service", "lan.dk.podcastserver.service", "lan.dk.podcastserver.business"})
+@ComponentScan(basePackages = {
+        "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business",
+        "lan.dk.podcastserver.service", "lan.dk.podcastserver.business"
+})
 public class BeanConfigScan {
 
     @Bean(name="Validator")
