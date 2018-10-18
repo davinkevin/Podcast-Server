@@ -8,11 +8,9 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.UrlService
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service
-
-import javax.validation.constraints.NotEmpty
 
 
 /**
@@ -44,7 +42,7 @@ class FranceTvFinder(val htmlService: HtmlService, val imageService: ImageServic
                     .flatMap { imageService.getCoverFromURL(it).toOption() }
                     .getOrElse { Cover.DEFAULT_COVER }!!
 
-    override fun compatibility(@NotEmpty url: String) = FranceTvUpdater.isFromFranceTv(url)
+    override fun compatibility(url: String?) = FranceTvUpdater.isFromFranceTv(url)
 }
 
 private fun String.addProtocolIfNecessary(protocol: String) =

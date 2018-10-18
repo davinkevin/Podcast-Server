@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.manager.worker.Finder
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Service
 import javax.validation.constraints.NotEmpty

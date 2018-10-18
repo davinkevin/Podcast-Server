@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service

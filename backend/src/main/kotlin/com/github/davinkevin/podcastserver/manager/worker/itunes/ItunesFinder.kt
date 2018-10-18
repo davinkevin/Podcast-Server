@@ -4,7 +4,7 @@ import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Service

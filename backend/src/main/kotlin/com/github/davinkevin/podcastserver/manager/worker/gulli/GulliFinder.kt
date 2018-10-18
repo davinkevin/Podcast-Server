@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service
 import javax.validation.constraints.NotEmpty
