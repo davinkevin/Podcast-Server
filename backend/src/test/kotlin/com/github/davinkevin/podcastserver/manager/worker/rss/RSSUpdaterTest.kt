@@ -93,8 +93,8 @@ class RSSUpdaterTest {
         /* When */
         val type = updater.type()
         /* Then */
-        assertThat(type.key()).isEqualTo("RSS")
-        assertThat(type.name()).isEqualTo("RSS")
+        assertThat(type.key).isEqualTo("RSS")
+        assertThat(type.name).isEqualTo("RSS")
     }
 
     @Test

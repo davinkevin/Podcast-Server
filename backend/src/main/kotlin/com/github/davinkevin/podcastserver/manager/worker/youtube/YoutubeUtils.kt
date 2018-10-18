@@ -5,7 +5,7 @@ import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
 import io.vavr.collection.Stream
-import lan.dk.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import java.util.*
 
 /**

@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideo
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
@@ -15,7 +16,6 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -111,8 +111,8 @@ class JeuxVideoComUpdaterTest {
 
     @Test
     fun `should be of type`() {
-        assertThat(updater.type().key()).isEqualTo("JeuxVideoCom")
-        assertThat(updater.type().name()).isEqualTo("JeuxVideo.com")
+        assertThat(updater.type().key).isEqualTo("JeuxVideoCom")
+        assertThat(updater.type().name).isEqualTo("JeuxVideo.com")
     }
 
     private fun configureForAllPage(file: String) {

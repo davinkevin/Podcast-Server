@@ -49,8 +49,8 @@ class UploadUpdaterTest {
         
         /* Then */
         assertThat(type).isSameAs(UploadUpdater.TYPE)
-        assertThat(type.key()).isEqualTo("upload")
-        assertThat(type.name()).isEqualTo("Upload")
+        assertThat(type.key).isEqualTo("upload")
+        assertThat(type.name).isEqualTo("Upload")
     }
 
     @Test

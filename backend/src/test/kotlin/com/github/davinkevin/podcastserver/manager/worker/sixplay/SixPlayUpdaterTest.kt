@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.None
+import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -11,7 +12,6 @@ import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
-import com.github.davinkevin.podcastserver.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Condition
@@ -186,8 +186,8 @@ class SixPlayUpdaterTest {
 
     @Test
     fun `should have type`() {
-        assertThat(updater.type().key()).isEqualTo("SixPlay")
-        assertThat(updater.type().name()).isEqualTo("6Play")
+        assertThat(updater.type().key).isEqualTo("SixPlay")
+        assertThat(updater.type().name).isEqualTo("6Play")
     }
 
     @Test

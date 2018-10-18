@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker;
 
+import com.github.davinkevin.podcastserver.manager.worker.Type;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.collection.Set;

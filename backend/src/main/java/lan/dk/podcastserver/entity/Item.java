@@ -268,7 +268,7 @@ public class Item {
         
     @AssertTrue
     public boolean hasValidURL() {
-        return (!StringUtils.isEmpty(this.url)) || Objects.equals(UploadUpdater.Companion.getTYPE().key(), podcast.getType());
+        return (!StringUtils.isEmpty(this.url)) || Objects.equals(UploadUpdater.Companion.getTYPE().getKey(), podcast.getType());
     }
 
     public Item reset() {

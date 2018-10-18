@@ -37,8 +37,8 @@ class NoOpUpdaterTest {
 
     @Test
     fun `should return its type`() {
-        assertThat(noOpUpdater.type().key()).isEqualTo("NoOpUpdater")
-        assertThat(noOpUpdater.type().name()).isEqualTo("NoOpUpdater")
+        assertThat(noOpUpdater.type().key).isEqualTo("NoOpUpdater")
+        assertThat(noOpUpdater.type().name).isEqualTo("NoOpUpdater")
     }
 
     @Test

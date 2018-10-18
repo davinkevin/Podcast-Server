@@ -146,8 +146,8 @@ class TF1ReplayUpdaterTest {
 
     @Test
     fun `should be of type`() {
-        assertThat(updater.type().key()).isEqualTo("TF1Replay")
-        assertThat(updater.type().name()).isEqualTo("TF1 Replay")
+        assertThat(updater.type().key).isEqualTo("TF1Replay")
+        assertThat(updater.type().name).isEqualTo("TF1 Replay")
     }
 
     @Test

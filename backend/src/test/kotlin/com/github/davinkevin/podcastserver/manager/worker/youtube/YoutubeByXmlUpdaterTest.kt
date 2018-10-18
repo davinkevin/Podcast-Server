@@ -41,8 +41,8 @@ class YoutubeByXmlUpdaterTest {
 
         /* Then */
         assertThat(type).isNotNull()
-        assertThat(type.key()).isEqualTo("Youtube")
-        assertThat(type.name()).isEqualTo("Youtube")
+        assertThat(type.key).isEqualTo("Youtube")
+        assertThat(type.name).isEqualTo("Youtube")
     }
 
     @Test

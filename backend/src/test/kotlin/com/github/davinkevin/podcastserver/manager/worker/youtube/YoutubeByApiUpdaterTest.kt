@@ -5,11 +5,11 @@ import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
-import com.github.davinkevin.podcastserver.service.properties.Api
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -135,7 +135,7 @@ class YoutubeByApiUpdaterTest {
     @Test
     fun `should return youtube type`() {
         val type = updater.type()
-        assertThat(type.name()).isEqualTo("Youtube")
-        assertThat(type.key()).isEqualTo("Youtube")
+        assertThat(type.name).isEqualTo("Youtube")
+        assertThat(type.key).isEqualTo("Youtube")
     }
 }

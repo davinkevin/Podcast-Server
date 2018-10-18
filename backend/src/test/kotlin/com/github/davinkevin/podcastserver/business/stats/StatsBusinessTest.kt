@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import lan.dk.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.repository.ItemRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

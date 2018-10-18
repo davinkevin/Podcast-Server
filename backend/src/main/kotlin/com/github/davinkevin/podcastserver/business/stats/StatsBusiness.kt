@@ -1,14 +1,14 @@
 package com.github.davinkevin.podcastserver.business.stats
 
+import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness.Selector.*
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.querydsl.core.types.dsl.BooleanExpression
 import io.vavr.collection.List
 import io.vavr.collection.Set
-import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import lan.dk.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.*
 import org.springframework.stereotype.Component
@@ -51,7 +51,7 @@ class StatsBusiness(val itemRepository: ItemRepository, val podcastBusiness: Pod
                 .map { it!!.toLocalDate() }
                 .toNumberOfItem()
 
-        return StatsPodcastType(type.name(), values)
+        return StatsPodcastType(type.name, values)
     }
 
     private fun allStatsByType(numberOfMonth: Int, selector: Selector): List<StatsPodcastType> {

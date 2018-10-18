@@ -84,8 +84,8 @@ class DailymotionUpdaterTest {
 
     @Test
     fun `should have type`() {
-        assertThat(updater.type().name()).isEqualTo("Dailymotion")
-        assertThat(updater.type().key()).isEqualTo("Dailymotion")
+        assertThat(updater.type().name).isEqualTo("Dailymotion")
+        assertThat(updater.type().key).isEqualTo("Dailymotion")
     }
 
     @Test

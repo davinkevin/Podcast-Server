@@ -125,8 +125,8 @@ class MyCanalUpdaterTest {
 
     @Test
     fun `should have a type`() {
-        assertThat(updater.type().key()).isEqualTo("MyCanal")
-        assertThat(updater.type().name()).isEqualTo("MyCanal")
+        assertThat(updater.type().key).isEqualTo("MyCanal")
+        assertThat(updater.type().name).isEqualTo("MyCanal")
     }
 
     @Test

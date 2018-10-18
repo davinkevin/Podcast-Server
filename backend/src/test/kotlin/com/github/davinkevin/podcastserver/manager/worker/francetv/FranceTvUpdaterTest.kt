@@ -1,9 +1,11 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
 import arrow.core.None
+import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
@@ -11,8 +13,6 @@ import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Condition
 import org.junit.jupiter.api.DisplayName
@@ -186,8 +186,8 @@ class FranceTvUpdaterTest {
 
     @Test
     fun `should has francetv type`() {
-        assertThat(franceTvUpdater.type().key()).isEqualTo("FranceTv")
-        assertThat(franceTvUpdater.type().name()).isEqualTo("France•tv")
+        assertThat(franceTvUpdater.type().key).isEqualTo("FranceTv")
+        assertThat(franceTvUpdater.type().name).isEqualTo("France•tv")
     }
 
     @Test

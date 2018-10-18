@@ -77,7 +77,7 @@ class UpdaterSelectorTest {
         /* When */
         val updaterClass = updaterSelector.of(url)
         /* Then */
-        assertThat(updaterClass.type().key()).isEqualTo(type)
+        assertThat(updaterClass.type().key).isEqualTo(type)
     }
 
     @Test

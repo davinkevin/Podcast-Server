@@ -13,7 +13,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.nodes.Element

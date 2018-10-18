@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker;
 
+import com.github.davinkevin.podcastserver.manager.worker.Type;
 import com.github.davinkevin.podcastserver.service.SignatureService;
 import io.vavr.Tuple3;
 import io.vavr.collection.HashSet;
