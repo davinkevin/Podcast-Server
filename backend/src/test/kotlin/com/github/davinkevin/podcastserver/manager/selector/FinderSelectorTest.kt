@@ -1,18 +1,17 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvFinder
-import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder
-import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayFinder
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsFinder
 import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionFinder
+import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvFinder
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliFinder
 import com.github.davinkevin.podcastserver.manager.worker.itunes.ItunesFinder
+import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalFinder
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
+import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayFinder
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayFinder
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeFinder
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -35,7 +34,6 @@ import kotlin.reflect.KClass
 @MockitoSettings(strictness = Strictness.LENIENT)
 class FinderSelectorTest {
 
-    @Mock lateinit var beInSportsFinder: BeInSportsFinder
     @Mock lateinit var dailymotionFinder: DailymotionFinder
     @Mock lateinit var franceTvFinder: FranceTvFinder
     @Mock lateinit var gulliFinder: GulliFinder
@@ -51,7 +49,6 @@ class FinderSelectorTest {
 
     @BeforeEach
     fun beforeEach() {
-        whenever(beInSportsFinder.compatibility(any())).thenCallRealMethod()
         whenever(dailymotionFinder.compatibility(any())).thenCallRealMethod()
         whenever(franceTvFinder.compatibility(any())).thenCallRealMethod()
         whenever(gulliFinder.compatibility(any())).thenCallRealMethod()
@@ -63,7 +60,7 @@ class FinderSelectorTest {
         whenever(tf1ReplayFinder.compatibility(any())).thenCallRealMethod()
         whenever(youtubeFinder.compatibility(any())).thenCallRealMethod()
 
-        finderSelector = FinderSelector(setOf(beInSportsFinder, myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, itunesFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder))
+        finderSelector = FinderSelector(setOf(myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, itunesFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder))
     }
 
     @Test
@@ -96,7 +93,6 @@ class FinderSelectorTest {
         @JvmStatic
         fun urlToFinderType() =
                 Stream.of(
-                        Arguments.of("http://www.beinsports.com/france/replay/lexpresso", BeInSportsFinder::class),
                         Arguments.of("http://www.dailymotion.com/foo/bar", DailymotionFinder::class),
                         Arguments.of("http://www.france.tv/videos/comment_ca_va_bien.html", FranceTvFinder::class),
                         Arguments.of("http://replay.gulli.fr/videos/foo/bar", GulliFinder::class),

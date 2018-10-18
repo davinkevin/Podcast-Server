@@ -1,19 +1,18 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
+import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater
+import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSUpdater
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
+import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByApiUpdater
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByXmlUpdater
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater
-import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionUpdater
-import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
-import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -34,7 +33,6 @@ class UpdaterSelectorTest {
 
     private lateinit var  updaterSelector: UpdaterSelector
 
-    @Mock lateinit var beInSportsUpdater: BeInSportsUpdater
     @Mock lateinit var dailymotionUpdater: DailymotionUpdater
     @Mock lateinit var franceTvUpdater: FranceTvUpdater
     @Mock lateinit var gulliUpdater: GulliUpdater
@@ -51,8 +49,7 @@ class UpdaterSelectorTest {
     fun beforeEach() {
         /* Given */
         val updaters = setOf(
-                beInSportsUpdater, 
-                dailymotionUpdater, 
+                dailymotionUpdater,
                 franceTvUpdater, 
                 gulliUpdater,
                 jeuxVideoComUpdater, 
@@ -94,7 +91,6 @@ class UpdaterSelectorTest {
     fun `should serve types`() {
         /* Given */
         val uTypes = setOf(
-                beInSportsUpdater,
                 dailymotionUpdater,
                 franceTvUpdater,
                 gulliUpdater,
@@ -115,7 +111,7 @@ class UpdaterSelectorTest {
         /* Then */
         assertThat(types)
                 .isNotEmpty
-                .hasSize(11)
+                .hasSize(10)
                 .containsAll(uTypes)
     }
 
@@ -123,7 +119,6 @@ class UpdaterSelectorTest {
         @JvmStatic
         fun urlToUpdater() =
                 Stream.of(
-                        Arguments.of("http://www.beinsports.com/replay/category/3361/name/lexpresso", "BeInSports"),
                         Arguments.of("http://www.dailymotion.com/showname", "Dailymotion"),
                         Arguments.of("http://www.france.tv/show/for/dummies", "FranceTv"),
                         Arguments.of("http://replay.gulli.fr/showname", "Gulli"),
