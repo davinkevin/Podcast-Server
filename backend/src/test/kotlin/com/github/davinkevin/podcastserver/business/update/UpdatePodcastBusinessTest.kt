@@ -11,7 +11,7 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import lan.dk.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters

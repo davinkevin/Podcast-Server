@@ -1,0 +1,127 @@
+package com.github.davinkevin.podcastserver.manager.worker
+
+import com.github.davinkevin.podcastserver.manager.worker.SimpleUpdater.Companion.ERROR_UUID
+import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import io.vavr.collection.HashSet
+import lan.dk.podcastserver.entity.Item
+import lan.dk.podcastserver.entity.Podcast
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito.verifyNoMoreInteractions
+import org.mockito.junit.jupiter.MockitoExtension
+import java.util.UUID
+import javax.validation.Validator
+
+/**
+ * Created by kevin on 22/06/15 for Podcast Server
+ */
+@ExtendWith(MockitoExtension::class)
+class UpdaterTest {
+
+    @Mock private lateinit var podcastServerParameters: PodcastServerParameters
+    @Mock private lateinit var signatureService: SignatureService
+    @Mock private lateinit var validator: Validator
+    @InjectMocks private lateinit var simpleUpdater: SimpleUpdater
+
+    @Test
+    fun should_not_update_because_of_same_signature() {
+        /* Given */
+        val podcast = Podcast().apply {
+            id = UUID.randomUUID()
+            signature = "123456789"
+        }
+
+        /* When */
+        val noChangeResult = simpleUpdater.update(podcast)
+
+        /* Then */
+        assertThat(noChangeResult)
+                .isSameAs(Updater.NO_MODIFICATION_TUPLE)
+        assertThat(noChangeResult._3().test(Item())).isEqualTo(true)
+    }
+
+    @Test
+    fun should_update_the_podcast() {
+        /* Given */
+        val podcast = Podcast().apply {
+            id = UUID.randomUUID()
+            signature = "XYZ"
+        }
+
+        /* When */
+        val result = simpleUpdater.update(podcast)
+
+        /* Then */
+        assertThat(result).isNotSameAs(Updater.NO_MODIFICATION_TUPLE)
+        assertThat(result._1()).isSameAs(podcast)
+        assertThat(result._2()).isInstanceOf(HashSet::class.java).hasSize(3)
+        assertThat(result._3()).isNotNull
+        assertThat(result._1().signature).isEqualTo("123456789")
+    }
+
+    @Test
+    fun should_handle_exception_during_update() {
+        /* Given */
+        val podcast = Podcast().apply {
+            id = ERROR_UUID
+            signature = "XYZ"
+        }
+
+        /* When */
+        val result = simpleUpdater.update(podcast)
+
+        /* Then */
+        assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE)
+    }
+
+    @Test
+    fun should_filter_with_default_predicate() {
+        /* Given */
+        val item = Item().apply { id = UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82") }
+        val podcast = Podcast().apply {
+            id = UUID.randomUUID()
+            url = "http://a.fake.url/rss.xml"
+            items = mutableSetOf()
+            add(item)
+        }
+
+        /* When */
+        val result = simpleUpdater.update(podcast)
+        val collectedItem = result._2().filter(result._3())
+
+        /* Then */
+        assertThat(collectedItem).hasSize(2)
+    }
+
+    @AfterEach
+    fun afterEach() {
+        verifyNoMoreInteractions(podcastServerParameters, signatureService, validator)
+    }
+}
+
+private class SimpleUpdater : Updater {
+
+    override fun getItems(podcast: Podcast) = setOf(
+            Item().apply { id = UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82") },
+            Item().apply { id = UUID.randomUUID() },
+            Item().apply { id = UUID.randomUUID() }
+    ).toVΛVΓ()
+
+    override fun signatureOf(podcast: Podcast) = when {
+        podcast.id === ERROR_UUID -> throw RuntimeException()
+        else -> "123456789"
+    }
+
+    override fun type() = Type("Foo", "Bar")
+    override fun compatibility(url: String?) = -1
+
+    companion object {
+        val ERROR_UUID = UUID.randomUUID()!!
+    }
+}

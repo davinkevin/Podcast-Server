@@ -10,7 +10,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Type
-import lan.dk.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component

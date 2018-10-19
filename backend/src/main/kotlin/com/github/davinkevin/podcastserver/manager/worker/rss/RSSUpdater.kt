@@ -12,7 +12,7 @@ import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Type
-import lan.dk.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory

@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import lan.dk.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpUpdater
 import org.springframework.stereotype.Service
 

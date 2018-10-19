@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import org.slf4j.LoggerFactory

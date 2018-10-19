@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.manager.worker.noop
 
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
