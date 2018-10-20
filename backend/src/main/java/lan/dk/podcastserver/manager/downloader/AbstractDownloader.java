@@ -41,8 +41,8 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     static final String WS_TOPIC_DOWNLOAD = "/topic/download";
 
     @Getter protected Item item;
-    @Getter @Accessors(chain = true) protected DownloadingItem downloadingItem;
-    @Setter @Accessors(chain = true) protected ItemDownloadManager itemDownloadManager;
+    @Getter protected DownloadingItem downloadingItem;
+    @Setter protected ItemDownloadManager itemDownloadManager;
 
     protected final ItemRepository itemRepository;
     protected final PodcastRepository podcastRepository;
@@ -57,10 +57,9 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
 
 
     @Override
-    public AbstractDownloader setDownloadingItem(DownloadingItem downloadingItem) {
+    public void setDownloadingItem(DownloadingItem downloadingItem) {
         this.downloadingItem = downloadingItem;
         this.item = downloadingItem.getItem();
-        return this;
     }
 
     @Override

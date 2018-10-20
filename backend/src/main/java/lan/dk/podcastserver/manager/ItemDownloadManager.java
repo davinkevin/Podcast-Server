@@ -223,7 +223,11 @@ public class ItemDownloadManager {
         Downloader downloader = downloadingItem
                 .toOption()
                 .map(downloaderSelector::of)
-                .map(d -> d.setDownloadingItem(downloadingItem.get()).setItemDownloadManager(this))
+                .map(d -> {
+                    d.setDownloadingItem(downloadingItem.get());
+                    d.setItemDownloadManager(this);
+                    return d;
+                })
                 .getOrElseThrow(() -> new RuntimeException("Error during selection of downloader"));
 
         downloadingQueue = downloadingQueue.put(item, downloader);

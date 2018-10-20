@@ -11,8 +11,8 @@ public interface Downloader extends Runnable {
 
     Item download();
 
-    Downloader setDownloadingItem(DownloadingItem item);
-    Downloader setItemDownloadManager(ItemDownloadManager itemDownloadManager);
+    void setDownloadingItem(DownloadingItem item);
+    void setItemDownloadManager(ItemDownloadManager itemDownloadManager);
 
     Item getItem();
     String getItemUrl(Item item);

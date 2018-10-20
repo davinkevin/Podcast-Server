@@ -141,8 +141,8 @@ public class ItemDownloadManagerTest {
         Downloader downloader = mock(Downloader.class);
         when(extractorSelector.of(anyString())).thenReturn(new NoOpExtractor());
         when(downloaderSelector.of(any(DownloadingItem.class))).thenReturn(downloader);
-        when(downloader.setDownloadingItem(any())).thenReturn(downloader);
-        when(downloader.setItemDownloadManager(any())).thenReturn(downloader);
+        //when(downloader.setDownloadingItem(any())).thenReturn(downloader);
+        //when(downloader.setItemDownloadManager(any())).thenReturn(downloader);
         when(downloaderExecutor.getCorePoolSize()).thenReturn(3);
         when(podcastServerParameters.getNumberOfTry()).thenReturn(5);
         /* When */
@@ -204,8 +204,8 @@ public class ItemDownloadManagerTest {
         Item item = Item.builder().id(id).url(id.toString()).numberOfFail(0).build();
         when(mockDownloader.getItem()).thenReturn(item);
         when(downloaderSelector.of(eq(DownloadingItem.builder().item(item).urls(List(id.toString())).build()))).thenReturn(mockDownloader);
-        when(mockDownloader.setDownloadingItem(any())).thenReturn(mockDownloader);
-        when(mockDownloader.setItemDownloadManager(any())).thenReturn(mockDownloader);
+        //when(mockDownloader.setDownloadingItem(any())).thenReturn(mockDownloader);
+        //when(mockDownloader.setItemDownloadManager(any())).thenReturn(mockDownloader);
         when(mockDownloader.getItem()).thenReturn(item);
         return Tuple.of(item, mockDownloader);
     }

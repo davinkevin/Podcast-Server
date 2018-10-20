@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.manager.selector
 
 import lan.dk.podcastserver.manager.downloader.Downloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import lan.dk.podcastserver.manager.downloader.NoOpDownloader
+import com.github.davinkevin.podcastserver.manager.downloader.NoOpDownloader
 import org.springframework.aop.TargetClassAware
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
