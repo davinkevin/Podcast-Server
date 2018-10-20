@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.downloader;
 
 
 import com.github.davinkevin.podcastserver.service.MimeTypeService;
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
 import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
@@ -9,11 +10,6 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.repository.PodcastRepository;
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -35,14 +31,13 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
-@RequiredArgsConstructor
 public abstract class AbstractDownloader implements Runnable, Downloader {
 
-    static final String WS_TOPIC_DOWNLOAD = "/topic/download";
+    /* Change visibility after kotlin Migration */ public static final String WS_TOPIC_DOWNLOAD = "/topic/download";
 
-    @Getter protected Item item;
-    @Getter protected DownloadingItem downloadingItem;
-    @Setter protected ItemDownloadManager itemDownloadManager;
+    protected Item item;
+    protected DownloadingItem downloadingItem;
+    /* Change visibility after kotlin Migration */ public ItemDownloadManager itemDownloadManager;
 
     protected final ItemRepository itemRepository;
     protected final PodcastRepository podcastRepository;
@@ -51,9 +46,17 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected final MimeTypeService mimeTypeService;
 
     String temporaryExtension;
-    protected Path target;
+    /* Change visibility after kotlin Migration */ public  Path target;
     private PathMatcher hasTempExtensionMatcher;
-    AtomicBoolean stopDownloading = new AtomicBoolean(false);
+    /* Change visibility after kotlin Migration */ public AtomicBoolean stopDownloading = new AtomicBoolean(false);
+
+    public AbstractDownloader(ItemRepository itemRepository, PodcastRepository podcastRepository, PodcastServerParameters podcastServerParameters, SimpMessagingTemplate template, MimeTypeService mimeTypeService) {
+        this.itemRepository = itemRepository;
+        this.podcastRepository = podcastRepository;
+        this.podcastServerParameters = podcastServerParameters;
+        this.template = template;
+        this.mimeTypeService = mimeTypeService;
+    }
 
 
     @Override
@@ -186,7 +189,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     }
 
     @Transactional
-    void convertAndSaveBroadcast() {
+    public void convertAndSaveBroadcast() {
         template.convertAndSend(WS_TOPIC_DOWNLOAD, item);
     }
 
@@ -198,5 +201,17 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     public void postConstruct() {
         temporaryExtension = podcastServerParameters.getDownloadExtension();
         hasTempExtensionMatcher = FileSystems.getDefault().getPathMatcher("glob:*" + temporaryExtension);
+    }
+
+    public void setItemDownloadManager(ItemDownloadManager itemDownloadManager) {
+        this.itemDownloadManager = itemDownloadManager;
+    }
+
+    public Item getItem() {
+        return this.item;
+    }
+
+    public DownloadingItem getDownloadingItem() {
+        return this.downloadingItem;
     }
 }
