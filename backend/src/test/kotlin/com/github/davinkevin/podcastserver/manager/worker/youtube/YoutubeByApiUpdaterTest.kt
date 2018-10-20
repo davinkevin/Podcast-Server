@@ -46,7 +46,7 @@ class YoutubeByApiUpdaterTest {
         whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(87)
@@ -66,7 +66,7 @@ class YoutubeByApiUpdaterTest {
         whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(0)

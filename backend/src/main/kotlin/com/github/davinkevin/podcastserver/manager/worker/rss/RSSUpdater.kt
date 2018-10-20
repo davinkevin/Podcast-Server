@@ -3,16 +3,15 @@ package com.github.davinkevin.podcastserver.manager.worker.rss
 import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
@@ -25,7 +24,7 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun getItems(podcast: Podcast) =
+    override fun findItems(podcast: Podcast) =
             jdomService.parse(podcast.url)
                     .k()
                     .flatMap { it.rootElement.getChild("channel").toOption() }
@@ -34,7 +33,6 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
                     .filter { hasEnclosure(it) }
                     .map { extractItem(it) }
                     .toSet()
-                    .toVΛVΓ()
 
     private fun hasEnclosure(item: Element) =
             item.getChild("enclosure") != null ||

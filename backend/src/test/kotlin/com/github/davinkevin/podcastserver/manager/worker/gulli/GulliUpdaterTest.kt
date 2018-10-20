@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.gulli
 
 import arrow.core.None
+import arrow.core.getOrElse
+import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -72,9 +74,9 @@ class GulliUpdaterTest {
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
         /* When */
-        val items = gulliUpdater.getItems(podcast)
-        val first = items.filter { it.title.contains("13") }.getOrElseThrow { RuntimeException("Episode 13 Not Found") }
-        val second = items.filter { it.title.contains("14") }.getOrElseThrow { RuntimeException("Episode 14 Not Found") }
+        val items = gulliUpdater.findItems(podcast)
+        val first = items.firstOption { it.title.contains("13") }.getOrElse { throw RuntimeException("Episode 13 Not Found") }
+        val second = items.firstOption { it.title.contains("14") }.getOrElse { throw RuntimeException("Episode 14 Not Found") }
 
         /* Then */
         assertThat(items).isNotEmpty.hasSize(2)
@@ -95,7 +97,7 @@ class GulliUpdaterTest {
         /* Given */
         whenever(htmlService.get(podcast.url)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-format.html")))
         /* When */
-        val items = gulliUpdater.getItems(podcast)
+        val items = gulliUpdater.findItems(podcast)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -105,7 +107,7 @@ class GulliUpdaterTest {
         /* Given */
         whenever(htmlService.get(podcast.url)).thenReturn(None.toVΛVΓ())
         /* When */
-        val items = gulliUpdater.getItems(podcast)
+        val items = gulliUpdater.findItems(podcast)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -117,7 +119,7 @@ class GulliUpdaterTest {
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
         /* When */
-        val items = gulliUpdater.getItems(podcast)
+        val items = gulliUpdater.findItems(podcast)
         /* Then */
         assertThat(items).hasSize(1)
     }
@@ -129,7 +131,7 @@ class GulliUpdaterTest {
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
         whenever(imageService.getCoverFromURL(any())).thenReturn(null)
         /* When */
-        val items = gulliUpdater.getItems(podcast)
+        val items = gulliUpdater.findItems(podcast)
         /* Then */
         assertThat(items).hasSize(1)
         assertThat(items.toList()[0].cover).isEqualTo(Cover.DEFAULT_COVER)

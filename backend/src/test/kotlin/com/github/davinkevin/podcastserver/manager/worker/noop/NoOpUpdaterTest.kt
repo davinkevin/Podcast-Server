@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
@@ -16,12 +16,12 @@ class NoOpUpdaterTest {
     @Test
     fun `should return no modification tuple`() {
         assertThat(noOpUpdater.update(Podcast()))
-                .isEqualTo(Updater.NO_MODIFICATION_TUPLE)
+                .isEqualTo(Updater.NO_MODIFICATION)
     }
 
     @Test
     fun `should return an empty set of items`() {
-        assertThat(noOpUpdater.getItems(Podcast()))
+        assertThat(noOpUpdater.findItems(Podcast()))
                 .isEmpty()
     }
 
@@ -32,7 +32,7 @@ class NoOpUpdaterTest {
 
     @Test
     fun `should return an everytime false predicate`() {
-        assertThat(noOpUpdater.notIn(Podcast()).test(Item())).isFalse()
+        assertThat(noOpUpdater.notIn(Podcast())(Item())).isFalse()
     }
 
     @Test

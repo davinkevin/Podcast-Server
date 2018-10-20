@@ -117,7 +117,7 @@ class FranceTvUpdaterTest {
             whenever(imageService.getCoverFromURL(any())).thenReturn(Cover())
 
             /* When */
-            val items = franceTvUpdater.getItems(PODCAST)
+            val items = franceTvUpdater.findItems(PODCAST)
 
             /* Then */
             assertThat(items)
@@ -133,7 +133,7 @@ class FranceTvUpdaterTest {
             whenever(imageService.getCoverFromURL(any())).thenReturn(Cover())
 
             /* When */
-            val items = franceTvUpdater.getItems(PODCAST)
+            val items = franceTvUpdater.findItems(PODCAST)
 
             /* Then */
             assertThat(items)
@@ -147,7 +147,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(FRANCETV_URL)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2_with_no_items.html")))
 
             /* When */
-            val items = franceTvUpdater.getItems(PODCAST)
+            val items = franceTvUpdater.findItems(PODCAST)
 
             /* Then */
             assertThat(items).hasSize(0)
@@ -159,7 +159,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(FRANCETV_URL)).thenReturn(None.toVΛVΓ())
 
             /* When */
-            val items = franceTvUpdater.getItems(PODCAST)
+            val items = franceTvUpdater.findItems(PODCAST)
 
             /* Then */
             assertThat(items).hasSize(0)
@@ -173,7 +173,7 @@ class FranceTvUpdaterTest {
             whenever(imageService.getCoverFromURL(any())).thenReturn(Cover())
 
             /* When */
-            val items = franceTvUpdater.getItems(PODCAST)
+            val items = franceTvUpdater.findItems(PODCAST)
 
             /* Then */
             assertThat(items)

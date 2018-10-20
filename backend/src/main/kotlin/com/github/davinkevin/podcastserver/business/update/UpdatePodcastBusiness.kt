@@ -4,16 +4,17 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.business.CoverBusiness
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
+import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.Updater.Companion.NO_MODIFICATION
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
-import io.vavr.Tuple3
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -28,13 +29,22 @@ import java.util.concurrent.CompletableFuture.supplyAsync
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.function.Predicate
 import java.util.function.Supplier
 import javax.annotation.PostConstruct
 import javax.validation.Validator
 
 @Component
-class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRepository: ItemRepository, val updaterSelector: UpdaterSelector, val template: SimpMessagingTemplate, val podcastServerParameters: PodcastServerParameters, @param:Qualifier("UpdateExecutor") val updateExecutor: ThreadPoolTaskExecutor, @param:Qualifier("ManualUpdater") val manualExecutor: ThreadPoolTaskExecutor, @param:Qualifier("Validator") val validator: Validator, val coverBusiness: CoverBusiness) {
+class UpdatePodcastBusiness(
+        val podcastRepository: PodcastRepository,
+        val itemRepository: ItemRepository,
+        val updaterSelector: UpdaterSelector,
+        val template: SimpMessagingTemplate,
+        val podcastServerParameters: PodcastServerParameters,
+        @param:Qualifier("UpdateExecutor") val updateExecutor: ThreadPoolTaskExecutor,
+        @param:Qualifier("ManualUpdater") val manualExecutor: ThreadPoolTaskExecutor,
+        @param:Qualifier("Validator") val validator: Validator,
+        val coverBusiness: CoverBusiness
+) {
 
     val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
@@ -81,7 +91,7 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
         updatePodcast(podcast.id)
     }
 
-    private fun updatePodcast(podcasts: kotlin.collections.Set<Podcast>, selectedExecutor: Executor) {
+    private fun updatePodcast(podcasts: Set<Podcast>, selectedExecutor: Executor) {
         changeAndCommunicateUpdate(true)
 
         log.info("Update launch")
@@ -90,8 +100,7 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
         podcasts
                 .map { supplyAsync(Supplier { updaterSelector.of(it.url).update(it) }, selectedExecutor) }
                 .stream()
-                .map { this.wait(it) }
-                .map { UpdatePodcastInformation(it) }
+                .map { wait(it) }
                 .filter { it != NO_MODIFICATION }
                 .peek { changeAndCommunicateUpdate(true) }
                 .map { attachNewItemsToPodcast(it.podcast, it.items, it.p) }
@@ -108,15 +117,15 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
         this.template.convertAndSend(WS_TOPIC_UPDATING, _isUpdating.get())
     }
 
-    private fun wait(future: CompletableFuture<Tuple3<Podcast, io.vavr.collection.Set<Item>, Predicate<Item>>>): Tuple3<Podcast, io.vavr.collection.Set<Item>, Predicate<Item>> =
+    private fun wait(future: CompletableFuture<UpdatePodcastInformation>): UpdatePodcastInformation =
             Try { future.get(timeValue.toLong(), timeUnit) }
                     .getOrElse {
                         log.error("Error during update", it)
                         future.cancel(true)
-                        Updater.NO_MODIFICATION_TUPLE
+                        Updater.NO_MODIFICATION
                     }
 
-    private fun attachNewItemsToPodcast(podcast: Podcast, items: kotlin.collections.Set<Item>, filter: (Item) -> Boolean): kotlin.collections.Set<Item> {
+    private fun attachNewItemsToPodcast(podcast: Podcast, items: Set<Item>, filter: (Item) -> Boolean): Set<Item> {
 
         if (items.isEmpty()) {
             log.info("Reset of signature in order to force the next update: {}", podcast.title)
@@ -126,8 +135,8 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
 
         val itemsToAdd = items
                 .filter(filter)
-                .map { item -> item.setPodcast(podcast) }
-                .filter { item -> validator.validate(item).isEmpty() }
+                .map { it.setPodcast(podcast) }
+                .filter { validator.validate(it).isEmpty() }
                 .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) null else it.cover } }
 
         if (itemsToAdd.isEmpty()) {
@@ -137,8 +146,8 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
 
         itemRepository.saveAll(
                 itemsToAdd
-                        .map { podcast.add(it); it.setStatus(Status.NOT_DOWNLOADED) }
-                        .map { it.setNumberOfFail(0) }
+                        .map { it.apply { numberOfFail = 0; status = Status.NOT_DOWNLOADED } }
+                        .map { podcast.add(it); it }
         )
 
         podcastRepository.save(podcast.lastUpdateToNow())
@@ -163,7 +172,7 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
         itemRepository
                 .findAllToDelete(podcastServerParameters.limitToKeepCoverOnDisk())
                 .flatMap { coverBusiness.getCoverPathOf(it) }
-                .forEach { arrow.core.Try { Files.deleteIfExists(it) } }
+                .forEach { Try { Files.deleteIfExists(it) } }
     }
 
     @PostConstruct
@@ -177,11 +186,5 @@ class UpdatePodcastBusiness(val podcastRepository: PodcastRepository, val itemRe
 
     companion object {
         private const val WS_TOPIC_UPDATING = "/topic/updating"
-        val NO_MODIFICATION = UpdatePodcastInformation(Updater.NO_MODIFICATION_TUPLE)
     }
-}
-
-data class UpdatePodcastInformation(val podcast: Podcast, val items: kotlin.collections.Set<Item>, val p: (Item) -> Boolean) {
-    constructor(t: Tuple3<Podcast, io.vavr.collection.Set<Item>, Predicate<Item>>)
-            : this(t._1, t._2.toJavaSet(), t._3::test)
 }

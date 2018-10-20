@@ -74,7 +74,7 @@ class JeuxVideoComUpdaterTest {
         configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm")
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(42)
@@ -86,7 +86,7 @@ class JeuxVideoComUpdaterTest {
         whenever(htmlService.get(podcast.url)).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).isEmpty()
@@ -101,7 +101,7 @@ class JeuxVideoComUpdaterTest {
                 .thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items)

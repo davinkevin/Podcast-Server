@@ -1,24 +1,22 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
-import java.util.function.Predicate
+import lan.dk.podcastserver.entity.Item
+import lan.dk.podcastserver.entity.Podcast
 
 /**
  * Created by kevin on 09/03/2016 for Podcast Server
  */
 class NoOpUpdater : Updater {
 
-    override fun update(podcast: Podcast) = Updater.NO_MODIFICATION_TUPLE
+    override fun update(podcast: Podcast) = Updater.NO_MODIFICATION
 
-    override fun getItems(podcast: Podcast) = setOf<Item>().toVΛVΓ()
+    override fun findItems(podcast: Podcast) = setOf<Item>()
 
     override fun signatureOf(podcast: Podcast) = ""
 
-    override fun notIn(podcast: Podcast)= Predicate<Item>{ false }
+    override fun notIn(podcast: Podcast): (Item) -> Boolean = { false }
 
     override fun type() = Type("NoOpUpdater", "NoOpUpdater")
 

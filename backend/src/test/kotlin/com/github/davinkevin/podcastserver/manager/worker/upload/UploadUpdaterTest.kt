@@ -24,7 +24,7 @@ class UploadUpdaterTest {
     
     @Test
     fun `should serve items`() {
-        assertThat(updater.getItems(podcast))
+        assertThat(updater.findItems(podcast))
                 .hasSize(3)
                 .contains(item1, item2, item3)
     }
@@ -37,7 +37,7 @@ class UploadUpdaterTest {
 
     @Test
     fun `should reject every item`() {
-        assertThat(updater.notIn(podcast).test(Item()))
+        assertThat(updater.notIn(podcast)(Item()))
                 .isFalse()
     }
 

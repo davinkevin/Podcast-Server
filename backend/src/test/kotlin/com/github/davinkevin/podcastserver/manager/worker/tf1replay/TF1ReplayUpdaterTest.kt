@@ -108,7 +108,7 @@ class TF1ReplayUpdaterTest {
             whenever(htmlService.get(any())).then { fileAsHtml(from(it.getArgument<String>(0).substringAfterLast("/"))) }
 
             /* When */
-            val items = updater.getItems(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(3)
@@ -129,7 +129,7 @@ class TF1ReplayUpdaterTest {
                     .whenever(htmlService).get(tf1VideoOf("barbamama-barbapapa-8.html"))
 
             /* When */
-            val items = updater.getItems(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(3)

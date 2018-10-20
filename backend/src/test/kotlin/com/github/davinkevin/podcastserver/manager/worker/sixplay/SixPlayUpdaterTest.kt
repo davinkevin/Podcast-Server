@@ -48,7 +48,7 @@ class SixPlayUpdaterTest {
         whenever(imageService.getCoverFromURL(any())).thenReturn(Cover.DEFAULT_COVER)
 
         /* When */
-        val items = updater.getItems(show)
+        val items = updater.findItems(show)
 
         /* Then */
         assertThat(items)
@@ -61,7 +61,7 @@ class SixPlayUpdaterTest {
         /* Given */
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         /* When */
-        val items = updater.getItems(show)
+        val items = updater.findItems(show)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -73,7 +73,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
-        assertThatThrownBy { updater.getItems(show) }
+        assertThatThrownBy { updater.findItems(show) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -86,7 +86,7 @@ class SixPlayUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-without-js.html"))
 
         /* When */
-        assertThatThrownBy { updater.getItems(show) }
+        assertThatThrownBy { updater.findItems(show) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -100,7 +100,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
 
         /* When */
-        assertThatThrownBy { updater.getItems(show) }
+        assertThatThrownBy { updater.findItems(show) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -116,15 +116,14 @@ class SixPlayUpdaterTest {
         whenever(imageService.getCoverFromURL(any())).thenReturn(Cover.DEFAULT_COVER)
 
         /* When */
-        val items = updater.getItems(show)
+        val items = updater.findItems(show)
 
         /* Then */
         assertThat(items).hasSize(2)
-        val i = items.toJavaList()[0]
+        val i = items.first { it.url == "http://www.6play.fr/sport-6-p_1380/emission-du-12-aout-a-2005" }
         assertThat(i.pubDate)
                 .isAfterOrEqualTo(now)
                 .isBeforeOrEqualTo(ZonedDateTime.now())
-        assertThat(i.url).isEqualTo("http://www.6play.fr/sport-6-p_1380/emission-du-12-aout-a-2005")
 
     }
     

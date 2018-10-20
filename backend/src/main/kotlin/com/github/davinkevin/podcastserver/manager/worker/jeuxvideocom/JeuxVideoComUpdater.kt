@@ -2,15 +2,14 @@ package com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom
 
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
@@ -25,12 +24,11 @@ import java.time.format.DateTimeFormatter
 @Component("JeuxVideoComUpdater")
 class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService) : Updater {
 
-    override fun getItems(podcast: Podcast) =
+    override fun findItems(podcast: Podcast) =
             htmlService.get(podcast.url).k()
                     .map { it.select("article") }
                     .map { htmlToItems(it) }
                     .getOrElse { setOf() }
-                    .toVΛVΓ()
 
     private fun htmlToItems(elements: Elements) =
             elements

@@ -2,16 +2,15 @@ package com.github.davinkevin.podcastserver.manager.worker.dailymotion
 
 import arrow.core.getOrElse
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -25,23 +24,21 @@ import java.time.ZonedDateTime
 @Component
 class DailymotionUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService) : Updater {
 
-    override fun getItems(podcast: Podcast): io.vavr.collection.Set<Item> {
-        return USER_NAME_EXTRACTOR.on(podcast.url).group(1).k()
-                .map { API_LIST_OF_ITEMS.format(it) }
-                .flatMap { jsonService.parseUrl(it).k() }
-                .map { it.read("list", LIST_DAILYMOTION_VIDEO_DETAIL_TYPE) }
-                .getOrElse { setOf() }
-                .map { Item().apply {
-                    url = ITEM_URL.format(it.id)
-                    cover = imageService.getCoverFromURL(it.cover)
-                    title = it.title
-                    pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(it.creationDate!!), ZoneId.of("Europe/Paris"))
-                    description = it.description
+    override fun findItems(podcast: Podcast): Set<Item> =
+            USER_NAME_EXTRACTOR.on(podcast.url).group(1).k()
+                    .map { API_LIST_OF_ITEMS.format(it) }
+                    .flatMap { jsonService.parseUrl(it).k() }
+                    .map { it.read("list", LIST_DAILYMOTION_VIDEO_DETAIL_TYPE) }
+                    .getOrElse { setOf() }
+                    .map { Item().apply {
+                        url = ITEM_URL.format(it.id)
+                        cover = imageService.getCoverFromURL(it.cover)
+                        title = it.title
+                        pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(it.creationDate!!), ZoneId.of("Europe/Paris"))
+                        description = it.description
                     }
-                }
-                .toSet()
-                .toVΛVΓ()
-    }
+                    }
+                    .toSet()
 
     override fun signatureOf(podcast: Podcast): String {
         return USER_NAME_EXTRACTOR.on(podcast.url).group(1).k()

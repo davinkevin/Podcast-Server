@@ -5,18 +5,17 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toTry
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
 import lan.dk.podcastserver.service.JsonService.to
 import org.jsoup.select.Elements
@@ -28,20 +27,19 @@ import org.springframework.stereotype.Component
 @Scope(SCOPE_PROTOTYPE)
 class MyCanalUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService, val htmlService: HtmlService) : Updater {
 
-    override fun getItems(podcast: Podcast) =
+    override fun findItems(podcast: Podcast) =
             itemsAsJsonFrom(podcast)
                     .getOrElse { setOf() }
                     .flatMap { findDetails(it).toList() }
                     .map { it.first to toItem(it.second) }
                     .map { it.second.apply { url = DOMAIN + it.first.onClick.path } }
                     .toSet()
-                    .toVΛVΓ()
 
-    override fun signatureOf(p: Podcast): String {
-        return itemsAsJsonFrom(p)
+    override fun signatureOf(podcast: Podcast): String {
+        return itemsAsJsonFrom(podcast)
                 .map { items -> items.map { it.contentID }.sorted().joinToString(",") }
                 .map { signatureService.fromText(it) }
-                .getOrElse { throw RuntimeException("Error during signature of " + p.title + " with url " + p.url) }
+                .getOrElse { throw RuntimeException("Error during signature of " + podcast.title + " with url " + podcast.url) }
     }
 
     private fun itemsAsJsonFrom(p: Podcast) =

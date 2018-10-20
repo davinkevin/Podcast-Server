@@ -55,7 +55,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).then { fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml") }
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat<Item>(items).hasSize(15)
@@ -74,7 +74,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(fileAsXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml"))
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat<Item>(items).hasSize(15)
@@ -128,7 +128,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat<Item>(items).hasSize(0)
@@ -145,7 +145,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat<Item>(items).hasSize(0)
@@ -162,7 +162,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat<Item>(items).hasSize(0)

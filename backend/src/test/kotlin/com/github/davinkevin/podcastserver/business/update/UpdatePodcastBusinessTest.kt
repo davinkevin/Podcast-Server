@@ -4,17 +4,18 @@ package com.github.davinkevin.podcastserver.business.update
 import arrow.core.Option
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.business.CoverBusiness
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
+import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import io.vavr.API.Tuple
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -119,9 +120,9 @@ class UpdatePodcastBusinessTest {
             val podcasts = setOf(podcast1, podcast2, podcast3)
             whenever(podcastRepository.findByUrlIsNotNull()).thenReturn(podcasts.toVΛVΓ())
             whenever(updaterSelector.of(argWhere { podcasts.map{it.url}.contains(it) })).thenReturn(updater)
-            whenever(updater.notIn(any())).then { Predicate<Item>{ item -> !it.getArgument<Podcast>(0).contains(item) } }
-            doAnswer { val p = it.getArgument<Podcast>(0); Tuple(p, generateItems(10, p).toVΛVΓ(), updater.notIn(p)) }.whenever(updater).update(podcast3)
-            doAnswer { val p = it.getArgument<Podcast>(0); Tuple(p, p.items.toVΛVΓ(), updater.notIn(p)) }.whenever(updater).update(argWhere { it != podcast3 })
+            whenever(updater.notIn(any())).then { { item: Item -> !it.getArgument<Podcast>(0).contains(item) } }
+            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, generateItems(10, p), updater.notIn(p)) }.whenever(updater).update(podcast3)
+            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, p.items, updater.notIn(p)) }.whenever(updater).update(argWhere { it != podcast3 })
             whenever(validator.validate(any<Item>())).thenReturn(setOf<ConstraintViolation<Item>>())
 
             /* When */
@@ -177,12 +178,10 @@ class UpdatePodcastBusinessTest {
             val items = generateItems(10, podcast).toVΛVΓ()
             whenever(podcastRepository.findById(uuid)).thenReturn(Optional.of(podcast))
             whenever(updaterSelector.of(podcast.url)).thenReturn(updater)
-            whenever(updater.notIn(any())).then {
-                Predicate<Item> { item -> !it.getArgument<Podcast>(0).contains(item) }
-            }
+            whenever(updater.notIn(any())).then { { item: Item -> !it.getArgument<Podcast>(0).contains(item) } }
             whenever(updater.update(any())).then {
                 val p = it.getArgument<Podcast>(0)
-                Tuple(p, items, updater.notIn(p))
+                UpdatePodcastInformation(p, items.toJavaSet(), updater.notIn(p))
             }
             whenever(validator.validate(any<Item>())).thenReturn(setOf<ConstraintViolation<Item>>())
 
@@ -249,11 +248,11 @@ class UpdatePodcastBusinessTest {
                 val updater = mock<Updater>()
                 whenever(updaterSelector.of(p.url)).thenReturn(updater)
                 whenever(updater.notIn(any())).then {
-                    Predicate<Item> { item -> !it.getArgument<Podcast>(0).contains(item) }
+                    { item: Item -> !it.getArgument<Podcast>(0).contains(item) }
                 }
                 whenever(updater.update(any())).then {
                     val podcast = it.getArgument<Podcast>(0)
-                    Tuple(podcast, generateItems(7, p).toVΛVΓ(), updater.notIn(podcast))
+                    UpdatePodcastInformation(podcast, generateItems(7, p), updater.notIn(podcast))
                 }
                 whenever(podcastRepository.findById(any())).thenReturn(Optional.of(p))
                 whenever(podcastRepository.save(any())).thenReturn(p)

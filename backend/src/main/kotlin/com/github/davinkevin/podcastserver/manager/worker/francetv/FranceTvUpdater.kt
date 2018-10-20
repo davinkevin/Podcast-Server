@@ -4,18 +4,16 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.List
-import io.vavr.collection.Set
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
@@ -30,7 +28,7 @@ import java.time.ZonedDateTime
 @Component
 class FranceTvUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService, val jsonService: JsonService) : Updater {
 
-    override fun getItems(podcast: Podcast): Set<Item> =
+    override fun findItems(podcast: Podcast) =
             htmlService
                     .get(podcast.url).k()
                     .map { it.select(LAST_VIDEOS_SELECTOR) }
@@ -39,7 +37,6 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
                     .getOrElse { listOf<Element>() }
                     .map { htmlToItem(it) }
                     .toSet()
-                    .toVΛVΓ()
 
     private fun htmlToItem(element: Element) =
             element.children()

@@ -5,17 +5,16 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
@@ -33,13 +32,11 @@ import java.util.*
 @Component
 class SixPlayUpdater(private val signatureService: SignatureService, private val htmlService: HtmlService, private val jsonService: JsonService, private val imageService: ImageService) : Updater {
 
-    override fun getItems(podcast: Podcast) : io.vavr.collection.Set<Item> =
+    override fun findItems(podcast: Podcast) =
             htmlService.get(podcast.url)
                     .map { it.select("script") }
                     .map { extractItems(it) }
                     .getOrElse { setOf() }
-                    .toVΛVΓ()
-
 
     private fun extractItems(script: Elements): Set<Item> {
         val root6Play = extractJson(script)

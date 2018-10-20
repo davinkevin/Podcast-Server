@@ -4,17 +4,16 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import lan.dk.podcastserver.service.JsonService
-import com.github.davinkevin.podcastserver.service.properties.Api
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
@@ -30,7 +29,7 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun getItems(podcast: Podcast): io.vavr.collection.Set<Item> {
+    override fun findItems(podcast: Podcast): Set<Item> {
         log.info("Youtube Update by API")
 
         val playlistId = findPlaylistId(podcast.url)
@@ -42,7 +41,6 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
                 .flatMap { it.items.asSequence() }
                 .map { it.toItem() }
                 .toSet()
-                .toVΛVΓ()
     }
 
     override fun signatureOf(podcast: Podcast): String {

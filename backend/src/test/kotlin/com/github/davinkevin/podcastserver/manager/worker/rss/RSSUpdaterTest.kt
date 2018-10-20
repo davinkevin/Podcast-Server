@@ -42,7 +42,7 @@ class RSSUpdaterTest {
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0) } }
 
         /* When */
-        val items = updater.getItems(rssAppload)
+        val items = updater.findItems(rssAppload)
 
         /* Then */
         assertThat(items).hasSize(217)
@@ -63,7 +63,7 @@ class RSSUpdaterTest {
         val podcastNotUpdatable = Podcast().apply { url = "http://notUpdatable.com" }
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
         /* When */
-        val items = updater.getItems(podcastNotUpdatable)
+        val items = updater.findItems(podcastNotUpdatable)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -74,7 +74,7 @@ class RSSUpdaterTest {
         val podcast = Podcast().apply { url = "http://foo.bar.fake.url/" }
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
         /* Then */
         assertThat(items).isEmpty()
     }

@@ -2,15 +2,14 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 
 import arrow.core.Option
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
@@ -28,7 +27,7 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun getItems(podcast: Podcast): io.vavr.collection.Set<Item> {
+    override fun findItems(podcast: Podcast): Set<Item> {
         log.info("Youtube Update by RSS")
 
         val url = playlistUrlOf(podcast.url)
@@ -45,7 +44,6 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
                 .getOrElse { listOf() }
                 .map { toItem(it, dn) }
                 .toSet()
-                .toVΛVΓ()
     }
 
     private fun playlistUrlOf(url: String): String =

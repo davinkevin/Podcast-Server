@@ -52,7 +52,7 @@ class DailymotionUpdaterTest {
                 .then { fileAsJson("/remote/podcast/dailymotion/user.karimdebbache.json") }
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(10)
@@ -65,7 +65,7 @@ class DailymotionUpdaterTest {
         whenever(jsonService.parseUrl(karimdebbache)).thenReturn(arrow.core.None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).isEmpty()

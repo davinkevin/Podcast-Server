@@ -4,17 +4,16 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.toOption
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -27,13 +26,12 @@ import java.time.ZonedDateTime
 @Component
 class GulliUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService) : Updater {
 
-    override fun getItems(podcast: Podcast) =
+    override fun findItems(podcast: Podcast) =
             htmlService.get(podcast.url).k()
                     .map { it.select("div.all-videos ul li.col-md-3") }
                     .getOrElse{ Elements() }
                     .flatMap { findDetailsInFromPage(it).toList() }
                     .toSet()
-                    .toVΛVΓ()
 
     private fun findDetailsInFromPage(e: Element) =
             e.select("a").firstOption()

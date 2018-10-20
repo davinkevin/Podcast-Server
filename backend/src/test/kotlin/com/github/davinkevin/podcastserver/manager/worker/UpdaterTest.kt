@@ -3,8 +3,6 @@ package com.github.davinkevin.podcastserver.manager.worker
 import com.github.davinkevin.podcastserver.manager.worker.SimpleUpdater.Companion.ERROR_UUID
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import io.vavr.collection.HashSet
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
@@ -17,6 +15,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.junit.jupiter.MockitoExtension
 import java.util.UUID
 import javax.validation.Validator
+import kotlin.collections.HashSet
 
 /**
  * Created by kevin on 22/06/15 for Podcast Server
@@ -42,8 +41,8 @@ class UpdaterTest {
 
         /* Then */
         assertThat(noChangeResult)
-                .isSameAs(Updater.NO_MODIFICATION_TUPLE)
-        assertThat(noChangeResult._3().test(Item())).isEqualTo(true)
+                .isSameAs(Updater.NO_MODIFICATION)
+        assertThat(noChangeResult.p(Item())).isEqualTo(true)
     }
 
     @Test
@@ -58,11 +57,11 @@ class UpdaterTest {
         val result = simpleUpdater.update(podcast)
 
         /* Then */
-        assertThat(result).isNotSameAs(Updater.NO_MODIFICATION_TUPLE)
-        assertThat(result._1()).isSameAs(podcast)
-        assertThat(result._2()).isInstanceOf(HashSet::class.java).hasSize(3)
-        assertThat(result._3()).isNotNull
-        assertThat(result._1().signature).isEqualTo("123456789")
+        assertThat(result).isNotSameAs(Updater.NO_MODIFICATION)
+        assertThat(result.podcast).isSameAs(podcast)
+        assertThat(result.items).isInstanceOf(HashSet::class.java).hasSize(3)
+        assertThat(result.p).isNotNull
+        assertThat(result.podcast.signature).isEqualTo("123456789")
     }
 
     @Test
@@ -77,7 +76,7 @@ class UpdaterTest {
         val result = simpleUpdater.update(podcast)
 
         /* Then */
-        assertThat(result).isSameAs(Updater.NO_MODIFICATION_TUPLE)
+        assertThat(result).isSameAs(Updater.NO_MODIFICATION)
     }
 
     @Test
@@ -93,7 +92,7 @@ class UpdaterTest {
 
         /* When */
         val result = simpleUpdater.update(podcast)
-        val collectedItem = result._2().filter(result._3())
+        val collectedItem = result.items.filter(result.p)
 
         /* Then */
         assertThat(collectedItem).hasSize(2)
@@ -107,11 +106,11 @@ class UpdaterTest {
 
 private class SimpleUpdater : Updater {
 
-    override fun getItems(podcast: Podcast) = setOf(
+    override fun findItems(podcast: Podcast) = setOf(
             Item().apply { id = UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82") },
             Item().apply { id = UUID.randomUUID() },
             Item().apply { id = UUID.randomUUID() }
-    ).toVΛVΓ()
+    )
 
     override fun signatureOf(podcast: Podcast) = when {
         podcast.id === ERROR_UUID -> throw RuntimeException()

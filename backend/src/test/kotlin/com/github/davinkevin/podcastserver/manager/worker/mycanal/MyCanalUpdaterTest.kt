@@ -88,7 +88,7 @@ class MyCanalUpdaterTest {
                 .forEach { it -> doReturn(Cover().apply { url = it; height = 200; width = 200 }).whenever(imageService).getCoverFromURL(it) }
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(16).are(coherent())
@@ -104,7 +104,7 @@ class MyCanalUpdaterTest {
                 .whenever(imageService).getCoverFromURL(argWhere { it in imageUrls })
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(120).are(coherent())
@@ -116,7 +116,7 @@ class MyCanalUpdaterTest {
         whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.getItems(podcast)
+        val items = updater.findItems(podcast)
 
         /* Then */
         assertThat(items).isEmpty()
