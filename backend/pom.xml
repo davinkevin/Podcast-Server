@@ -375,6 +375,12 @@
             <version>1.7.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility-kotlin</artifactId>
+            <version>3.1.2</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Configuration Processor -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

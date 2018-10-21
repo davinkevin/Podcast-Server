@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
+import com.github.davinkevin.podcastserver.manager.downloader.FfmpegDownloader
 import com.github.davinkevin.podcastserver.manager.downloader.HTTPDownloader
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any

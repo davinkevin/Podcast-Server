@@ -167,7 +167,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
         }
     }
 
-    Path generateTempFileNextTo(Path finalFile) {
+    /* Change visibility after kotlin Migration */ public Path generateTempFileNextTo(Path finalFile) {
         String fileName = finalFile.getFileName().toString();
         return Try.of(() -> Files.createTempFile(finalFile.getParent(), FilenameUtils.getBaseName(fileName) + "-", "." + FilenameUtils.getExtension(fileName) + temporaryExtension))
                 .getOrElseThrow(e -> new UncheckedIOException(IOException.class.cast(e)));
