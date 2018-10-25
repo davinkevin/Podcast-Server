@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DownloaderTest {
 
-    static final String TEMPORARY_EXTENSION = ".psdownload";
+    /* Visibility change due to refactor */ public static final String TEMPORARY_EXTENSION = ".psdownload";
 
     private @Mock PodcastRepository podcastRepository;
     private @Mock ItemRepository itemRepository;

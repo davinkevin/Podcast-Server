@@ -45,7 +45,7 @@ public abstract class AbstractDownloader implements Runnable, Downloader {
     protected final SimpMessagingTemplate template;
     protected final MimeTypeService mimeTypeService;
 
-    String temporaryExtension;
+    /* Change visibility after kotlin Migration */ public String temporaryExtension;
     /* Change visibility after kotlin Migration */ public  Path target;
     private PathMatcher hasTempExtensionMatcher;
     /* Change visibility after kotlin Migration */ public AtomicBoolean stopDownloading = new AtomicBoolean(false);
