@@ -1,10 +1,6 @@
 package com.github.davinkevin.podcastserver.utils.custom.ffmpeg
 
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
-
+import java.util.concurrent.CompletableFuture
 
 
 class ProcessListener(val url: String) {
@@ -13,15 +9,10 @@ class ProcessListener(val url: String) {
         val DEFAULT_PROCESS_LISTENER = ProcessListener("")
     }
 
-    private val pool: ExecutorService = Executors.newFixedThreadPool(10)
-    var process: Process? = null
+    var process: CompletableFuture<Process> = CompletableFuture()
 
-    fun findProcess(): Future<Process> {
-        return pool.submit<Process> {
-            while (process === null) {
-                TimeUnit.MILLISECONDS.sleep(100)
-            }
-            return@submit process
-        }
+    fun withProcess(p: Process): ProcessListener {
+        process.complete(p)
+        return this
     }
 }

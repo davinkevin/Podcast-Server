@@ -16,7 +16,6 @@ internal class CustomRunProcessFuncTest {
                 .run(listOf("/bin/bash", "anUrl", "Foo", "Bar"))
 
         /* Then */
-        assertThat(p).isSameAs(pl.process)
-        assertThat(pl.findProcess().get()).isSameAs(p)
+        assertThat(p).isSameAs(pl.process.get())
     }
 }

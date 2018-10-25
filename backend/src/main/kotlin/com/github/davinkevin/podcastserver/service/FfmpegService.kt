@@ -127,11 +127,9 @@ class FfmpegService(val runProcessFunc: CustomRunProcessFunc, val ffmpegExecutor
 
         runAsync(ffmpegExecutor.createJob(ffmpegBuilder, progressListener))
 
-        val process = pl.findProcess()
-
-        return Try { process.get(2, TimeUnit.SECONDS) }
+        return Try { pl.process.get(2, TimeUnit.SECONDS) }
                 .getOrElse {
-                    process.cancel(true)
+                    pl.process.cancel(true)
                     log.error("error during download", it)
                     throw RuntimeException(it)
                 }

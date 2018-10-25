@@ -9,7 +9,7 @@ import java.io.IOException
 /**
  * Created by kevin on 24/07/2016.
  */
-open class CustomRunProcessFunc(private var listeners: List<ProcessListener> = listOf()) : RunProcessFunction() {
+class CustomRunProcessFunc(private var listeners: List<ProcessListener> = listOf()) : RunProcessFunction() {
 
     @Throws(IOException::class)
     override fun run(args: List<String>): Process {
@@ -17,7 +17,7 @@ open class CustomRunProcessFunc(private var listeners: List<ProcessListener> = l
 
         val toBeRemoved = listeners
                 .firstOption { pl -> args.contains(pl.url) }
-                .map { it.process = p; it }
+                .map { it.withProcess(p) }
                 .getOrElse { DEFAULT_PROCESS_LISTENER }
 
         this.listeners = listeners - toBeRemoved
@@ -25,7 +25,7 @@ open class CustomRunProcessFunc(private var listeners: List<ProcessListener> = l
         return p
     }
 
-    open fun add(pl: ProcessListener): CustomRunProcessFunc {
+    fun add(pl: ProcessListener): CustomRunProcessFunc {
         this.listeners = listeners + pl
         return this
     }

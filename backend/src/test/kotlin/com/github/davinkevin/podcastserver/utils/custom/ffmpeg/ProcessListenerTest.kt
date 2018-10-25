@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.utils.custom.ffmpeg
 
-import com.jayway.awaitility.Awaitility
+import com.jayway.awaitility.Awaitility.await
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.mockito.Mockito
@@ -18,12 +18,12 @@ internal class ProcessListenerTest {
         var process: Process? = null
 
         /* When */
-        CompletableFuture.runAsync { process = pl.findProcess().get() }
+        CompletableFuture.runAsync { process = pl.process.get() }
         MILLISECONDS.sleep(200)
-        pl.process = aProcess
+        pl.withProcess(aProcess)
 
         /* Then */
-        Awaitility.await().atMost(5, SECONDS).until {
+        await().atMost(5, SECONDS).until {
             assertThat(process).isNotNull().isSameAs(aProcess)
         }
     }

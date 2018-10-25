@@ -152,7 +152,7 @@ class FfmpegServiceTest {
         val job: FFmpegJob = mock()
         whenever(runFunc.add(any())).then {
             val pl = it.getArgument<ProcessListener>(0)
-            pl.process = mock()
+            pl.withProcess(mock())
             runFunc
         }
         whenever(ffmpegExecutor.createJob(ArgumentMatchers.any(), ArgumentMatchers.any())).then { job }
