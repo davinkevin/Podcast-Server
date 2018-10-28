@@ -13,7 +13,5 @@ import org.springframework.stereotype.Component
 class DatabaseScheduled(val databaseService: DatabaseService) {
 
     @Scheduled(cron = "\${podcastserver.backup.cron:0 0 4 * * *}")
-    fun backup() {
-        databaseService.backupWithDefault()
-    }
+    fun backup() = databaseService.backupWithDefault()
 }
