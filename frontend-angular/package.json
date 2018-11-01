@@ -1,6 +1,6 @@
 {
   "name": "podcast-server",
-  "version": "2018.10.0",
+  "version": "2018.11.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

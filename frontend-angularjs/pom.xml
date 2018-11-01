@@ -5,7 +5,7 @@
 
     <groupId>com.github.davinkevin.podcastserver</groupId>
     <artifactId>frontend-angularjs</artifactId>
-    <version>2018.10.0</version>
+    <version>2018.11.0</version>
     <packaging>jar</packaging>
 
     <build>
