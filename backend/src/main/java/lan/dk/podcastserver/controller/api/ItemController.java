@@ -3,7 +3,7 @@ package lan.dk.podcastserver.controller.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.business.ItemBusiness;
-import lan.dk.podcastserver.business.WatchListBusiness;
+import com.github.davinkevin.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
 import lan.dk.podcastserver.manager.ItemDownloadManager;
