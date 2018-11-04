@@ -1,9 +1,8 @@
 package com.github.davinkevin.podcastserver.business
 
-import arrow.core.None
-import arrow.core.Some
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.JdomService
+import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.API.Set
 import lan.dk.podcastserver.entity.WatchList
@@ -19,8 +18,7 @@ import java.util.*
 class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRepository: ItemRepository, val jdomService: JdomService) {
 
     fun findOne(id: UUID): WatchList =
-            watchListRepository.findById(id)
-                    .toOption()
+            watchListRepository.findById(id).k()
                     .getOrElse { throw RuntimeException("Watchlist not found") }
 
     fun findAll() =
@@ -30,16 +28,14 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
                     .toVΛVΓ()
 
     fun findContainsItem(itemId: UUID) =
-            itemRepository.findById(itemId)
-                    .toOption()
+            itemRepository.findById(itemId).k()
                     .map { watchListRepository.findContainsItem(it) }
                     .getOrElse { Set() }
 
 
     fun add(watchListId: UUID, itemId: UUID): WatchList {
         val watchList = findOne(watchListId)
-        val item = itemRepository.findById(itemId)
-                .toOption()
+        val item = itemRepository.findById(itemId).k()
                 .getOrElse { throw RuntimeException("Item with ID $itemId not found") }
 
         return watchListRepository.save(watchList.add(item))
@@ -47,8 +43,7 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
 
     fun remove(watchListId: UUID, itemId: UUID): WatchList {
         val watchList = findOne(watchListId)
-        val item = itemRepository.findById(itemId)
-                .toOption()
+        val item = itemRepository.findById(itemId).k()
                 .getOrElse { throw RuntimeException("Item with ID $itemId not found") }
 
         return watchListRepository.save(watchList.remove(item))
@@ -58,16 +53,8 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
 
     fun save(watchList: WatchList) = watchListRepository.save(watchList)
 
-    fun asRss(id: UUID, domainFromRequest: String) = watchListRepository.findById(id)
-            .toOption()
+    fun asRss(id: UUID, domainFromRequest: String) = watchListRepository.findById(id).k()
             .map { jdomService.watchListToXml(it, domainFromRequest) }
             .getOrElse { throw RuntimeException("Rss generation of watchlist $id caused Error") }
-
-
-    private fun <T> Optional<T>.toOption(): arrow.core.Option<T> =
-            when {
-                this.isPresent -> Some(this.get())
-                else -> None
-            }
 }
 

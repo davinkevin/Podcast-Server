@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.github.davinkevin.podcastserver.business.TagBusiness;
 import com.github.davinkevin.podcastserver.service.MimeTypeService;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -43,7 +44,8 @@ public class PodcastBusinessTest {
     @Mock PodcastServerParameters podcastServerParameters;
     @Mock JdomService jdomService;
     @Mock PodcastRepository podcastRepository;
-    @Mock TagBusiness tagBusiness;
+    @Mock
+    TagBusiness tagBusiness;
     @Mock CoverBusiness coverBusiness;
     @Mock MimeTypeService mimeTypeService;
     @InjectMocks PodcastBusiness podcastBusiness;

@@ -1,7 +1,10 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
@@ -18,7 +21,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter @Setter
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Tag {
@@ -48,5 +50,23 @@ public class Tag {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Tag setId(UUID id) {
+        this.id = id;
+        return this;
+    }
+
+    public Tag setName(String name) {
+        this.name = name;
+        return this;
     }
 }
