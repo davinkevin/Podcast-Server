@@ -6,7 +6,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.downloader.Downloader;
+import com.github.davinkevin.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector;

@@ -13,7 +13,6 @@ import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.AbstractDownloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -44,7 +43,7 @@ class HTTPDownloader(
         log.debug("Download")
         try {
             info = this.downloadingItem.url().k()
-                    .orElse { getItemUrl(getItem()).toOption() }
+                    .orElse { getItemUrl(item).toOption() }
                     .map { urlService.getRealURL(it) }
                     .map { wGetFactory.newDownloadInfo(it) }
                     .getOrElse { throw RuntimeException("Error during creation of download of ${downloadingItem.item.title}") }
@@ -54,7 +53,7 @@ class HTTPDownloader(
             info.extract(stopDownloading, itemSynchronisation)
 
             target = getTargetFile(item)
-            val w = wGetFactory.newWGet(info, target.toFile())
+            val w = wGetFactory.newWGet(info, target!!.toFile())
 
             w.download(stopDownloading, itemSynchronisation)
         } catch (e: DownloadMultipartError) {

@@ -10,7 +10,6 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Status
-import lan.dk.podcastserver.manager.downloader.AbstractDownloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -62,7 +61,7 @@ class FfmpegDownloader(
                 )
             }
 
-            ffmpegService.concat(target, *files.toTypedArray())
+            ffmpegService.concat(target!!, *files.toTypedArray())
         } catch (e: Exception) {
             throw e
         } finally {
@@ -78,7 +77,7 @@ class FfmpegDownloader(
     private fun download(url: String): Try<Path> {
         val duration = ffmpegService.getDurationOf(url, downloadingItem.userAgent)
 
-        val subTarget = generateTempFileNextTo(target)
+        val subTarget = generateTempFileNextTo(target!!)
 
         return Try {
             val command = FFmpegBuilder()

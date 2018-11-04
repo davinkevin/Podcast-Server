@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Status
-import lan.dk.podcastserver.manager.downloader.AbstractDownloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -41,10 +40,10 @@ class RTMPDownloader(
 
         try {
             target = getTargetFile(item)
-            log.debug("out file : {}", target.toAbsolutePath().toString())
+            log.debug("out file : {}", target!!.toAbsolutePath().toString())
 
             val processToExecute = processService
-                    .newProcessBuilder(externalTools.rtmpdump, "-r", getItemUrl(item), "-o", target.toAbsolutePath().toString())
+                    .newProcessBuilder(externalTools.rtmpdump, "-r", getItemUrl(item), "-o", target!!.toAbsolutePath().toString())
                     .directory(File("/tmp"))
                     .redirectErrorStream(true)
 

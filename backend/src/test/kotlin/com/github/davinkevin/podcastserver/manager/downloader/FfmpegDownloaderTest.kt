@@ -76,8 +76,7 @@ class FfmpegDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            downloader.setItemDownloadManager(itemDownloadManager)
-            downloader.setDownloadingItem(DownloadingItem(item, listOf(item.url, "http://foo.bar.com/end.mp4").toVΛVΓ(), null, "Fake UserAgent"))
+            downloader.with(DownloadingItem(item, listOf(item.url, "http://foo.bar.com/end.mp4").toVΛVΓ(), null, "Fake UserAgent"), itemDownloadManager)
 
             whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
             whenever(podcastRepository.findById(aPodcast.id)).thenReturn(Optional.of(aPodcast))

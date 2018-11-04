@@ -18,7 +18,6 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.AbstractDownloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -71,7 +70,6 @@ class HTTPDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            downloader.setItemDownloadManager(itemDownloadManager)
             whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
             downloader.postConstruct()
             FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(podcast.title).toFile())
@@ -84,7 +82,10 @@ class HTTPDownloaderTest {
         fun should_run_download() {
             /* Given */
             val specificUrl = "${item.url}&params=2"
-            downloader.downloadingItem = DownloadingItem(item, listOf(specificUrl).toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf(specificUrl).toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             val downloadInfo = mock<DownloadInfo>()
             val wGet = mock<WGet>()
@@ -115,7 +116,10 @@ class HTTPDownloaderTest {
 
         @Test
         fun `should run download by fall-backing to item url`() {
-            downloader.downloadingItem = DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             val downloadInfo = mock<DownloadInfo>()
             val wGet = mock<WGet>()
@@ -154,7 +158,10 @@ class HTTPDownloaderTest {
                 title = "A Fake Http Podcast"
                 add(item)
             }
-            downloader.downloadingItem = DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
@@ -172,7 +179,10 @@ class HTTPDownloaderTest {
         @Test
         fun should_stop_download() {
             /* Given */
-            downloader.downloadingItem = DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             val downloadInfo = mock<DownloadInfo>()
             val wGet = mock<WGet>()
@@ -201,7 +211,10 @@ class HTTPDownloaderTest {
         @Test
         fun should_handle_multipart_download_error() {
             /* Given */
-            downloader.downloadingItem = DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             val downloadInfo = mock<DownloadInfo>()
             val wGet = mock<WGet>()
@@ -232,7 +245,10 @@ class HTTPDownloaderTest {
         @Test
         fun should_handle_downloadunterruptedError() {
             /* Given */
-            downloader.downloadingItem = DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             val downloadInfo = mock<DownloadInfo>()
             val wGet = mock<WGet>()
@@ -258,7 +274,10 @@ class HTTPDownloaderTest {
         @Test
         fun should_handle_IOException_during_download() {
             /* Given */
-            downloader.downloadingItem = DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             val downloadInfo = mock<DownloadInfo>()
             val wGet = mock<WGet>()
@@ -325,7 +344,7 @@ class HTTPDownloaderTest {
         @BeforeEach
         fun beforeEach() {
             whenever(downloader.item).thenReturn(item)
-            downloader.itemDownloadManager = itemDownloadManager
+            whenever(downloader.itemDownloadManager).then { itemDownloadManager }
             whenever(downloader.info).thenReturn(info)
 
             httpWatcher = HTTPWatcher(downloader)

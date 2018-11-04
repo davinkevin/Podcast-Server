@@ -8,7 +8,7 @@ import io.vavr.control.Try;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
-import lan.dk.podcastserver.manager.downloader.Downloader;
+import com.github.davinkevin.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
@@ -224,8 +224,7 @@ public class ItemDownloadManager {
                 .toOption()
                 .map(downloaderSelector::of)
                 .map(d -> {
-                    d.setDownloadingItem(downloadingItem.get());
-                    d.setItemDownloadManager(this);
+                    d.with(downloadingItem.get(), this);
                     return d;
                 })
                 .getOrElseThrow(() -> new RuntimeException("Error during selection of downloader"));

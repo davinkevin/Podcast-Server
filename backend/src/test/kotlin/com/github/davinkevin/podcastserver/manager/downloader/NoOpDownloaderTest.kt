@@ -19,8 +19,8 @@ class NoOpDownloaderTest {
     fun `should return default value`() {
         /* Given */
         val noOpDownloader = NoOpDownloader()
-        val item = DownloadingItem(Item.DEFAULT_ITEM, listOf<String>().toVΛVΓ(), "", "")
-
+        val realItem = Item().apply { url = "foo" }
+        val item = DownloadingItem(realItem, listOf<String>().toVΛVΓ(), "", "")
         /* When */
         noOpDownloader.pauseDownload()
         noOpDownloader.restartDownload()
@@ -30,7 +30,7 @@ class NoOpDownloaderTest {
         /* Then */
         assertThat(noOpDownloader.download()).isEqualTo(Item.DEFAULT_ITEM)
         assertThat(noOpDownloader.item).isEqualTo(Item.DEFAULT_ITEM)
-        assertThat(noOpDownloader.getItemUrl(Item.DEFAULT_ITEM)).isNull()
+        assertThat(noOpDownloader.getItemUrl(realItem)).isEqualTo(realItem.url)
         assertThat(noOpDownloader.compatibility(item)).isEqualTo(-1)
     }
 
@@ -40,8 +40,7 @@ class NoOpDownloaderTest {
         val idm = mock<ItemDownloadManager>()
         val di = DownloadingItem(Item.DEFAULT_ITEM, listOf<String>().toVΛVΓ(), "", "")
         val noOpDownloader = NoOpDownloader().apply {
-                setDownloadingItem(di)
-                setItemDownloadManager(idm)
+                with(di, idm)
         }
 
         /* WHEN  */

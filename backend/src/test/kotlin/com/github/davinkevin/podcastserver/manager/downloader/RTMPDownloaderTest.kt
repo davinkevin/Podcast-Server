@@ -90,8 +90,10 @@ class RTMPDownloaderTest {
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
             whenever(podcastRepository.findById(ArgumentMatchers.eq(aPodcast.id))).thenReturn(Optional.of(aPodcast))
 
-            downloader.downloadingItem = DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null)
-            downloader.setItemDownloadManager(itemDownloadManager)
+            downloader.with(
+                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
             downloader.postConstruct()
 
             FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(aPodcast.title).toFile())

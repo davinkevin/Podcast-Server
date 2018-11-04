@@ -11,6 +11,7 @@ import com.github.axet.wget.info.ex.DownloadIOCodeError
 import com.github.axet.wget.info.ex.DownloadInterruptedError
 import com.github.axet.wget.info.ex.DownloadMultipartError
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
+import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.service.FfmpegService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
@@ -21,7 +22,6 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloaderTest.TEMPORARY_EXTENSION
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -96,7 +96,7 @@ class YoutubeDownloaderTest {
     fun beforeEach() {
         whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
         downloader.postConstruct()
-        downloader.setItemDownloadManager(itemDownloadManager)
+        downloader.itemDownloadManager = itemDownloadManager
 
         Try {
             FileSystemUtils.deleteRecursively(path.toFile())
@@ -119,7 +119,10 @@ class YoutubeDownloaderTest {
             whenever(vGet.video).thenReturn(videoInfo)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
 
-            downloader.downloadingItem = DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null)
+            downloader.with(
+                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    itemDownloadManager
+            )
 
             whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.getArgument(0) }
@@ -145,7 +148,7 @@ class YoutubeDownloaderTest {
             assertThat(item.status).isEqualTo(Status.FINISH)
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_low.mp4"))
             assertThat(Files.exists(downloader.target)).isTrue()
-            assertThat(Files.exists(downloader.target.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
+            assertThat(Files.exists(downloader.target!!.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
         }
 
         @Test
@@ -166,7 +169,7 @@ class YoutubeDownloaderTest {
             assertThat(item.status).isEqualTo(Status.FINISH)
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_low.mp4"))
             assertThat(Files.exists(downloader.target)).isTrue()
-            assertThat(Files.exists(downloader.target.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
+            assertThat(Files.exists(downloader.target!!.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
         }
 
         @Test
@@ -186,7 +189,7 @@ class YoutubeDownloaderTest {
             assertThat(item.status).isEqualTo(Status.FINISH)
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_multiple.mp4"))
             assertThat(Files.exists(downloader.target)).isTrue()
-            assertThat(Files.exists(downloader.target.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
+            assertThat(Files.exists(downloader.target!!.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
             assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve("A Fake Youtube Podcast"))).isEqualTo(1)
         }
 
@@ -274,7 +277,7 @@ class YoutubeDownloaderTest {
                 assertThat(item.status).isEqualTo(Status.FINISH)
                 assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Youtube Podcast").resolve("A_super_Name_of_Youtube-Video_multiple.mp4"))
                 assertThat(Files.exists(downloader.target)).isTrue()
-                assertThat(Files.exists(downloader.target.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
+                assertThat(Files.exists(downloader.target!!.resolveSibling("A_super_Name_of_Youtube-Video$TEMPORARY_EXTENSION"))).isFalse()
                 assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve("A Fake Youtube Podcast"))).isEqualTo(1)
             }
         }

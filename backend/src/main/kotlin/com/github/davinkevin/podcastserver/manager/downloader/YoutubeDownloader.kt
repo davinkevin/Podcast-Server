@@ -12,7 +12,6 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import io.vavr.API.Try
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Status
-import lan.dk.podcastserver.manager.downloader.AbstractDownloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -63,12 +62,12 @@ class YoutubeDownloader(
             v = wGetFactory.newVGet(parser.info(URL(item.url)))
             v.extract(parser, stopDownloading, watcher)
 
-            target = getTargetFile(item) ?: throw RuntimeException("target is undefined for download of " + item.url)
+            target = getTargetFile(item)
 
             v
                     .video
                     .info
-                    .forEach { vi -> vi.target = generatePartFile(target, vi).toFile() }
+                    .forEach { vi -> vi.target = generatePartFile(target!!, vi).toFile() }
 
             v.download(parser, stopDownloading, watcher)
 
@@ -125,7 +124,7 @@ class YoutubeDownloader(
     }
 
     override fun finishDownload() {
-        val fileWithExtension = target.resolveSibling(toDefinitiveFileName())
+        val fileWithExtension = target!!.resolveSibling(toDefinitiveFileName())
         Files.deleteIfExists(target)
 
         target =
@@ -152,7 +151,7 @@ class YoutubeDownloader(
                 .map { it.substringAfter("/") }
                 .firstOrNull() ?: DEFAULT_EXTENSION_MP4
 
-        return target.fileName.toString().replace(temporaryExtension, ".$videoExt")
+        return target!!.fileName.toString().replace(temporaryExtension, ".$videoExt")
     }
 
     private fun hasOnlyOneStream() = v.video.info.size == 1
@@ -163,8 +162,8 @@ class YoutubeDownloader(
                     .map { v -> v.targetFile.toPath() }
                     .firstOrNull() ?: throw RuntimeException(format(ERROR_NO_CONTENT_TYPE, type, item.title, item.url))
 
-    override fun compatibility(ditem: DownloadingItem) =
-            if (ditem.urls.length() == 1 && "youtube.com" in ditem.urls.head()) 1
+    override fun compatibility(downloadingItem: DownloadingItem) =
+            if (downloadingItem.urls.length() == 1 && "youtube.com" in downloadingItem.urls.head()) 1
             else Integer.MAX_VALUE
 
     internal class YoutubeWatcher(private val youtubeDownloader: YoutubeDownloader, private val maxWaitingTime: TemporalAmount = Duration.ofMinutes(5)) : Runnable {
@@ -178,7 +177,7 @@ class YoutubeDownloader(
         override fun run() {
             val info = youtubeDownloader.v.video
             val downloadInfo = info.info
-            val item = youtubeDownloader.getItem()
+            val item = youtubeDownloader.item
 
             when (info.state) {
                 VideoInfo.States.EXTRACTING_DONE -> log.debug(FilenameUtils.getName(item.url.toString()) + " " + info.state)

@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import lan.dk.podcastserver.manager.downloader.Downloader
+import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.downloader.NoOpDownloader
 import org.springframework.aop.TargetClassAware
