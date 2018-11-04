@@ -6,13 +6,11 @@ import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.service.*
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status.*
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -76,7 +74,7 @@ class FfmpegDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            downloader.with(DownloadingItem(item, listOf(item.url, "http://foo.bar.com/end.mp4").toVΛVΓ(), null, "Fake UserAgent"), itemDownloadManager)
+            downloader.with(DownloadingItem(item, listOf(item.url, "http://foo.bar.com/end.mp4"), null, "Fake UserAgent"), itemDownloadManager)
 
             whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
             whenever(podcastRepository.findById(aPodcast.id)).thenReturn(Optional.of(aPodcast))
@@ -319,7 +317,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with multiple urls ending with M3U8 and MP4`() {
             /* Given */
-            val di = DownloadingItem(null, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -329,7 +327,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with only urls ending with M3U8`() {
             /* Given */
-            val di = DownloadingItem(null, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -339,7 +337,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with only urls ending with mp4`() {
             /* Given */
-            val di = DownloadingItem(null, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -351,7 +349,7 @@ class FfmpegDownloaderTest {
         @ValueSource(strings = ["m3u8", "mp4"])
         fun `should be compatible with only one url with extension`(ext: String) {
             /* Given */
-            val di = DownloadingItem(null, listOf("http://foo.bar.com/end.$ext").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.$ext"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -363,7 +361,7 @@ class FfmpegDownloaderTest {
         @ValueSource(strings = ["http://foo.bar.com/end.webm", "http://foo.bar.com/end.manifest"])
         fun `should not be compatible with`(url: String) {
             /* Given */
-            val di = DownloadingItem(null, listOf(url).toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf(url), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

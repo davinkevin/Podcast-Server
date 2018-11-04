@@ -4,7 +4,6 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 

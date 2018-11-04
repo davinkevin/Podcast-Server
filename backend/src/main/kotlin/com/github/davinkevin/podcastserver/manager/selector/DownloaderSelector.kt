@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.downloader.NoOpDownloader
 import org.springframework.aop.TargetClassAware
 import org.springframework.context.ApplicationContext
@@ -15,7 +15,7 @@ class DownloaderSelector(val context: ApplicationContext, val downloaders: Set<D
 
     @Suppress("UNCHECKED_CAST")
     fun of(item: DownloadingItem): Downloader =
-            if (item.urls.isEmpty) {
+            if (item.urls.isEmpty()) {
                 NO_OP_DOWNLOADER
             } else {
                 val d = downloaders.minBy { it.compatibility(item) }!!

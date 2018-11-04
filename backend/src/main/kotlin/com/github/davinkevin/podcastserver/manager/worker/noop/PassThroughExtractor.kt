@@ -1,9 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
+import lan.dk.podcastserver.entity.Item
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.lang.Integer.MAX_VALUE
@@ -16,7 +15,7 @@ import java.lang.Integer.MAX_VALUE
 class PassThroughExtractor : Extractor {
 
     override fun extract(item: Item) =
-            DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            DownloadingItem(item, listOf(item.url), null, null)
 
     override fun compatibility(url: String?) = MAX_VALUE - 1
 

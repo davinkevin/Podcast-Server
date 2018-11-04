@@ -9,7 +9,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader;
-import lan.dk.podcastserver.manager.downloader.DownloadingItem;
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem;
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters;

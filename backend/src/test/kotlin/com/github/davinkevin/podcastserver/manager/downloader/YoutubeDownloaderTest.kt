@@ -22,7 +22,6 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -120,7 +119,7 @@ class YoutubeDownloaderTest {
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
 
             downloader.with(
-                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    DownloadingItem(item,  listOf(), null, null),
                     itemDownloadManager
             )
 
@@ -393,7 +392,7 @@ class YoutubeDownloaderTest {
         @Test
         fun `should be compatible`() {
             /* Given */
-            val di = DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf(item.url), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -403,7 +402,7 @@ class YoutubeDownloaderTest {
         @Test
         fun `should not be compatible because multiple url`() {
             /* Given */
-            val di = DownloadingItem(item, listOf(item.url, item.url).toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf(item.url, item.url), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -413,7 +412,7 @@ class YoutubeDownloaderTest {
         @Test
         fun `should not be compatible because not starting with http`() {
             /* Given */
-            val di = DownloadingItem(item, listOf("ftp://foo.bar.com/file.mp4").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("ftp://foo.bar.com/file.mp4"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

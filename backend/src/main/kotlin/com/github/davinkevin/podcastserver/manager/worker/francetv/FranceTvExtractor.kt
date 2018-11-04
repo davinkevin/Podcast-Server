@@ -5,12 +5,11 @@ import arrow.core.orElse
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -32,7 +31,7 @@ class FranceTvExtractor(val htmlService: HtmlService, val jsonService: JsonServi
                     .flatMap { jsonService.parseUrl(it).k() }
                     .map { JsonService.to(FranceTvItem::class.java).apply(it) }
                     .map { it.url }
-                    .map { DownloadingItem(item, listOf(it).toVΛVΓ(), item.url.filename().baseName() + ".mp4", null) }
+                    .map { DownloadingItem(item, listOf(it), item.url.filename().baseName() + ".mp4", null) }
                     .getOrElse { throw RuntimeException("Error during extraction of FranceTV item") }
 
 

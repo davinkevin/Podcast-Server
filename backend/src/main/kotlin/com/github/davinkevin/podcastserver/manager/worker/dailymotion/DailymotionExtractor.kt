@@ -6,13 +6,12 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -41,7 +40,7 @@ class DailymotionExtractor(val json: JsonService, val html: HtmlService, val m3u
                 .map { m3u8.getM3U8UrlFormMultiStreamFile(it) }
                 .map { it.substringBefore("#") }
                 .map { it to getFileName(item) }
-                .map { DownloadingItem(item, listOf(it.first).toVΛVΓ(), it.second, null) }
+                .map { DownloadingItem(item, listOf(it.first), it.second, null) }
                 .getOrElse { throw RuntimeException("Error during Dailymotion extraction of " + item.title + " with url " + item.url) }
     }
 

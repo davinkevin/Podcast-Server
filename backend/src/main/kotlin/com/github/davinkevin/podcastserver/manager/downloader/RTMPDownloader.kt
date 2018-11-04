@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Status
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
@@ -121,7 +120,7 @@ class RTMPDownloader(
     }
 
     override fun compatibility(downloadingItem: DownloadingItem) =
-            if (downloadingItem.urls.length() == 1 && downloadingItem.urls.head().startsWith("rtmp://")) 1
+            if (downloadingItem.urls.size == 1 && downloadingItem.urls.first().startsWith("rtmp://")) 1
             else Integer.MAX_VALUE
 
     private fun broadcastProgression(item: Item, progression: Int) {

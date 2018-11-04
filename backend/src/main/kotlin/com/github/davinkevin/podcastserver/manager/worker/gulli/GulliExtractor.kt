@@ -5,14 +5,13 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.nodes.Element
 import org.springframework.context.annotation.Scope
@@ -31,7 +30,7 @@ class GulliExtractor(val htmlService: HtmlService, val jsonService: JsonService)
                     .map { it.select("script") }
                     .flatMap { it.firstOption { e -> e.html().contains("playlist:") } }
                     .flatMap { getPlaylistFromGulliScript(it) }
-                    .map { DownloadingItem(item, listOf(it).toVΛVΓ(), getFileName(item), null) }
+                    .map { DownloadingItem(item, listOf(it), getFileName(item), null) }
                     .getOrElse { throw RuntimeException("Gulli Url extraction failed") }
 
     private fun getPlaylistFromGulliScript(element: Element): Option<String> {

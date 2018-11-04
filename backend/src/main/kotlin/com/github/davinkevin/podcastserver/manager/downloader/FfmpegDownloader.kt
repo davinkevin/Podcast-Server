@@ -10,7 +10,6 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Status
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -47,11 +46,10 @@ class FfmpegDownloader(
         target = getTargetFile(downloadingItem.item)
 
         globalDuration = downloadingItem.urls
-                .toJavaList()
                 .map { ffmpegService.getDurationOf(it, downloadingItem.userAgent) }
                 .sum()
 
-        val multiDownloads = downloadingItem.urls.toJavaList().map { download(it) }
+        val multiDownloads = downloadingItem.urls.map { download(it) }
         val files = multiDownloads.flatMap { it.toList() }
 
         try {
@@ -148,7 +146,7 @@ class FfmpegDownloader(
     }
 
     override fun compatibility(downloadingItem: DownloadingItem) =
-            if (downloadingItem.urls.map { it.toLowerCase() }.forAll { "m3u8" in it || "mp4" in it }) 10
+            if (downloadingItem.urls.map { it.toLowerCase() }.all { "m3u8" in it || "mp4" in it }) 10
             else Integer.MAX_VALUE
 }
 

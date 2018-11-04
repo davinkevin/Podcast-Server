@@ -44,7 +44,7 @@ class MyCanalExtractorTest {
         val downloadingItem = extractor.extract(item)
         /* THEN  */
         assertThat(downloadingItem.item).isSameAs(item)
-        assertThat(downloadingItem.url()).containsOnly("https://strcpluscplus-vh.akamaihd.net/i/1712/16/1191740_16_,200k,400k,800k,1500k,.mp4.csmil/master.m3u8")
+        assertThat(downloadingItem.url().toList()).containsOnly("https://strcpluscplus-vh.akamaihd.net/i/1712/16/1191740_16_,200k,400k,800k,1500k,.mp4.csmil/master.m3u8")
         assertThat(downloadingItem.filename).isEqualTo("1474195.mp4")
     }
 

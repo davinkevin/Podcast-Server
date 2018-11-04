@@ -14,7 +14,6 @@ import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.entity.Status.STARTED
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -91,7 +90,7 @@ class RTMPDownloaderTest {
             whenever(podcastRepository.findById(ArgumentMatchers.eq(aPodcast.id))).thenReturn(Optional.of(aPodcast))
 
             downloader.with(
-                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    DownloadingItem(item,  listOf(), null, null),
                     itemDownloadManager
             )
             downloader.postConstruct()
@@ -324,7 +323,7 @@ class RTMPDownloaderTest {
         @Test
         fun `should be compatible with only one url starting with rtmp`() {
             /* Given */
-            val di = DownloadingItem(null, listOf("rtmp://foo.bar.com/end.M3U8").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("rtmp://foo.bar.com/end.M3U8"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -334,7 +333,7 @@ class RTMPDownloaderTest {
         @Test
         fun `should not be compatible with multiple url`() {
             /* Given */
-            val di = DownloadingItem(null, listOf("rmtp://foo.bar.com/end.m3u8", "rmtp://foo.bar.com/end.M3U8").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("rmtp://foo.bar.com/end.m3u8", "rmtp://foo.bar.com/end.M3U8"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -344,7 +343,7 @@ class RTMPDownloaderTest {
         @Test
         fun `should not be compatible with url not starting by rtmp`() {
             /* Given */
-            val di = DownloadingItem(null, listOf("http://foo.bar.com/end.MP4").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.MP4"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

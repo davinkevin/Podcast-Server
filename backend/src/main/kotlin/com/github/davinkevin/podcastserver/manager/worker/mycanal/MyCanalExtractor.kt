@@ -2,12 +2,11 @@ package com.github.davinkevin.podcastserver.manager.worker.mycanal
 
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -33,7 +32,7 @@ class MyCanalExtractor(val htmlService: HtmlService, val jsonService: JsonServic
                     .map { JsonService.to("detailPage.body.contentID", String::class.java).apply(it) }
                     .flatMap { jsonService.parseUrl(URL_DETAILS.format(it)).k() }
                     .map { JsonService.to("MEDIA.VIDEOS", MyCanalVideoItem::class.java).apply(it) }
-                    .map { DownloadingItem(item, listOf(it.hls).toVΛVΓ(), getFileName(item), null) }
+                    .map { DownloadingItem(item, listOf(it.hls), getFileName(item), null) }
                     .getOrElse { throw RuntimeException("Error during extraction of ${item.title} at url ${item.url}") }
 
     override fun getFileName(item: Item) = "${super.getFileName(item)}.mp4"

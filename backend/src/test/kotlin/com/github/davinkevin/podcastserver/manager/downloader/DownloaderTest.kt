@@ -5,13 +5,11 @@ import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader.Companion.WS_TOPIC_DOWNLOAD
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -73,7 +71,7 @@ class DownloaderTest {
         @Test
         fun `should stop download`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
             whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
@@ -94,7 +92,7 @@ class DownloaderTest {
         @Test
         fun `should handle finish download without target`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
@@ -113,7 +111,7 @@ class DownloaderTest {
         @Test
         fun `should pause a download`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
@@ -131,7 +129,7 @@ class DownloaderTest {
         @Test
         fun `should save with same file already existing`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
             whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
@@ -149,7 +147,7 @@ class DownloaderTest {
         @Test
         fun `should failed if error during move`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
             whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
@@ -168,7 +166,7 @@ class DownloaderTest {
         @Test
         fun `should get the same target file each call`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
 
             /* When */
@@ -182,7 +180,7 @@ class DownloaderTest {
         @Test
         fun `should handle duplicate on file name`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
 
             Files.createDirectory(ROOT_TEST_PATH.resolve(podcast.title))
@@ -199,7 +197,7 @@ class DownloaderTest {
         fun `should handle error during creation of temp file`() {
             /* Given */
             podcast.title = "bin"
-            downloader.with(DownloadingItem(item.setUrl("http://foo.bar.com/bash"), listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item.setUrl("http://foo.bar.com/bash"),  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastServerParameters.rootfolder).thenReturn(Paths.get("/"))
             whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
@@ -217,7 +215,7 @@ class DownloaderTest {
         @Test
         fun `should save sync with podcast`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastRepository.findById(any())).then { throw RuntimeException("Error on find") }
 
             /* When */
@@ -231,7 +229,7 @@ class DownloaderTest {
         @Test
         fun `should throw error if podcast not found`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastRepository.findById(any())).then { Optional.empty<Podcast>() }
 
             /* When */
@@ -246,7 +244,7 @@ class DownloaderTest {
         @Test
         fun `should get item standard`() {
             /* Given */
-            downloader.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
             /* When */
             val itemOfDownloader = downloader.item
@@ -263,7 +261,7 @@ class DownloaderTest {
         fun `should trigger fail if download fail`() {
             /* Given */
             val d = AlwaysFaillingDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService)
-            d.with(DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null), itemDownloadManager)
+            d.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             /* When */

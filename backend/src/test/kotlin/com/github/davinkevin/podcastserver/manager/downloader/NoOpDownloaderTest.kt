@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.mock
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.times
@@ -20,7 +19,7 @@ class NoOpDownloaderTest {
         /* Given */
         val noOpDownloader = NoOpDownloader()
         val realItem = Item().apply { url = "foo" }
-        val item = DownloadingItem(realItem, listOf<String>().toVΛVΓ(), "", "")
+        val item = DownloadingItem(realItem,  listOf(), "", "")
         /* When */
         noOpDownloader.pauseDownload()
         noOpDownloader.restartDownload()
@@ -38,7 +37,7 @@ class NoOpDownloaderTest {
     fun `should remove itself from idm when start`() {
         /* GIVEN */
         val idm = mock<ItemDownloadManager>()
-        val di = DownloadingItem(Item.DEFAULT_ITEM, listOf<String>().toVΛVΓ(), "", "")
+        val di = DownloadingItem(Item.DEFAULT_ITEM,  listOf(), "", "")
         val noOpDownloader = NoOpDownloader().apply {
                 with(di, idm)
         }

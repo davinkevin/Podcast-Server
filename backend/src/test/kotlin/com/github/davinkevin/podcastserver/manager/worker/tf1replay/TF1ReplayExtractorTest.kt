@@ -96,7 +96,7 @@ class TF1ReplayExtractorTest {
                 val downloadingItem = extractor.extract(item)
 
                 /* Then */
-                assertThat(downloadingItem.url()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
+                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
                 assertThat(downloadingItem.filename).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4")
                 assertThat(downloadingItem.userAgent).isEqualToIgnoringCase("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)")
             }
@@ -112,7 +112,7 @@ class TF1ReplayExtractorTest {
                 val downloadingItem = extractor.extract(item)
 
                 /* Then */
-                assertThat(downloadingItem.url()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
+                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
                 assertThat(downloadingItem.filename).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4")
                 assertThat(downloadingItem.userAgent).isEqualToIgnoringCase("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)")
                 verify(urlService).getRealURL(any(), argWhere(connectionIsMadeAsDesktop), any())
@@ -129,7 +129,7 @@ class TF1ReplayExtractorTest {
                 val itemUrl = extractor.extract(item)
 
                 /* Then */
-                assertThat(itemUrl.url()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
+                assertThat(itemUrl.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
             }
         }
 
@@ -149,7 +149,7 @@ class TF1ReplayExtractorTest {
                 val downloadingItem = extractor.extract(item)
 
                 /* Then */
-                assertThat(downloadingItem.url()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
+                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
                 assertThat(downloadingItem.filename).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4")
                 assertThat(downloadingItem.userAgent).isEqualToIgnoringCase("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)")
             }

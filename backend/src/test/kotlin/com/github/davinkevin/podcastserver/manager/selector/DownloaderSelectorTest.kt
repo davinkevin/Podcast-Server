@@ -1,13 +1,9 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import com.github.davinkevin.podcastserver.manager.downloader.FfmpegDownloader
-import com.github.davinkevin.podcastserver.manager.downloader.HTTPDownloader
-import com.github.davinkevin.podcastserver.manager.downloader.RTMPDownloader
-import com.github.davinkevin.podcastserver.manager.downloader.YoutubeDownloader
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.manager.downloader.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.manager.downloader.*
+import lan.dk.podcastserver.entity.Item
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -48,7 +44,7 @@ class DownloaderSelectorTest {
     @Test
     fun `should reject empty url`() {
         /* When */
-        assertThat(selector.of(DownloadingItem(null, listOf<String>().toVΛVΓ(), null, null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
+        assertThat(selector.of(DownloadingItem(Item.DEFAULT_ITEM, listOf(), null, null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
     }
 
     @MethodSource("urlToDownloader")
@@ -74,7 +70,7 @@ class DownloaderSelectorTest {
 }
 
 class DownloaderArgument(val url: String, val clazz: KClass<*>) {
-    val item = DownloadingItem(null, listOf(url).toVΛVΓ(), null, null)
+    val item = DownloadingItem(Item.DEFAULT_ITEM, listOf(url), null, null)
 
     override fun toString(): String {
         return "${clazz.simpleName} for $url"

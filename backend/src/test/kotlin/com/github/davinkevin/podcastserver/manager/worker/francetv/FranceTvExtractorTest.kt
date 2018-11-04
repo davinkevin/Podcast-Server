@@ -44,7 +44,7 @@ class FranceTvExtractorTest {
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url()).containsOnly(REAL_URL)
+        assertThat(downloadingItem.url().toList()).containsOnly(REAL_URL)
         assertThat(downloadingItem.item).isSameAs(item)
         assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
         verify(htmlService, times(1)).get(ITEM_URL)
@@ -62,7 +62,7 @@ class FranceTvExtractorTest {
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url()).containsOnly("https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8")
+        assertThat(downloadingItem.url().toList()).containsOnly("https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8")
         assertThat(downloadingItem.item).isSameAs(item)
         assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
         verify(htmlService, times(1)).get(ITEM_URL)
@@ -79,7 +79,7 @@ class FranceTvExtractorTest {
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url()).containsOnly("https://fake.url.com/index.m3u8")
+        assertThat(downloadingItem.url().toList()).containsOnly("https://fake.url.com/index.m3u8")
         assertThat(downloadingItem.item).isSameAs(item)
         assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
         verify(htmlService, times(1)).get(ITEM_URL)
@@ -96,7 +96,7 @@ class FranceTvExtractorTest {
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url()).containsOnly("http://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8?audiotrack=0%3Afra%3AFrancais")
+        assertThat(downloadingItem.url().toList()).containsOnly("http://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8?audiotrack=0%3Afra%3AFrancais")
         assertThat(downloadingItem.item).isSameAs(item)
         assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
         verify(htmlService, times(1)).get(ITEM_URL)

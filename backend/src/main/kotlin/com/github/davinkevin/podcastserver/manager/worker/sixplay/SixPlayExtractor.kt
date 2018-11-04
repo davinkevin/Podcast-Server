@@ -6,15 +6,14 @@ import arrow.core.orElse
 import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
@@ -37,13 +36,14 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
                 .map { it.read(ITEMS_EXTRACTOR, TYPE_ITEMS) }
                 .getOrElse { throw RuntimeException("No element founds for ${item.id} at url ${item.url}") }
 
-        val urls = list
+        val urls: List<String> = list
                 .flatMap { keepBestQuality(it).toList() }
                 .map { it.full_physical_path }
+                .filterNotNull()
 
         return DownloadingItem(
                 item,
-                urls.toVΛVΓ(),
+                urls,
                 getFileName(item),
                 null
         )

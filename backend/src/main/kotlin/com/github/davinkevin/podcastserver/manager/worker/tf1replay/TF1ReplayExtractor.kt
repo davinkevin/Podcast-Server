@@ -4,6 +4,7 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
@@ -12,9 +13,7 @@ import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGE
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_KEY
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_MOBILE
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -45,7 +44,7 @@ class TF1ReplayExtractor(val htmlService: HtmlService, val jsonService: JsonServ
                 .map { normalizeId(it) }
                 .map { getM3U8url(it) }
                 .map { getHighestQualityUrl(it) }
-                .map { DownloadingItem(item, listOf(it).toVΛVΓ(), getFileName(item), USER_AGENT_MOBILE) }
+                .map { DownloadingItem(item, listOf(it), getFileName(item), USER_AGENT_MOBILE) }
                 .getOrElse { throw RuntimeException("Url not extracted for ${item.url}") }
     }
 

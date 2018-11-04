@@ -7,7 +7,7 @@ import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader;
-import lan.dk.podcastserver.manager.downloader.DownloadingItem;
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem;
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector;
 import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpExtractor;
@@ -203,7 +203,7 @@ public class ItemDownloadManagerTest {
         final Downloader mockDownloader = mock(Downloader.class);
         Item item = Item.builder().id(id).url(id.toString()).numberOfFail(0).build();
         when(mockDownloader.getItem()).thenReturn(item);
-        when(downloaderSelector.of(eq(DownloadingItem.builder().item(item).urls(List(id.toString())).build()))).thenReturn(mockDownloader);
+        when(downloaderSelector.of(eq(new DownloadingItem(item, List(id.toString()).toJavaList(), null, null)))).thenReturn(mockDownloader);
         //when(mockDownloader.setDownloadingItem(any())).thenReturn(mockDownloader);
         //when(mockDownloader.setItemDownloadManager(any())).thenReturn(mockDownloader);
         when(mockDownloader.getItem()).thenReturn(item);
@@ -500,7 +500,7 @@ public class ItemDownloadManagerTest {
 
         /* Then */
         assertThat(entry1._1().getNumberOfFail()).isEqualTo(1);
-        verify(downloaderSelector, times(2)).of(eq(DownloadingItem.builder().item(entry1._1()).urls(List(entry1._1().getUrl())).build()));
+        verify(downloaderSelector, times(2)).of(eq(new DownloadingItem(entry1._1(), List(entry1._1().getUrl()).toJavaList(), null, null)));
         verifyPostLaunchDownload();
     }
 

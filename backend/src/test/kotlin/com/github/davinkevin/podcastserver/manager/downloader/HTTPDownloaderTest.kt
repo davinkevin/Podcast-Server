@@ -18,7 +18,6 @@ import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.manager.ItemDownloadManager
-import lan.dk.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -83,7 +82,7 @@ class HTTPDownloaderTest {
             /* Given */
             val specificUrl = "${item.url}&params=2"
             downloader.with(
-                    DownloadingItem(item, listOf(specificUrl).toVΛVΓ(), null, null),
+                    DownloadingItem(item, listOf(specificUrl), null, null),
                     itemDownloadManager
             )
 
@@ -117,7 +116,7 @@ class HTTPDownloaderTest {
         @Test
         fun `should run download by fall-backing to item url`() {
             downloader.with(
-                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    DownloadingItem(item,  listOf(), null, null),
                     itemDownloadManager
             )
 
@@ -159,7 +158,7 @@ class HTTPDownloaderTest {
                 add(item)
             }
             downloader.with(
-                    DownloadingItem(item, listOf<String>().toVΛVΓ(), null, null),
+                    DownloadingItem(item,  listOf(), null, null),
                     itemDownloadManager
             )
 
@@ -180,7 +179,7 @@ class HTTPDownloaderTest {
         fun should_stop_download() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    DownloadingItem(item, listOf(item.url), null, null),
                     itemDownloadManager
             )
 
@@ -212,7 +211,7 @@ class HTTPDownloaderTest {
         fun should_handle_multipart_download_error() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    DownloadingItem(item, listOf(item.url), null, null),
                     itemDownloadManager
             )
 
@@ -246,7 +245,7 @@ class HTTPDownloaderTest {
         fun should_handle_downloadunterruptedError() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    DownloadingItem(item, listOf(item.url), null, null),
                     itemDownloadManager
             )
 
@@ -275,7 +274,7 @@ class HTTPDownloaderTest {
         fun should_handle_IOException_during_download() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null),
+                    DownloadingItem(item, listOf(item.url), null, null),
                     itemDownloadManager
             )
 
@@ -303,7 +302,7 @@ class HTTPDownloaderTest {
         @Test
         fun `should be compatible`() {
             /* Given */
-            val di = DownloadingItem(item, listOf(item.url).toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf(item.url), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -313,7 +312,7 @@ class HTTPDownloaderTest {
         @Test
         fun `should not be compatible because multiple url`() {
             /* Given */
-            val di = DownloadingItem(item, listOf(item.url, item.url).toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf(item.url, item.url), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -323,7 +322,7 @@ class HTTPDownloaderTest {
         @Test
         fun `should not be compatible because not starting with http`() {
             /* Given */
-            val di = DownloadingItem(item, listOf("ftp://foo.bar.com/file.mp4").toVΛVΓ(), null, null)
+            val di = DownloadingItem(item, listOf("ftp://foo.bar.com/file.mp4"), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

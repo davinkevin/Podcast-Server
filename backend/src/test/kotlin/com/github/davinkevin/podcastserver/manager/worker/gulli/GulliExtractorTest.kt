@@ -42,7 +42,7 @@ class GulliExtractorTest {
         val downloadingItem = extractor.extract(item)
 
         /* Then */
-        assertThat(downloadingItem.url()).containsOnly("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4")
+        assertThat(downloadingItem.url().toList()).containsOnly("http://gulli-replay-mp4.scdn.arkena.com/68526621555000/68526621555000_1500.mp4")
         verify(htmlService, times(1)).get("http://replay.gulli.fr/")
         verify(jsonService, times(1)).parse(any())
     }
