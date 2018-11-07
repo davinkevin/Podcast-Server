@@ -4,7 +4,6 @@ import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.List
-import io.vavr.collection.Set
 import lan.dk.podcastserver.entity.Tag
 import lan.dk.podcastserver.repository.TagRepository
 import org.springframework.stereotype.Component
@@ -22,13 +21,13 @@ class TagBusiness(val tagRepository: TagRepository) {
             tagRepository.findById(id).k()
                     .getOrElse{ throw RuntimeException("Tag with ID $id not found") }
 
-    fun findByNameLike(name: String): Set<Tag> =
+    fun findByNameLike(name: String): io.vavr.collection.Set<Tag> =
             tagRepository.findByNameContainsIgnoreCase(name)
 
     fun getTagListByName(tagList: Set<Tag>): Set<Tag> =
-            tagList.map { findByName(it.name) }
+            tagList.map { findByName(it.name) }.toSet()
 
-    fun findAllByName(names: Set<String>): Set<Tag> =
+    fun findAllByName(names: io.vavr.collection.Set<String>): io.vavr.collection.Set<Tag> =
             names.flatMap { tagRepository.findByNameIgnoreCase(it) }
 
     private fun findByName(n: String): Tag =

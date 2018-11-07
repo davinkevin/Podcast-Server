@@ -261,7 +261,7 @@ public class UpdatePodcastBusinessTest {
             .forEach(t -> Try.run(() -> Files.createFile(Paths.get("/tmp/", t))));
 
         when(itemRepository.findAllToDelete(any())).thenReturn(items);
-        when(coverBusiness.getCoverPathOf(any()))
+        when(coverBusiness.getCoverPathOf(any(Item.class)))
                 .then(i -> {
                     Item v = i.getArgument(0);
                     return Option(Paths.get("/tmp/", v.getTitle()));

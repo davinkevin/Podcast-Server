@@ -97,12 +97,12 @@ public class CoverBusiness {
                 .getOrElse(Boolean.FALSE);
     }
 
-    Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
+    public Boolean hasSameCoverURL(Podcast patchPodcast, Podcast podcastToUpdate) {
         return !isNull(patchPodcast.getCover()) && !isNull(podcastToUpdate.getCover()) &&
                 patchPodcast.getCover().equals(podcastToUpdate.getCover());
     }
 
-    Path getCoverPathOf(Podcast podcast) {
+    public Path getCoverPathOf(Podcast podcast) {
         String fileName = podcastServerParameters.getCoverDefaultName() + "." + FilenameUtils.getExtension(podcast.getCover().getUrl());
         return podcastServerParameters.getRootfolder().resolve(podcast.getTitle()).resolve(fileName);
     }

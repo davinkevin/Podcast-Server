@@ -96,10 +96,10 @@ class TagBusinessTest {
         doAnswer { (it.getArgument(0) as Tag).setId(UUID.randomUUID()) }.whenever(tagRepository).save<Tag>(any())
 
         /* When */
-        val tagListByName = tagBusiness.getTagListByName(Set(tag1, tag2, tag3, tag4))
+        val tagListByName = tagBusiness.getTagListByName(setOf(tag1, tag2, tag3, tag4))
 
         /* Then */
-        assertThat(tagListByName.toJavaSet())
+        assertThat(tagListByName)
                 .extracting("name", String::class.java)
                 .contains(tag1.name, tag2.name, tag3.name, tag4.name)
     }

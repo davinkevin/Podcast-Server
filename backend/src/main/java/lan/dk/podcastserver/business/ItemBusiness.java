@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.business;
 
+import com.github.davinkevin.podcastserver.business.PodcastBusiness;
 import com.github.davinkevin.podcastserver.service.MimeTypeService;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;

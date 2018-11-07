@@ -6,7 +6,6 @@ import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -30,7 +29,6 @@ import static io.vavr.API.Try;
 @Slf4j
 @Entity
 @Builder
-@Setter
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor(onConstructor = @__({@JsonIgnore}))
@@ -196,6 +194,61 @@ public class Podcast implements Serializable {
 
     public Set<Tag> getTags() {
         return this.tags;
+    }
+
+    public Podcast setId(UUID id) {
+        this.id = id;
+        return this;
+    }
+
+    public Podcast setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Podcast setUrl(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public Podcast setSignature(String signature) {
+        this.signature = signature;
+        return this;
+    }
+
+    public Podcast setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public Podcast setLastUpdate(ZonedDateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
+        return this;
+    }
+
+    public Podcast setItems(Set<Item> items) {
+        this.items = items;
+        return this;
+    }
+
+    public Podcast setCover(Cover cover) {
+        this.cover = cover;
+        return this;
+    }
+
+    public Podcast setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public Podcast setHasToBeDeleted(Boolean hasToBeDeleted) {
+        this.hasToBeDeleted = hasToBeDeleted;
+        return this;
+    }
+
+    public Podcast setTags(Set<Tag> tags) {
+        this.tags = tags;
+        return this;
     }
 
     public interface PodcastListingView {}

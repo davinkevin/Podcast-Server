@@ -1,6 +1,5 @@
 package lan.dk.podcastserver.service.properties;
 
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,7 +13,7 @@ import static java.time.ZonedDateTime.now;
 /**
  * Created by kevin on 03/02/15.
  */
-@Setter @Getter
+@Setter
 @Accessors(chain = true)
 @ConfigurationProperties(value = "podcastserver"/*, ignoreUnknownFields = false*/)
 public class PodcastServerParameters {
@@ -66,4 +65,36 @@ public class PodcastServerParameters {
     //** GETTER OF THE PARAMETERS **//
     public ZonedDateTime limitDownloadDate() { return now().minusDays(numberOfDayToDownload); }
     public ZonedDateTime limitToKeepCoverOnDisk() { return now().minusDays(numberOfDayToSaveCover); }
+
+    public Path getRootfolder() {
+        return this.rootfolder;
+    }
+
+    public String getCoverDefaultName() {
+        return this.coverDefaultName;
+    }
+
+    public String getDownloadExtension() {
+        return this.downloadExtension;
+    }
+
+    public Integer getMaxUpdateParallels() {
+        return this.maxUpdateParallels;
+    }
+
+    public Integer getConcurrentDownload() {
+        return this.concurrentDownload;
+    }
+
+    public Integer getNumberOfTry() {
+        return this.numberOfTry;
+    }
+
+    public Long getNumberOfDayToDownload() {
+        return this.numberOfDayToDownload;
+    }
+
+    public Long getNumberOfDayToSaveCover() {
+        return this.numberOfDayToSaveCover;
+    }
 }

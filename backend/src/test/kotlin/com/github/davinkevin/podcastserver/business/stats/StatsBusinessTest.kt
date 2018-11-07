@@ -8,7 +8,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import io.vavr.API
 import io.vavr.collection.HashSet
 import io.vavr.collection.Set
-import lan.dk.podcastserver.business.PodcastBusiness
+import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.manager.selector.UpdaterSelector

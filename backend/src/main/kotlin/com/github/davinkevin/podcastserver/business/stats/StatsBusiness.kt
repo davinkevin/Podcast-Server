@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.querydsl.core.types.dsl.BooleanExpression
 import io.vavr.collection.List
 import io.vavr.collection.Set
-import lan.dk.podcastserver.business.PodcastBusiness
+import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.manager.selector.UpdaterSelector
 import lan.dk.podcastserver.manager.worker.Type

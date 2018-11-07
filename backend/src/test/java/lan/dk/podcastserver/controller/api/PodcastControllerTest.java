@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.api;
 
-import lan.dk.podcastserver.business.PodcastBusiness;
+import com.github.davinkevin.podcastserver.business.PodcastBusiness;
 import lan.dk.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.entity.Podcast;
