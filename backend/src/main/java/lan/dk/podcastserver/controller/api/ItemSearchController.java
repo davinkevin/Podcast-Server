@@ -2,7 +2,7 @@ package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.business.ItemBusiness;
+import com.github.davinkevin.podcastserver.business.ItemBusiness;
 import com.github.davinkevin.podcastserver.business.TagBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;

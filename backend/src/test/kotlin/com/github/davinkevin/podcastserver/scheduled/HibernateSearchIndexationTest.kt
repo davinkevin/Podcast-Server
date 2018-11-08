@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.scheduled
 
-import lan.dk.podcastserver.business.ItemBusiness
+import com.github.davinkevin.podcastserver.business.ItemBusiness
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks

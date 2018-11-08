@@ -3,7 +3,10 @@ package lan.dk.podcastserver.entity;
 import com.fasterxml.jackson.annotation.*;
 import io.vavr.control.Option;
 import lan.dk.podcastserver.manager.worker.upload.UploadUpdater;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -36,7 +39,6 @@ import static java.util.Objects.nonNull;
 @Indexed
 @Slf4j
 @Builder
-@Setter
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
 @Accessors(chain = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -340,6 +342,86 @@ public class Item {
 
     public Set<WatchList> getWatchLists() {
         return this.watchLists;
+    }
+
+    public Item setId(UUID id) {
+        this.id = id;
+        return this;
+    }
+
+    public Item setCover(Cover cover) {
+        this.cover = cover;
+        return this;
+    }
+
+    public Item setPodcast(Podcast podcast) {
+        this.podcast = podcast;
+        return this;
+    }
+
+    public Item setTitle(@NotNull @Size(min = 1, max = 254) String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Item setUrl(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public Item setPubDate(ZonedDateTime pubDate) {
+        this.pubDate = pubDate;
+        return this;
+    }
+
+    public Item setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public Item setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+        return this;
+    }
+
+    public Item setLength(Long length) {
+        this.length = length;
+        return this;
+    }
+
+    public Item setFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public Item setStatus(Status status) {
+        this.status = status;
+        return this;
+    }
+
+    public Item setProgression(Integer progression) {
+        this.progression = progression;
+        return this;
+    }
+
+    public Item setNumberOfFail(Integer numberOfFail) {
+        this.numberOfFail = numberOfFail;
+        return this;
+    }
+
+    public Item setDownloadDate(ZonedDateTime downloadDate) {
+        this.downloadDate = downloadDate;
+        return this;
+    }
+
+    public Item setCreationDate(ZonedDateTime creationDate) {
+        this.creationDate = creationDate;
+        return this;
+    }
+
+    public Item setWatchLists(Set<WatchList> watchLists) {
+        this.watchLists = watchLists;
+        return this;
     }
 
     public interface ItemSearchListView {}

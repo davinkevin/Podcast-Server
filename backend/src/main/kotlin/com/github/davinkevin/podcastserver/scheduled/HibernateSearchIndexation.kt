@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.scheduled
 
-import lan.dk.podcastserver.business.ItemBusiness
+import com.github.davinkevin.podcastserver.business.ItemBusiness
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
