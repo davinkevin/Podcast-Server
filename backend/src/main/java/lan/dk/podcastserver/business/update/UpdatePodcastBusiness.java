@@ -3,7 +3,7 @@ package lan.dk.podcastserver.business.update;
 import io.vavr.Tuple3;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.business.CoverBusiness;
+import com.github.davinkevin.podcastserver.business.CoverBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;

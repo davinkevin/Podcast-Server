@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.business
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.business.CoverBusiness
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.PodcastRepository
 import lan.dk.podcastserver.service.properties.PodcastServerParameters

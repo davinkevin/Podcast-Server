@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.business
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.business.CoverBusiness
 import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Tag
