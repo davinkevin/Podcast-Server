@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.business.PodcastBusiness;
-import lan.dk.podcastserver.business.find.FindPodcastBusiness;
+import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
