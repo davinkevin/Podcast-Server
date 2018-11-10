@@ -3,15 +3,15 @@ package com.github.davinkevin.podcastserver.business
 import arrow.core.Option
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.Set
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Status
 import lan.dk.podcastserver.entity.Tag
-import lan.dk.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecifications
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -88,7 +88,7 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
         val itemToReset = findOne(id)
 
         return when {
-            itemDownloadManager.isInDownloadingQueue(itemToReset)!! -> null
+            itemDownloadManager.isInDownloadingQueue(itemToReset) -> null
             else -> save(itemToReset.reset())
         }
 

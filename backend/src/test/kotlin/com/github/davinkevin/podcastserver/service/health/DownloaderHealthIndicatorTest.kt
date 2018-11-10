@@ -4,7 +4,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import io.vavr.API.Set
 import io.vavr.collection.Queue
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test

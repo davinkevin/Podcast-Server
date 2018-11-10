@@ -12,12 +12,11 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.Status
-import lan.dk.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -375,7 +373,7 @@ class HTTPDownloaderTest {
             /* Then */
             verify(downloader, never()).convertAndSaveBroadcast()
             verify(downloader, never()).stopDownload()
-            verify(itemDownloadManager, never()).removeACurrentDownload(ArgumentMatchers.any())
+            verify(itemDownloadManager, never()).removeACurrentDownload(any())
             verify(downloader, never()).finishDownload()
         }
 
@@ -390,7 +388,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             verify(downloader, times(1)).finishDownload()
-            verify(itemDownloadManager, times(1)).removeACurrentDownload(ArgumentMatchers.any())
+            verify(itemDownloadManager, times(1)).removeACurrentDownload(any())
             verify(downloader, never()).stopDownload()
             verify(downloader, never()).convertAndSaveBroadcast()
         }
@@ -406,7 +404,7 @@ class HTTPDownloaderTest {
             /* Then */
             verify(downloader, never()).stopDownload()
             verify(downloader, never()).convertAndSaveBroadcast()
-            verify(itemDownloadManager, never()).removeACurrentDownload(ArgumentMatchers.any())
+            verify(itemDownloadManager, never()).removeACurrentDownload(any())
             verify(downloader, never()).finishDownload()
         }
 
@@ -422,7 +420,7 @@ class HTTPDownloaderTest {
             verify(downloader, never()).finishDownload()
             verify(downloader, never()).convertAndSaveBroadcast()
             verify(downloader, never()).stopDownload()
-            verify(itemDownloadManager, never()).removeACurrentDownload(ArgumentMatchers.any())
+            verify(itemDownloadManager, never()).removeACurrentDownload(any())
         }
 
         @Test
@@ -436,7 +434,7 @@ class HTTPDownloaderTest {
             /* Then */
             verify(downloader, never()).finishDownload()
             verify(downloader, never()).convertAndSaveBroadcast()
-            verify(itemDownloadManager, never()).removeACurrentDownload(ArgumentMatchers.any())
+            verify(itemDownloadManager, never()).removeACurrentDownload(any())
             verify(downloader, never()).stopDownload()
         }
 
@@ -454,7 +452,7 @@ class HTTPDownloaderTest {
             assertThat(downloader.item.progression).isEqualTo(50)
             verify(downloader, never()).finishDownload()
             verify(downloader, never()).stopDownload()
-            verify(itemDownloadManager, never()).removeACurrentDownload(ArgumentMatchers.any())
+            verify(itemDownloadManager, never()).removeACurrentDownload(any())
             verify(downloader, times(1)).convertAndSaveBroadcast()
         }
 

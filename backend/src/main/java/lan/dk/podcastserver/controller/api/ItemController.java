@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.business.ItemBusiness;
 import com.github.davinkevin.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.WatchList;
-import lan.dk.podcastserver.manager.ItemDownloadManager;
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import com.github.davinkevin.podcastserver.service.ByteRangeResourceHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

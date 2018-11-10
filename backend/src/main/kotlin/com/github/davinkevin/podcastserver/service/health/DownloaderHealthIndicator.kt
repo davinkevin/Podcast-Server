@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.service.health
 
-import lan.dk.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.springframework.boot.actuate.health.AbstractHealthIndicator
 import org.springframework.boot.actuate.health.Health
 import org.springframework.stereotype.Component

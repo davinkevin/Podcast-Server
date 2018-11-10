@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.ws;
 
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.manager.ItemDownloadManager;
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;

@@ -5,7 +5,7 @@ import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.manager.ItemDownloadManager;
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.task;
 
 import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
-import lan.dk.podcastserver.manager.ItemDownloadManager;
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;

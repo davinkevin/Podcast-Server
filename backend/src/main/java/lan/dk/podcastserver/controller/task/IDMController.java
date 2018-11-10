@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.utils.form.MovingItemInQueueForm;
 import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.manager.ItemDownloadManager;
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
