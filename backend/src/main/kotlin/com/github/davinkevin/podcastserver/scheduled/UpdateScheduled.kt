@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.scheduled
 
-import lan.dk.podcastserver.business.update.UpdatePodcastBusiness
+import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness
 import lan.dk.podcastserver.manager.ItemDownloadManager
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled

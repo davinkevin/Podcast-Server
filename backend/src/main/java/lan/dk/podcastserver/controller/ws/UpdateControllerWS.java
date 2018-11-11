@@ -1,6 +1,6 @@
 package lan.dk.podcastserver.controller.ws;
 
-import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
+import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;

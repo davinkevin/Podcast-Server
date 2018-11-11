@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.business.PodcastBusiness;
 import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
-import lan.dk.podcastserver.business.update.UpdatePodcastBusiness;
+import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import lombok.RequiredArgsConstructor;

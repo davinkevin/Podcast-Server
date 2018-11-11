@@ -17,7 +17,7 @@ import static io.vavr.API.Try;
 public interface Updater {
 
     Logger log = org.slf4j.LoggerFactory.getLogger(Updater.class);
-    Tuple3<Podcast, Set<Item>, Predicate<Item>> NO_MODIFICATION_TUPLE = Tuple(null, null, null);
+    Tuple3<Podcast, Set<Item>, Predicate<Item>> NO_MODIFICATION_TUPLE = Tuple(Podcast.DEFAULT_PODCAST, Set(), i -> true);
 
     default Tuple3<Podcast, Set<Item>, Predicate<Item>> update(Podcast podcast) {
         return Try(() -> signatureOf(podcast))

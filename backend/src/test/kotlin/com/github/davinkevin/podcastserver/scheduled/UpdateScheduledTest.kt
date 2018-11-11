@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.scheduled
 
-import com.github.davinkevin.podcastserver.scheduled.UpdateScheduled
-import lan.dk.podcastserver.business.update.UpdatePodcastBusiness
+import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness
 import lan.dk.podcastserver.manager.ItemDownloadManager
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.service.health
 
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.business.update.UpdatePodcastBusiness
+import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test
