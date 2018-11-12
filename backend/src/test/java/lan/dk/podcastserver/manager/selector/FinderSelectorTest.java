@@ -9,7 +9,7 @@ import lan.dk.podcastserver.manager.worker.itunes.ItunesFinder;
 import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder;
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalFinder;
 import lan.dk.podcastserver.manager.worker.rss.RSSFinder;
-import lan.dk.podcastserver.manager.worker.sixplay.SixPlayFinder;
+import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayFinder;
 import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayFinder;
 import lan.dk.podcastserver.manager.worker.youtube.YoutubeFinder;
 import org.junit.Before;
