@@ -20,8 +20,8 @@ public class ExecutorsConfig {
     @Bean(name = "UpdateExecutor")
     public ThreadPoolTaskExecutor updateExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(podcastServerParameters.getConcurrentDownload());
-        executor.setMaxPoolSize(podcastServerParameters.getConcurrentDownload());
+        executor.setCorePoolSize(podcastServerParameters.getMaxUpdateParallels());
+        executor.setMaxPoolSize(podcastServerParameters.getMaxUpdateParallels());
         executor.setThreadNamePrefix("Update-");
         executor.initialize();
         return executor;

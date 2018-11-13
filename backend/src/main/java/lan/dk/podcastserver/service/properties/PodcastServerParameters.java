@@ -34,7 +34,7 @@ public class PodcastServerParameters {
     /**
      * Max Update podcast in parallel
      */
-    Integer maxUpdateParallels = 3;
+    Integer maxUpdateParallels = 256;
     /**
      * Number of concurrent download
      */

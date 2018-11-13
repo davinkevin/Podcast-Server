@@ -25,7 +25,7 @@ public class ExecutorsConfigTest {
     @Test
     public void should_generate_multi_thread_executor() {
         /* Given */
-        when(podcastServerParameters.getConcurrentDownload()).thenReturn(10);
+        when(podcastServerParameters.getMaxUpdateParallels()).thenReturn(10);
 
         /* When */
         TaskExecutor asyncExecutor = executorsConfig.updateExecutor();

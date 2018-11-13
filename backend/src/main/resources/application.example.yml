@@ -49,7 +49,7 @@ management.endpoint.health.show-details: always
 podcastserver:
  rootfolder: /tmp
  concurrent-download: 3
- max-update-parallels: 3
+ max-update-parallels: 256
  cover-default-name: cover
  number-of-day-to-download: 30
  number-of-day-to-save-cover: 30
