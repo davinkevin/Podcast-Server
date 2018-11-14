@@ -87,7 +87,7 @@ open class UrlService {
 
         const val PROTOCOL_SEPARATOR = "://"
         private const val MAX_NUMBER_OF_REDIRECTION = 10
-        private val NO_OP = Consumer<HttpURLConnection> { Function.identity<Any>().apply(it) }
+        val NO_OP = Consumer<HttpURLConnection> { Function.identity<Any>().apply(it) }
         private val EMPTY_PORT = Set(80, 443)
 
         @JvmStatic fun getDomainFromRequest(request: HttpServletRequest): String {

@@ -14,8 +14,8 @@ class MatcherExtractor(private val matcher: Matcher, private val isFind: Boolean
     constructor(m: Matcher) : this(m, m.find())
 
     companion object {
-        @JvmStatic
-        fun from(p: Pattern) = PatternExtractor(p)
+        @JvmStatic fun from(p: Pattern) = PatternExtractor(p)
+        fun from(s: String) = PatternExtractor(s.toPattern())
     }
 
     fun group(i: Int): Option<String> = when {
