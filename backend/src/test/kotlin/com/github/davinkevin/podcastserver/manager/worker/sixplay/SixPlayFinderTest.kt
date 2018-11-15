@@ -43,7 +43,7 @@ class SixPlayFinderTest {
         assertThat(podcast.title).isEqualTo("Le Message de Madénian et VDB")
         assertThat(podcast.description).isEqualTo("Mathieu Madénian et Thomas VDB ont des choses à leur dire, à vous dire...")
         assertThat(podcast.type).isEqualTo("SixPlay")
-        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v1/images/927766/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&blur=5&hash=7e385a780cdd50772d05ae985e77a1f89078e91f")
+        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v1/images/927766/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=f9a9603fe9b42e1cbb2e11b9e892f1dc0b2c5981")
         verify(imageService, times(1)).getCoverFromURL(any())
     }
 

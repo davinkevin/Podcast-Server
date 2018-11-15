@@ -31,7 +31,7 @@ class SixPlayFinder(val htmlService: HtmlService, val imageService: ImageService
                 title = document.select("h1.program-banner__title").text()
                 url = document.select("link[rel=canonical]").attr("href")
                 description = getDescription(document.select("script"))
-                cover = getCover(document.select("div.header-image__image").attr("style"))
+                cover = getCover(document)
                 type = "SixPlay"
             }
 
@@ -46,13 +46,16 @@ class SixPlayFinder(val htmlService: HtmlService, val imageService: ImageService
                     .map { it.toString() }
                     .getOrElse { null }
 
-    private fun getCover(style: String): Cover =
-            style.split(";".toRegex())
-                    .dropLastWhile { it.isEmpty() }
-                    .firstOption { it.contains("background-image") }
-                    .map { StringUtils.substringBetween(it, "(", ")") }
-                    .map { imageService.getCoverFromURL(it) }
-                    .getOrElse { Cover.DEFAULT_COVER }!!
+    private fun getCover(d: Document) = d.select("div.header-image__image")
+            .asSequence()
+            .map { it.attr("style") }
+            .filterNot { it.contains("blur") }
+            .flatMap { it.split(";".toRegex()).asSequence() }
+            .dropWhile { it.isEmpty() }
+            .firstOption { it.contains("background-image") }
+            .map { StringUtils.substringBetween(it, "(", ")") }
+            .map { imageService.getCoverFromURL(it) }
+            .getOrElse { Cover.DEFAULT_COVER }!!
 
     override fun compatibility(@NotEmpty url: String?) = SixPlayUpdater.isFrom6Play(url)
 }
