@@ -57,7 +57,7 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
                 type = patchPodcast.type
                 description = patchPodcast.description
                 hasToBeDeleted = patchPodcast.hasToBeDeleted
-                tags = tagBusiness.getTagListByName(patchPodcast.tags)
+                tags = tagBusiness.getTagListByName(patchPodcast.tags).toMutableSet()
                 cover = newCover
         }
 
