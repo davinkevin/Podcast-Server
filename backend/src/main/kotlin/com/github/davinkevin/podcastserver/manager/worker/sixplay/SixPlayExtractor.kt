@@ -71,6 +71,7 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
                     .map { urlService.get(it)
                             .header(UrlService.USER_AGENT_KEY, UrlService.USER_AGENT_MOBILE)
                             .asString() }
+                    .filter { it.status in 200..299 }
                     .map { it.rawBody }
                     .flatMap { m3U8Service.findBestQuality(it).k() }
                     .map { urlService.addDomainIfRelative(urlService.getRealURL(asset.full_physical_path!!), it) }

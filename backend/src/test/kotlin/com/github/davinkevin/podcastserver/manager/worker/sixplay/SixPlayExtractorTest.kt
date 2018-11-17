@@ -49,6 +49,7 @@ class SixPlayExtractorTest {
         whenever(request.header(any(), any())).thenReturn(request)
         whenever(request.asString()).thenReturn(response)
         whenever(response.rawBody).thenReturn(fileAsStream(of("118817179.manifest.m3u8")))
+        whenever(response.status).thenReturn(200)
 
         whenever(m3U8Service.findBestQuality(any())).thenCallRealMethod()
         whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
@@ -81,6 +82,7 @@ class SixPlayExtractorTest {
         whenever(request.header(any(), any())).thenReturn(request)
         whenever(request.asString()).thenReturn(response)
         whenever(response.rawBody).thenReturn(fileAsStream(of("12142481.manifest.m3u8")))
+        whenever(response.status).thenReturn(200)
 
         whenever(m3U8Service.findBestQuality(any())).thenCallRealMethod()
         whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
