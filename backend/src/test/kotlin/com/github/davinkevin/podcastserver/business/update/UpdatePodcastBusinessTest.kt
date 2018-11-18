@@ -25,13 +25,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.quality.Strictness
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.ZonedDateTime
 import java.util.*
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.function.Predicate
 import javax.validation.ConstraintViolation
 import javax.validation.Validator
@@ -56,7 +59,7 @@ class UpdatePodcastBusinessTest {
     @BeforeEach
     fun beforeEach() {
         updatePodcastBusiness = UpdatePodcastBusiness(podcastRepository, itemRepository, updaterSelector, template, podcastServerParameters, updateExecutor, manualExecutor, validator, coverBusiness)
-        updatePodcastBusiness.setTimeOut(1, TimeUnit.SECONDS)
+        updatePodcastBusiness.setTimeOut(1, SECONDS)
         Item.rootFolder = ROOT_FOLDER
         updateExecutor.initialize()
         manualExecutor.initialize()
@@ -153,7 +156,7 @@ class UpdatePodcastBusinessTest {
             whenever(updaterSelector.of(podcast.url)).thenReturn(updater)
             whenever(updater.update(any())).then {
                 val p = it.getArgument<Podcast>(0)
-                Tuple(p, generateItems(10, p).toVΛVΓ(), Predicate<Item> { false })
+                UpdatePodcastInformation(p, generateItems(10, p)) { false }
             }
 
             /* When */
@@ -209,17 +212,18 @@ class UpdatePodcastBusinessTest {
         }
 
         @Test
+        @MockitoSettings(strictness = Strictness.LENIENT)
         fun `and not handle too long update`() {
             /* Given */
             val updater = mock<Updater>()
             val podcast1 = Podcast().apply {
                 id = UUID.randomUUID()
-                title = "podcast1"
-                url = "http://foo.bar.com"
+                title = "podcast_async"
+                url = "http://a.specific.url.com"
             }
-            updatePodcastBusiness.setTimeOut(1, TimeUnit.MILLISECONDS)
+            updatePodcastBusiness.setTimeOut(1, MILLISECONDS)
             whenever(updaterSelector.of(podcast1.url)).thenReturn(updater)
-            whenever(updater.update(any())).then { TimeUnit.SECONDS.sleep(1) }
+            whenever(updater.update(podcast1)).then { SECONDS.sleep(1) }
             whenever(podcastRepository.findById(any())).thenReturn(Optional.of(podcast1))
 
             /* When */
@@ -228,6 +232,9 @@ class UpdatePodcastBusinessTest {
             /* Then */
             assertThat(podcast1.lastUpdate).isNull()
             verify(podcastRepository, times(1)).findById(any())
+            verify(podcastRepository, never()).save(any())
+            //verify(updater, times(1)).update(podcast1)
+            //verifyNoMoreInteractions(updater)
         }
 
         @Nested
