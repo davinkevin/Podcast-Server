@@ -38,8 +38,7 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
 
         val urls: List<String> = list
                 .flatMap { keepBestQuality(it).toList() }
-                .map { it.full_physical_path }
-                .filterNotNull()
+                .mapNotNull { it.full_physical_path }
 
         return DownloadingItem(
                 item,
@@ -54,8 +53,8 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
                 .filterNot { it.protocol == "primetime" }
 
         return a
-                .firstOption{ (it.video_quality ?: "").contains("sd1") }.flatMap { transformSD1Ism(it) }
-                .orElse { a.firstOption{ (it.video_quality ?: "").contains("sd3") }.flatMap { transformSd3Url(it) } }
+                .firstOption{ "sd1" in it.video_quality.orEmpty() }.flatMap { transformSD1Ism(it).orElse { transformUrl(it) } }
+                .orElse { a.firstOption{ "sd3" in it.video_quality.orEmpty() }.flatMap { transformSd3Url(it) } }
                 .orElse { a.firstOption { i -> "usp_hls_h264" == i.type } }
                 .orElse { a.firstOption { i -> "hq" == i.video_quality } }
                 .orElse { a.firstOption { i -> "hd" == i.video_quality } }

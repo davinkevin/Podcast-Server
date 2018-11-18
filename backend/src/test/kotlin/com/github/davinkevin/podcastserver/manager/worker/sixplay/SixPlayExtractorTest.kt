@@ -9,6 +9,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.mashape.unirest.http.HttpResponse
 import com.mashape.unirest.request.GetRequest
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
@@ -83,6 +84,48 @@ class SixPlayExtractorTest {
         whenever(request.asString()).thenReturn(response)
         whenever(response.rawBody).thenReturn(fileAsStream(of("12142481.manifest.m3u8")))
         whenever(response.status).thenReturn(200)
+
+        whenever(m3U8Service.findBestQuality(any())).thenCallRealMethod()
+        whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
+
+        /* WHEN  */
+        val downloadingItem = extractor.extract(item)
+
+        /* THEN  */
+        assertThat(downloadingItem.item).isSameAs(item)
+        assertThat(downloadingItem.urls)
+                .containsOnly("https://vod-m6w.global.ssl.fastly.net/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp-audio1=93468-video_eng=3152000.m3u8")
+
+    }
+
+    @Test
+    fun `should fall back to low quality if error in real url for sd1`() {
+        /* GIVEN */
+        val item = Item().apply {
+            id = UUID.randomUUID()
+            url = "http://www.6play.fr/scenes-de-menages-p_829/episodes-du-19-septembre-a-1330-c_12142481"
+        }
+        val sixPlayUrlJson = "https://pc.middleware.6play.fr/6play/v2/platforms/m6group_web/services/6play/videos/clip_12142481?with=clips&csa=5"
+        val physicalUrl = "https://lbv2.cdn.m6web.fr/v1/resource/s/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Manifest.m3u8?expiration=1537415521&scheme=https&groups%5B0%5D=m6web&customerName=m6web&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzczNzk1MjAsIm5iZiI6MTUzNzM3OTUyMCwiZXhwIjoxNTM3NDE1NTIxLCJyX2hhc2giOiIzMmFiMGRkZjZlMGU5ZWI1NjVlZTUzMWVmZWFmZjNjNTdmODVjZjMzIn0.yQfEckAljunifrAj6g75IU6j-DrrbWzTd9d9QEHMKno"
+        val realUrl = "https://vod-m6w.global.ssl.fastly.net/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Manifest.m3u8"
+        val realUrlTransformed = "https://vod-m6w.global.ssl.fastly.net/usp/mb_sd1/f/c/0/Scenes-de-menages_c12142481_Episodes-du-19-se/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.ism/Scenes-de-menages_c12142481_Episodes-du-19-se_unpnp.m3u8"
+        whenever(jsonService.parseUrl(sixPlayUrlJson)).thenReturn(fileAsJson(of("c_12142481.json")))
+        whenever(urlService.getRealURL(physicalUrl, UrlService.NO_OP, 0)).thenReturn(realUrl)
+
+        val highQualityRequest = mock<GetRequest>()
+        val highQualityResponse = mock<HttpResponse<String>>()
+        doAnswer { highQualityRequest }.whenever(urlService).get(realUrlTransformed)
+        doAnswer { highQualityRequest }.whenever(highQualityRequest).header(any(), any())
+        doAnswer { highQualityResponse }.whenever(highQualityRequest).asString()
+        doAnswer { 403 }.whenever(highQualityResponse).status
+
+        val lowQualityRequest = mock<GetRequest>()
+        val lowQualityResponse = mock<HttpResponse<String>>()
+        doAnswer { lowQualityRequest }.whenever(urlService).get(realUrl)
+        doAnswer { lowQualityRequest }.whenever(lowQualityRequest).header(any(), any())
+        doAnswer { lowQualityResponse }.whenever(lowQualityRequest).asString()
+        doAnswer { fileAsStream(of("12142481.manifest.m3u8")) }.whenever(lowQualityResponse).rawBody
+        doAnswer { 200 }.whenever(lowQualityResponse).status
 
         whenever(m3U8Service.findBestQuality(any())).thenCallRealMethod()
         whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
