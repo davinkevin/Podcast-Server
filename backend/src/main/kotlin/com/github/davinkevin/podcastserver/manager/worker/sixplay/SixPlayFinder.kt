@@ -28,7 +28,7 @@ class SixPlayFinder(val htmlService: HtmlService, val imageService: ImageService
 
     private fun htmlToPodcast(document: Document) =
             Podcast().apply {
-                title = document.select("h1.program-banner__title").text()
+                title = document.select("div.description-program__title").text()
                 url = document.select("link[rel=canonical]").attr("href")
                 description = getDescription(document.select("script"))
                 cover = getCover(document)

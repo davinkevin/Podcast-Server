@@ -32,7 +32,7 @@ class SixPlayFinderTest {
     fun `should find podcast`() {
         /* GIVEN */
         val podcastUrl = "http://www.6play.fr/custom-show"
-        whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"))
+        whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml(of("sport-6-p_1380.html")))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument<String>(0) } }
 
@@ -40,10 +40,10 @@ class SixPlayFinderTest {
         val podcast = finder.find(podcastUrl)
 
         /* THEN  */
-        assertThat(podcast.title).isEqualTo("Le Message de Madénian et VDB")
-        assertThat(podcast.description).isEqualTo("Mathieu Madénian et Thomas VDB ont des choses à leur dire, à vous dire...")
+        assertThat(podcast.title).isEqualTo("Sport 6")
         assertThat(podcast.type).isEqualTo("SixPlay")
-        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v1/images/927766/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=f9a9603fe9b42e1cbb2e11b9e892f1dc0b2c5981")
+        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v2/images/598896/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=33abccc9be94554a7081bb8cc10a1fe94b8fefa0")
+        assertThat(podcast.description).isEqualTo("Retrouvez chaque semaine toute l'actualité et les résultats du sport dans Sport 6. En 6 minutes, priorités aux images : les temps forts de l'actualité et les résultats sportifs sont décryptés pour tout connaître des faits marquants de la semaine.")
         verify(imageService, times(1)).getCoverFromURL(any())
     }
 
@@ -51,15 +51,17 @@ class SixPlayFinderTest {
     fun `should find podcast without description and without cover`() {
         /* GIVEN */
         val podcastUrl = "http://www.6play.fr/custom-show"
-        whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main-without-description.html"))
+        whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml(of("sport-6-p_1380-without-description.html")))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument<String>(0) } }
 
         /* WHEN  */
         val podcast = finder.find(podcastUrl)
 
         /* THEN  */
-        assertThat(podcast.title).isEqualTo("Le Message de Madénian et VDB")
+        assertThat(podcast.title).isEqualTo("Sport 6")
         assertThat(podcast.type).isEqualTo("SixPlay")
+        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v2/images/598896/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=33abccc9be94554a7081bb8cc10a1fe94b8fefa0")
         assertThat(podcast.description).isNull()
     }
 
@@ -81,5 +83,13 @@ class SixPlayFinderTest {
         assertThat(finder.compatibility(null)).isGreaterThan(1)
         assertThat(finder.compatibility("foo")).isGreaterThan(1)
         assertThat(finder.compatibility("http://www.6play.fr/test")).isEqualTo(1)
+    }
+
+    companion object {
+
+        private fun of(filename: String): String {
+            return "/remote/podcast/6play/$filename"
+        }
+
     }
 }
