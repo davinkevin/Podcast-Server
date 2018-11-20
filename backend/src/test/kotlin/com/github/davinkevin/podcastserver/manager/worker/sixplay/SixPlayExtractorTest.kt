@@ -1,11 +1,9 @@
 package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.None
-import arrow.core.Option
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import com.jayway.jsonpath.DocumentContext
 import com.mashape.unirest.http.HttpResponse
 import com.mashape.unirest.request.GetRequest
 import com.nhaarman.mockitokotlin2.any

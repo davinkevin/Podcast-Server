@@ -11,7 +11,7 @@ import lan.dk.podcastserver.manager.worker.gulli.GulliUpdater;
 import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater;
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUpdater;
 import lan.dk.podcastserver.manager.worker.rss.RSSUpdater;
-import lan.dk.podcastserver.manager.worker.sixplay.SixPlayUpdater;
+import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater;
 import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater;
 import lan.dk.podcastserver.manager.worker.upload.UploadUpdater;
 import lan.dk.podcastserver.manager.worker.youtube.YoutubeUpdater;

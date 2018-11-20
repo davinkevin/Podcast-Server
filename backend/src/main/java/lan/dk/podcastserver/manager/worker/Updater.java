@@ -14,7 +14,8 @@ import java.util.function.Predicate;
 import static io.vavr.API.*;
 import static io.vavr.API.Try;
 
-public interface Updater {
+public interface
+Updater {
 
     Logger log = org.slf4j.LoggerFactory.getLogger(Updater.class);
     Tuple3<Podcast, Set<Item>, Predicate<Item>> NO_MODIFICATION_TUPLE = Tuple(Podcast.DEFAULT_PODCAST, Set(), i -> true);
