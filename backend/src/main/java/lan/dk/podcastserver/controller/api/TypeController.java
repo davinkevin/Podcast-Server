@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.controller.api;
 
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.manager.selector.UpdaterSelector;
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector;
 import lan.dk.podcastserver.manager.worker.Type;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;

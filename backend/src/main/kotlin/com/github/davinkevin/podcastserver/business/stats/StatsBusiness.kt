@@ -7,7 +7,7 @@ import io.vavr.collection.List
 import io.vavr.collection.Set
 import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import lan.dk.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.*
