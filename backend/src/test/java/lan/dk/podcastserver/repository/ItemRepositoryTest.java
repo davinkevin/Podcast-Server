@@ -95,10 +95,8 @@ public class ItemRepositoryTest {
         /* Then */
         PageAssert
                 .assertThat(itemByPodcast)
-                .hasSize(1)
                 .hasTotalElements(3)
-                .hasTotalPages(3)
-                .hasNumberOfElements(1);
+                .hasTotalPages(3);
 
         assertThat(itemByPodcast.getContent().get(0)).hasTitle("Appload 1");
     }
