@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Status
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory

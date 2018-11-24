@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.business.ItemBusiness;
 import com.github.davinkevin.podcastserver.business.TagBusiness;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Status;
+import com.github.davinkevin.podcastserver.entity.Status;
 import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;

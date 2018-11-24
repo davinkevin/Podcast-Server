@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import com.github.davinkevin.podcastserver.entity.Cover;
+import com.github.davinkevin.podcastserver.entity.Status;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.FileSystemUtils;

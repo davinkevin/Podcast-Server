@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.service
 
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock

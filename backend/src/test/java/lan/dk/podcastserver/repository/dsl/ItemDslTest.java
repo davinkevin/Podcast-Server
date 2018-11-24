@@ -7,7 +7,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import com.querydsl.core.types.ExpressionUtils;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.QItem;
-import lan.dk.podcastserver.entity.Status;
+import com.github.davinkevin.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest;
 import lan.dk.podcastserver.repository.ItemRepository;

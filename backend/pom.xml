@@ -552,7 +552,7 @@
                         <param>lan.dk.podcastserver.entity.WatchList</param>
                         <param>lan.dk.podcastserver.entity.Podcast</param>
                         <param>lan.dk.podcastserver.entity.Tag</param>
-                        <param>lan.dk.podcastserver.entity.Status</param>
+                        <param>com.github.davinkevin.podcastserver.entity.Status</param>
                         <param>org.springframework.data.domain.Page</param>
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>

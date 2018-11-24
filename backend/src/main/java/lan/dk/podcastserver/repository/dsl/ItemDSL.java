@@ -7,7 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.QItem;
-import lan.dk.podcastserver.entity.Status;
+import com.github.davinkevin.podcastserver.entity.Status;
 import lan.dk.podcastserver.entity.Tag;
 
 import java.time.ZonedDateTime;
