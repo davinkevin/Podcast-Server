@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import com.github.davinkevin.podcastserver.entity.Cover;
+import com.github.davinkevin.podcastserver.entity.Tag;
 import io.vavr.collection.HashSet;
 import io.vavr.control.Option;
 import org.junit.Before;

@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.Set
 import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
-import lan.dk.podcastserver.entity.Tag
+import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecifications

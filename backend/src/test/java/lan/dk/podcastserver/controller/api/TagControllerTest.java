@@ -4,7 +4,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.business.TagBusiness;
-import lan.dk.podcastserver.entity.Tag;
+import com.github.davinkevin.podcastserver.entity.Tag;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

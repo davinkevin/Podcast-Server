@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.business
 
 import com.nhaarman.mockitokotlin2.*
 import io.vavr.API.*
-import lan.dk.podcastserver.entity.Tag
+import com.github.davinkevin.podcastserver.entity.Tag
 import lan.dk.podcastserver.repository.TagRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -93,7 +93,11 @@ class TagBusinessTest {
 
         doReturn(Option(tag1)).whenever(tagRepository).findByNameIgnoreCase(eq(tag1.name))
         doReturn(None<Tag>()).whenever(tagRepository).findByNameIgnoreCase(argWhere { it != tag1.name})
-        doAnswer { (it.getArgument(0) as Tag).setId(UUID.randomUUID()) }.whenever(tagRepository).save<Tag>(any())
+        doAnswer {
+            val t = it.getArgument<Tag>(0)
+            t.id = UUID.randomUUID()
+            t
+        }.whenever(tagRepository).save<Tag>(any())
 
         /* When */
         val tagListByName = tagBusiness.getTagListByName(setOf(tag1, tag2, tag3, tag4))

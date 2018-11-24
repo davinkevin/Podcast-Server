@@ -3,7 +3,7 @@ package lan.dk.podcastserver.controller.api;
 import com.github.davinkevin.podcastserver.business.TagBusiness;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Tag;
+import com.github.davinkevin.podcastserver.entity.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

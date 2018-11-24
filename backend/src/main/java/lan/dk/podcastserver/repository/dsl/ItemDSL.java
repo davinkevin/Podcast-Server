@@ -8,7 +8,7 @@ import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.QItem;
 import com.github.davinkevin.podcastserver.entity.Status;
-import lan.dk.podcastserver.entity.Tag;
+import com.github.davinkevin.podcastserver.entity.Tag;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;

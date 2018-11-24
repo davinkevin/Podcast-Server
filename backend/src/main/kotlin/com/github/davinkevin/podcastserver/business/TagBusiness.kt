@@ -4,7 +4,7 @@ import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.List
-import lan.dk.podcastserver.entity.Tag
+import com.github.davinkevin.podcastserver.entity.Tag
 import lan.dk.podcastserver.repository.TagRepository
 import org.springframework.stereotype.Component
 import java.util.*
@@ -25,7 +25,10 @@ class TagBusiness(val tagRepository: TagRepository) {
             tagRepository.findByNameContainsIgnoreCase(name)
 
     fun getTagListByName(tagList: Set<Tag>): Set<Tag> =
-            tagList.map { findByName(it.name) }.toSet()
+            tagList
+                    .mapNotNull { it.name }
+                    .map { findByName(it) }
+                    .toSet()
 
     fun findAllByName(names: io.vavr.collection.Set<String>): io.vavr.collection.Set<Tag> =
             names.flatMap { tagRepository.findByNameIgnoreCase(it) }

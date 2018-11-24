@@ -3,14 +3,14 @@ package lan.dk.podcastserver.repository;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
-import lan.dk.podcastserver.entity.Tag;
+import com.github.davinkevin.podcastserver.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-import static lan.dk.podcastserver.entity.QTag.tag;
+import static com.github.davinkevin.podcastserver.entity.QTag.tag;
 
 /**
  * Created by kevin on 07/06/2014.

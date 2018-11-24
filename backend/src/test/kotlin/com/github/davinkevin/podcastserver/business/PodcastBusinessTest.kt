@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.nhaarman.mockitokotlin2.*
 import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.entity.Tag
+import com.github.davinkevin.podcastserver.entity.Tag
 import lan.dk.podcastserver.repository.PodcastRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat

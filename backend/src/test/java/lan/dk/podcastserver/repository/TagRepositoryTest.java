@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.repository;
 
+import com.github.davinkevin.podcastserver.entity.Tag;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
-import lan.dk.podcastserver.entity.Tag;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
-import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,9 +60,8 @@ public class TagRepositoryTest {
         /* WHEN  */
         Tag tag = tagRepository.findById(id).get();
         /* THEN  */
-        assertThat(tag)
-                .hasId(id)
-                .hasName("Foo");
+        assertThat(tag.getId()).isEqualTo(id);
+        assertThat(tag.getName()).isEqualTo("Foo");
     }
 
     @Test
@@ -74,23 +72,26 @@ public class TagRepositoryTest {
         Option<Tag> aTag = tagRepository.findByNameIgnoreCase(name);
         /* THEN  */
         assertThat(aTag).isNotEmpty();
-        assertThat(aTag.get())
-                .hasName("bAr")
-                .hasId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"));
+        assertThat(aTag.get().getName()).isEqualTo("bAr");
+        assertThat(aTag.get().getId()).isEqualTo(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"));
     }
 
     @Test
     public void should_find_by_containing_ignoring_case() {
         /* GIVEN */
         String name = "bar";
+        Tag t1 = new Tag();
+        t1.setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"));
+        t1.setName("bAr");
+
+        Tag t2 = new Tag();
+        t2.setId(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"));
+        t2.setName("Another Bar");
+
         /* WHEN  */
         Set<Tag> tags = tagRepository.findByNameContainsIgnoreCase(name);
         /* THEN  */
-        assertThat(tags).isNotEmpty()
-                .contains(
-                        Tag.builder().id(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).name("bAr").build(),
-                        Tag.builder().id(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6")).name("Another Bar").build()
-                );
+        assertThat(tags).isNotEmpty().contains(t1, t2);
     }
 
 

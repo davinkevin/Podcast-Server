@@ -9,7 +9,7 @@ import io.vavr.collection.List
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
-import lan.dk.podcastserver.entity.Tag
+import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters

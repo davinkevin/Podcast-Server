@@ -8,7 +8,7 @@ import com.querydsl.core.types.ExpressionUtils;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.QItem;
 import com.github.davinkevin.podcastserver.entity.Status;
-import lan.dk.podcastserver.entity.Tag;
+import com.github.davinkevin.podcastserver.entity.Tag;
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest;
 import lan.dk.podcastserver.repository.ItemRepository;
 import org.junit.Before;
@@ -193,7 +193,9 @@ public class ItemDslTest {
     public void should_find_in_tag() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        Tag tag = new Tag().setId(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08")).setName("French Spin");
+        Tag tag = new Tag();
+        tag.setId(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"));
+        tag.setName("French Spin");
 
 
         /* When */
@@ -229,7 +231,10 @@ public class ItemDslTest {
         /* Given */
         dbSetupTracker.skipNextLaunch();
         io.vavr.collection.List<UUID> ids = io.vavr.collection.List.of(UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"));
-        io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        Tag t = new Tag();
+        t.setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"));
+        t.setName("Tag1");
+        io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(t);
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(ids, tags, Set()));
@@ -245,7 +250,10 @@ public class ItemDslTest {
     public void should_result_with_search_without_ids() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(new Tag().setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")).setName("Tag1"));
+        Tag t = new Tag();
+        t.setId(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"));
+        t.setName("Tag1");
+        io.vavr.collection.Set<Tag> tags = io.vavr.collection.HashSet.of(t);
 
         /* When */
         Iterable<Item> items = itemRepository.findAll(getSearchSpecifications(null, tags, Set()));

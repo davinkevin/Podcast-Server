@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.service
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -177,7 +178,7 @@ class JdomServiceTest {
             description = "Loren ipsum"
             hasToBeDeleted = true
             cover = Cover().apply { height = 200; width = 200; url = "http://fake.url/1234/cover.png" }
-            tags = setOf(Tag().setName("Open-Source"))
+            tags = setOf(Tag().apply { name = "Open-Source" })
             signature = "123456789"
             lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
             items = generateItems(this, 100)
@@ -200,7 +201,7 @@ class JdomServiceTest {
             description = "Loren ipsum"
             hasToBeDeleted = true
             cover = Cover().apply { height = 200; width = 200; url = "/1234/cover.png" }
-            tags = setOf(Tag().setName("Open-Source"))
+            tags = setOf(Tag().apply { name = "Open-Source" })
             signature = "123456789"
             lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
             items = generateItems(this, 100)
