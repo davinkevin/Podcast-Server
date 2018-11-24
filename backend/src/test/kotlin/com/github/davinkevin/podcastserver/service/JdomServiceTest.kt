@@ -10,7 +10,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.*
+import lan.dk.podcastserver.entity.Item
+import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.WatchList
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -237,7 +239,7 @@ class JdomServiceTest {
         val watchList = WatchList().apply {
             id = UUID.fromString("c988babd-a2b1-4774-b8f8-fa4903dc3786")
             name = "A custom WatchList"
-            items = generateItems(podcastOne, 10) + (generateItems(podcastTwo, 20))
+            items = (generateItems(podcastOne, 10) + (generateItems(podcastTwo, 20))).toMutableSet()
         }
 
         /* When */

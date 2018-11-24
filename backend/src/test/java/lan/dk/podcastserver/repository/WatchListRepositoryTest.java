@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.repository;
 
+import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.WatchList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,6 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
-import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,7 +63,8 @@ public class WatchListRepositoryTest {
     @Test
     public void should_save_a_playlist() {
         /* Given */
-        WatchList watchList = WatchList.builder().name("A New Playlist").build();
+        WatchList watchList = new WatchList();
+        watchList.setName("A New Playlist");
 
         /* When */
         WatchList savedWatchList = watchListRepository.save(watchList);
@@ -85,7 +85,8 @@ public class WatchListRepositoryTest {
         /* Then */
         assertThat(watchList).isNotNull();
         assertThat(watchList.getItems()).hasSize(2);
-        assertThat(watchList).hasId(id).hasName("Humour Playlist");
+        assertThat(watchList.getId()).isEqualTo(id);
+        assertThat(watchList.getName()).isEqualTo("Humour Playlist");
     }
 
     @Test
@@ -106,9 +107,9 @@ public class WatchListRepositoryTest {
         /* Given */
         Item item = itemRepository.findById(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53")).get();
         WatchList watchList = watchListRepository.findById(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66")).get();
-
+        watchList.add(item);
         /* When */
-        watchListRepository.save(watchList.add(item));
+        watchListRepository.save(watchList);
         watchListRepository.flush();
         WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66")).get();
 
@@ -121,9 +122,9 @@ public class WatchListRepositoryTest {
         /* Given */
         Item thirdItem = itemRepository.findById(UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")).get();
         WatchList watchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
-
+        watchList.remove(thirdItem);
         /* When */
-        watchListRepository.save(watchList.remove(thirdItem));
+        watchListRepository.save(watchList);
         watchListRepository.flush();
         WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
 

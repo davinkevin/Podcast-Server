@@ -3,6 +3,7 @@ package lan.dk.podcastserver.entity;
 import com.fasterxml.jackson.annotation.*;
 import com.github.davinkevin.podcastserver.entity.Cover;
 import com.github.davinkevin.podcastserver.entity.Status;
+import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater;
 import io.vavr.control.Option;
 import org.apache.commons.io.FilenameUtils;

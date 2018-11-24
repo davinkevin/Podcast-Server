@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.github.davinkevin.podcastserver.business.WatchListBusiness;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.WatchList;
+import com.github.davinkevin.podcastserver.entity.WatchList;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
-import static lan.dk.podcastserver.entity.WatchList.WatchListDetailsListView;
+import static com.github.davinkevin.podcastserver.entity.WatchList.WatchListDetailsListView;
 
 /**
  * Created by kevin on 17/01/2016 for PodcastServer

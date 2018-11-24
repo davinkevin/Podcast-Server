@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import com.github.davinkevin.podcastserver.service.ByteRangeResourceHandler;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.WatchList;
+import com.github.davinkevin.podcastserver.entity.WatchList;
 import org.slf4j.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;

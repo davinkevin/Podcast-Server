@@ -549,7 +549,6 @@
                 <configuration>
                     <classes>
                         <param>lan.dk.podcastserver.entity.Item</param>
-                        <param>lan.dk.podcastserver.entity.WatchList</param>
                         <param>lan.dk.podcastserver.entity.Podcast</param>
                         <param>org.springframework.data.domain.Page</param>
                     </classes>

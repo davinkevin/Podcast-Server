@@ -9,7 +9,7 @@ import io.vavr.control.Option
 import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.entity.WatchList
+import com.github.davinkevin.podcastserver.entity.WatchList
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element

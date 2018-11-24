@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.API.Set
-import lan.dk.podcastserver.entity.WatchList
+import com.github.davinkevin.podcastserver.entity.WatchList
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.WatchListRepository
 import org.springframework.stereotype.Component
@@ -38,7 +38,7 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
         val item = itemRepository.findById(itemId).k()
                 .getOrElse { throw RuntimeException("Item with ID $itemId not found") }
 
-        return watchListRepository.save(watchList.add(item))
+        return watchListRepository.save(watchList.apply { add(item) })
     }
 
     fun remove(watchListId: UUID, itemId: UUID): WatchList {
@@ -46,7 +46,7 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
         val item = itemRepository.findById(itemId).k()
                 .getOrElse { throw RuntimeException("Item with ID $itemId not found") }
 
-        return watchListRepository.save(watchList.remove(item))
+        return watchListRepository.save(watchList.apply { remove(item) })
     }
 
     fun delete(uuid: UUID) = watchListRepository.deleteById(uuid)
