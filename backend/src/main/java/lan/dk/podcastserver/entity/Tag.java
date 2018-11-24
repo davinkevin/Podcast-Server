@@ -1,11 +1,6 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import javax.persistence.Column;
@@ -18,10 +13,6 @@ import java.util.UUID;
  * Created by kevin on 07/06/2014.
  */
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Tag {
 
@@ -32,6 +23,19 @@ public class Tag {
 
     @Column(unique = true)
     private String name;
+
+    @java.beans.ConstructorProperties({"id", "name"})
+    private Tag(UUID id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Tag() {
+    }
+
+    public static TagBuilder builder() {
+        return new TagBuilder();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -68,5 +72,31 @@ public class Tag {
     public Tag setName(String name) {
         this.name = name;
         return this;
+    }
+
+    public static class TagBuilder {
+        private UUID id;
+        private String name;
+
+        TagBuilder() {
+        }
+
+        public Tag.TagBuilder id(UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public Tag.TagBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Tag build() {
+            return new Tag(id, name);
+        }
+
+        public String toString() {
+            return "Tag.TagBuilder(id=" + this.id + ", name=" + this.name + ")";
+        }
     }
 }

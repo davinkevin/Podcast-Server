@@ -10,7 +10,7 @@ import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
@@ -111,7 +111,7 @@ internal data class Snippet(val title: String, val resourceId: ResourceId, val d
     fun cover() = this.thumbnails
             .betterThumbnail()
             .map { Cover().apply { url = it.url; width = it.width; height = it.height } }
-            .getOrElse { Cover.DEFAULT_COVER }!!
+            .getOrElse { Cover.DEFAULT_COVER }
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

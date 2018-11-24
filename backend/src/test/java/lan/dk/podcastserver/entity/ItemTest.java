@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.entity;
 
+import com.github.davinkevin.podcastserver.entity.Cover;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.FileSystemUtils;
@@ -23,8 +24,8 @@ public class ItemTest {
     private static Item ITEM = new Item();
     private static Podcast PODCAST = new Podcast().setId(UUID.randomUUID());
     private static final ZonedDateTime NOW = ZonedDateTime.now();
-    private static final Cover COVER = Cover.builder().url("http://fakeItem.com/cover.png").build();
-    private static final Cover PODCAST_COVER = Cover.builder().url("PodcastCover").build();
+    private static final Cover COVER = new Cover() {{ setUrl("http://fakeItem.com/cover.png"); }};
+    private static final Cover PODCAST_COVER = new Cover() {{ setUrl("PodcastCover"); }};
     private static final UUID ID = UUID.randomUUID();
 
     @Before
@@ -139,8 +140,11 @@ public class ItemTest {
 
     @Test
     public void should_report_parent_podcast_cover() {
+        Cover cover = new Cover();
+        cover.setUrl("/api/podcasts/" + PODCAST_ID + "/items/" + ID + "/cover.png");
+
         assertThat(ITEM.getCoverOfItemOrPodcast())
-                .isEqualTo(Cover.builder().url("/api/podcasts/" + PODCAST_ID + "/items/" + ID + "/cover.png").build());
+                .isEqualTo(cover);
 
         ITEM.setCover(null);
         assertThat(ITEM.getCoverOfItemOrPodcast()).isSameAs(PODCAST_COVER);

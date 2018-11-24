@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.entity;
 
+import com.github.davinkevin.podcastserver.entity.Cover;
 import io.vavr.collection.HashSet;
 import io.vavr.control.Option;
 import org.junit.Before;
@@ -22,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PodcastTest {
 
     private static final ZonedDateTime NOW = ZonedDateTime.now();
-    private static final Cover COVER = Cover.builder().url("ACover.jpg").build();
+    private static final Cover COVER = new Cover() {{ setUrl("ACover.jpg"); }};
     private static String PODCAST_TO_STRING;
     private Podcast podcast;
     private UUID id;

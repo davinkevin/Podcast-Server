@@ -3,8 +3,6 @@ package lan.dk.podcastserver.repository.impl;
 import io.vavr.collection.List;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
@@ -13,6 +11,7 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.transform.ResultTransformer;
+import org.slf4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -21,14 +20,18 @@ import java.util.UUID;
 
 import static io.vavr.API.Option;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private static final String[] SEARCH_FIELDS = new String[]{"description", "title"};
     private static final HibernateIdExtractor RESULT_TRANSFORMER = new HibernateIdExtractor();
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ItemRepositoryImpl.class);
 
     private final EntityManager entityManager;
+
+    @java.beans.ConstructorProperties({"entityManager"})
+    public ItemRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @Transactional

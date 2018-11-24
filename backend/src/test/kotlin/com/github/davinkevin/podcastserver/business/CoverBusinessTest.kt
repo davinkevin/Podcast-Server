@@ -1,15 +1,15 @@
 package com.github.davinkevin.podcastserver.business
 
 import com.github.davinkevin.podcastserver.service.UrlService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.CoverRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -198,7 +198,8 @@ class CoverBusinessTest {
         /* Given */
         val cover = Cover().apply { url = "http://anUrl.jiz/foo/bar" }
         val createdId = UUID.randomUUID()
-        whenever(coverRepository.save<Cover>(eq(cover))).thenReturn(cover.toBuilder().id(createdId).build())
+        val returnedCover = Cover().apply { url = "http://anUrl.jiz/foo/bar"; id = createdId }
+        whenever(coverRepository.save<Cover>(eq(cover))).thenReturn(returnedCover)
 
         /* When */
         val savedCover = coverBusiness.save(cover)

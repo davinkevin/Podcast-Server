@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

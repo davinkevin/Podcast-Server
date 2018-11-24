@@ -3,13 +3,13 @@ package com.github.davinkevin.podcastserver.service
 import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.control.Option
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.entity.WatchList
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
@@ -237,6 +237,6 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
 
 
     private fun Cover.relativeUrl(domain: String): String =
-            if (url.startsWith("/")) "$domain$url"
-            else url
+            if (url!!.startsWith("/")) "$domain$url"
+            else url!!
 }

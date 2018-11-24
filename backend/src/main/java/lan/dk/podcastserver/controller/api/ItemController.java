@@ -1,15 +1,14 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.business.ItemBusiness;
 import com.github.davinkevin.podcastserver.business.WatchListBusiness;
-import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import com.github.davinkevin.podcastserver.service.ByteRangeResourceHandler;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import io.vavr.collection.Set;
+import lan.dk.podcastserver.entity.Item;
+import lan.dk.podcastserver.entity.WatchList;
+import org.slf4j.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -31,16 +30,23 @@ import java.util.UUID;
 /**
  * Created by kevin on 26/12/2013.
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/podcasts/{idPodcast}/items")
-@RequiredArgsConstructor
 public class ItemController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ItemController.class);
     private final ItemBusiness itemBusiness;
     private final ItemDownloadManager itemDownloadManager;
     private final ByteRangeResourceHandler handler;
     private final WatchListBusiness watchListBusiness;
+
+    @java.beans.ConstructorProperties({"itemBusiness", "itemDownloadManager", "handler", "watchListBusiness"})
+    public ItemController(ItemBusiness itemBusiness, ItemDownloadManager itemDownloadManager, ByteRangeResourceHandler handler, WatchListBusiness watchListBusiness) {
+        this.itemBusiness = itemBusiness;
+        this.itemDownloadManager = itemDownloadManager;
+        this.handler = handler;
+        this.watchListBusiness = watchListBusiness;
+    }
 
     @GetMapping
     @JsonView(Item.ItemPodcastListView.class)

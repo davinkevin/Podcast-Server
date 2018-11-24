@@ -1,20 +1,16 @@
 package lan.dk.podcastserver.entity;
 
 import com.fasterxml.jackson.annotation.*;
-import io.vavr.control.Option;
+import com.github.davinkevin.podcastserver.entity.Cover;
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
+import io.vavr.control.Option;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.slf4j.Logger;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,16 +33,13 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @Indexed
-@Slf4j
-@Builder
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
-@Accessors(chain = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-@NoArgsConstructor @AllArgsConstructor(onConstructor = @__({ @JsonIgnore }), access = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset", "coverPath" })
 @EntityListeners(AuditingEntityListener.class)
 public class Item {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(Item.class);
     public  static Path rootFolder;
     public  static final Item DEFAULT_ITEM = new Item();
     private static final String COVER_PROXY_URL = "/api/podcasts/%s/items/%s/cover.%s";
@@ -111,6 +104,34 @@ public class Item {
     @JsonIgnore
     @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
     private java.util.Set<WatchList> watchLists = new HashSet<>();
+
+    @java.beans.ConstructorProperties({"id", "cover", "podcast", "title", "url", "pubDate", "description", "mimeType", "length", "fileName", "status", "progression", "numberOfFail", "downloadDate", "creationDate", "watchLists"})
+    @JsonIgnore
+    private Item(UUID id, Cover cover, Podcast podcast, @NotNull @Size(min = 1, max = 254) String title, String url, ZonedDateTime pubDate, String description, String mimeType, Long length, String fileName, Status status, Integer progression, Integer numberOfFail, ZonedDateTime downloadDate, ZonedDateTime creationDate, Set<WatchList> watchLists) {
+        this.id = id;
+        this.cover = cover;
+        this.podcast = podcast;
+        this.title = title;
+        this.url = url;
+        this.pubDate = pubDate;
+        this.description = description;
+        this.mimeType = mimeType;
+        this.length = length;
+        this.fileName = fileName;
+        this.status = status;
+        this.progression = progression;
+        this.numberOfFail = numberOfFail;
+        this.downloadDate = downloadDate;
+        this.creationDate = creationDate;
+        this.watchLists = watchLists;
+    }
+
+    public Item() {
+    }
+
+    public static ItemBuilder builder() {
+        return new ItemBuilder();
+    }
 
     public String getLocalUri() {
         return (fileName == null) ? null : getLocalPath().toString();
@@ -259,7 +280,14 @@ public class Item {
     public Cover getCoverOfItemOrPodcast() {
         return Option(cover)
                 .map(c -> String.format(COVER_PROXY_URL, podcast.getId(), id, FilenameUtils.getExtension(c.getUrl())))
-                .map(url -> cover.toBuilder().url(url).build())
+                .map(url -> {
+                    Cover c = new Cover();
+                    c.setUrl(url);
+                    c.setHeight(this.cover.getHeight());
+                    c.setWidth(this.cover.getWidth());
+                    c.setId(this.cover.getId());
+                    return c;
+                })
                 .getOrElse(() -> podcast.getCover());
     }
 
@@ -427,4 +455,114 @@ public class Item {
     public interface ItemSearchListView {}
     public interface ItemPodcastListView extends ItemSearchListView {}
     public interface ItemDetailsView extends ItemPodcastListView {}
+
+    public static class ItemBuilder {
+        private UUID id;
+        private Cover cover;
+        private Podcast podcast;
+        private @NotNull @Size(min = 1, max = 254) String title;
+        private String url;
+        private ZonedDateTime pubDate;
+        private String description;
+        private String mimeType;
+        private Long length;
+        private String fileName;
+        private Status status;
+        private Integer progression;
+        private Integer numberOfFail;
+        private ZonedDateTime downloadDate;
+        private ZonedDateTime creationDate;
+        private Set<WatchList> watchLists;
+
+        ItemBuilder() {
+        }
+
+        public ItemBuilder id(UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public ItemBuilder cover(Cover cover) {
+            this.cover = cover;
+            return this;
+        }
+
+        public ItemBuilder podcast(Podcast podcast) {
+            this.podcast = podcast;
+            return this;
+        }
+
+        public ItemBuilder title(@NotNull @Size(min = 1, max = 254) String title) {
+            this.title = title;
+            return this;
+        }
+
+        public ItemBuilder url(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public ItemBuilder pubDate(ZonedDateTime pubDate) {
+            this.pubDate = pubDate;
+            return this;
+        }
+
+        public ItemBuilder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public ItemBuilder mimeType(String mimeType) {
+            this.mimeType = mimeType;
+            return this;
+        }
+
+        public ItemBuilder length(Long length) {
+            this.length = length;
+            return this;
+        }
+
+        public ItemBuilder fileName(String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public ItemBuilder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public ItemBuilder progression(Integer progression) {
+            this.progression = progression;
+            return this;
+        }
+
+        public ItemBuilder numberOfFail(Integer numberOfFail) {
+            this.numberOfFail = numberOfFail;
+            return this;
+        }
+
+        public ItemBuilder downloadDate(ZonedDateTime downloadDate) {
+            this.downloadDate = downloadDate;
+            return this;
+        }
+
+        public ItemBuilder creationDate(ZonedDateTime creationDate) {
+            this.creationDate = creationDate;
+            return this;
+        }
+
+        public ItemBuilder watchLists(Set<WatchList> watchLists) {
+            this.watchLists = watchLists;
+            return this;
+        }
+
+        public Item build() {
+            return new Item(id, cover, podcast, title, url, pubDate, description, mimeType, length, fileName, status, progression, numberOfFail, downloadDate, creationDate, watchLists);
+        }
+
+        public String toString() {
+            return "Item.ItemBuilder(id=" + this.id + ", cover=" + this.cover + ", podcast=" + this.podcast + ", title=" + this.title + ", url=" + this.url + ", pubDate=" + this.pubDate + ", description=" + this.description + ", mimeType=" + this.mimeType + ", length=" + this.length + ", fileName=" + this.fileName + ", status=" + this.status + ", progression=" + this.progression + ", numberOfFail=" + this.numberOfFail + ", downloadDate=" + this.downloadDate + ", creationDate=" + this.creationDate + ", watchLists=" + this.watchLists + ")";
+        }
+    }
 }

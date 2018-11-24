@@ -15,7 +15,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.vavr.API.Option;
-import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
 /**

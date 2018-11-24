@@ -3,12 +3,12 @@ package com.github.davinkevin.podcastserver.manager.worker.francetv
 import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.UrlService
-import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service
 
@@ -40,7 +40,7 @@ class FranceTvFinder(val htmlService: HtmlService, val imageService: ImageServic
                     .map { it.attr("content") }
                     .map { it.addProtocolIfNecessary("https:") }
                     .flatMap { imageService.getCoverFromURL(it).toOption() }
-                    .getOrElse { Cover.DEFAULT_COVER }!!
+                    .getOrElse { Cover.DEFAULT_COVER }
 
     override fun compatibility(url: String?) = FranceTvUpdater.isFromFranceTv(url)
 }

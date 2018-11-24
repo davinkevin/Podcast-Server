@@ -1,13 +1,12 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.business.ItemBusiness;
 import com.github.davinkevin.podcastserver.business.TagBusiness;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Status;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,14 +18,19 @@ import org.springframework.web.bind.annotation.*;
  * Created by kevin on 23/08/2014.
  * Podcast Server
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/items")
-@RequiredArgsConstructor
 public class ItemSearchController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ItemSearchController.class);
     private final ItemBusiness itemBusiness;
     private final TagBusiness tagBusiness;
+
+    @java.beans.ConstructorProperties({"itemBusiness", "tagBusiness"})
+    public ItemSearchController(ItemBusiness itemBusiness, TagBusiness tagBusiness) {
+        this.itemBusiness = itemBusiness;
+        this.tagBusiness = tagBusiness;
+    }
 
     @Cacheable("search")
     @GetMapping("search")

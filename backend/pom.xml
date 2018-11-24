@@ -209,12 +209,6 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.20</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.rauschig</groupId>
             <artifactId>jarchivelib</artifactId>
             <version>0.7.1</version>
@@ -402,7 +396,15 @@
                     </args>
                     <compilerPlugins>
                         <plugin>spring</plugin>
+                        <plugin>no-arg</plugin>
+                        <plugin>jpa</plugin>
                     </compilerPlugins>
+
+                    <pluginOptions>
+                        <!-- Each annotation is placed on its own line -->
+                        <option>no-arg:annotation=javax.persistence.Entity</option>
+                    </pluginOptions>
+
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -410,8 +412,35 @@
                         <artifactId>kotlin-maven-allopen</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
                 </dependencies>
                 <executions>
+
+                    <execution>
+                        <id>kapt</id>
+                        <goals>
+                            <goal>kapt</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                                 <sourceDir>src/main/java/</sourceDir>
+                            </sourceDirs>
+                            <annotationProcessorPaths>
+                                <annotationProcessorPath>
+                                    <groupId>com.querydsl</groupId>
+                                    <artifactId>querydsl-apt</artifactId>
+                                    <version>${querydsl.version}</version>
+                                    <classifier>jpa</classifier>
+                                </annotationProcessorPath>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+
                     <execution>
                         <id>compile</id>
                         <goals>
@@ -435,6 +464,7 @@
                         </configuration>
                     </execution>
                 </executions>
+
             </plugin>
             <!-- Build : Spring Boot Build -->
             <plugin>
@@ -518,7 +548,6 @@
                 </executions>
                 <configuration>
                     <classes>
-                        <param>lan.dk.podcastserver.entity.Cover</param>
                         <param>lan.dk.podcastserver.entity.Item</param>
                         <param>lan.dk.podcastserver.entity.WatchList</param>
                         <param>lan.dk.podcastserver.entity.Podcast</param>
@@ -528,24 +557,6 @@
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>
                 </configuration>
-            </plugin>
-            <!-- DSL : Query DSL Generation -->
-            <plugin>
-                <groupId>com.mysema.maven</groupId>
-                <artifactId>apt-maven-plugin</artifactId>
-                <version>1.1.3</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/generated-sources/queryDSL</outputDirectory>
-                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <!-- Docker Images -->
             <plugin>

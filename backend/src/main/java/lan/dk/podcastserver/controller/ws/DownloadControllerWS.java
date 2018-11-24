@@ -1,8 +1,7 @@
 package lan.dk.podcastserver.controller.ws;
 
-import lan.dk.podcastserver.entity.Item;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
-import lombok.RequiredArgsConstructor;
+import lan.dk.podcastserver.entity.Item;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
@@ -13,10 +12,14 @@ import java.util.Collection;
  * Created by kevin on 27/06/2014.
  */
 @Controller
-@RequiredArgsConstructor
 public class DownloadControllerWS {
 
     private final ItemDownloadManager IDM;
+
+    @java.beans.ConstructorProperties({"IDM"})
+    public DownloadControllerWS(ItemDownloadManager IDM) {
+        this.IDM = IDM;
+    }
 
     @SubscribeMapping("/waiting")
     public Collection<Item> waitingList() {

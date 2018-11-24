@@ -2,8 +2,6 @@ package lan.dk.podcastserver;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lan.dk.podcastserver.service.JsonService;
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +41,24 @@ public class ApplicationTest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ApplicationHealthStatus extends HealthStatus {
-        @Getter @Setter private DiskSpaceStatus diskSpace;
-        @Getter @Setter private DbStatus db;
+        private DiskSpaceStatus diskSpace;
+        private DbStatus db;
+
+        public DiskSpaceStatus getDiskSpace() {
+            return this.diskSpace;
+        }
+
+        public DbStatus getDb() {
+            return this.db;
+        }
+
+        public void setDiskSpace(DiskSpaceStatus diskSpace) {
+            this.diskSpace = diskSpace;
+        }
+
+        public void setDb(DbStatus db) {
+            this.db = db;
+        }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class DiskSpaceStatus extends HealthStatus {}
@@ -53,7 +67,15 @@ public class ApplicationTest {
     }
 
     public static class HealthStatus {
-        @Getter @Setter private String status;
+        private String status;
+
+        public String getStatus() {
+            return this.status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
     }
 
 }

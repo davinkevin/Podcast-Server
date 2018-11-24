@@ -1,17 +1,16 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.github.davinkevin.podcastserver.service.UrlService;
-import io.vavr.collection.Set;
 import com.github.davinkevin.podcastserver.business.PodcastBusiness;
 import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
+import com.github.davinkevin.podcastserver.service.UrlService;
+import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
@@ -29,16 +28,23 @@ import java.util.UUID;
 /**
  * Created by kevin on 26/12/2013.
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/podcasts")
-@RequiredArgsConstructor
 public class PodcastController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(PodcastController.class);
     private final PodcastBusiness podcastBusiness;
     private final FindPodcastBusiness findPodcastBusiness;
     private final StatsBusiness statsBusiness;
     private final UpdatePodcastBusiness updatePodcastBusiness;
+
+    @java.beans.ConstructorProperties({"podcastBusiness", "findPodcastBusiness", "statsBusiness", "updatePodcastBusiness"})
+    public PodcastController(PodcastBusiness podcastBusiness, FindPodcastBusiness findPodcastBusiness, StatsBusiness statsBusiness, UpdatePodcastBusiness updatePodcastBusiness) {
+        this.podcastBusiness = podcastBusiness;
+        this.findPodcastBusiness = findPodcastBusiness;
+        this.statsBusiness = statsBusiness;
+        this.updatePodcastBusiness = updatePodcastBusiness;
+    }
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public Podcast create(@RequestBody Podcast podcast) {

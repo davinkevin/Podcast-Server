@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.jsoup.nodes.Document

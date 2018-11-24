@@ -1,11 +1,10 @@
 package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.github.davinkevin.podcastserver.business.WatchListBusiness;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
-import com.github.davinkevin.podcastserver.business.WatchListBusiness;
 import lan.dk.podcastserver.entity.WatchList;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +17,14 @@ import static lan.dk.podcastserver.entity.WatchList.WatchListDetailsListView;
  */
 @RestController
 @RequestMapping("/api/watchlists")
-@RequiredArgsConstructor
 public class WatchListController {
 
     private final WatchListBusiness watchListBusiness;
+
+    @java.beans.ConstructorProperties({"watchListBusiness"})
+    public WatchListController(WatchListBusiness watchListBusiness) {
+        this.watchListBusiness = watchListBusiness;
+    }
 
     @JsonView(WatchListDetailsListView.class)
     @PostMapping

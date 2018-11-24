@@ -2,10 +2,10 @@ package com.github.davinkevin.podcastserver.business
 
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.JdomService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.PodcastRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
@@ -44,7 +44,7 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
             patchPodcast.cover.url = coverBusiness.download(patchPodcast)
         }
 
-        val newCover = coverBusiness.findOne(patchPodcast.cover.id).apply {
+        val newCover = coverBusiness.findOne(patchPodcast.cover.id!!).apply {
             height = patchPodcast.cover.height
             url = patchPodcast.cover.url
             width = patchPodcast.cover.width

@@ -3,13 +3,13 @@ package com.github.davinkevin.podcastserver.manager.worker.rss
 import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import org.jdom2.Element
@@ -66,7 +66,7 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
                 .toOption()
                 .map { it.getAttributeValue("url").toOption().getOrElse { it.text } }
                 .flatMap { imageService.getCoverFromURL(it).toOption() }
-                .getOrElse { Cover.DEFAULT_COVER }!!
+                .getOrElse { Cover.DEFAULT_COVER }
     }
 
     private fun getPubDate(item: Element): ZonedDateTime? {

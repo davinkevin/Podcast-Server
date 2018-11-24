@@ -1,12 +1,11 @@
 package lan.dk.podcastserver.controller.task;
 
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import com.github.davinkevin.podcastserver.utils.form.MovingItemInQueueForm;
 import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +14,17 @@ import java.util.UUID;
 /**
  * Created by kevin on 26/12/2013.
  */
-@Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/task/downloadManager")
 public class IDMController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(IDMController.class);
     private final ItemDownloadManager IDM;
+
+    @java.beans.ConstructorProperties({"IDM"})
+    public IDMController(ItemDownloadManager IDM) {
+        this.IDM = IDM;
+    }
 
     @GetMapping("/queue")
     public Queue<Item> getDownloadList () {

@@ -1,9 +1,8 @@
 package lan.dk.podcastserver.controller.api;
 
-import io.vavr.collection.List;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType;
-import lombok.RequiredArgsConstructor;
+import io.vavr.collection.List;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/stats")
-@RequiredArgsConstructor
 public class StatsController {
 
     private final StatsBusiness itemStatsBusiness;
+
+    @java.beans.ConstructorProperties({"itemStatsBusiness"})
+    public StatsController(StatsBusiness itemStatsBusiness) {
+        this.itemStatsBusiness = itemStatsBusiness;
+    }
 
     @PostMapping("byDownloadDate")
     @Cacheable(value = "stats", key = "{#root.methodName, #numberOfMonth}")

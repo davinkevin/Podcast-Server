@@ -5,13 +5,13 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
 import com.github.davinkevin.podcastserver.service.UrlService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.mashape.unirest.http.HttpResponse
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.CoverRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -37,15 +37,15 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
     fun download(podcast: Podcast): String {
         val cover = podcast.cover
 
-        if ( (cover?.url ?: "").isEmpty() ) {
+        if ( cover?.url.isNullOrEmpty() ) {
             return ""
         }
 
-        if (cover.url.startsWith("/")) {
-            return cover.url
+        if (cover.url!!.startsWith("/")) {
+            return cover.url!!
         }
 
-        val coverUrl = cover.url
+        val coverUrl = cover.url!!
         val extension = FilenameUtils.getExtension(coverUrl)
         val fileLocation = parameters.rootfolder
                 .resolve(podcast.title)
@@ -70,7 +70,7 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
             return false
         }
 
-        val coverUrl = item.cover.url
+        val coverUrl = item.cover.url!!
         val fileLocation = parameters.rootfolder
                 .resolve(item.podcast.title)
                 .resolve("${item.id}.${FilenameUtils.getExtension(coverUrl)}")

@@ -1,13 +1,14 @@
 package com.github.davinkevin.podcastserver.service
 
+import com.github.davinkevin.podcastserver.IOUtils
+import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.*
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -174,7 +175,7 @@ class JdomServiceTest {
             title = "FakePodcast"
             description = "Loren ipsum"
             hasToBeDeleted = true
-            cover = Cover.builder().height(200).width(200).url("http://fake.url/1234/cover.png").build()
+            cover = Cover().apply { height = 200; width = 200; url = "http://fake.url/1234/cover.png" }
             tags = setOf(Tag().setName("Open-Source"))
             signature = "123456789"
             lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
@@ -197,7 +198,7 @@ class JdomServiceTest {
             title = "FakePodcast"
             description = "Loren ipsum"
             hasToBeDeleted = true
-            cover = Cover.builder().height(200).width(200).url("/1234/cover.png").build()
+            cover = Cover().apply { height = 200; width = 200; url = "/1234/cover.png" }
             tags = setOf(Tag().setName("Open-Source"))
             signature = "123456789"
             lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
@@ -218,7 +219,7 @@ class JdomServiceTest {
         val podcastOne = Podcast().apply {
             id = UUID.fromString("029d7820-b7e1-4c0f-a94f-235584ffb570")
             title = "FakePodcast_1"
-            cover = Cover.builder().height(200).width(200).url("http://fake.url/1234/cover.png").build()
+            cover = Cover().apply { height = 200; width = 200; url = "http://fake.url/1234/cover.png" }
             signature = "123456789"
             lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
         }
@@ -226,7 +227,7 @@ class JdomServiceTest {
         val podcastTwo = Podcast().apply {
             id = UUID.fromString("526d5187-0563-4c44-801f-3bea447a86ea")
             title = "FakePodcast_2"
-            cover = Cover.builder().height(200).width(200).url("http://fake.url/4567/cover.png").build()
+            cover = Cover().apply { height = 200; width = 200; url = "http://fake.url/1234/cover.png" }
             signature = "987654321"
             lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
         }

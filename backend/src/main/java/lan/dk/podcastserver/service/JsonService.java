@@ -6,7 +6,7 @@ import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +17,10 @@ import static java.util.stream.Collectors.joining;
 /**
  * Created by kevin on 21/02/2016 for Podcast Server
  */
-@Slf4j
 @Service
 public class JsonService {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(JsonService.class);
     private final UrlService urlService;
     private final ParseContext parserContext;
 

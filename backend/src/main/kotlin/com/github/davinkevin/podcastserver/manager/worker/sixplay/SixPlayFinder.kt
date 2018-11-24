@@ -4,7 +4,7 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
-import lan.dk.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import lan.dk.podcastserver.service.JsonService

@@ -22,7 +22,7 @@ import static java.time.ZonedDateTime.now;
  */
 @Configuration
 @EnableJpaRepositories(basePackages = "lan.dk.podcastserver.repository")
-@EntityScan(basePackages = "lan.dk.podcastserver.entity")
+@EntityScan(basePackages = {"lan.dk.podcastserver.entity", "com.github.davinkevin.podcastserver.entity"})
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 public class DatabaseConfigurationTest {
 
