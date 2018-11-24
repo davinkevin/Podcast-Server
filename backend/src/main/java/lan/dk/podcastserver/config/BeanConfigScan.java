@@ -27,7 +27,7 @@ import java.nio.file.Paths;
 @Configuration
 @EnableConfigurationProperties({PodcastServerParameters.class, Api.class, Backup.class, ExternalTools.class})
 @ComponentScan(basePackages = {
-        "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager",
+        "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager", "com.github.davinkevin.podcastserver.config",
         "lan.dk.podcastserver.service"
 })
 public class BeanConfigScan {
