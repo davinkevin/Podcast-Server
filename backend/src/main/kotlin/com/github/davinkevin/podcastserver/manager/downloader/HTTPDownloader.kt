@@ -7,18 +7,18 @@ import com.github.axet.wget.info.DownloadInfo
 import com.github.axet.wget.info.URLInfo.States.*
 import com.github.axet.wget.info.ex.DownloadInterruptedError
 import com.github.axet.wget.info.ex.DownloadMultipartError
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
 
 @Scope(SCOPE_PROTOTYPE)
@@ -27,7 +27,7 @@ class HTTPDownloader(
         itemRepository: ItemRepository,
         podcastRepository: PodcastRepository,
         podcastServerParameters: PodcastServerParameters,
-        template: SimpMessagingTemplate,
+        template: MessagingTemplate,
         mimeTypeService: MimeTypeService,
         val urlService: UrlService,
         val wGetFactory: WGetFactory

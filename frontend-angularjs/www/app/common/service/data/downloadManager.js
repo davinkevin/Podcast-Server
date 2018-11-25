@@ -1,10 +1,8 @@
 import {Module, Service} from '../../../decorators';
-import AngularStompDKConfig from '../../../config/ngstomp';
 import Rx from 'rx';
 
 @Module({
-    name : 'ps.common.service.data.downloadManager',
-    modules : [ AngularStompDKConfig ]
+    name : 'ps.common.service.data.downloadManager'
 })
 @Service('DonwloadManager')
 export default class DownloadManager {
@@ -14,20 +12,21 @@ export default class DownloadManager {
     waiting$ = new Rx.ReplaySubject(0);
     updating$ = new Rx.BehaviorSubject(null);
     
-    constructor(ngstomp, $http) {
+    constructor($http) {
         "ngInject";
         this.$http = $http;
-        this.ngstomp = ngstomp;
 
-        this.ngstomp.subscribeTo('/topic/download').withBodyInJson().withDigest(false)
-                .callback(m => this.download$.onNext(m.body))
-            .and()
-                .subscribeTo('/topic/waiting').withBodyInJson().withDigest(false)
-                .callback(m => this.waiting$.onNext(m.body))
-            .and()
-                .subscribeTo('/topic/updating').withBodyInJson().withDigest(false)
-                .callback(m => this.updating$.onNext(m.body))
-            .connect();
+        const sse = new EventSource("/api/sse");
+
+        sse.addEventListener("updating", (m) =>  {
+          this.updating$.onNext(JSON.parse(m.data));
+        });
+        sse.addEventListener("waiting", (m) =>  {
+          this.waiting$.onNext(JSON.parse(m.data));
+        });
+        sse.addEventListener("downloading", (m) =>  {
+          this.download$.onNext(JSON.parse(m.data));
+        });
     }
 
     downloading() {
@@ -66,9 +65,9 @@ export default class DownloadManager {
         return this.$http.post(`/api/task/downloadManager/move`, {id : item.id, position });
     }
     toggle(item) {
-        this.ngstomp.send(`${this.WS_DOWNLOAD_BASE}/toogle`, item);
+      return this.$http.post(`/api/task/downloadManager/toogleDownload/${item.id}`);
     }
     stop(item) {
-        this.ngstomp.send(`${this.WS_DOWNLOAD_BASE}/stop`, item);
+      return this.$http.post(`/api/task/downloadManager/stopDownload/${item.id}`);
     }
 }

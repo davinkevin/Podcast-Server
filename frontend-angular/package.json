@@ -27,7 +27,6 @@
     "@angular/platform-browser-dynamic": "^6.0.6",
     "@angular/router": "^6.0.6",
     "@davinkevin/companion-component": "^1.0.1",
-    "@davinkevin/ngx-stomp": "^2.0.0",
     "@davinkevin/router-store-helper": "^1.0.1",
     "@ngrx/effects": "^6.0.1",
     "@ngrx/router-store": "^6.0.1",

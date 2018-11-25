@@ -82,9 +82,9 @@ public class IDMController {
     }
 
     // Action on id identified download :
-    @PostMapping("/stopDownload")
+    @PostMapping("/stopDownload/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void stopCurrentDownload(@RequestBody UUID id) {
+    public void stopCurrentDownload(@PathVariable("id") UUID id) {
         IDM.stopDownload(id);
     }
 
@@ -100,9 +100,9 @@ public class IDMController {
         IDM.restartDownload(id);
     }
 
-    @PostMapping("/toogleDownload")
+    @PostMapping("/toogleDownload/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void toggleCurrentDownload(@RequestBody UUID id) {
+    public void toggleCurrentDownload(@PathVariable("id") UUID id) {
         IDM.toggleDownload(id);
     }
 

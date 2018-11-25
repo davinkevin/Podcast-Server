@@ -17,6 +17,7 @@ import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.FfmpegService
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -38,7 +39,6 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.util.FileSystemUtils
 import java.net.URL
 import java.nio.file.Files
@@ -65,7 +65,7 @@ class YoutubeDownloaderTest {
     @Mock lateinit var itemRepository: ItemRepository
     @Mock lateinit var itemDownloadManager: ItemDownloadManager
     @Mock lateinit var podcastServerParameters: PodcastServerParameters
-    @Mock lateinit var template: SimpMessagingTemplate
+    @Mock lateinit var template: MessagingTemplate
     @Mock lateinit var mimeTypeService: MimeTypeService
     @Mock lateinit var wGetFactory: WGetFactory
     @InjectMocks lateinit var downloader: YoutubeDownloader

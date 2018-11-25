@@ -5,20 +5,20 @@ import arrow.core.Success
 import arrow.core.getOrElse
 import arrow.data.mapOf
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
 import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.HashMap
 import io.vavr.collection.Queue
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
 import lan.dk.podcastserver.repository.ItemRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock
 @Service
 @Transactional
 class ItemDownloadManager (
-        private val template: SimpMessagingTemplate,
+        private val template: MessagingTemplate,
         private val itemRepository: ItemRepository,
         private val podcastServerParameters: PodcastServerParameters,
         private val downloaderSelector: DownloaderSelector,

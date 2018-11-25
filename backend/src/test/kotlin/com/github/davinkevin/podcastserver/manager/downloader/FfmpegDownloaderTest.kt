@@ -5,12 +5,12 @@ import arrow.core.Try
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.*
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -29,7 +29,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
@@ -47,7 +46,7 @@ class FfmpegDownloaderTest {
     @Mock lateinit var podcastRepository: PodcastRepository
     @Mock lateinit var itemRepository: ItemRepository
     @Mock lateinit var podcastServerParameters: PodcastServerParameters
-    @Mock lateinit var template: SimpMessagingTemplate
+    @Mock lateinit var template: MessagingTemplate
     @Mock lateinit var mimeTypeService: MimeTypeService
     @Mock lateinit var itemDownloadManager: ItemDownloadManager
 

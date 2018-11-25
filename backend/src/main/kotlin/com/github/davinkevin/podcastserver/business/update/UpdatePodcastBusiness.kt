@@ -4,20 +4,20 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.business.CoverBusiness
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.Updater.Companion.NO_MODIFICATION
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -38,7 +38,7 @@ class UpdatePodcastBusiness(
         val podcastRepository: PodcastRepository,
         val itemRepository: ItemRepository,
         val updaterSelector: UpdaterSelector,
-        val template: SimpMessagingTemplate,
+        val template: MessagingTemplate,
         val podcastServerParameters: PodcastServerParameters,
         @param:Qualifier("UpdateExecutor") val updateExecutor: ThreadPoolTaskExecutor,
         @param:Qualifier("ManualUpdater") val manualExecutor: ThreadPoolTaskExecutor,

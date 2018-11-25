@@ -17,7 +17,6 @@ System.config({
   separateCSS: true,
 
   map: {
-    "AngularStompDK": "github:davinkevin/AngularStompDK@0.9.2",
     "angular": "github:angular/bower-angular@1.5.7",
     "angular-animate": "github:angular/bower-angular-animate@1.5.7",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.14.3",
@@ -76,11 +75,6 @@ System.config({
     "github:chieffancypants/angular-loading-bar@0.8.0": {
       "angular": "github:angular/bower-angular@1.5.7",
       "css": "github:systemjs/plugin-css@0.1.23"
-    },
-    "github:davinkevin/AngularStompDK@0.9.2": {
-      "angular": "github:angular/bower-angular@1.5.7",
-      "angular-mocks": "github:angular/bower-angular-mocks@1.5.7",
-      "stompjs": "github:jmesnil/stomp-websocket@2.3.4"
     },
     "github:distros/bootstrap-less@3.3.9": {
       "jquery": "github:components/jquery@3.0.0"

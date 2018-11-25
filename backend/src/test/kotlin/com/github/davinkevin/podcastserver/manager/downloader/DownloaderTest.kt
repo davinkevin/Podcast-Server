@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader.Companion.WS_TOPIC_DOWNLOAD
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
 import java.nio.file.Files
@@ -36,7 +36,7 @@ class DownloaderTest {
     @Mock lateinit var podcastRepository: PodcastRepository
     @Mock lateinit var itemRepository: ItemRepository
     @Mock lateinit var podcastServerParameters: PodcastServerParameters
-    @Mock lateinit var template: SimpMessagingTemplate
+    @Mock lateinit var template: MessagingTemplate
     @Mock lateinit var mimeTypeService: MimeTypeService
     @Mock lateinit var itemDownloadManager: ItemDownloadManager
     internal lateinit var downloader: SimpleDownloader
@@ -279,7 +279,7 @@ class DownloaderTest {
             itemRepository: ItemRepository,
             podcastRepository: PodcastRepository,
             podcastServerParameters: PodcastServerParameters,
-            template: SimpMessagingTemplate,
+            template: MessagingTemplate,
             mimeTypeService: MimeTypeService
     ) : AbstractDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService) {
 
@@ -303,7 +303,7 @@ class DownloaderTest {
             itemRepository: ItemRepository,
             podcastRepository: PodcastRepository,
             podcastServerParameters: PodcastServerParameters,
-            template: SimpMessagingTemplate,
+            template: MessagingTemplate,
             mimeTypeService: MimeTypeService
     ) : AbstractDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService) {
 

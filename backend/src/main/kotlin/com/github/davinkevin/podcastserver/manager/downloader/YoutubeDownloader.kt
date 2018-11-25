@@ -5,20 +5,20 @@ import com.github.axet.vget.info.VideoFileInfo
 import com.github.axet.vget.info.VideoInfo
 import com.github.axet.wget.info.ex.DownloadIOCodeError
 import com.github.axet.wget.info.ex.DownloadMultipartError
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.FfmpegService
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import io.vavr.API.Try
-import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
 import java.lang.String.format
 import java.net.URL
@@ -41,7 +41,7 @@ class YoutubeDownloader(
         itemRepository: ItemRepository,
         podcastRepository: PodcastRepository,
         podcastServerParameters: PodcastServerParameters,
-        template: SimpMessagingTemplate,
+        template: MessagingTemplate,
         mimeTypeService: MimeTypeService,
         val wGetFactory: WGetFactory,
         val ffmpegService: FfmpegService

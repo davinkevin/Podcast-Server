@@ -5,14 +5,15 @@ import arrow.core.Option
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.business.CoverBusiness
 import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -27,7 +28,6 @@ import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -47,7 +47,7 @@ class UpdatePodcastBusinessTest {
     @Mock lateinit var podcastRepository: PodcastRepository
     @Mock lateinit var itemRepository: ItemRepository
     @Mock lateinit var updaterSelector: UpdaterSelector
-    @Mock lateinit var template: SimpMessagingTemplate
+    @Mock lateinit var template: MessagingTemplate
     @Mock lateinit var podcastServerParameters: PodcastServerParameters
     @Spy var updateExecutor = ThreadPoolTaskExecutor()
     @Spy var manualExecutor = ThreadPoolTaskExecutor()

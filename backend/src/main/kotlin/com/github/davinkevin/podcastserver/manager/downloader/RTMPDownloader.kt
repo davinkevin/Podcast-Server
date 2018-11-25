@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
@@ -23,7 +24,7 @@ class RTMPDownloader(
         itemRepository: ItemRepository,
         podcastRepository: PodcastRepository,
         podcastServerParameters: PodcastServerParameters,
-        template: SimpMessagingTemplate,
+        template: MessagingTemplate,
         mimeTypeService: MimeTypeService,
         val processService: ProcessService,
         val externalTools: ExternalTools

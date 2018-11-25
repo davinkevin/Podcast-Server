@@ -2,16 +2,16 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -25,7 +25,7 @@ abstract class AbstractDownloader(
         val itemRepository: ItemRepository,
         val podcastRepository: PodcastRepository,
         val podcastServerParameters: PodcastServerParameters,
-        val template: SimpMessagingTemplate,
+        val template: MessagingTemplate,
         val mimeTypeService: MimeTypeService
 ) : Runnable, Downloader {
 

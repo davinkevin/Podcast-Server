@@ -3,13 +3,10 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 import arrow.core.Failure
 import arrow.core.Try
-import com.github.davinkevin.podcastserver.service.FfmpegService
-import com.github.davinkevin.podcastserver.service.MimeTypeService
-import com.github.davinkevin.podcastserver.service.ProcessService
-import com.github.davinkevin.podcastserver.service.UrlService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.service.*
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -17,7 +14,6 @@ import net.bramp.ffmpeg.progress.ProgressListener
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
@@ -28,7 +24,7 @@ class FfmpegDownloader(
         itemRepository: ItemRepository,
         podcastRepository: PodcastRepository,
         podcastServerParameters: PodcastServerParameters,
-        template: SimpMessagingTemplate,
+        template: MessagingTemplate,
         mimeTypeService: MimeTypeService,
         val ffmpegService: FfmpegService,
         val processService: ProcessService

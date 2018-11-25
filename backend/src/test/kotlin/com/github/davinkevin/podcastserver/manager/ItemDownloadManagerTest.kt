@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
 import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpExtractor
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
@@ -23,7 +24,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.verification.VerificationMode
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.time.ZonedDateTime.now
 import java.util.*
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit
 @ExtendWith(MockitoExtension::class)
 class ItemDownloadManagerTest {
 
-    @Mock lateinit var template: SimpMessagingTemplate
+    @Mock lateinit var template: MessagingTemplate
     @Mock lateinit var itemRepository: ItemRepository
     @Mock lateinit var podcastServerParameters: PodcastServerParameters
     @Mock lateinit var downloaderSelector: DownloaderSelector
