@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
@@ -146,7 +146,7 @@ abstract class AbstractDownloader(
                 return finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
             }
 
-            log.info("Doublon sur le fichier en lien avec {} - {}, {}", item.podcast.title, item.id, item.title)
+            log.info("Doublon sur le fichier en lien avec {} - {}, {}", item.podcast?.title, item.id, item.title)
             return generateTempFileNextTo(finalFile)
         } catch (e: Exception) {
             failDownload()
@@ -164,13 +164,13 @@ abstract class AbstractDownloader(
 
     private fun getDestinationFile(item: Item): Path {
         val fileName = downloadingItem.filename ?: getFileName(item)
-        return podcastServerParameters.rootfolder.resolve(item.podcast.title).resolve(fileName)
+        return podcastServerParameters.rootfolder.resolve(item.podcast?.title).resolve(fileName)
     }
 
     @Transactional
     open fun saveSyncWithPodcast() {
         try {
-            val podcast = podcastRepository.findById(item.podcast.id!!).orElseThrow { RuntimeException("Podcast with ID " + item.podcast.id + " not found") }
+            val podcast = podcastRepository.findById(item.podcast?.id!!).orElseThrow { RuntimeException("Podcast with ID " + item.podcast?.id + " not found") }
             item.podcast = podcast
             itemRepository.save(item)
         } catch (e: Exception) {

@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.service.health
 
+import com.github.davinkevin.podcastserver.entity.Item
 import com.nhaarman.mockitokotlin2.whenever
 import io.vavr.API.Set
 import io.vavr.collection.Queue
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry

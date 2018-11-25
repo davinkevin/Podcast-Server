@@ -14,7 +14,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toTry
 import com.jayway.jsonpath.TypeRef
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import lan.dk.podcastserver.service.JsonService.to

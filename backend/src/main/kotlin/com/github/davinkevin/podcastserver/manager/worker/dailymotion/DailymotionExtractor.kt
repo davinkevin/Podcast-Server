@@ -11,7 +11,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -26,14 +26,14 @@ import org.springframework.stereotype.Component
 class DailymotionExtractor(val json: JsonService, val html: HtmlService, val m3u8: M3U8Service) : Extractor {
 
     override fun extract(item: Item): DownloadingItem {
-        return html.get(item.url).k()
+        return html.get(item.url!!).k()
                 .map { it.select("script") }
                 .getOrElse { Elements() }
                 .firstOption { "__PLAYER_CONFIG__" in it.html() }
                 .flatMap { getPlayerConfig(it.html()) }
                 .map { json.parse(it) }
                 .map { JsonService.to("context", DailymotionContextItemExtractor::class.java).apply(it) }
-                .map { it.url.replace(":videoId", toId(item.url)) }
+                .map { it.url.replace(":videoId", toId(item.url!!)) }
                 .flatMap { json.parseUrl(it).k() }
                 .map { JsonService.to(DailymotionMetadataItemExtractor::class.java).apply(it) }
                 .map { it.url }

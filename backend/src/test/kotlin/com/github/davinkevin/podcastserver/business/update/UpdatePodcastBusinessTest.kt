@@ -4,6 +4,7 @@ package com.github.davinkevin.podcastserver.business.update
 import arrow.core.Option
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.business.CoverBusiness
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
@@ -11,7 +12,6 @@ import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository

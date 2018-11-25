@@ -1,14 +1,14 @@
 package lan.dk.podcastserver.repository.dsl;
 
 
+import com.github.davinkevin.podcastserver.entity.QItem;
+import com.github.davinkevin.podcastserver.entity.Status;
+import com.github.davinkevin.podcastserver.entity.Tag;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.QItem;
-import com.github.davinkevin.podcastserver.entity.Status;
-import com.github.davinkevin.podcastserver.entity.Tag;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;

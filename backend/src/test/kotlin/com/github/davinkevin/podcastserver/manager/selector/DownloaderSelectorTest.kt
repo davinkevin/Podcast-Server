@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.downloader.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Item
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

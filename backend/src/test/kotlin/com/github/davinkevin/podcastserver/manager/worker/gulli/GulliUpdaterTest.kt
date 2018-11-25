@@ -6,6 +6,7 @@ import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -14,7 +15,6 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -75,8 +75,8 @@ class GulliUpdaterTest {
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
         /* When */
         val items = gulliUpdater.findItems(podcast)
-        val first = items.firstOption { it.title.contains("13") }.getOrElse { throw RuntimeException("Episode 13 Not Found") }
-        val second = items.firstOption { it.title.contains("14") }.getOrElse { throw RuntimeException("Episode 14 Not Found") }
+        val first = items.firstOption { it.title!!.contains("13") }.getOrElse { throw RuntimeException("Episode 13 Not Found") }
+        val second = items.firstOption { it.title!!.contains("14") }.getOrElse { throw RuntimeException("Episode 14 Not Found") }
 
         /* Then */
         assertThat(items).isNotEmpty.hasSize(2)
@@ -84,12 +84,12 @@ class GulliUpdaterTest {
         assertThat(first.title).isEqualTo("Saison 19, Episode 13 : Voyages croisés")
         assertThat(first.url).isEqualTo("http://replay.gulli.fr/jwplayer/embed/VOD68526621555000")
         assertThat(first.description).isEqualTo("Sacha et Liam livrent un combat, et Amphinobi et Jungko, maintenant évolués, sont passionnés par cette revanche ! Non loin de là, Alain, qui est en voyage pour étudier la Méga-Évolution, s'arrête pour regarder le combat, et il est très intrigué de voir qu'Amphinobi semble se transformer, juste avant de vaincre Jungko. Alain veut en savoir davantage sur les possibilités de l'Amphinobi de Sacha, et il le met au défi de combattre son Dracaufeu. Lorsque Dracaufeu méga-évolue et qu'Amphinobi change à nouveau d'apparence, le combat devient intense ! Amphinobi finit par être vaincu mais tous souhaitent en savoir plus sur cette mystérieuse transformation ! Pendant ce temps, les expériences de la Team Flare semblent progresser...")
-        assertThat(first.cover.url).isEqualTo("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621555000_20161007-141504.png")
+        assertThat(first.cover!!.url).isEqualTo("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621555000_20161007-141504.png")
 
         assertThat(second.title).isEqualTo("Saison 19, Episode 14 : Une opération explosive")
         assertThat(second.url).isEqualTo("http://replay.gulli.fr/jwplayer/embed/VOD68526621609000")
         assertThat(second.description).isEqualTo("À la recherche de la Team Flare et de Pouic, la Team Rocket rencontre un Pokémon qui lui ressemble, celui que l'on connait sous le nom de Z2...et la Team Flare est sur ses traces ! Les deux équipes s'affrontent, et Z2 change plusieurs fois de ravisseurs jusqu'au moment où il fusionne avec de nombreuses Cellules pour devenir un Pokémon reptilien puissant et menaçant, dont les attaques bousculent ses ravisseurs ! Z2 prend l'avantage, mais Lysandre a appelé du renfort ! Avec l'aide d'Alain et de son Méga-Dracaufeu, la Team Flare affronte Z2 et l'enferme dans une cage. Pendant ce temps, au campement de nos héros, Clem câline un Pouic triste et inquiet, en essayant de comprendre ce qui ne va pas...")
-        assertThat(second.cover.url).isEqualTo("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621609000_20161007-142635.png")
+        assertThat(second.cover!!.url).isEqualTo("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621609000_20161007-142635.png")
     }
 
     @Test

@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.k
 import io.vavr.collection.List
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.lang3.StringUtils

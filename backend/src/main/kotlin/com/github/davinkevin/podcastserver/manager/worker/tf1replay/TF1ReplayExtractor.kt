@@ -13,7 +13,7 @@ import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGE
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_KEY
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_MOBILE
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -30,13 +30,13 @@ class TF1ReplayExtractor(val htmlService: HtmlService, val jsonService: JsonServ
 
     // https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-deuxieme-partie-21-juin-2017.html
     override fun getFileName(item: Item): String =
-            item.url
+            item.url!!
                     .substringAfterLast("/")
                     .substringBeforeLast("?")
                     .baseName() + ".mp4"
 
     override fun extract(item: Item): DownloadingItem {
-        return htmlService.get(item.url).k()
+        return htmlService.get(item.url!!).k()
                 .flatMap { it.select("#zonePlayer").firstOption() }
                 .map { it.attr("data-src") }
                 .map { UrlService.removeQueryParameters(it) }

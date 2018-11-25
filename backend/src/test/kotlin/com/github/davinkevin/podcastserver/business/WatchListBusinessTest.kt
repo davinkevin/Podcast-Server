@@ -1,10 +1,10 @@
 package com.github.davinkevin.podcastserver.business
 
 
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.nhaarman.mockitokotlin2.*
 import io.vavr.API.Set
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.WatchList
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.WatchListRepository

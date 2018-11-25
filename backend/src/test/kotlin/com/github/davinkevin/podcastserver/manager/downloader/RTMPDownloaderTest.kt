@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.STARTED
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
@@ -11,7 +12,6 @@ import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -115,7 +115,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(item.status).isEqualTo(Status.FAILED)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
+                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast!!.title)))
                         .isEqualTo(0)
             }
 
@@ -135,7 +135,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(item.status).isEqualTo(Status.FAILED)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
+                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast!!.title)))
                         .isEqualTo(0)
                 verify(p).destroy()
             }
@@ -145,10 +145,10 @@ class RTMPDownloaderTest {
         @DisplayName("should download")
         inner class ShouldDownload {
 
-            private val destination = ROOT_TEST_PATH.resolve(item.podcast.title).resolve("bar.mp4$TEMPORARY_EXTENSION")
+            private val destination = ROOT_TEST_PATH.resolve(item.podcast!!.title).resolve("bar.mp4$TEMPORARY_EXTENSION")
             private val pb = mock<ProcessBuilder>()
             private val p = mock<Process>()
-            private val parameters = arrayOf("/usr/local/bin/rtmpdump","-r", item.url, "-o", destination.toAbsolutePath().toString())
+            private val parameters = arrayOf("/usr/local/bin/rtmpdump","-r", item.url!!, "-o", destination.toAbsolutePath().toString())
             private val pid = 1234
 
             @BeforeEach
@@ -172,7 +172,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(item.status).isEqualTo(Status.FINISH)
-                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("bar.mp4")).exists()
+                assertThat(ROOT_TEST_PATH.resolve(item.podcast!!.title).resolve("bar.mp4")).exists()
             }
 
             @Nested
@@ -309,7 +309,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(item.status).isEqualTo(Status.FAILED)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
+                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast!!.title)))
                         .isEqualTo(0)
             }
         }

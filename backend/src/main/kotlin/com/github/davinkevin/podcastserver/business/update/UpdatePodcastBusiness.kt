@@ -4,6 +4,7 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.business.CoverBusiness
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
@@ -11,8 +12,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.Updater.Companion.NO_MODIFICATION
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
@@ -125,18 +125,18 @@ class UpdatePodcastBusiness(
                         Updater.NO_MODIFICATION
                     }
 
-    private fun attachNewItemsToPodcast(podcast: Podcast, items: Set<Item>, filter: (Item) -> Boolean): Set<Item> {
+    private fun attachNewItemsToPodcast(p: Podcast, items: Set<Item>, filter: (Item) -> Boolean): Set<Item> {
 
         if (items.isEmpty()) {
-            log.info("Reset of signature in order to force the next update: {}", podcast.title)
-            podcast.signature = ""
-            podcastRepository.save(podcast)
+            log.info("Reset of signature in order to force the next update: {}", p.title)
+            p.signature = ""
+            podcastRepository.save(p)
             return setOf()
         }
 
         val itemsToAdd = items
                 .filter(filter)
-                .map { it.setPodcast(podcast) }
+                .map { it.apply { podcast = p } }
                 .filter { validator.validate(it).isEmpty() }
                 .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) null else it.cover } }
 
@@ -148,10 +148,10 @@ class UpdatePodcastBusiness(
         itemRepository.saveAll(
                 itemsToAdd
                         .map { it.apply { numberOfFail = 0; status = Status.NOT_DOWNLOADED } }
-                        .map { podcast.add(it); it }
+                        .map { p.add(it); it }
         )
 
-        podcastRepository.save(podcast.lastUpdateToNow())
+        podcastRepository.save(p.lastUpdateToNow())
 
         return itemsToAdd.toSet()
     }
@@ -181,7 +181,7 @@ class UpdatePodcastBusiness(
         log.info("Reset of Started and Paused")
 
         itemRepository.findByStatus(Status.STARTED, Status.PAUSED)
-                .map { it.setStatus(Status.NOT_DOWNLOADED) }
+                .map { it.apply { status = Status.NOT_DOWNLOADED } }
                 .forEach { itemRepository.save(it) }
     }
 

@@ -548,7 +548,6 @@
                 </executions>
                 <configuration>
                     <classes>
-                        <param>lan.dk.podcastserver.entity.Item</param>
                         <param>org.springframework.data.domain.Page</param>
                     </classes>
                     <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>

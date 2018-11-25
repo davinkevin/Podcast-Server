@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.manager.worker
 
 import arrow.core.getOrElse
 import arrow.core.toOption
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.apache.commons.io.FilenameUtils
 

@@ -4,8 +4,8 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.core.toOption
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YOUTUBE
+import com.github.davinkevin.podcastserver.entity.Item
 import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika
 import org.springframework.stereotype.Service
@@ -39,12 +39,12 @@ class MimeTypeService(val tikaProbeContentType: TikaProbeContentType) {
 
     fun getExtension(item: Item): String {
         if (item.mimeType != null) {
-            return item.mimeType
+            return item.mimeType!!
                     .replace("audio/", ".")
                     .replace("video/", ".")
         }
 
-        if (item.podcast.type == YOUTUBE || !item.url.contains(".") ) {
+        if (item.podcast!!.type == YOUTUBE || !item.url!!.contains(".") ) {
             return ".mp4"
         }
 

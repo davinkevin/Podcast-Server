@@ -4,12 +4,12 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.WatchList
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.control.Option
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Item
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
@@ -185,7 +185,7 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         // URL Format
         private val LINK_PODCAST_HTML_FORMAT = "%s/podcasts/%s"
         private val LINK_PODCAST_FORMAT = "%s/api/podcasts/%s/rss"
-        private val PUB_DATE_COMPARATOR = { one: Item, another: Item -> -(one.pubDate.compareTo(another.pubDate)) }
+        private val PUB_DATE_COMPARATOR = { one: Item, another: Item -> -(one.pubDate!!.compareTo(another.pubDate!!)) }
         private val TITLE_COMPARATOR = Comparator.comparing(Function<Podcast, String> { it.title!! })
     }
 
@@ -221,7 +221,7 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         return Element(ITEM).apply {
             addContent(Element(TITLE).addContent(Text(title)))
             addContent(Element(DESCRIPTION).addContent(Text(description)))
-            addContent(Element(PUB_DATE).addContent(Text(pubDate.format(DateTimeFormatter.RFC_1123_DATE_TIME))))
+            addContent(Element(PUB_DATE).addContent(Text(pubDate!!.format(DateTimeFormatter.RFC_1123_DATE_TIME))))
             addContent(Element(EXPLICIT, ITUNES_NAMESPACE).addContent(Text(NO)))
             addContent(Element(SUBTITLE, ITUNES_NAMESPACE).addContent(Text(title)))
             addContent(Element(SUMMARY, ITUNES_NAMESPACE).addContent(Text(description)))

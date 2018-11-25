@@ -13,7 +13,7 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.TypeRef
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
@@ -28,7 +28,7 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
 
     override fun extract(item: Item): DownloadingItem {
 
-        val m = URL_EXTRACTOR.on(item.url)
+        val m = URL_EXTRACTOR.on(item.url!!)
 
         val list = (m.group(1).k() to m.group(2).k())
                 .map { toJsonUrl(it) }

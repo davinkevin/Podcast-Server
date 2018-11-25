@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.entity.Item
 
 /**
  * Created by kevin on 10/03/2016 for Podcast Server
@@ -19,7 +19,7 @@ class NoOpDownloader : Downloader {
     }
 
     override fun download(): Item = Item.DEFAULT_ITEM
-    override fun getItemUrl(item: Item): String = item.url
+    override fun getItemUrl(item: Item): String = item.url!!
     override fun startDownload() = failDownload()
     override fun pauseDownload() {}
     override fun restartDownload() {}

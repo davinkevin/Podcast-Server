@@ -10,7 +10,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat

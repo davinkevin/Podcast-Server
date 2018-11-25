@@ -8,6 +8,7 @@ import com.github.axet.wget.info.ex.DownloadInterruptedError
 import com.github.axet.wget.info.ex.DownloadMultipartError
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MimeTypeService
@@ -15,7 +16,6 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -124,8 +124,8 @@ class HTTPDownloaderTest {
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
             whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
-            whenever(urlService.getRealURL(eq(item.url), any(), any())).then { it.arguments[0] }
-            whenever(wGetFactory.newDownloadInfo(item.url)).thenReturn(downloadInfo)
+            whenever(urlService.getRealURL(eq(item.url!!), any(), any())).then { it.arguments[0] }
+            whenever(wGetFactory.newDownloadInfo(item.url!!)).thenReturn(downloadInfo)
             whenever(wGetFactory.newWGet(any(), any())).thenReturn(wGet)
             doAnswer {
                 Files.createFile(ROOT_TEST_PATH.resolve(podcast.title).resolve("file.mp4$TEMPORARY_EXTENSION"))
@@ -177,7 +177,7 @@ class HTTPDownloaderTest {
         fun should_stop_download() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url), null, null),
+                    DownloadingItem(item, listOf(item.url!!), null, null),
                     itemDownloadManager
             )
 
@@ -209,7 +209,7 @@ class HTTPDownloaderTest {
         fun should_handle_multipart_download_error() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url), null, null),
+                    DownloadingItem(item, listOf(item.url!!), null, null),
                     itemDownloadManager
             )
 
@@ -243,7 +243,7 @@ class HTTPDownloaderTest {
         fun should_handle_downloadunterruptedError() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url), null, null),
+                    DownloadingItem(item, listOf(item.url!!), null, null),
                     itemDownloadManager
             )
 
@@ -272,7 +272,7 @@ class HTTPDownloaderTest {
         fun should_handle_IOException_during_download() {
             /* Given */
             downloader.with(
-                    DownloadingItem(item, listOf(item.url), null, null),
+                    DownloadingItem(item, listOf(item.url!!), null, null),
                     itemDownloadManager
             )
 
@@ -300,7 +300,7 @@ class HTTPDownloaderTest {
         @Test
         fun `should be compatible`() {
             /* Given */
-            val di = DownloadingItem(item, listOf(item.url), null, null)
+            val di = DownloadingItem(item, listOf(item.url!!), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -310,7 +310,7 @@ class HTTPDownloaderTest {
         @Test
         fun `should not be compatible because multiple url`() {
             /* Given */
-            val di = DownloadingItem(item, listOf(item.url, item.url), null, null)
+            val di = DownloadingItem(item, listOf(item.url!!, item.url!!), null, null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

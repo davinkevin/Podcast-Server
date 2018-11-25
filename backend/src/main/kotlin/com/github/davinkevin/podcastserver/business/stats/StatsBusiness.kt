@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.querydsl.core.types.dsl.BooleanExpression
 import io.vavr.collection.List
 import io.vavr.collection.Set
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.*
 import org.springframework.stereotype.Component

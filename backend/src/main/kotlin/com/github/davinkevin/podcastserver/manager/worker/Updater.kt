@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.worker
 
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.slf4j.LoggerFactory
 

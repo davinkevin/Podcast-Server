@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
+import com.github.davinkevin.podcastserver.entity.Item
 import com.nhaarman.mockitokotlin2.mock
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

@@ -1,12 +1,12 @@
 package lan.dk.podcastserver.repository;
 
+import com.github.davinkevin.podcastserver.entity.Item;
 import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Item;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -93,7 +93,7 @@ public class WatchListRepositoryTest {
     public void should_find_playlist_having_item() {
         /* Given */
         dbSetupTracker.skipNextLaunch();
-        Item item = new Item().setId(UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"));
+        Item item = new Item(); item.setId(UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"));
 
         /* When */
         Set<WatchList> watchLists = watchListRepository.findContainsItem(item);

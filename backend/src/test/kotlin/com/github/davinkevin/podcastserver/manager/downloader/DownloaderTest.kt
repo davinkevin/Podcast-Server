@@ -2,14 +2,14 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader.Companion.WS_TOPIC_DOWNLOAD
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -197,7 +197,7 @@ class DownloaderTest {
         fun `should handle error during creation of temp file`() {
             /* Given */
             podcast.title = "bin"
-            downloader.with(DownloadingItem(item.setUrl("http://foo.bar.com/bash"),  listOf(), null, null), itemDownloadManager)
+            downloader.with(DownloadingItem(item.apply { url = "http://foo.bar.com/bash" },  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastServerParameters.rootfolder).thenReturn(Paths.get("/"))
             whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
@@ -287,8 +287,8 @@ class DownloaderTest {
             try {
                 target = getTargetFile(item)
                 item.status = Status.FINISH
-                Files.createFile(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4$TEMPORARY_EXTENSION"))
-                Files.createFile(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4"))
+                Files.createFile(ROOT_TEST_PATH.resolve(item.podcast!!.title).resolve("file.mp4$TEMPORARY_EXTENSION"))
+                Files.createFile(ROOT_TEST_PATH.resolve(item.podcast!!.title).resolve("file.mp4"))
             } catch (e: IOException) {
                 e.printStackTrace()
             }

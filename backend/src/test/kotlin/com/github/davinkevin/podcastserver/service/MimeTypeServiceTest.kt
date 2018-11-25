@@ -3,9 +3,9 @@ package com.github.davinkevin.podcastserver.service
 import arrow.core.Option
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.IOUtils
-import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.nhaarman.mockitokotlin2.whenever
 import org.apache.tika.Tika
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -56,7 +56,7 @@ class MimeTypeServiceTest {
         @Test
         fun `should get extension by mimeType`() {
             /* Given */
-            val item = Item().setMimeType("audio/mp3")
+            val item = Item().apply { mimeType = "audio/mp3" }
 
             /* When */
             val extension = mimeTypeService.getExtension(item)
@@ -66,7 +66,9 @@ class MimeTypeServiceTest {
         @Test
         fun `should get extension by Youtube`() {
             /* Given */
-            val item = Item().setPodcast(Podcast().apply { type = "Youtube"; url = "http://fake.com/foo/bar" })
+            val item = Item().apply {
+                podcast = Podcast().apply { type = "Youtube"; url = "http://fake.com/foo/bar" }
+            }
 
             /* When */
             val extension = mimeTypeService.getExtension(item)
@@ -76,9 +78,10 @@ class MimeTypeServiceTest {
         @Test
         fun `should get extension by url`() {
             /* Given */
-            val item = Item()
-                    .setPodcast(Podcast().apply { type = "Other" })
-                    .setUrl("http://fake.com/foo/bar.mp4a")
+            val item = Item().apply {
+                podcast = Podcast().apply { type = "Other" }
+                url = "http://fake.com/foo/bar.mp4a"
+            }
 
             /* When */
             val extension = mimeTypeService.getExtension(item)

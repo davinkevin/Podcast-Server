@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.manager.worker.tf1replay
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.service.UrlService
@@ -13,7 +14,6 @@ import com.mashape.unirest.http.HttpResponse
 import com.mashape.unirest.request.GetRequest
 import com.nhaarman.mockitokotlin2.*
 import io.vavr.API
-import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.input.NullInputStream
 import org.assertj.core.api.Assertions.assertThat
@@ -88,7 +88,7 @@ class TF1ReplayExtractorTest {
             @Test
             fun `real url`() {
                 /* Given */
-                whenever(htmlService.get(item.url)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
                 doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
                 doAnswer { m3u8request }.whenever(urlService).get(url)
 
@@ -104,7 +104,7 @@ class TF1ReplayExtractorTest {
             @Test
             fun `add user agent for real url`() {
                 /* Given */
-                whenever(htmlService.get(item.url)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
                 doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
                 doAnswer { m3u8request }.whenever(urlService).get(url)
 
@@ -121,7 +121,7 @@ class TF1ReplayExtractorTest {
             @Test
             fun `url with short id`() {
                 /* Given */
-                whenever(htmlService.get(item.url)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.short-id.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.short-id.item.html"))
                 doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/3184238")
                 doAnswer { m3u8request }.whenever(urlService).get(url)
 
@@ -139,7 +139,7 @@ class TF1ReplayExtractorTest {
             @Test
             fun `fall back to default url`() {
                 /* Given */
-                whenever(htmlService.get(item.url)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
                 doAnswer { throw RuntimeException("Error during fetch of $url") }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
                 doAnswer { m3u8request }.whenever(urlService).get("http://wat.tv/get/ipad/13184238.m3u8")
                 whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
@@ -169,7 +169,7 @@ class TF1ReplayExtractorTest {
                 /* Given */
                 whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
                 whenever(m3U8Service.findBestQuality(any())).thenReturn(API.Option("foo/bar/video.mp4"))
-                whenever(htmlService.get(item.url)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
                 doAnswer { apiRequest }.whenever(urlService).get(url)
                 doAnswer { throw RuntimeException("Error during `get` of `http://www.wat.tv/get/webhtml/13184238`") }
                         .whenever(urlService).get("http://wat.tv/get/ipad/13184238.m3u8")
@@ -185,7 +185,7 @@ class TF1ReplayExtractorTest {
             fun `when searching for best m3u8 format`() {
                 /* Given */
                 whenever(m3U8Service.findBestQuality(any())).thenReturn(None.toVΛVΓ())
-                whenever(htmlService.get(item.url)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
                 doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
                 doAnswer { m3u8request }.whenever(urlService).get(url)
 
@@ -201,7 +201,7 @@ class TF1ReplayExtractorTest {
     @Test
     fun `should throw error if url can't be extracted`() {
         /* Given */
-        whenever(htmlService.get(item.url)).then { None.toVΛVΓ() }
+        whenever(htmlService.get(item.url!!)).then { None.toVΛVΓ() }
         /* When */
         assertThatThrownBy { extractor.extract(item) }
         /* Then */

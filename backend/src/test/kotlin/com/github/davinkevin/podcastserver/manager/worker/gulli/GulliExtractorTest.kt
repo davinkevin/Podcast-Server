@@ -2,10 +2,10 @@ package com.github.davinkevin.podcastserver.manager.worker.gulli
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -27,10 +27,10 @@ class GulliExtractorTest {
     @Mock lateinit var jsonService: JsonService
     @InjectMocks lateinit var extractor: GulliExtractor
     
-    private val item: Item = Item.builder()
-            .title("Gulli Item")
-            .url("http://replay.gulli.fr/")
-            .build()
+    private val item: Item = Item().apply {
+            title = "Gulli Item"
+            url = "http://replay.gulli.fr/"
+    }
 
     @Test
     fun `should find url for gulli item`() {

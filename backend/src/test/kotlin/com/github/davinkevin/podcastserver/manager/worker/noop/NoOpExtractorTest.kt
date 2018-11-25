@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

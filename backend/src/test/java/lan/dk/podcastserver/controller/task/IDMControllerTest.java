@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.controller.task;
 
+import com.github.davinkevin.podcastserver.entity.Item;
+import com.github.davinkevin.podcastserver.entity.Podcast;
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Item;
-import com.github.davinkevin.podcastserver.entity.Podcast;
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,9 +14,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.UUID;
 
-import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by kevin on 08/08/2016.
@@ -32,10 +34,13 @@ public class IDMControllerTest {
     @Test
     public void should_get_download_list() {
         /* Given */
-        Queue<Item> waitingQueue = Queue.of(
-                Item.builder().title("Foo").podcast(PODCAST).build(),
-                Item.builder().title("Bar").podcast(PODCAST).build()
-        );
+        Item i1 = new Item();
+        i1.setTitle("Foo");
+        i1.setPodcast(PODCAST);
+        Item i2 = new Item();
+        i2.setTitle("Bar");
+        i2.setPodcast(PODCAST);
+        Queue<Item> waitingQueue = Queue.of(i1, i2);
         when(IDM.getWaitingQueue()).thenReturn(waitingQueue);
 
         /* When */
@@ -50,10 +55,13 @@ public class IDMControllerTest {
     @Test
     public void should_get_downloading_list() {
         /* Given */
-        Set<Item> items = HashSet.of(
-                Item.builder().id(UUID.randomUUID()).title("Foo").podcast(PODCAST).build(),
-                Item.builder().id(UUID.randomUUID()).title("Bar").podcast(PODCAST).build()
-        );
+        Item i1 = new Item();
+        i1.setTitle("Foo");
+        i1.setPodcast(PODCAST);
+        Item i2 = new Item();
+        i2.setTitle("Bar");
+        i2.setPodcast(PODCAST);
+        Set<Item> items = HashSet.of(i1, i2);
         when(IDM.getItemsInDownloadingQueue()).thenReturn(items);
 
         /* When */
@@ -67,16 +75,16 @@ public class IDMControllerTest {
     @Test
     public void should_find_item_in_downloading_list_by_id() {
         /* Given */
-        Item item = Item.builder().id(UUID.randomUUID()).build();
+        Item item = new Item();
+        item.setId(UUID.randomUUID());
         when(IDM.getItemInDownloadingQueue(eq(item.getId()))).thenReturn(item);
 
         /* When */
         Item itemInDownloadingList = idmController.getDownloadingList(item.getId());
 
         /* Then */
-        assertThat(itemInDownloadingList)
-                .isSameAs(item)
-                .hasId(item.getId());
+        assertThat(itemInDownloadingList).isSameAs(item);
+        assertThat(itemInDownloadingList.getId()).isEqualTo(item.getId());
         verify(IDM, only()).getItemInDownloadingQueue(eq(item.getId()));
     }
 

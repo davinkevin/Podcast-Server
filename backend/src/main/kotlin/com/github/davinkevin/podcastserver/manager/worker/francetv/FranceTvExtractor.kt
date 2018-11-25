@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -24,14 +24,14 @@ import org.springframework.stereotype.Component
 class FranceTvExtractor(val htmlService: HtmlService, val jsonService: JsonService) : Extractor {
 
     override fun extract(item: Item) =
-            htmlService.get(item.url).k()
+            htmlService.get(item.url!!).k()
                     .flatMap { it.select("#player").firstOption() }
                     .map { it.attr("data-main-video") }
                     .map { CATALOG_URL.format(it) }
                     .flatMap { jsonService.parseUrl(it).k() }
                     .map { JsonService.to(FranceTvItem::class.java).apply(it) }
                     .map { it.url }
-                    .map { DownloadingItem(item, listOf(it), item.url.filename().baseName() + ".mp4", null) }
+                    .map { DownloadingItem(item, listOf(it), item.url!!.filename().baseName() + ".mp4", null) }
                     .getOrElse { throw RuntimeException("Error during extraction of FranceTV item") }
 
 

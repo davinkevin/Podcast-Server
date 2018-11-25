@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 import arrow.syntax.collections.firstOption
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 
 /**
  * Created by kevin on 03/12/2017

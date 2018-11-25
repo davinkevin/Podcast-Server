@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.business
 
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
@@ -10,7 +11,6 @@ import com.nhaarman.mockitokotlin2.*
 import com.querydsl.core.types.Predicate
 import io.vavr.API.Set
 import io.vavr.collection.List
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import org.assertj.core.api.Assertions.assertThat

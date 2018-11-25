@@ -4,11 +4,11 @@ import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
 import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -29,7 +29,7 @@ class DailymotionExtractorTest {
     @Mock lateinit var m3U8Service: M3U8Service
     @InjectMocks lateinit var extractor: DailymotionExtractor
 
-    private var item: Item = Item().apply { 
+    private var item: Item = Item().apply {
             title = "CHROMA S01.11 LES AFFRANCHIS"
             url = "https://www.dailymotion.com/video/x5ikng3?param=1"
     }
@@ -38,7 +38,7 @@ class DailymotionExtractorTest {
     fun `should load chromecast stream`() {
         /* Given */
         val chromecastUrl = "https://www.dailymotion.com/cdn/manifest/video/x5ikng3.m3u8?auth=1539545073-2562-nei1ulu3-81a790d43c8e11ced7a896781f49c941"
-        whenever(htmlService.get(item.url))
+        whenever(htmlService.get(item.url!!))
                 .then { fileAsHtml(from("karimdebbache.chroma.s01e11.html")) }
         whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(jsonService.parseUrl("https://www.dailymotion.com/player/metadata/video/x5ikng3?embedder=https%3A%2F%2Fwww.dailymotion.com%2Fvideo%2Fx5ikng3&locale=en&integration=inline&GK_PV5_NEON=1"))
@@ -60,7 +60,7 @@ class DailymotionExtractorTest {
     @Test
     fun `should throw error if no result found from html remote call`() {
         /* GIVEN */
-        whenever(htmlService.get(item.url)).then { None.toVΛVΓ() }
+        whenever(htmlService.get(item.url!!)).then { None.toVΛVΓ() }
 
         /* When */
         assertThatThrownBy { extractor.extract(item) }
@@ -75,7 +75,7 @@ class DailymotionExtractorTest {
     @Test
     fun `should throw error if no script tag with json data`() {
         /* GIVEN */
-        whenever(htmlService.get(item.url))
+        whenever(htmlService.get(item.url!!))
                 .then { fileAsHtml(from("karimdebbache.chroma.s01e11.incoherent.html")) }
 
         /* When */
@@ -91,7 +91,7 @@ class DailymotionExtractorTest {
     @Test
     fun `should throw error if nothing found from json call`() {
         /* GIVEN */
-        whenever(htmlService.get(item.url))
+        whenever(htmlService.get(item.url!!))
                 .then { fileAsHtml(from("karimdebbache.chroma.s01e11.html")) }
         whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(jsonService.parseUrl("https://www.dailymotion.com/player/metadata/video/x5ikng3?embedder=https%3A%2F%2Fwww.dailymotion.com%2Fvideo%2Fx5ikng3&locale=en&integration=inline&GK_PV5_NEON=1"))

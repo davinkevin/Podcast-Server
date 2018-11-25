@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.manager
 
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
@@ -9,14 +11,11 @@ import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpExtractor
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Status
 import lan.dk.podcastserver.repository.ItemRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyString
@@ -26,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.verification.VerificationMode
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
-import java.nio.file.Paths
 import java.time.ZonedDateTime.now
 import java.util.*
 import java.util.concurrent.CompletableFuture.runAsync
@@ -251,15 +249,15 @@ class ItemDownloadManagerTest {
     fun should_add_item_to_queue() {
         /* Given */
         val item = Item().apply { id = UUID.randomUUID(); status = Status.FINISH }
-        whenever(itemRepository.findById(item.id)).thenReturn(Optional.of(item))
+        whenever(itemRepository.findById(item.id!!)).thenReturn(Optional.of(item))
         whenever(downloaderExecutor.corePoolSize).thenReturn(3)
 
         /* When */
-        itemDownloadManager.addItemToQueue(item.id)
+        itemDownloadManager.addItemToQueue(item.id!!)
 
         /* Then */
         verifyConvertAndSave()
-        verify(itemRepository).findById(item.id)
+        verify(itemRepository).findById(item.id!!)
         assertThat(itemDownloadManager.waitingQueue).isEmpty()
     }
 
@@ -298,11 +296,11 @@ class ItemDownloadManagerTest {
     fun should_remove_from_queue() {
         /* Given */
         val item = Item().apply { id = UUID.randomUUID() }
-        whenever(itemRepository.findById(item.id)).thenReturn(Optional.of(item))
+        whenever(itemRepository.findById(item.id!!)).thenReturn(Optional.of(item))
         /* When */
-        itemDownloadManager.removeItemFromQueue(item.id, true)
+        itemDownloadManager.removeItemFromQueue(item.id!!, true)
         /* Then */
-        verify(itemRepository).findById(item.id)
+        verify(itemRepository).findById(item.id!!)
         verify(itemRepository).save(item)
         verifyConvertAndSave(times(1))
     }
@@ -311,16 +309,16 @@ class ItemDownloadManagerTest {
     fun should_remove_from_queue_an_unknown_item() {
         /* Given */
         val item = Item().apply { id = UUID.randomUUID() }
-        whenever(itemRepository.findById(item.id)).thenReturn(Optional.empty())
+        whenever(itemRepository.findById(item.id!!)).thenReturn(Optional.empty())
 
         /* When */
-        assertThatThrownBy { itemDownloadManager.removeItemFromQueue(item.id, true) }
+        assertThatThrownBy { itemDownloadManager.removeItemFromQueue(item.id!!, true) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessageStartingWith("Item with ID ")
                 .hasMessageEndingWith("not found")
 
         /* Then */
-        verify(itemRepository).findById(item.id)
+        verify(itemRepository).findById(item.id!!)
         verifyConvertAndSave(times(0))
     }
 
@@ -363,7 +361,7 @@ class ItemDownloadManagerTest {
         itemDownloadManager.launchDownload()
 
         /* When */
-        itemDownloadManager.stopDownload(item2.id)
+        itemDownloadManager.stopDownload(item2.id!!)
 
         /* Then */
         verify(downloader1, never()).stopDownload()
@@ -397,7 +395,7 @@ class ItemDownloadManagerTest {
         itemDownloadManager.launchDownload()
 
         /* When */
-        itemDownloadManager.pauseDownload(item2.id)
+        itemDownloadManager.pauseDownload(item2.id!!)
 
         /* Then */
         verify(downloader1, never()).pauseDownload()
@@ -423,7 +421,7 @@ class ItemDownloadManagerTest {
         whenever(downloader2.item).thenReturn(item2)
 
         /* When */
-        itemDownloadManager.restartDownload(item2.id)
+        itemDownloadManager.restartDownload(item2.id!!)
 
         /* Then */
         verify(downloader1, never()).restartDownload()
@@ -450,7 +448,7 @@ class ItemDownloadManagerTest {
         whenever(downloader2.item).thenReturn(item2)
 
         /* When */
-        itemDownloadManager.toggleDownload(item2.id)
+        itemDownloadManager.toggleDownload(item2.id!!)
 
         /* Then */
         verify(downloader1, never()).pauseDownload()
@@ -477,7 +475,7 @@ class ItemDownloadManagerTest {
         item2.status = Status.PAUSED
 
         /* When */
-        itemDownloadManager.toggleDownload(item2.id)
+        itemDownloadManager.toggleDownload(item2.id!!)
 
         /* Then */
         verify(downloader1, never()).restartDownload()
@@ -538,7 +536,7 @@ class ItemDownloadManagerTest {
         itemDownloadManager.addItemToQueue(ITEM_3)
 
         /* When */
-        itemDownloadManager.moveItemInQueue(ITEM_2.id, 2)
+        itemDownloadManager.moveItemInQueue(ITEM_2.id!!, 2)
 
         /* Then */
         assertThat(itemDownloadManager.waitingQueue)
@@ -583,7 +581,7 @@ class ItemDownloadManagerTest {
 
         /* Then */
         assertThat(item.numberOfFail).isEqualTo(1)
-        verify(downloaderSelector, times(2)).of(DownloadingItem(item, listOf(item.url), null, null))
+        verify(downloaderSelector, times(2)).of(DownloadingItem(item, listOf(item.url!!), null, null))
         verifyPostLaunchDownload()
     }
 
@@ -681,7 +679,7 @@ class ItemDownloadManagerTest {
         itemDownloadManager.launchDownload()
 
         /* When */
-        val item = itemDownloadManager.getItemInDownloadingQueue(item1.id)
+        val item = itemDownloadManager.getItemInDownloadingQueue(item1.id!!)
 
         /* Then */
         assertThat(item).isSameAs(item1)

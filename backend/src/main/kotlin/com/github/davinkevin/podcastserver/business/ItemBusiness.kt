@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.Set
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecifications
 import org.apache.commons.io.FilenameUtils
@@ -73,7 +73,7 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
 
         //* Si le téléchargement est en cours ou en attente : *//
         itemDownloadManager.removeItemFromQueueAndDownload(itemToDelete)
-        itemToDelete.podcast.items!!.remove(itemToDelete)
+        itemToDelete.podcast?.items!!.remove(itemToDelete)
         itemRepository.delete(itemToDelete)
     }
 

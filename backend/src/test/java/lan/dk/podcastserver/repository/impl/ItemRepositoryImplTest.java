@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.repository.impl;
 
+import com.github.davinkevin.podcastserver.entity.Item;
 import io.vavr.collection.List;
-import lan.dk.podcastserver.entity.Item;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;
 import org.hibernate.search.MassIndexer;

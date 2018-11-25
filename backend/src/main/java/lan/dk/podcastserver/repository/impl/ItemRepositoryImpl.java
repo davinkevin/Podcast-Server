@@ -1,7 +1,7 @@
 package lan.dk.podcastserver.repository.impl;
 
+import com.github.davinkevin.podcastserver.entity.Item;
 import io.vavr.collection.List;
-import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.repository.custom.ItemRepositoryCustom;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;

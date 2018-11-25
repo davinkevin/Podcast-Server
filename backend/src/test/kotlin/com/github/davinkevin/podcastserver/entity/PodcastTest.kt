@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.entity
 
 import io.vavr.collection.HashSet
-import lan.dk.podcastserver.entity.Item
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -97,8 +96,8 @@ class PodcastTest {
 
     @Test
     fun should_contains_item() {
-        val itemToAdd = Item().setId(UUID.randomUUID())
-        val itemToAdd2 = Item().setId(UUID.randomUUID())
+        val itemToAdd = Item().apply { id = UUID.randomUUID() }
+        val itemToAdd2 = Item().apply { id = UUID.randomUUID() }
         podcast.add(itemToAdd)
 
         assertThat(podcast.contains(itemToAdd)).isTrue()

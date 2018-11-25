@@ -4,6 +4,7 @@ import arrow.core.None
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater.Companion.JEUXVIDEOCOM_HOST
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
@@ -14,7 +15,6 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

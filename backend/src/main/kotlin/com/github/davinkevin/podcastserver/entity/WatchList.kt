@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.entity
 
 import com.fasterxml.jackson.annotation.JsonView
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import java.util.*
 import javax.persistence.*
 

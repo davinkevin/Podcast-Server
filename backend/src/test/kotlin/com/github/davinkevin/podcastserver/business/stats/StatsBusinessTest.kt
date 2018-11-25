@@ -9,7 +9,7 @@ import io.vavr.API
 import io.vavr.collection.HashSet
 import io.vavr.collection.Set
 import com.github.davinkevin.podcastserver.business.PodcastBusiness
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.Type

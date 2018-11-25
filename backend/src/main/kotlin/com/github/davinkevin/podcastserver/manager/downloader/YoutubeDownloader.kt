@@ -5,13 +5,13 @@ import com.github.axet.vget.info.VideoFileInfo
 import com.github.axet.vget.info.VideoInfo
 import com.github.axet.wget.info.ex.DownloadIOCodeError
 import com.github.axet.wget.info.ex.DownloadMultipartError
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.FfmpegService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import io.vavr.API.Try
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
@@ -56,7 +56,7 @@ class YoutubeDownloader(
     override fun download(): Item {
         try {
             watcher = YoutubeWatcher(this)
-            val parser = wGetFactory.parser(item.url)
+            val parser = wGetFactory.parser(item.url!!)
 
             v = wGetFactory.newVGet(parser.info(URL(item.url)))
             v.extract(parser, stopDownloading, watcher)

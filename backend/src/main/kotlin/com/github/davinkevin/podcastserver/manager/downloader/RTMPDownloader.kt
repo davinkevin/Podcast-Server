@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository

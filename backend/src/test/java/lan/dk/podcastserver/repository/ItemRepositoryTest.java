@@ -1,14 +1,14 @@
 package lan.dk.podcastserver.repository;
 
+import com.github.davinkevin.podcastserver.entity.Item;
+import com.github.davinkevin.podcastserver.entity.Status;
+import com.github.davinkevin.podcastserver.manager.worker.Type;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.API;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Item;
-import com.github.davinkevin.podcastserver.entity.Status;
-import com.github.davinkevin.podcastserver.manager.worker.Type;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,6 @@ import java.util.UUID;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
-import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter;
 import static lan.dk.podcastserver.repository.dsl.ItemDSL.hasStatus;
@@ -98,7 +97,7 @@ public class ItemRepositoryTest {
                 .hasTotalElements(3)
                 .hasTotalPages(3);
 
-        assertThat(itemByPodcast.getContent().get(0)).hasTitle("Appload 1");
+        assertThat(itemByPodcast.getContent().get(0).getTitle()).isEqualTo("Appload 1");
     }
 
     @Test
@@ -132,7 +131,7 @@ public class ItemRepositoryTest {
 
         /* Then */
         assertThat(itemToDelete).hasSize(1);
-        assertThat(itemToDelete.get()).hasTitle("Geek INC 124");
+        assertThat(itemToDelete.get().getTitle()).isEqualTo("Geek INC 124");
     }
 
     @Test
@@ -168,7 +167,9 @@ public class ItemRepositoryTest {
     @Test
     public void should_save_an_item() {
         /* Given */
-        Item item = new Item().setUrl("http://an.super.url.com/a/url").setTitle("A fake Item");
+        Item item = new Item();
+        item.setUrl("http://an.super.url.com/a/url");
+        item.setTitle("A fake Item");
         /* When */
         Item savedItem = itemRepository.save(item);
         /* Then */

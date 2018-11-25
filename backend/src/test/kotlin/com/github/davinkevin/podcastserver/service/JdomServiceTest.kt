@@ -1,18 +1,13 @@
 package com.github.davinkevin.podcastserver.service
 
 import com.github.davinkevin.podcastserver.IOUtils
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.entity.Tag
-import com.github.davinkevin.podcastserver.entity.WatchList
+import com.github.davinkevin.podcastserver.entity.*
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

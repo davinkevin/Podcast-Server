@@ -11,7 +11,7 @@ import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.TypeRef
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.nodes.Element
 import org.springframework.context.annotation.Scope
@@ -26,7 +26,7 @@ import java.util.regex.Pattern
 class GulliExtractor(val htmlService: HtmlService, val jsonService: JsonService) : Extractor {
 
     override fun extract(item: Item) =
-            htmlService.get(item.url).k()
+            htmlService.get(item.url!!).k()
                     .map { it.select("script") }
                     .flatMap { it.firstOption { e -> e.html().contains("playlist:") } }
                     .flatMap { getPlaylistFromGulliScript(it) }

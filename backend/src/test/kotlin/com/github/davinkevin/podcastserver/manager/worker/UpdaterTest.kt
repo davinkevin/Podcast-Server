@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.manager.worker
 
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.worker.SimpleUpdater.Companion.ERROR_UUID
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach

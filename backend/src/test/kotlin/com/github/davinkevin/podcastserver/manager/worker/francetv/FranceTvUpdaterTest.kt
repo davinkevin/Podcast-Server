@@ -10,7 +10,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
@@ -178,7 +178,7 @@ class FranceTvUpdaterTest {
             /* Then */
             assertThat(items)
                     .hasSize(3)
-                    .filteredOn { it.title.contains("S2E3") }
+                    .filteredOn { it.title!!.contains("S2E3") }
                     .are(allValid())
                     .hasSize(1)
         }

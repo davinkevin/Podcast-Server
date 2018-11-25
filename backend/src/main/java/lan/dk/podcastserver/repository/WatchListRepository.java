@@ -1,9 +1,9 @@
 package lan.dk.podcastserver.repository;
 
+import com.github.davinkevin.podcastserver.entity.Item;
+import com.github.davinkevin.podcastserver.entity.WatchList;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Item;
-import com.github.davinkevin.podcastserver.entity.WatchList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;

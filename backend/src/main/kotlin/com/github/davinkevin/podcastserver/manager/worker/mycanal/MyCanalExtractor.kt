@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
 class MyCanalExtractor(val htmlService: HtmlService, val jsonService: JsonService) : Extractor {
 
     override fun extract(item: Item) =
-            htmlService.get(item.url).k()
+            htmlService.get(item.url!!).k()
                     .map { it.body() }
                     .map { it.select("script") }
                     .getOrElse { Elements() }

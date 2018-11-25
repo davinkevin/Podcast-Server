@@ -5,7 +5,7 @@ import arrow.core.toOption
 import com.fasterxml.jackson.annotation.*
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.control.Option
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
@@ -140,7 +140,8 @@ open class Podcast : Serializable {
     }
 
     fun add(item: Item): Podcast {
-        items!!.add(item.setPodcast(this))
+        item.podcast = this
+        items!!.add(item)
         return this
     }
 

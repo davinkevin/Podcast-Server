@@ -4,12 +4,12 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.*
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
@@ -75,7 +75,7 @@ class FfmpegDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            downloader.with(DownloadingItem(item, listOf(item.url, "http://foo.bar.com/end.mp4"), null, "Fake UserAgent"), itemDownloadManager)
+            downloader.with(DownloadingItem(item, listOf(item.url!!, "http://foo.bar.com/end.mp4"), null, "Fake UserAgent"), itemDownloadManager)
 
             whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
             whenever(podcastRepository.findById(aPodcast.id!!)).thenReturn(Optional.of(aPodcast))
@@ -128,7 +128,7 @@ class FfmpegDownloaderTest {
                     (0..100).map { it * 5L }.forEach { sendProgress(i, it)}
                     mock<Process>()
                 }
-                        .whenever(ffmpegService).download(eq(item.url), any(), any())
+                        .whenever(ffmpegService).download(eq(item.url!!), any(), any())
                 doAnswer { throw RuntimeException("Error during download of other url") }
                         .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
 
@@ -150,7 +150,7 @@ class FfmpegDownloaderTest {
                     (0..100).map { it * 5L }.forEach { sendProgress(i, it)}
                     mock<Process>()
                 }
-                        .whenever(ffmpegService).download(eq(item.url), any(), any())
+                        .whenever(ffmpegService).download(eq(item.url!!), any(), any())
                 doAnswer { throw RuntimeException("Error during download of other url") }
                         .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
                 whenever(processService.waitFor(any())).thenReturn(Try.Success(1))

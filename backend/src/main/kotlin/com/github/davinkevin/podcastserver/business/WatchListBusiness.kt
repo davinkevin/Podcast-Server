@@ -1,11 +1,11 @@
 package com.github.davinkevin.podcastserver.business
 
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.entity.WatchList
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.API.Set
-import com.github.davinkevin.podcastserver.entity.WatchList
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.WatchListRepository
 import org.springframework.stereotype.Component

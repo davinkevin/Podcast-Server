@@ -10,7 +10,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.jdom2.Element
 import org.jdom2.Namespace

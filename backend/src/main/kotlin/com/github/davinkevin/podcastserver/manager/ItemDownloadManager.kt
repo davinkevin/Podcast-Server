@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.HashMap
 import io.vavr.collection.Queue
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import lan.dk.podcastserver.repository.ItemRepository
@@ -231,7 +231,7 @@ class ItemDownloadManager (
 
     fun removeItemFromQueueAndDownload(itemToRemove: Item) {
         when {
-            isInDownloadingQueue(itemToRemove) -> stopDownload(itemToRemove.id)
+            isInDownloadingQueue(itemToRemove) -> stopDownload(itemToRemove.id!!)
             itemToRemove in _waitingQueue -> removeItemFromQueue(itemToRemove)
         }
         this.convertAndSendWaitingQueue()

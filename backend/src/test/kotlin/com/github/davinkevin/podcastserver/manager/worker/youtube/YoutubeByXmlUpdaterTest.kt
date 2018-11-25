@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsXml
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -10,7 +11,6 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName

@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.mashape.unirest.http.HttpResponse
-import lan.dk.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.CoverRepository
 import org.apache.commons.io.FilenameUtils
@@ -69,9 +69,9 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
             return false
         }
 
-        val coverUrl = item.cover.url!!
+        val coverUrl = item.cover?.url!!
         val fileLocation = parameters.rootfolder
-                .resolve(item.podcast.title)
+                .resolve(item.podcast?.title)
                 .resolve("${item.id}.${FilenameUtils.getExtension(coverUrl)}")
 
         return urlToDisk(coverUrl, fileLocation)
@@ -97,7 +97,7 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
                 .map { it.url }
                 .map { FilenameUtils.getExtension(it) }
                 .map { "${i.id}.$it" }
-                .map { parameters.rootfolder.resolve(i.podcast.title).resolve(it) }
+                .map { parameters.rootfolder.resolve(i.podcast?.title).resolve(it) }
                 .toVΛVΓ()
     }
 

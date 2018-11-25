@@ -2,14 +2,14 @@ package com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom
 
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Item
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
@@ -39,7 +39,7 @@ class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlServic
     private fun generateItemFromPage(videoPageUrl: String) =
             htmlService.get(JEUXVIDEOCOM_HOST + videoPageUrl).k()
                     .map { htmlToItem(it) }
-                    .getOrElse { Item.DEFAULT_ITEM }!!
+                    .getOrElse { Item.DEFAULT_ITEM }
 
     private fun htmlToItem(page: Document): Item {
         val headerVideo = page.select(".header-video")

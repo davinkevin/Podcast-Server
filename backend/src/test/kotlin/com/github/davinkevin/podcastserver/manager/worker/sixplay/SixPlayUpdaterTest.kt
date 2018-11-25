@@ -2,15 +2,15 @@ package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils
+import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -198,9 +198,9 @@ class SixPlayUpdaterTest {
 
     private fun allValid(): Condition<Item> {
         val p = Predicate<Item>{ it.url != null }
-                .and { it.title.isNotEmpty() }
+                .and { it.title!!.isNotEmpty() }
                 .and { it.pubDate != null }
-                .and { it.url.isNotEmpty() }
+                .and { it.url!!.isNotEmpty() }
                 .and { it.length != null }
                 .and { it.cover != null }
 
