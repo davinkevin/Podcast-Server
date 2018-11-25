@@ -4,6 +4,7 @@ package com.github.davinkevin.podcastserver.business.update
 import arrow.core.Option
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.business.CoverBusiness
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Updater
@@ -11,8 +12,7 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -120,7 +120,7 @@ class UpdatePodcastBusinessTest {
             whenever(updaterSelector.of(argWhere { podcasts.map{it.url}.contains(it) })).thenReturn(updater)
             whenever(updater.notIn(any())).then { { item: Item -> !it.getArgument<Podcast>(0).contains(item) } }
             doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, generateItems(10, p), updater.notIn(p)) }.whenever(updater).update(podcast3)
-            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, p.items, updater.notIn(p)) }.whenever(updater).update(argWhere { it != podcast3 })
+            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, p.items!!, updater.notIn(p)) }.whenever(updater).update(argWhere { it != podcast3 })
             whenever(validator.validate(any<Item>())).thenReturn(setOf<ConstraintViolation<Item>>())
 
             /* When */
@@ -133,7 +133,7 @@ class UpdatePodcastBusinessTest {
             assertThat(updatePodcastBusiness.lastFullUpdate).isNotNull()
 
             verify(podcastRepository, times(podcasts.size)).save(any())
-            verify(validator, times(10)).validate(argWhere<Item> { podcast3.items.contains(it) })
+            verify(validator, times(10)).validate(argWhere<Item> { podcast3.items!!.contains(it) })
         }
 
         @Test

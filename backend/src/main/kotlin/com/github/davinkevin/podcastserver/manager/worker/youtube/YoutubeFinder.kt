@@ -4,7 +4,7 @@ import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service

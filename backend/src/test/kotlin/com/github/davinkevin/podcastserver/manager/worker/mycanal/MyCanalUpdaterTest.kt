@@ -11,7 +11,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -42,7 +42,7 @@ class MyCanalUpdaterTest {
         id = UUID.randomUUID()
         url = "https://www.mycanal.fr/url/fake"
         title = "A MyCanal Podcast"
-        items = setOf()
+        items = mutableSetOf()
     }
 
     @Test

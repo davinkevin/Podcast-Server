@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Service

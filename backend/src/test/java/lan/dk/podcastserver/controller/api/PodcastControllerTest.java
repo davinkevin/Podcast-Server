@@ -3,7 +3,7 @@ package lan.dk.podcastserver.controller.api;
 import com.github.davinkevin.podcastserver.business.PodcastBusiness;
 import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
-import lan.dk.podcastserver.entity.Podcast;
+import com.github.davinkevin.podcastserver.entity.Podcast;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -74,9 +73,8 @@ public class PodcastControllerTest {
         Podcast podcastUpdated = podcastController.update(podcast, id);
 
         /* Then */
-        assertThat(podcastUpdated)
-                .isInstanceOf(Podcast.class)
-                .hasId(id);
+        assertThat(podcastUpdated).isInstanceOf(Podcast.class);
+        assertThat(podcastUpdated.getId()).isEqualTo(id);
         verify(podcastBusiness, only()).reatachAndSave(same(podcast));
     }
 
@@ -91,9 +89,8 @@ public class PodcastControllerTest {
         Podcast podcastUpdated = podcastController.patchUpdate(podcast, id);
 
         /* Then */
-        assertThat(podcastUpdated)
-                .isInstanceOf(Podcast.class)
-                .hasId(id);
+        assertThat(podcastUpdated).isInstanceOf(Podcast.class);
+        assertThat(podcastUpdated.getId()).isEqualTo(id);
         verify(podcastBusiness, only()).patchUpdate(same(podcast));
     }
 

@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.UrlService
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service
 

@@ -12,15 +12,15 @@ import com.github.axet.wget.info.ex.DownloadInterruptedError
 import com.github.axet.wget.info.ex.DownloadMultipartError
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.FfmpegService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -122,7 +122,7 @@ class YoutubeDownloaderTest {
                     itemDownloadManager
             )
 
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.getArgument(0) }
             whenever(wGetFactory.parser(item.url)).thenReturn(vGetParser)
             whenever(vGetParser.info(URL(item.url))).thenReturn(videoInfo)

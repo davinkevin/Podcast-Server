@@ -2,11 +2,11 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
@@ -170,7 +170,7 @@ abstract class AbstractDownloader(
     @Transactional
     open fun saveSyncWithPodcast() {
         try {
-            val podcast = podcastRepository.findById(item.podcast.id).orElseThrow { RuntimeException("Podcast with ID " + item.podcast.id + " not found") }
+            val podcast = podcastRepository.findById(item.podcast.id!!).orElseThrow { RuntimeException("Podcast with ID " + item.podcast.id + " not found") }
             item.podcast = podcast
             itemRepository.save(item)
         } catch (e: Exception) {

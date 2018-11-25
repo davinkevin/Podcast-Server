@@ -14,7 +14,7 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
@@ -33,7 +33,7 @@ import java.util.*
 class SixPlayUpdater(private val signatureService: SignatureService, private val htmlService: HtmlService, private val jsonService: JsonService, private val imageService: ImageService) : Updater {
 
     override fun findItems(podcast: Podcast) =
-            htmlService.get(podcast.url)
+            htmlService.get(podcast.url!!)
                     .map { it.select("script") }
                     .map { extractItems(it) }
                     .getOrElse { setOf() }
@@ -86,7 +86,7 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
             .removeSuffix(";")
 
     override fun signatureOf(podcast: Podcast) =
-            htmlService.get(podcast.url).k()
+            htmlService.get(podcast.url!!).k()
                     .map { it.select("script") }
                     .flatMap { extractJson(it) }
                     .map { JsonService.extract<Any>("video.programVideosBySubCategory").apply(it) }

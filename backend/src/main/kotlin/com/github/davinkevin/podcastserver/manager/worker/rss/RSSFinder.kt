@@ -6,7 +6,7 @@ import arrow.core.orElse
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import org.jdom2.Element
 import org.springframework.stereotype.Service

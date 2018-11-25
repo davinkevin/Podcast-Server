@@ -1,10 +1,10 @@
 package com.github.davinkevin.podcastserver.manager.worker.gulli
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,9 +40,10 @@ class GulliFinderTest {
         assertThat(podcast.title).isEqualTo("Pokémon")
         assertThat(podcast.type).isEqualTo("Gulli")
 
-        assertThat(podcast.cover.url).isEqualTo(coverUrl)
-        assertThat(podcast.cover.height).isEqualTo(250)
-        assertThat(podcast.cover.width).isEqualTo(250)
+        val cover = podcast.cover!!
+        assertThat(cover.url).isEqualTo(coverUrl)
+        assertThat(cover.height).isEqualTo(250)
+        assertThat(cover.width).isEqualTo(250)
     }
 
     @Test

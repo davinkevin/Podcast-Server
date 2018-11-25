@@ -4,13 +4,13 @@ import arrow.core.Option
 import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.mashape.unirest.http.HttpResponse
-import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.CoverRepository
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
@@ -35,17 +35,16 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
     fun findOne(id: UUID): Cover = coverRepository.findById(id).orElseThrow { Error("Cover with ID $id not found") }
 
     fun download(podcast: Podcast): String {
-        val cover = podcast.cover
+        val coverUrl = podcast.cover?.url
 
-        if ( cover?.url.isNullOrEmpty() ) {
+        if ( coverUrl.isNullOrEmpty() ) {
             return ""
         }
 
-        if (cover.url!!.startsWith("/")) {
-            return cover.url!!
+        if ( coverUrl!!.startsWith("/")) {
+            return coverUrl
         }
 
-        val coverUrl = cover.url!!
         val extension = FilenameUtils.getExtension(coverUrl)
         val fileLocation = parameters.rootfolder
                 .resolve(podcast.title)
@@ -89,7 +88,7 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
                     && patchPodcast.cover == podcastToUpdate.cover
 
     fun getCoverPathOf(podcast: Podcast): Path {
-        val fileName = "${parameters.coverDefaultName}.${FilenameUtils.getExtension(podcast.cover.url)}"
+        val fileName = "${parameters.coverDefaultName}.${FilenameUtils.getExtension(podcast.cover?.url)}"
         return parameters.rootfolder.resolve(podcast.title).resolve(fileName)
     }
 

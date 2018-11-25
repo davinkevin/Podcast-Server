@@ -1,6 +1,7 @@
 package lan.dk.podcastserver.entity;
 
 import com.github.davinkevin.podcastserver.entity.Cover;
+import com.github.davinkevin.podcastserver.entity.Podcast;
 import com.github.davinkevin.podcastserver.entity.Status;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import static java.lang.Boolean.*;
 import static lan.dk.podcastserver.assertion.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,7 +25,7 @@ public class ItemTest {
 
     private static final UUID PODCAST_ID = UUID.randomUUID();
     private static Item ITEM = new Item();
-    private static Podcast PODCAST = new Podcast().setId(UUID.randomUUID());
+    private static Podcast PODCAST = new Podcast() {{ setId(UUID.randomUUID()); }};
     private static final ZonedDateTime NOW = ZonedDateTime.now();
     private static final Cover COVER = new Cover() {{ setUrl("http://fakeItem.com/cover.png"); }};
     private static final Cover PODCAST_COVER = new Cover() {{ setUrl("PodcastCover"); }};
@@ -32,13 +34,12 @@ public class ItemTest {
     @Before
     public void beforeEach() throws IOException {
         /* Given */
-        PODCAST = Podcast.builder()
-                .title("Fake Podcast")
-                .id(PODCAST_ID)
-                .type("Youtube")
-                .cover(PODCAST_COVER)
-                .hasToBeDeleted(Boolean.TRUE)
-                .build();
+        PODCAST = new Podcast();
+        PODCAST.setTitle("Fake Podcast");
+        PODCAST.setId(PODCAST_ID);
+        PODCAST.setType("Youtube");
+        PODCAST.setCover(PODCAST_COVER);
+        PODCAST.setHasToBeDeleted(TRUE);
 
 
         ITEM = new Item()

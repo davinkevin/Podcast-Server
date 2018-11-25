@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -38,12 +38,12 @@ class YoutubeByApiUpdaterTest {
         /* Given */
         val page1 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO"
         val page2 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA"
-        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = setOf() }
+        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = mutableSetOf() }
 
         whenever(api.youtube).thenReturn("FOO")
         doAnswer{ fileAsJson("/remote/podcast/youtube/joueurdugrenier.json")   }.whenever(jsonService).parseUrl(page1)
         doAnswer{ fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json") }.whenever(jsonService).parseUrl(page2)
-        whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
 
         /* When */
         val items = updater.findItems(podcast)
@@ -57,10 +57,10 @@ class YoutubeByApiUpdaterTest {
     fun `should handle error during fetch items`() {
         /* Given */
         whenever(api.youtube).thenReturn("FOO")
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/user/androiddevelopers")
-                .items(setOf())
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/user/androiddevelopers"
+            items = mutableSetOf()
+        }
 
         whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
@@ -77,10 +77,10 @@ class YoutubeByApiUpdaterTest {
     fun `should sign with api key`() {
         /* Given */
         val page1 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO"
-        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = setOf() }
+        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = mutableSetOf() }
 
         whenever(api.youtube).thenReturn("FOO")
-        whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
         doAnswer{ fileAsJson("/remote/podcast/youtube/joueurdugrenier.json")   }.whenever(jsonService).parseUrl(page1)
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
@@ -94,7 +94,7 @@ class YoutubeByApiUpdaterTest {
     @Test
     fun `should return empty if no result`() {
         /* Given */
-        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = setOf() }
+        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = mutableSetOf() }
 
         whenever(api.youtube).thenReturn("FOO")
         whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))

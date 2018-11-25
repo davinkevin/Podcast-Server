@@ -15,7 +15,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -45,7 +45,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should sign podcast`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
@@ -58,7 +58,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should error during sign`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
 
         /* When */
         val signature = updater.signatureOf(podcast)
@@ -70,7 +70,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should get items`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
         configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm")
 
         /* When */
@@ -83,7 +83,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should return empty list if not found`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
 
         /* When */
         val items = updater.findItems(podcast)
@@ -95,7 +95,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should get items with exception`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
         configureForAllPage(from("chroniques-video.htm"))
         whenever(htmlService.get("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))
                 .thenReturn(None.toVΛVΓ())

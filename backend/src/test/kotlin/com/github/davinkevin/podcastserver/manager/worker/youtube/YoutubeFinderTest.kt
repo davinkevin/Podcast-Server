@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -36,8 +36,8 @@ class YoutubeFinderTest {
         assertThat(podcast.title).isEqualTo("Cauet")
         assertThat(podcast.description).isEqualTo("La chaîne officielle de Cauet, c'est toujours plus de kiff et de partage ! Des vidéos exclusives de C'Cauet sur NRJ tous les soirs de 19h à 22h. Des défis in...")
 
-        assertThat(cover).isNotNull()
-        assertThat(cover.url).isEqualTo("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg")
+        assertThat(cover).isNotNull
+        assertThat(cover!!.url).isEqualTo("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg")
     }
 
     @Test
@@ -66,7 +66,7 @@ class YoutubeFinderTest {
         assertThat(podcast.title).isEmpty()
         assertThat(podcast.description).isEmpty()
         assertThat(cover).isNotNull()
-        assertThat(cover.url).isNull()
+        assertThat(cover!!.url).isNull()
     }
 
     @DisplayName("should be compatible with")

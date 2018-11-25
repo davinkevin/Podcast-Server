@@ -13,7 +13,7 @@ import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull
 class TF1ReplayUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService, val jsonService: JsonService) : Updater {
 
     override fun findItems(podcast: Podcast) =
-            htmlFromStandardOrReplay(podcast.url)
+            htmlFromStandardOrReplay(podcast.url!!)
                     .map { toItem(it) }
                     .toSet()
 
@@ -74,7 +74,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val htmlService: 
                     .getOrElse { ZonedDateTime.now() }
 
     override fun signatureOf(podcast: Podcast): String {
-        val v = htmlFromStandardOrReplay(podcast.url).html()
+        val v = htmlFromStandardOrReplay(podcast.url!!).html()
         return  if (v.isNotEmpty()) signatureService.fromText(v)
         else v
     }

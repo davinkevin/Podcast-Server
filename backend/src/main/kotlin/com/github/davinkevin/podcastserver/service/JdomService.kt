@@ -3,13 +3,13 @@ package com.github.davinkevin.podcastserver.service
 import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
+import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.WatchList
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.control.Option
-import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.WatchList
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
@@ -44,7 +44,8 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
     }
 
     private fun podcastToXMLGeneric(podcast: Podcast, domainName: String, limit: Long): String {
-        val coverUrl = podcast.cover.relativeUrl(domainName)
+        val cover = podcast.cover
+        val coverUrl = cover?.relativeUrl(domainName)
 
         val channel = Element(CHANNEL).apply {
                 addContent(Element(TITLE).addContent(Text(podcast.title)))
@@ -58,17 +59,17 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         }
 
         if (podcast.lastUpdate != null) {
-            val d = podcast.lastUpdate.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+            val d = podcast.lastUpdate!!.format(DateTimeFormatter.RFC_1123_DATE_TIME)
             channel.addContent(Element(PUB_DATE).addContent(d))
         }
 
-        if (podcast.cover != null) {
+        if (cover != null) {
             val itunesImage = Element(IMAGE, ITUNES_NAMESPACE).apply { addContent(Text(coverUrl)) }
 
             val image = Element(IMAGE).apply {
-                    addContent(Element(HEIGHT).addContent(podcast.cover.height.toString()))
+                    addContent(Element(HEIGHT).addContent(cover.height.toString()))
                     addContent(Element(URL_STRING).addContent(coverUrl))
-                    addContent(Element(WIDTH).addContent(podcast.cover.width.toString()))
+                    addContent(Element(WIDTH).addContent(cover.width.toString()))
             }
 
             channel
@@ -76,7 +77,7 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
                     .addContent(itunesImage)
         }
 
-        podcast.items
+        podcast.items!!
                 .stream()
                 .filter { nonNull(it.pubDate) }
                 .sorted(PUB_DATE_COMPARATOR)
@@ -185,7 +186,7 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         private val LINK_PODCAST_HTML_FORMAT = "%s/podcasts/%s"
         private val LINK_PODCAST_FORMAT = "%s/api/podcasts/%s/rss"
         private val PUB_DATE_COMPARATOR = { one: Item, another: Item -> -(one.pubDate.compareTo(another.pubDate)) }
-        private val TITLE_COMPARATOR = Comparator.comparing(Function<Podcast, String> { it.title })
+        private val TITLE_COMPARATOR = Comparator.comparing(Function<Podcast, String> { it.title!! })
     }
 
     private fun Podcast.toOutline(domain: String) =
@@ -233,7 +234,7 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
 
     private fun withNumberOfItem(podcast: Podcast, limit: Boolean?) =
             if (TRUE == limit) podcastServerParameters.rssDefaultNumberItem
-            else podcast.items.size.toLong()
+            else podcast.items!!.size.toLong()
 
 
     private fun Cover.relativeUrl(domain: String): String =

@@ -3,12 +3,12 @@ package com.github.davinkevin.podcastserver.business.stats
 import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness.Selector.*
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.querydsl.core.types.dsl.BooleanExpression
 import io.vavr.collection.List
 import io.vavr.collection.Set
 import lan.dk.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.*
 import org.springframework.stereotype.Component
@@ -68,7 +68,7 @@ class StatsBusiness(val itemRepository: ItemRepository, val podcastBusiness: Pod
         val dateInPast = LocalDate.now().minusMonths(numberOfMonth)
 
         return podcastBusiness.findOne(id)
-                .items
+                .items!!
                 .map(mapper)
                 .filter { Objects.nonNull(it) }
                 .map { it!!.toLocalDate() }

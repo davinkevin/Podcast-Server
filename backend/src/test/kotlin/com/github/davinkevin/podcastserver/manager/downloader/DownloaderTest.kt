@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import lan.dk.podcastserver.repository.ItemRepository
@@ -74,7 +74,7 @@ class DownloaderTest {
             downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -83,7 +83,7 @@ class DownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.STOPPED)
-            verify(podcastRepository, atLeast(1)).findById(podcast.id)
+            verify(podcastRepository, atLeast(1)).findById(podcast.id!!)
             verify(itemRepository, atLeast(1)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item))
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake typeless Podcast").resolve("file.mp4$TEMPORARY_EXTENSION"))
@@ -94,7 +94,7 @@ class DownloaderTest {
             /* Given */
             downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
-            whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -102,7 +102,7 @@ class DownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.FAILED)
-            verify(podcastRepository, atLeast(1)).findById(eq(podcast.id))
+            verify(podcastRepository, atLeast(1)).findById(eq(podcast.id!!))
             verify(itemRepository, atLeast(1)).save(eq(item))
             verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item))
             assertThat(downloader.target).isNull()
@@ -113,7 +113,7 @@ class DownloaderTest {
             /* Given */
             downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
 
-            whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -121,7 +121,7 @@ class DownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.PAUSED)
-            verify(podcastRepository, atLeast(1)).findById(eq(podcast.id))
+            verify(podcastRepository, atLeast(1)).findById(eq(podcast.id!!))
             verify(itemRepository, atLeast(1)).save(eq(item))
             verify(template, atLeast(1)).convertAndSend(eq(WS_TOPIC_DOWNLOAD), same(item))
         }
@@ -131,7 +131,7 @@ class DownloaderTest {
             /* Given */
             downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -149,7 +149,7 @@ class DownloaderTest {
             /* Given */
             downloader.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -200,7 +200,7 @@ class DownloaderTest {
             downloader.with(DownloadingItem(item.setUrl("http://foo.bar.com/bash"),  listOf(), null, null), itemDownloadManager)
 
             whenever(podcastServerParameters.rootfolder).thenReturn(Paths.get("/"))
-            whenever(podcastRepository.findById(eq(podcast.id))).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -262,7 +262,7 @@ class DownloaderTest {
             /* Given */
             val d = AlwaysFaillingDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService)
             d.with(DownloadingItem(item,  listOf(), null, null), itemDownloadManager)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             /* When */
             d.run()

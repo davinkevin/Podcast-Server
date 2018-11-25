@@ -8,15 +8,15 @@ import com.github.axet.wget.info.ex.DownloadInterruptedError
 import com.github.axet.wget.info.ex.DownloadMultipartError
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -88,7 +88,7 @@ class HTTPDownloaderTest {
             val wGet = mock<WGet>()
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             whenever(urlService.getRealURL(eq(specificUrl), any(), any())).then { it.arguments[0] }
             whenever(wGetFactory.newDownloadInfo(specificUrl)).thenReturn(downloadInfo)
@@ -105,7 +105,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.FINISH)
-            verify(podcastRepository, atLeast(1)).findById(podcast.id)
+            verify(podcastRepository, atLeast(1)).findById(podcast.id!!)
             verify(itemRepository, atLeast(1)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4"))
@@ -122,7 +122,7 @@ class HTTPDownloaderTest {
             val wGet = mock<WGet>()
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             whenever(urlService.getRealURL(eq(item.url), any(), any())).then { it.arguments[0] }
             whenever(wGetFactory.newDownloadInfo(item.url)).thenReturn(downloadInfo)
@@ -139,7 +139,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.FINISH)
-            verify(podcastRepository, atLeast(1)).findById(podcast.id)
+            verify(podcastRepository, atLeast(1)).findById(podcast.id!!)
             verify(itemRepository, atLeast(1)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4"))
@@ -160,7 +160,7 @@ class HTTPDownloaderTest {
                     itemDownloadManager
             )
 
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             /* When */
@@ -168,7 +168,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.FAILED)
-            verify(podcastRepository, atLeast(1)).findById(podcast.id)
+            verify(podcastRepository, atLeast(1)).findById(podcast.id!!)
             verify(itemRepository, atLeast(1)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
         }
@@ -185,7 +185,7 @@ class HTTPDownloaderTest {
             val wGet = mock<WGet>()
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             whenever(urlService.getRealURL(any(), any(), any())).then { it.arguments[0] }
             whenever(wGetFactory.newDownloadInfo(any())).thenReturn(downloadInfo)
@@ -199,7 +199,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.STOPPED)
-            verify(podcastRepository, atLeast(1)).findById(podcast.id)
+            verify(podcastRepository, atLeast(1)).findById(podcast.id!!)
             verify(itemRepository, atLeast(1)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
             assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("A Fake Http Podcast").resolve("file.mp4$TEMPORARY_EXTENSION"))
@@ -219,7 +219,7 @@ class HTTPDownloaderTest {
             val exception = mock<DownloadInfo.Part>()
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             whenever(urlService.getRealURL(any(), any(), any())).then { it.arguments[0] }
             whenever(wGetFactory.newDownloadInfo(any())).thenReturn(downloadInfo)
@@ -234,7 +234,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.FAILED)
-            verify(podcastRepository, atLeast(2)).findById(podcast.id)
+            verify(podcastRepository, atLeast(2)).findById(podcast.id!!)
             verify(itemRepository, atLeast(2)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
         }
@@ -251,7 +251,7 @@ class HTTPDownloaderTest {
             val wGet = mock<WGet>()
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
             whenever(urlService.getRealURL(any(), any(), any())).then { it.arguments[0] }
             whenever(wGetFactory.newDownloadInfo(any())).thenReturn(downloadInfo)
@@ -263,7 +263,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.STARTED)
-            verify(podcastRepository, atLeast(1)).findById(podcast.id)
+            verify(podcastRepository, atLeast(1)).findById(podcast.id!!)
             verify(itemRepository, atLeast(1)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
         }
@@ -280,7 +280,7 @@ class HTTPDownloaderTest {
             val wGet = mock<WGet>()
 
             whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(Optional.of(podcast))
+            whenever(podcastRepository.findById(podcast.id!!)).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { i -> i.arguments[0] }
             whenever(urlService.getRealURL(any(), any(), any())).then { it.arguments[0] }
             whenever(wGetFactory.newDownloadInfo(any())).thenReturn(downloadInfo)
@@ -292,7 +292,7 @@ class HTTPDownloaderTest {
 
             /* Then */
             assertThat(item.status).isEqualTo(Status.FAILED)
-            verify(podcastRepository, atLeast(2)).findById(podcast.id)
+            verify(podcastRepository, atLeast(2)).findById(podcast.id!!)
             verify(itemRepository, atLeast(2)).save(item)
             verify(template, atLeast(1)).convertAndSend(eq(AbstractDownloader.WS_TOPIC_DOWNLOAD), same(item))
         }

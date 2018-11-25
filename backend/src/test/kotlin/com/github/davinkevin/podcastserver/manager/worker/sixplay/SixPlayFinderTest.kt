@@ -1,14 +1,14 @@
 package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
+import com.github.davinkevin.podcastserver.IOUtils
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.service.JsonService
-import com.github.davinkevin.podcastserver.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ class SixPlayFinderTest {
         /* THEN  */
         assertThat(podcast.title).isEqualTo("Sport 6")
         assertThat(podcast.type).isEqualTo("SixPlay")
-        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v2/images/598896/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=33abccc9be94554a7081bb8cc10a1fe94b8fefa0")
+        assertThat(podcast.cover!!.url).isEqualTo("https://images.6play.fr/v2/images/598896/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=33abccc9be94554a7081bb8cc10a1fe94b8fefa0")
         assertThat(podcast.description).isEqualTo("Retrouvez chaque semaine toute l'actualité et les résultats du sport dans Sport 6. En 6 minutes, priorités aux images : les temps forts de l'actualité et les résultats sportifs sont décryptés pour tout connaître des faits marquants de la semaine.")
         verify(imageService, times(1)).getCoverFromURL(any())
     }
@@ -61,7 +61,7 @@ class SixPlayFinderTest {
         /* THEN  */
         assertThat(podcast.title).isEqualTo("Sport 6")
         assertThat(podcast.type).isEqualTo("SixPlay")
-        assertThat(podcast.cover.url).isEqualTo("https://images.6play.fr/v2/images/598896/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=33abccc9be94554a7081bb8cc10a1fe94b8fefa0")
+        assertThat(podcast.cover!!.url).isEqualTo("https://images.6play.fr/v2/images/598896/raw?width=1024&height=576&fit=max&quality=60&format=jpeg&interlace=1&hash=33abccc9be94554a7081bb8cc10a1fe94b8fefa0")
         assertThat(podcast.description).isNull()
     }
 

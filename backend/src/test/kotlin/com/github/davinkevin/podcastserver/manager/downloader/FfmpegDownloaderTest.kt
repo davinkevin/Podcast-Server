@@ -4,13 +4,13 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.*
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status.*
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -59,6 +59,7 @@ class FfmpegDownloaderTest {
     @InjectMocks lateinit var downloader: FfmpegDownloader
 
     val aPodcast: Podcast = Podcast().apply {
+        id = UUID.randomUUID()
         title = "M3U8Podcast"
     }
     val item: Item = Item().apply {
@@ -77,7 +78,7 @@ class FfmpegDownloaderTest {
             downloader.with(DownloadingItem(item, listOf(item.url, "http://foo.bar.com/end.mp4"), null, "Fake UserAgent"), itemDownloadManager)
 
             whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
-            whenever(podcastRepository.findById(aPodcast.id)).thenReturn(Optional.of(aPodcast))
+            whenever(podcastRepository.findById(aPodcast.id!!)).thenReturn(Optional.of(aPodcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
             FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(aPodcast.title).toFile())

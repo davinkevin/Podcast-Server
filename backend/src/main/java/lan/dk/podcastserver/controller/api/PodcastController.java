@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
-import lan.dk.podcastserver.entity.Podcast;
+import com.github.davinkevin.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;

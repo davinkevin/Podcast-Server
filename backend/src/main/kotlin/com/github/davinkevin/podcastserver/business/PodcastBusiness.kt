@@ -4,7 +4,7 @@ import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -31,7 +31,7 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
     fun delete(entity: Podcast) = podcastRepository.delete(entity)
 
     fun patchUpdate(patchPodcast: Podcast): Podcast {
-        val podcastToUpdate = findOne(patchPodcast.id)
+        val podcastToUpdate = findOne(patchPodcast.id!!)
 
         if (podcastToUpdate.title != patchPodcast.title) {
             Files.move(
@@ -41,13 +41,13 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
         }
 
         if (!coverBusiness.hasSameCoverURL(patchPodcast, podcastToUpdate)) {
-            patchPodcast.cover.url = coverBusiness.download(patchPodcast)
+            patchPodcast.cover?.url = coverBusiness.download(patchPodcast)
         }
 
-        val newCover = coverBusiness.findOne(patchPodcast.cover.id!!).apply {
-            height = patchPodcast.cover.height
-            url = patchPodcast.cover.url
-            width = patchPodcast.cover.width
+        val newCover = coverBusiness.findOne(patchPodcast.cover?.id!!).apply {
+            height = patchPodcast.cover?.height
+            url = patchPodcast.cover?.url
+            width = patchPodcast.cover?.width
         }
 
         podcastToUpdate.apply {
@@ -77,7 +77,7 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
         val podcastSaved = reatachAndSave(podcast)
 
         if (podcast.cover != null) {
-            val cover = podcast.cover
+            val cover = podcast.cover!!
             cover.url = coverBusiness.download(podcast)
             coverBusiness.save(cover)
         }

@@ -2,12 +2,12 @@ package com.github.davinkevin.podcastserver.manager.worker.rss
 
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsXml
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -35,8 +35,8 @@ class RSSFinderTest {
         //Then
         assertThat(podcast.title).isEqualToIgnoringCase("Les Grandes Gueules du Sport")
         assertThat(podcast.description).isEqualToIgnoringCase("Grand en gueule, fort en sport ! ")
-        assertThat(podcast.cover).isNotNull()
-        assertThat(podcast.cover.url).isEqualToIgnoringCase(COVER_URL)
+        assertThat(podcast.cover).isNotNull
+        assertThat(podcast.cover!!.url).isEqualToIgnoringCase(COVER_URL)
     }
 
     @Test
@@ -51,7 +51,7 @@ class RSSFinderTest {
 
         //Then
         assertThat(podcast.cover).isNotNull()
-        assertThat(podcast.cover.url).isEqualTo(COVER_URL)
+        assertThat(podcast.cover!!.url).isEqualTo(COVER_URL)
     }
 
     @Test

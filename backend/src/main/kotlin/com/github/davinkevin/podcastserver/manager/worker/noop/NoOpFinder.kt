@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 
 /**

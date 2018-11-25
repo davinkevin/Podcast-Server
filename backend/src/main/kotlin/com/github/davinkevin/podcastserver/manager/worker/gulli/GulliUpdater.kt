@@ -4,6 +4,7 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.toOption
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -11,9 +12,8 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -27,7 +27,7 @@ import java.time.ZonedDateTime
 class GulliUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService) : Updater {
 
     override fun findItems(podcast: Podcast) =
-            htmlService.get(podcast.url).k()
+            htmlService.get(podcast.url!!).k()
                     .map { it.select("div.all-videos ul li.col-md-3") }
                     .getOrElse{ Elements() }
                     .flatMap { findDetailsInFromPage(it).toList() }
@@ -62,7 +62,7 @@ class GulliUpdater(val signatureService: SignatureService, val htmlService: Html
                     .getOrElse { Cover.DEFAULT_COVER }
 
     override fun signatureOf(podcast: Podcast)=
-            htmlService.get(podcast.url).k()
+            htmlService.get(podcast.url!!).k()
                     .flatMap { it.select("div.all-videos ul").firstOption() }
                     .map { it.html() }
                     .map { signatureService.fromText(it) }

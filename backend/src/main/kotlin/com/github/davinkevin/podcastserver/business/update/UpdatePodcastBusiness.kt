@@ -3,16 +3,16 @@ package com.github.davinkevin.podcastserver.business.update
 import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.business.CoverBusiness
+import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.Updater.Companion.NO_MODIFICATION
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
@@ -88,7 +88,7 @@ class UpdatePodcastBusiness(
                 .getOrElse{ throw RuntimeException("Podcast with ID $id not found") }
         podcast.signature = ""
         podcast = podcastRepository.save(podcast)
-        updatePodcast(podcast.id)
+        updatePodcast(podcast.id!!)
     }
 
     private fun updatePodcast(podcasts: Set<Podcast>, selectedExecutor: Executor) {
@@ -129,7 +129,8 @@ class UpdatePodcastBusiness(
 
         if (items.isEmpty()) {
             log.info("Reset of signature in order to force the next update: {}", podcast.title)
-            podcastRepository.save(podcast.setSignature(""))
+            podcast.signature = ""
+            podcastRepository.save(podcast)
             return setOf()
         }
 

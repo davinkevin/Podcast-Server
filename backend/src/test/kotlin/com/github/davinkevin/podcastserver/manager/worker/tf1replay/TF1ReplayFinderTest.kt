@@ -2,13 +2,13 @@ package com.github.davinkevin.podcastserver.manager.worker.tf1replay
 
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -41,7 +41,7 @@ class TF1ReplayFinderTest {
         assertThat(podcast.description).isEqualTo("Tous les replays  19h live: les vidéos bonus exclusives des coulisses, des interviews de  19h live:")
         assertThat(podcast.url).isEqualTo(anUrl)
         assertThat(podcast.type).isEqualTo("TF1Replay")
-        assertThat(podcast.cover.url).isEqualTo("http://photos1.tf1.fr/1920/960/1920x1080-19h-5619b8-0@1x.jpg")
+        assertThat(podcast.cover!!.url).isEqualTo("http://photos1.tf1.fr/1920/960/1920x1080-19h-5619b8-0@1x.jpg")
     }
 
     @Test
@@ -59,7 +59,7 @@ class TF1ReplayFinderTest {
         assertThat(podcast.description).isEqualTo("Tous les replays  19h live: les vidéos bonus exclusives des coulisses, des interviews de  19h live:")
         assertThat(podcast.url).isEqualTo(anUrl)
         assertThat(podcast.type).isEqualTo("TF1Replay")
-        assertThat(podcast.cover.url).isEqualTo("http://photos2.tf1.fr/130/65/logo_programme-284-3955bf-0@1x.jpg")
+        assertThat(podcast.cover!!.url).isEqualTo("http://photos2.tf1.fr/130/65/logo_programme-284-3955bf-0@1x.jpg")
     }
 
     @Test

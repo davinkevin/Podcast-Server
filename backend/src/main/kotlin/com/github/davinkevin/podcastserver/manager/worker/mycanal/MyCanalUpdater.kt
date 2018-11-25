@@ -5,6 +5,7 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -13,9 +14,8 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toTry
 import com.jayway.jsonpath.TypeRef
-import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import lan.dk.podcastserver.service.JsonService.to
 import org.jsoup.select.Elements
@@ -43,7 +43,7 @@ class MyCanalUpdater(val signatureService: SignatureService, val jsonService: Js
     }
 
     private fun itemsAsJsonFrom(p: Podcast) =
-            htmlService.get(p.url).k()
+            htmlService.get(p.url!!).k()
                     .map { it.body() }
                     .map { it.select("script") }
                     .getOrElse { Elements() }

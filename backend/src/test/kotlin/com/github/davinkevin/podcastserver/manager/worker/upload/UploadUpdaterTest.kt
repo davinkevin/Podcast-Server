@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.worker.upload
 
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -14,7 +14,7 @@ class UploadUpdaterTest {
     private val item1 = Item().apply { id = UUID.randomUUID() }
     private val item2 = Item().apply { id = UUID.randomUUID() }
     private val item3 = Item().apply { id = UUID.randomUUID() }
-    private var podcast: Podcast = Podcast().apply { 
+    private var podcast: Podcast = Podcast().apply {
         add(item1)
         add(item2)
         add(item3)

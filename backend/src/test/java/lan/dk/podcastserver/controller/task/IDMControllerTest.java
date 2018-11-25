@@ -4,7 +4,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import lan.dk.podcastserver.entity.Item;
-import lan.dk.podcastserver.entity.Podcast;
+import com.github.davinkevin.podcastserver.entity.Podcast;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class IDMControllerTest {
 
-    private static final Podcast PODCAST = Podcast.builder().title("Podcast").build();
+    private static final Podcast PODCAST = new Podcast() {{ setTitle("Podcast"); }};
 
     private @Mock ItemDownloadManager IDM;
     private @InjectMocks IDMController idmController;

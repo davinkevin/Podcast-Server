@@ -13,7 +13,7 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.k
 import io.vavr.collection.List
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
@@ -30,7 +30,7 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
 
     override fun findItems(podcast: Podcast) =
             htmlService
-                    .get(podcast.url).k()
+                    .get(podcast.url!!).k()
                     .map { it.select(LAST_VIDEOS_SELECTOR) }
                     .flatMap { it.firstOption() }
                     .map { it.select("li") }
@@ -63,7 +63,7 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
                     .addProtocolIfNecessary("https:")
 
     override fun signatureOf(podcast: Podcast): String {
-        val listOfIds = htmlService.get(podcast.url).k()
+        val listOfIds = htmlService.get(podcast.url!!).k()
                 .map { p -> p.select(LAST_VIDEOS_SELECTOR) }
                 .flatMap { it.firstOption() }
                 .map { it.select("li") }

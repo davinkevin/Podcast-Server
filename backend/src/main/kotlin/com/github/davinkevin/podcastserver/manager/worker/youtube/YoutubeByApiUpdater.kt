@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -32,7 +32,7 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
     override fun findItems(podcast: Podcast): Set<Item> {
         log.info("Youtube Update by API")
 
-        val playlistId = findPlaylistId(podcast.url)
+        val playlistId = findPlaylistId(podcast.url!!)
         val fetch = fetchWithCache()
 
         return generateSequence(fetch(asApiPlaylistUrl(playlistId))) { fetch(asApiPlaylistUrl(playlistId, it.nextPageToken)) }
@@ -44,7 +44,7 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
     }
 
     override fun signatureOf(podcast: Podcast): String {
-        val playlistId = findPlaylistId(podcast.url)
+        val playlistId = findPlaylistId(podcast.url!!)
 
         val ids = jsonService.parseUrl(asApiPlaylistUrl(playlistId)).k()
                 .map { JsonService.to(YoutubeApiResponse::class.java).apply(it) }

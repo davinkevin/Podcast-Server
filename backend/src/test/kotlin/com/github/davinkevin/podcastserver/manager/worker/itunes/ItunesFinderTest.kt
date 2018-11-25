@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.manager.worker.itunes
 
 import com.github.davinkevin.podcastserver.IOUtils
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat

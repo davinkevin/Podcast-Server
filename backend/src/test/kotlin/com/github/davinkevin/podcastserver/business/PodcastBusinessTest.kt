@@ -1,13 +1,13 @@
 package com.github.davinkevin.podcastserver.business
 
+import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
-import com.nhaarman.mockitokotlin2.*
-import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Tag
-import lan.dk.podcastserver.repository.PodcastRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.nhaarman.mockitokotlin2.*
+import com.github.davinkevin.podcastserver.entity.Podcast
+import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -159,7 +159,7 @@ class PodcastBusinessTest {
         val aCover = Cover().apply { url = "http://fakeurl.com/image.png" }
         val podcast = Podcast().apply { tags = tagSet; cover = aCover }
 
-        whenever(coverBusiness.download(any<Podcast>())).then { (it.arguments[0] as Podcast).cover.url }
+        whenever(coverBusiness.download(any<Podcast>())).then { it.getArgument<Podcast>(0).cover?.url }
         whenever(tagBusiness.getTagListByName(any())).thenReturn(tagSet)
         whenever(podcastRepository.save(any())).then { i -> i.arguments[0] }
 
@@ -243,7 +243,7 @@ class PodcastBusinessTest {
 
         Files.createDirectories(workingFolder.resolve(retrievePodcast.title))
         whenever(podcastServerParameters.rootfolder).thenReturn(workingFolder)
-        whenever(podcastRepository.findById(patchPodcast.id)).thenReturn(Optional.of(retrievePodcast))
+        whenever(podcastRepository.findById(patchPodcast.id!!)).thenReturn(Optional.of(retrievePodcast))
         whenever(coverBusiness.hasSameCoverURL(any(), any())).thenReturn(false)
         whenever(coverBusiness.findOne(any())).then {
             Cover().apply { id = it.arguments[0] as UUID; height = 100; width = 100; url = "http://a.pretty.url.com/image.png" }

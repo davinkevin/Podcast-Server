@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter
 class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService) : Updater {
 
     override fun findItems(podcast: Podcast) =
-            htmlService.get(podcast.url).k()
+            htmlService.get(podcast.url!!).k()
                     .map { it.select("article") }
                     .map { htmlToItems(it) }
                     .getOrElse { setOf() }
@@ -53,7 +53,7 @@ class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlServic
     }
 
     override fun signatureOf(podcast: Podcast) =
-            htmlService.get(podcast.url).k()
+            htmlService.get(podcast.url!!).k()
                     .map { it.select("article").html() }
                     .map { signatureService.fromText(it) }
                     .getOrElse { "" }

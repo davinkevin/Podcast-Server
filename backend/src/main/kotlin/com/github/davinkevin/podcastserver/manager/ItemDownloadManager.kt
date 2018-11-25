@@ -13,7 +13,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.HashMap
 import io.vavr.collection.Queue
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import lan.dk.podcastserver.repository.ItemRepository
 import org.slf4j.LoggerFactory

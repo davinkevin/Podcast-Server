@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -26,7 +26,7 @@ class DailymotionUpdaterTest {
     @Mock lateinit var imageService: ImageService
     @InjectMocks lateinit var updater: DailymotionUpdater
 
-    val podcast = Podcast().apply { 
+    val podcast = Podcast().apply {
             title = "Karim Debbache"
             url = "http://www.dailymotion.com/karimdebbache"
     }

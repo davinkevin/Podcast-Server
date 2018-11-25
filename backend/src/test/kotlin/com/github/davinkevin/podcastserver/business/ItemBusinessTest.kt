@@ -1,18 +1,18 @@
 package com.github.davinkevin.podcastserver.business
 
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Tag
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import com.querydsl.core.types.Predicate
 import io.vavr.API.Set
 import io.vavr.collection.List
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.entity.Tag
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -120,7 +120,7 @@ class ItemBusinessTest {
         val idOfItem = UUID.randomUUID()
         val p = Podcast().apply { items = mutableSetOf() }
         val item = Item().apply { podcast = p }
-        p.items.add(item)
+        p.items!!.add(item)
 
         whenever(itemRepository.findById(idOfItem)).thenReturn(Optional.of(item))
 

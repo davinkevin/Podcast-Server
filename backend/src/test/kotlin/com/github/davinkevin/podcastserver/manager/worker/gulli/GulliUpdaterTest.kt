@@ -5,6 +5,7 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
+import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -13,8 +14,7 @@ import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,7 +44,7 @@ class GulliUpdaterTest {
     @Test
     fun `should get signature`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(fileAsHtml(from("pokemon.html")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("pokemon.html")))
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
@@ -69,7 +69,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return list of items`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(IOUtils.fileAsHtml(from("pokemon.html")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.html")))
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
@@ -95,7 +95,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return empty list if video selector is not found`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-format.html")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-format.html")))
         /* When */
         val items = gulliUpdater.findItems(podcast)
         /* Then */
@@ -105,7 +105,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return empty list if page isn't available`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
         /* When */
         val items = gulliUpdater.findItems(podcast)
         /* Then */
@@ -115,7 +115,7 @@ class GulliUpdaterTest {
     @Test
     fun `should handle item with different structure`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-item-format.html")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-item-format.html")))
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
         whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
         /* When */
@@ -127,7 +127,7 @@ class GulliUpdaterTest {
     @Test
     fun `should handle item without cover`() {
         /* Given */
-        whenever(htmlService.get(podcast.url)).thenReturn(IOUtils.fileAsHtml(from("pokemon.without-cover.html")))
+        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.without-cover.html")))
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
         whenever(imageService.getCoverFromURL(any())).thenReturn(null)
         /* When */

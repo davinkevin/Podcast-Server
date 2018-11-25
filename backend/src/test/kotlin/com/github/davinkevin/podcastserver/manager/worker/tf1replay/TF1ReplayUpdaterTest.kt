@@ -13,7 +13,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -79,7 +79,7 @@ class TF1ReplayUpdaterTest {
     @Test
     fun `should not get name from url`() {
         /* Given */
-        val podcast = Podcast.builder().url("http://www.tf1.fr/foo/bar").build()
+        val podcast = Podcast().apply { url = "http://www.tf1.fr/foo/bar" }
 
         /* When */
         val signature = updater.signatureOf(podcast)

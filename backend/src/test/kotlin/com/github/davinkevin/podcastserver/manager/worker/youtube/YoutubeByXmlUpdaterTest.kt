@@ -11,7 +11,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
-import lan.dk.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -48,9 +48,9 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should get items for channel`() {
         /* Given */
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/user/androiddevelopers")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/user/androiddevelopers"
+        }
         whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).then { fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml") }
 
@@ -67,9 +67,9 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should get items for playlist`() {
         /* Given */
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/playlist?list=PLAD454F0807B6CB80")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/playlist?list=PLAD454F0807B6CB80"
+        }
 
         whenever(jdomService.parse(any())).thenReturn(fileAsXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml"))
 
@@ -84,9 +84,9 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should generate signature`() {
         /* Given */
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/user/androiddevelopers")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/user/androiddevelopers"
+        }
 
         whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).thenReturn( fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"))
@@ -103,9 +103,9 @@ class YoutubeByXmlUpdaterTest {
 
     @Test
     fun `should handle error during signature`() {
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/user/androiddevelopers")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/user/androiddevelopers"
+        }
 
         whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
@@ -120,9 +120,9 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should return empty if parsing error`() {
         /* Given */
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D"
+        }
 
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
@@ -137,9 +137,9 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should return empty set because html page not found`() {
         /* Given */
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/user/androiddevelopers")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/user/androiddevelopers"
+        }
 
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
@@ -154,9 +154,9 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should return empty set because of data tag not find`() {
         /* Given */
-        val podcast = Podcast.builder()
-                .url("https://www.youtube.com/user/androiddevelopers")
-                .build()
+        val podcast = Podcast().apply {
+            url = "https://www.youtube.com/user/androiddevelopers"
+        }
 
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
