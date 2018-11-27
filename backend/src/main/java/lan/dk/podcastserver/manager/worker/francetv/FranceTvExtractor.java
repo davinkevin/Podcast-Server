@@ -2,6 +2,7 @@ package lan.dk.podcastserver.manager.worker.francetv;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater;
 import com.github.davinkevin.podcastserver.service.HtmlService;
 import io.vavr.collection.List;
 import lan.dk.podcastserver.entity.Item;
@@ -51,7 +52,7 @@ public class FranceTvExtractor implements Extractor {
 
     @Override
     public Integer compatibility(String url) {
-        return FranceTvUpdater.isFromFranceTv(url);
+        return FranceTvUpdater.Companion.isFromFranceTv(url);
     }
 
     @Override

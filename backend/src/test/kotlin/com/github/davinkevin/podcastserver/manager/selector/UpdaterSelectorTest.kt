@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionUpdater
-import lan.dk.podcastserver.manager.worker.francetv.FranceTvUpdater
+import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import lan.dk.podcastserver.manager.worker.gulli.GulliUpdater
 import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUpdater

@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager.worker.francetv;
 
+import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater;
 import com.github.davinkevin.podcastserver.service.HtmlService;
 import com.github.davinkevin.podcastserver.service.ImageService;
 import com.github.davinkevin.podcastserver.service.UrlService;
@@ -51,6 +52,6 @@ public class FranceTvFinder implements Finder {
 
     @Override
     public Integer compatibility(@NotEmpty String url) {
-        return FranceTvUpdater.isFromFranceTv(url);
+        return FranceTvUpdater.Companion.isFromFranceTv(url);
     }
 }
