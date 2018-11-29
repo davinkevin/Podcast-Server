@@ -6,10 +6,9 @@ import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
+import com.github.davinkevin.podcastserver.entity.Podcast;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
-import com.github.davinkevin.podcastserver.entity.Podcast;
-import lan.dk.podcastserver.exception.PodcastNotFoundException;
 import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.FileSystemResource;
@@ -66,7 +65,7 @@ public class PodcastController {
 
     @JsonView(Podcast.PodcastDetailsView.class)
     @PatchMapping("{id}")
-    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) throws PodcastNotFoundException {
+    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
         podcast.setId(id);
         Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
         patchedPodcast.setItems(null);
