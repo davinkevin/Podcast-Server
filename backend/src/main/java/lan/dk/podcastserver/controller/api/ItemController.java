@@ -8,18 +8,18 @@ import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import com.github.davinkevin.podcastserver.service.ByteRangeResourceHandler;
 import io.vavr.collection.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -50,7 +50,15 @@ public class ItemController {
 
     @GetMapping
     @JsonView(Item.ItemPodcastListView.class)
-    public Page<Item> findAll(@PathVariable UUID idPodcast, Pageable pageable) {
+    public Page<Item> findAll(@PathVariable UUID idPodcast,
+                              @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                              @RequestParam(value = "size", required = false, defaultValue = "12") Integer size,
+                              @RequestParam(value = "sort", required = false, defaultValue = "pubDate,DESC") String sort
+    ) {
+        String field = StringUtils.substringBefore(sort, ",");
+        Sort.Direction direction = Sort.Direction.fromString(StringUtils.substringAfter(sort, ","));
+        PageRequest pageable = PageRequest.of(page, size, new Sort(direction, field));
+        
         return itemBusiness.findByPodcast(idPodcast, pageable);
     }
 
@@ -82,17 +90,6 @@ public class ItemController {
     @GetMapping("{id}/addtoqueue")
     public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
-    }
-
-    @GetMapping("{id}/{file}")
-    public void getEpisodeFile(@PathVariable UUID id, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Item item = itemBusiness.findOne(id);
-        if (item.isDownloaded()) {
-            request.setAttribute(ByteRangeResourceHandler.Companion.getATTR_FILE(), item.getLocalPath());
-            handler.handleRequest(request, response);
-        } else {
-            response.sendRedirect(item.getUrl());
-        }
     }
 
     @GetMapping("{id}/cover{ext}")

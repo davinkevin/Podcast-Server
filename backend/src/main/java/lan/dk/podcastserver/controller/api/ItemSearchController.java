@@ -5,13 +5,15 @@ import com.github.davinkevin.podcastserver.business.ItemBusiness;
 import com.github.davinkevin.podcastserver.business.TagBusiness;
 import com.github.davinkevin.podcastserver.entity.Item;
 import com.github.davinkevin.podcastserver.entity.Status;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -36,18 +38,28 @@ public class ItemSearchController {
     @GetMapping("search")
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestParam(value = "q", required = false, defaultValue = "") String q,
-                             @RequestParam(value = "tags", required = false, defaultValue = "") Set<String> tags,
-                             @RequestParam(value = "status", required = false, defaultValue = "") Set<String> _statuses,
-                             Pageable pageable) {
+                             @RequestParam(value = "tags", required = false, defaultValue = "") String _tags,
+                             @RequestParam(value = "status", required = false, defaultValue = "") String _statuses,
 
-        if (!isSearch(q, tags, _statuses)) {
+                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                             @RequestParam(value = "size", required = false, defaultValue = "12") Integer size,
+                             @RequestParam(value = "sort", required = false, defaultValue = "pubDate,DESC") String sort
+    ) {
+        String field = StringUtils.substringBefore(sort, ",");
+        Sort.Direction direction = Sort.Direction.fromString(StringUtils.substringAfter(sort, ","));
+        PageRequest pageable = PageRequest.of(page, size, new Sort(direction, field));
+
+        Set<String> tags = HashSet.of(_tags.split(","));
+        Set<String> statuses = HashSet.of(_statuses.split(","));
+
+        if (!isSearch(q, tags, statuses)) {
             return itemBusiness.findAll(pageable);
         }
 
         return itemBusiness.findByTagsAndFullTextTerm(
                 q,
                 tagBusiness.findAllByName(tags),
-                _statuses.flatMap(Status::from),
+                statuses.flatMap(Status::from),
                 pageable
         );
     }

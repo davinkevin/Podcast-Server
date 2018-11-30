@@ -10,13 +10,14 @@ import io.vavr.API.Set
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ServerWebExchange
 import java.io.BufferedReader
 import java.io.InputStream
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.util.function.Consumer
 import java.util.function.Function
-import javax.servlet.http.HttpServletRequest
 
 /**
  * Created by kevin on 21/07/2016.
@@ -90,15 +91,15 @@ open class UrlService {
         val NO_OP = Consumer<HttpURLConnection> { Function.identity<Any>().apply(it) }
         private val EMPTY_PORT = Set(80, 443)
 
-        @JvmStatic fun getDomainFromRequest(request: HttpServletRequest): String {
-            if (request.getHeader("origin") != null) {
-                return request.getHeader("origin")
+        @JvmStatic fun getDomainFromRequest(ex: ServerWebExchange): URI {
+            val origin = ex.request.headers["origin"]?.firstOrNull()
+            if (origin != null) {
+                return URI(origin)
             }
 
-            return with(request) {
-                val port = if (EMPTY_PORT.contains(serverPort)) "" else ":$serverPort"
-                "$scheme://$serverName$port"
-            }
+            val uri = ex.request.uri
+            val port = if(uri.port in EMPTY_PORT) { "" } else { ":${uri.port}" }
+            return URI("${uri.scheme}://${uri.host}:$port/")
         }
 
         @JvmStatic fun addProtocolIfNecessary(protocol: String, url: String): String {

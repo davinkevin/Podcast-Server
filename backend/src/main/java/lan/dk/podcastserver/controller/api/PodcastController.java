@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -84,11 +84,11 @@ public class PodcastController {
     public List<Podcast> findAll() { return podcastBusiness.findAll(); }
 
     @GetMapping(value="/opml", produces = "application/xml; charset=utf-8")
-    public String asOpml(HttpServletRequest request) { return podcastBusiness.asOpml(UrlService.getDomainFromRequest(request)); }
+    public String asOpml(ServerWebExchange request) { return podcastBusiness.asOpml(UrlService.getDomainFromRequest(request).toASCIIString()); }
 
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
-    public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, HttpServletRequest request) {
-        return podcastBusiness.getRss(id, limit, UrlService.getDomainFromRequest(request));
+    public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, ServerWebExchange request) {
+        return podcastBusiness.getRss(id, limit, UrlService.getDomainFromRequest(request).toASCIIString());
     }
 
     @GetMapping(value="{id}/cover.{ext}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})

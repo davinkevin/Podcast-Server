@@ -4,13 +4,9 @@
 
 spring:
  h2.console.enabled: true
- mvc.view:
-  suffix: .html
-  prefix: /
  datasource:
   url: jdbc:h2:/tmp/podcast-server
   username: sa
-
   driver-class-name: org.h2.Driver
  jpa:
   database-platform: org.hibernate.dialect.H2Dialect
@@ -31,9 +27,6 @@ spring:
 
 server:
  port: 8080
- compression:
-  enabled: true
-  mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
 logging:
  path: /tmp/podcast-server/podcast-server.log

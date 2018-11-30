@@ -2,12 +2,12 @@ package lan.dk.podcastserver.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.github.davinkevin.podcastserver.business.WatchListBusiness;
+import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
-import com.github.davinkevin.podcastserver.entity.WatchList;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 import static com.github.davinkevin.podcastserver.entity.WatchList.WatchListDetailsListView;
@@ -61,7 +61,7 @@ public class WatchListController {
     }
 
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
-    public String asRss(@PathVariable UUID id, HttpServletRequest request) {
-        return watchListBusiness.asRss(id, UrlService.getDomainFromRequest(request));
+    public String asRss(@PathVariable UUID id, ServerWebExchange request) {
+        return watchListBusiness.asRss(id, UrlService.getDomainFromRequest(request).toASCIIString());
     }
 }
