@@ -3,7 +3,7 @@ package lan.dk.podcastserver.manager.selector;
 import lan.dk.podcastserver.manager.worker.Finder;
 import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsFinder;
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionFinder;
-import lan.dk.podcastserver.manager.worker.francetv.FranceTvFinder;
+import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvFinder;
 import lan.dk.podcastserver.manager.worker.gulli.GulliFinder;
 import lan.dk.podcastserver.manager.worker.itunes.ItunesFinder;
 import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder;

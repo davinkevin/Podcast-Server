@@ -202,13 +202,14 @@ class FranceTvUpdaterTest {
         return IOUtils.fileAsJson(from(url))
     }
 
-    private fun from(name: String): String {
-        return String.format("/remote/podcast/francetv/%s", name)
-    }
-
     companion object {
         private const val FRANCETV_URL = "https://www.france.tv/france-2/secrets-d-histoire/"
         private var PODCAST = Podcast().apply { url = FRANCETV_URL }
+
+
+        internal fun from(name: String): String {
+            return String.format("/remote/podcast/francetv/%s", name)
+        }
 
         private fun allValid(): Condition<Item> {
             val p = Predicate<Item>{ !it.url.isNullOrEmpty() }
