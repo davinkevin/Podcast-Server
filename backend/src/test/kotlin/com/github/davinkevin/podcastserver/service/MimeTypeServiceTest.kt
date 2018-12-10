@@ -5,7 +5,7 @@ import arrow.core.getOrElse
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Item
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.utils.IOUtils
+import com.github.davinkevin.podcastserver.IOUtils
 import org.apache.tika.Tika
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested

@@ -9,7 +9,7 @@ import com.mashape.unirest.request.GetRequest;
 import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.service.JsonService;
-import lan.dk.utils.IOUtils;
+import com.github.davinkevin.podcastserver.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.junit.Test;
 import org.junit.runner.RunWith;

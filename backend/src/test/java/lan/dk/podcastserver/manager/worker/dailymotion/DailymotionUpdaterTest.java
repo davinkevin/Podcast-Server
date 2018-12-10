@@ -7,7 +7,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
-import lan.dk.utils.IOUtils;
+import com.github.davinkevin.podcastserver.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -8,7 +8,7 @@ import lan.dk.podcastserver.entity.Item;
 import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.manager.worker.Type;
 import com.github.davinkevin.podcastserver.service.JdomService;
-import lan.dk.utils.IOUtils;
+import com.github.davinkevin.podcastserver.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;

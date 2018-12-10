@@ -11,7 +11,7 @@ import lan.dk.podcastserver.manager.worker.Type;
 import com.github.davinkevin.podcastserver.service.JdomService;
 import lan.dk.podcastserver.service.JsonService;
 import lan.dk.podcastserver.service.properties.Api;
-import lan.dk.utils.IOUtils;
+import com.github.davinkevin.podcastserver.IOUtils;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
 
 import static io.vavr.API.List;
 import static io.vavr.API.None;
-import static lan.dk.utils.IOUtils.fileAsXml;
+import static com.github.davinkevin.podcastserver.IOUtils.fileAsXml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;

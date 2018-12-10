@@ -1,10 +1,10 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
+import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.entity.Cover
-import lan.dk.utils.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -48,7 +48,7 @@ class FranceTvFinderTest {
 Magazine Secrets d'Histoire
 Accessible à tous, le magazine Secrets d’Histoire vous entraîne au cœur des épisodes mystérieux de l’histoire à travers des reportages, des enquêtes, des quizz… et bien plus encore ! En savoir plus""")
     }
-    
+
     @Test
     fun `should be compatible`() {
         /* GIVEN */

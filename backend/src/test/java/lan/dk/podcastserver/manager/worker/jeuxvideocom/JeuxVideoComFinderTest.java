@@ -2,7 +2,7 @@ package lan.dk.podcastserver.manager.worker.jeuxvideocom;
 
 import com.github.davinkevin.podcastserver.service.HtmlService;
 import lan.dk.podcastserver.entity.Podcast;
-import lan.dk.utils.IOUtils;
+import com.github.davinkevin.podcastserver.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
