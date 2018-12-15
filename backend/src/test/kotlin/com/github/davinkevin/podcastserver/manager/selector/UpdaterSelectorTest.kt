@@ -6,7 +6,7 @@ import lan.dk.podcastserver.manager.worker.beinsports.BeInSportsUpdater
 import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import lan.dk.podcastserver.manager.worker.gulli.GulliUpdater
-import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater
+import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import lan.dk.podcastserver.manager.worker.rss.RSSUpdater
 import lan.dk.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater

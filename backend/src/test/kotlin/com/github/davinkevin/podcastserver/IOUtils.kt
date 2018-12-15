@@ -58,10 +58,12 @@ object IOUtils {
                 .toVΛVΓ()
     }
 
-    @JvmStatic fun fileAsHtml(uri: String): Option<Document> {
+    @JvmStatic
+    @JvmOverloads
+    fun fileAsHtml(uri: String, baseUri: String = ""): Option<Document> {
         return toPath(uri)
                 .map { it.toFile() }
-                .map { Jsoup.parse(it, "UTF-8", "") }
+                .map { Jsoup.parse(it, "UTF-8", baseUri) }
                 .toOption()
                 .toVΛVΓ()
     }
