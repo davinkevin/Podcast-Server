@@ -82,10 +82,10 @@ class Item {
 
     @Transient
     @JsonView(ItemDetailsView::class)
-    var progression: Int = 0
+    var progression: Int? = 0
 
     @JsonIgnore
-    var numberOfFail: Int = 0
+    var numberOfFail: Int? = 0
 
     @JsonView(ItemDetailsView::class)
     var downloadDate: ZonedDateTime? = null
@@ -172,7 +172,7 @@ class Item {
                 .getOrElse { null }
 
     fun addATry() {
-        this.numberOfFail++
+        this.numberOfFail = this.numberOfFail!!+1
     }
 
     override fun equals(other: Any?): Boolean {

@@ -98,7 +98,7 @@ class HTTPWatcher(private val httpDownloader: HTTPDownloader) : Runnable {
                 }
 
                 val progression = (info.count * 100 / info.length.toFloat()).toInt()
-                if (item.progression < progression) {
+                if (item.progression!! < progression) {
                     item.progression = progression
                     log.debug("Progression of {} : {}%", item.title, progression)
                     httpDownloader.convertAndSaveBroadcast()

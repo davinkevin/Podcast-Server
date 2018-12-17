@@ -77,7 +77,7 @@ class ItemTest {
     @Test
     fun `should advance in progression`() {
         /* When */ ITEM.progression = 50
-        /* Then */ assertThat(ITEM.progression).isEqualTo(50)
+        /* Then */ assertThat(ITEM.progression!!).isEqualTo(50)
     }
 
     @Test
@@ -93,10 +93,10 @@ class ItemTest {
         assertThat(ITEM.numberOfFail).isEqualTo(0)
 
         ITEM.numberOfFail = 6
-        assertThat(ITEM.numberOfFail).isEqualTo(6)
+        assertThat(ITEM.numberOfFail!!).isEqualTo(6)
 
         ITEM.addATry()
-        assertThat(ITEM.numberOfFail).isEqualTo(7)
+        assertThat(ITEM.numberOfFail!!).isEqualTo(7)
     }
 
     @Test

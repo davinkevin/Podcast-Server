@@ -216,7 +216,7 @@ class YoutubeDownloader(
 
             val count = downloadInfo.map { it.count }.sum()
             val currentState = (count * 100 / globalSize.toFloat()).toInt()
-            if (item.progression < currentState) {
+            if (item.progression!! < currentState) {
                 item.progression = currentState
                 log.debug("{} - {}%", item.title, item.progression)
                 youtubeDownloader.convertAndSaveBroadcast()

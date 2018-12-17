@@ -203,7 +203,7 @@ class YoutubeDownloaderTest {
 
             /* When */
             val asyncTask = runAsync { downloader.run() }
-            await().atMost(5, SECONDS).until { item.progression > 1 }
+            await().atMost(5, SECONDS).until { item.progression!! > 1 }
             downloader.pauseDownload()
 
             /* Then */
@@ -223,7 +223,7 @@ class YoutubeDownloaderTest {
 
             /* When */
             val asyncTask = runAsync { downloader.run() }
-            await().atMost(5, SECONDS).until { item.progression > 1 }
+            await().atMost(5, SECONDS).until { item.progression!! > 1 }
             downloader.stopDownload()
 
             /* Then */
@@ -243,7 +243,7 @@ class YoutubeDownloaderTest {
 
             /* When */
             runAsync { downloader.run() }
-            await().atMost(5, SECONDS).until { item.progression > 1 }
+            await().atMost(5, SECONDS).until { item.progression!! > 1 }
             downloader.pauseDownload()
             await().until(progressionStopChange)
             downloader.stopDownload()
@@ -265,7 +265,7 @@ class YoutubeDownloaderTest {
 
             /* When */
             runAsync { downloader.run() }
-            await().atMost(5, SECONDS).until { item.progression > 1 }
+            await().atMost(5, SECONDS).until { item.progression!! > 1 }
             downloader.pauseDownload()
             await().until(progressionStopChange)
             downloader.restartDownload()

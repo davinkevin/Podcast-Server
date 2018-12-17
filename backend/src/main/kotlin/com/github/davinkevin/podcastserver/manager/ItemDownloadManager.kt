@@ -239,7 +239,7 @@ class ItemDownloadManager (
 
     private fun convertAndSendWaitingQueue() = template.convertAndSend(WS_TOPIC_WAITING_LIST, waitingQueue)
 
-    fun canBeReset(item: Item) = item.numberOfFail + 1 <= podcastServerParameters.numberOfTry
+    fun canBeReset(item: Item) = item.numberOfFail!! + 1 <= podcastServerParameters.numberOfTry
 
     fun isInDownloadingQueue(item: Item) = _downloadingQueue.containsKey(item)
 
