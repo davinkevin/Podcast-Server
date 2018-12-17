@@ -6,7 +6,7 @@ import lan.dk.podcastserver.manager.worker.dailymotion.DailymotionFinder;
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvFinder;
 import lan.dk.podcastserver.manager.worker.gulli.GulliFinder;
 import lan.dk.podcastserver.manager.worker.itunes.ItunesFinder;
-import lan.dk.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder;
+import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder;
 import lan.dk.podcastserver.manager.worker.mycanal.MyCanalFinder;
 import lan.dk.podcastserver.manager.worker.rss.RSSFinder;
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayFinder;
