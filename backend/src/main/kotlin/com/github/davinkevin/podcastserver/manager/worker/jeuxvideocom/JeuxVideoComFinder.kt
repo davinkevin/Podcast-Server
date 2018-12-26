@@ -29,7 +29,5 @@ class JeuxVideoComFinder(val htmlService: HtmlService) : Finder {
         }
     }
 
-    override fun compatibility(url: String?) =
-            if ((url ?: "").contains("jeuxvideo.com")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String?) = JeuxVideoComUpdater.isFromJeuxVideoCom(url)
 }

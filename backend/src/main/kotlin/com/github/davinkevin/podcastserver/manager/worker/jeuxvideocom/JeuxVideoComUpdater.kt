@@ -62,11 +62,13 @@ class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlServic
 
     override fun type() = Type("JeuxVideoCom", "JeuxVideo.com")
 
-    override fun compatibility(url: String?) =
-            if ((url ?: "").contains( "jeuxvideo.com")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String?) = isFromJeuxVideoCom(url)
 
     companion object {
         const val JEUXVIDEOCOM_HOST = "http://www.jeuxvideo.com"
+
+        fun isFromJeuxVideoCom(url: String?) =
+                if ((url ?: "").contains( "jeuxvideo.com")) 1
+                else Integer.MAX_VALUE
     }
 }
