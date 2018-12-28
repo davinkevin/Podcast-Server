@@ -62,7 +62,7 @@ public class FinderSelectorTest {
 
     @Test
     public void should_reject_if_url_empty() {
-        assertThat(finderSelector.of(null)).isEqualTo(FinderSelector.NO_OP_FINDER);
+        assertThat(finderSelector.of(null)).isEqualTo(FinderSelector.Companion.getNO_OP_FINDER());
     }
 
     @Test
