@@ -1,4 +1,4 @@
-package lan.dk.podcastserver.manager.selector
+package com.github.davinkevin.podcastserver.manager.selector
 
 import lan.dk.podcastserver.manager.worker.Finder
 import lan.dk.podcastserver.manager.worker.noop.NoOpFinder

@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.business.find
 
 import lan.dk.podcastserver.entity.Podcast
-import lan.dk.podcastserver.manager.selector.FinderSelector
+import com.github.davinkevin.podcastserver.manager.selector.FinderSelector
 import org.springframework.stereotype.Component
 
 /**
