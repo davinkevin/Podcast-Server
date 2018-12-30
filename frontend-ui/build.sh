@@ -11,5 +11,8 @@ cp -r ${UI_FOLDER}/src/docker/Dockerfile \
 
 cp -r frontend-angularjs/target/dist ${UI_FOLDER}/target/docker/podcast-server
 
+mkdir -p ${UI_FOLDER}/target/docker/podcast-server/v2/
+cp frontend-angular/dist/* ${UI_FOLDER}/target/docker/podcast-server/v2/
+
 cd ${UI_FOLDER}/target/docker/
 docker build -t davinkevin/podcast-server/ui .
