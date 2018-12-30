@@ -5,7 +5,7 @@ Podcast-Server
 
 Back-end : [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2030290b1c2145f6878e9ad7811c542e)](https://www.codacy.com/app/davin-kevin/Podcast-Server?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=davinkevin/Podcast-Server&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/davinkevin/Podcast-Server/badge.svg?branch=master)](https://coveralls.io/r/davinkevin/Podcast-Server?branch=master)
 
-Migration : ![Java stage](https://badgen.net/badge/Java/65%25/orange) ![Kotlin stage](https://badgen.net/badge/Kotlin/35%25/purple)
+Migration : ![Java stage](https://badgen.net/badge/Java/64%25/orange) ![Kotlin stage](https://badgen.net/badge/Kotlin/36%25/purple)
 
 Front-end : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
 

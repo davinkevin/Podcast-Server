@@ -10,7 +10,7 @@ import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
 import lan.dk.podcastserver.manager.selector.DownloaderSelector;
-import lan.dk.podcastserver.manager.selector.ExtractorSelector;
+import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
