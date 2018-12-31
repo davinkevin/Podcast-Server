@@ -17,6 +17,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.PathMatcher
+import java.nio.file.attribute.PosixFilePermission.*
 import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.PostConstruct
@@ -111,6 +112,7 @@ abstract class AbstractDownloader(
                 Files.move(t, targetWithoutExtension)
 
                 t = targetWithoutExtension
+                Files.setPosixFilePermissions(t, setOf(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ))
             }
         } catch (e:Exception) {
             failDownload()

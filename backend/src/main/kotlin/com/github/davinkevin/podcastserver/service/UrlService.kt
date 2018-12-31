@@ -92,14 +92,14 @@ open class UrlService {
         private val EMPTY_PORT = Set(80, 443)
 
         @JvmStatic fun getDomainFromRequest(ex: ServerWebExchange): URI {
-            val origin = ex.request.headers["origin"]?.firstOrNull()
+            val origin = ex.request.headers["Origin"]?.firstOrNull()
             if (origin != null) {
                 return URI(origin)
             }
 
             val uri = ex.request.uri
             val port = if(uri.port in EMPTY_PORT) { "" } else { ":${uri.port}" }
-            return URI("${uri.scheme}://${uri.host}:$port/")
+            return URI("${uri.scheme}://${uri.host}$port/")
         }
 
         @JvmStatic fun addProtocolIfNecessary(protocol: String, url: String): String {
