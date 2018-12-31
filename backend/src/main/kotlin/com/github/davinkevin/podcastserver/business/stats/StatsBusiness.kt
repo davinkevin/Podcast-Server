@@ -1,14 +1,13 @@
 package com.github.davinkevin.podcastserver.business.stats
 
-import com.github.davinkevin.podcastserver.business.PodcastBusiness
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness.Selector.*
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.querydsl.core.types.dsl.BooleanExpression
 import io.vavr.collection.List
 import io.vavr.collection.Set
-import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.*
 import org.springframework.stereotype.Component
@@ -20,7 +19,7 @@ import java.util.*
  * Created by kevin on 28/04/15 for HackerRank problem
  */
 @Component
-class StatsBusiness(val itemRepository: ItemRepository, val podcastBusiness: PodcastBusiness, val updaterSelector: UpdaterSelector) {
+class StatsBusiness(val itemRepository: ItemRepository, val updaterSelector: UpdaterSelector) {
 
     fun allStatsByTypeAndDownloadDate(numberOfMonth: Int) =
             allStatsByType(numberOfMonth, BY_DOWNLOAD_DATE)
@@ -31,14 +30,14 @@ class StatsBusiness(val itemRepository: ItemRepository, val podcastBusiness: Pod
     fun allStatsByTypeAndPubDate(numberOfMonth: Int) =
             allStatsByType(numberOfMonth, BY_PUBLICATION_DATE)
 
-    fun statsByPubDate(id: UUID, numberOfMonth: Long) =
-            statOf(id, BY_PUBLICATION_DATE.date, numberOfMonth)
+    fun statsByPubDate(id: UUID, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> =
+            itemRepository.findStatOfPubDate(id, numberOfMonth.toInt())
 
-    fun statsByDownloadDate(id: UUID, numberOfMonth: Long) =
-            statOf(id, BY_DOWNLOAD_DATE.date, numberOfMonth)
+    fun statsByDownloadDate(id: UUID, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> =
+            itemRepository.findStatOfDownloadDate(id, numberOfMonth.toInt())
 
-    fun statsByCreationDate(id: UUID, numberOfMonth: Long) =
-            statOf(id, BY_CREATION_DATE.date, numberOfMonth)
+    fun statsByCreationDate(id: UUID, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> =
+            itemRepository.findStatOfCreationDate(id, numberOfMonth.toInt())
 
     private fun generateForType(type: Type, numberOfMonth: Int, selector: Selector): StatsPodcastType {
         val dateInPast = ZonedDateTime.now().minusMonths(numberOfMonth.toLong())
@@ -62,18 +61,6 @@ class StatsBusiness(val itemRepository: ItemRepository, val podcastBusiness: Pod
                 .filter { stats -> !stats.isEmpty }
                 .sortedBy { it.type }
                 .toVΛVΓ()
-    }
-
-    private fun statOf(id: UUID, mapper: (Item) -> ZonedDateTime?, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> {
-        val dateInPast = LocalDate.now().minusMonths(numberOfMonth)
-
-        return podcastBusiness.findOne(id)
-                .items!!
-                .map(mapper)
-                .filter { Objects.nonNull(it) }
-                .map { it!!.toLocalDate() }
-                .filter { date -> date.isAfter(dateInPast) }
-                .toNumberOfItem()
     }
 
     private enum class Selector(val date: (Item) -> ZonedDateTime?, val filter: (ZonedDateTime) ->  BooleanExpression) {

@@ -1,5 +1,10 @@
 package com.github.davinkevin.podcastserver.business.stats
 
+import com.github.davinkevin.podcastserver.business.PodcastBusiness
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -8,17 +13,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import io.vavr.API
 import io.vavr.collection.HashSet
 import io.vavr.collection.Set
-import com.github.davinkevin.podcastserver.business.PodcastBusiness
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import com.github.davinkevin.podcastserver.manager.worker.Type
 import lan.dk.podcastserver.repository.ItemRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -31,6 +28,7 @@ import java.util.*
 /**
  * Created by kevin on 05/08/15 for Podcast Server
  */
+@Disabled
 @ExtendWith(MockitoExtension::class)
 class StatsBusinessTest {
 
