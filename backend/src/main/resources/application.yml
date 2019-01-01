@@ -5,7 +5,7 @@
 spring:
  h2.console.enabled: true
  datasource:
-  url: jdbc:h2:/tmp/podcast-server
+  url: jdbc:h2:tcp://localhost:1521/podcast-server
   username: sa
   driver-class-name: org.h2.Driver
  jpa:
@@ -58,7 +58,7 @@ podcastserver:
   location: /tmp/podcast-server/backup/
   cron: 0 30 4 * * ?
   binary: false
-  enabled: true
+  enabled: false
  externaltools:
   #rtmpdump: /usr/local/bin/rtmpdump
   #ffmpeg: /usr/local/bin/ffmpeg

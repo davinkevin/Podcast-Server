@@ -1,0 +1,10 @@
+[Unit]
+Description=Scheduler to execute database backup of the podcast server
+
+[Timer]
+OnCalendar=*-*-* 4:30:00
+Persistent=true
+Unit=podcast-server-database-backup.service
+
+[Install]
+WantedBy=timers.target

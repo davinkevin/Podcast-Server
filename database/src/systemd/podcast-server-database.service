@@ -1,0 +1,20 @@
+[Unit]
+Description=Podcast Server H2 Database
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+TimeoutStartSec=0
+ExecStart=/usr/bin/docker run --rm \
+        -p 8999:81 \
+        -p 1521:1521 \
+        -v /opt/h2/data:/opt/h2-data \
+        --name podcast-server-database \
+        davinkevin/podcast-server/database:latest
+ExecStop=/usr/bin/docker stop podcast-server-database
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
