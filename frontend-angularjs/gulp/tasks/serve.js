@@ -41,3 +41,7 @@ function startBrowserSync(directoryBase, files, browser) {
 gulp.task('serve', ['watch'], () => {
     startBrowserSync([paths.srcDir, './' ]);
 });
+
+gulp.task('serve:dev', () => {
+    startBrowserSync([paths.releaseDirName]);
+});
