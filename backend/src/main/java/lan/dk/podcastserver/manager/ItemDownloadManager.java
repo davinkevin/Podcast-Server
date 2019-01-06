@@ -1,5 +1,6 @@
 package lan.dk.podcastserver.manager;
 
+import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
@@ -9,8 +10,7 @@ import lan.dk.podcastserver.entity.Podcast;
 import lan.dk.podcastserver.entity.Status;
 import lan.dk.podcastserver.manager.downloader.Downloader;
 import lan.dk.podcastserver.manager.downloader.DownloadingItem;
-import lan.dk.podcastserver.manager.selector.DownloaderSelector;
-import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector;
+import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector;
 import lan.dk.podcastserver.repository.ItemRepository;
 import lan.dk.podcastserver.service.properties.PodcastServerParameters;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static io.vavr.API.Try;
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static lan.dk.podcastserver.manager.selector.DownloaderSelector.NO_OP_DOWNLOADER;
 
 @Slf4j
 @Service
@@ -205,7 +204,7 @@ public class ItemDownloadManager {
     private void getDownloaderByTypeAndRun(Item item) {
         if (isInDownloadingQueue(item)) { // case when the worker stay in the downloading queue
             log.debug("Start Item : " + item.getTitle());
-            Downloader downloader = downloadingQueue.get(item).getOrElse(NO_OP_DOWNLOADER);
+            Downloader downloader = downloadingQueue.get(item).getOrElse(DownloaderSelector.Companion.getNO_OP_DOWNLOADER());
             downloader.restartDownload();
         } else { // Case when the worker totally end when paused, need to launch as new
             launchWithNewWorkerFrom(item);
