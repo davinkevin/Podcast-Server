@@ -9,17 +9,15 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.API;
 import io.vavr.collection.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageAssert;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.time.ZonedDateTime;
@@ -37,8 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 04/09/15 for Podcast Server
  */
 @DataJpaTest
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DatabaseConfigurationTest.class})
+@Import(DatabaseConfigurationTest.class)
 public class ItemRepositoryTest {
 
     @Autowired DataSource dataSource;
@@ -73,7 +70,7 @@ public class ItemRepositoryTest {
                     .build()
     );
 
-    @Before
+    @BeforeEach
     public void prepare() throws Exception {
         Operation operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);

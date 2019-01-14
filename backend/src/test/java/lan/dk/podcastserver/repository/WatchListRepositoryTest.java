@@ -7,13 +7,13 @@ import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
 import java.util.UUID;
@@ -28,8 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 17/01/2016 for PodcastServer
  */
 @DataJpaTest
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DatabaseConfigurationTest.class})
+@ExtendWith(SpringExtension.class)
+@Import(DatabaseConfigurationTest.class)
 public class WatchListRepositoryTest {
 
     @Autowired DataSource dataSource;
@@ -52,7 +52,7 @@ public class WatchListRepositoryTest {
                     .build()
     );
 
-    @Before
+    @BeforeEach
     public void prepare() throws Exception {
         Operation operation = sequenceOf(DELETE_ALL, INSERT_PLAYLIST_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);

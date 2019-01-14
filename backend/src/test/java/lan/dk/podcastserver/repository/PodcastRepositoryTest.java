@@ -1,18 +1,16 @@
 package lan.dk.podcastserver.repository;
 
+import com.github.davinkevin.podcastserver.entity.Podcast;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
-import com.github.davinkevin.podcastserver.entity.Podcast;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.context.annotation.Import;
 
 import javax.sql.DataSource;
 import java.util.UUID;
@@ -24,9 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by kevin on 17/08/15 for Podcast Server
  */
-@RunWith(SpringRunner.class)
 @DataJpaTest
-@SpringBootTest(classes = {DatabaseConfigurationTest.class})
+@Import(DatabaseConfigurationTest.class)
 public class PodcastRepositoryTest {
 
     @Autowired DataSource dataSource;
@@ -42,7 +39,7 @@ public class PodcastRepositoryTest {
                     );
 
 
-    @Before
+    @BeforeEach
     public void prepare() throws Exception {
         Operation operation = sequenceOf(DatabaseConfigurationTest.DELETE_ALL, INSERT_REFERENCE_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);

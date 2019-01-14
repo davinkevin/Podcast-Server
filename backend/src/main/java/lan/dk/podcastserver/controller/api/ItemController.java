@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.business.WatchListBusiness;
 import com.github.davinkevin.podcastserver.entity.Item;
 import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
-import com.github.davinkevin.podcastserver.service.ByteRangeResourceHandler;
 import io.vavr.collection.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,14 +36,11 @@ public class ItemController {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(ItemController.class);
     private final ItemBusiness itemBusiness;
     private final ItemDownloadManager itemDownloadManager;
-    private final ByteRangeResourceHandler handler;
     private final WatchListBusiness watchListBusiness;
 
-    @java.beans.ConstructorProperties({"itemBusiness", "itemDownloadManager", "handler", "watchListBusiness"})
-    public ItemController(ItemBusiness itemBusiness, ItemDownloadManager itemDownloadManager, ByteRangeResourceHandler handler, WatchListBusiness watchListBusiness) {
+    public ItemController(ItemBusiness itemBusiness, ItemDownloadManager itemDownloadManager, WatchListBusiness watchListBusiness) {
         this.itemBusiness = itemBusiness;
         this.itemDownloadManager = itemDownloadManager;
-        this.handler = handler;
         this.watchListBusiness = watchListBusiness;
     }
 

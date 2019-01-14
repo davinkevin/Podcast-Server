@@ -7,13 +7,11 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.context.annotation.Import;
 
 import javax.sql.DataSource;
 import java.util.UUID;
@@ -27,8 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 02/06/2017 for Podcast Server
  */
 @DataJpaTest
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DatabaseConfigurationTest.class})
+@Import(DatabaseConfigurationTest.class)
 public class TagRepositoryTest {
 
     private @Autowired DataSource dataSource;
@@ -44,7 +41,7 @@ public class TagRepositoryTest {
                     .build()
     );
 
-    @Before
+    @BeforeEach
     public void prepare() throws Exception {
         Operation operation = sequenceOf(DELETE_ALL, INSERT_TAG_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);

@@ -11,17 +11,13 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import com.querydsl.core.types.ExpressionUtils;
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest;
 import lan.dk.podcastserver.repository.ItemRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.context.annotation.Import;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -39,8 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by kevin on 17/08/15 for Podcast Server
  */
 @DataJpaTest
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DatabaseConfigurationTest.class})
+@Import(DatabaseConfigurationTest.class)
 public class ItemDslTest {
 
     @Autowired DataSource dataSource;
@@ -265,16 +260,7 @@ public class ItemDslTest {
                 .contains("Geek INC 123");
     }
 
-    @Test(expected = InvocationTargetException.class)
-    public void should_throw_exception_on_dsl_instanciation() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Constructor<ItemDSL> constructor = ItemDSL.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        constructor.newInstance();
-    }
-
-
-
-    @Before
+    @BeforeEach
     public void prepare() throws Exception {
         Operation operation = sequenceOf(DELETE_ALL, INSERT_REFERENCE_DATA);
         DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operation);
