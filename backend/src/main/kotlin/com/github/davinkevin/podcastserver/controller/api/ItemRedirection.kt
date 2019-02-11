@@ -2,9 +2,9 @@ package com.github.davinkevin.podcastserver.controller.api
 
 import com.github.davinkevin.podcastserver.business.ItemBusiness
 import com.github.davinkevin.podcastserver.service.UrlService
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,11 +13,11 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.util.*
 
-@Controller
+//@Controller
 @RequestMapping("/api/podcasts/{idPodcast}/items")
-class ItemRedirection(val itemBusiness: ItemBusiness) {
+class ItemRedirection(private val itemBusiness: ItemBusiness) {
 
-    internal var log = org.slf4j.LoggerFactory.getLogger(ItemRedirection::class.java)
+    internal var log = LoggerFactory.getLogger(ItemRedirection::class.java)
 
     @GetMapping(value = ["{id}/{file}"])
     fun file(@PathVariable id: UUID, exchange: ServerWebExchange): Mono<Void> {

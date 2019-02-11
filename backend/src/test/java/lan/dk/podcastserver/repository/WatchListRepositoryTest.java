@@ -22,6 +22,7 @@ import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static java.time.ZonedDateTime.now;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
+import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -38,7 +39,7 @@ public class WatchListRepositoryTest {
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
     private static final Operation INSERT_PLAYLIST_DATA = sequenceOf(
-            ItemRepositoryTest.INSERT_ITEM_DATA,
+            INSERT_ITEM_DATA,
             insertInto("WATCH_LIST")
                     .columns("ID", "NAME")
                     .values(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
