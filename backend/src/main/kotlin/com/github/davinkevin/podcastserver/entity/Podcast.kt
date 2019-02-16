@@ -1,11 +1,11 @@
 package com.github.davinkevin.podcastserver.entity
 
 
+import arrow.core.getOrElse
 import arrow.core.toOption
 import com.fasterxml.jackson.annotation.*
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.control.Option
-import com.github.davinkevin.podcastserver.entity.Item
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
@@ -13,6 +13,7 @@ import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import org.springframework.util.FileSystemUtils
 import java.io.Serializable
+import java.nio.file.Files
 import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.util.*
@@ -47,7 +48,7 @@ open class Podcast : Serializable {
     @Fetch(FetchMode.SUBSELECT)
     var items: MutableSet<Item>? = HashSet()
 
-    @JsonView(PodcastListingView::class)
+    @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH], orphanRemoval = true)
     var cover: Cover? = null
 
@@ -71,6 +72,31 @@ open class Podcast : Serializable {
                 .map { FilenameUtils.getExtension(it) }
                 .map { ext -> rootFolder!!.resolve(title).resolve("cover.$ext") }
                 .toVΛVΓ()
+
+    var coverOfPodcast: Cover
+        @JsonProperty("cover")
+        @JsonView(PodcastListingView::class)
+        get() {
+            return coverPath
+                    .filter { Files.exists(it) }
+                    .filter { this.id != null }
+                    .flatMap { arrow.core.Option.fromNullable(cover)
+                            .map { c -> String.format(COVER_PROXY_URL, id, FilenameUtils.getExtension(c.url)) }
+                            .map { anUrl -> val c = this.cover!!
+                                return@map Cover().apply {
+                                    url = anUrl
+                                    height = c.height
+                                    width = c.width
+                                    id = c.id
+                                }
+                            }
+                            .toVΛVΓ()
+                    }
+                    .getOrElse { cover!! }
+        }
+        set(value) {
+            cover = value
+        }
 
     @java.beans.ConstructorProperties("id", "title", "url", "signature", "type", "lastUpdate", "items", "cover", "description", "hasToBeDeleted", "tags")
     @JsonIgnore
@@ -158,6 +184,6 @@ open class Podcast : Serializable {
         private val log = org.slf4j.LoggerFactory.getLogger(Podcast::class.java)
         var rootFolder: Path? = null
         val DEFAULT_PODCAST = Podcast()
-        const val COVER_PROXY_URL = "/api/podcasts/%s/cover.%s"
+        const val COVER_PROXY_URL = "/api/v1/podcasts/%s/cover.%s"
     }
 }

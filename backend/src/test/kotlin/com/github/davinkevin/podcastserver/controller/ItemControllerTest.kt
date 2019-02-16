@@ -80,7 +80,7 @@ class ItemControllerTest {
                                    "cover":{
                                       "height":100,
                                       "id":"39fed2d8-1401-40ad-b367-e9ce612461aa",
-                                      "url":"/api/podcasts/d352d583-83cc-4c09-910a-ae5d5d8adad7/items/904ee60c-c510-4172-8a09-2ec0ed25d442/cover.png",
+                                      "url":"/api/v1/podcasts/d352d583-83cc-4c09-910a-ae5d5d8adad7/items/904ee60c-c510-4172-8a09-2ec0ed25d442/cover.png",
                                       "width":100
                                    },
                                    "creationDate":"2019-01-14T14:15:16.000000017+01:00",
@@ -94,7 +94,7 @@ class ItemControllerTest {
                                    "mimeType":null,
                                    "podcastId":"d352d583-83cc-4c09-910a-ae5d5d8adad7",
                                    "progression":0,
-                                   "proxyURL":"/api/podcasts/d352d583-83cc-4c09-910a-ae5d5d8adad7/items/904ee60c-c510-4172-8a09-2ec0ed25d442/a_custom_podcast__.mp3",
+                                   "proxyURL":"/api/v1/podcasts/d352d583-83cc-4c09-910a-ae5d5d8adad7/items/904ee60c-c510-4172-8a09-2ec0ed25d442/a_custom_podcast__.mp3",
                                    "status":"NOT_DOWNLOADED",
                                    "title":"a custom podcast !",
                                    "url":null

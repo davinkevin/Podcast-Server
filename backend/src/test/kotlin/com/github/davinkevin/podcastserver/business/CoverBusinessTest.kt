@@ -154,7 +154,7 @@ class CoverBusinessTest {
 
         /* Then */
         assertThat(url)
-                .isEqualTo("/api/podcasts/${podcast.id}/$defaultCoverValue.$imageExtension")
+                .isEqualTo("/api/v1/podcasts/${podcast.id}/$defaultCoverValue.$imageExtension")
     }
 
     @Test

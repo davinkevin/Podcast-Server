@@ -8,6 +8,7 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
 import io.vavr.collection.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

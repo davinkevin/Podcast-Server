@@ -10,6 +10,8 @@ import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DAT
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
@@ -29,7 +31,7 @@ import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemReposito
 class ItemRepositoryV2Test {
 
     @Autowired lateinit var query: DSLContext
-    @Autowired lateinit var itemRepository: ItemRepository
+    @Autowired lateinit var repository: ItemRepository
     @Autowired lateinit var dataSource: DataSource
 
     private val dbSetupTracker = DbSetupTracker()
@@ -42,6 +44,44 @@ class ItemRepositoryV2Test {
         dbSetupTracker.launchIfNecessary(dbSetup)
     }
 
+    @Nested
+    @DisplayName("Should find by id")
+    inner class ShouldFindById {
+
+        @BeforeEach
+        fun beforeEach() {
+            dbSetupTracker.skipNextLaunch()
+        }
+
+        @Test
+        fun `and return one matching element`() {
+            /* Given */
+            val id = UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+
+            /* When */
+            StepVerifier.create(repository.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isEqualTo(id)
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `and return empty mono if not find by id`() {
+            /* Given */
+            val id = UUID.fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
+
+            /* When */
+            StepVerifier.create(repository.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+    }
+
+
     @Test
     fun `should find all to delete`() {
         /* Given */
@@ -49,7 +89,7 @@ class ItemRepositoryV2Test {
         val today = now()
 
         /* When */
-        StepVerifier.create(itemRepository.findAllToDelete(today))
+        StepVerifier.create(repository.findAllToDelete(today))
                 /* Then */
                 .assertNext {
                     assertThat(it.id).isEqualTo(UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
@@ -65,7 +105,7 @@ class ItemRepositoryV2Test {
         val item3 = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
 
         /* When */
-        StepVerifier.create(itemRepository.deleteById(listOf(item1, item2, item3)))
+        StepVerifier.create(repository.deleteById(listOf(item1, item2, item3)))
                 .expectSubscription()
                 /* Then */
                 .then {

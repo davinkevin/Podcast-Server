@@ -1,10 +1,10 @@
 package com.github.davinkevin.podcastserver.business
 
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -77,9 +77,8 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
         val podcastSaved = reatachAndSave(podcast)
 
         if (podcast.cover != null) {
-            val cover = podcast.cover!!
-            cover.url = coverBusiness.download(podcast)
-            coverBusiness.save(cover)
+            coverBusiness.download(podcast)
+            coverBusiness.save(podcast.cover!!)
         }
 
         return podcastSaved

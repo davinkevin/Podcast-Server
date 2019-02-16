@@ -11,16 +11,10 @@ import com.github.davinkevin.podcastserver.service.UrlService;
 import io.vavr.collection.Set;
 import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,18 +83,6 @@ public class PodcastController {
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, ServerWebExchange request) {
         return podcastBusiness.getRss(id, limit, UrlService.getDomainFromRequest(request).toASCIIString());
-    }
-
-    @GetMapping(value="{id}/cover.{ext}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_GIF_VALUE})
-    public ResponseEntity<?> cover(@PathVariable UUID id) throws IOException {
-        Path cover = podcastBusiness.coverOf(id);
-
-        if (Files.notExists(cover))
-            return ResponseEntity.notFound().build();
-
-       return ResponseEntity.ok()
-               .lastModified(Files.getLastModifiedTime(cover).toMillis())
-               .body(new FileSystemResource(cover.toFile()));
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)

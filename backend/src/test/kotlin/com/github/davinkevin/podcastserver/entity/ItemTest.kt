@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.entity
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
@@ -124,6 +125,7 @@ class ItemTest {
     }
 
     @Test
+    @Disabled("will be fully removed when Item entity will be removed")
     fun `should_report parent podcast cover`() {
         val cover = Cover()
         cover.url = "/api/podcasts/$PODCAST_ID/items/$ID/cover.png"
@@ -138,10 +140,10 @@ class ItemTest {
     @Test
     fun `should_expose the API url`() {
         assertThat(ITEM.proxyURLWithoutExtention)
-                .isEqualTo(String.format("/api/podcasts/%s/items/%s/" + "Fake_Item", PODCAST_ID, ID))
+                .isEqualTo(String.format("/api/v1/podcasts/%s/items/%s/" + "Fake_Item", PODCAST_ID, ID))
 
         assertThat(ITEM.proxyURL)
-                .isEqualTo(String.format("/api/podcasts/%s/items/%s/Fake_Item.mp4", PODCAST_ID, ID))
+                .isEqualTo(String.format("/api/v1/podcasts/%s/items/%s/Fake_Item.mp4", PODCAST_ID, ID))
     }
 
     @Test

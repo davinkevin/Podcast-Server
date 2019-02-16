@@ -608,6 +608,12 @@
                         <version>1.2.0</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <systemPropertyVariables>
+                        <spring.datasource.url>${database.url}</spring.datasource.url>
+                        <spring.datasource.username>${database.user}</spring.datasource.username>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <!-- Liquibase -->
             <plugin>

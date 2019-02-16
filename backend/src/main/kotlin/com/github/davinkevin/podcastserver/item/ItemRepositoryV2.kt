@@ -4,8 +4,11 @@ import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrap
 import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
+import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
+import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import org.jooq.DSLContext
 import org.jooq.TableField
@@ -73,6 +76,34 @@ class ItemRepositoryV2(private val query: DSLContext) {
                                     .toVΛVΓ()
                     )
                 }
+    }
+
+    fun findById(id: UUID) = Mono.defer {
+        query
+                .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
+                        ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
+                        ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
+
+                        PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                        COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+                )
+                .from(
+                        ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
+                                .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
+                )
+                .where(ITEM.ID.eq(id))
+                .fetchOneAsMono()
+                .map {
+                    val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
+                    val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
+                    Item(
+                            it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
+                            it[ITEM.PUB_DATE].toUTC(), it[ITEM.DOWNLOAD_DATE].toUTC(), it[ITEM.CREATION_DATE].toUTC(),
+                            it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], Status.of(it[ITEM.STATUS]),
+                            p, c
+                    )
+                }
+
     }
 
     fun findAllToDelete(date: OffsetDateTime) = Flux.defer {

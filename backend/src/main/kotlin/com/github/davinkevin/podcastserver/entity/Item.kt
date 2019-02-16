@@ -41,7 +41,7 @@ class Item {
     @Column(columnDefinition = "UUID")
     var id: UUID? = null
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH])
     var cover: Cover? = null
 
     @ManyToOne(cascade = [CascadeType.MERGE], fetch = FetchType.EAGER)
@@ -112,6 +112,7 @@ class Item {
         get() = UriComponentsBuilder.fromPath("/")
                 .pathSegment(
                         "api",
+                        "v1",
                         "podcasts",
                         podcast!!.id.toString(),
                         "items",
@@ -272,6 +273,6 @@ class Item {
         private val log = org.slf4j.LoggerFactory.getLogger(Item::class.java)
         var rootFolder: Path? = null
         val DEFAULT_ITEM = Item()
-        private const val COVER_PROXY_URL = "/api/podcasts/%s/items/%s/cover.%s"
+        private const val COVER_PROXY_URL = "/api/v1/podcasts/%s/items/%s/cover.%s"
     }
 }

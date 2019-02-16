@@ -82,7 +82,7 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
             itemRepository.findByPodcast(idPodcast, pageable)
 
     @Throws(InterruptedException::class)
-    fun reindex() = itemRepository.reindex()
+    fun reindex() = itemRepository. reindex()
 
     fun reset(id: UUID): Item? {
         val itemToReset = findOne(id)

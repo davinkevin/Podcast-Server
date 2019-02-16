@@ -138,7 +138,7 @@ class UpdatePodcastBusiness(
                 .filter(filter)
                 .map { it.apply { podcast = p } }
                 .filter { validator.validate(it).isEmpty() }
-                .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) null else it.cover } }
+                .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) podcast?.cover else it.cover } }
 
         if (itemsToAdd.isEmpty()) {
             return itemsToAdd

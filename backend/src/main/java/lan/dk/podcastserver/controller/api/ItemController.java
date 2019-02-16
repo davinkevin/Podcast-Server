@@ -9,20 +9,15 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import io.vavr.collection.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.UUID;
 
@@ -87,21 +82,6 @@ public class ItemController {
     public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
     }
-
-    @GetMapping("{id}/cover{ext}")
-    public ResponseEntity<?> getCover(@PathVariable UUID id) throws Exception {
-        Item item = itemBusiness.findOne(id);
-        Path cover = item.getCoverPath().getOrElseThrow(() -> new RuntimeException("File not found for item of id " + id));
-
-        if (Files.notExists(cover))
-            return ResponseEntity
-                    .ok(new UrlResource(item.getCover().getUrl()));
-
-        return ResponseEntity.ok()
-                .lastModified(Files.getLastModifiedTime(cover).toMillis())
-                .body(new FileSystemResource(cover.toFile()));
-    }
-
 
     @GetMapping("{id}/reset")
     @JsonView(Item.ItemDetailsView.class)

@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
@@ -11,7 +12,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -27,6 +30,35 @@ class ItemServiceTest {
     @MockBean lateinit var p: PodcastServerParameters
     @MockBean lateinit var fileService: FileService
 
+    val item = Item(
+            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+            title = "Foo",
+            url = "https://external.domain.tld/foo/bar.mp4",
+
+            pubDate = OffsetDateTime.now(),
+            downloadDate = OffsetDateTime.now(),
+            creationDate = OffsetDateTime.now(),
+
+            description = "desc",
+            mimeType = null,
+            length = 100,
+            fileName = null,
+            status = Status.NOT_DOWNLOADED,
+
+            podcast = PodcastForItem(
+                    id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                    title = "Podcast Bar",
+                    url = "https://external.domain.tld/bar.rss"
+            ),
+            cover = CoverForItem(
+                    id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                    url = "https://external.domain.tld/foo/bar.png",
+                    width = 200,
+                    height = 200
+            )
+    )
+
+
     @Test
     fun `should delete old items`() {
         /* Given */
@@ -39,7 +71,7 @@ class ItemServiceTest {
         )
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit.toOffsetDateTime())).thenReturn(repoResponse)
-        doNothing().whenever(fileService).deleteItem(any())
+        whenever(fileService.deleteItem(any())).thenReturn(Mono.empty())
         whenever(repository.deleteById(any())).thenReturn(Mono.empty())
 
         /* When */
@@ -52,6 +84,18 @@ class ItemServiceTest {
                     verify(fileService, times(3)).deleteItem(argWhere { it in paths })
                 }
                 /* Then */
+                .verifyComplete()
+    }
+
+    @Test
+    fun `should find by id`() {
+        /* Given */
+        whenever(repository.findById(any())).thenReturn(item.toMono())
+        /* When */
+        StepVerifier.create(itemService.findById(item.id))
+                /* Then */
+                .expectSubscription()
+                .expectNext(item)
                 .verifyComplete()
     }
 }

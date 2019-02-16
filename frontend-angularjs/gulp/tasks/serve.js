@@ -31,6 +31,7 @@ function startBrowserSync(directoryBase, files, browser) {
             middleware: [
                 redirect('/ws').to('http://localhost:8080/ws'),
                 redirect('/api').to('http://localhost:8080/api'),
+                redirect('/data').to('http://localhost:8181/data'),
                 modRewrite(['!\\.\\w+$ /index.html [L]']) // require for HTML5 mode
             ]
         },

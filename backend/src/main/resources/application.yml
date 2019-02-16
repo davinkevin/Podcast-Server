@@ -15,6 +15,7 @@ spring:
   properties :
    jadira.usertype.autoRegisterUserTypes: true
    hibernate:
+    event.merge.entity_copy_observer: allow
     format_sql: true
     search.default:
       indexmanager: near-real-time

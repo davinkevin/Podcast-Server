@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.FileSystemUtils
+import reactor.test.StepVerifier
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -45,9 +46,13 @@ class FileServiceTest {
         val f = Files.createFile(tempFolder.resolve(file))
 
         /* When */
-        fileService.deleteItem(file)
-
-        /* Then */
-        assertThat(Files.exists(f)).isFalse()
+        StepVerifier.create(fileService.deleteItem(file))
+                .expectSubscription()
+                /* Then */
+                .expectNext(true)
+                .then {
+                    assertThat(Files.exists(f)).isFalse()
+                }
+                .verifyComplete()
     }
 }
