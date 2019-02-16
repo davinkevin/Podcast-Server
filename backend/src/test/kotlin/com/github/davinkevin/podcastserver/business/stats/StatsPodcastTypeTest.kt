@@ -14,7 +14,7 @@ class StatsPodcastTypeTest {
     @Test
     fun `should has correct value`() {
         /* Given */
-        val numberOfItemSets = Set(NI_1, NI_2, NI_3)
+        val numberOfItemSets = setOf(NI_1, NI_2, NI_3)
 
         /* When */
         val (type, values) = StatsPodcastType(FAKE_TYPE, numberOfItemSets)

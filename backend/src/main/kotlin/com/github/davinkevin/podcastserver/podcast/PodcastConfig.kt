@@ -15,6 +15,10 @@ class PodcastRoutingConfig {
     fun podcastRouter(podcast: PodcastHandler) = router {
         "/api/v1/podcasts".nest {
             GET("/{id}/cover.{ext}", podcast::cover)
+
+            GET("/{id}/stats/byPubDate", podcast::findStatByPubDate)
+            GET("/{id}/stats/byDownloadDate", podcast::findStatByDownloadDate)
+            GET("/{id}/stats/byCreationDate", podcast::findStatByCreationDate)
         }
     }
 }

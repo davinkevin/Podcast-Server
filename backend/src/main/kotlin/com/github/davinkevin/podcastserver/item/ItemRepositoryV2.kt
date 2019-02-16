@@ -29,30 +29,9 @@ import java.util.*
 @Repository
 class ItemRepositoryV2(private val query: DSLContext) {
 
-    fun findStatOfCreationDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.CREATION_DATE)
-    fun findStatOfPubDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.PUB_DATE)
-    fun findStatOfDownloadDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.DOWNLOAD_DATE)
-
     fun allStatsByTypeAndCreationDate(numberOfMonth: Int) = allStatsByTypeAndField(numberOfMonth, ITEM.CREATION_DATE)
     fun allStatsByTypeAndPubDate(numberOfMonth: Int) = allStatsByTypeAndField(numberOfMonth, ITEM.PUB_DATE)
     fun allStatsByTypeAndDownloadDate(numberOfMonth: Int) = allStatsByTypeAndField(numberOfMonth, ITEM.DOWNLOAD_DATE)
-
-    private fun findStatOfOnField(pid: UUID, month: Int, field: TableField<ItemRecord, Timestamp>): Set<NumberOfItemByDateWrapper> {
-        val date = trunc(field)
-        val startDate = now().minusMonths(month.toLong())
-        val numberOfDays = Duration.between(startDate, now()).toDays()
-
-        return query
-                .select(count(), date)
-                .from(ITEM)
-                .where(ITEM.PODCAST_ID.eq(pid))
-                .and(field.isNotNull)
-                .and(dateDiff(currentDate(), date(field)).lessThan(numberOfDays.toInt()))
-                .groupBy(date)
-                .orderBy(date.desc())
-                .fetch { NumberOfItemByDateWrapper(it.component2().toLocalDateTime().toLocalDate(), it.component1()) }
-                .toSet()
-    }
 
     private fun allStatsByTypeAndField(month: Int, field: TableField<ItemRecord, Timestamp>): List<StatsPodcastType> {
         val date = trunc(field)
@@ -73,7 +52,6 @@ class ItemRepositoryV2(private val query: DSLContext) {
                             values = it.value
                                     .map { (_, number, date) -> NumberOfItemByDateWrapper(date.toLocalDateTime().toLocalDate(), number) }
                                     .toSet()
-                                    .toVΛVΓ()
                     )
                 }
     }

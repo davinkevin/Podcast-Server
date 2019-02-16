@@ -94,59 +94,6 @@ class StatsBusinessTest {
         }
     }
 
-    @Nested
-    @DisplayName("For a specific podcast")
-    inner class ForASpecificPodcast {
-
-        val podcast = Podcast().apply {
-            items = generateItems(356).toJavaSet()
-        }
-
-        @BeforeEach
-        fun beforeEach() {
-            whenever(podcastBusiness.findOne(any())).thenReturn(podcast)
-        }
-
-        @Test
-        fun `should generate stats by downloadDate for podcast`() {
-            /* Given */
-
-            /* When */
-            val numberOfItemByDateWrappers = statsBusiness.statsByDownloadDate(UUID.randomUUID(), 6L)
-
-            /* Then */
-            val days = ChronoUnit.DAYS.between(LocalDate.now().minusMonths(6), LocalDate.now()) - 1
-            assertThat(numberOfItemByDateWrappers).hasSize(days.toInt())
-        }
-
-
-        @Test
-        fun `should generate stats by pubdate for podcast`() {
-            /* Given */
-
-            /* When */
-            val numberOfItemByDateWrappers = statsBusiness.statsByPubDate(UUID.randomUUID(), 2L)
-
-            /* Then */
-            val days = ChronoUnit.DAYS.between(LocalDate.now().minusMonths(2), LocalDate.now()) - 1
-            assertThat(numberOfItemByDateWrappers).hasSize(days.toInt())
-        }
-
-        @Test
-        fun `should generate stats by creation date for podcast`() {
-            /* Given */
-
-            /* When */
-            val numberOfItemByDateWrappers = statsBusiness.statsByCreationDate(UUID.randomUUID(), 2L)
-
-            /* Then */
-            val days = ChronoUnit.DAYS.between(LocalDate.now().minusMonths(2), LocalDate.now()) - 1
-            assertThat(numberOfItemByDateWrappers).hasSize(days.toInt())
-        }
-
-    }
-
-
     private fun generateItems(numberOfItem: Int): Set<Item> =
             (1..numberOfItem)
             .map { it.toLong()}

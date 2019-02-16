@@ -1,14 +1,19 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
+import java.time.LocalDate
 import java.util.*
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
@@ -44,5 +49,54 @@ class PodcastServiceTest {
                 .expectNext(podcast)
                 .verifyComplete()
     }
-    
+
+    @Nested
+    @DisplayName("should find stats")
+    inner class ShouldFindStats {
+
+        val r = listOf(
+                NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+        )
+
+        @Test
+        fun `should find stats by pubDate`() {
+            /* Given */
+            whenever(repository.findStatByPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+            /* When */
+            StepVerifier.create(service.findStatByPubDate(podcast.id, 3))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextSequence(r)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `should find stats by downloadDate`() {
+            /* Given */
+            whenever(repository.findStatByDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+            /* When */
+            StepVerifier.create(service.findStatByDownloadDate(podcast.id, 3))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextSequence(r)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `should find stats by creationDate`() {
+            /* Given */
+            whenever(repository.findStatByCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+            /* When */
+            StepVerifier.create(service.findStatByCreationDate(podcast.id, 3))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextSequence(r)
+                    .verifyComplete()
+        }
+
+    }
+
+
 }

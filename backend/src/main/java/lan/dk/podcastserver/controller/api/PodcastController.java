@@ -3,12 +3,10 @@ package lan.dk.podcastserver.controller.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.github.davinkevin.podcastserver.business.PodcastBusiness;
 import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
-import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper;
 import com.github.davinkevin.podcastserver.business.stats.StatsBusiness;
 import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
 import com.github.davinkevin.podcastserver.entity.Podcast;
 import com.github.davinkevin.podcastserver.service.UrlService;
-import io.vavr.collection.Set;
 import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -89,21 +87,6 @@ public class PodcastController {
     @PostMapping("fetch")
     public Podcast fetchPodcastInfoByUrl(@RequestBody(required=false) String url) {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
-    }
-
-    @PostMapping(value="{id}/stats/byPubDate")
-    public Set<NumberOfItemByDateWrapper> statsByPubdate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
-        return statsBusiness.statsByPubDate(id, numberOfMonth);
-    }
-
-    @PostMapping("{id}/stats/byDownloadDate")
-    public Set<NumberOfItemByDateWrapper> statsByDownloadDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
-        return statsBusiness.statsByDownloadDate(id, numberOfMonth);
-    }
-
-    @PostMapping("{id}/stats/byCreationDate")
-    public Set<NumberOfItemByDateWrapper> statsByCreationDate(@PathVariable UUID id, @RequestBody Long numberOfMonth) {
-        return statsBusiness.statsByCreationDate(id, numberOfMonth);
     }
 
     @GetMapping("{id}/update")

@@ -43,15 +43,15 @@ export default class PodcastService  {
     }
 
     statsByPubDate(id, numberOfMonth = 6) {
-        return this.$http.post(`/api/podcasts/${id}/stats/byPubDate`, numberOfMonth).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/${id}/stats/byPubDate?numberOfMonths=${numberOfMonth}`).then(r => r.data);
     }
 
     statsByByDownloadDate(id, numberOfMonth = 6) {
-        return this.$http.post(`/api/podcasts/${id}/stats/byDownloadDate`, numberOfMonth).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/${id}/stats/byDownloadDate?numberOfMonths=${numberOfMonth}`).then(r => r.data);
     }
 
     statsByCreationDate(id, numberOfMonth = 6) {
-        return this.$http.post(`/api/podcasts/${id}/stats/byCreationDate`, numberOfMonth).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/${id}/stats/byCreationDate?numberOfMonths=${numberOfMonth}`).then(r => r.data);
     }
 
     refresh(id) {

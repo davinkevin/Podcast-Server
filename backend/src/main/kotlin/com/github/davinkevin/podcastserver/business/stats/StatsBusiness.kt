@@ -20,13 +20,4 @@ class StatsBusiness(val itemRepository: ItemRepository) {
 
     fun allStatsByTypeAndPubDate(numberOfMonth: Int) =
             itemRepository.allStatsByTypeAndPubDate(numberOfMonth).toVΛVΓ()
-
-    fun statsByPubDate(id: UUID, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> =
-            itemRepository.findStatOfPubDate(id, numberOfMonth.toInt()).toVΛVΓ()
-
-    fun statsByDownloadDate(id: UUID, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> =
-            itemRepository.findStatOfDownloadDate(id, numberOfMonth.toInt()).toVΛVΓ()
-
-    fun statsByCreationDate(id: UUID, numberOfMonth: Long): Set<NumberOfItemByDateWrapper> =
-            itemRepository.findStatOfCreationDate(id, numberOfMonth.toInt()).toVΛVΓ()
 }

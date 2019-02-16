@@ -1,12 +1,11 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.github.davinkevin.podcastserver.item.ItemRoutingConfig
-import com.github.davinkevin.podcastserver.item.ItemService
+import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
+import com.github.davinkevin.podcastserver.controller.assertThatJson
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -17,9 +16,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.nio.file.Path
+import java.time.LocalDate
 import java.util.*
 
 /**
@@ -83,6 +85,157 @@ class PodcastHandlerTest {
                     .expectHeader()
                     .valueEquals("Location", "https://external.domain.tld/cover.png")
         }
+
+    }
+
+    @Nested
+    @DisplayName("should find stats")
+    inner class ShouldFindStats {
+
+        @Nested
+        @DisplayName("by pubDate")
+        inner class ByPubDate {
+
+            @Test
+            fun `with some data`() {
+                /* Given */
+                val r = listOf(
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+                )
+                whenever(podcastService.findStatByPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+                /* When */
+                rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byPubDate")
+                                .queryParam("numberOfMonths", 3)
+                                .build()
+                        }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isEqualTo(""" [
+                               { "date":"2019-01-02", "numberOfItems":3 },
+                               { "date":"2019-01-12", "numberOfItems":2 },
+                               { "date":"2019-01-28", "numberOfItems":6 }
+                        ] """) }
+            }
+
+            @Test
+            fun `with no data`() {
+                /* Given */
+                whenever(podcastService.findStatByPubDate(podcast.id, 3)).thenReturn(Flux.empty())
+                /* When */
+                rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byPubDate")
+                                .queryParam("numberOfMonths", 3)
+                                .build()
+                        }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isArray.isEmpty() }
+            }
+        }
+
+        @Nested
+        @DisplayName("by downloadDate")
+        inner class ByDownloadDate {
+
+            @Test
+            fun `with some data`() {
+                /* Given */
+                val r = listOf(
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+                )
+                whenever(podcastService.findStatByDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+                /* When */
+                rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byDownloadDate")
+                                .queryParam("numberOfMonths", 3)
+                                .build()
+                        }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isEqualTo(""" [
+                               { "date":"2019-01-02", "numberOfItems":3 },
+                               { "date":"2019-01-12", "numberOfItems":2 },
+                               { "date":"2019-01-28", "numberOfItems":6 }
+                        ] """) }
+            }
+
+            @Test
+            fun `with no data`() {
+                /* Given */
+                whenever(podcastService.findStatByDownloadDate(podcast.id, 3)).thenReturn(Flux.empty())
+                /* When */
+                rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byDownloadDate")
+                                .queryParam("numberOfMonths", 3)
+                                .build()
+                        }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isArray.isEmpty() }
+            }
+        }
+
+        @Nested
+        @DisplayName("by creationDate")
+        inner class ByCreationDate {
+
+            @Test
+            fun `with some data`() {
+                /* Given */
+                val r = listOf(
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+                )
+                whenever(podcastService.findStatByCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+                /* When */
+                rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byCreationDate")
+                                .queryParam("numberOfMonths", 3)
+                                .build()
+                        }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isEqualTo(""" [
+                               { "date":"2019-01-02", "numberOfItems":3 },
+                               { "date":"2019-01-12", "numberOfItems":2 },
+                               { "date":"2019-01-28", "numberOfItems":6 }
+                        ] """) }
+            }
+
+            @Test
+            fun `with no data`() {
+                /* Given */
+                whenever(podcastService.findStatByCreationDate(podcast.id, 3)).thenReturn(Flux.empty())
+                /* When */
+                rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byCreationDate")
+                                .queryParam("numberOfMonths", 3)
+                                .build()
+                        }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isArray.isEmpty() }
+            }
+        }
+
 
     }
 }
