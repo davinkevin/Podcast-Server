@@ -69,4 +69,4 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
     }
 }
 
-private fun CoverForItem.extension() = FilenameUtils.getExtension(url)
+private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"

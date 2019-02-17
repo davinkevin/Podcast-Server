@@ -45,7 +45,7 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
             return coverUrl
         }
 
-        val extension = FilenameUtils.getExtension(coverUrl)
+        val extension = coverUrl.extension()
         val fileLocation = parameters.rootfolder
                 .resolve(podcast.title)
                 .resolve("${parameters.coverDefaultName}.$extension")
@@ -72,7 +72,7 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
         val coverUrl = item.cover?.url!!
         val fileLocation = parameters.rootfolder
                 .resolve(item.podcast?.title)
-                .resolve("${item.id}.${FilenameUtils.getExtension(coverUrl)}")
+                .resolve("${item.id}.${coverUrl.extension()}")
 
         return urlToDisk(coverUrl, fileLocation)
                 .map { true }
@@ -132,5 +132,12 @@ class CoverBusiness(val coverRepository: CoverRepository, val parameters: Podcas
             Files.createDirectories(fileLocation.parent)
         }
     }
+}
 
+private fun String.extension(): String {
+    val extension = FilenameUtils.getExtension(this)
+    return when {
+        extension.isNullOrBlank() -> "jpg"
+        else -> extension
+    }
 }

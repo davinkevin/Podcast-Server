@@ -135,8 +135,8 @@ class Item {
         get() = arrow.core.Option.fromNullable(cover)
                 .flatMap { it.url.toOption() }
                 .filter { !StringUtils.isEmpty(it)}
-                .map { FilenameUtils.getExtension(it) }
-                .map { ext -> podcastPath.resolve(id.toString() + "." + ext) }
+                .map { it.extension() }
+                .map { podcastPath.resolve("${id.toString()}.$it") }
                 .toVΛVΓ()
                 .orElse { podcast!!.coverPath }
 
@@ -154,7 +154,7 @@ class Item {
         @JsonProperty("cover")
         @JsonView(ItemSearchListView::class)
         get() = Option<Cover>(cover)
-                .map { c -> String.format(COVER_PROXY_URL, podcast!!.id, id, FilenameUtils.getExtension(c.url)) }
+                .map { c -> String.format(COVER_PROXY_URL, podcast!!.id, id, c.url!!.extension()) }
                 .map { url ->
                     val c = Cover()
                     c.url = url
@@ -274,5 +274,13 @@ class Item {
         var rootFolder: Path? = null
         val DEFAULT_ITEM = Item()
         private const val COVER_PROXY_URL = "/api/v1/podcasts/%s/items/%s/cover.%s"
+    }
+}
+
+private fun String.extension(): String {
+    val extension = FilenameUtils.getExtension(this)
+    return when {
+        extension.isNullOrBlank() -> "jpg"
+        else -> extension
     }
 }

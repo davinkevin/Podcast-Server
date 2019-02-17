@@ -21,7 +21,7 @@ data class Item(
         val downloadDate: OffsetDateTime?,
         val creationDate: OffsetDateTime?,
 
-        val description: String,
+        val description: String?,
         val mimeType: String?,
         val length: Long?,
         val fileName: String?,
