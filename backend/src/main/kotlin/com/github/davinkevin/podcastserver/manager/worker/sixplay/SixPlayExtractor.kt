@@ -33,6 +33,7 @@ class SixPlayExtractor(val jsonService: JsonService, val m3U8Service: M3U8Servic
         val list = (m.group(1).k() to m.group(2).k())
                 .map { toJsonUrl(it) }
                 .flatMap { jsonService.parseUrl(it).k() }
+                .filter { it.read<String>("service_display.code") == "m6replay" }
                 .map { it.read(ITEMS_EXTRACTOR, TYPE_ITEMS) }
                 .getOrElse { throw RuntimeException("No element founds for ${item.id} at url ${item.url}") }
 

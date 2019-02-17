@@ -57,6 +57,7 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
 
         return JsonService.to(VIDEO_BY_ID_SELECTOR, TYPE_ITEMS)
                 .apply(root6Play)
+                .filter { it.service_display.code in replay }
                 .map { convertToItem(it, basePath) }
                 .toSet()
     }
@@ -105,7 +106,8 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
             var title: String? = null,
             var lastDiffusion: String? = null /* 2016-12-18 11:20:00 */,
             var duration: Long? = null,
-            var id: String? = null
+            var id: String? = null,
+            val service_display: ServiceDisplay
     ){
 
         fun getLastDiffusion(): ZonedDateTime {
@@ -143,6 +145,9 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
                 private val salt = "54b55408a530954b553ff79e98"
             }
         }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        class ServiceDisplay(var code: String = "")
     }
 
     companion object {
@@ -150,6 +155,8 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         private val TYPE_ITEMS = object : TypeRef<Set<SixPlayItem>>() {}
         private val TYPE_KEYS = object : TypeRef<Map<String, Any>>() {}
+
+        private val replay = setOf("m6replay", "w9replay", "6terreplay", "fun_radio", "rtl2")
 
         private const val URL_TEMPLATE_PODCAST = "http://www.6play.fr/%s-p_%d/"
         private const val PROGRAM_CODE_SELECTOR = "program.programsById.%d.code"
