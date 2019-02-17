@@ -15,7 +15,7 @@ import java.nio.file.Path
 @Service
 class FileService(val p: PodcastServerParameters) {
 
-    private val log = LoggerFactory.getLogger(ItemService::class.java)
+    private val log = LoggerFactory.getLogger(FileService::class.java)
 
     fun deleteItem(path: Path) = Mono.defer {
         val file = p.rootfolder.resolve(path)
@@ -28,7 +28,7 @@ class FileService(val p: PodcastServerParameters) {
     fun exists(path: Path) = Mono.defer {
         val file = p.rootfolder.resolve(path)
         val exists = Files.exists(file)
-        log.info("the file $file exists: $exists")
+        log.debug("the file $file exists: $exists")
         exists
                 .toMono()
                 .filter { it }
