@@ -19,12 +19,6 @@ class ItemDeletionScheduledTest {
     @InjectMocks lateinit var itemDeletionScheduled: ItemDeletionScheduled
 
     @Test
-    fun `should delete old item`() {
-        /* When */ itemDeletionScheduled.deleteOldItem()
-        /* Then */ verify<UpdatePodcastBusiness>(updatePodcastBusiness, times(1)).deleteOldEpisode()
-    }
-
-    @Test
     fun `should delete old cover`() {
         /* When */ itemDeletionScheduled.deleteOldCover()
         /* Then */ verify<UpdatePodcastBusiness>(updatePodcastBusiness, times(1)).deleteOldCover()

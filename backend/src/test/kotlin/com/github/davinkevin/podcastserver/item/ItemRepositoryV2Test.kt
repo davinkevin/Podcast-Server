@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
+import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
@@ -116,6 +117,27 @@ class ItemRepositoryV2Test {
                             UUID.fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"),
                             UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
                     )
+                }
+                .verifyComplete()
+    }
+
+    @Test
+    fun `should update as deleted`() {
+        /* Given */
+        val item1 = UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
+        val item2 = UUID.fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
+        val item3 = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+        val ids = listOf(item1, item2, item3)
+        /* When */
+        StepVerifier.create(repository.updateAsDeleted(ids))
+                /* Then */
+                .expectSubscription()
+                .then {
+                    val items = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
+                    assertThat(items).allSatisfy {
+                        assertThat(it.status).isEqualTo(Status.DELETED.toString())
+                        assertThat(it.fileName).isNull()
+                    }
                 }
                 .verifyComplete()
     }

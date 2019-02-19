@@ -2,17 +2,24 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
 import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType
-import com.github.davinkevin.podcastserver.database.Tables.*
+import com.github.davinkevin.podcastserver.database.Tables.COVER
+import com.github.davinkevin.podcastserver.database.Tables.ITEM
+import com.github.davinkevin.podcastserver.database.Tables.PODCAST
+import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST_ITEMS
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
 import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import com.github.davinkevin.podcastserver.extension.repository.toUTC
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import org.jooq.DSLContext
 import org.jooq.TableField
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.count
+import org.jooq.impl.DSL.currentDate
+import org.jooq.impl.DSL.date
+import org.jooq.impl.DSL.dateDiff
+import org.jooq.impl.DSL.trunc
+import org.jooq.impl.DSL.value
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -99,6 +106,16 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun deleteById(items: Collection<UUID>) = Mono.defer {
         query
                 .deleteFrom(ITEM)
+                .where(ITEM.ID.`in`(items))
+                .executeAsyncAsMono()
+                .then()
+    }
+
+    fun updateAsDeleted(items: Collection<UUID>) = Mono.defer {
+        query
+                .update(ITEM)
+                .set(ITEM.STATUS, Status.DELETED.toString())
+                .set(ITEM.FILE_NAME, value<String>(null))
                 .where(ITEM.ID.`in`(items))
                 .executeAsyncAsMono()
                 .then()

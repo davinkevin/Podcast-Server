@@ -34,10 +34,4 @@ public class UpdatePodcastController {
         updatePodcastBusiness.updatePodcast();
         IDM.launchDownload();
     }
-
-    @RequestMapping(value = "/deleteOdlItems", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void deleteOldItem() {
-        updatePodcastBusiness.deleteOldEpisode();
-    }
 }

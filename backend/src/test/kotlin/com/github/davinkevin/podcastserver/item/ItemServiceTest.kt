@@ -72,16 +72,18 @@ class ItemServiceTest {
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit.toOffsetDateTime())).thenReturn(repoResponse)
         whenever(fileService.deleteItem(any())).thenReturn(Mono.empty())
-        whenever(repository.deleteById(any())).thenReturn(Mono.empty())
+        whenever(repository.updateAsDeleted(any())).thenReturn(Mono.empty())
 
         /* When */
         StepVerifier.create(itemService.deleteOldEpisodes())
                 .expectSubscription()
                 .then {
-                    val paths = items.map { i -> i.path }
+                    val paths = items.map { it.path }
+                    val ids = items.map { it.id }
 
                     verify(repository).findAllToDelete(limit.toOffsetDateTime())
                     verify(fileService, times(3)).deleteItem(argWhere { it in paths })
+                    verify(repository).updateAsDeleted(argWhere { it == ids })
                 }
                 /* Then */
                 .verifyComplete()

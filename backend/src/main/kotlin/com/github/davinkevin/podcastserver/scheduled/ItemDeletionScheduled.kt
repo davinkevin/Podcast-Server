@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component
 @Component
 class ItemDeletionScheduled(val updatePodcastBusiness: UpdatePodcastBusiness) {
 
-    @Scheduled(fixedDelay = 86400000)
-    fun deleteOldItem() = updatePodcastBusiness.deleteOldEpisode()
-
     @Scheduled(cron = "0 0 3 * * *")
     fun deleteOldCover() = updatePodcastBusiness.deleteOldCover()
 }

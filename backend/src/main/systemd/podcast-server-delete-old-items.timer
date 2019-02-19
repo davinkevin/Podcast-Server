@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for trigger delete of old items
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=podcast-server-delete-old-items.service
+
+[Install]
+WantedBy=timers.target

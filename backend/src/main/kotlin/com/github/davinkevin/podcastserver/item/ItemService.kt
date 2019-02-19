@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import reactor.core.publisher.toMono
 import java.util.*
 import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
 
@@ -25,7 +24,7 @@ class ItemService(
             .doOnSubscribe { log.info("Deletion of old items") }
             .delayUntil { fileService.deleteItem(it.path) }
             .collectList()
-            .flatMap { repository.deleteById(it.map { v -> v.id }) }
+            .flatMap { repository.updateAsDeleted(it.map { v -> v.id }) }
 
     fun findById(id: UUID) = repository.findById(id)
 
