@@ -20,6 +20,7 @@ class ItemRoutingConfig {
 
     @Bean
     fun podcastItemRouter(item: ItemHandler) = router {
+        GET("/api/v1/podcasts/{idPodcast}/items/{id}", item::findById)
         GET("/api/v1/podcasts/{idPodcast}/items/{id}/cover.{ext}", item::cover)
         GET("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item::file)
     }

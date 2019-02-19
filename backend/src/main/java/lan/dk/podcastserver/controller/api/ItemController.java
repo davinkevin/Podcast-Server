@@ -52,13 +52,7 @@ public class ItemController {
         
         return itemBusiness.findByPodcast(idPodcast, pageable);
     }
-
-    @GetMapping("{id}")
-    @JsonView(Item.ItemDetailsView.class)
-    public Item findById(@PathVariable UUID id) {
-        return itemBusiness.findOne(id);
-    }
-
+    
     @PutMapping("{id}")
     @JsonView(Item.ItemDetailsView.class)
     public Item update(@RequestBody Item item, @PathVariable("id") UUID id) {

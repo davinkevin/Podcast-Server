@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.any
@@ -8,7 +9,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
@@ -18,8 +18,8 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.net.URI
 import java.nio.file.Path
+import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.util.*
 
@@ -71,7 +71,7 @@ class ItemHandlerTest {
         @Test
         fun `and returns ok`() {
             /* Given */
-            whenever(itemService.deleteOldEpisodes()).thenReturn(Mono.empty())
+            whenever(itemService.deleteOldEpisodes()).thenReturn(Mono.just(1).then())
 
             /* When */
             rest.delete()
@@ -160,4 +160,133 @@ class ItemHandlerTest {
                     .valueEquals("Location", "https://external.domain.tld/foo/bar.png")
         }
     }
+
+    @Nested
+    @DisplayName("should find by id")
+    inner class ShouldFindById {
+
+        private val notDownloadedItem = Item(
+                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+                title = "Foo",
+                url = "https://external.domain.tld/foo/bar.mp4",
+
+                pubDate = OffsetDateTime.parse("2019-02-01T13:14:15.000Z"),
+                downloadDate = null,
+                creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
+
+                description = "desc",
+                mimeType = null,
+                length = 100,
+                fileName = null,
+                status = Status.NOT_DOWNLOADED,
+
+                podcast = PodcastForItem(
+                        id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                        title = "Podcast Bar",
+                        url = "https://external.domain.tld/bar.rss"
+                ),
+                cover = CoverForItem(
+                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                        url = "https://external.domain.tld/foo/bar.png",
+                        width = 200,
+                        height = 200
+                )
+        )
+
+        @Test
+        fun `with not downloaded item`() {
+            /* Given */
+            val pid = notDownloadedItem.podcast.id
+            val iid = notDownloadedItem.id
+            whenever(itemService.findById(iid)).thenReturn(notDownloadedItem.toMono())
+            /* When */
+            rest.get()
+                    .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo(""" {
+                           "cover":{
+                              "height":200,
+                              "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
+                              "url":"https://external.domain.tld/foo/bar.png",
+                              "width":200
+                           },
+                           "creationDate":"2019-02-05T13:14:15Z",
+                           "description":"desc",
+                           "downloadDate":null,
+                           "fileName":null,
+                           "id":"27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
+                           "isDownloaded":false,
+                           "length":100,
+                           "mimeType":null,
+                           "podcast":{
+                              "id":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
+                              "title":"Podcast Bar",
+                              "url":"https://external.domain.tld/bar.rss"
+                           },
+                           "podcastId":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
+                           "proxyUrl":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo",
+                           "pubDate":"2019-02-01T13:14:15Z",
+                           "status":"NOT_DOWNLOADED",
+                           "title":"Foo",
+                           "url":"https://external.domain.tld/foo/bar.mp4"
+                        } """)
+                    }
+        }
+
+        @Test
+        fun `with downloaded item`() {
+            /* Given */
+            val downloadedItem = notDownloadedItem.copy(
+                    fileName = "foo.mp4",
+                    mimeType = "video/mp4",
+                    status = Status.FINISH
+            )
+            val pid = downloadedItem.podcast.id
+            val iid = downloadedItem.id
+            whenever(itemService.findById(iid)).thenReturn(downloadedItem.toMono())
+            /* When */
+            rest.get()
+                    .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo(""" {
+                           "cover":{
+                              "height":200,
+                              "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
+                              "url":"https://external.domain.tld/foo/bar.png",
+                              "width":200
+                           },
+                           "creationDate":"2019-02-05T13:14:15Z",
+                           "description":"desc",
+                           "downloadDate":null,
+                           "fileName":"foo.mp4",
+                           "id":"27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
+                           "isDownloaded":true,
+                           "length":100,
+                           "mimeType":"video/mp4",
+                           "podcast":{
+                              "id":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
+                              "title":"Podcast Bar",
+                              "url":"https://external.domain.tld/bar.rss"
+                           },
+                           "podcastId":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
+                           "proxyUrl":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo.mp4",
+                           "pubDate":"2019-02-01T13:14:15Z",
+                           "status":"FINISH",
+                           "title":"Foo",
+                           "url":"https://external.domain.tld/foo/bar.mp4"
+                        } """)
+                    }
+        }
+
+
+    }
+
 }

@@ -29,7 +29,7 @@ export default class ItemService {
     }
 
     findById(podcastId, itemId) {
-        return this.$http.get(`/api/podcasts/${podcastId}/items/${itemId}`).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/${podcastId}/items/${itemId}`).then(r => r.data);
     }
 
     getItemForPodcastWithPagination(podcast, pageParams) {
