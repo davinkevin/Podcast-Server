@@ -228,7 +228,7 @@ class ItemHandlerTest {
                               "url":"https://external.domain.tld/bar.rss"
                            },
                            "podcastId":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
-                           "proxyUrl":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo",
+                           "proxyURL":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo",
                            "pubDate":"2019-02-01T13:14:15Z",
                            "status":"NOT_DOWNLOADED",
                            "title":"Foo",
@@ -277,7 +277,7 @@ class ItemHandlerTest {
                               "url":"https://external.domain.tld/bar.rss"
                            },
                            "podcastId":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
-                           "proxyUrl":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo.mp4",
+                           "proxyURL":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo.mp4",
                            "pubDate":"2019-02-01T13:14:15Z",
                            "status":"FINISH",
                            "title":"Foo",

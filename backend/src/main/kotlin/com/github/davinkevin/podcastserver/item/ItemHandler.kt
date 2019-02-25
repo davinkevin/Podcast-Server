@@ -95,7 +95,7 @@ data class ItemHAL(
 ) {
     val podcastId = podcast.id
 
-    val proxyUrl: URI
+    val proxyURL: URI
         get() {
             val extension = Option.fromNullable(fileName)
                     .map { FilenameUtils.getExtension(it) }
