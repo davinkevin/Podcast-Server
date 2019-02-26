@@ -43,7 +43,7 @@ class StatsBusinessTest {
 
         @BeforeEach
         fun beforeEach() {
-            whenever(updaterSelector.types()).thenReturn(API.Set(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE))
+            whenever(updaterSelector.types()).thenReturn(setOf(RSS, BE_IN_SPORT, CANAL_PLUS, YOUTUBE))
 
             doReturn(generateItems(5)).whenever(itemRepository).findByTypeAndExpression(eq(RSS), any())
             doReturn(HashSet.empty<Item>()).whenever(itemRepository).findByTypeAndExpression(eq(BE_IN_SPORT), any())

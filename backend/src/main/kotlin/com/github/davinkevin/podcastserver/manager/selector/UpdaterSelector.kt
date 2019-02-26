@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpUpdater
 import org.springframework.stereotype.Service
@@ -18,7 +18,7 @@ class UpdaterSelector(val updaters: Set<Updater>) {
                 updaters.minBy { updater -> updater.compatibility(url) }!!
             }
 
-    fun types() = updaters.map { it.type() }.toSet().toVΛVΓ()
+    fun types(): Set<Type> = updaters.map { it.type() }.toSet()
 
     companion object {
         @JvmStatic

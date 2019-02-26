@@ -15,6 +15,7 @@ export default class typeService {
     }
 
     findAll() {
-        return this.$http.get('/api/types').then(r => r.data);
+        return this.$http.get('/api/v1/podcasts/types')
+          .then(r => r.data.content);
     }
 }
