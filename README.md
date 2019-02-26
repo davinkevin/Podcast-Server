@@ -17,6 +17,13 @@ It also works on many sources like Youtube, Dailymotion, CanalPlus... Check this
 
 The application is available in [fat-jar](https://github.com/davinkevin/Podcast-Server/releases) format or in [docker images](https://hub.docker.com/r/davinkevin/podcast-server/) 
 
+## Run in local env: 
+
+### Starts component one by one
+
+* nginx file server: `docker run --rm -it -p 8181:80 -v /tmp/podcast-server/:/var/www/podcast-server-files/data/ davinkevin/podcast-server/files-server:latest`
+* h2 database: `docker run --rm -it -p 8999:81 -p 1521:1521 -v /tmp/h2-podcast-server:/opt/h2-data --name podcast-server-database davinkevin/podcast-server/database:latest` 
+* frontend: `./target/node/npm run serve`
 ## License
 
 Copyright 2018 DAVIN KEVIN
