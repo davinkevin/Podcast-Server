@@ -31,7 +31,6 @@ public class PodcastControllerTest {
 
     @Mock PodcastBusiness podcastBusiness;
     @Mock FindPodcastBusiness findPodcastBusiness;
-    @Mock StatsBusiness statsBusiness;
     @InjectMocks PodcastController podcastController;
 
     @Test

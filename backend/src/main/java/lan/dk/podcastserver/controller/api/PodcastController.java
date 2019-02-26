@@ -23,17 +23,13 @@ import java.util.UUID;
 @RequestMapping("/api/podcasts")
 public class PodcastController {
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(PodcastController.class);
     private final PodcastBusiness podcastBusiness;
     private final FindPodcastBusiness findPodcastBusiness;
-    private final StatsBusiness statsBusiness;
     private final UpdatePodcastBusiness updatePodcastBusiness;
 
-    @java.beans.ConstructorProperties({"podcastBusiness", "findPodcastBusiness", "statsBusiness", "updatePodcastBusiness"})
-    public PodcastController(PodcastBusiness podcastBusiness, FindPodcastBusiness findPodcastBusiness, StatsBusiness statsBusiness, UpdatePodcastBusiness updatePodcastBusiness) {
+    public PodcastController(PodcastBusiness podcastBusiness, FindPodcastBusiness findPodcastBusiness, UpdatePodcastBusiness updatePodcastBusiness) {
         this.podcastBusiness = podcastBusiness;
         this.findPodcastBusiness = findPodcastBusiness;
-        this.statsBusiness = statsBusiness;
         this.updatePodcastBusiness = updatePodcastBusiness;
     }
 
