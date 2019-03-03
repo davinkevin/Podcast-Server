@@ -16,9 +16,9 @@ class PodcastRoutingConfig {
         "/api/v1/podcasts".nest {
             GET("/{id}/cover.{ext}", podcast::cover)
 
-            GET("/{id}/stats/byPubDate", podcast::findStatByPubDate)
-            GET("/{id}/stats/byDownloadDate", podcast::findStatByDownloadDate)
-            GET("/{id}/stats/byCreationDate", podcast::findStatByCreationDate)
+            GET("/{id}/stats/byPubDate", podcast::findStatByPodcastIdAndPubDate)
+            GET("/{id}/stats/byDownloadDate", podcast::findStatByPodcastIdAndDownloadDate)
+            GET("/{id}/stats/byCreationDate", podcast::findStatByPodcastIdAndCreationDate)
         }
     }
 }

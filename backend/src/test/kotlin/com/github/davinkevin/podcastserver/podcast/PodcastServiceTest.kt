@@ -63,9 +63,9 @@ class PodcastServiceTest {
         @Test
         fun `should find stats by pubDate`() {
             /* Given */
-            whenever(repository.findStatByPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+            whenever(repository.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r.toFlux())
             /* When */
-            StepVerifier.create(service.findStatByPubDate(podcast.id, 3))
+            StepVerifier.create(service.findStatByPodcastIdAndPubDate(podcast.id, 3))
                     /* Then */
                     .expectSubscription()
                     .expectNextSequence(r)
@@ -75,9 +75,9 @@ class PodcastServiceTest {
         @Test
         fun `should find stats by downloadDate`() {
             /* Given */
-            whenever(repository.findStatByDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+            whenever(repository.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
             /* When */
-            StepVerifier.create(service.findStatByDownloadDate(podcast.id, 3))
+            StepVerifier.create(service.findStatByPodcastIdAndDownloadDate(podcast.id, 3))
                     /* Then */
                     .expectSubscription()
                     .expectNextSequence(r)
@@ -87,9 +87,9 @@ class PodcastServiceTest {
         @Test
         fun `should find stats by creationDate`() {
             /* Given */
-            whenever(repository.findStatByCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+            whenever(repository.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
             /* When */
-            StepVerifier.create(service.findStatByCreationDate(podcast.id, 3))
+            StepVerifier.create(service.findStatByPodcastIdAndCreationDate(podcast.id, 3))
                     /* Then */
                     .expectSubscription()
                     .expectNextSequence(r)

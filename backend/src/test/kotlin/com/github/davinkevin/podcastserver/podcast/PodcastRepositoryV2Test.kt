@@ -90,7 +90,7 @@ class PodcastRepositoryV2Test {
         fun `by pubDate`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findStatByPubDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+            StepVerifier.create(repository.findStatByPodcastIdAndPubDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
                     /* Then */
                     .expectSubscription()
                     .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(1), 2))
@@ -103,7 +103,7 @@ class PodcastRepositoryV2Test {
         fun `by downloadDate`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findStatByDownloadDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+            StepVerifier.create(repository.findStatByPodcastIdAndDownloadDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
                     /* Then */
                     .expectSubscription()
                     .expectNext(NumberOfItemByDateWrapper(LocalDate.now(), 1))
@@ -115,7 +115,7 @@ class PodcastRepositoryV2Test {
         fun `by creationDate`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findStatByCreationDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+            StepVerifier.create(repository.findStatByPodcastIdAndCreationDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
                     /* Then */
                     .expectSubscription()
                     .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(1), 1))
