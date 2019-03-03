@@ -183,7 +183,7 @@ class RTMPDownloaderTest {
 
                 @BeforeEach
                 fun beforeEach() {
-                    whenever(p.waitFor()).then { isWaiting = true; SECONDS.sleep(4) }
+                    whenever(p.waitFor()).then { isWaiting = true; SECONDS.sleep(4); 0 }
                 }
 
                 @Nested
