@@ -109,16 +109,15 @@ class ItemRepositoryV2Test {
         StepVerifier.create(repository.deleteById(listOf(item1, item2, item3)))
                 .expectSubscription()
                 /* Then */
-                .then {
-                    val items = query.select(ITEM.ID).from(ITEM).fetch { it[ITEM.ID] }
-                    assertThat(items).hasSize(4).contains(
-                            UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
-                            UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
-                            UUID.fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"),
-                            UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
-                    )
-                }
                 .verifyComplete()
+
+        val items = query.select(ITEM.ID).from(ITEM).fetch { it[ITEM.ID] }
+        assertThat(items).hasSize(4).contains(
+                UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
+                UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                UUID.fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"),
+                UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+        )
     }
 
     @Test
