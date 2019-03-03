@@ -9,6 +9,7 @@ import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_PODCAST_DATA
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -78,52 +79,136 @@ class PodcastRepositoryV2Test {
     @DisplayName("should find stats")
     inner class ShouldFindStats {
 
-        @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-            println(dataSource.connection.metaData.url)
-            dbSetupTracker.launchIfNecessary(dbSetup)
+        @Nested
+        @DisplayName("by podcast")
+        inner class ByPodcast {
+
+            @BeforeEach
+            fun prepare() {
+                val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
+                val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
+                dbSetupTracker.launchIfNecessary(dbSetup)
+            }
+
+            @Test
+            fun `by pubDate`() {
+                /* Given */
+                /* When */
+                StepVerifier.create(repository.findStatByPodcastIdAndPubDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(1), 2))
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1))
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusYears(1), 1))
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by downloadDate`() {
+                /* Given */
+                /* When */
+                StepVerifier.create(repository.findStatByPodcastIdAndDownloadDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now(), 1))
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1))
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by creationDate`() {
+                /* Given */
+                /* When */
+                StepVerifier.create(repository.findStatByPodcastIdAndCreationDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(1), 1))
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(2), 1))
+                        .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusMonths(2), 2))
+                        .verifyComplete()
+            }
+
         }
 
-        @Test
-        fun `by pubDate`() {
-            /* Given */
-            /* When */
-            StepVerifier.create(repository.findStatByPodcastIdAndPubDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(1), 2))
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1))
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusYears(1), 1))
-                    .verifyComplete()
-        }
+        @Nested
+        @DisplayName("globally")
+        inner class Globally {
 
-        @Test
-        fun `by downloadDate`() {
-            /* Given */
-            /* When */
-            StepVerifier.create(repository.findStatByPodcastIdAndDownloadDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now(), 1))
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1))
-                    .verifyComplete()
-        }
+            @BeforeEach
+            fun prepare() {
+                val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
+                val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
+                dbSetupTracker.launchIfNecessary(dbSetup)
+            }
 
-        @Test
-        fun `by creationDate`() {
-            /* Given */
-            /* When */
-            StepVerifier.create(repository.findStatByPodcastIdAndCreationDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(1), 1))
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(2), 1))
-                    .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusMonths(2), 2))
-                    .verifyComplete()
-        }
+            @Test
+            fun `by pubDate`() {
+                /* Given */
+                /* When */
+                StepVerifier.create(repository.findStatByTypeAndPubDate(13))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.type).isEqualTo("RSS")
+                            assertThat(it.values).contains(
+                                    NumberOfItemByDateWrapper(LocalDate.now(), 1),
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1),
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusDays(30), 1)
+                            )
+                        }
+                        .assertNext {
+                            assertThat(it.type).isEqualTo("YOUTUBE")
+                            assertThat(it.values).contains(
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusDays(1), 2),
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1),
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusYears(1), 1)
+                            )
+                        }
+                        .verifyComplete()
+            }
 
+            @Test
+            fun `by downloadDate`() {
+                /* Given */
+                /* When */
+                StepVerifier.create(repository.findStatByTypeAndDownloadDate(13))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.type).isEqualTo("YOUTUBE")
+                            assertThat(it.values).contains(
+                                    NumberOfItemByDateWrapper(LocalDate.now(), 1),
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1)
+                            )
+                        }
+                        .assertNext {
+                            assertThat(it.type).isEqualTo("RSS")
+                            assertThat(it.values).contains(
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusDays(15), 1)
+                            )
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by creationDate`() {
+                /* Given */
+                /* When */
+                StepVerifier.create(repository.findStatByTypeAndCreationDate(13))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.type).isEqualTo("YOUTUBE")
+                            assertThat(it.values).contains(
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(1), 1),
+                                    NumberOfItemByDateWrapper(LocalDate.now().minusMonths(2), 1)
+                            )
+                        }
+                        .verifyComplete()
+            }
+
+
+        }
 
 
     }

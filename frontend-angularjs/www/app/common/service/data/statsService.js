@@ -15,15 +15,15 @@ export default class StatService {
     }
 
     byDownloadDate(numberOfMonth = 1) {
-        return this.$http.post('/api/stats/byDownloadDate', numberOfMonth).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/stats/byDownloadDate?numberOfMonths=${numberOfMonth}`).then(r => r.data.content);
     }
 
     byCreationDate(numberOfMonth = 1) {
-        return this.$http.post('/api/stats/byCreationDate', numberOfMonth).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/stats/byCreationDate?numberOfMonths=${numberOfMonth}`).then(r => r.data.content);
     }
 
     byPubDate(numberOfMonth = 1) {
-        return this.$http.post('/api/stats/byPubDate', numberOfMonth).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/stats/byPubDate?numberOfMonths=${numberOfMonth}`).then(r => r.data.content);
     }
 
     dateMapper() {

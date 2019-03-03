@@ -82,28 +82,6 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, ItemRepositor
         return findAllDownloadedAndDownloadedBeforeAndHasToBeDeleted(date);
     }
 
-    @Query(value = "SELECT count(*) as numberOfItems, TRUNCATE(CREATION_DATE) as date FROM ITEM WHERE PODCAST_ID = :pid AND DATEDIFF('MONTH', CREATION_DATE, CURRENT_TIMESTAMP()) < :nmonth GROUP BY date ORDER BY date DESC;", nativeQuery = true)
-    Object[][] _findStatOfCreationDate(@Param("pid") UUID pid, @Param("nmonth") Integer nmonth);
-
-    default Set<NumberOfItemByDateWrapper> findStatOfCreationDate(@Param("pid") UUID pid, @Param("nmonth") Integer nmonth) {
-        return as(_findStatOfCreationDate(pid, nmonth));
-    }
-
-    @Query(value = "SELECT count(*) as numberOfItems, TRUNCATE(PUB_DATE) as date FROM ITEM WHERE PODCAST_ID = :pid AND DATEDIFF('MONTH', PUB_DATE, CURRENT_TIMESTAMP()) < :nmonth GROUP BY date ORDER BY date DESC;", nativeQuery = true)
-    Object[][] _findStatOfPubDate(@Param("pid") UUID pid, @Param("nmonth") Integer nmonth);
-
-    default Set<NumberOfItemByDateWrapper> findStatOfPubDate(@Param("pid") UUID pid, @Param("nmonth") Integer nmonth) {
-        return as(_findStatOfPubDate(pid, nmonth));
-    }
-
-    @Query(value = "SELECT count(*) as numberOfItems, TRUNCATE(DOWNLOAD_DATE) as date FROM ITEM WHERE PODCAST_ID = :pid AND DATEDIFF('MONTH', DOWNLOAD_DATE, CURRENT_TIMESTAMP()) < :nmonth GROUP BY date ORDER BY date DESC;", nativeQuery = true)
-    Object[][] _findStatOfDownloadDate(@Param("pid") UUID pid, @Param("nmonth") Integer nmonth);
-
-    default Set<NumberOfItemByDateWrapper> findStatOfDownloadDate(@Param("pid") UUID pid, @Param("nmonth") Integer nmonth) {
-        return as(_findStatOfDownloadDate(pid, nmonth));
-    }
-
-
     static Set<NumberOfItemByDateWrapper> as(Object[][] r) {
         return HashSet.of(r)
                 .map(v -> Tuple((BigInteger) v[0], (java.sql.Date) v[1]))

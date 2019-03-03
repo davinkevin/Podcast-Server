@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
+import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -53,7 +54,6 @@ class PodcastHandler(
                 .flatMap { seeOther(it).build() }
     }
 
-
     fun findStatByPodcastIdAndPubDate(r: ServerRequest): Mono<ServerResponse> = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndPubDate(id, number) }
     fun findStatByPodcastIdAndDownloadDate(r: ServerRequest): Mono<ServerResponse> = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndDownloadDate(id, number) }
     fun findStatByPodcastIdAndCreationDate(r: ServerRequest): Mono<ServerResponse> = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndCreationDate(id, number) }
@@ -67,6 +67,20 @@ class PodcastHandler(
                 .flatMap { ok().syncBody(it) }
     }
 
+
+    fun findStatByTypeAndCreationDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndCreationDate(number) }
+    fun findStatByTypeAndPubDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndPubDate(number) }
+    fun findStatByTypeAndDownloadDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndDownloadDate(number) }
+
+    private fun statsBy(r: ServerRequest, proj: (n: Int) -> Flux<StatsPodcastType>): Mono<ServerResponse> {
+        val numberOfMonths = r.queryParam("numberOfMonths").orElse("1").toInt()
+
+        return proj(numberOfMonths)
+                .collectList()
+                .flatMap { ok().syncBody(StatsPodcastTypeWrapperHAL(it)) }
+    }
 }
+
+private class StatsPodcastTypeWrapperHAL(val content: Collection<StatsPodcastType>)
 
 private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url)

@@ -49,7 +49,6 @@ public class ItemDSL {
     }
 
     public static BooleanExpression hasBeenDownloadedAfter(ZonedDateTime dateTime) { return Q_ITEM.downloadDate.gt(dateTime); }
-    public static BooleanExpression hasBeenCreatedAfter(ZonedDateTime dateTime) { return Q_ITEM.creationDate.gt(dateTime); }
 
     public static BooleanExpression isOfType(String type) {
         return Q_ITEM.podcast.type.eq(type);

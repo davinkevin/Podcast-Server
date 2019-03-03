@@ -14,11 +14,24 @@ class PodcastRoutingConfig {
     @Bean
     fun podcastRouter(podcast: PodcastHandler) = router {
         "/api/v1/podcasts".nest {
-            GET("/{id}/cover.{ext}", podcast::cover)
 
-            GET("/{id}/stats/byPubDate", podcast::findStatByPodcastIdAndPubDate)
-            GET("/{id}/stats/byDownloadDate", podcast::findStatByPodcastIdAndDownloadDate)
-            GET("/{id}/stats/byCreationDate", podcast::findStatByPodcastIdAndCreationDate)
+            "/{id}".nest {
+                GET("/cover.{ext}", podcast::cover)
+
+                "/stats".nest {
+                    GET("/byPubDate", podcast::findStatByPodcastIdAndPubDate)
+                    GET("/byDownloadDate", podcast::findStatByPodcastIdAndDownloadDate)
+                    GET("/byCreationDate", podcast::findStatByPodcastIdAndCreationDate)
+                }
+
+            }
+
+            "/stats".nest {
+                GET("/byCreationDate", podcast::findStatByTypeAndCreationDate)
+                GET("/byPubDate", podcast::findStatByTypeAndPubDate)
+                GET("/byDownloadDate", podcast::findStatByTypeAndDownloadDate)
+            }
+
         }
     }
 }

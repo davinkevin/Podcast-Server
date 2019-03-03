@@ -9,8 +9,12 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as Podcas
 class PodcastService(private val repository: PodcastRepository) {
 
     fun findById(id: UUID): Mono<Podcast> = repository.findById(id)
+
     fun findStatByPodcastIdAndPubDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndPubDate(id, numberOfMonths)
     fun findStatByPodcastIdAndDownloadDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndDownloadDate(id, numberOfMonths)
     fun findStatByPodcastIdAndCreationDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndCreationDate(id, numberOfMonths)
 
+    fun findStatByTypeAndCreationDate(numberOfMonths: Int) = repository.findStatByTypeAndCreationDate(numberOfMonths)
+    fun findStatByTypeAndPubDate(numberOfMonths: Int) = repository.findStatByTypeAndPubDate(numberOfMonths)
+    fun findStatByTypeAndDownloadDate(numberOfMonths: Int) = repository.findStatByTypeAndDownloadDate(numberOfMonths)
 }

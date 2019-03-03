@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
+import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import reactor.core.publisher.Flux
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
@@ -60,43 +62,101 @@ class PodcastServiceTest {
                 NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
         )
 
-        @Test
-        fun `should find stats by pubDate`() {
-            /* Given */
-            whenever(repository.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r.toFlux())
-            /* When */
-            StepVerifier.create(service.findStatByPodcastIdAndPubDate(podcast.id, 3))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextSequence(r)
-                    .verifyComplete()
+        @Nested
+        @DisplayName("by podcast id")
+        inner class ByPodcastId {
+
+            @Test
+            fun `by pubDate`() {
+                /* Given */
+                whenever(repository.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+                /* When */
+                StepVerifier.create(service.findStatByPodcastIdAndPubDate(podcast.id, 3))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNextSequence(r)
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by downloadDate`() {
+                /* Given */
+                whenever(repository.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+                /* When */
+                StepVerifier.create(service.findStatByPodcastIdAndDownloadDate(podcast.id, 3))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNextSequence(r)
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by creationDate`() {
+                /* Given */
+                whenever(repository.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+                /* When */
+                StepVerifier.create(service.findStatByPodcastIdAndCreationDate(podcast.id, 3))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNextSequence(r)
+                        .verifyComplete()
+            }
         }
 
-        @Test
-        fun `should find stats by downloadDate`() {
-            /* Given */
-            whenever(repository.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
-            /* When */
-            StepVerifier.create(service.findStatByPodcastIdAndDownloadDate(podcast.id, 3))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextSequence(r)
-                    .verifyComplete()
-        }
+        @Nested
+        @DisplayName("globally")
+        inner class Globally {
 
-        @Test
-        fun `should find stats by creationDate`() {
-            /* Given */
-            whenever(repository.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
-            /* When */
-            StepVerifier.create(service.findStatByPodcastIdAndCreationDate(podcast.id, 3))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextSequence(r)
-                    .verifyComplete()
+            val s = listOf(
+                    NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                    NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 2),
+                    NumberOfItemByDateWrapper(LocalDate.parse("2019-03-28"), 6)
+            )
+
+            val youtube = StatsPodcastType("YOUTUBE", s.toSet())
+            val rss = StatsPodcastType("RSS", r.toSet())
+
+            @Test
+            fun `by pubDate`() {
+                /* Given */
+                whenever(repository.findStatByTypeAndPubDate(3)).thenReturn(Flux.just(youtube, rss))
+                /* When */
+                StepVerifier.create(service.findStatByTypeAndPubDate(3))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(youtube)
+                        .expectNext(rss)
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by downloadDate`() {
+                /* Given */
+                whenever(repository.findStatByTypeAndDownloadDate(3)).thenReturn(Flux.just(youtube, rss))
+                /* When */
+                StepVerifier.create(service.findStatByTypeAndDownloadDate(3))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(youtube)
+                        .expectNext(rss)
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `by creationDate`() {
+                /* Given */
+                whenever(repository.findStatByTypeAndCreationDate(3)).thenReturn(Flux.just(youtube, rss))
+                /* When */
+                StepVerifier.create(service.findStatByTypeAndCreationDate(3))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(youtube)
+                        .expectNext(rss)
+                        .verifyComplete()
+            }
+
         }
 
     }
-
 
 }

@@ -21,6 +21,34 @@ import java.util.*
 
 class PodcastRepositoryV2(private val query: DSLContext) {
 
+    fun findStatByTypeAndCreationDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.CREATION_DATE)
+    fun findStatByTypeAndPubDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.PUB_DATE)
+    fun findStatByTypeAndDownloadDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.DOWNLOAD_DATE)
+
+    private fun findStatByTypeAndField(month: Int, field: TableField<ItemRecord, Timestamp>): Flux<StatsPodcastType> {
+        val date = DSL.trunc(field)
+        val startDate = ZonedDateTime.now().minusMonths(month.toLong())
+        val numberOfDays = Duration.between(startDate, ZonedDateTime.now()).toDays()
+
+        return query
+                .select(PODCAST.TYPE, DSL.count(), date)
+                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+                .where(field.isNotNull)
+                .and(DSL.dateDiff(DSL.currentDate(), DSL.date(field)).lessThan(numberOfDays.toInt()))
+                .groupBy(PODCAST.TYPE, date)
+                .orderBy(date.desc())
+                .groupBy { it[PODCAST.TYPE] }
+                .map {
+                    StatsPodcastType(
+                            type = it.key,
+                            values = it.value
+                                    .map { (_, number, date) -> NumberOfItemByDateWrapper(date.toLocalDateTime().toLocalDate(), number) }
+                                    .toSet()
+                    )
+                }
+                .toFlux()
+    }
+
     fun findStatByPodcastIdAndPubDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.PUB_DATE)
     fun findStatByPodcastIdAndCreationDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.CREATION_DATE)
     fun findStatByPodcastIdAndDownloadDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.DOWNLOAD_DATE)
