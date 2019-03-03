@@ -156,17 +156,6 @@ class UpdatePodcastBusiness(
         return itemsToAdd.toSet()
     }
 
-    fun deleteOldEpisode() {
-        log.info("Deletion of olds items")
-
-        itemRepository
-                .findAllToDelete(podcastServerParameters.limitDownloadDate())
-                .toStream()
-                .peek { log.info("Deletion of file associated with item {} : {}", it.id, it.localPath.toAbsolutePath()) }
-                .map { it.deleteDownloadedFile() }
-                .forEach { itemRepository.save(it) }
-    }
-
     fun deleteOldCover() {
         log.info("Deletion of old covers item")
 

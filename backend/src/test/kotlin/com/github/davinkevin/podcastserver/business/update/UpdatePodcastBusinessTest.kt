@@ -65,23 +65,6 @@ class UpdatePodcastBusinessTest {
     }
 
     @Test
-    fun `should delete old episode`() {
-        /* Given */
-        val p = Podcast().apply { title = "Title" }
-        val items = generateItems(3, p).toVΛVΓ()
-        val now = ZonedDateTime.now()
-        doReturn(items).whenever(itemRepository).findAllToDelete(now)
-        whenever(podcastServerParameters.limitDownloadDate()).thenReturn(now)
-
-        /* When */
-        updatePodcastBusiness.deleteOldEpisode()
-
-        /* Then */
-        verify(itemRepository, times(3)).save(argWhere { items.contains(it)  })
-        assertThat(items).allMatch { it.status == Status.DELETED && it.fileName == null }
-    }
-
-    @Test
     fun `should reset item with incorrect state`() {
         /* Given */
         val items = setOf(
