@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
-import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

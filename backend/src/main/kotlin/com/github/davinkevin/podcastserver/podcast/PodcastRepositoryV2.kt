@@ -1,13 +1,9 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.github.davinkevin.podcastserver.business.stats.NumberOfItemByDateWrapper
-import com.github.davinkevin.podcastserver.business.stats.StatsPodcastType
-import com.github.davinkevin.podcastserver.database.Tables
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
 import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
 import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import org.jooq.DSLContext
 import org.jooq.TableField
 import org.jooq.impl.DSL
@@ -38,8 +34,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 .groupBy(PODCAST.TYPE, date)
                 .orderBy(date.desc())
                 .groupBy { it[PODCAST.TYPE] }
-                .map {
-                    StatsPodcastType(
+                .map { StatsPodcastType(
                             type = it.key,
                             values = it.value
                                     .map { (_, number, date) -> NumberOfItemByDateWrapper(date.toLocalDateTime().toLocalDate(), number) }

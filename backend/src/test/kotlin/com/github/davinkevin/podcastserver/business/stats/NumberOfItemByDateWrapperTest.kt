@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.business.stats
 
+import com.github.davinkevin.podcastserver.podcast.NumberOfItemByDateWrapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
