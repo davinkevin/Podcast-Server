@@ -18,7 +18,7 @@ export class ItemService {
 	}
 
 	findById(itemId: uuid, podcastId: uuid): Observable<Item> {
-		return this.http.get<Item>(`/api/podcasts/${podcastId}/items/${itemId}`);
+		return this.http.get<Item>(`/api/v1/podcasts/${podcastId}/items/${itemId}`);
 	}
 
 	delete(itemId: uuid, podcastId: uuid): Observable<void> {

@@ -175,7 +175,7 @@ describe('Service: Item', () => {
 			});
 
 		/* Then */
-		const req = httpMock.expectOne(r => r.url === `/api/podcasts/${podcastId}/items/${itemId}`);
+		const req = httpMock.expectOne(r => r.url === `/api/v1/podcasts/${podcastId}/items/${itemId}`);
 		expect(req.request.method).toEqual('GET');
 		req.flush(ITEM);
 	});
