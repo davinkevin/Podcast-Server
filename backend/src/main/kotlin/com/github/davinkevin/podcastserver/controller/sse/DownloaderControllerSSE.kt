@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.DirectProcessor
+import reactor.core.publisher.Flux
+import java.time.Duration
+import java.time.Duration.*
 
 
 /**
@@ -19,7 +22,10 @@ class DownloaderControllerSSE {
     val messages = DirectProcessor.create<ServerSentEvent<Any>>()
 
     @GetMapping
-    fun sseMessages() = messages.share()
+    fun sseMessages() = Flux
+            .interval(ofSeconds(5))
+            .map { ServerSentEvent.builder(it as Any).event("heartbeat").build() }
+            .mergeWith(messages.share())
 
     @EventListener
     fun <T> listener(v: Message<T>) = send(v)
