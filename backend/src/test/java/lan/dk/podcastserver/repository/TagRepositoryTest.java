@@ -16,9 +16,9 @@ import org.springframework.context.annotation.Import;
 import javax.sql.DataSource;
 import java.util.UUID;
 
-import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf;
 import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL;
+import static lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_TAG_DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -32,14 +32,6 @@ public class TagRepositoryTest {
     private @Autowired TagRepository tagRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
-    private static final Operation INSERT_TAG_DATA = sequenceOf(
-            insertInto("TAG")
-                    .columns("ID", "NAME")
-                    .values(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
-                    .values(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
-                    .values(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
-                    .build()
-    );
 
     @BeforeEach
     public void prepare() throws Exception {

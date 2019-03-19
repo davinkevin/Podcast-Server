@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.service.properties.Backup
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.tag.TagConfig
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.Set
 import org.apache.tika.Tika
@@ -29,7 +30,7 @@ import java.nio.file.Paths
 @EnableCaching
 @Configuration
 @EnableConfigurationProperties(PodcastServerParameters::class, Api::class, Backup::class, ExternalTools::class)
-@Import(ItemConfig::class, PodcastConfig::class, TypeConfig::class)
+@Import(ItemConfig::class, PodcastConfig::class, TypeConfig::class, TagConfig::class)
 @ComponentScan(basePackages = [
     "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager", "com.github.davinkevin.podcastserver.config",
     "lan.dk.podcastserver.service"])

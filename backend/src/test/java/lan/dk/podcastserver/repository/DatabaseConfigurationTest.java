@@ -95,4 +95,13 @@ public class DatabaseConfigurationTest {
                     .values(UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
                     .build()
     );
+
+    public static final Operation INSERT_TAG_DATA = CompositeOperation.sequenceOf(
+            insertInto("TAG")
+                    .columns("ID", "NAME")
+                    .values(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+                    .values(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+                    .values(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+                    .build()
+    );
 }

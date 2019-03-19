@@ -22,11 +22,6 @@ public class TagController {
         this.tagBusiness = tagBusiness;
     }
 
-    @GetMapping("{id}")
-    public Tag findById(@PathVariable UUID id) {
-        return tagBusiness.findOne(id);
-    }
-
     @GetMapping
     public List<Tag> findAll() {
         return tagBusiness.findAll();
