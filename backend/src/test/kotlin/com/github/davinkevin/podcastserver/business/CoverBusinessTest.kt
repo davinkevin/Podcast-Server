@@ -293,7 +293,7 @@ class CoverBusinessTest {
     companion object {
 
         private val ROOT_FOLDER = Paths.get("/tmp/podcast")
-        private const val PORT = 8089
+        private const val PORT = 9889
         private const val HTTP_LOCALHOST = "http://localhost:$PORT"
 
         private fun host(path: String): String {
