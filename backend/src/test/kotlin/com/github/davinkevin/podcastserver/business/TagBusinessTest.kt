@@ -1,14 +1,19 @@
 package com.github.davinkevin.podcastserver.business
 
-import com.nhaarman.mockitokotlin2.*
-import io.vavr.API.*
 import com.github.davinkevin.podcastserver.entity.Tag
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argWhere
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.whenever
+import io.vavr.API.None
+import io.vavr.API.Option
+import io.vavr.API.Set
 import lan.dk.podcastserver.repository.TagRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -22,64 +27,6 @@ class TagBusinessTest {
 
     @Mock lateinit var tagRepository: TagRepository
     @InjectMocks lateinit var tagBusiness: TagBusiness
-
-    @Test
-    fun `should find all`() {
-        /* Given */
-        whenever(tagRepository.findAll()).thenReturn(listOf())
-
-        /* When */
-        val tags = tagBusiness.findAll()
-
-        /* Then */
-        assertThat(tags.toJavaList()).isEqualTo(listOf<Tag>())
-        verify(tagRepository, times(1)).findAll()
-    }
-
-    @Test
-    fun `should find one`() {
-        /* Given */
-        val tagId = UUID.randomUUID()
-        val tag = Tag().apply { id = tagId }
-        whenever(tagRepository.findById(any())).thenReturn(Optional.of(tag))
-
-        /* When */
-        val tagToFind = tagBusiness.findOne(tagId)
-
-        /* Then */
-        assertThat(tagToFind).isSameAs(tag)
-        verify(tagRepository, times(1)).findById(eq(tagId))
-    }
-
-    @Test
-    fun `should throw exception if tags not found`() {
-        /* Given */
-        val id = UUID.randomUUID()
-        whenever(tagRepository.findById(any())).thenReturn(Optional.empty())
-
-        /* When */
-        assertThatThrownBy { tagBusiness.findOne(id) }
-
-        /* Then */
-                .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Tag with ID $id not found")
-        verify(tagRepository, times(1)).findById(eq(id))
-    }
-
-    @Test
-    fun `should find by name like`() {
-        /* Given */
-        val searchWord = "name"
-        val foundTags = Set<Tag>()
-        whenever(tagRepository.findByNameContainsIgnoreCase(anyString())).thenReturn(foundTags)
-
-        /* When */
-        val tags = tagBusiness.findByNameLike(searchWord)
-
-        /* Then */
-        assertThat(tags).isSameAs(foundTags)
-        verify(tagRepository, times(1)).findByNameContainsIgnoreCase(eq(searchWord))
-    }
 
     @Test
     fun `should get tag by name in set`() {
