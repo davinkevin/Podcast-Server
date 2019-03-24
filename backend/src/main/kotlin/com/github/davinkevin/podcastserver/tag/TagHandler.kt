@@ -24,6 +24,19 @@ class TagHandler(private val tagService: TagService) {
                 .flatMap { ok().syncBody(it) }
                 .switchIfEmpty { notFound().build() }
     }
+
+    fun findByNameLike(s: ServerRequest): Mono<ServerResponse> {
+        val name = s.queryParam("name").orElse("")
+
+        return tagService
+                .findByNameLike(name)
+                .map { TagHAL(it.id, it.name) }
+                .collectList()
+                .map { TagsResponse(it) }
+                .flatMap { ok().syncBody(it) }
+    }
 }
 
 class TagHAL(val id: UUID, val name: String)
+
+private class TagsResponse(val content: Collection<TagHAL>)

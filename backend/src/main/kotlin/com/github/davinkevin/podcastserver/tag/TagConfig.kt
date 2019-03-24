@@ -14,6 +14,7 @@ class TagRoutingConfig {
     @Bean
     fun tagRouter(tag: TagHandler) = router {
         "/api/v1/tags".nest {
+            GET("/search", tag::findByNameLike)
             GET("/{id}", tag::findById)
         }
     }

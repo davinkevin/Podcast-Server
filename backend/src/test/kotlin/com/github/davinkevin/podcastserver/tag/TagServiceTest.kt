@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.tag
 
-import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
@@ -56,6 +56,38 @@ class TagServiceTest {
                     .expectSubscription()
                     .verifyComplete()
         }
+    }
+
+    @Nested
+    @DisplayName("should find by name")
+    inner class ShouldFindByName {
+
+        @Test
+        fun `with existing tags`() {
+            /* Given */
+            val tag = Tag(UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf"), "foo")
+            whenever(repo.findByNameLike("foo")).thenReturn(Flux.just(tag))
+
+            /* When */
+            StepVerifier.create(service.findByNameLike("foo"))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(tag)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with no result`() {
+            /* Given */
+            whenever(repo.findByNameLike("foo")).thenReturn(Flux.empty())
+
+            /* When */
+            StepVerifier.create(service.findByNameLike("foo"))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+
     }
 
 }

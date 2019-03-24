@@ -76,4 +76,35 @@ class TagRepositoryV2Test {
 
     }
 
+    @Nested
+    @DisplayName("Should find by name")
+    inner class ShouldFindByNameLike {
+
+        @BeforeEach
+        fun beforeEach() = dbSetupTracker.skipNextLaunch()
+
+        @Test
+        fun `with with insensitive case results`() {
+            /* Given */
+
+            /* When */
+            StepVerifier.create(repository.findByNameLike("bar"))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Tag(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"))
+                    .expectNext(Tag(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr"))
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `without any match`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repository.findByNameLike("boo"))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+
+    }
 }

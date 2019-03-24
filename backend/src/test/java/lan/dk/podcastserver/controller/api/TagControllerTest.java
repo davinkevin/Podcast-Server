@@ -25,20 +25,20 @@ public class TagControllerTest {
     private @Mock TagBusiness tagBusiness;
     private @InjectMocks TagController tagController;
 
-    @Test
-    public void should_find_tag_by_id() {
-        /* Given */
-        UUID id = UUID.randomUUID();
-        Tag value = new Tag();
-        when(tagBusiness.findOne(id)).thenReturn(value);
-
-        /* When */
-        Tag tagById = tagController.findById(id);
-
-        /* Then */
-        assertThat(tagById).isSameAs(value);
-        verify(tagBusiness, only()).findOne(id);
-    }
+//    @Test
+//    public void should_find_tag_by_id() {
+//        /* Given */
+//        UUID id = UUID.randomUUID();
+//        Tag value = new Tag();
+//        when(tagBusiness.findOne(id)).thenReturn(value);
+//
+//        /* When */
+//        Tag tagById = tagController.findById(id);
+//
+//        /* Then */
+//        assertThat(tagById).isSameAs(value);
+//        verify(tagBusiness, only()).findOne(id);
+//    }
 
     @Test
     public void should_find_all_tag() {
