@@ -1,23 +1,27 @@
 package com.github.davinkevin.podcastserver.business
 
-import com.github.davinkevin.podcastserver.service.UrlService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.service.UrlService
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.repository.CoverRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.any
+import org.mockito.Mockito.eq
+import org.mockito.Mockito.only
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.util.FileSystemUtils
@@ -31,8 +35,6 @@ import java.util.*
 @ExtendWith(MockitoExtension::class)
 class CoverBusinessTest {
 
-    val wireMockServer: WireMockServer = WireMockServer(WireMockConfiguration.wireMockConfig().port(PORT))
-
     @Mock lateinit var coverRepository: CoverRepository
     @Mock lateinit var podcastServerParameters: PodcastServerParameters
     @Spy lateinit var urlService: UrlService
@@ -41,12 +43,7 @@ class CoverBusinessTest {
     @BeforeEach
     fun beforeEach() {
         FileSystemUtils.deleteRecursively(ROOT_FOLDER.toFile())
-        wireMockServer.start()
-        WireMock.configureFor(PORT)
     }
-
-    @AfterEach
-    fun afterEach() = wireMockServer.stop()
 
     @Test
     fun `should find one`() {
@@ -299,5 +296,17 @@ class CoverBusinessTest {
         private fun host(path: String): String {
             return HTTP_LOCALHOST + path
         }
+
+        private val wireMockServer: WireMockServer = WireMockServer(WireMockConfiguration.wireMockConfig().port(PORT))
+
+        @BeforeAll
+        @JvmStatic
+        fun beforeAll() = wireMockServer.start()
+
+        @AfterAll
+        @JvmStatic
+        fun afterAll() = wireMockServer.stop()
+
+
     }
 }
