@@ -28,7 +28,6 @@ import java.util.UUID;
 @RequestMapping("/api/podcasts/{idPodcast}/items")
 public class ItemController {
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ItemController.class);
     private final ItemBusiness itemBusiness;
     private final ItemDownloadManager itemDownloadManager;
     private final WatchListBusiness watchListBusiness;
@@ -75,12 +74,6 @@ public class ItemController {
     @GetMapping("{id}/addtoqueue")
     public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
-    }
-
-    @GetMapping("{id}/reset")
-    @JsonView(Item.ItemDetailsView.class)
-    public Item reset(@PathVariable UUID id) {
-        return itemBusiness.reset(id);
     }
 
     @PostMapping("/upload")

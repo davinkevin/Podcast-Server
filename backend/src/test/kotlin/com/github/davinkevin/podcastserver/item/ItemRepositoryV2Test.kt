@@ -82,7 +82,6 @@ class ItemRepositoryV2Test {
         }
     }
 
-
     @Test
     fun `should find all to delete`() {
         /* Given */
@@ -137,6 +136,65 @@ class ItemRepositoryV2Test {
                         assertThat(it.status).isEqualTo(Status.DELETED.toString())
                         assertThat(it.fileName).isNull()
                     }
+                }
+                .verifyComplete()
+    }
+
+    @Nested
+    @DisplayName("should find if item has to be deleted")
+    inner class HasToBeDeleted {
+
+        @BeforeEach
+        fun beforeEach() = dbSetupTracker.skipNextLaunch()
+
+        @Test
+        fun `and return true because its parent podcast has to`() {
+            /* Given */
+            val id = UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            /* When */
+            StepVerifier.create(repository.hasToBeDeleted(id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(true)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `and return false because its parent podcast hasn't`() {
+            /* Given */
+            val id = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            /* When */
+            StepVerifier.create(repository.hasToBeDeleted(id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(false)
+                    .verifyComplete()
+        }
+
+
+    }
+
+    @Test
+    fun `should reset by Id`() {
+        /* Given */
+        val id = UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+        /* When */
+        StepVerifier.create(repository.resetById(id))
+                /* Then */
+                .expectSubscription()
+                .assertNext {
+                    assertThat(it.id).isEqualTo(id)
+                    assertThat(it.title).isEqualTo("Geek INC 126")
+                    assertThat(it.url).isEqualTo("http://fakeurl.com/geekinc.126.mp3")
+                    assertThat(it.fileName).isEqualTo(null)
+                    assertThat(it.fileName).isEqualTo(null)
+                    assertThat(it.podcast).isEqualTo(PodcastForItem(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
+                    assertThat(it.status).isEqualTo(Status.NOT_DOWNLOADED)
+                    assertThat((it.downloadDate == null)).isEqualTo(true)
+                }
+                .then {
+                    val numberOfFail = query.selectFrom(ITEM).where(ITEM.ID.eq(id)).fetchOne().numberOfFail
+                    assertThat(numberOfFail).isEqualTo(0)
                 }
                 .verifyComplete()
     }

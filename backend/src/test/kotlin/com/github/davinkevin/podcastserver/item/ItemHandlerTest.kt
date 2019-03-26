@@ -289,4 +289,81 @@ class ItemHandlerTest {
 
     }
 
+    @Nested
+    @DisplayName("should reset")
+    inner class ShouldReset {
+
+        private val anItemToBeReseted = Item(
+                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+                title = "Foo",
+                url = "https://external.domain.tld/foo/bar.mp4",
+
+                pubDate = OffsetDateTime.parse("2019-02-01T13:14:15.000Z"),
+                downloadDate = null,
+                creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
+
+                description = "desc",
+                mimeType = null,
+                length = 100,
+                fileName = null,
+                status = Status.NOT_DOWNLOADED,
+
+                podcast = PodcastForItem(
+                        id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                        title = "Podcast Bar",
+                        url = "https://external.domain.tld/bar.rss"
+                ),
+                cover = CoverForItem(
+                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                        url = "https://external.domain.tld/foo/bar.png",
+                        width = 200,
+                        height = 200
+                )
+        )
+
+
+        @Test
+        fun `an item`() {
+            /* Given */
+            whenever(itemService.reset(anItemToBeReseted.id)).thenReturn(anItemToBeReseted.toMono())
+            /* When */
+            rest.post()
+                    .uri("/api/v1/podcasts/${anItemToBeReseted.podcast.id}/items/${anItemToBeReseted.id}/reset")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo(""" {
+                           "cover":{
+                              "height":200,
+                              "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
+                              "url":"https://external.domain.tld/foo/bar.png",
+                              "width":200
+                           },
+                           "creationDate":"2019-02-05T13:14:15Z",
+                           "description":"desc",
+                           "downloadDate":null,
+                           "fileName":null,
+                           "id":"27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
+                           "isDownloaded":false,
+                           "length":100,
+                           "mimeType":null,
+                           "podcast":{
+                              "id":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
+                              "title":"Podcast Bar",
+                              "url":"https://external.domain.tld/bar.rss"
+                           },
+                           "podcastId":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
+                           "proxyURL":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/Foo",
+                           "pubDate":"2019-02-01T13:14:15Z",
+                           "status":"NOT_DOWNLOADED",
+                           "title":"Foo",
+                           "url":"https://external.domain.tld/foo/bar.mp4"
+                        } """)
+                    }
+        }
+
+    }
+
 }

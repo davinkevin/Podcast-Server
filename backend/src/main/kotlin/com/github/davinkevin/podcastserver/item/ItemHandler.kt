@@ -39,6 +39,14 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                     .deleteOldEpisodes()
                     .then(ok().build())
 
+    fun reset(s: ServerRequest): Mono<ServerResponse> {
+        val id = UUID.fromString(s.pathVariable("id"))
+
+        return itemService.reset(id)
+                .map(::toItemHAL)
+                .flatMap { ok().syncBody(it) }
+    }
+
     fun file(s: ServerRequest): Mono<ServerResponse> {
         val host = s.extractHost()
         val id = UUID.fromString(s.pathVariable("id"))

@@ -145,44 +145,6 @@ class ItemBusinessTest {
     }
 
     @Test
-    fun `should reset item`() {
-        /* Given */
-        val itemId = UUID.randomUUID()
-        val item = mock<Item>()
-        whenever(item.reset()).thenReturn(item)
-        whenever(itemRepository.findById(itemId)).thenReturn(Optional.of(item))
-        whenever(itemDownloadManager.isInDownloadingQueue(item)).thenReturn(false)
-        whenever(itemRepository.save(item)).thenReturn(item)
-
-        /* When */
-        val resetedItem = itemBusiness.reset(itemId)
-
-        /* Then */
-        assertThat(resetedItem).isSameAs(item)
-        verify(itemRepository, times(1)).findById(itemId)
-        verify(itemDownloadManager, times(1)).isInDownloadingQueue(item)
-        verify(item, times(1)).reset()
-        verify(itemRepository, times(1)).save(item)
-    }
-
-    @Test
-    fun `should reset a downloading item`() {
-        /* Given */
-        val itemId = UUID.randomUUID()
-        val item = mock<Item>()
-        whenever(itemRepository.findById(itemId)).thenReturn(Optional.of(item))
-        whenever(itemDownloadManager.isInDownloadingQueue(item)).thenReturn(true)
-
-        /* When */
-        val resetedItem = itemBusiness.reset(itemId)
-
-        /* Then */
-        assertThat(resetedItem).isNull()
-        verify(itemRepository, times(1)).findById(itemId)
-        verify(itemDownloadManager, times(1)).isInDownloadingQueue(item)
-    }
-
-    @Test
     fun `should find page in podcast`() {
         /* Given */
         val idPodcast = UUID.randomUUID()

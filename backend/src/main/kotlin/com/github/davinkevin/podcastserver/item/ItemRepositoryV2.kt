@@ -82,4 +82,25 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .executeAsyncAsMono()
                 .then()
     }
+
+    fun hasToBeDeleted(id: UUID): Mono<Boolean> = Mono.defer {
+        query
+                .select(PODCAST.HAS_TO_BE_DELETED)
+                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+                .where(ITEM.ID.eq(id))
+                .fetchOneAsMono()
+                .map { it[PODCAST.HAS_TO_BE_DELETED] }
+    }
+
+    fun resetById(id: UUID): Mono<Item> = Mono.defer {
+        query
+                .update(ITEM)
+                .set(ITEM.STATUS, Status.NOT_DOWNLOADED.toString())
+                .set(ITEM.DOWNLOAD_DATE, value<Timestamp>(null))
+                .set(ITEM.FILE_NAME, value<String>(null))
+                .set(ITEM.NUMBER_OF_FAIL, 0)
+                .where(ITEM.ID.eq(id))
+                .executeAsyncAsMono()
+                .flatMap { findById(id) }
+    }
 }

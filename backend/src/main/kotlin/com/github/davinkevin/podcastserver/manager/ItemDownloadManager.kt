@@ -242,6 +242,7 @@ class ItemDownloadManager (
     fun canBeReset(item: Item) = item.numberOfFail!! + 1 <= podcastServerParameters.numberOfTry
 
     fun isInDownloadingQueue(item: Item) = _downloadingQueue.containsKey(item)
+    fun isInDownloadingQueueById(id: UUID) = _downloadingQueue.keys.asSequence().map { it.id }.any { it == id }
 
     fun moveItemInQueue(itemId: UUID, position: Int) {
         val copyWL = _waitingQueue.toMutableList()

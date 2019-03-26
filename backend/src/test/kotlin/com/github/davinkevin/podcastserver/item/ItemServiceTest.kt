@@ -1,11 +1,17 @@
 package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
@@ -14,6 +20,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
+import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
@@ -23,12 +30,14 @@ import java.util.*
  */
 @ExtendWith(SpringExtension::class)
 @Import(ItemService::class)
+@Suppress("UnassignedFluxMonoInstance")
 class ItemServiceTest {
 
     @Autowired lateinit var itemService: ItemService
     @MockBean lateinit var repository: ItemRepositoryV2
     @MockBean lateinit var p: PodcastServerParameters
     @MockBean lateinit var fileService: FileService
+    @MockBean lateinit var idm: ItemDownloadManager
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
@@ -43,7 +52,7 @@ class ItemServiceTest {
             mimeType = null,
             length = 100,
             fileName = null,
-            status = Status.NOT_DOWNLOADED,
+            status = NOT_DOWNLOADED,
 
             podcast = PodcastForItem(
                     id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
@@ -99,5 +108,129 @@ class ItemServiceTest {
                 .expectSubscription()
                 .expectNext(item)
                 .verifyComplete()
+    }
+
+    @Nested
+    @DisplayName("should reset")
+    inner class ShouldReset {
+
+        @BeforeEach
+        fun beforeEach() = Mockito.reset(fileService, repository)
+
+        @Test
+        fun `and do nothing because item is currently downloading`() {
+            /* Given */
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true)
+            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.reset(item.id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(item)
+                    .verifyComplete()
+
+            verify(repository, never()).hasToBeDeleted(any())
+            verify(repository, never()).findById(any())
+            verify(fileService, never()).deleteItem(any())
+        }
+
+        @Test
+        fun `and do nothing because the podcast is delete protected`() {
+            /* Given */
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(false.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.reset(item.id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(item)
+                    .verifyComplete()
+
+            verify(repository, never()).findById(any())
+            verify(fileService, never()).deleteItem(any())
+        }
+
+        @Test
+        fun `and do nothing because element is not downloaded`() {
+            /* Given */
+            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
+            whenever(repository.findById(item.id)).thenReturn(item.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.reset(item.id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(item)
+                    .verifyComplete()
+
+            verify(fileService, never()).deleteItem(any())
+        }
+
+        @Test
+        fun `and do nothing because element doesn't have a filename`() {
+            /* Given */
+            val currentItem = item.copy(status = FINISH, fileName = null)
+            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
+            whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.reset(item.id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(item)
+                    .verifyComplete()
+
+            verify(fileService, never()).deleteItem(any())
+        }
+
+        @Test
+        fun `and do nothing because element has filename empty`() {
+            /* Given */
+            val currentItem = item.copy(status = FINISH, fileName = "")
+            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
+            whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.reset(item.id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(item)
+                    .verifyComplete()
+
+            verify(fileService, never()).deleteItem(any())
+        }
+
+        @Test
+        fun `and delete files`() {
+            /* Given */
+            val currentItem = item.copy(status = FINISH, fileName = "foo.mp4")
+            val itemPath = Paths.get(currentItem.podcast.title, currentItem.fileName)
+            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
+            whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
+            whenever(fileService.deleteItem(itemPath)).thenReturn(Mono.empty())
+
+            /* When */
+            StepVerifier.create(itemService.reset(item.id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(item)
+                    .verifyComplete()
+
+            verify(fileService).deleteItem(itemPath)
+        }
+
+
+
     }
 }

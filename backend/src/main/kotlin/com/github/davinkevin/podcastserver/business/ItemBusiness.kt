@@ -84,16 +84,6 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
     @Throws(InterruptedException::class)
     fun reindex() = itemRepository. reindex()
 
-    fun reset(id: UUID): Item? {
-        val itemToReset = findOne(id)
-
-        return when {
-            itemDownloadManager.isInDownloadingQueue(itemToReset) -> null
-            else -> save(itemToReset.reset())
-        }
-
-    }
-
     fun addItemByUpload(podcastId: UUID, uploadedFile: MultipartFile): Item {
         val p = podcastBusiness.findOne(podcastId)
 

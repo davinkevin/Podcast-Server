@@ -255,15 +255,6 @@ class Item {
         return !this.url.isNullOrEmpty() || UploadUpdater.TYPE.key == podcast!!.type
     }
 
-    fun reset(): Item {
-        checkAndDelete()
-        status = Status.NOT_DOWNLOADED
-        downloadDate = null
-        fileName = null
-        numberOfFail = 0
-        return this
-    }
-
     interface ItemSearchListView
     interface ItemPodcastListView : ItemSearchListView
     interface ItemDetailsView : ItemPodcastListView

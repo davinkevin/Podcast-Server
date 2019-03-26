@@ -166,16 +166,6 @@ class ItemTest {
     }
 
     @Test
-    fun `should be reset`() {
-        /* Given */ ITEM.status = Status.FINISH
-        /* When  */ ITEM.reset()
-        /* Then  */
-        assertThat(ITEM.fileName).isNull()
-        assertThat(ITEM.downloadDate).isNull()
-        assertThat(ITEM.status).isEqualTo(Status.NOT_DOWNLOADED)
-    }
-
-    @Test
     fun `should_change the local uri`() {
         /* When */
         ITEM.localUri = "http://www.google.fr/mavideo.mp4"

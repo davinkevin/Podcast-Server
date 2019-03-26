@@ -16,13 +16,13 @@ class ItemRoutingConfig {
         "/api/v1/items".nest {
             DELETE("/clean", item::clean)
         }
-    }
 
-    @Bean
-    fun podcastItemRouter(item: ItemHandler) = router {
-        GET("/api/v1/podcasts/{idPodcast}/items/{id}", item::findById)
-        GET("/api/v1/podcasts/{idPodcast}/items/{id}/cover.{ext}", item::cover)
-        GET("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item::file)
+        "/api/v1/podcasts/{idPodcast}/items/{id}".nest {
+            GET("/", item::findById)
+            GET("/cover.{ext}", item::cover)
+            GET("/{file}", item::file)
+            POST("/reset", item::reset)
+        }
     }
 }
 

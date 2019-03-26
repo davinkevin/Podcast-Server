@@ -43,7 +43,7 @@ export default class ItemService {
     }
 
     reset(item) {
-        return this.$http.get(`/api/podcasts/${item.podcastId}/items/${item.id}/reset`).then(r => r.data);
+      return this.$http.post(`/api/v1/podcasts/${item.podcastId}/items/${item.id}/reset`).then(r => r.data);
     }
 
     download(item) {
