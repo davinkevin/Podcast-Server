@@ -2,10 +2,17 @@ package com.github.davinkevin.podcastserver.business
 
 
 import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.service.JdomService
-import com.nhaarman.mockitokotlin2.*
-import io.vavr.API.Set
 import com.github.davinkevin.podcastserver.entity.WatchList
+import com.github.davinkevin.podcastserver.service.JdomService
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.only
+import com.nhaarman.mockitokotlin2.same
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.whenever
+import io.vavr.API.Set
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.WatchListRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -213,12 +220,13 @@ class WatchListBusinessTest {
             name = "First"
             items = mutableSetOf()
         }
+        whenever(watchListRepository.save(watchList)).thenReturn(watchList)
 
         /* When */
         watchListBusiness.save(watchList)
 
         /* Then */
-        verify(watchListRepository, only()).save(eq(watchList))
+        verify(watchListRepository, only()).save(watchList)
     }
 
     @Test
