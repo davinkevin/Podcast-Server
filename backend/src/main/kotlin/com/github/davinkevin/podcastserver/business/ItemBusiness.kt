@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.business
 
 import arrow.core.Option
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
@@ -9,7 +10,6 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import io.vavr.collection.Set
-import com.github.davinkevin.podcastserver.entity.Item
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.dsl.ItemDSL.getSearchSpecifications
 import org.apache.commons.io.FilenameUtils
@@ -22,7 +22,11 @@ import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
-import java.time.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.ZonedDateTime.now
 import java.time.ZonedDateTime.of
 import java.time.format.DateTimeFormatter
@@ -60,8 +64,6 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
 
         return PageImpl(v, page, v.size.toLong())
     }
-
-    fun save(entity: Item): Item = itemRepository.save(entity)
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     fun findOne(id: UUID): Item =
@@ -116,7 +118,7 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
             lastUpdate = now()
         }
 
-        item = save(item)
+        item = itemRepository.save(item)
         podcastBusiness.save(p)
 
         return item

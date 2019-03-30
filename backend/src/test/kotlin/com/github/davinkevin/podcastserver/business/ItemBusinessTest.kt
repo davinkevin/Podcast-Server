@@ -1,17 +1,22 @@
 package com.github.davinkevin.podcastserver.business
 
 import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Tag
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.querydsl.core.types.Predicate
 import io.vavr.API.Set
 import io.vavr.collection.List
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.repository.ItemRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -33,7 +38,11 @@ import java.io.IOException
 import java.net.URISyntaxException
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.time.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -68,20 +77,6 @@ class ItemBusinessTest {
         /* Then */
         assertThat(pageResponse).isSameAs(page)
         verify(itemRepository, times(1)).findAll(eq(pageRequest))
-    }
-
-    @Test
-    fun `should save`() {
-        /* Given */
-        val item = Item()
-        whenever(itemRepository.save(item)).thenReturn(item)
-
-        /* When */
-        val savedItem = itemBusiness.save(item)
-
-        /* Then */
-        assertThat(savedItem).isSameAs(item)
-        verify(itemRepository, times(1)).save(item)
     }
 
     @Test

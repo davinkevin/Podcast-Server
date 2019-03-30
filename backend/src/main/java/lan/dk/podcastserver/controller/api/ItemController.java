@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import io.vavr.collection.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -50,13 +49,6 @@ public class ItemController {
         PageRequest pageable = PageRequest.of(page, size, new Sort(direction, field));
         
         return itemBusiness.findByPodcast(idPodcast, pageable);
-    }
-    
-    @PutMapping("{id}")
-    @JsonView(Item.ItemDetailsView.class)
-    public Item update(@RequestBody Item item, @PathVariable("id") UUID id) {
-        item.setId(id);
-        return itemBusiness.save(item);
     }
 
     @GetMapping("{id}/watchlists")
