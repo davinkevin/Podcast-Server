@@ -122,14 +122,22 @@ data class ItemHAL(
     private val isDownloaded = Status.FINISH == status
 }
 
-data class CoverHAL(val id: UUID, val url: String, val width: Int, val height: Int)
+data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
 data class PodcastHAL(val id: UUID, val title: String, val url: String)
 
-fun toItemHAL(i: Item) = ItemHAL(
-        id = i.id, title = i.title, url = i.url,
-        pubDate = i.pubDate, downloadDate = i.downloadDate, creationDate = i.creationDate,
-        description = i.description, mimeType = i.mimeType, length = i.length, fileName = i.fileName, status = i.status,
+fun toItemHAL(i: Item): ItemHAL {
 
-        podcast = PodcastHAL(i.podcast.id, i.podcast.title, i.podcast.url),
-        cover = CoverHAL(i.cover.id, i.cover.url, i.cover.width, i.cover.height)
-)
+    val coverUrl = UriComponentsBuilder.fromPath("/")
+            .pathSegment("api", "v1", "podcasts", i.podcast.id.toString(), "items", i.id.toString(), "cover." + FilenameUtils.getExtension(i.cover.url))
+            .build(true)
+            .toUri()
+
+    return ItemHAL(
+            id = i.id, title = i.title, url = i.url,
+            pubDate = i.pubDate, downloadDate = i.downloadDate, creationDate = i.creationDate,
+            description = i.description, mimeType = i.mimeType, length = i.length, fileName = i.fileName, status = i.status,
+
+            podcast = PodcastHAL(i.podcast.id, i.podcast.title, i.podcast.url),
+            cover = CoverHAL(i.cover.id, i.cover.width, i.cover.height, coverUrl)
+    )
+}
