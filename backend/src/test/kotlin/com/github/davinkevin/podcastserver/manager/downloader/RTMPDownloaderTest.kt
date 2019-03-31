@@ -17,7 +17,7 @@ import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.awaitility.kotlin.await
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -203,7 +203,7 @@ class RTMPDownloaderTest {
                         /* GIVEN */
                         /* WHEN  */
                         runAsync { downloader.run() }
-                        await.until { isWaiting }
+                        await().until { isWaiting }
                         downloader.pauseDownload()
 
                         /* THEN  */
@@ -219,7 +219,7 @@ class RTMPDownloaderTest {
 
                         /* WHEN  */
                         runAsync { downloader.run() }
-                        await.until { isWaiting }
+                        await().until { isWaiting }
                         downloader.pauseDownload()
 
                         /* THEN  */
@@ -245,7 +245,7 @@ class RTMPDownloaderTest {
                             /* GIVEN */
                             /* WHEN  */
                             runAsync { downloader.run() }
-                            await.until { isWaiting }
+                            await().until { isWaiting }
                             downloader.pauseDownload()
                             downloader.restartDownload()
 
@@ -262,7 +262,7 @@ class RTMPDownloaderTest {
 
                             /* WHEN  */
                             runAsync { downloader.run() }
-                            await.until { isWaiting }
+                            await().until { isWaiting }
                             downloader.pauseDownload()
                             downloader.restartDownload()
 
@@ -279,7 +279,7 @@ class RTMPDownloaderTest {
                     /* GIVEN */
                     /* WHEN  */
                     runAsync { downloader.run() }
-                    await.until { isWaiting }
+                    await().until { isWaiting }
                     downloader.stopDownload()
 
                     /* THEN  */
