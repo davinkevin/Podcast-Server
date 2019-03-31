@@ -8,13 +8,13 @@ import { Item, Podcast } from '../shared/entity';
 import { ItemService } from '../shared/service/item/item.service';
 
 import {
-	DeleteItemAction,
-	FindOneAction,
-	FindOneSuccessAction,
-	FindParentPodcastAction,
-	FindParentPodcastSuccessAction,
-	ItemAction,
-	ResetAction
+  DeleteItemAction,
+  FindOneAction,
+  FindOneSuccessAction,
+  FindParentPodcastAction,
+  FindParentPodcastSuccessAction,
+  ItemAction,
+  ResetAction
 } from './item.actions';
 import { RouterNavigateAction } from '@davinkevin/router-store-helper';
 import { PodcastService } from '#app/shared/service/podcast/podcast.service';
@@ -31,7 +31,7 @@ export class ItemEffects {
 	@Effect()
 	findParentPodcast$: Observable<Action> = this.actions$.pipe(
 		ofType(ItemAction.FIND_PARENT_PODCAST),
-		concatMap(({ id }: FindParentPodcastAction) => this.podcastService.findOne(id)),
+		concatMap(({ id }: FindParentPodcastAction) => this.podcastService.findById(id)),
 		map((p: Podcast) => new FindParentPodcastSuccessAction(p))
 	);
 

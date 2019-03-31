@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.podcast.type.TypeConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -14,6 +15,8 @@ class PodcastRoutingConfig {
     @Bean
     fun podcastRouter(podcast: PodcastHandler) = router {
         "/api/v1/podcasts".nest {
+
+            GET("/{id}", podcast::findById)
 
             "/{id}".nest {
                 GET("/cover.{ext}", podcast::cover)
@@ -37,5 +40,5 @@ class PodcastRoutingConfig {
 }
 
 @Configuration
-@Import(PodcastRepositoryV2::class, PodcastRoutingConfig::class, PodcastService::class, PodcastHandler::class)
+@Import(PodcastRepositoryV2::class, TypeConfig::class, PodcastRoutingConfig::class, PodcastService::class, PodcastHandler::class)
 class PodcastConfig

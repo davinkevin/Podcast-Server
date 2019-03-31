@@ -9,13 +9,13 @@ import { ItemService } from '../shared/service/item/item.service';
 import { PodcastService } from '../shared/service/podcast/podcast.service';
 
 import {
-	PodcastAction,
-	FindItemsByPodcastsAndPageAction,
-	FindItemsByPodcastsAndPageSuccessAction,
-	FindOneAction,
-	FindOneSuccessAction,
-	RefreshAction,
-	RefreshSuccessAction
+  FindItemsByPodcastsAndPageAction,
+  FindItemsByPodcastsAndPageSuccessAction,
+  FindOneAction,
+  FindOneSuccessAction,
+  PodcastAction,
+  RefreshAction,
+  RefreshSuccessAction
 } from './podcast.actions';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class PodcastEffects {
 	findOne$: Observable<Action> = this.actions$.pipe(
 		ofType(PodcastAction.FIND_ONE),
 		map((v: FindOneAction) => v.id),
-		switchMap(id => this.podcastService.findOne(id)),
+		switchMap(id => this.podcastService.findById(id)),
 		map((p: Podcast) => new FindOneSuccessAction(p))
 	);
 

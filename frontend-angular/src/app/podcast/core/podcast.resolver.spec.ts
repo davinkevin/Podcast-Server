@@ -49,7 +49,7 @@ describe('PodcastResolver', () => {
 		})
 	);
 
-	it('should trigger findOne', () => {
+	it('should trigger findById', () => {
 		/* Given */
 		const route = new ActivatedRouteSnapshot();
 		route.params = { id: '88561083-9dbd-45a9-92c1-6ca5730e7f7c' };

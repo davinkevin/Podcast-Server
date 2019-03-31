@@ -15,7 +15,7 @@ export default class PodcastService  {
     }
 
     findById(id) {
-        return this.$http.get(`/api/podcasts/${id}`).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/${id}`).then(r => r.data);
     }
 
     findAll() {

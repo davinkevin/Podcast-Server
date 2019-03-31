@@ -11,8 +11,8 @@ export class PodcastService {
 		return this.http.get<Podcast[]>('/api/podcasts');
 	}
 
-	findOne(id: string): Observable<Podcast> {
-		return this.http.get<Podcast>(`/api/podcasts/${id}`);
+  findById(id: string): Observable<Podcast> {
+		return this.http.get<Podcast>(`/api/v1/podcasts/${id}`);
 	}
 
 	refresh(p: Podcast): Observable<void> {

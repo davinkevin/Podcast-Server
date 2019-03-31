@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.tag.Tag
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
@@ -7,7 +8,6 @@ import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_PODCAST_DATA
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -17,10 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
+import java.net.URI
 import java.time.LocalDate
 import java.util.*
+import java.util.UUID.fromString
 import javax.sql.DataSource
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
+
 /**
  * Created by kevin on 2019-02-16
  */
@@ -55,7 +58,19 @@ class PodcastRepositoryV2Test {
                     /* Then */
                     .expectSubscription()
                     .assertNext {
-                        Assertions.assertThat(it.id).isEqualTo(id)
+                        assertThat(it.id).isEqualTo(id)
+                        assertThat(it.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/rss")
+                        assertThat(it.hasToBeDeleted).isEqualTo(true)
+                        assertThat(it.type).isEqualTo("Youtube")
+                        assertThat(it.tags).containsOnly(
+                                Tag(fromString("df801a7a-5630-4442-8b83-0cb36ae94981"),"Geek"),
+                                Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"),"Studio Renegade")
+                        )
+                        assertThat(it.cover.id).isEqualTo(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
+                        assertThat(it.cover.url).isEqualTo(URI("http://fake.url.com/appload/cover.png"))
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.height).isEqualTo(100)
                     }
                     .verifyComplete()
         }

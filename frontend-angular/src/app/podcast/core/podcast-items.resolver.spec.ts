@@ -1,7 +1,7 @@
 import { Store, StoreModule } from '@ngrx/store';
 import { reducer } from '../podcast.reducer';
 import { async, inject, TestBed } from '@angular/core/testing';
-import { PodcastItemsResolver, toPodcastPageOfItems } from './podcast-items.resolver';
+import { PodcastItemsResolver } from './podcast-items.resolver';
 import { FindItemsByPodcastsAndPageAction, FindItemsByPodcastsAndPageSuccessAction } from '../podcast.actions';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { Direction, Item, Page, Pageable } from '#app/shared/entity';
@@ -241,7 +241,7 @@ describe('PodcastItemsResolver', () => {
 		})
 	);
 
-	it('should trigger findOne', () => {
+	it('should trigger findById', () => {
 		/* Given */
 		const route = new ActivatedRouteSnapshot();
 		route.params = { id: '88561083-9dbd-45a9-92c1-6ca5730e7f7c' };

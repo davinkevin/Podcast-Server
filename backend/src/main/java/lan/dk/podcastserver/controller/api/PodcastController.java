@@ -37,12 +37,6 @@ public class PodcastController {
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @GetMapping("{id}")
-    public Podcast findById(@PathVariable UUID id) {
-        return podcastBusiness.findOne(id);
-    }
-
-    @JsonView(Podcast.PodcastDetailsView.class)
     @PutMapping("{id}")
     public Podcast update(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
         podcast.setId(id);

@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.tag.Tag
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -13,7 +14,10 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
+import java.net.URI
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
@@ -30,10 +34,15 @@ class PodcastServiceTest {
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
             title = "Podcast title",
+            url = "https://foo.bar.com/app/file.rss",
+            hasToBeDeleted = true,
+            lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+            type = "RSS",
+            tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
             cover = CoverForPodcast(
                     id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                    url = "https://external.domain.tld/cover.png",
+                    url = URI("https://external.domain.tld/cover.png"),
                     height = 200, width = 200
             )
     )

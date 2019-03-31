@@ -90,9 +90,21 @@ public class DatabaseConfigurationTest {
                     .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
                     .build(),
             insertInto("PODCAST")
-                    .columns("ID", "TITLE", "URL", "COVER_ID")
-                    .values(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"))
-                    .values(UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
+                    .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE", "LAST_UPDATE")
+                    .values(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), false, "RSS", now().minusDays(15).format(formatter))
+                    .values(UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), true, "Youtube", now().minusDays(30).format(formatter))
+                    .build(),
+            insertInto("TAG")
+                    .columns("ID", "NAME")
+                    .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "French Spin")
+                    .values(fromString("df801a7a-5630-4442-8b83-0cb36ae94981"), "Geek")
+                    .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "Studio Renegade")
+                    .build(),
+            insertInto("PODCAST_TAGS")
+                    .columns("PODCASTS_ID", "TAGS_ID")
+                    .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("df801a7a-5630-4442-8b83-0cb36ae94981"))
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
                     .build()
     );
 

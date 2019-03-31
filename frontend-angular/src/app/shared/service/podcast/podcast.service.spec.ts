@@ -38,7 +38,7 @@ describe('PodcastService', () => {
 		req.flush(resp);
 	});
 
-	it('should call for findOne', () => {
+	it('should call for findById', () => {
 		/* Given */
 		const resp = {
 			id: '8ba490ac-8f9a-4e2d-8758-b65e783e783a',
@@ -54,12 +54,12 @@ describe('PodcastService', () => {
 		};
 
 		/* When  */
-		service.findOne('8ba490ac-8f9a-4e2d-8758-b65e783e783a').subscribe(podcast => {
+		service.findById('8ba490ac-8f9a-4e2d-8758-b65e783e783a').subscribe(podcast => {
 			expect(podcast).toBe(resp);
 		});
 
 		/* Then  */
-		const req = httpMock.expectOne(`/api/podcasts/${resp.id}`);
+		const req = httpMock.expectOne(`/api/v1/podcasts/${resp.id}`);
 		expect(req.request.method).toEqual('GET');
 		req.flush(resp);
 	});

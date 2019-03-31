@@ -17,6 +17,7 @@ import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toMono
 import java.net.URI
 import java.nio.file.Paths
+import java.time.OffsetDateTime
 import java.util.*
 
 /**
@@ -30,6 +31,14 @@ class PodcastHandler(
 ) {
 
     private var log = LoggerFactory.getLogger(PodcastHandler::class.java)
+
+    fun findById(r: ServerRequest): Mono<ServerResponse> {
+        val id = UUID.fromString(r.pathVariable("id"))
+
+        return podcastService.findById(id)
+                .map(::toPodcastHAL)
+                .flatMap { ok().syncBody(it) }
+    }
 
     fun cover(r: ServerRequest): Mono<ServerResponse> {
         val host = r.extractHost()
@@ -46,7 +55,7 @@ class PodcastHandler(
                                 .pathSegment("data", podcast.title, it)
                                 .build().toUri()
                         }
-                        .switchIfEmpty { URI(podcast.cover.url).toMono() }
+                        .switchIfEmpty { podcast.cover.url.toMono() }
                 }
                 .doOnNext { log.debug("Redirect cover to {}", it)}
                 .flatMap { seeOther(it).build() }
@@ -81,4 +90,32 @@ class PodcastHandler(
 
 private class StatsPodcastTypeWrapperHAL(val content: Collection<StatsPodcastType>)
 
-private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url)
+private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.path)
+
+private data class PodcastHAL(val id: UUID,
+                      val title: String,
+                      val url: String?,
+                      val hasToBeDeleted: Boolean,
+                      val lastUpdate: OffsetDateTime?,
+                      val type: String,
+
+                      val tags: Collection<TagHAL>,
+
+                      val cover: CoverHAL)
+
+private data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
+private data class TagHAL(val id: UUID, val name: String)
+
+private fun toPodcastHAL(p: Podcast): PodcastHAL {
+
+    val coverUrl = UriComponentsBuilder.fromPath("/")
+            .pathSegment("api", "v1", "podcasts", p.id.toString(), "cover." + FilenameUtils.getExtension(p.cover.url.path))
+            .build(true)
+            .toUri()
+
+    return PodcastHAL(
+            p.id, p.title, p.url, p.hasToBeDeleted, p.lastUpdate, p.type,
+            p.tags.map { TagHAL(it.id, it.name) },
+            CoverHAL(p.cover.id, p.cover.width, p.cover.height, coverUrl)
+    )
+}

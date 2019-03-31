@@ -47,21 +47,6 @@ public class PodcastControllerTest {
     }
 
     @Test
-    public void should_find_by_id() {
-        /* Given */
-        Podcast podcast = new Podcast();
-        when(podcastBusiness.findOne(any(UUID.class))).thenReturn(podcast);
-        UUID id = UUID.randomUUID();
-
-        /* When */
-        Podcast podcastById = podcastController.findById(id);
-
-        /* Then */
-        assertThat(podcastById).isSameAs(podcast);
-        verify(podcastBusiness, only()).findOne(eq(id));
-    }
-
-    @Test
     public void should_update() {
         Podcast podcast = new Podcast();
         when(podcastBusiness.reatachAndSave(any(Podcast.class))).thenReturn(podcast);
