@@ -33,20 +33,6 @@ public class PodcastControllerTest {
     @InjectMocks PodcastController podcastController;
 
     @Test
-    public void should_create_podcast() {
-        /* Given */
-        Podcast podcast = new Podcast();
-        when(podcastBusiness.create(eq(podcast))).thenReturn(podcast);
-
-        /* When */
-        Podcast createdPodcast = podcastController.create(podcast);
-
-        /* Then */
-        assertThat(createdPodcast).isEqualTo(podcast);
-        verify(podcastBusiness, only()).create(eq(podcast));
-    }
-
-    @Test
     public void should_update() {
         Podcast podcast = new Podcast();
         when(podcastBusiness.reatachAndSave(any(Podcast.class))).thenReturn(podcast);

@@ -31,11 +31,6 @@ public class PodcastController {
         this.updatePodcastBusiness = updatePodcastBusiness;
     }
 
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
-    public Podcast create(@RequestBody Podcast podcast) {
-        return podcastBusiness.create(podcast);
-    }
-
     @JsonView(Podcast.PodcastDetailsView.class)
     @PutMapping("{id}")
     public Podcast update(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {

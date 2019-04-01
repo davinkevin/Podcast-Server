@@ -149,31 +149,6 @@ class PodcastBusinessTest {
         verify(podcastRepository, times(1)).save(podcast)
     }
 
-    @Test
-    fun should_create_podcast() {
-        /* Given */
-        val tagSet = setOf(
-                Tag().apply { name = "Tag1" }, Tag().apply { name = "Tag2" }
-        )
-
-        val aCover = Cover().apply { url = "http://fakeurl.com/image.png" }
-        val podcast = Podcast().apply { tags = tagSet; cover = aCover }
-
-        whenever(coverBusiness.download(any<Podcast>())).then { it.getArgument<Podcast>(0).cover?.url }
-        whenever(tagBusiness.getTagListByName(any())).thenReturn(tagSet)
-        whenever(podcastRepository.save(any())).then { i -> i.arguments[0] }
-
-        /* When */
-        val savedPodcast = podcastBusiness.create(podcast)
-
-        /* Then */
-        assertThat(savedPodcast.tags).containsAll(tagSet)
-        assertThat(savedPodcast.cover).isSameAs(aCover)
-        verify(coverBusiness, times(1)).download(podcast)
-        verify(tagBusiness, times(1)).getTagListByName(tagSet)
-        verify(podcastRepository, times(1)).save(podcast)
-    }
-
     @Nested
     @DisplayName("should get rss")
     inner class AsRss {

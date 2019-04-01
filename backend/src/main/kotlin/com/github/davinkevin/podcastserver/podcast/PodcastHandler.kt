@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -10,6 +12,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.ServerResponse.seeOther
+import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -39,6 +42,13 @@ class PodcastHandler(
                 .map(::toPodcastHAL)
                 .flatMap { ok().syncBody(it) }
     }
+
+    fun create(r: ServerRequest): Mono<ServerResponse> = r
+                    .bodyToMono<PodcastCreationHAL>()
+                    .map { it.toPodcastCreation() }
+                    .flatMap { podcastService.save(it) }
+                    .map(::toPodcastHAL)
+                    .flatMap { ok().syncBody(it) }
 
     fun cover(r: ServerRequest): Mono<ServerResponse> {
         val host = r.extractHost()
@@ -93,15 +103,15 @@ private class StatsPodcastTypeWrapperHAL(val content: Collection<StatsPodcastTyp
 private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.path)
 
 private data class PodcastHAL(val id: UUID,
-                      val title: String,
-                      val url: String?,
-                      val hasToBeDeleted: Boolean,
-                      val lastUpdate: OffsetDateTime?,
-                      val type: String,
+                              val title: String,
+                              val url: String?,
+                              val hasToBeDeleted: Boolean,
+                              val lastUpdate: OffsetDateTime?,
+                              val type: String,
 
-                      val tags: Collection<TagHAL>,
+                              val tags: Collection<TagHAL>,
 
-                      val cover: CoverHAL)
+                              val cover: CoverHAL)
 
 private data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
 private data class TagHAL(val id: UUID, val name: String)
@@ -119,3 +129,23 @@ private fun toPodcastHAL(p: Podcast): PodcastHAL {
             CoverHAL(p.cover.id, p.cover.width, p.cover.height, coverUrl)
     )
 }
+
+private data class PodcastCreationHAL(
+        val title: String,
+        val url: URI,
+        val tags: Collection<TagForCreationHAL>?,
+        val type: String,
+        val hasToBeDeleted: Boolean,
+        val cover: CoverForCreationHAL
+) {
+    fun toPodcastCreation() = PodcastForCreation(
+            title = title,
+            url = url,
+            tags = (tags ?: listOf()).map { TagForCreation(it.id, it.name) },
+            type = type,
+            hasToBeDeleted = hasToBeDeleted,
+            cover = CoverForCreation(cover.width, cover.height, cover.url)
+    )
+}
+private data class TagForCreationHAL(val id: UUID?, val name: String)
+private data class CoverForCreationHAL(val width: Int, val height: Int, val url: URI)

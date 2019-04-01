@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.config
 
+import com.github.davinkevin.podcastserver.cover.CoverConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
 import com.github.davinkevin.podcastserver.service.TikaProbeContentType
@@ -29,7 +30,7 @@ import java.nio.file.Paths
 @EnableCaching
 @Configuration
 @EnableConfigurationProperties(PodcastServerParameters::class, Api::class, Backup::class, ExternalTools::class)
-@Import(ItemConfig::class, PodcastConfig::class, TagConfig::class)
+@Import(ItemConfig::class, PodcastConfig::class, TagConfig::class, CoverConfig::class)
 @ComponentScan(basePackages = [
     "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager", "com.github.davinkevin.podcastserver.config",
     "lan.dk.podcastserver.service"])

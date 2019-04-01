@@ -26,7 +26,7 @@ export default class PodcastService  {
         if (podcast.id) {
             return this.$http.put(`/api/podcasts/${podcast.id}`, podcast).then(r => r.data);
         }
-        return this.$http.post(`/api/podcasts`, podcast).then(r => r.data);
+        return this.$http.post(`/api/v1/podcasts`, podcast).then(r => r.data);
     }
 
     patch(podcast) {

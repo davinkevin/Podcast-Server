@@ -1,13 +1,16 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
+import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_PODCAST_DATA
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_TAG_DATA
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -60,7 +63,7 @@ class PodcastRepositoryV2Test {
                     .assertNext {
                         assertThat(it.id).isEqualTo(id)
                         assertThat(it.title).isEqualTo("Geek Inc HD")
-                        assertThat(it.url).isEqualTo("http://fake.url.com/rss")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/geekinc.rss")
                         assertThat(it.hasToBeDeleted).isEqualTo(true)
                         assertThat(it.type).isEqualTo("Youtube")
                         assertThat(it.tags).containsOnly(
@@ -224,6 +227,96 @@ class PodcastRepositoryV2Test {
 
         }
 
+
+    }
+
+    @Nested
+    @DisplayName("should save")
+    inner class ShouldSave {
+
+        private val podcastCover = insertInto("COVER")
+                .columns("ID", "URL", "WIDTH", "HEIGHT")
+                .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/a-podcast-to-save/cover.png", 100, 100)
+                .build()!!
+
+        @BeforeEach
+        fun prepare() {
+            val operation = sequenceOf(DELETE_ALL, INSERT_TAG_DATA, podcastCover)
+            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
+
+            dbSetupTracker.launchIfNecessary(dbSetup)
+        }
+
+        @Nested
+        @DisplayName("a new podcast")
+        inner class ANewPodcast {
+
+            private val tag1 = Tag(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+            private val tag2 = Tag(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+            private val tag3 = Tag(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+
+            @Test
+            fun `with many tags`() {
+                /* Given */
+
+                /* When */
+                StepVerifier.create(repository.save(
+                        title = "a podcast",
+                        url = "http://foo.bar.com/feed.rss",
+                        hasToBeDeleted = true,
+                        type = "Rss",
+                        tags = listOf(tag1, tag2, tag3),
+                        cover = Cover(
+                                id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                                url = URI("http://fake.url.com/a-podcast-to-save/cover.png"),
+                                width = 100, height = 100
+                        )
+                ))
+                        .expectSubscription()
+                        /* Then */
+                        .assertNext {
+                            assertThat(it.title).isEqualTo("a podcast")
+                            assertThat(it.url).isEqualTo("http://foo.bar.com/feed.rss")
+                            assertThat(it.hasToBeDeleted).isTrue()
+                            assertThat(it.type).isEqualTo("Rss")
+                            assertThat(it.tags.map(Tag::id)).containsExactlyInAnyOrder(tag1.id, tag2.id, tag3.id)
+                            assertThat(it.cover.id).isEqualTo(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with no tag`() {
+                /* Given */
+
+                /* When */
+                StepVerifier.create(repository.save(
+                        title = "a podcast",
+                        url = "http://foo.bar.com/feed.rss",
+                        hasToBeDeleted = true,
+                        type = "Rss",
+                        tags = listOf(),
+                        cover = Cover(
+                                id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                                url = URI("http://fake.url.com/a-podcast-to-save/cover.png"),
+                                width = 100, height = 100
+                        )
+                ))
+                        .expectSubscription()
+                        /* Then */
+                        .assertNext {
+                            assertThat(it.title).isEqualTo("a podcast")
+                            assertThat(it.url).isEqualTo("http://foo.bar.com/feed.rss")
+                            assertThat(it.hasToBeDeleted).isTrue()
+                            assertThat(it.type).isEqualTo("Rss")
+                            assertThat(it.tags.map(Tag::id)).isEmpty()
+                            assertThat(it.cover.id).isEqualTo(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
+                        }
+                        .verifyComplete()
+            }
+
+
+        }
 
     }
 

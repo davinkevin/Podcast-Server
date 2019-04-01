@@ -1,11 +1,13 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.COVER
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST_TAGS
 import com.github.davinkevin.podcastserver.database.Tables.TAG
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
+import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
 import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
 import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import com.github.davinkevin.podcastserver.extension.repository.toUTC
@@ -100,6 +102,25 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                         c
                 )
             }
+
+    fun save(title: String, url: String, hasToBeDeleted: Boolean, type: String, tags: Collection<Tag>, cover: Cover) = Mono.defer {
+        val id = UUID.randomUUID()
+
+        val insertPodcast = query
+                .insertInto(PODCAST, PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.HAS_TO_BE_DELETED, PODCAST.TYPE, PODCAST.COVER_ID)
+                .values(id, title, url, hasToBeDeleted, type, cover.id)
+                .executeAsyncAsMono()
+
+        val linkToTags = if (tags.isEmpty()) Mono.empty() else {
+            query.insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID )
+                    .apply { tags.forEach { values(id, it.id) } }
+                    .executeAsyncAsMono()
+        }
+
+        insertPodcast
+                .then(linkToTags)
+                .then(findById(id))
+    }
 
     private fun findTagsByPodcastId(id: UUID): Mono<Collection<Tag>> = Mono.defer {
         query.select(TAG.ID, TAG.NAME)

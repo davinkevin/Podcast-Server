@@ -73,17 +73,6 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
         return save(podcast)
     }
 
-    fun create(podcast: Podcast): Podcast {
-        val podcastSaved = reatachAndSave(podcast)
-
-        if (podcast.cover != null) {
-            coverBusiness.download(podcast)
-            coverBusiness.save(podcast.cover!!)
-        }
-
-        return podcastSaved
-    }
-
     fun coverOf(id: UUID): Path = coverBusiness.getCoverPathOf(findOne(id))
 
     fun asOpml(domainName: String): String = jdomService.podcastsToOpml(findAll(), domainName)

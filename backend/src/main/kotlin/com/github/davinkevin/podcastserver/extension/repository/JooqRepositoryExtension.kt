@@ -21,7 +21,7 @@ fun <R: Record> ResultQuery<R>.fetchOneAsMono(): Mono<R> =
 private fun <R: Record> CompletionStage<Result<R>>.toFlux(): Flux<R> =
         Mono.fromCompletionStage(this).flatMapMany { Flux.fromIterable(it) }
 
-fun Query.executeAsyncAsMono(): Mono<Int> = Mono.fromCompletionStage(this.executeAsync())
+fun Query.executeAsyncAsMono(): Mono<Int> = Mono.defer { Mono.fromCompletionStage(executeAsync()) }
 
 fun <R: Record> InsertResultStep<R>.fetchOneAsMono(): Mono<R> =
         Mono.justOrEmpty(this.fetchOptional())

@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.tag
 
+import com.github.davinkevin.podcastserver.database.tables.Tag.*
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
@@ -104,6 +105,30 @@ class TagRepositoryV2Test {
                     /* Then */
                     .expectSubscription()
                     .verifyComplete()
+        }
+    }
+
+    @Nested
+    @DisplayName("Should save ")
+    inner class ShouldSave {
+
+        @Test
+        fun `an item with just name`() {
+            /* Given */
+            val name = "a_wonderful_tag_name"
+            /* When */
+            StepVerifier.create(repository.save(name))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.name).isEqualTo(name)
+
+                        val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
+                        assertThat(tagRecord.id).isEqualTo(it.id)
+                    }
+                    .verifyComplete()
+
         }
 
     }

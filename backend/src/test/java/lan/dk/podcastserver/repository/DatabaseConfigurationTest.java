@@ -91,8 +91,8 @@ public class DatabaseConfigurationTest {
                     .build(),
             insertInto("PODCAST")
                     .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE", "LAST_UPDATE")
-                    .values(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), false, "RSS", now().minusDays(15).format(formatter))
-                    .values(UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), true, "Youtube", now().minusDays(30).format(formatter))
+                    .values(UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/appload.rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), false, "RSS", now().minusDays(15).format(formatter))
+                    .values(UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), true, "Youtube", now().minusDays(30).format(formatter))
                     .build(),
             insertInto("TAG")
                     .columns("ID", "NAME")

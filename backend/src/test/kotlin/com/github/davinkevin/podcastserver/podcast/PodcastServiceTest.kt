@@ -1,7 +1,12 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.cover.Cover
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.tag.Tag
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -20,6 +25,8 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
+import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
+import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
 
 /**
  * Created by kevin on 2019-02-16
@@ -29,6 +36,8 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as Podcas
 class PodcastServiceTest {
 
     @Autowired lateinit var service: PodcastService
+    @MockBean lateinit var coverRepository: CoverRepository
+    @MockBean lateinit var tagRepository: TagRepository
     @MockBean lateinit var repository: PodcastRepository
 
     val podcast = Podcast(
@@ -166,4 +175,114 @@ class PodcastServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("should save podcast")
+    inner class ShouldSavePodcast {
+
+        val podcastForCreation = PodcastForCreation(
+                title = "Podcast title",
+                url = URI("https://foo.bar.com/app/file.rss"),
+                hasToBeDeleted = true,
+                type = "RSS",
+                tags = setOf(
+                        TagForCreation(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma"),
+                        TagForCreation(UUID.fromString("f9d92928-1c4c-47a5-965d-efbb2d422f0c"), "Sport"),
+                        TagForCreation(id = null, name = "new")
+                ),
+                cover = CoverForCreation(url = URI("https://external.domain.tld/cover.png"), height = 200, width = 200)
+
+        )
+
+        @Nested
+        @DisplayName("which doesn't exist before")
+        inner class WhichDoesntExistBefore {
+
+            @Test
+            fun `with no tags and just a cover`() {
+                /* Given */
+                val tags = emptySet<TagForCreation>()
+                val p = podcastForCreation.copy(tags = tags)
+                val savedCover = p.cover.toPodcastCover()
+                whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
+                whenever(repository.save(eq(p.title), eq(p.url.toASCIIString()), eq(p.hasToBeDeleted), eq(p.type), argThat { isEmpty() }, eq(savedCover)))
+                        .thenReturn(podcast.toMono())
+
+                /* When */
+                StepVerifier.create(service.save(p))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext { assertThat(it).isSameAs(podcast) }
+                        .verifyComplete()
+            }
+
+
+            @Test
+            fun `with already existing tags and a cover`() {
+                /* Given */
+                val tags = listOf(
+                        TagForCreation(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma"),
+                        TagForCreation(UUID.fromString("f9d92928-1c4c-47a5-965d-efbb2d422f0c"), "Sport")
+                )
+                val p = podcastForCreation.copy(tags = tags)
+                val savedCover = p.cover.toPodcastCover()
+
+                whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
+                whenever(repository.save(
+                        eq(p.title),
+                        eq(p.url.toASCIIString()),
+                        eq(p.hasToBeDeleted),
+                        eq(p.type),
+                        argThat { map { it.id }.containsAll(tags.map { it.id }) && size == 2 },
+                        eq(savedCover)
+                ))
+                        .thenReturn(podcast.toMono())
+
+                /* When */
+                StepVerifier.create(service.save(p))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext { assertThat(it).isSameAs(podcast) }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with new and old tags and a cover`() {
+                /* Given */
+                val newTagId = UUID.randomUUID()
+                val oldTagId = UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c")
+                val tags = listOf(
+                        TagForCreation(oldTagId, "Cinéma"),
+                        TagForCreation(null, "Sport")
+                )
+                val p = podcastForCreation.copy(tags = tags)
+                val savedCover = p.cover.toPodcastCover()
+
+                whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
+                whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport").toMono())
+                whenever(repository.save(
+                        eq(p.title),
+                        eq(p.url.toASCIIString()),
+                        eq(p.hasToBeDeleted),
+                        eq(p.type),
+                        argThat { map { it.id }.containsAll(listOf(newTagId, oldTagId)) && size == 2 },
+                        eq(savedCover)
+                ))
+                        .thenReturn(podcast.toMono())
+
+                /* When */
+                StepVerifier.create(service.save(p))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext { assertThat(it).isSameAs(podcast) }
+                        .verifyComplete()
+            }
+
+
+
+        }
+
+    }
+
 }
+
+private fun CoverForCreation.toPodcastCover() = Cover(UUID.randomUUID(), url = url, height = height, width = width)

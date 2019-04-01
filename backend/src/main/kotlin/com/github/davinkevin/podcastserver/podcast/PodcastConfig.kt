@@ -17,6 +17,7 @@ class PodcastRoutingConfig {
         "/api/v1/podcasts".nest {
 
             GET("/{id}", podcast::findById)
+            POST("/", podcast::create)
 
             "/{id}".nest {
                 GET("/cover.{ext}", podcast::cover)
