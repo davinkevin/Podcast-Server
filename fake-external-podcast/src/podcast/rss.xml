@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
+    <channel>
+        <title>Fake Podcast</title>
+        <link>http://localhost:7070/feed.rss</link>
+        <description>A Fake Podcast to help local dev</description>
+        <itunes:subtitle>A Fake Podcast to help local dev</itunes:subtitle>
+        <itunes:summary>A Fake Podcast to help local dev</itunes:summary>
+        <language>fr-fr</language>
+        <itunes:author>RSS</itunes:author>
+        <itunes:category />
+        <pubDate>Wed, 27 Mar 2019 10:06:26 +0100</pubDate>
+        <image>
+            <height>1400</height>
+            <url>http://localhost:7070/fake.jpg</url>
+            <width>1400</width>
+        </image>
+        <itunes:image>http://localhost:7070/fake.jpg</itunes:image>
+
+        <item>
+            <title>Episode 1</title>
+            <description>Description Item 1</description>
+            <pubDate>Wed, 27 Mar 2019 00:12:59 +0100</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Description Item 1</itunes:subtitle>
+            <itunes:summary>Description Item 1</itunes:summary>
+            <guid>http://localhost:7070/episode_1.mp3</guid>
+            <itunes:image>http://localhost:7070/fake.jpg</itunes:image>
+            <media:thumbnail url="http://localhost:7070/fake.jpg" />
+            <enclosure url="http://localhost:7070/episode_1.mp3" length="54578511" type="audio/mp3" />
+        </item>
+    </channel>
+</rss>
