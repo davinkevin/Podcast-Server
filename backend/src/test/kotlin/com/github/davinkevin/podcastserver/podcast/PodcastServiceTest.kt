@@ -69,6 +69,82 @@ class PodcastServiceTest {
     }
 
     @Nested
+    @DisplayName("should find all")
+    inner class ShouldFindAll {
+
+        private val podcast1 = Podcast(
+                id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast first",
+                url = "https://foo.bar.com/app/1.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/1.png"),
+                        height = 200, width = 200
+                )
+        )
+        private val podcast2 = Podcast(
+                id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast second",
+                url = "https://foo.bar.com/app/2.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/2.png"),
+                        height = 200, width = 200
+                )
+        )
+        private val podcast3 = Podcast(
+                id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast third",
+                url = "https://foo.bar.com/app/3.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/3.png"),
+                        height = 200, width = 200
+                )
+        )
+
+        @Test
+        fun `with 3 podcasts`() {
+            /* Given */
+            val podcasts = listOf(podcast1, podcast2, podcast3)
+            whenever(repository.findAll()).thenReturn(podcasts.toFlux())
+            /* When */
+            StepVerifier.create(service.findAll())
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(podcast1, podcast2, podcast3)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with 0 podcast`() {
+            /* Given */
+            whenever(repository.findAll()).thenReturn(Flux.empty())
+            /* When */
+            StepVerifier.create(service.findAll())
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+
+    }
+
+    @Nested
     @DisplayName("should find stats")
     inner class ShouldFindStats {
 

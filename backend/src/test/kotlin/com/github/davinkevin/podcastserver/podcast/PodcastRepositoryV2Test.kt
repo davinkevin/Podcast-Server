@@ -6,11 +6,13 @@ import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
+import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_PODCAST_DATA
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_TAG_DATA
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -22,8 +24,12 @@ import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.ZonedDateTime.now
 import java.util.*
-import java.util.UUID.fromString
+import java.util.UUID.*
 import javax.sql.DataSource
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
@@ -54,7 +60,7 @@ class PodcastRepositoryV2Test {
         @Test
         fun `and return one matching element`() {
             /* Given */
-            val id = UUID.fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")
+            val id = fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")
 
             /* When */
             StepVerifier.create(repository.findById(id))
@@ -81,12 +87,98 @@ class PodcastRepositoryV2Test {
         @Test
         fun `and don't return any element`() {
             /* Given */
-            val id = UUID.fromString("ef85dcd3-758c-573f-a8fc-b82104762d9d")
+            val id = fromString("ef85dcd3-758c-573f-a8fc-b82104762d9d")
 
             /* When */
             StepVerifier.create(repository.findById(id))
                     /* Then */
                     .expectSubscription()
+                    .verifyComplete()
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Should find all")
+    inner class ShouldFindAll {
+
+        private val currentNow = ZonedDateTime.of(2019, 3, 15, 11, 12, 2, 0, ZoneId.systemDefault())!!
+
+        private val multipleTypeOfPodcasts = CompositeOperation.sequenceOf(
+                insertInto("COVER")
+                        .columns("ID", "URL", "WIDTH", "HEIGHT")
+                        .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+                        .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
+                        .values(fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), "http://fake.url.com/notags/cover.png", 100, 100)
+                        .build(),
+                insertInto("PODCAST")
+                        .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE", "LAST_UPDATE")
+                        .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/appload.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), false, "RSS", currentNow.minusDays(15).format(formatter))
+                        .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), true, "Youtube", currentNow.minusDays(30).format(formatter))
+                        .values(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"), "Without tags", "http://fake.url.com/notags.rss", fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), true, "Youtube", currentNow.minusDays(45).format(formatter))
+                        .build(),
+                insertInto("TAG")
+                        .columns("ID", "NAME")
+                        .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "French Spin")
+                        .values(fromString("df801a7a-5630-4442-8b83-0cb36ae94981"), "Geek")
+                        .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "Studio Renegade")
+                        .build(),
+                insertInto("PODCAST_TAGS")
+                        .columns("PODCASTS_ID", "TAGS_ID")
+                        .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                        .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("df801a7a-5630-4442-8b83-0cb36ae94981"))
+                        .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
+                        .build()
+        )
+
+
+        @BeforeEach
+        fun prepare() {
+            val operation = sequenceOf(DELETE_ALL, multipleTypeOfPodcasts)
+            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
+
+            dbSetupTracker.launchIfNecessary(dbSetup)
+        }
+
+        @Test
+        fun `with different cardinality with tags`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repository.findAll())
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isEqualTo(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
+                        assertThat(it.title).isEqualTo("AppLoad")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/appload.rss")
+                        assertThat(it.hasToBeDeleted).isFalse()
+                        assertThat(it.type).isEqualTo("RSS")
+                        assertThat(it.lastUpdate).isBetween(currentNow.minusDays(16).toOffsetDateTime(), currentNow.minusDays(14).toOffsetDateTime())
+                        assertThat(it.tags).hasSize(1)
+                        assertThat(it.tags.map(Tag::name)).containsExactly("French Spin")
+                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), URI("http://fake.url.com/appload/cover.png"), 100, 100))
+                    }
+                    .assertNext {
+                        assertThat(it.id).isEqualTo(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"))
+                        assertThat(it.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/geekinc.rss")
+                        assertThat(it.hasToBeDeleted).isTrue()
+                        assertThat(it.type).isEqualTo("Youtube")
+                        assertThat(it.lastUpdate).isBetween(currentNow.minusDays(31).toOffsetDateTime(), currentNow.minusDays(29).toOffsetDateTime())
+                        assertThat(it.tags).hasSize(2)
+                        assertThat(it.tags.map(Tag::name)).containsExactly("Geek", "Studio Renegade")
+                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), URI("http://fake.url.com/geekinc/cover.png"), 100, 100))
+                    }
+                    .assertNext {
+                        assertThat(it.id).isEqualTo(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"))
+                        assertThat(it.title).isEqualTo("Without tags")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/notags.rss")
+                        assertThat(it.hasToBeDeleted).isTrue()
+                        assertThat(it.type).isEqualTo("Youtube")
+                        assertThat(it.lastUpdate).isBetween(currentNow.minusDays(46).toOffsetDateTime(), currentNow.minusDays(44).toOffsetDateTime())
+                        assertThat(it.tags).hasSize(0)
+                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), URI("http://fake.url.com/notags/cover.png"), 100, 100))
+                    }
                     .verifyComplete()
         }
 
@@ -111,7 +203,7 @@ class PodcastRepositoryV2Test {
             fun `by pubDate`() {
                 /* Given */
                 /* When */
-                StepVerifier.create(repository.findStatByPodcastIdAndPubDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+                StepVerifier.create(repository.findStatByPodcastIdAndPubDate(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
                         /* Then */
                         .expectSubscription()
                         .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusDays(1), 2))
@@ -124,7 +216,7 @@ class PodcastRepositoryV2Test {
             fun `by downloadDate`() {
                 /* Given */
                 /* When */
-                StepVerifier.create(repository.findStatByPodcastIdAndDownloadDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+                StepVerifier.create(repository.findStatByPodcastIdAndDownloadDate(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
                         /* Then */
                         .expectSubscription()
                         .expectNext(NumberOfItemByDateWrapper(LocalDate.now(), 1))
@@ -136,7 +228,7 @@ class PodcastRepositoryV2Test {
             fun `by creationDate`() {
                 /* Given */
                 /* When */
-                StepVerifier.create(repository.findStatByPodcastIdAndCreationDate(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
+                StepVerifier.create(repository.findStatByPodcastIdAndCreationDate(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), 13))
                         /* Then */
                         .expectSubscription()
                         .expectNext(NumberOfItemByDateWrapper(LocalDate.now().minusWeeks(1), 1))
@@ -251,9 +343,9 @@ class PodcastRepositoryV2Test {
         @DisplayName("a new podcast")
         inner class ANewPodcast {
 
-            private val tag1 = Tag(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
-            private val tag2 = Tag(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
-            private val tag3 = Tag(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+            private val tag1 = Tag(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+            private val tag2 = Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+            private val tag3 = Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
 
             @Test
             fun `with many tags`() {

@@ -95,6 +95,126 @@ class PodcastHandlerTest {
     }
 
     @Nested
+    @DisplayName("should find all")
+    inner class ShouldFindAll {
+
+        val podcast1 = Podcast(
+                id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast first",
+                url = "https://foo.bar.com/app/1.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/1.png"),
+                        height = 200, width = 200
+                )
+        )
+        val podcast2 = Podcast(
+                id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast second",
+                url = "https://foo.bar.com/app/2.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/2.png"),
+                        height = 200, width = 200
+                )
+        )
+        val podcast3 = Podcast(
+                id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast third",
+                url = "https://foo.bar.com/app/3.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/3.png"),
+                        height = 200, width = 200
+                )
+        )
+
+        @Test
+        fun `with 3 podcasts`() {
+            /* Given */
+            val podcasts = listOf(podcast1, podcast2, podcast3)
+            whenever(podcastService.findAll()).thenReturn(podcasts.toFlux())
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                              "content": [
+                                {
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
+                                  "hasToBeDeleted": true,
+                                  "id": "ad16b2eb-657e-4064-b470-5b99397ce729",
+                                  "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
+                                  "tags": [ { "id": "f9d92927-1c4c-47a5-965d-efbb2d422f0c", "name": "Cinéma" } ],
+                                  "title": "Podcast first",
+                                  "type": "RSS",
+                                  "url": "https://foo.bar.com/app/1.rss"
+                                },
+                                {
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
+                                  "hasToBeDeleted": true,
+                                  "id": "bd16b2eb-657e-4064-b470-5b99397ce729",
+                                  "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
+                                  "tags": [ { "id": "f9d92927-1c4c-47a5-965d-efbb2d422f0c", "name": "Cinéma" } ],
+                                  "title": "Podcast second",
+                                  "type": "RSS",
+                                  "url": "https://foo.bar.com/app/2.rss"
+                                },
+                                {
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/cd16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
+                                  "hasToBeDeleted": true,
+                                  "id": "cd16b2eb-657e-4064-b470-5b99397ce729",
+                                  "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
+                                  "tags": [ { "id": "f9d92927-1c4c-47a5-965d-efbb2d422f0c", "name": "Cinéma" } ],
+                                  "title": "Podcast third",
+                                  "type": "RSS",
+                                  "url": "https://foo.bar.com/app/3.rss"
+                                }
+                              ]
+                            }
+                            """)
+                    }
+        }
+
+        @Test
+        fun `with no podcast`() {
+            /* Given */
+            whenever(podcastService.findAll()).thenReturn(Flux.empty())
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson { isEqualTo("""{ "content": [] } """) }
+        }
+
+
+    }
+
+    @Nested
     @DisplayName("should create")
     inner class ShouldCreate {
 

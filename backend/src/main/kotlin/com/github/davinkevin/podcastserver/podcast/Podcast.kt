@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.*
 
-class Podcast (
+data class Podcast (
     val id: UUID,
     val title: String,
     val url: String?,
@@ -19,7 +19,7 @@ class Podcast (
     val cover: CoverForPodcast
 )
 
-class CoverForPodcast(
+data class CoverForPodcast(
         val id: UUID,
         val url: URI,
         val height: Int,

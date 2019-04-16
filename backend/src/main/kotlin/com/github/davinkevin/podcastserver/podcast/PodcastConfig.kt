@@ -16,6 +16,7 @@ class PodcastRoutingConfig {
     fun podcastRouter(podcast: PodcastHandler) = router {
         "/api/v1/podcasts".nest {
 
+            GET("/", podcast::findAll)
             GET("/{id}", podcast::findById)
             POST("/", podcast::create)
 

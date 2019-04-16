@@ -21,6 +21,7 @@ class PodcastService(
         private val tagRepository: TagRepositoryV2
 ) {
 
+    fun findAll(): Flux<Podcast> = repository.findAll()
     fun findById(id: UUID): Mono<Podcast> = repository.findById(id)
 
     fun findStatByPodcastIdAndPubDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndPubDate(id, numberOfMonths)

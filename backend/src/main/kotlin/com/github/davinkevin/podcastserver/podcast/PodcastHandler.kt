@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
@@ -42,6 +41,13 @@ class PodcastHandler(
                 .map(::toPodcastHAL)
                 .flatMap { ok().syncBody(it) }
     }
+
+    fun findAll(r: ServerRequest): Mono<ServerResponse> =
+            podcastService.findAll()
+                    .map(::toPodcastHAL)
+                    .collectList()
+                    .map { FindAllPodcastHAL(it) }
+                    .flatMap { ok().syncBody(it) }
 
     fun create(r: ServerRequest): Mono<ServerResponse> = r
                     .bodyToMono<PodcastCreationHAL>()
@@ -98,6 +104,7 @@ class PodcastHandler(
     }
 }
 
+private class FindAllPodcastHAL(val content: Collection<PodcastHAL>)
 private class StatsPodcastTypeWrapperHAL(val content: Collection<StatsPodcastType>)
 
 private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.path)

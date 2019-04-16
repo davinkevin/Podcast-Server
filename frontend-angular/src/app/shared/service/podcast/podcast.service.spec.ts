@@ -25,15 +25,15 @@ describe('PodcastService', () => {
 
 	it('should call for findAll', () => {
 		/* Given */
-		const resp = [];
+		const resp = {content: []};
 
 		/* When  */
 		service.findAll().subscribe(podcasts => {
-			expect(podcasts).toBe(resp);
+			expect(podcasts).toBe([]);
 		});
 
 		/* Then  */
-		const req = httpMock.expectOne('/api/podcasts');
+		const req = httpMock.expectOne('/api/v1/podcasts');
 		expect(req.request.method).toEqual('GET');
 		req.flush(resp);
 	});

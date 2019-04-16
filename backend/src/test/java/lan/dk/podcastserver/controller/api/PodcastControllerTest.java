@@ -75,19 +75,6 @@ public class PodcastControllerTest {
         verify(podcastBusiness, only()).delete(eq(id));
     }
 
-    @Test
-    public void should_find_all() {
-        /* Given */
-        List<Podcast> podcasts = new ArrayList<>();
-        when(podcastBusiness.findAll()).thenReturn(podcasts);
-
-        /* When */
-        List<Podcast> all = podcastController.findAll();
-
-        /* Then */
-        assertThat(podcasts).isSameAs(all);
-    }
-
 //    @Test
 //    public void should_get_rss_with_origin_header() {
 //        /* Given */

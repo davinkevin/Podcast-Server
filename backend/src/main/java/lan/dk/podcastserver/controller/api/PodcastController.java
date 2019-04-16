@@ -6,12 +6,10 @@ import com.github.davinkevin.podcastserver.business.find.FindPodcastBusiness;
 import com.github.davinkevin.podcastserver.business.update.UpdatePodcastBusiness;
 import com.github.davinkevin.podcastserver.entity.Podcast;
 import com.github.davinkevin.podcastserver.service.UrlService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,11 +50,6 @@ public class PodcastController {
     public void delete (@PathVariable UUID id) {
         podcastBusiness.delete(id);
     }
-
-    @GetMapping
-    @Cacheable("podcasts")
-    @JsonView(Podcast.PodcastListingView.class)
-    public List<Podcast> findAll() { return podcastBusiness.findAll(); }
 
     @GetMapping(value="/opml", produces = "application/xml; charset=utf-8")
     public String asOpml(ServerWebExchange request) { return podcastBusiness.asOpml(UrlService.getDomainFromRequest(request).toASCIIString()); }

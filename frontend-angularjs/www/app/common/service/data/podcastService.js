@@ -19,7 +19,7 @@ export default class PodcastService  {
     }
 
     findAll() {
-        return this.$http.get(`/api/podcasts`).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts`).then(r => r.data.content);
     }
 
     save(podcast) {
