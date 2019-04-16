@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.*
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -136,12 +137,12 @@ class JdomServiceTest {
             "62927825-88E7-B99B-338E-4847D8B4142F"
     )
 
-    val wireMockServer: WireMockServer = WireMockServer(WireMockConfiguration.wireMockConfig().port(8181))
+    val wireMockServer: WireMockServer = WireMockServer(wireMockConfig().port(8282))
 
     @BeforeEach
     fun beforeEach() {
         wireMockServer.start()
-        WireMock.configureFor("localhost", 8181)
+        WireMock.configureFor("localhost", 8282)
     }
 
     @AfterEach
@@ -150,7 +151,7 @@ class JdomServiceTest {
     @Test
     fun `should parse`() {
         /* Given */
-        val url = "http://localhost:8181/a/valid.xml"
+        val url = "http://localhost:8282/a/valid.xml"
         whenever(urlService.asStream(anyString())).then { i -> IOUtils.urlAsStream(i.getArgument(0)) }
         stubFor(get(urlEqualTo("/a/valid.xml"))
                 .willReturn(aResponse()
