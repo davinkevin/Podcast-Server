@@ -28,7 +28,7 @@ const ITEM: Item = {
   creationDate: '2018-01-19T05:41:32.547+01:00',
   proxyURL: '/api/podcasts/1f64b3a3-aaba-4282-a709-073299e3ef52/items/a725174f-6e61-4132-9c4f-795a9d2fc598/A_pas_d_invite_.mp3',
   isDownloaded: true,
-  podcastId: '1f64b3a3-aaba-4282-a709-073299e3ef52'
+  podcast: { id: '1f64b3a3-aaba-4282-a709-073299e3ef52'}
 };
 
 describe('Service: Item', () => {
@@ -121,7 +121,7 @@ describe('Service: Item', () => {
 		});
 
 		/* Then */
-		const req = httpMock.expectOne(r => r.url === '/api/items/search');
+		const req = httpMock.expectOne(r => r.url === '/api/v1/items/search');
 		expect(req.request.method).toEqual('GET');
 		expect(req.request.params.toString()).toEqual(expectedParams.toString());
 		req.flush(body);

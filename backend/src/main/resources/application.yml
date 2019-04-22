@@ -33,6 +33,7 @@ logging:
  path: /tmp/podcast-server/podcast-server.log
  level:
   lan.dk.podcastserver : DEBUG
+  org.jooq: DEBUG
 
 management:
   endpoint:

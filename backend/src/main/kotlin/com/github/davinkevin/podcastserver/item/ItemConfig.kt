@@ -14,6 +14,7 @@ class ItemRoutingConfig {
     @Bean
     fun itemRouter(item: ItemHandler) = router {
         "/api/v1/items".nest {
+            GET("/search", item::search)
             DELETE("/clean", item::clean)
         }
 

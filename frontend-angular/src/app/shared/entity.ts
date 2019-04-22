@@ -25,7 +25,7 @@ export interface Item {
 	status: Status | string;
 	isDownloaded: boolean;
 	proxyURL: string;
-	podcastId: string;
+	podcast: { id: uuid }
 	length?: number;
 	fileName?: string;
 	progression?: number;
@@ -94,5 +94,5 @@ export interface Pageable {
 export interface SearchItemPageRequest extends Pageable {
 	q?: string;
 	status?: Status[];
-	tags?: Tag[];
+	tags?: { name: string }[];
 }

@@ -89,7 +89,7 @@ const searchResult = {
       creationDate: '2017-05-15T05: 01: 23.372+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/85366aef-5cfe-4716-9891-347d3f70150b/items/33c98205-51dd-4245-a86b-6c725121684d/download.mp4',
-      podcastId: '85366aef-5cfe-4716-9891-347d3f70150b'
+      podcast: { id: '85366aef-5cfe-4716-9891-347d3f70150b' }
     },
     {
       id: 'fdf9d570-9386-483b-8d78-e8e0657c9feb',
@@ -106,7 +106,7 @@ const searchResult = {
       creationDate: '2017-05-15T01: 01: 38.141+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/8e99045e-c685-4757-9f93-d67d6d125332/items/fdf9d570-9386-483b-8d78-e8e0657c9feb/download.mp3',
-      podcastId: '8e99045e-c685-4757-9f93-d67d6d125332'
+      podcast: { id: '8e99045e-c685-4757-9f93-d67d6d125332' }
     },
     {
       id: '124e8f13-29cb-4c96-9423-2988a4d335d4',
@@ -123,7 +123,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.921+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/9c8e10ea-e61c-4985-9944-95697a6c0c97/items/124e8f13-29cb-4c96-9423-2988a4d335d4/download.mp3',
-      podcastId: '9c8e10ea-e61c-4985-9944-95697a6c0c97'
+      podcast: { id: '9c8e10ea-e61c-4985-9944-95697a6c0c97' }
     },
     {
       id: '78cfdb14-31bc-4c8d-bb63-a2c1740aa2fb',
@@ -140,7 +140,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.61+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/299ffb9c-45c5-4568-bc55-703befdc6562/items/78cfdb14-31bc-4c8d-bb63-a2c1740aa2fb/download.mp3',
-      podcastId: '299ffb9c-45c5-4568-bc55-703befdc6562'
+      podcast: { id: '299ffb9c-45c5-4568-bc55-703befdc6562' }
     },
     {
       id: '4fd34d58-9f4d-417b-a2d1-f5e3a5b25219',
@@ -157,7 +157,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.92+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/9c8e10ea-e61c-4985-9944-95697a6c0c97/items/4fd34d58-9f4d-417b-a2d1-f5e3a5b25219/download.mp3',
-      podcastId: '9c8e10ea-e61c-4985-9944-95697a6c0c97'
+      podcast: { id: '9c8e10ea-e61c-4985-9944-95697a6c0c97' }
     },
     {
       id: 'f2ced3ce-13de-44b0-9ec2-faf8200c5282',
@@ -174,7 +174,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.61+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/299ffb9c-45c5-4568-bc55-703befdc6562/items/f2ced3ce-13de-44b0-9ec2-faf8200c5282/download.mp3',
-      podcastId: '299ffb9c-45c5-4568-bc55-703befdc6562'
+      podcast: { id: '299ffb9c-45c5-4568-bc55-703befdc6562' }
     },
     {
       id: '403ad0b2-da32-4c62-beba-c5fa955ac75a',
@@ -191,7 +191,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.609+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/299ffb9c-45c5-4568-bc55-703befdc6562/items/403ad0b2-da32-4c62-beba-c5fa955ac75a/download.mp3',
-      podcastId: '299ffb9c-45c5-4568-bc55-703befdc6562'
+      podcast: { id: '299ffb9c-45c5-4568-bc55-703befdc6562' }
     },
     {
       id: '667dcaa4-c945-4a04-baf8-a3b16924e9cb',
@@ -208,7 +208,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.916+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/9c8e10ea-e61c-4985-9944-95697a6c0c97/items/667dcaa4-c945-4a04-baf8-a3b16924e9cb/download.mp3',
-      podcastId: '9c8e10ea-e61c-4985-9944-95697a6c0c97'
+      podcast: { id: '9c8e10ea-e61c-4985-9944-95697a6c0c97' }
     },
     {
       id: '00b2310f-4a42-4959-a515-1e5b21defc4e',
@@ -220,7 +220,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.68+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/624831fb-722c-49e6-ba44-256c194c8f66/items/00b2310f-4a42-4959-a515-1e5b21defc4e/download.mp4',
-      podcastId: '624831fb-722c-49e6-ba44-256c194c8f66'
+      podcast: { id: '624831fb-722c-49e6-ba44-256c194c8f66' }
     },
     {
       id: '7b1d8095-6d0b-427f-a842-f74e0f935633',
@@ -237,7 +237,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.595+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/102c6319-1b46-40ae-8cca-bc4fd8ba0789/items/7b1d8095-6d0b-427f-a842-f74e0f935633/download.mp3',
-      podcastId: '102c6319-1b46-40ae-8cca-bc4fd8ba0789'
+      podcast: { id: '102c6319-1b46-40ae-8cca-bc4fd8ba0789' }
     },
     {
       id: 'ab3d517d-b484-4207-9300-726a4a872a3f',
@@ -254,7 +254,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.942+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/daf66f11-835c-48ac-9713-98b6d2a0cef3/items/ab3d517d-b484-4207-9300-726a4a872a3f/download.mp4',
-      podcastId: 'daf66f11-835c-48ac-9713-98b6d2a0cef3'
+      podcast: { id: 'daf66f11-835c-48ac-9713-98b6d2a0cef3' }
     },
     {
       id: '01bc6166-a690-4372-9889-bbb69b83a87d',
@@ -271,7 +271,7 @@ const searchResult = {
       creationDate: '2017-05-14T23: 33: 56.353+02: 00',
       isDownloaded: true,
       proxyURL: '/api/podcasts/040731fe-1c0f-45a0-8672-1bd85fdef0c4/items/01bc6166-a690-4372-9889-bbb69b83a87d/download.mp3',
-      podcastId: '040731fe-1c0f-45a0-8672-1bd85fdef0c4'
+      podcast: { id: '040731fe-1c0f-45a0-8672-1bd85fdef0c4' }
     }
   ],
   totalPages: 259,
@@ -325,7 +325,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-15T05: 01: 23.372+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/85366aef-5cfe-4716-9891-347d3f70150b/items/33c98205-51dd-4245-a86b-6c725121684d/download.mp4',
-          podcastId: '85366aef-5cfe-4716-9891-347d3f70150b'
+          podcast: { id: '85366aef-5cfe-4716-9891-347d3f70150b' }
         },
         {
           id: 'fdf9d570-9386-483b-8d78-e8e0657c9feb',
@@ -342,7 +342,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-15T01: 01: 38.141+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/8e99045e-c685-4757-9f93-d67d6d125332/items/fdf9d570-9386-483b-8d78-e8e0657c9feb/download.mp3',
-          podcastId: '8e99045e-c685-4757-9f93-d67d6d125332'
+          podcast: { id: '8e99045e-c685-4757-9f93-d67d6d125332' }
         },
         {
           id: '124e8f13-29cb-4c96-9423-2988a4d335d4',
@@ -359,7 +359,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.921+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/9c8e10ea-e61c-4985-9944-95697a6c0c97/items/124e8f13-29cb-4c96-9423-2988a4d335d4/download.mp3',
-          podcastId: '9c8e10ea-e61c-4985-9944-95697a6c0c97'
+          podcast: { id: '9c8e10ea-e61c-4985-9944-95697a6c0c97' }
         },
         {
           id: '78cfdb14-31bc-4c8d-bb63-a2c1740aa2fb',
@@ -376,7 +376,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.61+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/299ffb9c-45c5-4568-bc55-703befdc6562/items/78cfdb14-31bc-4c8d-bb63-a2c1740aa2fb/download.mp3',
-          podcastId: '299ffb9c-45c5-4568-bc55-703befdc6562'
+          podcast: { id: '299ffb9c-45c5-4568-bc55-703befdc6562' }
         },
         {
           id: '4fd34d58-9f4d-417b-a2d1-f5e3a5b25219',
@@ -393,7 +393,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.92+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/9c8e10ea-e61c-4985-9944-95697a6c0c97/items/4fd34d58-9f4d-417b-a2d1-f5e3a5b25219/download.mp3',
-          podcastId: '9c8e10ea-e61c-4985-9944-95697a6c0c97'
+          podcast: { id: '9c8e10ea-e61c-4985-9944-95697a6c0c97' }
         },
         {
           id: 'f2ced3ce-13de-44b0-9ec2-faf8200c5282',
@@ -410,7 +410,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.61+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/299ffb9c-45c5-4568-bc55-703befdc6562/items/f2ced3ce-13de-44b0-9ec2-faf8200c5282/download.mp3',
-          podcastId: '299ffb9c-45c5-4568-bc55-703befdc6562'
+          podcast: { id: '299ffb9c-45c5-4568-bc55-703befdc6562' }
         },
         {
           id: '403ad0b2-da32-4c62-beba-c5fa955ac75a',
@@ -427,7 +427,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.609+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/299ffb9c-45c5-4568-bc55-703befdc6562/items/403ad0b2-da32-4c62-beba-c5fa955ac75a/download.mp3',
-          podcastId: '299ffb9c-45c5-4568-bc55-703befdc6562'
+          podcast: { id: '299ffb9c-45c5-4568-bc55-703befdc6562' }
         },
         {
           id: '667dcaa4-c945-4a04-baf8-a3b16924e9cb',
@@ -444,7 +444,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.916+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/9c8e10ea-e61c-4985-9944-95697a6c0c97/items/667dcaa4-c945-4a04-baf8-a3b16924e9cb/download.mp3',
-          podcastId: '9c8e10ea-e61c-4985-9944-95697a6c0c97'
+          podcast: { id: '9c8e10ea-e61c-4985-9944-95697a6c0c97' }
         },
         {
           id: '00b2310f-4a42-4959-a515-1e5b21defc4e',
@@ -461,7 +461,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.68+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/624831fb-722c-49e6-ba44-256c194c8f66/items/00b2310f-4a42-4959-a515-1e5b21defc4e/download.mp4',
-          podcastId: '624831fb-722c-49e6-ba44-256c194c8f66'
+          podcast: { id: '624831fb-722c-49e6-ba44-256c194c8f66' }
         },
         {
           id: '7b1d8095-6d0b-427f-a842-f74e0f935633',
@@ -478,7 +478,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.595+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/102c6319-1b46-40ae-8cca-bc4fd8ba0789/items/7b1d8095-6d0b-427f-a842-f74e0f935633/download.mp3',
-          podcastId: '102c6319-1b46-40ae-8cca-bc4fd8ba0789'
+          podcast: { id: '102c6319-1b46-40ae-8cca-bc4fd8ba0789' }
         },
         {
           id: 'ab3d517d-b484-4207-9300-726a4a872a3f',
@@ -495,7 +495,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.942+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/daf66f11-835c-48ac-9713-98b6d2a0cef3/items/ab3d517d-b484-4207-9300-726a4a872a3f/download.mp4',
-          podcastId: 'daf66f11-835c-48ac-9713-98b6d2a0cef3'
+          podcast: { id: 'daf66f11-835c-48ac-9713-98b6d2a0cef3' }
         },
         {
           id: '01bc6166-a690-4372-9889-bbb69b83a87d',
@@ -512,7 +512,7 @@ xdescribe('SearchFeature', () => {
           creationDate: '2017-05-14T23: 33: 56.353+02: 00',
           isDownloaded: true,
           proxyURL: '/api/podcasts/040731fe-1c0f-45a0-8672-1bd85fdef0c4/items/01bc6166-a690-4372-9889-bbb69b83a87d/download.mp3',
-          podcastId: '040731fe-1c0f-45a0-8672-1bd85fdef0c4'
+          podcast: { id: '040731fe-1c0f-45a0-8672-1bd85fdef0c4' }
         }
       ],
       totalPages: 259,
@@ -543,6 +543,7 @@ xdescribe('SearchFeature', () => {
     };
 
     beforeEach(() => {
+      // @ts-ignore
       itemService = { search: jest.fn() };
       (itemService.search as jest.Mock<Page<Item>>).mockReturnValue(of(PAGE));
     });
@@ -572,12 +573,13 @@ xdescribe('SearchFeature', () => {
   });
 });
 
-fdescribe('SearchModule', () => {
+describe('SearchModule', () => {
 
   let tester: SearchComponentTester;
   let store: Store<AppState>;
 
   beforeEach(async(() => {
+    // @ts-ignore
     TestBed.configureTestingModule({
       declarations: [SearchComponent],
       imports: [

@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -42,9 +42,12 @@ class ItemService(
             .filterWhen { repository.hasToBeDeleted(it) }
             .flatMap { repository.findById(it) }
             .delayUntil { item -> item.toMono()
-                            .filter { it.isDownloaded() }
-                            .filter { !it.fileName.isNullOrEmpty() }
-                            .flatMap { fileService.deleteItem(Paths.get(item.podcast.title, item.fileName)) }
+                    .filter { it.isDownloaded() }
+                    .filter { !it.fileName.isNullOrEmpty() }
+                    .flatMap { fileService.deleteItem(Paths.get(item.podcast.title, item.fileName)) }
             }
             .then()
+
+    fun search(tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> =
+            repository.search(tags = tags, statuses = statuses, page = page)
 }

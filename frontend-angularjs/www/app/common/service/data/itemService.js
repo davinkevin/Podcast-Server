@@ -21,11 +21,18 @@ export default class ItemService {
     }
 
     search(searchParams = { page : 0, size : 12, status : ['FINISH'], tags: []} ) {
-        let params = Object.assign({}, searchParams);
-        params.sort = params.sort.map(o => `${o.property},${o.direction}`);
-        params.tags = params.tags.map(t => t.name).join();
-        params.status = params.status.join();
-        return this.$http.get(`/api/items/search`, { params }).then(r => r.data);
+        const tags = searchParams.tags.map(t => t.name).join();
+        const status = searchParams.status.join();
+        const sort = searchParams.sort.map(o => `${o.property},${o.direction}`);
+
+        const params = Object.assign(searchParams, {tags, status, sort});
+
+      console.log (params);
+      if (params.q != null && params.q !== "") {
+          return this.$http.get(`/api/items/search`, { params }).then(r => r.data);
+        }
+
+        return this.$http.get(`/api/v1/items/search`, { params }).then(r => r.data);
     }
 
     findById(podcastId, itemId) {

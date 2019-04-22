@@ -45,3 +45,40 @@ data class CoverForItem (
         val width: Int,
         val height: Int
 )
+
+data class ItemSort(val direction: String, val field: String)
+data class ItemPageRequest(val page: Int, val size: Int, val sort: ItemSort)
+
+data class PageItem(
+        val content: Collection<Item>,
+        val empty: Boolean,
+        val first: Boolean,
+        val last: Boolean,
+        val number: Int,
+        val numberOfElements: Int,
+        val size: Int,
+        val totalElements: Int,
+        val totalPages: Int
+) {
+    companion object {
+
+        fun of(content: Collection<Item>, totalElements: Int, page: ItemPageRequest): PageItem {
+
+            val totalPages = Math.ceil(totalElements.toDouble() / page.size.toDouble()).toInt()
+
+            return PageItem(
+                    content = content,
+                    empty = content.isEmpty(),
+                    first = page.page == 0,
+                    last = page.page + 1 > totalPages - 1,
+                    number = page.page,
+                    numberOfElements = content.size,
+                    size = page.size,
+                    totalElements = totalElements,
+                    totalPages = totalPages
+            )
+
+        }
+
+    }
+}

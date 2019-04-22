@@ -69,7 +69,7 @@
                     </a>
                 </div>
                 <div class="text-center clearfix itemTitle center" >
-                    <a ng-href="{{ ::'/podcasts/' + item.podcastId + '/items/' + item.id }}" tooltip-append-to-body="true" uib-tooltip="{{ ::item.title }}" tooltip-placement="bottom" >
+                    <a ng-href="{{ ::'/podcasts/' + item.podcast.id + '/items/' + item.id }}" tooltip-append-to-body="true" uib-tooltip="{{ ::item.title }}" tooltip-placement="bottom" >
                         {{ ::item.title | characters:30 }}
                     </a>
                 </div>

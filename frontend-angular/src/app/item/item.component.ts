@@ -39,15 +39,15 @@ export class ItemComponent implements OnInit, OnDestroy {
 	}
 
 	delete(): void {
-		this.store.dispatch(new DeleteItemAction(this.item.id, this.item.podcastId));
+		this.store.dispatch(new DeleteItemAction(this.item.id, this.item.podcast.id));
 	}
 
 	download(): void {
-		this.store.dispatch(new DownloadItemAction(this.item.id, this.item.podcastId));
+		this.store.dispatch(new DownloadItemAction(this.item.id, this.item.podcast.id));
 	}
 
 	reset(): void {
-		this.store.dispatch(new ResetAction(this.item.id, this.item.podcastId));
+		this.store.dispatch(new ResetAction(this.item.id, this.item.podcast.id));
 	}
 
 	back(): void {

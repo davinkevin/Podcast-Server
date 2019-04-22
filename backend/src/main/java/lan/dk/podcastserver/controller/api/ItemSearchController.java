@@ -10,7 +10,6 @@ import io.vavr.collection.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -35,7 +34,6 @@ public class ItemSearchController {
         this.tagBusiness = tagBusiness;
     }
 
-    @Cacheable("search")
     @GetMapping("search")
     @JsonView(Item.ItemSearchListView.class)
     public Page<Item> search(@RequestParam(value = "q", required = false, defaultValue = "") String q,

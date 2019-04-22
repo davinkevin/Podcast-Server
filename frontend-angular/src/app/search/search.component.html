@@ -54,7 +54,7 @@
     <mat-card-header>
       <mat-card-title>{{ item.title | truncate: 20}}</mat-card-title>
     </mat-card-header>
-    <a [routerLink]="['/podcasts', item.podcastId, 'items', item.id]">
+    <a [routerLink]="['/podcasts', item.podcast.id, 'items', item.id]">
       <img mat-card-image [src]="item.cover?.url">
     </a>
 <!--    <img mat-card-image [routerLink]="['/podcasts', item.podcastId, 'items', item.id]" [src]="item.cover?.url">-->

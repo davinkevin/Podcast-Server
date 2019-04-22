@@ -3,18 +3,27 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.database.Tables.COVER
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
+import com.github.davinkevin.podcastserver.database.Tables.PODCAST_TAGS
+import com.github.davinkevin.podcastserver.database.Tables.TAG
 import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST_ITEMS
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
+import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
 import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import org.jooq.DSLContext
+import org.jooq.Record18
+import org.jooq.impl.DSL.and
+import org.jooq.impl.DSL.countDistinct
+import org.jooq.impl.DSL.trueCondition
 import org.jooq.impl.DSL.value
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
+import reactor.util.function.component1
+import reactor.util.function.component2
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.util.*
@@ -40,17 +49,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 )
                 .where(ITEM.ID.eq(id))
                 .fetchOneAsMono()
-                .map {
-                    val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
-                    val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
-                    Item(
-                            it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
-                            it[ITEM.PUB_DATE].toUTC(), it[ITEM.DOWNLOAD_DATE].toUTC(), it[ITEM.CREATION_DATE].toUTC(),
-                            it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], Status.of(it[ITEM.STATUS]),
-                            p, c
-                    )
-                }
-
+                .map(::toItem)
     }
 
     fun findAllToDelete(date: OffsetDateTime) = Flux.defer {
@@ -103,4 +102,82 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .executeAsyncAsMono()
                 .flatMap { findById(id) }
     }
+
+    fun search(tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> = Mono.defer {
+        query
+                .select(TAG.ID)
+                .from(TAG)
+                .where(TAG.NAME.`in`(tags))
+                .fetchAsFlux()
+                .map { (v) -> v }
+                .collectList()
+                .flatMap { tagIds ->
+                    val tables = ITEM
+                            .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
+                            .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
+
+                    val statusesCondition = if (statuses.isEmpty()) trueCondition() else ITEM.STATUS.`in`(statuses)
+                    val tagsCondition = if (tagIds.isEmpty()) trueCondition() else {
+                        val multipleTagsCondition = tagIds.map {
+                            value(it).`in`(query
+                                    .select(PODCAST_TAGS.TAGS_ID)
+                                    .from(PODCAST_TAGS)
+                                    .where(PODCAST.ID.eq(PODCAST_TAGS.PODCASTS_ID))
+                            ) }
+                        and(multipleTagsCondition)
+                    }
+
+                    val content = query
+                            .selectDistinct(
+                                    ITEM.ID, ITEM.TITLE, ITEM.URL,
+                                    ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
+                                    ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
+
+                                    PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+                            )
+                            .from(tables)
+                            .where(statusesCondition.and(tagsCondition))
+                            .orderBy(page.sort.toOrderBy())
+                            .limit((page.size * page.page), page.size)
+                            .fetchAsFlux()
+                            .map(::toItem)
+                            .collectList()
+
+                    val totalElements = query
+                            .select(countDistinct(ITEM.ID))
+                            .from(tables)
+                            .where(statusesCondition.and(tagsCondition))
+                            .fetchOneAsMono()
+                            .map { (v) -> v }
+
+
+                    Mono.zip(content, totalElements)
+                            .map { (content, totalElements) -> PageItem.of(content, totalElements, page) }
+                }
+
+
+    }
 }
+
+private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Timestamp, String, String, Long, String, String, UUID, String, String, UUID, String, Int, Int>): Item {
+    val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
+    val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
+    return Item(
+            it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
+            it[ITEM.PUB_DATE].toUTC(), it[ITEM.DOWNLOAD_DATE].toUTC(), it[ITEM.CREATION_DATE].toUTC(),
+            it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], Status.of(it[ITEM.STATUS]),
+            p, c
+    )
+}
+
+private fun ItemSort.toOrderBy() = when(field) {
+    "pubDate" -> ITEM.PUB_DATE
+    "downloadDate" -> ITEM.DOWNLOAD_DATE
+    else -> ITEM.PUB_DATE
+}.let { when(direction.toUpperCase()) {
+    "ASC" -> it.asc()
+    "DESC" -> it.desc()
+    else -> it.desc()
+} }
+

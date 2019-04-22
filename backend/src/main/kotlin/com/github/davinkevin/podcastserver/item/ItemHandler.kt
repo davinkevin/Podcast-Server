@@ -3,12 +3,9 @@ package com.github.davinkevin.podcastserver.item
 import arrow.core.Option
 import arrow.core.getOrElse
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonValue
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import io.vavr.API
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -16,7 +13,6 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.ServerResponse.seeOther
-import org.springframework.web.util.UriComponents
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import reactor.core.publisher.switchIfEmpty
@@ -91,6 +87,36 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 .map(::toItemHAL)
                 .flatMap { ok().syncBody(it) }
     }
+
+    fun search(s: ServerRequest): Mono<ServerResponse> {
+        val page = s.queryParam("page").map { it.toInt() }.orElse(0)
+        val size  = s.queryParam("size").map { it.toInt() }.orElse(12)
+        val sort  = s.queryParam("sort").orElse("pubDate,DESC")
+        val field = sort.split(",").first()
+        val direction = sort.split(",").last()
+
+        val itemPageable = ItemPageRequest(page, size, ItemSort(direction, field))
+
+        val tags = s.queryParam("tags")
+                .filter { !it.isEmpty() }
+                .map { it.split(",") }
+                .orElse(listOf())
+
+        val statuses = s.queryParam("status")
+                .filter { !it.isEmpty() }
+                .map { it.split(",") }
+                .orElse(listOf())
+                .map { Status.of(it) }
+
+        return itemService.search(
+                tags = tags,
+                statuses = statuses,
+                page = itemPageable
+        )
+                .map(::toPageItemHAL)
+                .flatMap { ok().syncBody(it) }
+
+    }
 }
 
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
@@ -141,3 +167,27 @@ fun toItemHAL(i: Item): ItemHAL {
             cover = CoverHAL(i.cover.id, i.cover.width, i.cover.height, coverUrl)
     )
 }
+
+data class PageItemHAL (
+        val content: Collection<ItemHAL>,
+        val empty: Boolean,
+        val first: Boolean,
+        val last: Boolean,
+        val number: Int,
+        val numberOfElements: Int,
+        val size: Int,
+        val totalElements: Int,
+        val totalPages: Int
+)
+
+private fun toPageItemHAL(p: PageItem) = PageItemHAL(
+        content = p.content.map(::toItemHAL),
+        empty = p.empty,
+        first = p.first,
+        last = p.last,
+        number = p.number,
+        numberOfElements = p.numberOfElements,
+        size = p.size,
+        totalElements = p.totalElements,
+        totalPages = p.totalPages
+)

@@ -109,7 +109,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 	}
 
 	download(item: Item): void {
-		this.store.dispatch(new DownloadItemAction(item.id, item.podcastId));
+		this.store.dispatch(new DownloadItemAction(item.id, item.podcast.id));
 	}
 
 	ngOnDestroy(): void {

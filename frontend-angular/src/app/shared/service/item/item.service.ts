@@ -9,7 +9,12 @@ export class ItemService {
 
 	search(searchPageRequest: SearchItemPageRequest): Observable<Page<Item>> {
 		const params = toSearchParams(searchPageRequest);
-		return this.http.get<Page<Item>>('/api/items/search', { params });
+
+    if (searchPageRequest.q != null && searchPageRequest.q !== "") {
+		  return this.http.get<Page<Item>>('/api/items/search', { params });
+    }
+
+		return this.http.get<Page<Item>>('/api/v1/items/search', { params });
 	}
 
 	findByPodcastAndPage(id: string, page: Pageable): Observable<Page<Item>> {
