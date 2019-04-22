@@ -9,6 +9,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/items")
 public class ItemSearchController {
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ItemSearchController.class);
+    private static final Logger log = LoggerFactory.getLogger(ItemSearchController.class);
     private final ItemBusiness itemBusiness;
     private final TagBusiness tagBusiness;
 
@@ -49,8 +50,8 @@ public class ItemSearchController {
         Sort.Direction direction = Sort.Direction.fromString(StringUtils.substringAfter(sort, ","));
         PageRequest pageable = PageRequest.of(page, size, new Sort(direction, field));
 
-        Set<String> tags = HashSet.of(_tags.split(","));
-        Set<String> statuses = HashSet.of(_statuses.split(","));
+        Set<String> tags = StringUtils.isEmpty(_tags) ? HashSet.empty(): HashSet.of(_tags.split(","));
+        Set<String> statuses = StringUtils.isEmpty(_statuses) ? HashSet.empty(): HashSet.of(_statuses.split(","));
 
         if (!isSearch(q, tags, statuses)) {
             return itemBusiness.findAll(pageable);
@@ -71,6 +72,6 @@ public class ItemSearchController {
     }
 
     private static Boolean isSearch(String q, Set<String> tags, Set<String> statuses) {
-        return !(StringUtils.isEmpty(q) && tags.isEmpty() && statuses.isEmpty());
+        return !StringUtils.isEmpty(q) || !tags.isEmpty() || !statuses.isEmpty();
     }
 }
