@@ -27,7 +27,7 @@ cache:
   - $HOME/.m2
 
 before_script:
-- npm install -g jspm
+- npm install -g jspm@0.16.34
 - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
 
 script:
