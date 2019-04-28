@@ -68,12 +68,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-        <!-- Hibernate Search -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
-            <version>5.11.1.Final</version>
-        </dependency>
         <!-- Query DSL-->
         <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-core -->
         <dependency>

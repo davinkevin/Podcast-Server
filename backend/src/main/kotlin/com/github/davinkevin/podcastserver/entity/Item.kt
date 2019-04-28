@@ -11,9 +11,6 @@ import io.vavr.control.Option
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.hibernate.search.annotations.DocumentId
-import org.hibernate.search.annotations.Field
-import org.hibernate.search.annotations.Indexed
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.web.util.UriComponentsBuilder
@@ -28,7 +25,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 @Entity
-@Indexed
 @Table(name = "item", uniqueConstraints = [UniqueConstraint(columnNames = arrayOf("podcast_id", "url"))])
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
 @JsonIgnoreProperties(ignoreUnknown = true, value = ["numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset", "coverPath"])
@@ -36,7 +32,6 @@ import javax.validation.constraints.Size
 class Item {
 
     @Id
-    @DocumentId
     @GeneratedValue
     @Column(columnDefinition = "UUID")
     var id: UUID? = null
@@ -49,7 +44,6 @@ class Item {
     var podcast: Podcast? = null
 
     @NotNull
-    @Field
     @JsonView(ItemSearchListView::class)
     @get:Size(min = 1, max = 254)
     var title: String? = null
@@ -61,7 +55,6 @@ class Item {
     @JsonView(ItemPodcastListView::class)
     var pubDate: ZonedDateTime? = null
 
-    @Field
     @Column(length = 2147483647)
     @JsonView(ItemPodcastListView::class)
     var description: String? = null

@@ -326,7 +326,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -352,7 +352,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -378,7 +378,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(15, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -404,7 +404,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(16, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -436,7 +436,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -465,7 +465,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -494,7 +494,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(7, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -523,7 +523,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(8, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -554,7 +554,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -589,7 +589,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -624,7 +624,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -659,7 +659,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -690,7 +690,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -716,7 +716,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -742,7 +742,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -768,7 +768,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -798,7 +798,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -833,7 +833,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -868,7 +868,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -903,7 +903,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search(listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
                         /* Then */
                         .expectSubscription()
                         .assertNext {

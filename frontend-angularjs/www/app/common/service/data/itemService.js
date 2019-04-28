@@ -26,11 +26,11 @@ export default class ItemService {
         const sort = searchParams.sort.map(o => `${o.property},${o.direction}`);
 
         const params = Object.assign(searchParams, {tags, status, sort});
-
-      console.log (params);
-      if (params.q != null && params.q !== "") {
-          return this.$http.get(`/api/items/search`, { params }).then(r => r.data);
-        }
+      //
+      // console.log (params);
+      // if (params.q != null && params.q !== "") {
+      //     return this.$http.get(`/api/items/search`, { params }).then(r => r.data);
+      //   }
 
         return this.$http.get(`/api/v1/items/search`, { params }).then(r => r.data);
     }

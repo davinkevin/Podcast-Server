@@ -16,6 +16,7 @@ import org.jooq.DSLContext
 import org.jooq.Record18
 import org.jooq.impl.DSL.and
 import org.jooq.impl.DSL.countDistinct
+import org.jooq.impl.DSL.or
 import org.jooq.impl.DSL.trueCondition
 import org.jooq.impl.DSL.value
 import org.springframework.stereotype.Repository
@@ -103,7 +104,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .flatMap { findById(id) }
     }
 
-    fun search(tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> = Mono.defer {
+    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> = Mono.defer {
         query
                 .select(TAG.ID)
                 .from(TAG)
@@ -126,6 +127,11 @@ class ItemRepositoryV2(private val query: DSLContext) {
                             ) }
                         and(multipleTagsCondition)
                     }
+                    val queryCondition = if (q.isNullOrEmpty()) trueCondition() else {
+                        or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.contains(q) )
+                    }
+
+                    val filterConditions = and(statusesCondition, tagsCondition, queryCondition)
 
                     val content = query
                             .selectDistinct(
@@ -137,7 +143,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                                     COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
                             )
                             .from(tables)
-                            .where(statusesCondition.and(tagsCondition))
+                            .where(filterConditions)
                             .orderBy(page.sort.toOrderBy())
                             .limit((page.size * page.page), page.size)
                             .fetchAsFlux()
@@ -147,7 +153,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                     val totalElements = query
                             .select(countDistinct(ITEM.ID))
                             .from(tables)
-                            .where(statusesCondition.and(tagsCondition))
+                            .where(filterConditions)
                             .fetchOneAsMono()
                             .map { (v) -> v }
 

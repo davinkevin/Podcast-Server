@@ -130,16 +130,6 @@ class ItemBusinessTest {
     }
 
     @Test
-    @Throws(InterruptedException::class)
-    fun `should reindex`() {
-        /* Given */
-        /* When */
-        itemBusiness.reindex()
-        /* Then */
-        verify(itemRepository, times(1)).reindex()
-    }
-
-    @Test
     fun `should find page in podcast`() {
         /* Given */
         val idPodcast = UUID.randomUUID()
@@ -197,65 +187,6 @@ class ItemBusinessTest {
         verify(podcastBusiness, times(1)).findOne(idPodcast)
         verify(podcastBusiness, times(1)).save(podcast)
         verify(itemRepository, times(1)).save(item)
-    }
-
-    @Nested
-    @DisplayName("should search ")
-    inner class ShouldSearch {
-
-        val tags = setOf(
-                Tag().apply { name = "Discovery" }, Tag().apply { name = "Fun" }
-        ).toVΛVΓ()
-        val pageResponse = PageImpl(listOf<Item>())
-        val term = "Foo"
-
-        @Test
-        fun `by tags and full text without specific order`() {
-            /* Given */
-            val pageRequest = PageRequest.of(1, 3, Sort.Direction.DESC, "title")
-            whenever(itemRepository.fullTextSearch(eq(term))).thenReturn(List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()))
-            whenever(itemRepository.findAll(any(), any<PageRequest>())).thenReturn(pageResponse)
-
-            /* When */
-            val byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm(term, tags, Set(Status.FINISH), pageRequest)
-
-            /* Then */
-            assertThat(byTagsAndFullTextTerm).isSameAs(pageResponse)
-            verify(itemRepository, times(1)).fullTextSearch(term)
-            verify(itemRepository, times(1)).findAll(any(), eq(pageRequest))
-        }
-
-        @Test
-        fun `by tags`() {
-            /* Given */
-            val pageRequest = PageRequest.of(1, 3, Sort.Direction.DESC, "title")
-            whenever(itemRepository.findAll(any(), any<PageRequest>())).thenReturn(pageResponse)
-
-            /* When */
-            val byTagsAndFullTextTerm = itemBusiness.findByTagsAndFullTextTerm("", tags, Set(Status.FINISH), pageRequest)
-
-            /* Then */
-            assertThat(byTagsAndFullTextTerm).isSameAs(pageResponse)
-            verify(itemRepository, times(1)).findAll(any(), eq(pageRequest))
-        }
-
-        @Test
-        fun `by tags and full text with pertinence order asc`() {
-            /* Given */
-            val pageRequest = PageRequest.of(1, 3, Sort.Direction.ASC, "pertinence")
-            val itemsFrom1To20 = (1..20).map { Item().apply { id = UUID.randomUUID(); title = "Position $it" } }
-
-            whenever(itemRepository.fullTextSearch(eq(term))).thenReturn(itemsFrom1To20.map{ it.id }.toVΛVΓ())
-            whenever(itemRepository.findAll(any<Predicate>())).thenReturn(itemsFrom1To20)
-
-            /* When */
-            val pageOfItem = itemBusiness.findByTagsAndFullTextTerm(term, tags, Set(Status.FINISH), pageRequest)
-
-            /* Then */
-            assertThat(pageOfItem.content).contains(itemsFrom1To20[17-1], itemsFrom1To20[16-1], itemsFrom1To20[15-1])
-            verify(itemRepository, times(1)).fullTextSearch(term)
-            verify(itemRepository, times(1)).findAll(any<Predicate>())
-        }
     }
 
     companion object {

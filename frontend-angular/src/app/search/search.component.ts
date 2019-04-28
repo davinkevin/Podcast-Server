@@ -44,7 +44,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 	];
 
 	properties = [
-		{ title: 'Relevance', value: 'pertinence' },
+		// { title: 'Relevance', value: 'pertinence' },
 		{ title: 'Publication Date', value: 'pubDate' },
 		{ title: 'Download Date', value: 'downloadDate' }
 	];

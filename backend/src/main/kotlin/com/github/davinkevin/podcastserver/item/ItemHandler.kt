@@ -89,6 +89,7 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
     }
 
     fun search(s: ServerRequest): Mono<ServerResponse> {
+        val q: String? = s.queryParam("q").filter { it.isNotEmpty() }.orElse(null)
         val page = s.queryParam("page").map { it.toInt() }.orElse(0)
         val size  = s.queryParam("size").map { it.toInt() }.orElse(12)
         val sort  = s.queryParam("sort").orElse("pubDate,DESC")
@@ -109,6 +110,7 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 .map { Status.of(it) }
 
         return itemService.search(
+                q = q,
                 tags = tags,
                 statuses = statuses,
                 page = itemPageable

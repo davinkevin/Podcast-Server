@@ -48,6 +48,6 @@ class ItemService(
             }
             .then()
 
-    fun search(tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> =
-            repository.search(tags = tags, statuses = statuses, page = page)
+    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> =
+            repository.search(q = q, tags = tags, statuses = statuses, page = page)
 }

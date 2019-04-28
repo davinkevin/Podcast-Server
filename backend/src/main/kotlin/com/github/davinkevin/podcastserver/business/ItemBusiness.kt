@@ -40,32 +40,6 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
     fun findAll(pageable: Pageable): Page<Item> = itemRepository.findAll(pageable)
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    fun findByTagsAndFullTextTerm(term: String, tags: Set<Tag>, statuses: Set<Status>, page: Pageable): Page<Item> {
-        return Option.just(page.sort)
-                .flatMap { Option.fromNullable(it.getOrderFor("pertinence")) }
-                .map { findByTagsAndFullTextTermOrderByPertinence(term, tags, statuses, page) }
-                .getOrElse { itemRepository.findAll(getSearchSpecifications(if (term.isEmpty()) null else itemRepository.fullTextSearch(term), tags, statuses), page) }
-    }
-
-    private fun findByTagsAndFullTextTermOrderByPertinence(term: String?, tags: Set<Tag>, state: Set<Status>, page: Pageable): Page<Item> {
-        val idDesc = itemRepository.fullTextSearch(term).toJavaList()!!
-
-        val direction = page.sort.getOrderFor("pertinence")!!.direction
-
-        val idsOrdered = if (direction == Sort.Direction.ASC) idDesc.reversed() else idDesc
-
-        val allResult = itemRepository.findAll(getSearchSpecifications(idsOrdered.toVΛVΓ(), tags, state))
-
-        val v = idsOrdered
-                .map { id -> allResult.find { item -> id == item.id } }
-                .filter { it != null }
-                .drop(page.offset.toInt())
-                .take(page.pageSize)
-
-        return PageImpl(v, page, v.size.toLong())
-    }
-
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     fun findOne(id: UUID): Item =
             itemRepository.findById(id)
                     .orElseThrow { RuntimeException("Item with ID $id not found") }
@@ -82,9 +56,6 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
     @Transactional(readOnly = true)
     fun findByPodcast(idPodcast: UUID, pageable: Pageable): Page<Item> =
             itemRepository.findByPodcast(idPodcast, pageable)
-
-    @Throws(InterruptedException::class)
-    fun reindex() = itemRepository. reindex()
 
     fun addItemByUpload(podcastId: UUID, uploadedFile: MultipartFile): Item {
         val p = podcastBusiness.findOne(podcastId)
