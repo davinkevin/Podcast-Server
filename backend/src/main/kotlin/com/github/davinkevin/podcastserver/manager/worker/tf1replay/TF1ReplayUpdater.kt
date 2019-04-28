@@ -59,6 +59,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val htmlService: 
                     .split(",")
                     .lastOrNull { it.isNotEmpty() }
                     .toOption()
+                    .map { it.split(" ").first() }
                     .flatMap { imageService.getCoverFromURL(SCHEME_DEFAULT + it).toOption() }
                     .getOrElse { Cover.DEFAULT_COVER }
 
