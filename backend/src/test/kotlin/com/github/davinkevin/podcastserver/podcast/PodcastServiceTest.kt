@@ -2,20 +2,26 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
@@ -39,6 +45,7 @@ class PodcastServiceTest {
     @MockBean lateinit var coverRepository: CoverRepository
     @MockBean lateinit var tagRepository: TagRepository
     @MockBean lateinit var repository: PodcastRepository
+    @MockBean lateinit var fileService: FileService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -251,6 +258,7 @@ class PodcastServiceTest {
 
     }
 
+    @Suppress("UnassignedFluxMonoInstance")
     @Nested
     @DisplayName("should save podcast")
     inner class ShouldSavePodcast {
@@ -272,6 +280,17 @@ class PodcastServiceTest {
         @Nested
         @DisplayName("which doesn't exist before")
         inner class WhichDoesntExistBefore {
+
+            @BeforeEach
+            fun beforeEach() {
+                whenever(fileService.downloadPodcastCover(podcast)).thenReturn(Mono.empty())
+            }
+
+            @AfterEach
+            fun afterEach() {
+                verify(fileService).downloadPodcastCover(podcast)
+                Mockito.reset(fileService)
+            }
 
             @Test
             fun `with no tags and just a cover`() {
@@ -352,8 +371,6 @@ class PodcastServiceTest {
                         .assertNext { assertThat(it).isSameAs(podcast) }
                         .verifyComplete()
             }
-
-
 
         }
 

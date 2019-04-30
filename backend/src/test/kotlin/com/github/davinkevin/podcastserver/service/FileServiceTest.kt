@@ -9,7 +9,11 @@ import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.Tag
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.nhaarman.mockitokotlin2.whenever
+import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -18,6 +22,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -37,6 +43,7 @@ import java.util.*
  */
 @ExtendWith(SpringExtension::class)
 @Import(FileService::class)
+@ImportAutoConfiguration(WebClientAutoConfiguration::class)
 class FileServiceTest {
 
     @Autowired lateinit var fileService: FileService
@@ -183,4 +190,49 @@ class FileServiceTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("should download cover")
+    inner class ShouldDownloadCover {
+
+        private val wireMockServer: WireMockServer = WireMockServer(wireMockConfig().port(8089))
+
+        @BeforeEach
+        fun beforeEach() = wireMockServer.start()
+
+        @AfterEach
+        fun afterEach() = wireMockServer.stop()
+
+        val podcast = Podcast(
+                id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast title",
+                url = "https://foo.bar.com/app/file.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("http://localhost:8089/img/image.png"),
+                        height = 200, width = 200
+                )
+        )
+
+        @Test
+        fun `and save it to file`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(fileService.downloadPodcastCover(podcast))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            val file = tempFolder.resolve(podcast.title).resolve("${podcast.id}.${podcast.cover.extension()}")
+            assertThat(file).exists()
+            assertThat(file).hasDigest("MD5", "1cc21d3dce8bfedbda2d867a3238e8db")
+        }
+    }
 }
+
+private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.toASCIIString()) ?: "jpg"

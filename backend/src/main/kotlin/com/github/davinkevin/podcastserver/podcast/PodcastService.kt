@@ -2,6 +2,8 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2
+import com.github.davinkevin.podcastserver.cover.DownloadPodcastCoverInformation
+import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepositoryV2
 import org.springframework.stereotype.Service
@@ -18,7 +20,8 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as Podcas
 class PodcastService(
         private val repository: PodcastRepository,
         private val coverRepository: CoverRepositoryV2,
-        private val tagRepository: TagRepositoryV2
+        private val tagRepository: TagRepositoryV2,
+        private val fileService: FileService
 ) {
 
     fun findAll(): Flux<Podcast> = repository.findAll()
@@ -49,6 +52,7 @@ class PodcastService(
                         tags = t,
                         cover = c)
                 }
+                .delayUntil { fileService.downloadPodcastCover(it) }
     }
 }
 

@@ -8,7 +8,10 @@ import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.nio.file.Files
@@ -19,7 +22,7 @@ import java.nio.file.Paths
  * Created by kevin on 2019-02-09
  */
 @Service
-class FileService(val p: PodcastServerParameters) {
+class FileService(val p: PodcastServerParameters, val wcb: WebClient.Builder) {
 
     private val log = LoggerFactory.getLogger(FileService::class.java)
 
@@ -50,7 +53,26 @@ class FileService(val p: PodcastServerParameters) {
                 .map { path }
                 .map { it.toString().substringAfterLast("/") }
     }
+
+    fun downloadPodcastCover(podcast: Podcast): Mono<Void> {
+        return wcb.clone()
+                .baseUrl(podcast.cover.url.toASCIIString())
+                .build()
+                .get()
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(ByteArrayResource::class.java)
+                .map { val file = p.rootfolder
+                            .resolve(podcast.title)
+                            .create()
+                            .resolve("${podcast.id}.${podcast.cover.extension()}")
+
+                    log.debug("Save file ${file.toAbsolutePath()}")
+                    Files.write(file, it.byteArray) }
+                .then()
+    }
 }
 
+private fun Path.create() = if (Files.exists(this)) this else Files.createDirectory(this)
 private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.toASCIIString()) ?: "jpg"
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"

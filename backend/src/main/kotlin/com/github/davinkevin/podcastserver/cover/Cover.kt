@@ -9,3 +9,5 @@ class Cover(
         val height: Int,
         val width: Int
 )
+
+data class DownloadPodcastCoverInformation(val podcastTitle: String, val podcastId: UUID, val coverURI: URI)
