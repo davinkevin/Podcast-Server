@@ -67,9 +67,7 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 .doOnNext { log.debug("the url of cover is ${it.cover.url}")}
                 .flatMap { item -> item
                         .toMono()
-                        .map { Paths.get(it.podcast.title).resolve("${it.id}.${it.cover.extension()}") }
-                        .flatMap { fileService.exists(it) }
-                        .map { it.toString().substringAfterLast("/") }
+                        .flatMap { fileService.coverExists(it) }
                         .map { UriComponentsBuilder.fromUri(host)
                                     .pathSegment("data", item.podcast.title, it)
                                     .build().toUri()

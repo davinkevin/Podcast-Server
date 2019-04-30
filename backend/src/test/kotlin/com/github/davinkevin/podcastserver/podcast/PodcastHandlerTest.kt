@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
+import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -23,6 +24,7 @@ import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.net.URI
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -303,7 +305,9 @@ class PodcastHandlerTest {
         fun `by redirecting to local file server if cover exists locally`() {
             /* Given */
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
-            whenever(fileService.exists(any())).then { it.getArgument<Path>(0).toMono() }
+            whenever(fileService.coverExists(any<Podcast>())).then {
+                FilenameUtils.getName(it.getArgument<Podcast>(0).cover.url.toASCIIString()).toMono()
+            }
             whenever(p.coverDefaultName).thenReturn("cover")
             /* When */
             rest
@@ -320,7 +324,7 @@ class PodcastHandlerTest {
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
-            whenever(fileService.exists(any())).then { Mono.empty<Path>() }
+            whenever(fileService.coverExists(any<Podcast>())).then { Mono.empty<Path>() }
 
             /* When */
             rest

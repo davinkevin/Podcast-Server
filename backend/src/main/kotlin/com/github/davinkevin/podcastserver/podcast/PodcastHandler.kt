@@ -64,8 +64,7 @@ class PodcastHandler(
                 .doOnNext { log.debug("the url of the podcast cover is ${it.cover.url}")}
                 .flatMap { podcast -> podcast
                         .toMono()
-                        .map { Paths.get(it.title).resolve("${p.coverDefaultName}.${it.cover.extension()}") }
-                        .flatMap { fileService.exists(it) }
+                        .flatMap { fileService.coverExists(it) }
                         .map { it.toString().substringAfterLast("/") }
                         .map { UriComponentsBuilder.fromUri(host)
                                 .pathSegment("data", podcast.title, it)

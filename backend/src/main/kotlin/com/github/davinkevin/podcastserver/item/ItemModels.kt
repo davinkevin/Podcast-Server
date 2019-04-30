@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-09
  */
-class DeleteItemInformation(val id: UUID, fileName: String, podcastTitle: String) {
+data class DeleteItemInformation(val id: UUID, val fileName: String, val podcastTitle: String) {
     val path = Paths.get(podcastTitle, fileName)!!
 }
 

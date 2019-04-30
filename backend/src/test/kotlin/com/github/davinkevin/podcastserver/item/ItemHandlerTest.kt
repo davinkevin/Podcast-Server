@@ -2,10 +2,12 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
+import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
+import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -130,7 +132,11 @@ class ItemHandlerTest {
         fun `by redirecting to local file server if cover exists locally`() {
             /* Given */
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
-            whenever(fileService.exists(any())).then { it.getArgument<Path>(0).toMono() }
+            whenever(fileService.coverExists(any<Item>())).then {
+                val item = it.getArgument<Item>(0)
+                val extension = FilenameUtils.getExtension(item.cover.url)
+                "${item.id}.$extension".toMono()
+            }
 
             /* When */
             rest
@@ -147,7 +153,7 @@ class ItemHandlerTest {
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
-            whenever(fileService.exists(any())).then { Mono.empty<Path>() }
+            whenever(fileService.coverExists(any<Item>())).then { Mono.empty<Path>() }
 
             /* When */
             rest

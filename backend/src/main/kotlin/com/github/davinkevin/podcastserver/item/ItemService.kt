@@ -28,7 +28,7 @@ class ItemService(
     fun deleteOldEpisodes() = repository.
             findAllToDelete( p.limitDownloadDate().toOffsetDateTime() )
             .doOnSubscribe { log.info("Deletion of old items") }
-            .delayUntil { fileService.deleteItem(it.path) }
+            .delayUntil { fileService.deleteItem(it) }
             .collectList()
             .flatMap { repository.updateAsDeleted(it.map { v -> v.id }) }
 
@@ -44,7 +44,8 @@ class ItemService(
             .delayUntil { item -> item.toMono()
                     .filter { it.isDownloaded() }
                     .filter { !it.fileName.isNullOrEmpty() }
-                    .flatMap { fileService.deleteItem(Paths.get(item.podcast.title, item.fileName)) }
+                    .map { DeleteItemInformation(it.id, it.fileName!!, it.podcast.title) }
+                    .flatMap { fileService.deleteItem(it) }
             }
             .then()
 

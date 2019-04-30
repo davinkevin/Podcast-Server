@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.item
 
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.FileService
@@ -80,7 +79,8 @@ class ItemServiceTest {
         )
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit.toOffsetDateTime())).thenReturn(repoResponse)
-        whenever(fileService.deleteItem(any())).thenReturn(Mono.empty())
+        whenever(fileService.
+                deleteItem(any())).thenReturn(Mono.empty())
         whenever(repository.updateAsDeleted(any())).thenReturn(Mono.empty())
 
         /* When */
@@ -91,7 +91,7 @@ class ItemServiceTest {
                     val ids = items.map { it.id }
 
                     verify(repository).findAllToDelete(limit.toOffsetDateTime())
-                    verify(fileService, times(3)).deleteItem(argWhere { it in paths })
+                    verify(fileService, times(3)).deleteItem(argWhere { it in items })
                     verify(repository).updateAsDeleted(argWhere { it == ids })
                 }
                 /* Then */
@@ -213,12 +213,12 @@ class ItemServiceTest {
         fun `and delete files`() {
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = "foo.mp4")
-            val itemPath = Paths.get(currentItem.podcast.title, currentItem.fileName)
+            val deleteItemInformation = DeleteItemInformation(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
             whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
-            whenever(fileService.deleteItem(itemPath)).thenReturn(Mono.empty())
+            whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(Mono.empty())
 
             /* When */
             StepVerifier.create(itemService.reset(item.id))
@@ -227,7 +227,7 @@ class ItemServiceTest {
                     .expectNext(item)
                     .verifyComplete()
 
-            verify(fileService).deleteItem(itemPath)
+            verify(fileService).deleteItem(deleteItemInformation)
         }
 
 
