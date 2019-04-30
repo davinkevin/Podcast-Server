@@ -24,11 +24,8 @@ import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.LocalDate
-import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.ZonedDateTime.now
-import java.util.*
 import java.util.UUID.*
 import javax.sql.DataSource
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
@@ -412,4 +409,220 @@ class PodcastRepositoryV2Test {
 
     }
 
+    @Nested
+    @DisplayName("should update")
+    inner class ShouldUpdate {
+
+        private val podcastCovers = insertInto("COVER")
+                .columns("ID", "URL", "WIDTH", "HEIGHT")
+                .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
+                .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 200, 200)
+                .values(fromString("8ea0373e-7af8-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/a-podcast-to-update/cover_3.png", 300, 300)
+                .values(fromString("8ea0373e-7af9-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/a-podcast-to-update/cover_4.png", 400, 400)
+                .build()!!
+
+        private val podcastToUpdate = insertInto("PODCAST")
+                .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE")
+                .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "podcast without tags", "http://fake.url.com/appload.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), false, "RSS")
+                .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), true, "RSS")
+                .build()!!
+
+        private val tagsInDb = insertInto("TAG")
+                .columns("ID", "NAME")
+                .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+                .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+                .values(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+                .build()!!
+
+        private val podcastTag = insertInto("PODCAST_TAGS")
+                .columns("PODCASTS_ID", "TAGS_ID")
+                .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
+                .build()!!
+
+
+        @BeforeEach
+        fun prepare() {
+            val operation = sequenceOf(DELETE_ALL, tagsInDb, podcastCovers, podcastToUpdate, podcastTag)
+            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
+
+            dbSetupTracker.launchIfNecessary(dbSetup)
+        }
+
+        @Test
+        fun `the title`() {
+            /* Given */
+            val id = fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")
+
+            /* When */
+            StepVerifier.create(repository.update(
+                    id = id,
+                    title = "new title",
+                    url = "http://fake.url.com/appload.rss",
+                    hasToBeDeleted = false,
+                    tags = listOf(),
+                    cover = Cover(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://foo.bar.com/a/cover.png"), height = 100, width = 100)
+            ))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Podcast(
+                            id = id,
+                            title = "new title",
+                            url = "http://fake.url.com/appload.rss",
+                            hasToBeDeleted = false,
+                            lastUpdate = null,
+                            type = "RSS",
+                            tags = listOf(),
+                            cover = CoverForPodcast(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
+                    ))
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `the url`() {
+            /* Given */
+            val id = fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")
+
+            /* When */
+            StepVerifier.create(repository.update(
+                    id = id,
+                    title = "new title",
+                    url = "http://fake.url.com/new-url.rss",
+                    hasToBeDeleted = false,
+                    tags = listOf(),
+                    cover = Cover(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://foo.bar.com/a/cover.png"), height = 100, width = 100)
+            ))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Podcast(
+                            id = id,
+                            title = "new title",
+                            url = "http://fake.url.com/new-url.rss",
+                            hasToBeDeleted = false,
+                            lastUpdate = null,
+                            type = "RSS",
+                            tags = listOf(),
+                            cover = CoverForPodcast(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
+                    ))
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `has to be deleted`() {
+            /* Given */
+            val id = fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")
+
+            /* When */
+            StepVerifier.create(repository.update(
+                    id = id,
+                    title = "new title",
+                    url = "http://fake.url.com/appload.rss",
+                    hasToBeDeleted = true,
+                    tags = listOf(),
+                    cover = Cover(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://foo.bar.com/a/cover.png"), height = 100, width = 100)
+            ))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Podcast(
+                            id = id,
+                            title = "new title",
+                            url = "http://fake.url.com/appload.rss",
+                            hasToBeDeleted = true,
+                            lastUpdate = null,
+                            type = "RSS",
+                            tags = listOf(),
+                            cover = CoverForPodcast(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
+                    ))
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `the cover id`() {
+            /* Given */
+            val id = fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")
+
+            /* When */
+            StepVerifier.create(repository.update(
+                    id = id,
+                    title = "new title",
+                    url = "http://fake.url.com/appload.rss",
+                    hasToBeDeleted = true,
+                    tags = listOf(),
+                    cover = Cover(id = fromString("8ea0373e-7af9-4e15-b0fd-9ec4b10822ec"), url = URI("http://foo.bar.com/a/cover.png"), height = 100, width = 100)
+            ))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Podcast(
+                            id = id,
+                            title = "new title",
+                            url = "http://fake.url.com/appload.rss",
+                            hasToBeDeleted = true,
+                            lastUpdate = null,
+                            type = "RSS",
+                            tags = listOf(),
+                            cover = CoverForPodcast(id = fromString("8ea0373e-7af9-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_4.png"), height = 400, width = 400)
+                    ))
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `to add Foo, bAr and another_Bar tags`() {
+            /* Given */
+            val id = fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")
+
+            val tag1 = Tag(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+            val tag2 = Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+            val tag3 = Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+
+            /* When */
+            StepVerifier.create(repository.update(
+                    id = id,
+                    title = "Geek Inc HD",
+                    url = "http://fake.url.com/geekinc.rss",
+                    hasToBeDeleted = true,
+                    tags = listOf(tag1, tag2, tag3),
+                    cover = Cover(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://foo.bar.com/a/cover.png"), height = 100, width = 100)
+            ))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isEqualTo(id)
+                        assertThat(it.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/geekinc.rss")
+                        assertThat(it.hasToBeDeleted).isEqualTo(true)
+                        assertThat(it.type).isEqualTo("RSS")
+                        assertThat(it.tags).containsExactlyInAnyOrder(tag1, tag2, tag3)
+                        assertThat(it.cover).isEqualTo(CoverForPodcast(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_2.png"), height = 200, width = 200))
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `to remove all tags`() {
+            /* Given */
+            val id = fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")
+
+            /* When */
+            StepVerifier.create(repository.update(
+                    id = id,
+                    title = "Geek Inc HD",
+                    url = "http://fake.url.com/geekinc.rss",
+                    hasToBeDeleted = true,
+                    tags = listOf(),
+                    cover = Cover(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://foo.bar.com/a/cover.png"), height = 100, width = 100)
+            ))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isEqualTo(id)
+                        assertThat(it.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/geekinc.rss")
+                        assertThat(it.hasToBeDeleted).isEqualTo(true)
+                        assertThat(it.type).isEqualTo("RSS")
+                        assertThat(it.tags).isEmpty()
+                        assertThat(it.cover).isEqualTo(CoverForPodcast(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_2.png"), height = 200, width = 200))
+                    }
+                    .verifyComplete()
+        }
+    }
 }

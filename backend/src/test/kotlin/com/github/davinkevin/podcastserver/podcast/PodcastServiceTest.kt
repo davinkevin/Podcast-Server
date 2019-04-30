@@ -4,8 +4,11 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
@@ -376,6 +379,346 @@ class PodcastServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("should update podcast")
+    @Suppress("UnassignedFluxMonoInstance")
+    inner class ShouldUpdatePodcast {
+
+        private val id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729")
+
+        private val podcastForUpdate = PodcastForUpdate(
+                id = id,
+                title = "Podcast title",
+                url = URI("https://foo.bar.com/app/file.rss"),
+                hasToBeDeleted = true,
+                tags = setOf(),
+                cover = CoverForCreation(url = URI("https://external.domain.tld/cover.png"), height = 200, width = 200)
+        )
+
+        @BeforeEach
+        fun beforeEach() {
+            Mockito.reset(tagRepository, coverRepository, fileService)
+        }
+
+        @Test
+        fun `with same data`() {
+            /* Given */
+            val p = podcast
+            whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+            whenever(repository.update(
+                    id = eq(p.id),
+                    title = eq(p.title),
+                    url = eq(p.url),
+                    hasToBeDeleted = eq(p.hasToBeDeleted),
+                    tags = argThat { isEmpty() },
+                    cover = argThat {
+                        id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                                url == java.net.URI("https://external.domain.tld/cover.png") &&
+                                height == 200 && width == 200
+                    }
+            )).thenReturn(p.toMono())
+
+            /* When */
+            StepVerifier.create(service.update(podcastForUpdate))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(p)
+                    .verifyComplete()
+
+            verify(tagRepository, never()).save(any())
+            verify(coverRepository, never()).save(any())
+            verify(fileService, never()).downloadPodcastCover(any())
+            verify(fileService, never()).movePodcast(any(), any())
+        }
+
+        @Nested
+        @DisplayName("with modification on tags")
+        inner class WithModificationOnTags {
+
+            private val newTagForCreation = TagForCreation(id = null, name = "Foo")
+            private val newTagsInDb = Tag(UUID.randomUUID(), newTagForCreation.name)
+
+            private val oldTagForCreation = TagForCreation(id = UUID.randomUUID(), name = "Bar")
+            private val oldTagInDb = Tag(oldTagForCreation.id!!, oldTagForCreation.name)
+
+            @Test
+            fun `with only one new tag`() {
+                /* Given */
+                val pToUpdate = podcastForUpdate.copy(tags = setOf(newTagForCreation))
+                val p = podcast.copy(tags = setOf(newTagsInDb))
+
+                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = argThat { contains(newTagsInDb) && size == 1 },
+                        cover = argThat {
+                            id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                                    url == java.net.URI("https://external.domain.tld/cover.png") &&
+                                    height == 200 && width == 200
+                        }
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(tagRepository, times(1)).save(any())
+            }
+
+            @Test
+            fun `with one new tag and one old tag`() {
+                /* Given */
+                val pToUpdate = podcastForUpdate.copy(tags = setOf(newTagForCreation, oldTagForCreation))
+                val p = podcast.copy(tags = setOf(newTagsInDb, oldTagInDb))
+
+                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = argThat { containsAll(listOf(newTagsInDb, oldTagInDb)) && size == 2 },
+                        cover = any()
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(tagRepository, times(1)).save(any())
+            }
+
+            @Test
+            fun `with only one old tag`() {
+                /* Given */
+                val pToUpdate = podcastForUpdate.copy(tags = setOf(oldTagForCreation))
+                val p = podcast.copy(tags = setOf(oldTagInDb))
+
+                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = argThat { containsAll(listOf(oldTagInDb)) && size == 1 },
+                        cover = any()
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(tagRepository, never()).save(any())
+            }
+
+            @Test
+            fun `with many new and many old tags`() {
+                /* Given */
+                val tagsName = listOf("Foo", "Bar", "One", "Another", "Tags")
+                val listOfNewTags = tagsName
+                        .map { "$it.new" }
+                        .map { TagForCreation(id = null, name = it) }
+                val listOfOldTags = tagsName
+                        .map { "$it.old" }
+                        .map { TagForCreation(id = UUID.randomUUID(), name = it) }
+
+                val allTagsInDb = (listOfNewTags + listOfOldTags)
+                        .map { Tag(it.id ?: UUID.randomUUID(), it.name) }
+
+                val pToUpdate = podcastForUpdate.copy(tags = listOfNewTags + listOfOldTags)
+                val p = podcast.copy(tags = allTagsInDb)
+
+                whenever(tagRepository.save(argThat { this in listOfNewTags.map { it.name } }))
+                        .then { allTagsInDb.first() { t -> t.name == it.getArgument<String>(0) }.toMono() }
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = argThat { containsAll(allTagsInDb) && size == allTagsInDb.size },
+                        cover = any()
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(tagRepository, times(listOfNewTags.size)).save(any())
+            }
+
+            @AfterEach
+            fun afterEach() {
+                verify(coverRepository, never()).save(any())
+                verify(fileService, never()).downloadPodcastCover(any())
+                verify(fileService, never()).movePodcast(any(), any())
+            }
+
+        }
+
+        @Nested
+        @DisplayName("with modification on cover")
+        inner class WithModificationOnCover {
+
+            @Test
+            fun `and do nothing if new cover url is relative`() {
+                /* Given */
+                val pToUpdate = podcastForUpdate.copy(
+                        cover = CoverForCreation(200, 200, URI("/api/v1/cover.png"))
+                )
+                val p = podcast
+
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = any(),
+                        cover = argThat {
+                            id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                                    url == URI("https://external.domain.tld/cover.png") &&
+                                    height == 200 && width == 200
+                        }
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(coverRepository, never()).save(any())
+            }
+
+            @Test
+            fun `and do nothing if new cover url is same as old cover`() {
+                /* Given */
+                val p = podcast
+                val pToUpdate = podcastForUpdate.copy(
+                        cover = CoverForCreation(200, 200, p.cover.url)
+                )
+
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = any(),
+                        cover = argThat {
+                            id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                                    url == URI("https://external.domain.tld/cover.png") &&
+                                    height == 200 && width == 200
+                        }
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(coverRepository, never()).save(any())
+            }
+
+            @Test
+            fun `and save new cover`() {
+                /* Given */
+                val newCover = CoverForCreation(200, 200, URI("http://foo.bar.com/image.png"))
+                val coverInDb = Cover(UUID.randomUUID(), newCover.url, newCover.height, newCover.width)
+                val pToUpdate = podcastForUpdate.copy(cover = newCover)
+                val p = podcast
+
+                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(coverRepository.save(newCover)).thenReturn(coverInDb.toMono())
+                whenever(fileService.downloadPodcastCover(argThat { title == p.title && cover.url == newCover.url }))
+                        .thenReturn(Mono.empty())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(p.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = any(),
+                        cover = eq(coverInDb)
+                )).thenReturn(p.toMono())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(p)
+                        .verifyComplete()
+
+                verify(coverRepository, times(1)).save(any())
+                verify(fileService, times(1)).downloadPodcastCover(any())
+            }
+
+
+
+            @AfterEach
+            fun afterEach() {
+                verify(tagRepository, never()).save(any())
+                verify(fileService, never()).movePodcast(any(), any())
+            }
+        }
+
+        @Nested
+        @DisplayName("with modification on title")
+        inner class WithModificationOnTitle {
+
+            @Test
+            fun `and should trigger a move of the folder`() {
+                /* Given */
+                val p = podcast.copy(title = "oldName")
+                val pToUpdate = podcastForUpdate.copy(title = "newName")
+                val pAfterUpdate = p.copy(title = "newName")
+                whenever(repository.findById(p.id)).thenReturn(p.toMono())
+                whenever(repository.update(
+                        id = eq(p.id),
+                        title = eq(pToUpdate.title),
+                        url = eq(p.url),
+                        hasToBeDeleted = eq(p.hasToBeDeleted),
+                        tags = any(),
+                        cover = any()
+                )).thenReturn(pAfterUpdate.toMono())
+                whenever(fileService.movePodcast(p, pToUpdate.title)).thenReturn(Mono.empty())
+
+                /* When */
+                StepVerifier.create(service.update(pToUpdate))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(pAfterUpdate)
+                        .verifyComplete()
+
+                verify(tagRepository, never()).save(any())
+                verify(coverRepository, never()).save(any())
+                verify(fileService, never()).downloadPodcastCover(any())
+                verify(fileService, times(1)).movePodcast(p, pToUpdate.title)
+            }
+
+        }
+    }
 }
 
 private fun CoverForCreation.toPodcastCover() = Cover(UUID.randomUUID(), url = url, height = height, width = width)

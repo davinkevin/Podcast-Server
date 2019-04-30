@@ -17,6 +17,7 @@ import org.jooq.TableField
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.util.function.component1
@@ -173,6 +174,34 @@ class PodcastRepositoryV2(private val query: DSLContext) {
 
         insertPodcast
                 .then(linkToTags)
+                .then(findById(id))
+    }
+
+    fun update(id: UUID, title: String, url: String?, hasToBeDeleted: Boolean, tags: Collection<Tag>, cover: Cover): Mono<Podcast> = Mono.defer {
+
+        val update = query
+                .update(PODCAST)
+                .set(PODCAST.TITLE, title)
+                .set(PODCAST.URL, url)
+                .set(PODCAST.HAS_TO_BE_DELETED, hasToBeDeleted)
+                .set(PODCAST.COVER_ID, cover.id)
+                .where(PODCAST.ID.eq(id))
+                .executeAsyncAsMono()
+
+        val deleteAllTags = query
+                .delete(PODCAST_TAGS)
+                .where(PODCAST_TAGS.PODCASTS_ID.eq(id))
+                .executeAsyncAsMono()
+
+        val insertNewTags = if (tags.isEmpty()) Mono.empty()
+                    else query
+                            .insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID)
+                            .apply { tags.forEach { values(id, it.id) } }
+                            .executeAsyncAsMono()
+
+        update
+                .then(deleteAllTags)
+                .then(insertNewTags)
                 .then(findById(id))
     }
 }

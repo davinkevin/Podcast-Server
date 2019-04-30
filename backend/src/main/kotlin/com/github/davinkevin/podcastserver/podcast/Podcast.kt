@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.tag.Tag
 import java.net.URI
 import java.time.LocalDate
@@ -37,3 +38,8 @@ data class NumberOfItemByDateWrapper(val date: LocalDate, val numberOfItems: Int
 }
 
 data class StatsPodcastType(val type: String, val values: Set<NumberOfItemByDateWrapper>)
+
+
+data class PodcastForCreation(val title: String, val url: URI, val tags: Collection<TagForCreation>, val type: String, val hasToBeDeleted: Boolean, val cover: CoverForCreation)
+data class PodcastForUpdate(val id: UUID, val title: String, val url: URI, val hasToBeDeleted: Boolean, val tags: Collection<TagForCreation>, val cover: CoverForCreation)
+data class TagForCreation(val id: UUID?, val name: String)

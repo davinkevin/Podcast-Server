@@ -19,6 +19,7 @@ class PodcastRoutingConfig {
             GET("/", podcast::findAll)
             GET("/{id}", podcast::findById)
             POST("/", podcast::create)
+            PUT("/{id}", podcast::update)
 
             "/{id}".nest {
                 GET("/cover.{ext}", podcast::cover)

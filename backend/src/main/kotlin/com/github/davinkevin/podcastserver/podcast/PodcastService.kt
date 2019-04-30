@@ -1,15 +1,17 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2
-import com.github.davinkevin.podcastserver.cover.DownloadPodcastCoverInformation
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepositoryV2
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
 import reactor.util.function.component1
 import reactor.util.function.component2
 import java.net.URI
@@ -54,9 +56,37 @@ class PodcastService(
                 }
                 .delayUntil { fileService.downloadPodcastCover(it) }
     }
+
+    fun update(updatePodcast: PodcastForUpdate): Mono<Podcast> = findById(updatePodcast.id).flatMap { p ->
+
+        val oldTags = updatePodcast.tags.toFlux().filter { it.id != null }.map { Tag(it.id!!, it.name) }
+        val newTags = updatePodcast.tags.toFlux().filter { it.id == null }.flatMap { tagRepository.save(it.name) }
+        val tags = Flux.merge(oldTags, newTags).collectList()
+
+        val newCover = updatePodcast.cover
+        val oldCover = p.cover
+        val cover =
+                if (!newCover.url.toASCIIString().startsWith("/") && oldCover.url != newCover.url)
+                    coverRepository.save(newCover).delayUntil {
+                        fileService.downloadPodcastCover(p.copy(cover = CoverForPodcast(it.id, it.url, it.height, it.width)))
+                    }
+                else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width).toMono()
+
+        val title =
+                if (p.title != updatePodcast.title) fileService.movePodcast(p, updatePodcast.title)
+                else Mono.empty()
+
+        Mono.zip(tags, cover)
+                .flatMap { (t, c) ->
+                    repository.update(
+                            id = updatePodcast.id,
+                            title = updatePodcast.title,
+                            url = updatePodcast.url.toASCIIString(),
+                            hasToBeDeleted = updatePodcast.hasToBeDeleted,
+                            tags = t,
+                            cover = c)
+                }
+                .delayUntil { title }
+    }
 }
-
-
-data class PodcastForCreation(val title: String, val url: URI, val tags: Collection<TagForCreation>, val type: String, val hasToBeDeleted: Boolean, val cover: CoverForCreation)
-data class TagForCreation(val id: UUID?, val name: String)
 

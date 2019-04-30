@@ -30,7 +30,7 @@ export default class PodcastService  {
     }
 
     patch(podcast) {
-        return this.$http.patch(`/api/podcasts/${podcast.id}`, podcast).then(r => r.data);
+      return this.$http.put (`/api/v1/podcasts/${podcast.id}`, podcast).then (r => r.data);
     }
 
     delete(podcast) {

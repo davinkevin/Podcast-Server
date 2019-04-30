@@ -22,7 +22,7 @@ import java.nio.file.Paths
  * Created by kevin on 2019-02-09
  */
 @Service
-class FileService(val p: PodcastServerParameters, val wcb: WebClient.Builder) {
+class FileService(private val p: PodcastServerParameters, private val wcb: WebClient.Builder) {
 
     private val log = LoggerFactory.getLogger(FileService::class.java)
 
@@ -69,6 +69,17 @@ class FileService(val p: PodcastServerParameters, val wcb: WebClient.Builder) {
 
                     log.debug("Save file ${file.toAbsolutePath()}")
                     Files.write(file, it.byteArray) }
+                .then()
+    }
+
+    fun movePodcast(oldPodcast: Podcast, newTitle: String): Mono<Void> = Mono.defer {
+        val oldLocation = p.rootfolder.resolve(oldPodcast.title)
+        val newLocation = p.rootfolder.resolve(newTitle)
+
+        log.info("Move podcast from $oldLocation to $newLocation")
+
+        Files.move(oldLocation, newLocation)
+                .toMono()
                 .then()
     }
 }

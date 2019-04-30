@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toMono
 import java.net.URI
-import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -55,6 +54,13 @@ class PodcastHandler(
                     .flatMap { podcastService.save(it) }
                     .map(::toPodcastHAL)
                     .flatMap { ok().syncBody(it) }
+
+    fun update(r: ServerRequest): Mono<ServerResponse> = r
+            .bodyToMono<PodcastUpdateHAL>()
+            .map { it.toPodcastUpdate() }
+            .flatMap { podcastService.update(it) }
+            .map(::toPodcastHAL)
+            .flatMap { ok().syncBody(it) }
 
     fun cover(r: ServerRequest): Mono<ServerResponse> {
         val host = r.extractHost()
@@ -106,8 +112,6 @@ class PodcastHandler(
 private class FindAllPodcastHAL(val content: Collection<PodcastHAL>)
 private class StatsPodcastTypeWrapperHAL(val content: Collection<StatsPodcastType>)
 
-private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.path)
-
 private data class PodcastHAL(val id: UUID,
                               val title: String,
                               val url: String?,
@@ -155,3 +159,22 @@ private data class PodcastCreationHAL(
 }
 private data class TagForCreationHAL(val id: UUID?, val name: String)
 private data class CoverForCreationHAL(val width: Int, val height: Int, val url: URI)
+
+private data class PodcastUpdateHAL(
+        val id: UUID,
+        val title: String,
+        val url: URI,
+        val hasToBeDeleted: Boolean,
+        val tags: Collection<TagForCreationHAL>?,
+        val cover: CoverForCreationHAL
+) {
+    fun toPodcastUpdate() = PodcastForUpdate(
+            id = id,
+            title = title,
+            url = url,
+            hasToBeDeleted = hasToBeDeleted,
+            tags = (tags ?: listOf()).map { TagForCreation(it.id, it.name) },
+            cover = CoverForCreation(cover.width, cover.height, cover.url)
+    )
+}
+
