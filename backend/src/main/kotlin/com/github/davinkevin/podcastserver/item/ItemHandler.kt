@@ -155,8 +155,12 @@ data class PodcastHAL(val id: UUID, val title: String, val url: String)
 
 fun toItemHAL(i: Item): ItemHAL {
 
+    val extension = i.cover
+            .extension()
+            .substringBeforeLast("?")
+
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", i.podcast.id.toString(), "items", i.id.toString(), "cover." + FilenameUtils.getExtension(i.cover.url))
+            .pathSegment("api", "v1", "podcasts", i.podcast.id.toString(), "items", i.id.toString(), "cover.$extension")
             .build(true)
             .toUri()
 
