@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toMono
 import java.net.URI
-import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -133,6 +132,7 @@ data class ItemHAL(
         get() {
             val extension = Option.fromNullable(fileName)
                     .map { FilenameUtils.getExtension(it) }
+                    .map { it.substringBeforeLast("?") }
                     .map { ".$it" }
                     .getOrElse { "" }
 
