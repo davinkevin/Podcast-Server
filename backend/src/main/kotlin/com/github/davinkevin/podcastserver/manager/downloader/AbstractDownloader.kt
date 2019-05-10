@@ -17,7 +17,10 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.PathMatcher
-import java.nio.file.attribute.PosixFilePermission.*
+import java.nio.file.attribute.PosixFilePermission.GROUP_READ
+import java.nio.file.attribute.PosixFilePermission.OTHERS_READ
+import java.nio.file.attribute.PosixFilePermission.OWNER_READ
+import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
 import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.PostConstruct
@@ -112,11 +115,17 @@ abstract class AbstractDownloader(
                 Files.move(t, targetWithoutExtension)
 
                 t = targetWithoutExtension
-                Files.setPosixFilePermissions(t, setOf(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ))
             }
         } catch (e:Exception) {
             failDownload()
             throw RuntimeException("Error during move of file", e)
+        }
+
+        try {
+            log.debug("Modification of read/write access")
+            Files.setPosixFilePermissions(t, setOf(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ))
+        } catch (e: Exception) {
+            log.warn("Modification of read/write access not made")
         }
 
         item.apply {
