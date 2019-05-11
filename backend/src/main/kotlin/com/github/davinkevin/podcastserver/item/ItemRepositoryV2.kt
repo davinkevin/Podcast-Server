@@ -113,9 +113,6 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .map { (v) -> v }
                 .collectList()
                 .flatMap { tagIds ->
-                    val tables = ITEM
-                            .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
-                            .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
 
                     val statusesCondition = if (statuses.isEmpty()) trueCondition() else ITEM.STATUS.`in`(statuses)
                     val tagsCondition = if (tagIds.isEmpty()) trueCondition() else {
@@ -123,36 +120,72 @@ class ItemRepositoryV2(private val query: DSLContext) {
                             value(it).`in`(query
                                     .select(PODCAST_TAGS.TAGS_ID)
                                     .from(PODCAST_TAGS)
-                                    .where(PODCAST.ID.eq(PODCAST_TAGS.PODCASTS_ID))
+                                    .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID))
                             ) }
                         and(multipleTagsCondition)
                     }
                     val queryCondition = if (q.isNullOrEmpty()) trueCondition() else {
-                        or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.contains(q) )
+                        or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
                     }
 
                     val filterConditions = and(statusesCondition, tagsCondition, queryCondition)
 
-                    val content = query
-                            .selectDistinct(
+                    val i = query
+                            .select(
                                     ITEM.ID, ITEM.TITLE, ITEM.URL,
                                     ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
                                     ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
 
-                                    PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
-                                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+                                    ITEM.PODCAST_ID, ITEM.COVER_ID
                             )
-                            .from(tables)
+                            .from(ITEM)
                             .where(filterConditions)
                             .orderBy(page.sort.toOrderBy())
                             .limit((page.size * page.page), page.size)
+                            .asTable("FILTERED_ITEMS")
+
+                    val itemId = i.field(ITEM.ID);
+                    val itemTitle = i.field(ITEM.TITLE)
+                    val itemURL = i.field(ITEM.URL)
+                    val itemPubDate = i.field(ITEM.PUB_DATE)
+                    val itemDownloadDate = i.field(ITEM.DOWNLOAD_DATE)
+                    val itemCreationDate = i.field(ITEM.CREATION_DATE)
+                    val itemDescription = i.field(ITEM.DESCRIPTION)
+                    val itemMimeType = i.field(ITEM.MIME_TYPE)
+                    val itemLength = i.field(ITEM.LENGTH)
+                    val itemFileName = i.field(ITEM.FILE_NAME)
+                    val itemStatus = i.field(ITEM.STATUS)
+
+                    val content: Mono<List<Item>> = query
+                            .select(
+                                    itemId, itemTitle, itemURL,
+                                    itemPubDate, itemDownloadDate, itemCreationDate,
+                                    itemDescription, itemMimeType, itemLength,
+                                    itemFileName, itemStatus,
+
+                                    PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+                            )
+                            .from(
+                                    i
+                                            .innerJoin(COVER).on(i.field(ITEM.COVER_ID).eq(COVER.ID))
+                                            .innerJoin(PODCAST).on(i.field(ITEM.PODCAST_ID).eq(PODCAST.ID)))
                             .fetchAsFlux()
-                            .map(::toItem)
+                            .map {
+                                val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
+                                val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
+                                Item(
+                                        it[itemId], it[itemTitle], it[itemURL],
+                                        it[itemPubDate].toUTC(), it[itemDownloadDate].toUTC(), it[itemCreationDate].toUTC(),
+                                        it[itemDescription], it[itemMimeType], it[itemLength], it[itemFileName], Status.of(it[itemStatus]),
+                                        p, c
+                                )
+                            }
                             .collectList()
 
                     val totalElements = query
                             .select(countDistinct(ITEM.ID))
-                            .from(tables)
+                            .from(ITEM)
                             .where(filterConditions)
                             .fetchOneAsMono()
                             .map { (v) -> v }

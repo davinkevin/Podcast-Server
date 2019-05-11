@@ -149,7 +149,7 @@ data class ItemHAL(
 }
 
 data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
-data class PodcastHAL(val id: UUID, val title: String, val url: String)
+data class PodcastHAL(val id: UUID, val title: String, val url: String?)
 
 fun toItemHAL(i: Item): ItemHAL {
 

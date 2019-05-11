@@ -1,6 +1,12 @@
 package com.github.davinkevin.podcastserver.extension.repository
 
-import org.jooq.*
+import org.jooq.InsertResultStep
+import org.jooq.Query
+import org.jooq.Record
+import org.jooq.Result
+import org.jooq.ResultQuery
+import org.jooq.UpdateResultStep
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
@@ -10,8 +16,12 @@ import java.util.concurrent.CompletionStage
 /**
  * Created by kevin on 2019-02-12
  */
-fun <R: Record> ResultQuery<R>.fetchAsFlux(): Flux<R> =
-        Mono.fromCompletionStage(this.fetchAsync()).flatMapMany { Flux.fromIterable(it) }
+
+private val log = LoggerFactory.getLogger("JooqExtension")!!
+
+fun <R: Record> ResultQuery<R>.fetchAsFlux(): Flux<R> = Flux.defer {
+    Mono.fromCompletionStage(this.fetchAsync()).flatMapMany { Flux.fromIterable(it) }
+}
 
 fun <R: Record> ResultQuery<R>.fetchOneAsMono(): Mono<R> =
         Mono.fromCompletionStage(this.fetchAsync())

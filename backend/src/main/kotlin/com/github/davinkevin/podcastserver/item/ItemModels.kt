@@ -36,7 +36,7 @@ data class Item(
 data class PodcastForItem(
         val id: UUID,
         val title: String,
-        val url: String
+        val url: String?
 )
 
 data class CoverForItem (
