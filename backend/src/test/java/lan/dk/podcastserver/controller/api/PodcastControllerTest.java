@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,21 +29,6 @@ public class PodcastControllerTest {
     @Mock PodcastBusiness podcastBusiness;
     @Mock FindPodcastBusiness findPodcastBusiness;
     @InjectMocks PodcastController podcastController;
-
-    @Test
-    public void should_update() {
-        Podcast podcast = new Podcast();
-        when(podcastBusiness.reatachAndSave(any(Podcast.class))).thenReturn(podcast);
-        UUID id = UUID.randomUUID();
-
-        /* When */
-        Podcast podcastUpdated = podcastController.update(podcast, id);
-
-        /* Then */
-        assertThat(podcastUpdated).isInstanceOf(Podcast.class);
-        assertThat(podcastUpdated.getId()).isEqualTo(id);
-        verify(podcastBusiness, only()).reatachAndSave(same(podcast));
-    }
 
     @Test
     public void should_patch_update() {

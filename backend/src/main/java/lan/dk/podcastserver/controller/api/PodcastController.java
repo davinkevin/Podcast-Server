@@ -30,13 +30,6 @@ public class PodcastController {
     }
 
     @JsonView(Podcast.PodcastDetailsView.class)
-    @PutMapping("{id}")
-    public Podcast update(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
-        podcast.setId(id);
-        return podcastBusiness.reatachAndSave(podcast);
-    }
-
-    @JsonView(Podcast.PodcastDetailsView.class)
     @PatchMapping("{id}")
     public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
         podcast.setId(id);
