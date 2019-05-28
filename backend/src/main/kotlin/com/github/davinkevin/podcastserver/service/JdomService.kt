@@ -116,32 +116,6 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         return XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
     }
 
-    fun podcastsToOpml(podcasts: List<Podcast>, domain: String): String {
-        val opml = Element(OPML).apply {
-            setAttribute("version", "2.0")
-        }
-
-        val head = Element(HEAD).apply {
-            addContent(Element(TITLE).addContent("Podcast-Server"))
-        }
-
-        val outlines = podcasts
-                .sortedBy { it.title }
-                .map { it.toOutline(domain) }
-
-        val body = Element(BODY)
-                .addContent(outlines)
-
-        val doc = with(opml) {
-            addContent(head)
-            addContent(body)
-            Document(this)
-        }
-
-        return XMLOutputter(Format.getPrettyFormat())
-                .outputString(doc)
-    }
-
     companion object {
 
         // Element names :
@@ -168,37 +142,15 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         private val GUID = "guid"
         private val THUMBNAIL = "thumbnail"
         private val RSS = "rss"
-        private val OPML = "opml"
-        private val HEAD = "head"
-        private val BODY = "body"
-        private val OUTLINE = "outline"
-        private val TEXT = "text"
-        private val HTML_URL = "htmlUrl"
-        private val VERSION = "version"
-        private val XML_URL = "xmlUrl"
-        private val RSS_2 = "RSS2"
 
         //Useful namespace :
         val ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
         private val MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
 
         // URL Format
-        private val LINK_PODCAST_HTML_FORMAT = "%s/podcasts/%s"
         private val LINK_PODCAST_FORMAT = "%s/api/podcasts/%s/rss"
         private val PUB_DATE_COMPARATOR = { one: Item, another: Item -> -(one.pubDate!!.compareTo(another.pubDate!!)) }
-        private val TITLE_COMPARATOR = Comparator.comparing(Function<Podcast, String> { it.title!! })
     }
-
-    private fun Podcast.toOutline(domain: String) =
-            Element(JdomService.OUTLINE).apply {
-                setAttribute(JdomService.TEXT, title)
-                setAttribute(JdomService.DESCRIPTION, if (description != null) description else "")
-                setAttribute(JdomService.HTML_URL, "$domain/podcasts/${id}")
-                setAttribute(JdomService.TITLE, title)
-                setAttribute(JdomService.TYPE, JdomService.RSS)
-                setAttribute(JdomService.VERSION, JdomService.RSS_2)
-                setAttribute(JdomService.XML_URL, String.format(JdomService.LINK_PODCAST_FORMAT, domain, id))
-            }
 
     private fun Item.toElement(domain: String): Element {
         val itemCoverUrl = coverOfItemOrPodcast.relativeUrl(domain)

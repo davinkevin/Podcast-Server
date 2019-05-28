@@ -53,6 +53,7 @@ class PodcastServiceTest {
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
             title = "Podcast title",
+            description = "desc",
             url = "https://foo.bar.com/app/file.rss",
             hasToBeDeleted = true,
             lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -85,6 +86,7 @@ class PodcastServiceTest {
         private val podcast1 = Podcast(
                 id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast first",
+                description = "desc",
                 url = "https://foo.bar.com/app/1.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -100,6 +102,7 @@ class PodcastServiceTest {
         private val podcast2 = Podcast(
                 id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast second",
+                description = "desc",
                 url = "https://foo.bar.com/app/2.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -115,6 +118,7 @@ class PodcastServiceTest {
         private val podcast3 = Podcast(
                 id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast third",
+                description = "desc",
                 url = "https://foo.bar.com/app/3.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),

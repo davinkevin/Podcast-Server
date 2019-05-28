@@ -271,16 +271,4 @@ class PodcastBusinessTest {
         verify(podcastRepository).findById(podcastId)
         verify(coverBusiness).getCoverPathOf(podcast)
     }
-
-    @Test
-    fun should_transform_to_opml() {
-        /* GIVEN */
-        whenever(podcastRepository.findAll()).thenReturn(listOf())
-        whenever(jdomService.podcastsToOpml(any(), anyString())).thenReturn("Foo")
-        /* WHEN  */
-        val v = podcastBusiness.asOpml("http://fake.domain.com/")
-        /* THEN  */
-        assertThat(v).isEqualTo("Foo")
-        verify(podcastRepository, times(1)).findAll()
-    }
 }

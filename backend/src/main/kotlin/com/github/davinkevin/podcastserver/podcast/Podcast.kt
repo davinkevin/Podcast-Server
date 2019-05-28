@@ -10,6 +10,7 @@ import java.util.*
 data class Podcast (
     val id: UUID,
     val title: String,
+    val description: String?,
     val url: String?,
     val hasToBeDeleted: Boolean,
     val lastUpdate: OffsetDateTime?,

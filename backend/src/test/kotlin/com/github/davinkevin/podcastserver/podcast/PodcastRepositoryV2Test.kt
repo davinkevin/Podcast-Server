@@ -468,6 +468,7 @@ class PodcastRepositoryV2Test {
                     .expectNext(Podcast(
                             id = id,
                             title = "new title",
+                            description = null,
                             url = "http://fake.url.com/appload.rss",
                             hasToBeDeleted = false,
                             lastUpdate = null,
@@ -497,6 +498,7 @@ class PodcastRepositoryV2Test {
                     .expectNext(Podcast(
                             id = id,
                             title = "new title",
+                            description = null,
                             url = "http://fake.url.com/new-url.rss",
                             hasToBeDeleted = false,
                             lastUpdate = null,
@@ -526,6 +528,7 @@ class PodcastRepositoryV2Test {
                     .expectNext(Podcast(
                             id = id,
                             title = "new title",
+                            description = null,
                             url = "http://fake.url.com/appload.rss",
                             hasToBeDeleted = true,
                             lastUpdate = null,
@@ -555,6 +558,7 @@ class PodcastRepositoryV2Test {
                     .expectNext(Podcast(
                             id = id,
                             title = "new title",
+                            description = null,
                             url = "http://fake.url.com/appload.rss",
                             hasToBeDeleted = true,
                             lastUpdate = null,

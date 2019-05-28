@@ -17,6 +17,7 @@ class PodcastRoutingConfig {
         "/api/v1/podcasts".nest {
 
             GET("/", podcast::findAll)
+            GET("/opml", podcast::opml)
             GET("/{id}", podcast::findById)
             POST("/", podcast::create)
             PUT("/{id}", podcast::update)

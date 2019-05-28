@@ -47,6 +47,7 @@ class PodcastHandlerTest {
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
             title = "Podcast title",
+            description = "desc",
             url = "https://foo.bar.com/app/file.rss",
             hasToBeDeleted = true,
             lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -103,6 +104,7 @@ class PodcastHandlerTest {
         val podcast1 = Podcast(
                 id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast first",
+                description = "desc",
                 url = "https://foo.bar.com/app/1.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -118,6 +120,7 @@ class PodcastHandlerTest {
         val podcast2 = Podcast(
                 id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast second",
+                description = "desc",
                 url = "https://foo.bar.com/app/2.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -133,6 +136,7 @@ class PodcastHandlerTest {
         val podcast3 = Podcast(
                 id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast third",
+                description = "desc",
                 url = "https://foo.bar.com/app/3.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -229,6 +233,7 @@ class PodcastHandlerTest {
         val p = Podcast(
                 id = UUID.fromString("dbb18cac-58bb-4d89-b9ec-afc9da00afc5"),
                 title = "foo",
+                description = "desc",
                 url = "http://foo.bar.com/val.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 4, 9, 11, 12, 13, 0, ZoneOffset.ofHours(2)),
@@ -311,6 +316,7 @@ class PodcastHandlerTest {
         val p = Podcast(
                 id = UUID.fromString("dbb18cac-58bb-4d89-b9ec-afc9da00afc5"),
                 title = "foo",
+                description = "desc",
                 url = "http://foo.bar.com/val.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 4, 9, 11, 12, 13, 0, ZoneOffset.ofHours(2)),
@@ -381,7 +387,6 @@ class PodcastHandlerTest {
         }
 
     }
-
 
     @Nested
     @DisplayName("should find cover")
@@ -774,6 +779,139 @@ class PodcastHandlerTest {
 
         }
 
+
+    }
+
+    @Nested
+    @DisplayName("should generate opml")
+    inner class ShouldGenerateOPML {
+
+        val podcast1 = Podcast(
+                id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast first",
+                description = "desc",
+                url = "https://foo.bar.com/app/1.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/1.png"),
+                        height = 200, width = 200
+                )
+        )
+        val podcast2 = Podcast(
+                id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast second",
+                description = "desc",
+                url = "https://foo.bar.com/app/2.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/2.png"),
+                        height = 200, width = 200
+                )
+        )
+        val podcast3 = Podcast(
+                id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast third",
+                description = "desc",
+                url = "https://foo.bar.com/app/3.rss",
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+                type = "RSS",
+                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+
+                cover = CoverForPodcast(
+                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                        url = URI("https://external.domain.tld/3.png"),
+                        height = 200, width = 200
+                )
+        )
+
+        @Test
+        fun `with no podcast`() {
+            /* Given */
+            whenever(podcastService.findAll()).thenReturn(Flux.empty())
+
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/opml")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml("""
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <opml version="2.0">
+                          <head>
+                            <title>Podcast-Server</title>
+                          </head>
+                          <body />
+                        </opml>
+                    """.trimIndent())
+        }
+
+        @Test
+        fun `with one podcast`() {
+            /* Given */
+            whenever(podcastService.findAll()).thenReturn(listOf(podcast1).toFlux())
+
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/opml")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml("""
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <opml version="2.0">
+                          <head>
+                            <title>Podcast-Server</title>
+                          </head>
+                          <body>
+                            <outline text="Podcast first" description="desc" htmlUrl="https://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" title="Podcast first" type="rss" version="RSS2" xmlUrl="https://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" />
+                          </body>
+                        </opml>
+                    """.trimIndent())
+        }
+
+        @Test
+        fun `with 3 podcasts`() {
+            /* Given */
+            whenever(podcastService.findAll()).thenReturn(listOf(podcast1, podcast2, podcast3).toFlux())
+
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/opml")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml("""
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <opml version="2.0">
+                          <head>
+                            <title>Podcast-Server</title>
+                          </head>
+                          <body>
+                            <outline text="Podcast first" description="desc" htmlUrl="https://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" title="Podcast first" type="rss" version="RSS2" xmlUrl="https://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" />
+                            <outline text="Podcast second" description="desc" htmlUrl="https://localhost:8080/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729" title="Podcast second" type="rss" version="RSS2" xmlUrl="https://localhost:8080/api/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729/rss" />
+                            <outline text="Podcast third" description="desc" htmlUrl="https://localhost:8080/podcasts/cd16b2eb-657e-4064-b470-5b99397ce729" title="Podcast third" type="rss" version="RSS2" xmlUrl="https://localhost:8080/api/podcasts/cd16b2eb-657e-4064-b470-5b99397ce729/rss" />
+                          </body>
+                        </opml>
+                    """.trimIndent())
+        }
 
     }
 }

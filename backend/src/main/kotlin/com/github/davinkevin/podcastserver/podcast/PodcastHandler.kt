@@ -5,7 +5,12 @@ import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
+import org.jdom2.Document
+import org.jdom2.Element
+import org.jdom2.output.Format
+import org.jdom2.output.XMLOutputter
 import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -48,12 +53,22 @@ class PodcastHandler(
                     .map { FindAllPodcastHAL(it) }
                     .flatMap { ok().syncBody(it) }
 
+    fun opml(r: ServerRequest): Mono<ServerResponse> {
+        val host = r.extractHost()
+        return podcastService.findAll()
+                .map { OpmlOutline(it, host)}
+                .sort { a,b -> a.title.compareTo(b.title) }
+                .collectList()
+                .map { Opml(it).toXML() }
+                .flatMap { ok().contentType(MediaType.APPLICATION_XML).syncBody(it) }
+    }
+
     fun create(r: ServerRequest): Mono<ServerResponse> = r
-                    .bodyToMono<PodcastCreationHAL>()
-                    .map { it.toPodcastCreation() }
-                    .flatMap { podcastService.save(it) }
-                    .map(::toPodcastHAL)
-                    .flatMap { ok().syncBody(it) }
+            .bodyToMono<PodcastCreationHAL>()
+            .map { it.toPodcastCreation() }
+            .flatMap { podcastService.save(it) }
+            .map(::toPodcastHAL)
+            .flatMap { ok().syncBody(it) }
 
     fun update(r: ServerRequest): Mono<ServerResponse> = r
             .bodyToMono<PodcastUpdateHAL>()
@@ -178,3 +193,47 @@ private data class PodcastUpdateHAL(
     )
 }
 
+private class Opml(val podcastOutlines: List<OpmlOutline>) {
+
+    fun toXML(): String {
+        val opml = Element("opml").apply {
+            setAttribute("version", "2.0")
+
+            val head = Element("head").apply {
+                addContent(Element("title").addContent("Podcast-Server"))
+            }
+
+            val outlines = podcastOutlines
+                    .sortedBy { it.title }
+                    .map { it.toXML() }
+
+            val body = Element("body")
+                    .addContent(outlines)
+
+            addContent(head)
+            addContent(body)
+        }
+
+        return XMLOutputter(Format.getPrettyFormat()).outputString(Document(opml))
+    }
+}
+
+private class OpmlOutline(p: Podcast, host: URI) {
+    val text = p.title
+    val description = p.description
+    val htmlUrl = host.toASCIIString()!! + "podcasts/${p.id}"
+    val title = p.title
+    val type = "rss"
+    val version = "RSS2"
+    val xmlUrl = host.toASCIIString()!! + "api/podcasts/${p.id}/rss"
+
+    fun toXML() = Element("outline").apply {
+        setAttribute("text", title)
+        setAttribute("description", description ?: "")
+        setAttribute("htmlUrl", htmlUrl)
+        setAttribute("title", title)
+        setAttribute("type", "rss")
+        setAttribute("version", "RSS2")
+        setAttribute("xmlUrl", xmlUrl)
+    }
+}

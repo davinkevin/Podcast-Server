@@ -44,8 +44,6 @@ public class PodcastController {
         podcastBusiness.delete(id);
     }
 
-    @GetMapping(value="/opml", produces = "application/xml; charset=utf-8")
-    public String asOpml(ServerWebExchange request) { return podcastBusiness.asOpml(UrlService.getDomainFromRequest(request).toASCIIString()); }
 
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, ServerWebExchange request) {

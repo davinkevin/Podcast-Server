@@ -17,7 +17,6 @@ import org.jooq.TableField
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.util.function.component1
@@ -33,7 +32,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
     fun findById(id: UUID) = Mono.zip(
             Mono.defer { query
                     .select(
-                            PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                            PODCAST.ID, PODCAST.TITLE, PODCAST.DESCRIPTION, PODCAST.URL,
                             PODCAST.HAS_TO_BE_DELETED, PODCAST.LAST_UPDATE,
                             PODCAST.TYPE,
                             COVER.ID, COVER.URL, COVER.HEIGHT, COVER.WIDTH
@@ -48,7 +47,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 val c = CoverForPodcast(p[COVER.ID], URI(p[COVER.URL]), p[COVER.WIDTH], p[COVER.HEIGHT])
 
                 Podcast (
-                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.URL],
+                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.URL],
                         p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE].toUTC(),
                         p[PODCAST.TYPE],
 
@@ -72,7 +71,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 .select(
                         PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
                         PODCAST.HAS_TO_BE_DELETED, PODCAST.LAST_UPDATE,
-                        PODCAST.TYPE,
+                        PODCAST.TYPE, PODCAST.DESCRIPTION,
 
                         COVER.ID, COVER.URL, COVER.HEIGHT, COVER.WIDTH,
 
@@ -99,7 +98,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                                 val c = CoverForPodcast(p[COVER.ID], URI(p[COVER.URL]), p[COVER.WIDTH], p[COVER.HEIGHT])
 
                                 Podcast (
-                                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.URL],
+                                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.URL],
                                         p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE].toUTC(),
                                         p[PODCAST.TYPE],
 

@@ -74,6 +74,4 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
     }
 
     fun coverOf(id: UUID): Path = coverBusiness.getCoverPathOf(findOne(id))
-
-    fun asOpml(domainName: String): String = jdomService.podcastsToOpml(findAll(), domainName)
 }

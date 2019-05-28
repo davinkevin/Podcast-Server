@@ -92,6 +92,7 @@ class FileServiceTest {
             val podcast = Podcast(
                     id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
                     title = "Podcast title",
+                    description = "desc",
                     url = "https://foo.bar.com/app/file.rss",
                     hasToBeDeleted = true,
                     lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
@@ -186,9 +187,7 @@ class FileServiceTest {
                         /* Then */
                         .verifyComplete()
             }
-
         }
-
     }
 
     @Nested
@@ -206,6 +205,7 @@ class FileServiceTest {
         val podcast = Podcast(
                 id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast title",
+                description = "desc",
                 url = "https://foo.bar.com/app/file.rss",
                 hasToBeDeleted = true,
                 lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
