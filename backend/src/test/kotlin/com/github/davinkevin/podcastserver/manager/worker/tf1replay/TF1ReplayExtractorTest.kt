@@ -26,12 +26,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.quality.Strictness
 import java.net.HttpURLConnection
 import java.util.function.Consumer
 
 /**
  * Created by kevin on 12/12/2017
  */
+@MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension::class)
 class TF1ReplayExtractorTest {
 
@@ -41,8 +44,8 @@ class TF1ReplayExtractorTest {
     @Mock lateinit var urlService: UrlService
     @InjectMocks lateinit var extractor: TF1ReplayExtractor
 
-    val item = Item().apply { url = "http://www.tf1.fr/tf1/19h-live/videos/19h-live-20-juillet-2016.html" }
-    val url = "http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/13315645.m3u8?vk=MTMzMTU2NDUubTN1OA==&st=UycCudlvBB6aTcCG37_Ulw&e=1492276114&t=1492265314"
+    val item = Item().apply { url = "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-deuxieme-partie-14-juin-2019.html" }
+    val url = "http://ios-q1.tf1.fr/2/USP-0x0/20/64/13642064/ssm/13642064.ism/13642064.m3u8?vk=MTM2NDIwNjQubTN1OA==&st=GaNw39ILGAkALcJzgvj-Qg&e=1560633707&t=1560622907"
     val connectionIsMadeAsDesktop: (Consumer<HttpURLConnection>) -> Boolean = {
         val c = mock<HttpURLConnection>()
         it.accept(c)
@@ -63,10 +66,10 @@ class TF1ReplayExtractorTest {
         fun beforeEach() {
             whenever(apiRequest.header(any(), any())).thenReturn(apiRequest)
             whenever(apiRequest.asString()).thenReturn(apiResponse)
-            whenever(apiResponse.body).thenReturn("{\n" +
-                    "  \"hls\": \"http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/13315645.m3u8?vk=MTMzMTU2NDUubTN1OA==&st=UycCudlvBB6aTcCG37_Ulw&e=1492276114&t=1492265314&min_bitrate=100000&max_bitrate=1600001\",\n" +
-                    "  \"mpd\": \"http://das-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/13315645.mpd?vk=MTMzMTU2NDUubXBk&st=SFYRoQwZsQ-84qF0vnX6Sw&e=1492276114&t=1492265314&min_bitrate=100000&max_bitrate=1600001\"\n" +
-                    "}")
+            whenever(apiResponse.body).thenReturn(""" {
+                "hls":"http://ios-q1.tf1.fr/2/USP-0x0/20/64/13642064/ssm/13642064.ism/13642064.m3u8?vk=MTM2NDIwNjQubTN1OA==&st=GaNw39ILGAkALcJzgvj-Qg&e=1560633707&t=1560622907&min_bitrate=100000&max_bitrate=1600001",
+                "mpd":"http://das-q1.tf1.fr/2/USP-0x0/20/64/13642064/ssm/13642064.ism/13642064.mpd?vk=MTM2NDIwNjQubXBk&st=HKMBOEf-YKVi9TXz3sJNXg&e=1560633707&t=1560622907&min_bitrate=100000&max_bitrate=1600001"
+            } """)
             whenever(m3u8request.header(any(), any())).thenReturn(m3u8request)
             whenever(m3u8request.asString()).thenReturn(m3u8Response)
             whenever(m3u8Response.rawBody).thenReturn(NullInputStream(1L))
@@ -83,65 +86,52 @@ class TF1ReplayExtractorTest {
                 whenever(m3U8Service.findBestQuality(any())).thenReturn(API.Option("foo/bar/video.mp4"))
                 whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
                 whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
+                doAnswer { m3u8request }.whenever(urlService).get(url)
             }
 
             @Test
             fun `real url`() {
                 /* Given */
-                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
-                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
-                doAnswer { m3u8request }.whenever(urlService).get(url)
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml(from("quotidien-deuxieme-partie-14-juin-2019.html")))
+                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13642064")
 
                 /* When */
                 val downloadingItem = extractor.extract(item)
 
                 /* Then */
-                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
-                assertThat(downloadingItem.filename).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4")
+                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/20/64/13642064/ssm/13642064.ism/foo/bar/video.mp4")
+                assertThat(downloadingItem.filename).isEqualToIgnoringCase("quotidien-deuxieme-partie-14-juin-2019.mp4")
                 assertThat(downloadingItem.userAgent).isEqualToIgnoringCase("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)")
             }
 
             @Test
             fun `add user agent for real url`() {
                 /* Given */
-                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
-                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
-                doAnswer { m3u8request }.whenever(urlService).get(url)
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml(from("quotidien-deuxieme-partie-14-juin-2019.html")))
+                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13642064")
 
                 /* When */
                 val downloadingItem = extractor.extract(item)
 
                 /* Then */
-                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
-                assertThat(downloadingItem.filename).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4")
+                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/20/64/13642064/ssm/13642064.ism/foo/bar/video.mp4")
+                assertThat(downloadingItem.filename).isEqualToIgnoringCase("quotidien-deuxieme-partie-14-juin-2019.mp4")
                 assertThat(downloadingItem.userAgent).isEqualToIgnoringCase("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)")
                 verify(urlService).getRealURL(any(), argWhere(connectionIsMadeAsDesktop), any())
-            }
-
-            @Test
-            fun `url with short id`() {
-                /* Given */
-                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.short-id.item.html"))
-                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/3184238")
-                doAnswer { m3u8request }.whenever(urlService).get(url)
-
-                /* When */
-                val itemUrl = extractor.extract(item)
-
-                /* Then */
-                assertThat(itemUrl.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
             }
         }
 
         @Nested
         @DisplayName("with fall back url")
         inner class WithFallBackUrl {
+
             @Test
             fun `fall back to default url`() {
                 /* Given */
-                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
-                doAnswer { throw RuntimeException("Error during fetch of $url") }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
-                doAnswer { m3u8request }.whenever(urlService).get("http://wat.tv/get/ipad/13184238.m3u8")
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml(from("quotidien-deuxieme-partie-14-juin-2019.html")))
+                whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
+                doAnswer { throw RuntimeException("Error during fetch of $url") }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13642064")
+                doAnswer { m3u8request }.whenever(urlService).get("http://wat.tv/get/ipad/13642064.m3u8")
                 whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
                 whenever(m3U8Service.findBestQuality(any())).thenReturn(API.Option("foo/bar/video.mp4"))
 
@@ -149,8 +139,8 @@ class TF1ReplayExtractorTest {
                 val downloadingItem = extractor.extract(item)
 
                 /* Then */
-                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/56/45/13315645/ssm/13315645.ism/foo/bar/video.mp4")
-                assertThat(downloadingItem.filename).isEqualToIgnoringCase("19h-live-20-juillet-2016.mp4")
+                assertThat(downloadingItem.url().toList()).contains("http://ios-q1.tf1.fr/2/USP-0x0/20/64/13642064/ssm/13642064.ism/foo/bar/video.mp4")
+                assertThat(downloadingItem.filename).isEqualToIgnoringCase("quotidien-deuxieme-partie-14-juin-2019.mp4")
                 assertThat(downloadingItem.userAgent).isEqualToIgnoringCase("AppleCoreMedia/1.0.0.10B400 (iPod; U; CPU OS 6_1_5 like Mac OS X; fr_fr)")
             }
         }
@@ -159,34 +149,43 @@ class TF1ReplayExtractorTest {
         @DisplayName("an error")
         inner class AnError {
 
-            @BeforeEach
-            fun beforeEach() {
-                whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
-            }
-
             @Test
             fun `when fetching m3u8 file`() {
                 /* Given */
+                whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
                 whenever(urlService.addDomainIfRelative(any(), any())).thenCallRealMethod()
                 whenever(m3U8Service.findBestQuality(any())).thenReturn(API.Option("foo/bar/video.mp4"))
-                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml(from("quotidien-deuxieme-partie-14-juin-2019.html")))
                 doAnswer { apiRequest }.whenever(urlService).get(url)
-                doAnswer { throw RuntimeException("Error during `get` of `http://www.wat.tv/get/webhtml/13184238`") }
-                        .whenever(urlService).get("http://wat.tv/get/ipad/13184238.m3u8")
+                doAnswer { throw RuntimeException("Error during `get` of `http://www.wat.tv/get/webhtml/13642064`") }
+                        .whenever(urlService).get("http://wat.tv/get/ipad/13642064.m3u8")
 
                 /* When */
                 assertThatThrownBy { extractor.extract(item) }
                 /* Then */
                         .isInstanceOf(RuntimeException::class.java)
-                        .hasMessage("Request end up on error for http://wat.tv/get/ipad/13184238.m3u8")
+                        .hasMessage("Request end up on error for http://wat.tv/get/ipad/13642064.m3u8")
+            }
+
+            @Test
+            fun `when error during json parsing`() {
+                /* Given */
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml(from("quotidien-deuxieme-partie-14-juin-2019.html")))
+
+                /* When */
+                assertThatThrownBy { extractor.extract(item) }
+                        /* Then */
+                        .isInstanceOf(RuntimeException::class.java)
+                        .hasMessage("error during extraction of json data from page")
             }
 
             @Test
             fun `when searching for best m3u8 format`() {
                 /* Given */
                 whenever(m3U8Service.findBestQuality(any())).thenReturn(None.toVΛVΓ())
-                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml("/remote/podcast/tf1replay/19h-live.item.html"))
-                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13184238")
+                whenever(htmlService.get(item.url!!)).thenReturn(fileAsHtml(from("quotidien-deuxieme-partie-14-juin-2019.html")))
+                whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
+                doAnswer { apiRequest }.whenever(urlService).get("http://www.wat.tv/get/webhtml/13642064")
                 doAnswer { m3u8request }.whenever(urlService).get(url)
 
                 /* When */
@@ -206,7 +205,7 @@ class TF1ReplayExtractorTest {
         assertThatThrownBy { extractor.extract(item) }
         /* Then */
                 .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Url not extracted for ${item.url}")
+                .hasMessage("no script tag found in the page")
     }
 
     @Test
@@ -228,4 +227,6 @@ class TF1ReplayExtractorTest {
         /* Then */
         assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
     }
+    
+    fun from(name: String) = "/remote/podcast/tf1replay/$name"
 }

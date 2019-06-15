@@ -2,8 +2,10 @@ package com.github.davinkevin.podcastserver.manager.worker.tf1replay
 
 import arrow.core.Try
 import arrow.core.getOrElse
+import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -13,9 +15,10 @@ import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGE
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_KEY
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_MOBILE
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Item
+import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.io.FilenameUtils
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -28,6 +31,8 @@ import java.util.function.Consumer
 @Scope(SCOPE_PROTOTYPE)
 class TF1ReplayExtractor(val htmlService: HtmlService, val jsonService: JsonService, val urlService: UrlService, val m3U8Service: M3U8Service) : Extractor {
 
+    private val log = LoggerFactory.getLogger(TF1ReplayExtractor::class.java)!!
+
     // https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-deuxieme-partie-21-juin-2017.html
     override fun getFileName(item: Item): String =
             item.url!!
@@ -36,21 +41,34 @@ class TF1ReplayExtractor(val htmlService: HtmlService, val jsonService: JsonServ
                     .baseName() + ".mp4"
 
     override fun extract(item: Item): DownloadingItem {
-        return htmlService.get(item.url!!).k()
-                .flatMap { it.select("#zonePlayer").firstOption() }
-                .map { it.attr("data-src") }
-                .map { UrlService.removeQueryParameters(it) }
-                .map { extractId(it) }
-                .map { normalizeId(it) }
-                .map { getM3U8url(it) }
-                .map { getHighestQualityUrl(it) }
-                .map { DownloadingItem(item, listOf(it), getFileName(item), USER_AGENT_MOBILE) }
-                .getOrElse { throw RuntimeException("Url not extracted for ${item.url}") }
-    }
 
-    private fun normalizeId(id: String): String =
-            if (id.matches("[0-9]+".toRegex())) id
-            else id.substring(1)
+        val slug = item.url!!.substringAfterLast("/")
+                .substringBeforeLast(".")
+
+        val t = htmlService.get(item.url!!).k()
+                .map { it.select("script") }
+                .getOrElse { throw RuntimeException("no script tag found in the page") }
+                .map { it.html() }
+                .firstOption { it.contains("APOLLO_STATE") }
+                .map { it.substringAfter("=").trim(';') }
+                .flatMap { jsonService.parse(it).toOption() }
+
+        val jsonContext = t
+                .getOrElse { throw RuntimeException("error during extraction of json data from page") }
+
+        val streamId = JsonService.to(TYPE_KEYS)
+                .apply(jsonContext)
+                .filter { it.value.containsKey("slug") }
+                .filter { it.value.containsKey("streamId") }
+                .filter { it.value["slug"] == slug }
+                .map { it.value["streamId"].toString() }
+                .first()
+
+        val m3uUrl = getM3U8url(streamId)
+        val highestQuality = getHighestQualityUrl(m3uUrl)
+
+        return DownloadingItem(item, listOf(highestQuality), getFileName(item), USER_AGENT_MOBILE)
+    }
 
     private fun getM3U8url(id: String): String {
         return Try {
@@ -102,7 +120,7 @@ class TF1ReplayExtractor(val htmlService: HtmlService, val jsonService: JsonServ
             else Integer.MAX_VALUE
 
     companion object {
-        private fun extractId(src: String) = src.substring(src.length - 8)
+        private val TYPE_KEYS = object : TypeRef<Map<String, Map<String, Any>>>() {}
     }
 }
 

@@ -1,15 +1,13 @@
 package com.github.davinkevin.podcastserver.manager.worker.tf1replay
 
 import arrow.core.getOrElse
-import arrow.core.orElse
 import arrow.core.toOption
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.service.ImageService
-import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
-import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.service.HtmlService
+import com.github.davinkevin.podcastserver.service.ImageService
+import com.github.davinkevin.podcastserver.utils.k
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service
@@ -37,8 +35,10 @@ class TF1ReplayFinder(val htmlService: HtmlService, val imageService: ImageServi
             }
 
     private fun getCover(p: Document) =
-            PICTURE_EXTRACTOR.on(p.select(".focalImg style").html()).group(1).k()
-                    .orElse { p.select("meta[property=og:image]").attr("content").toOption() }
+            p.select("meta[property=og:image]")
+                    .attr("content")
+                    .toOption()
+                    .filter { it.isNotEmpty() }
                     .map { toUrl(it) }
                     .flatMap { imageService.getCoverFromURL(it).toOption() }
                     .getOrElse { Cover.DEFAULT_COVER }
@@ -48,12 +48,7 @@ class TF1ReplayFinder(val htmlService: HtmlService, val imageService: ImageServi
         else -> url
     }
 
-
     override fun compatibility(url: String?) =
             if (StringUtils.contains(url, "www.tf1.fr")) 1
             else Integer.MAX_VALUE
-
-    companion object {
-        private val PICTURE_EXTRACTOR = from("url\\(([^)]+)\\).*")
-    }
 }
