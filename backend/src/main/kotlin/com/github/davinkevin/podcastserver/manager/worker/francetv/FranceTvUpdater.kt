@@ -1,9 +1,12 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
 import arrow.core.getOrElse
+import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -11,13 +14,15 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.k
+import com.jayway.jsonpath.TypeRef
 import io.vavr.collection.List
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.web.util.UriComponentsBuilder
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -28,49 +33,63 @@ import java.time.ZonedDateTime
 @Component
 class FranceTvUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService, val jsonService: JsonService) : Updater {
 
-    override fun findItems(podcast: Podcast) =
-            htmlService
-                    .get(podcast.url!!).k()
-                    .map { it.select(LAST_VIDEOS_SELECTOR) }
-                    .flatMap { it.firstOption() }
-                    .map { it.select("li") }
-                    .getOrElse { listOf<Element>() }
-                    .map { htmlToItem(it) }
-                    .toSet()
+    private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)!!
 
-    private fun htmlToItem(element: Element) =
-            element.children()
-                    .firstOption { it.tagName() == "a" }
-                    .map { it.attr("data-video") }
-                    .map { CATALOG_URL.format(it) }
+    override fun findItems(podcast: Podcast): Set<Item> {
+
+        val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url!!)
+
+        return htmlService
+                .get(toReplayUrl(podcast.url!!)).k()
+                .map { it.select("a[href]") }
+                .getOrElse {
+                    log.error("No items found for ${podcast.title} at ${podcast.url}, the layout may have changed")
+                    listOf<Element>()
+                }
+                .map { urlBuilder.replacePath(it.attr("href")).toUriString() }
+                .map { urlToItem(it) }
+                .toSet()
+    }
+
+    private fun toReplayUrl(url: String): String = "$url/replay-videos/ajax/?page=0"
+
+    private fun urlToItem(itemUrl: String): Item =
+            htmlService
+                    .get(itemUrl)
+                    .map { it.select("script") }
+                    .getOrElse {
+                        log.error("No script found for item $itemUrl")
+                        Elements()
+                    }
+                    .map { it.html() }
+                    .firstOption { it.contains("FTVPlayerVideos") }
+                    .map { it.substringAfter("=").trim(';') }
+                    .flatMap { jsonService.parse(it).toOption() }
+                    .map { JsonService.to(PAGE_ITEM).apply(it) }
+                    .getOrElse { setOf() }
+                    .firstOption { it.contentId in itemUrl }
+                    .map { CATALOG_URL.format(it.videoId)}
                     .flatMap { jsonService.parseUrl(it).k() }
                     .map { JsonService.to(FranceTvItem::class.java).apply(it) }
-                    .map { ftv ->
-                        Item().apply {
-                            title = ftv.title()
-                            description = ftv.synopsis
-                            pubDate = ftv.pubDate()
-                            url = getUrl(element)
-                            cover = imageService.getCoverFromURL(ftv.image)
-                        }
-                    }
+                    .map { ftv -> Item().apply {
+                        title = ftv.title()
+                        description = ftv.synopsis
+                        pubDate = ftv.pubDate()
+                        url = itemUrl
+                        cover = imageService.getCoverFromURL(ftv.image)
+                    } }
                     .getOrElse { Item.DEFAULT_ITEM }
 
-    private fun getUrl(element: Element) =
-            element.children()
-                    .first { it.tagName() == "a" }
-                    .attr("href")
-                    .addProtocolIfNecessary("https:")
-
     override fun signatureOf(podcast: Podcast): String {
-        val listOfIds = htmlService.get(podcast.url!!).k()
-                .map { p -> p.select(LAST_VIDEOS_SELECTOR) }
-                .flatMap { it.firstOption() }
-                .map { it.select("li") }
-                .getOrElse { setOf<Element>() }
-                .flatMap { it.children().firstOption { el -> el.tagName() == "a" }.toList() }
-                .map { it.attr("data-video") }
-                .toList()
+
+        val listOfIds = htmlService
+                .get(toReplayUrl(podcast.url!!)).k()
+                .map { it.select("a[href]") }
+                .getOrElse {
+                    log.error("No items found for ${podcast.title} at ${podcast.url}, the layout may have changed")
+                    listOf<Element>()
+                }
+                .map { it.attr("href") }
                 .sorted()
                 .joinToString("-")
 
@@ -81,10 +100,9 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
 
     override fun compatibility(url: String?) = isFromFranceTv(url)
 
-
     companion object {
-        private val LAST_VIDEOS_SELECTOR = "#main ul.video-list"
-        private val CATALOG_URL = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s"
+        const val CATALOG_URL = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s"
+        internal val PAGE_ITEM = object : TypeRef<Set<FranceTvPageItem>>() {}
 
         fun isFromFranceTv(url: String?) =
                 if (StringUtils.contains(url, "www.france.tv")) 1
@@ -92,8 +110,8 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
     }
 }
 
-private fun String.addProtocolIfNecessary(protocol: String) =
-        UrlService.addProtocolIfNecessary(protocol, this)
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal class FranceTvPageItem(val contentId: String, val videoId: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 private class FranceTvItem {

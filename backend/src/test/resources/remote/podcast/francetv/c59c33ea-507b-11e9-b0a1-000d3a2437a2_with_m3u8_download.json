@@ -1,0 +1,118 @@
+{
+  "id":"c59c33ea-507b-11e9-b0a1-000d3a2437a2",
+  "ref_source":"VIDEONI",
+  "code_programme":"secrets_d_histoire",
+  "titre":"Immersion dans le myst\u00e8re Toutankhamon",
+  "sous_titre":null,
+  "synopsis":"C'est en ouvrant le sarcophage de Tout\u00e2nkhamon qu'Howard Carter fit la d\u00e9couverte arch\u00e9ologique la plus c\u00e9l\u00e8bre de l'Histoire... Un si\u00e8cle apr\u00e8s, le myst\u00e8re s'est-il \u00e9clairci ?",
+  "genre":"Magazine historique",
+  "genre_pluzz":null,
+  "genre_pluzz_antenne":null,
+  "type":"Extrait",
+  "episode":null,
+  "saison":null,
+  "diffusion":{
+    "timestamp":1553682344,
+    "date_debut":"27\/03\/2019 11:25"
+  },
+  "texte_diffusions":null,
+  "duree":"00:03:04",
+  "real_duration":184,
+  "image":"https:\/\/sivideo.webservices.francetelevisions.fr\/staticftv\/images_pdm_ni\/2019-03-27\/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682841.jpeg",
+  "image_secure":"https:\/\/sivideo.webservices.francetelevisions.fr\/staticftv\/images_pdm_ni\/2019-03-27\/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682841.jpeg",
+  "chaine":"France 2",
+  "mediamat_id_chaine":825,
+  "credit":[
+    {
+      "role":{
+        "id":"presentateur",
+        "label":"Pr\u00e9sentateur"
+      },
+      "first_name":"St\u00e9phane",
+      "last_name":"Bern",
+      "character":null
+    }
+  ],
+  "region":"",
+  "url_site":"http:\/\/www.france2.fr\/emissions\/secrets-dhistoire\/",
+  "url_guidetv":null,
+  "personnes":[
+    {
+      "nom":"Bern",
+      "prenom":"St\u00e9phane",
+      "fonctions":[
+        "Pr\u00e9sentateur"
+      ]
+    }
+  ],
+  "videos":[
+    {
+      "format":"hds_akamai",
+      "url":"http:\/\/ftvingest-vh.akamaihd.net\/z\/ingest\/streaming-adaptatif\/2019\/S13\/J3\/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil\/manifest.f4m?audiotrack=0%3Afra%3AFrancais",
+      "url_secure":"https:\/\/ftvingest-vh.akamaihd.net\/z\/ingest\/streaming-adaptatif\/2019\/S13\/J3\/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil\/manifest.f4m?audiotrack=0%3Afra%3AFrancais",
+      "statut":"ONLINE",
+      "drm":false,
+      "embed":true,
+      "geoblocage":null,
+      "droits_lecture_hors_connexion":true,
+      "plages_ouverture":[
+        {
+          "debut":1553682762,
+          "fin":1585218762,
+          "direct":false,
+          "startover":null
+        }
+      ]
+    },
+    {
+      "format":"m3u8-download",
+      "url":"http:\/\/ftvingest-vh.akamaihd.net\/i\/ingest\/streaming-adaptatif\/2019\/S13\/J3\/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil\/master.m3u8",
+      "url_secure":"https:\/\/ftvingest-vh.akamaihd.net\/i\/ingest\/streaming-adaptatif\/2019\/S13\/J3\/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil\/master.m3u8",
+      "statut":"ONLINE",
+      "drm":false,
+      "embed":true,
+      "geoblocage":null,
+      "droits_lecture_hors_connexion":true,
+      "plages_ouverture":[
+        {
+          "debut":1553682762,
+          "fin":1585218762,
+          "direct":false,
+          "startover":null
+        }
+      ]
+    }
+  ],
+  "url_reference":null,
+  "direct":null,
+  "id_aedra":"F23146652750974420192303",
+  "semaine_diffusion":null,
+  "droit":{
+    "type":"tvr",
+    "csa":"CSA1"
+  },
+  "subtitles":[
+
+  ],
+  "sequences":[
+
+  ],
+  "lectures":{
+    "id":"c59c33ea-507b-11e9-b0a1-000d3a2437a2",
+    "nb_lectures":0
+  },
+  "lectures_groupes":[
+
+  ],
+  "votes":null,
+  "indexes":[
+
+  ],
+  "ordre":"",
+  "tag_OAS":null,
+  "id_emission_plurimedia":149433584,
+  "audiodescription":null,
+  "spritesheet":null,
+  "spritesheet_secure":null,
+  "cue_points":null
+}

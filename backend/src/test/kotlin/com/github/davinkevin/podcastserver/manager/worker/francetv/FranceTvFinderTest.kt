@@ -26,14 +26,14 @@ class FranceTvFinderTest {
     fun `should find podcast`() {
         /* Given */
         val podcastUrl = "https://www.france.tv/france-2/secrets-d-histoire/"
-        val coverUrl = "https://www.france.tv/image/carre/265/265/o/c/f/f3b67d5d-phpijifco.png"
+        val coverUrl = "https://www.france.tv/image/vignette_16x9/400/225/j/e/z/733fe45c-phprc4zej.png"
         val cover = Cover().apply {
             url = coverUrl
             width = 200
             height = 200
         }
 
-        whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2.html")))
+        whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.home.html")))
         whenever(imageService.getCoverFromURL(coverUrl)).thenReturn(cover)
 
         /* When */
@@ -44,9 +44,7 @@ class FranceTvFinderTest {
         assertThat(podcast.title).isEqualTo("Secrets d'Histoire")
         assertThat(podcast.type).isEqualTo("FranceTv")
         assertThat(podcast.cover).isEqualTo(cover)
-        assertThat(podcast.description).isEqualTo("""Secrets d'Histoire est une émission de télévision présentée par Stéphane Bern. Chaque numéro retrace la vie d'un grand personnage de l'histoire et met en lumière des lieux hautement emblématiques du patrimoine.
-Magazine Secrets d'Histoire
-Accessible à tous, le magazine Secrets d’Histoire vous entraîne au cœur des épisodes mystérieux de l’histoire à travers des reportages, des enquêtes, des quizz… et bien plus encore ! En savoir plus""")
+        assertThat(podcast.description).isEqualTo("""Secrets d'Histoire est une émission de télévision présentée par Stéphane Bern. Chaque numéro retrace la vie d'un grand personnage de l'histoire et met en lumière des lieux hautement emblématiques du patrimoine. Magazine Secrets d'Histoire Accessible à tous, le magazine Secrets d’Histoire vous entraîne au cœur des épisodes mystérieux de l’histoire à travers des reportages, des enquêtes, des quizz… et bien plus encore ! En savoir plus""")
     }
 
     @Test

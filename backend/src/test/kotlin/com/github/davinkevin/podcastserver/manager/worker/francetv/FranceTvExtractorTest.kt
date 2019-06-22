@@ -1,113 +1,135 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
 import arrow.core.None
+import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * Created by kevin on 24/12/2017
  */
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(SpringExtension::class)
 class FranceTvExtractorTest {
 
-    @Mock lateinit var jsonService: JsonService
-    @Mock lateinit var htmlService: HtmlService
-    @InjectMocks lateinit var extractor: FranceTvExtractor
+    @Autowired lateinit var jsonService: JsonService
+    @Autowired lateinit var htmlService: HtmlService
+    @Autowired lateinit var extractor: FranceTvExtractor
 
     val item = Item().apply {
         title = "Secrets d'histoire - Jeanne d'Arc, au nom de Dieu"
-        url = ITEM_URL
+        url = "https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"
+    }
+
+    @BeforeEach
+    fun beforeEach() {
+        Mockito.reset(htmlService, jsonService)
     }
 
     @Test
     fun `should get url for given item`() {
         /* GIVEN */
-        whenever(htmlService.get(ITEM_URL)).thenReturn(fileAsHtml(from(HTML_ITEM)))
-        whenever(jsonService.parseUrl(fromCatalog(JSON_ITEM_ID))).thenReturn(fileAsJson(from("$JSON_ITEM_ID.json")))
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(fileAsHtml(from("948775-immersion-dans-le-mystere-toutankhamon.html")))
+        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(from("c59c33ea-507b-11e9-b0a1-000d3a2437a2.json")) }
 
         /* WHEN  */
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url().toList()).containsOnly(REAL_URL)
+        assertThat(downloadingItem.url().toList()).containsOnly("https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif/2019/S13/J3/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8?audiotrack=0%3Afra%3AFrancais")
         assertThat(downloadingItem.item).isSameAs(item)
-        assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
-        verify(htmlService, times(1)).get(ITEM_URL)
-        verify(jsonService, times(1)).parseUrl(any())
+        assertThat(downloadingItem.filename).isEqualTo("948775-immersion-dans-le-mystere-toutankhamon.mp4")
+        verify(htmlService, times(1)).get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html")
     }
 
 
     @Test
     fun `should use m3u8 url as backup if no hsl stream`() {
         /* GIVEN */
-        whenever(htmlService.get(ITEM_URL)).thenReturn(fileAsHtml(from(HTML_ITEM)))
-        whenever(jsonService.parseUrl(fromCatalog(JSON_ITEM_ID))).thenReturn(fileAsJson(from("${JSON_ITEM_ID}_without_hls_stream.json")))
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(fileAsHtml(from("948775-immersion-dans-le-mystere-toutankhamon.html")))
+        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(from("c59c33ea-507b-11e9-b0a1-000d3a2437a2_with_m3u8_download.json")) }
 
         /* WHEN  */
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url().toList()).containsOnly("https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8")
+        assertThat(downloadingItem.url().toList()).containsOnly("https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif/2019/S13/J3/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8")
         assertThat(downloadingItem.item).isSameAs(item)
-        assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
-        verify(htmlService, times(1)).get(ITEM_URL)
-        verify(jsonService, times(1)).parseUrl(any())
+        assertThat(downloadingItem.filename).isEqualTo("948775-immersion-dans-le-mystere-toutankhamon.mp4")
+        verify(htmlService, times(1)).get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html")
     }
 
     @Test
-    fun `should use first m3u8 stream if two formats are not found`() {
+    fun `should use first m3u8 stream if hls_v5_os and m3u8-download are not found`() {
         /* GIVEN */
-        whenever(htmlService.get(ITEM_URL)).thenReturn(fileAsHtml(from(HTML_ITEM)))
-        whenever(jsonService.parseUrl(fromCatalog(JSON_ITEM_ID))).thenReturn(fileAsJson(from("${JSON_ITEM_ID}_without_hls_and_official_m3u8.json")))
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(fileAsHtml(from("948775-immersion-dans-le-mystere-toutankhamon.html")))
+        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(from("c59c33ea-507b-11e9-b0a1-000d3a2437a2_with_m3u8_download.json")) }
 
         /* WHEN  */
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url().toList()).containsOnly("https://fake.url.com/index.m3u8")
+        assertThat(downloadingItem.url().toList()).containsOnly("https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif/2019/S13/J3/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8")
         assertThat(downloadingItem.item).isSameAs(item)
-        assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
-        verify(htmlService, times(1)).get(ITEM_URL)
-        verify(jsonService, times(1)).parseUrl(any())
+        assertThat(downloadingItem.filename).isEqualTo("948775-immersion-dans-le-mystere-toutankhamon.mp4")
+        verify(htmlService, times(1)).get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html")
     }
 
     @Test
     fun `should use not secure url if secured not found`() {
         /* GIVEN */
-        whenever(htmlService.get(ITEM_URL)).then { fileAsHtml(from(HTML_ITEM)) }
-        whenever(jsonService.parseUrl(fromCatalog(JSON_ITEM_ID))).thenReturn(fileAsJson(from("${JSON_ITEM_ID}_without_secured_url.json")))
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(fileAsHtml(from("948775-immersion-dans-le-mystere-toutankhamon.html")))
+        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(from("c59c33ea-507b-11e9-b0a1-000d3a2437a2_without_secured.json")) }
 
         /* WHEN  */
         val downloadingItem = extractor.extract(item)
 
         /* THEN  */
-        assertThat(downloadingItem.url().toList()).containsOnly("http://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8?audiotrack=0%3Afra%3AFrancais")
+        assertThat(downloadingItem.url().toList()).containsOnly("http://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif/2019/S13/J3/c59c33ea-507b-11e9-b0a1-000d3a2437a2_1553682844-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8?audiotrack=0%3Afra%3AFrancais")
         assertThat(downloadingItem.item).isSameAs(item)
-        assertThat(downloadingItem.filename).isEqualTo("14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.mp4")
-        verify(htmlService, times(1)).get(ITEM_URL)
-        verify(jsonService, times(1)).parseUrl(any())
+        assertThat(downloadingItem.filename).isEqualTo("948775-immersion-dans-le-mystere-toutankhamon.mp4")
+        verify(htmlService, times(1)).get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html")
     }
 
     @Test
     fun `should throw exception if no url found`() {
         /* GIVEN */
-        whenever(htmlService.get(ITEM_URL)).then { fileAsHtml(from(HTML_ITEM)) }
-        whenever(jsonService.parseUrl(fromCatalog(JSON_ITEM_ID))).thenReturn(fileAsJson(from("${JSON_ITEM_ID}_without_videos.json")))
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(fileAsHtml(from("948775-immersion-dans-le-mystere-toutankhamon.html")))
+        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(from("c59c33ea-507b-11e9-b0a1-000d3a2437a2_without_video.json")) }
 
         /* WHEN  */
         assertThatThrownBy { extractor.extract(item) }
@@ -117,15 +139,32 @@ class FranceTvExtractorTest {
     }
 
     @Test
-    fun `should throw exception if can t find url at all`() {
+    fun `should throw error because every videos are offline`() {
         /* GIVEN */
-        whenever(htmlService.get(ITEM_URL)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(fileAsHtml(from("948775-immersion-dans-le-mystere-toutankhamon.html")))
+        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(jsonService.parseUrl(any())).then { fileAsJson(from("c59c33ea-507b-11e9-b0a1-000d3a2437a2_offline.json")) }
 
         /* WHEN  */
         assertThatThrownBy { extractor.extract(item) }
                 /* THEN  */
                 .isInstanceOf(RuntimeException::class.java)
-                .withFailMessage("Url not found for " + item.url)
+                .hasMessageStartingWith("No video found in this FranceTvItem")
+    }
+
+    @Test
+    fun `should not find any elements because layout change`() {
+        /* GIVEN */
+        whenever(htmlService.get("https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"))
+                .thenReturn(None.toVΛVΓ())
+
+        /* WHEN  */
+        assertThatThrownBy { extractor.extract(item) }
+                /* THEN  */
+                .isInstanceOf(RuntimeException::class.java)
+                .hasMessageStartingWith("Error during extraction of FranceTV item")
+
     }
 
     @Test
@@ -148,12 +187,16 @@ class FranceTvExtractorTest {
         assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
     }
 
+    @TestConfiguration
+    @Import(FranceTvExtractor::class)
+    class LocalTestConfiguration {
+        @Bean fun jsonService() = mock<JsonService>()
+        @Bean fun htmlService() = mock<HtmlService>()
+    }
+
     companion object {
 
-        private const val ITEM_URL = "https://www.france.tv/spectacles-et-culture/emissions-culturelles/14383-secrets-d-histoire-jeanne-d-arc-au-nom-de-dieu.html"
         private const val REAL_URL = "https://ftvingest-vh.akamaihd.net/i/ingest/streaming-adaptatif_france-dom-tom/2017/S26/J4/006a3008-8f95-52d3-be47-c15cf3640542_1498732103-h264-web-,398k,632k,934k,1500k,.mp4.csmil/master.m3u8?audiotrack=0%3Afra%3AFrancais"
-        private const val HTML_ITEM = "200015-le-divorce-satyrique-fondateur-de-la-legende-noire-de-la-reine-margot.html"
-        private const val JSON_ITEM_ID = "006a3008-8f95-52d3-be47-c15cf3640542"
 
         private fun from(s: String) = "/remote/podcast/francetv/$s"
         private fun fromCatalog(id: String) = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=$id"
