@@ -31,12 +31,7 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, QuerydslPredi
 
     @CacheEvict(value = {"search", "stats"}, allEntries = true)
     void deleteById(Item item);
-
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    default Page<Item> findByPodcast(UUID idPodcast, Pageable pageRequest) {
-        return findAll(isInPodcast(idPodcast), pageRequest);
-    }
-
+    
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     default Set<Item> findAllNotDownloadedAndNewerThanAndNumberOfFailLessThan(ZonedDateTime date, Integer maxNumberOfRetry) {
         return HashSet.ofAll(findAll(

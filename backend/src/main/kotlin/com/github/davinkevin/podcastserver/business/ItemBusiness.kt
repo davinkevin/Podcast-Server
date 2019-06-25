@@ -53,10 +53,6 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val parameters:
         itemRepository.delete(itemToDelete)
     }
 
-    @Transactional(readOnly = true)
-    fun findByPodcast(idPodcast: UUID, pageable: Pageable): Page<Item> =
-            itemRepository.findByPodcast(idPodcast, pageable)
-
     fun addItemByUpload(podcastId: UUID, uploadedFile: MultipartFile): Item {
         val p = podcastBusiness.findOne(podcastId)
 

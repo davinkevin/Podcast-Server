@@ -37,20 +37,6 @@ public class ItemController {
         this.watchListBusiness = watchListBusiness;
     }
 
-    @GetMapping
-    @JsonView(Item.ItemPodcastListView.class)
-    public Page<Item> findAll(@PathVariable UUID idPodcast,
-                              @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                              @RequestParam(value = "size", required = false, defaultValue = "12") Integer size,
-                              @RequestParam(value = "sort", required = false, defaultValue = "pubDate,DESC") String sort
-    ) {
-        String field = StringUtils.substringBefore(sort, ",");
-        Sort.Direction direction = Sort.Direction.fromString(StringUtils.substringAfter(sort, ","));
-        PageRequest pageable = PageRequest.of(page, size, new Sort(direction, field));
-        
-        return itemBusiness.findByPodcast(idPodcast, pageable);
-    }
-
     @GetMapping("{id}/watchlists")
     @JsonView(Object.class)
     public Set<WatchList> getWatchListOfItem(@PathVariable("id") UUID id) {

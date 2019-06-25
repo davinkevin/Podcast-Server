@@ -42,7 +42,7 @@ export default class ItemService {
     getItemForPodcastWithPagination(podcast, pageParams) {
         let params = Object.assign({}, pageParams);
         params.sort = params.sort.map(o => `${o.property},${o.direction}`);
-        return this.$http.get(`/api/podcasts/${podcast.id}/items`, { params }).then(r => r.data);
+        return this.$http.get(`/api/v1/podcasts/${podcast.id}/items`, { params }).then(r => r.data);
     }
 
     delete(item) {

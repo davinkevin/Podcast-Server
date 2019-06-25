@@ -130,22 +130,6 @@ class ItemBusinessTest {
     }
 
     @Test
-    fun `should find page in podcast`() {
-        /* Given */
-        val idPodcast = UUID.randomUUID()
-        val pageRequest = PageRequest.of(0, 20)
-        val pageOfItem = PageImpl(listOf<Item>())
-        whenever(itemRepository.findByPodcast(idPodcast, pageRequest)).thenReturn(pageOfItem)
-
-        /* When */
-        val pageOfPodcast = itemBusiness.findByPodcast(idPodcast, pageRequest)
-
-        /* Then */
-        assertThat(pageOfPodcast.content).isEqualTo(listOf<Item>())
-        verify(itemRepository, times(1)).findByPodcast(idPodcast, pageRequest)
-    }
-
-    @Test
     @Throws(IOException::class, URISyntaxException::class)
     fun `should add item by upload`() {
         /* Given */

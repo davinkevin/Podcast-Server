@@ -1,17 +1,13 @@
 package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
-import com.github.davinkevin.podcastserver.entity.Status.DELETED
-import com.github.davinkevin.podcastserver.entity.Status.FINISH
-import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
+import com.github.davinkevin.podcastserver.entity.Status.*
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -42,7 +38,6 @@ class ItemRepositoryV2Test {
 
     private val dbSetupTracker = DbSetupTracker()
 
-
     @Nested
     @DisplayName("Should find")
     inner class ShouldFindById {
@@ -59,7 +54,7 @@ class ItemRepositoryV2Test {
         @Test
         fun `by id and return one matching element`() {
             /* Given */
-            val id = UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
 
             /* When */
             StepVerifier.create(repository.findById(id))
@@ -74,7 +69,7 @@ class ItemRepositoryV2Test {
         @Test
         fun `by id and return empty mono if not find by id`() {
             /* Given */
-            val id = UUID.fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
+            val id = fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
 
             /* When */
             StepVerifier.create(repository.findById(id))
@@ -106,7 +101,7 @@ class ItemRepositoryV2Test {
             StepVerifier.create(repository.findAllToDelete(today))
                     /* Then */
                     .assertNext {
-                        assertThat(it.id).isEqualTo(UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
+                        assertThat(it.id).isEqualTo(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
                     }
                     .verifyComplete()
         }
@@ -127,9 +122,9 @@ class ItemRepositoryV2Test {
         @Test
         fun `by id`() {
             /* Given */
-            val item1 = UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
-            val item2 = UUID.fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
-            val item3 = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            val item1 = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
+            val item2 = fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
+            val item3 = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
 
             /* When */
             StepVerifier.create(repository.deleteById(listOf(item1, item2, item3)))
@@ -139,10 +134,10 @@ class ItemRepositoryV2Test {
 
             val items = query.select(ITEM.ID).from(ITEM).fetch { it[ITEM.ID] }
             assertThat(items).hasSize(4).contains(
-                    UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
-                    UUID.fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
-                    UUID.fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"),
-                    UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+                    fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
+                    fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                    fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"),
+                    fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             )
         }
     }
@@ -162,9 +157,9 @@ class ItemRepositoryV2Test {
         @Test
         fun `as deleted`() {
             /* Given */
-            val item1 = UUID.fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
-            val item2 = UUID.fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
-            val item3 = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            val item1 = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
+            val item2 = fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
+            val item3 = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             val ids = listOf(item1, item2, item3)
             /* When */
             StepVerifier.create(repository.updateAsDeleted(ids))
@@ -196,7 +191,7 @@ class ItemRepositoryV2Test {
         @Test
         fun `by Id`() {
             /* Given */
-            val id = UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
             StepVerifier.create(repository.resetById(id))
                     /* Then */
@@ -207,7 +202,7 @@ class ItemRepositoryV2Test {
                         assertThat(it.url).isEqualTo("http://fakeurl.com/geekinc.126.mp3")
                         assertThat(it.fileName).isEqualTo(null)
                         assertThat(it.fileName).isEqualTo(null)
-                        assertThat(it.podcast).isEqualTo(PodcastForItem(UUID.fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
+                        assertThat(it.podcast).isEqualTo(PodcastForItem(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
                         assertThat(it.status).isEqualTo(NOT_DOWNLOADED)
                         assertThat((it.downloadDate == null)).isEqualTo(true)
                     }
@@ -237,7 +232,7 @@ class ItemRepositoryV2Test {
         @Test
         fun `and return true because its parent podcast has to`() {
             /* Given */
-            val id = UUID.fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
             StepVerifier.create(repository.hasToBeDeleted(id))
                     /* Then */
@@ -249,7 +244,7 @@ class ItemRepositoryV2Test {
         @Test
         fun `and return false because its parent podcast hasn't`() {
             /* Given */
-            val id = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            val id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             /* When */
             StepVerifier.create(repository.hasToBeDeleted(id))
                     /* Then */
@@ -326,7 +321,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -352,7 +347,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -378,7 +373,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(15, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -404,7 +399,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(16, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -436,7 +431,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -465,7 +460,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -494,7 +489,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(7, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -523,7 +518,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(8, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -554,7 +549,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -589,7 +584,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -624,7 +619,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -659,7 +654,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -690,7 +685,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -716,7 +711,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -742,7 +737,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -768,7 +763,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page))
+                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -798,7 +793,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -833,7 +828,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -868,7 +863,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -903,7 +898,7 @@ class ItemRepositoryV2Test {
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page))
+                StepVerifier.create(repository.search("", listOf(), listOf(NOT_DOWNLOADED), page, null))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
@@ -919,8 +914,48 @@ class ItemRepositoryV2Test {
                         }
                         .verifyComplete()
             }
+        }
 
+        @Nested
+        @DisplayName("with podcast id")
+        inner class WithPodcastId {
 
+            private val podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8")
+
+            @Test
+            fun `67b56578-454b-40a5-8d55-5fe1a14673e8`() {
+                /* Given */
+                val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
+
+                /* When */
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, podcastId))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.content.size).isEqualTo(12)
+                            assertThat(it.first).isTrue()
+                            assertThat(it.last).isFalse()
+                            assertThat(it.number).isEqualTo(0)
+                            assertThat(it.numberOfElements).isEqualTo(12)
+                            assertThat(it.totalElements).isEqualTo(50)
+                            assertThat(it.totalPages).isEqualTo(5)
+                            assertThat(it.content.map(Item::title)).containsExactly(
+                                    "Appload 50",
+                                    "Appload 49",
+                                    "Appload 48",
+                                    "Appload 47",
+                                    "Appload 46",
+                                    "Appload 45",
+                                    "Appload 44",
+                                    "Appload 43",
+                                    "Appload 42",
+                                    "Appload 41",
+                                    "Appload 40",
+                                    "Appload 39"
+                            )
+                        }
+                        .verifyComplete()
+            }
         }
 
     }

@@ -24,6 +24,7 @@ class PodcastRoutingConfig {
 
             "/{id}".nest {
                 GET("/cover.{ext}", podcast::cover)
+                GET("/items", podcast::items)
 
                 "/stats".nest {
                     GET("/byPubDate", podcast::findStatByPodcastIdAndPubDate)

@@ -19,7 +19,7 @@ export class ItemService {
 
 	findByPodcastAndPage(id: string, page: Pageable): Observable<Page<Item>> {
 		const params = toParams(page);
-		return this.http.get<Page<Item>>(`/api/podcasts/${id}/items`, { params });
+		return this.http.get<Page<Item>>(`/api/v1/podcasts/${id}/items`, { params });
 	}
 
 	findById(itemId: uuid, podcastId: uuid): Observable<Item> {

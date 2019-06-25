@@ -49,25 +49,6 @@ public class ItemRepositoryTest {
     }
 
     @Test
-    public void should_find_by_podcast_and_page() {
-        /* Given */
-        dbSetupTracker.skipNextLaunch();
-        UUID podcastId = UUID.fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561");
-        PageRequest pageRequest = PageRequest.of(1, 1, Sort.Direction.ASC, "id");
-
-        /* When */
-        Page<Item> itemByPodcast = itemRepository.findByPodcast(podcastId, pageRequest);
-
-        /* Then */
-//        PageAssert
-//                .assertThat(itemByPodcast)
-//                .hasTotalElements(3)
-//                .hasTotalPages(3);
-
-        assertThat(itemByPodcast.getContent().get(0).getTitle()).isEqualTo("Appload 1");
-    }
-
-    @Test
     public void should_find_all_to_download() {
         dbSetupTracker.skipNextLaunch();
         /* Given */

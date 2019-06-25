@@ -1,7 +1,9 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
+import com.github.davinkevin.podcastserver.item.*
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
@@ -32,6 +34,7 @@ import java.util.*
 @Component
 class PodcastHandler(
         private val podcastService: PodcastService,
+        private val itemService: ItemService,
         private val p: PodcastServerParameters,
         private val fileService: FileService
 ) {
@@ -95,6 +98,38 @@ class PodcastHandler(
                 }
                 .doOnNext { log.debug("Redirect cover to {}", it)}
                 .flatMap { seeOther(it).build() }
+    }
+
+    fun items(r: ServerRequest): Mono<ServerResponse> {
+        val q: String? = r.queryParam("q").filter { it.isNotEmpty() }.orElse(null)
+        val page = r.queryParam("page").map { it.toInt() }.orElse(0)
+        val size  = r.queryParam("size").map { it.toInt() }.orElse(12)
+        val (field, direction) = r.queryParam("sort").orElse("pubDate,DESC").split(",")
+        val podcastId = UUID.fromString(r.pathVariable("id"))
+
+        val itemPageable = ItemPageRequest(page, size, ItemSort(direction, field))
+
+        val tags = r.queryParam("tags")
+                .filter { it.isNotEmpty() }
+                .map { it.split(",") }
+                .orElse(listOf())
+
+        val statuses = r.queryParam("status")
+                .filter { it.isNotEmpty() }
+                .map { it.split(",") }
+                .orElse(listOf())
+                .map { Status.of(it) }
+
+        return itemService.search(
+                q = q,
+                tags = tags,
+                statuses = statuses,
+                page = itemPageable,
+                podcastId = podcastId
+        )
+                .map(::toPageItemHAL)
+                .flatMap { ok().syncBody(it) }
+
     }
 
     fun findStatByPodcastIdAndPubDate(r: ServerRequest): Mono<ServerResponse> = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndPubDate(id, number) }
@@ -237,3 +272,27 @@ private class OpmlOutline(p: Podcast, host: URI) {
         setAttribute("xmlUrl", xmlUrl)
     }
 }
+
+private fun toPageItemHAL(p: PageItem) = PageItemHAL(
+        content = p.content.map(::toItemHAL),
+        empty = p.empty,
+        first = p.first,
+        last = p.last,
+        number = p.number,
+        numberOfElements = p.numberOfElements,
+        size = p.size,
+        totalElements = p.totalElements,
+        totalPages = p.totalPages
+)
+
+data class PageItemHAL (
+        val content: Collection<ItemHAL>,
+        val empty: Boolean,
+        val first: Boolean,
+        val last: Boolean,
+        val number: Int,
+        val numberOfElements: Int,
+        val size: Int,
+        val totalElements: Int,
+        val totalPages: Int
+)

@@ -110,7 +110,8 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 q = q,
                 tags = tags,
                 statuses = statuses,
-                page = itemPageable
+                page = itemPageable,
+                podcastId = null
         )
                 .map(::toPageItemHAL)
                 .flatMap { ok().syncBody(it) }

@@ -1,11 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
-import com.github.davinkevin.podcastserver.database.Tables.COVER
-import com.github.davinkevin.podcastserver.database.Tables.ITEM
-import com.github.davinkevin.podcastserver.database.Tables.PODCAST
-import com.github.davinkevin.podcastserver.database.Tables.PODCAST_TAGS
-import com.github.davinkevin.podcastserver.database.Tables.TAG
-import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST_ITEMS
+import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
@@ -14,11 +9,7 @@ import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import org.jooq.DSLContext
 import org.jooq.Record18
-import org.jooq.impl.DSL.and
-import org.jooq.impl.DSL.countDistinct
-import org.jooq.impl.DSL.or
-import org.jooq.impl.DSL.trueCondition
-import org.jooq.impl.DSL.value
+import org.jooq.impl.DSL.*
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -104,7 +95,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .flatMap { findById(id) }
     }
 
-    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> = Mono.defer {
+    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
         query
                 .select(TAG.ID)
                 .from(TAG)
@@ -128,7 +119,11 @@ class ItemRepositoryV2(private val query: DSLContext) {
                         or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
                     }
 
-                    val filterConditions = and(statusesCondition, tagsCondition, queryCondition)
+                    val podcastCondition = if(podcastId == null) trueCondition() else {
+                        ITEM.PODCAST_ID.eq(podcastId)
+                    }
+
+                    val filterConditions = and(statusesCondition, tagsCondition, queryCondition, podcastCondition)
 
                     val i = query
                             .select(

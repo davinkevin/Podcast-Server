@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.item
 
-import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.Status.FINISH
+import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -19,7 +21,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
-import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
@@ -232,5 +233,49 @@ class ItemServiceTest {
 
 
 
+    }
+
+    @Nested
+    @DisplayName("shoud search")
+    inner class ShouldSearch {
+
+        @Test
+        fun `with podcast id`() {
+            /* Given */
+            val q = ""
+            val tags = listOf<String>()
+            val statuses = listOf<Status>()
+            val page = ItemPageRequest(0, 12, ItemSort("DESC", "title"))
+            val podcastId = UUID.fromString("167991ba-44ca-4f2b-b47b-5233a33d33b8")
+            val result = PageItem.of(listOf(item), 1, page)
+            whenever(repository.search(q, tags, statuses, page, podcastId))
+                    .thenReturn(result.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.search(q, tags, statuses, page, podcastId))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(result)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `without podcast id`() {
+            /* Given */
+            val q = ""
+            val tags = listOf<String>()
+            val statuses = listOf<Status>()
+            val page = ItemPageRequest(0, 12, ItemSort("DESC", "title"))
+            val result = PageItem.of(listOf(item), 1, page)
+            whenever(repository.search(q, tags, statuses, page, null))
+                    .thenReturn(result.toMono())
+
+            /* When */
+            StepVerifier.create(itemService.search(q, tags, statuses, page))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(result)
+                    .verifyComplete()
+        }
     }
 }

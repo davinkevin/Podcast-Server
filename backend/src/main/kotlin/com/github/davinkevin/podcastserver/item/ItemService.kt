@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.nio.file.Paths
 import java.util.*
 import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
 
@@ -49,6 +48,6 @@ class ItemService(
             }
             .then()
 
-    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest): Mono<PageItem> =
-            repository.search(q = q, tags = tags, statuses = statuses, page = page)
+    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
+            repository.search(q = q, tags = tags, statuses = statuses, page = page, podcastId = podcastId)
 }
