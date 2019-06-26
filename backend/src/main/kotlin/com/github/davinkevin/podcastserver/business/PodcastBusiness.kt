@@ -64,10 +64,6 @@ class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: 
         return save(podcastToUpdate)
     }
 
-    @Transactional(readOnly = true)
-    fun getRss(id: UUID, limit: Boolean?, domainName: String): String =
-            jdomService.podcastToXMLGeneric(findOne(id), domainName, limit)
-
     fun reatachAndSave(podcast: Podcast): Podcast {
         podcast.tags = tagBusiness.getTagListByName(podcast.tags)
         return save(podcast)

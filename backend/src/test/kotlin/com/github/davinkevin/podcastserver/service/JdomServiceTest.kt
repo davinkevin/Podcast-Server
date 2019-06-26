@@ -167,52 +167,6 @@ class JdomServiceTest {
     }
 
     @Test
-    fun `should generate xml from podcast with only 50 items`() {
-        /* Given */
-        whenever(podcastServerParameters.rssDefaultNumberItem).thenReturn(50L)
-        val podcast = Podcast().apply {
-            id = UUID.fromString("029d7820-b7e1-4c0f-a94f-235584ffb570")
-            title = "FakePodcast"
-            description = "Loren ipsum"
-            hasToBeDeleted = true
-            cover = Cover().apply { height = 200; width = 200; url = "http://fake.url/1234/cover.png" }
-            tags = setOf(Tag().apply { name = "Open-Source" })
-            signature = "123456789"
-            lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
-            items = generateItems(this, 100)
-        }
-
-
-        /* When */
-        val xml = jdomService.podcastToXMLGeneric(podcast, "http://localhost", true)
-
-        /* Then */
-        assertThat(xml).isXmlEqualToContentOf(IOUtils.get("/xml/podcast.output.50.xml").toFile())
-    }
-
-    @Test
-    fun `should generate xml from podcast with only all items`() {
-        /* Given */
-        val podcast = Podcast().apply {
-            id = UUID.fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")
-            title = "FakePodcast"
-            description = "Loren ipsum"
-            hasToBeDeleted = true
-            cover = Cover().apply { height = 200; width = 200; url = "/1234/cover.png" }
-            tags = setOf(Tag().apply { name = "Open-Source" })
-            signature = "123456789"
-            lastUpdate = ZonedDateTime.of(2015, 9, 8, 7, 0, 0, 0, ZoneId.of("Europe/Paris"))
-            items = generateItems(this, 100)
-        }
-
-        /* When */
-        val xml = jdomService.podcastToXMLGeneric(podcast, "http://localhost", false)
-
-        /* Then */
-        assertThat(xml).isXmlEqualToContentOf(IOUtils.get("/xml/podcast.output.100.xml").toFile())
-    }
-
-    @Test
     @Throws(URISyntaxException::class)
     fun `should generate xml from watch list`() {
         /* Given */

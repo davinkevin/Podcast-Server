@@ -58,44 +58,6 @@ public class PodcastControllerTest {
         verify(podcastBusiness, only()).delete(eq(id));
     }
 
-//    @Test
-//    public void should_get_rss_with_origin_header() {
-//        /* Given */
-//        UUID id = UUID.randomUUID();
-//        Boolean limit = Boolean.TRUE;
-//        HttpServletRequest resquest = mock(HttpServletRequest.class);
-//        when(resquest.getHeader(eq("origin"))).thenReturn("http://localhost");
-//        when(podcastBusiness.getRss(any(UUID.class), anyBoolean(), anyString())).thenReturn("Foo");
-//
-//        /* When */
-//        String rss = podcastController.getRss(id, limit, resquest);
-//
-//        /* Then */
-//        assertThat(rss).isEqualTo("Foo");
-//        verify(podcastBusiness, only()).getRss(eq(id), eq(limit), eq("http://localhost"));
-//    }
-
-//    @Test
-//    public void should_get_rss_without_origin_header() {
-//        /* Given */
-//        UUID id = UUID.randomUUID();
-//        Boolean limit = Boolean.TRUE;
-//        HttpServletRequest resquest = mock(HttpServletRequest.class);
-//        when(resquest.getHeader(eq("origin"))).thenReturn(null);
-//        when(resquest.getScheme()).thenReturn("http");
-//        when(resquest.getServerName()).thenReturn("localhost");
-//        when(resquest.getServerPort()).thenReturn(6060);
-//
-//        when(podcastBusiness.getRss(any(UUID.class), anyBoolean(), anyString())).then(i -> "Foo");
-//
-//        /* When */
-//        String rss = podcastController.getRss(id, limit, resquest);
-//
-//        /* Then */
-//        assertThat(rss).isEqualTo("Foo");
-//        verify(podcastBusiness, only()).getRss(eq(id), eq(limit), eq("http://localhost:6060"));
-//    }
-
     @Test
     public void should_fetch_podcast() {
         /* Given */

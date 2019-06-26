@@ -149,45 +149,6 @@ class PodcastBusinessTest {
         verify(podcastRepository, times(1)).save(podcast)
     }
 
-    @Nested
-    @DisplayName("should get rss")
-    inner class AsRss {
-
-        val podcast = Podcast()
-        val response = "Success"
-        val id = UUID.randomUUID()
-
-        @Test
-        fun with_default_limit() {
-            /* Given */
-            whenever(podcastRepository.findById(any())).thenReturn(Optional.of(podcast))
-            whenever(jdomService.podcastToXMLGeneric(eq(podcast), anyString(), anyBoolean())).thenReturn(response)
-
-            /* When */
-            val rssReturn = podcastBusiness.getRss(id, true, "http://localhost")
-
-            /* Then */
-            assertThat(rssReturn).isEqualTo(response)
-            verify(podcastRepository, times(1)).findById(id)
-            verify(jdomService, times(1)).podcastToXMLGeneric(podcast, "http://localhost", true)
-        }
-
-        @Test
-        fun with_define_limit() {
-            /* Given */
-            whenever(podcastRepository.findById(any())).thenReturn(Optional.of(podcast))
-            whenever(jdomService.podcastToXMLGeneric(eq(podcast), anyString(), anyBoolean())).thenReturn(response)
-
-            /* When */
-            val rssReturn = podcastBusiness.getRss(id, false, "http://localhost")
-
-            /* Then */
-            assertThat(rssReturn).isEqualTo(response)
-            verify(podcastRepository, times(1)).findById(eq(id))
-            verify(jdomService, times(1)).podcastToXMLGeneric(podcast, "http://localhost", false)
-        }
-    }
-
     @Test
     fun should_patch_podcast() {
         /* Given */

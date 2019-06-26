@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.item.*
@@ -1131,6 +1132,99 @@ class PodcastHandlerTest {
                         </opml>
                     """.trimIndent())
         }
+
+    }
+
+    @Nested
+    @DisplayName("should generate rss")
+    inner class ShouldGenerateRss {
+
+        private val coverForItem = CoverForItem(
+                id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                url = "https://external.domain.tld/foo/bar.png",
+                width = 200,
+                height = 200
+        )
+
+        private val podcastForItem = PodcastForItem(
+                id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast title",
+                url = "https://foo.bar.com/app/file.rss"
+        )
+
+        private val items = (200 downTo 1)
+                .map { it.toString().padStart(3, '0') }
+                .map { Item(
+                            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f$it"),
+                            title = "Foo $it",
+                            url = "https://external.domain.tld/foo/bar.$it.mp4",
+
+                            pubDate = OffsetDateTime.of(2019, 6, 24, 5, 28, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong() ),
+                            creationDate = OffsetDateTime.of(2019, 6, 24, 5, 29, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong()),
+                            downloadDate = OffsetDateTime.of(2019, 6, 25, 5, 30, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong()),
+
+                            description = "desc $it",
+                            mimeType = "video/mp4",
+                            length = 100,
+                            fileName = null,
+                            status = Status.NOT_DOWNLOADED,
+
+                            podcast = podcastForItem,
+                            cover = coverForItem
+                    ) }
+
+        @Test
+        fun `for podcast with limit`() {
+            /* Given */
+            val podcastId = podcastForItem.id
+            val size = 50
+            val page = ItemPageRequest(0, size, ItemSort("DESC", "pubDate"))
+            val result = PageItem.of(items.take(size), size, page)
+
+            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                    .thenReturn(result.toMono())
+            whenever(podcastService.findById(podcastId))
+                    .thenReturn(podcast.toMono())
+
+            val xml = IOUtils.fileAsString("/xml/podcast-with-50-items.xml")
+
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml(xml.trimIndent())
+        }
+
+        @Test
+        fun `for podcast without limit`() {
+            /* Given */
+            val podcastId = podcastForItem.id
+            val page = ItemPageRequest(0, Int.MAX_VALUE, ItemSort("DESC", "pubDate"))
+            val result = PageItem.of(items.take(200), 200, page)
+
+            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                    .thenReturn(result.toMono())
+            whenever(podcastService.findById(podcastId))
+                    .thenReturn(podcast.toMono())
+
+            val xml = IOUtils.fileAsString("/xml/podcast-with-200-items.xml")
+
+            /* When */
+            rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?limit=false")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml(xml.trimIndent())
+        }
+
+
 
     }
 }

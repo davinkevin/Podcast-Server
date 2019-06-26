@@ -39,55 +39,6 @@ class JdomService (val podcastServerParameters: PodcastServerParameters, val mim
         return v.toOption().toVΛVΓ()
     }
 
-    fun podcastToXMLGeneric(podcast: Podcast, domainName: String, limit: Boolean?): String {
-        return podcastToXMLGeneric(podcast, domainName, withNumberOfItem(podcast, limit))
-    }
-
-    private fun podcastToXMLGeneric(podcast: Podcast, domainName: String, limit: Long): String {
-        val cover = podcast.cover
-        val coverUrl = cover?.relativeUrl(domainName)
-
-        val channel = Element(CHANNEL).apply {
-                addContent(Element(TITLE).addContent(Text(podcast.title)))
-                addContent(Element(LINK).addContent(Text(String.format(LINK_PODCAST_FORMAT, domainName, podcast.id))))
-                addContent(Element(DESCRIPTION).addContent(Text(podcast.description)))
-                addContent(Element(SUBTITLE, ITUNES_NAMESPACE).addContent(Text(podcast.description)))
-                addContent(Element(SUMMARY, ITUNES_NAMESPACE).addContent(Text(podcast.description)))
-                addContent(Element(LANGUAGE).addContent(Text("fr-fr")))
-                addContent(Element(AUTHOR, ITUNES_NAMESPACE).addContent(Text(podcast.type)))
-                addContent(Element(CATEGORY, ITUNES_NAMESPACE))
-        }
-
-        if (podcast.lastUpdate != null) {
-            val d = podcast.lastUpdate!!.format(DateTimeFormatter.RFC_1123_DATE_TIME)
-            channel.addContent(Element(PUB_DATE).addContent(d))
-        }
-
-        if (cover != null) {
-            val itunesImage = Element(IMAGE, ITUNES_NAMESPACE).apply { addContent(Text(coverUrl)) }
-
-            val image = Element(IMAGE).apply {
-                    addContent(Element(HEIGHT).addContent(cover.height.toString()))
-                    addContent(Element(URL_STRING).addContent(coverUrl))
-                    addContent(Element(WIDTH).addContent(cover.width.toString()))
-            }
-
-            channel
-                    .addContent(image)
-                    .addContent(itunesImage)
-        }
-
-        podcast.items!!
-                .stream()
-                .filter { nonNull(it.pubDate) }
-                .sorted(PUB_DATE_COMPARATOR)
-                .limit(limit)
-                .map { it.toElement(domainName)}
-                .forEachOrdered { channel.addContent(it) }
-
-        return channelToRss(channel)
-    }
-
     fun watchListToXml(watchList: WatchList, domainName: String): String {
 
         val channel = Element(CHANNEL).apply {

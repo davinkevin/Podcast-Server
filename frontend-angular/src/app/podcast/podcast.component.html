@@ -6,7 +6,7 @@
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
-        <a mat-menu-item [href]="'/api/podcasts/' + podcast.id + '/rss'" target="_blank">
+        <a mat-menu-item [href]="'/api/v1/podcasts/' + podcast.id + '/rss'" target="_blank">
           <mat-icon>rss_feed</mat-icon>
           <span>RSS Feed</span>
         </a>

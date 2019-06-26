@@ -16,7 +16,7 @@
                 </div>
                 <div class="action-button pull-right">
                     <button ng-if="pdc.isUpdatable()" ng-click="pdc.refresh()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-                    <a type="button" class="btn btn-default" target="_self" ng-href="/api/podcasts/{{ pdc.podcast.id }}/rss"><span class="ionicons ion-social-rss"></span></a>
+                    <a type="button" class="btn btn-default" target="_self" ng-href="/api/v1/podcasts/{{ pdc.podcast.id }}/rss"><span class="ionicons ion-social-rss"></span></a>
                 </div>
             </div>
         </div>

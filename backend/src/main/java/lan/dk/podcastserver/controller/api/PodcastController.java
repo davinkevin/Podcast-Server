@@ -45,11 +45,6 @@ public class PodcastController {
     }
 
 
-    @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
-    public String getRss(@PathVariable UUID id, @RequestParam(value="limit", required = false, defaultValue = "true") Boolean limit, ServerWebExchange request) {
-        return podcastBusiness.getRss(id, limit, UrlService.getDomainFromRequest(request).toASCIIString());
-    }
-
     @JsonView(Podcast.PodcastDetailsView.class)
     @PostMapping("fetch")
     public Podcast fetchPodcastInfoByUrl(@RequestBody(required=false) String url) {
