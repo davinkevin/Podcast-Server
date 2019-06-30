@@ -18,11 +18,14 @@ class ItemRoutingConfig {
             DELETE("/clean", item::clean)
         }
 
-        "/api/v1/podcasts/{idPodcast}/items/{id}".nest {
-            GET("/", item::findById)
-            GET("/cover.{ext}", item::cover)
-            GET("/{file}", item::file)
-            POST("/reset", item::reset)
+        "/api/v1/podcasts/{idPodcast}".nest {
+            GET("/items", item::pocastItems )
+            "/items/{id}".nest {
+                GET("/", item::findById)
+                GET("/cover.{ext}", item::cover)
+                GET("/{file}", item::file)
+                POST("/reset", item::reset)
+            }
         }
     }
 }

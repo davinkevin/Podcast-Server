@@ -117,6 +117,38 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 .flatMap { ok().syncBody(it) }
 
     }
+
+    fun pocastItems(r: ServerRequest): Mono<ServerResponse> {
+        val q: String? = r.queryParam("q").filter { it.isNotEmpty() }.orElse(null)
+        val page = r.queryParam("page").map { it.toInt() }.orElse(0)
+        val size  = r.queryParam("size").map { it.toInt() }.orElse(12)
+        val (field, direction) = r.queryParam("sort").orElse("pubDate,DESC").split(",")
+        val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
+
+        val itemPageable = ItemPageRequest(page, size, ItemSort(direction, field))
+
+        val tags = r.queryParam("tags")
+                .filter { it.isNotEmpty() }
+                .map { it.split(",") }
+                .orElse(listOf())
+
+        val statuses = r.queryParam("status")
+                .filter { it.isNotEmpty() }
+                .map { it.split(",") }
+                .orElse(listOf())
+                .map { Status.of(it) }
+
+        return itemService.search(
+                q = q,
+                tags = tags,
+                statuses = statuses,
+                page = itemPageable,
+                podcastId = podcastId
+        )
+                .map(::toPageItemHAL)
+                .flatMap { ok().syncBody(it) }
+    }
+
 }
 
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
