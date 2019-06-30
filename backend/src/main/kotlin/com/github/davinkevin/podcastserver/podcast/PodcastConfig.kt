@@ -13,18 +13,18 @@ import org.springframework.web.reactive.function.server.router
 class PodcastRoutingConfig {
 
     @Bean
-    fun podcastRouter(podcast: PodcastHandler) = router {
+    fun podcastRouter(podcast: PodcastHandler, xml: PodcastXmlHandler) = router {
         "/api/v1/podcasts".nest {
 
             GET("/", podcast::findAll)
-            GET("/opml", podcast::opml)
+            GET("/opml", xml::opml)
             GET("/{id}", podcast::findById)
             POST("/", podcast::create)
             PUT("/{id}", podcast::update)
 
             "/{id}".nest {
                 GET("/cover.{ext}", podcast::cover)
-                GET("/rss", podcast::rss)
+                GET("/rss", xml::rss)
 
                 "/stats".nest {
                     GET("/byPubDate", podcast::findStatByPodcastIdAndPubDate)
@@ -45,5 +45,5 @@ class PodcastRoutingConfig {
 }
 
 @Configuration
-@Import(PodcastRepositoryV2::class, TypeConfig::class, PodcastRoutingConfig::class, PodcastService::class, PodcastHandler::class)
+@Import(PodcastRepositoryV2::class, TypeConfig::class, PodcastRoutingConfig::class, PodcastService::class, PodcastHandler::class, PodcastXmlHandler::class)
 class PodcastConfig
