@@ -21,12 +21,6 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
             watchListRepository.findById(id).k()
                     .getOrElse { throw RuntimeException("Watchlist not found") }
 
-    fun findAll() =
-            watchListRepository
-                    .findAll()
-                    .toSet()
-                    .toVΛVΓ()
-
     fun findContainsItem(itemId: UUID) =
             itemRepository.findById(itemId).k()
                     .map { watchListRepository.findContainsItem(it) }

@@ -38,19 +38,6 @@ class WatchListBusinessTest {
     @InjectMocks lateinit var watchListBusiness: WatchListBusiness
 
     @Test
-    fun `should find all`() {
-        /* Given */
-        whenever(watchListRepository.findAll()).thenReturn(listOf())
-
-        /* When */
-        val all = watchListBusiness.findAll()
-
-        /* Then */
-        assertThat(all).isEmpty()
-        verify(watchListRepository, only()).findAll()
-    }
-
-    @Test
     fun `should find all playlist with specified item`() {
         /* Given */
         val uuid = UUID.randomUUID()

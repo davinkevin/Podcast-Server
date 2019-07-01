@@ -32,12 +32,6 @@ public class WatchListController {
         return watchListBusiness.save(entity);
     }
 
-    @JsonView(Object.class)
-    @GetMapping
-    public Set<WatchList> findAll() {
-        return watchListBusiness.findAll();
-    }
-
     @GetMapping("{id}")
     public WatchList findOne(@PathVariable UUID id) {
         return watchListBusiness.findOne(id);
