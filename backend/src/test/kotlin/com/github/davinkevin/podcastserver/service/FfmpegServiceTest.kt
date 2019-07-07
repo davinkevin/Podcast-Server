@@ -14,6 +14,7 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
@@ -106,6 +107,7 @@ class FfmpegServiceTest {
     }
 
     @Test
+    @Disabled
     fun `should not merge if folder is read only`(@TempDir dir: Path) {
         /* Given */
         val subDir = dir.resolve("readonly")
