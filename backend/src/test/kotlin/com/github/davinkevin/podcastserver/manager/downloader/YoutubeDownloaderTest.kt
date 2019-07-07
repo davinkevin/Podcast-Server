@@ -31,6 +31,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Answers
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -43,7 +44,7 @@ import org.springframework.util.FileSystemUtils
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermission.OWNER_READ
 import java.time.Duration
 import java.time.Duration.ZERO
 import java.time.Duration.ofMillis
@@ -293,9 +294,13 @@ class YoutubeDownloaderTest {
         }
 
         @Test
-        fun `and failed if destination can't be written`() {
+        fun `and failed if destination can't be written`(@TempDir dir: Path) {
             /* Given */
-            whenever(podcastServerParameters.rootfolder).thenReturn(Paths.get("/bin/foo/"))
+            val subDir = dir.resolve(UUID.randomUUID().toString())
+            val readOnlyFolder = Files.createDirectory(subDir)
+            Files.setPosixFilePermissions(readOnlyFolder, setOf(OWNER_READ))
+
+            whenever(podcastServerParameters.rootfolder).thenReturn(subDir)
             whenever(videoInfo.title).thenReturn("A super Name of Youtube-Video stop")
             whenever(videoInfo.info).thenReturn(generate(3))
 

@@ -17,10 +17,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.PathMatcher
-import java.nio.file.attribute.PosixFilePermission.GROUP_READ
-import java.nio.file.attribute.PosixFilePermission.OTHERS_READ
-import java.nio.file.attribute.PosixFilePermission.OWNER_READ
-import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
+import java.nio.file.attribute.PosixFilePermission.*
 import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.PostConstruct
@@ -151,7 +148,9 @@ abstract class AbstractDownloader(
         log.debug("Creation of file : {}", finalFile.toFile().absolutePath)
 
         try {
-            if (Files.notExists(finalFile.parent)) Files.createDirectories(finalFile.parent)
+            if (!Files.exists(finalFile.parent)) {
+                Files.createDirectories(finalFile.parent) // # Should explode !
+            }
 
             if (!(Files.exists(finalFile) || Files.exists(finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)))) {
                 return finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
