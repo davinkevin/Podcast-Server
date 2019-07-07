@@ -16,13 +16,16 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.*
 import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import java.io.IOException
 import java.nio.file.AccessDeniedException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermission.OWNER_READ
 
 /**
  * Created by kevin on 20/03/2016 for Podcast Server
@@ -103,14 +106,18 @@ class FfmpegServiceTest {
     }
 
     @Test
-    fun `should not merge if folder is read only`() {
+    fun `should not merge if folder is read only`(@TempDir dir: Path) {
         /* Given */
-        val video = Paths.get("/tmp/bar.mp4")
-        val audio = Paths.get("/tmp/bar.webm")
-        val dest = Paths.get("/foo.mp4")
+        val subDir = dir.resolve("readonly")
+        val readOnlyFolder = Files.createDirectory(subDir)
+        Files.setPosixFilePermissions(readOnlyFolder, setOf(OWNER_READ))
+
+        val video = readOnlyFolder.resolve("bar.mp4")
+        val audio = readOnlyFolder.resolve("bar.webm")
+        val dest = readOnlyFolder.resolve("foo.mp4")
 
         val job: FFmpegJob = mock()
-        whenever(ffmpegExecutor.createJob(ArgumentMatchers.any())).thenReturn(job)
+        whenever(ffmpegExecutor.createJob(any())).thenReturn(job)
 
         /* When */
         assertThatThrownBy { ffmpegService.mergeAudioAndVideo(video, audio, dest) }
