@@ -1,0 +1,72 @@
+
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
+stages:
+  - ⬇ download
+  - 🧪 test
+  - 📦 packaging
+
+⬇ backend:
+  stage: ⬇ download
+  image: openjdk:8
+  script:
+    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml dependency:resolve dependency:resolve-plugins
+  cache:
+    key: "$CI_PIPELINE_ID-backend"
+    policy: push
+    paths:
+      - .m2/
+
+⬇ ui-v1:
+  stage: ⬇ download
+  image: node:6
+  before_script:
+    - npm install -g jspm@0.16.34
+    - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
+    - cd frontend-angularjs
+  script:
+    - npm install
+    - ./node_modules/.bin/jspm install
+  cache:
+    key: "$CI_PIPELINE_ID-ui-v1"
+    policy: push
+    paths:
+      - frontend-angularjs/node_modules/
+      - frontend-angularjs/www/jspm_packages/
+
+⬇ ui-v2:
+  stage: ⬇ download
+  image: node:11
+  script:
+    - yarn --cwd frontend-angular
+  cache:
+    key: "$CI_PIPELINE_ID-ui-v2"
+    policy: push
+    paths:
+      - .yarn
+      - frontend-angular/node_modules/
+
+🧪 backend:
+  stage: 🧪 test
+  image: openjdk:8
+  script:
+    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate test -Ddatabase.url=jdbc:h2:/tmp/podcast-server jacoco:report
+  cache:
+    key: "$CI_PIPELINE_ID-backend"
+    policy: pull
+    paths:
+      - .m2/
+
+🧪 ui-v2:
+  stage: 🧪 test
+  image: node:11
+  script:
+    - yarn --cwd frontend-angular test
+  cache:
+    key: "$CI_PIPELINE_ID-ui-v2"
+    policy: pull
+    paths:
+      - .yarn
+      - frontend-angular/node_modules/

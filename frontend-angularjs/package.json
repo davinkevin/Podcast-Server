@@ -109,11 +109,14 @@
   "license": "ISC",
   "scripts": {
     "prebuild": "npm install",
-    "postinstall": "jspm install && gulp less",
+    "jspminstall": "jspm install && gulp less",
     "build": "gulp build",
     "release": "gulp release --type $(type)",
     "serve": "gulp serve",
     "serve:dev": "gulp serve:dev"
+  },
+  "config": {
+    "unsafe-perm": true
   },
   "bugs": {
     "url": "https://github.com/davinkevin/Podcast-Server/issues"
