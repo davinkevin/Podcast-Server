@@ -19,12 +19,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermission
 import java.util.*
 
 /**
@@ -194,12 +197,17 @@ class DownloaderTest {
         }
 
         @Test
-        fun `should handle error during creation of temp file`() {
+        fun `should handle error during creation of temp file`(@TempDir dir: Path) {
+            /* Given */
+            val subDir = dir.resolve(UUID.randomUUID().toString())
+            val readOnlyFolder = Files.createDirectory(subDir)
+            Files.setPosixFilePermissions(readOnlyFolder, setOf(PosixFilePermission.OWNER_READ))
+
             /* Given */
             podcast.title = "bin"
             downloader.with(DownloadingItem(item.apply { url = "http://foo.bar.com/bash" },  listOf(), null, null), itemDownloadManager)
 
-            whenever(podcastServerParameters.rootfolder).thenReturn(Paths.get("/"))
+            whenever(podcastServerParameters.rootfolder).thenReturn(subDir)
             whenever(podcastRepository.findById(eq(podcast.id!!))).thenReturn(Optional.of(podcast))
             whenever(itemRepository.save(any())).then { it.arguments[0] }
 
