@@ -4,7 +4,9 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.podcast.PodcastService
 import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.BeforeEach
@@ -24,6 +26,7 @@ import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
+import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
 
 /**
  * Created by kevin on 2019-02-12
@@ -38,6 +41,9 @@ class ItemServiceTest {
     @MockBean lateinit var p: PodcastServerParameters
     @MockBean lateinit var fileService: FileService
     @MockBean lateinit var idm: ItemDownloadManager
+    @MockBean lateinit var podcastService: PodcastService
+    @MockBean lateinit var coverRepositoryV2: CoverRepository
+    @MockBean lateinit var mimeTypeService: MimeTypeService
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),

@@ -67,7 +67,7 @@ export default class ItemService {
         };
 
         return this.$http
-            .post(`/api/podcasts/${podcast.id}/items/upload`, formData, config)
+            .post(`/api/v1/podcasts/${podcast.id}/items/upload`, formData, config)
             .then(r => r.data);
     }
 

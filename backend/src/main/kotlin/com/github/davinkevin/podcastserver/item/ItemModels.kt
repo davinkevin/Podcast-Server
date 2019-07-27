@@ -15,7 +15,7 @@ data class DeleteItemInformation(val id: UUID, val fileName: String, val podcast
 data class Item(
         val id: UUID,
         val title: String,
-        val url: String,
+        val url: String?,
 
         val pubDate: OffsetDateTime?,
         val downloadDate: OffsetDateTime?,
@@ -82,3 +82,21 @@ data class PageItem(
 
     }
 }
+
+data class ItemForCreation(
+        val title: String,
+        val url: String?,
+
+        val pubDate: OffsetDateTime?,
+        val downloadDate: OffsetDateTime?,
+        val creationDate: OffsetDateTime?,
+
+        val description: String?,
+        val mimeType: String?,
+        val length: Long?,
+        val fileName: String?,
+        val status: Status,
+
+        val podcastId: UUID,
+        val coverId: UUID
+)

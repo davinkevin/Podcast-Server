@@ -1,12 +1,10 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
-import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepositoryV2
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -14,7 +12,6 @@ import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.util.function.component1
 import reactor.util.function.component2
-import java.net.URI
 import java.util.*
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
@@ -48,7 +45,7 @@ class PodcastService(
         return Mono.zip(tags, cover)
                 .flatMap { (t, c) ->  repository.save(
                         title = p.title,
-                        url = p.url.toASCIIString(),
+                        url = p.url?.toASCIIString(),
                         hasToBeDeleted = p.hasToBeDeleted,
                         type = p.type,
                         tags = t,
@@ -81,7 +78,7 @@ class PodcastService(
                     repository.update(
                             id = updatePodcast.id,
                             title = updatePodcast.title,
-                            url = updatePodcast.url.toASCIIString(),
+                            url = updatePodcast.url?.toASCIIString(),
                             hasToBeDeleted = updatePodcast.hasToBeDeleted,
                             tags = t,
                             cover = c)

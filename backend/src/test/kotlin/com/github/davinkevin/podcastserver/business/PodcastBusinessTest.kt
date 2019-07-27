@@ -47,20 +47,6 @@ class PodcastBusinessTest {
     }
 
     @Test
-    fun should_find_all() {
-        /* Given */
-        val listOfPodcast = listOf<Podcast>()
-        whenever(podcastRepository.findAll()).thenReturn(listOfPodcast)
-
-        /* When */
-        val podcasts = podcastBusiness.findAll()
-
-        /* Then */
-        assertThat(podcasts).isEqualTo(listOfPodcast)
-        verify(podcastRepository, times(1)).findAll()
-    }
-
-    @Test
     fun should_save() {
         /* Given */
         val podcast = Podcast()

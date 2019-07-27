@@ -12,11 +12,7 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,8 +29,8 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
-import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
+import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
 
 /**
@@ -306,7 +302,7 @@ class PodcastServiceTest {
                 val p = podcastForCreation.copy(tags = tags)
                 val savedCover = p.cover.toPodcastCover()
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
-                whenever(repository.save(eq(p.title), eq(p.url.toASCIIString()), eq(p.hasToBeDeleted), eq(p.type), argThat { isEmpty() }, eq(savedCover)))
+                whenever(repository.save(eq(p.title), eq(p.url!!.toASCIIString()), eq(p.hasToBeDeleted), eq(p.type), argThat { isEmpty() }, eq(savedCover)))
                         .thenReturn(podcast.toMono())
 
                 /* When */
@@ -331,7 +327,7 @@ class PodcastServiceTest {
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
                 whenever(repository.save(
                         eq(p.title),
-                        eq(p.url.toASCIIString()),
+                        eq(p.url!!.toASCIIString()),
                         eq(p.hasToBeDeleted),
                         eq(p.type),
                         argThat { map { it.id }.containsAll(tags.map { it.id }) && size == 2 },
@@ -363,7 +359,7 @@ class PodcastServiceTest {
                 whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport").toMono())
                 whenever(repository.save(
                         eq(p.title),
-                        eq(p.url.toASCIIString()),
+                        eq(p.url!!.toASCIIString()),
                         eq(p.hasToBeDeleted),
                         eq(p.type),
                         argThat { map { it.id }.containsAll(listOf(newTagId, oldTagId)) && size == 2 },

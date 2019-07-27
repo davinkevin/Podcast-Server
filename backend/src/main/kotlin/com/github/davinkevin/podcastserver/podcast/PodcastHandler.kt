@@ -1,22 +1,10 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import arrow.core.Option
-import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
-import com.github.davinkevin.podcastserver.item.*
 import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.service.JdomService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
-import org.jdom2.Document
-import org.jdom2.Element
-import org.jdom2.Namespace
-import org.jdom2.Text
-import org.jdom2.output.Format
-import org.jdom2.output.XMLOutputter
 import org.slf4j.LoggerFactory
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -24,13 +12,13 @@ import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.ServerResponse.seeOther
 import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
-import reactor.core.publisher.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.publisher.switchIfEmpty
+import reactor.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
-import reactor.util.function.component1
-import reactor.util.function.component2
 
 /**
  * Created by kevin on 2019-02-15
@@ -151,7 +139,7 @@ private fun toPodcastHAL(p: Podcast): PodcastHAL {
 
 private data class PodcastCreationHAL(
         val title: String,
-        val url: URI,
+        val url: URI?,
         val tags: Collection<TagForCreationHAL>?,
         val type: String,
         val hasToBeDeleted: Boolean,

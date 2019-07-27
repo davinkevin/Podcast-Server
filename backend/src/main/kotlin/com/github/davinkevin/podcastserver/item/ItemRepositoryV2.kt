@@ -3,10 +3,7 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
-import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
-import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
-import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
-import com.github.davinkevin.podcastserver.extension.repository.toUTC
+import com.github.davinkevin.podcastserver.extension.repository.*
 import org.jooq.DSLContext
 import org.jooq.Record18
 import org.jooq.impl.DSL.*
@@ -191,6 +188,27 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 }
 
 
+    }
+
+    fun create(item: ItemForCreation): Mono<Item> {
+        val id = UUID.randomUUID()
+
+        return query.insertInto(ITEM)
+                .set(ITEM.ID, id)
+                .set(ITEM.TITLE, item.title)
+                .set(ITEM.URL, item.url)
+                .set(ITEM.PUB_DATE, item.pubDate.toTimestamp())
+                .set(ITEM.DOWNLOAD_DATE, item.downloadDate.toTimestamp())
+                .set(ITEM.CREATION_DATE, item.creationDate.toTimestamp())
+                .set(ITEM.DESCRIPTION, item.description)
+                .set(ITEM.MIME_TYPE, item.mimeType)
+                .set(ITEM.LENGTH, item.length)
+                .set(ITEM.FILE_NAME, item.fileName)
+                .set(ITEM.STATUS, item.status.toString())
+                .set(ITEM.PODCAST_ID, item.podcastId)
+                .set(ITEM.COVER_ID, item.coverId)
+                .executeAsyncAsMono()
+                .then(findById(id))
     }
 }
 

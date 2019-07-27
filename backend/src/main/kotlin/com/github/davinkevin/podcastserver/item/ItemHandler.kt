@@ -8,11 +8,12 @@ import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.ServerResponse.seeOther
+import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import reactor.core.publisher.switchIfEmpty
@@ -149,12 +150,25 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 .flatMap { ok().syncBody(it) }
     }
 
+    fun upload(r: ServerRequest): Mono<ServerResponse> {
+        val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
+        val host = r.extractHost()
+        log.debug("uploading to podcast {}", podcastId)
+
+        return r.body(BodyExtractors.toMultipartData())
+                .map { it.toSingleValueMap() }
+                .map { it["file"] as FilePart }
+                .doOnNext { log.info("upload of file ${it.filename()}") }
+                .flatMap { itemService.upload(podcastId, it) }
+                .flatMap { created(URI("${host}api/v1/items/${it.id}")).syncBody(it) }
+    }
+
 }
 
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
 
 data class ItemHAL(
-        val id: UUID, val title: String, val url: String,
+        val id: UUID, val title: String, val url: String?,
         val pubDate: OffsetDateTime?, val downloadDate: OffsetDateTime?, val creationDate: OffsetDateTime?,
         val description: String?, val mimeType: String?, val length: Long?, val fileName: String?, val status: Status,
         val podcast: PodcastHAL, val cover: CoverHAL

@@ -16,8 +16,6 @@ import java.util.*
 @Transactional
 class PodcastBusiness(val parameters: PodcastServerParameters, val jdomService: JdomService, val podcastRepository: PodcastRepository, val tagBusiness: TagBusiness, val coverBusiness: CoverBusiness) {
 
-    fun findAll(): List<Podcast> = podcastRepository.findAll()
-
     fun save(entity: Podcast): Podcast = podcastRepository.save(entity)
 
     fun findOne(id: UUID): Podcast =

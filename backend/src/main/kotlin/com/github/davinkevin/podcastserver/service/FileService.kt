@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
@@ -82,6 +83,14 @@ class FileService(private val p: PodcastServerParameters, private val wcb: WebCl
                 .toMono()
                 .then()
     }
+
+    fun upload(destination: Path, file: FilePart): Mono<Void> {
+        Files.deleteIfExists(destination)
+        Files.createDirectories(destination.parent)
+        return file.transferTo(destination)
+    }
+
+    fun size(file: Path): Mono<Long> = Files.size(file).toMono()
 }
 
 private fun Path.create() = if (Files.exists(this)) this else Files.createDirectory(this)

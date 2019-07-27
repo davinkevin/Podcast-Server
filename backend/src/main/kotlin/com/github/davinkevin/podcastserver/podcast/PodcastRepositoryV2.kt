@@ -1,11 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
-import com.github.davinkevin.podcastserver.database.Tables.COVER
-import com.github.davinkevin.podcastserver.database.Tables.ITEM
-import com.github.davinkevin.podcastserver.database.Tables.PODCAST
-import com.github.davinkevin.podcastserver.database.Tables.PODCAST_TAGS
-import com.github.davinkevin.podcastserver.database.Tables.TAG
+import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
 import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
 import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
@@ -157,7 +153,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 .map { NumberOfItemByDateWrapper(it.component2().toLocalDateTime().toLocalDate(), it.component1()) }
     }
 
-    fun save(title: String, url: String, hasToBeDeleted: Boolean, type: String, tags: Collection<Tag>, cover: Cover) = Mono.defer {
+    fun save(title: String, url: String?, hasToBeDeleted: Boolean, type: String, tags: Collection<Tag>, cover: Cover) = Mono.defer {
         val id = UUID.randomUUID()
 
         val insertPodcast = query

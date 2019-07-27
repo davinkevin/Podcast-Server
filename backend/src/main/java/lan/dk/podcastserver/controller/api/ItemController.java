@@ -7,13 +7,10 @@ import com.github.davinkevin.podcastserver.entity.Item;
 import com.github.davinkevin.podcastserver.entity.WatchList;
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager;
 import io.vavr.collection.Set;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -52,11 +49,5 @@ public class ItemController {
     @GetMapping("{id}/addtoqueue")
     public void addToDownloadList(@PathVariable("id") UUID id) {
         itemDownloadManager.addItemToQueue(id);
-    }
-
-    @PostMapping("/upload")
-    @JsonView(Item.ItemDetailsView.class)
-    public Item uploadFile(@PathVariable UUID idPodcast, @RequestPart("file") MultipartFile file) throws IOException, ParseException, URISyntaxException {
-        return itemBusiness.addItemByUpload(idPodcast, file);
     }
 }

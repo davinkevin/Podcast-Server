@@ -300,6 +300,60 @@ class PodcastHandlerTest {
                     }
         }
 
+        @Test
+        fun `with upload podcast without url`() {
+            /* Given */
+            val uploadPodcast = Podcast(
+                    id = UUID.fromString("dbb18cac-58bb-4d89-b9ec-afc9da00afc5"),
+                    title = "foo",
+                    description = "desc",
+                    url = null,
+                    hasToBeDeleted = true,
+                    lastUpdate = OffsetDateTime.of(2019, 4, 9, 11, 12, 13, 0, ZoneOffset.ofHours(2)),
+                    type = "upload",
+                    tags = listOf(),
+                    cover = CoverForPodcast(UUID.fromString("d6d4033a-d499-4c09-8d3e-d74595ae0993"), URI("http://foo.bar.com/cover.png"), 1200, 600)
+            )
+            whenever(podcastService.save(any())).thenReturn(uploadPodcast.toMono())
+
+            /* When */
+            rest
+                    .post()
+                    .uri("/api/v1/podcasts")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .syncBody(""" {
+                        "title": "foo",
+                        "type": "upload",
+                        "tags": [],
+                        "cover": {
+                            "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
+                        }
+                    }""")
+                    /* Then */
+                    .exchange()
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo(""" {
+                              "cover": {
+                                "height": 1200,
+                                "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
+                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "width": 600
+                              },
+                              "hasToBeDeleted": true,
+                              "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
+                              "lastUpdate": "2019-04-09T11:12:13+02:00",
+                              "tags": [],
+                              "title": "foo",
+                              "url": null,
+                              "type": "upload"
+                            } """)
+                    }
+        }
+
+
+
     }
 
     @Nested
