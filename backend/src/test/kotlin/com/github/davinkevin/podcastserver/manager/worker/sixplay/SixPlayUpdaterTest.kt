@@ -43,7 +43,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should extract items`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"))
+        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
         whenever(imageService.getCoverFromURL(any())).thenReturn(Cover.DEFAULT_COVER)
 
@@ -52,7 +52,7 @@ class SixPlayUpdaterTest {
 
         /* Then */
         assertThat(items)
-                .hasSize(77)
+                .hasSize(2)
                 .are(allValid())
     }
 
@@ -69,7 +69,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should throw exception if problem during get items`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"))
+        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
@@ -104,7 +104,7 @@ class SixPlayUpdaterTest {
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("programId not found in react store")
+                .hasMessage("No results for path: \$['program']['programsById']")
     }
 
     @Test
@@ -130,7 +130,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should do signature`() {
         /* GIVEN */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"))
+        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
@@ -155,9 +155,9 @@ class SixPlayUpdaterTest {
     }
 
     @Test
-    fun `should_throw parsing exception if problem during signature`() {
+    fun `should throw parsing exception if problem during signature`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"))
+        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
@@ -171,7 +171,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should have the same signature twice`() {
         /* GIVEN */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/mm-vdb-main.html"))
+        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 

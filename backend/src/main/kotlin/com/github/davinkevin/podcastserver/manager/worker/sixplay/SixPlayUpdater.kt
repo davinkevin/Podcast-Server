@@ -2,9 +2,10 @@ package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.Option
 import arrow.core.getOrElse
-import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -13,8 +14,6 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.TypeRef
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
@@ -43,11 +42,9 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
                 .getOrElse { throw RuntimeException("No parsable JS found in the page") }
 
         val programId = JsonService.to(PROGRAM_ID_SELECTOR, TYPE_KEYS).apply(root6Play)
-                .toOption()
-                .map { it.keys }
-                .flatMap { it.firstOption() }
-                .map { it.toInt() }
-                .getOrElse{ throw RuntimeException("programId not found in react store") }
+                .keys
+                .first()
+                .toInt()
 
         val programCode = JsonService.to(PROGRAM_CODE_SELECTOR.format(programId), String::class.java)
                 .apply(root6Play)
@@ -77,7 +74,7 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
                     .toSet()
                     .firstOption { it.html().contains("root.") }
                     .map { it.html() }
-                    .map { StringUtils.substringBetween(it, " = ", "}(this));") }
+                    .map { it.substringBetween(" = ", "}(this));")!!}
                     .map { it.removeJs() }
                     .map { jsonService.parse(it) }
 
@@ -85,6 +82,7 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
             .trim { v -> v <= ' ' }
             .replace("function [^}]*".toRegex(), "{}")
             .removeSuffix(";")
+            .cleanForJsonSerialization()
 
     override fun signatureOf(podcast: Podcast) =
             htmlService.get(podcast.url!!).k()

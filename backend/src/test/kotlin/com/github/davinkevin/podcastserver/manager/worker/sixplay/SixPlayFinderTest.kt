@@ -48,7 +48,7 @@ class SixPlayFinderTest {
     }
 
     @Test
-    fun `should find podcast without description and without cover`() {
+    fun `should find podcast without description`() {
         /* GIVEN */
         val podcastUrl = "http://www.6play.fr/custom-show"
         whenever(htmlService.get(podcastUrl)).thenReturn(IOUtils.fileAsHtml(of("sport-6-p_1380-without-description.html")))
