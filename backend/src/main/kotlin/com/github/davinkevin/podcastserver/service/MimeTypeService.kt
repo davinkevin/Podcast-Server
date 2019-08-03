@@ -52,10 +52,10 @@ class MimeTypeService(val tikaProbeContentType: TikaProbeContentType) {
     }
 
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
-    fun probeContentType(file: Path) =
+    fun probeContentType(file: Path): String =
             filesProbeContentType(file)
                     .orElse { tikaProbeContentType.probeContentType(file) }
-                    .getOrElse({ getMimeType(FilenameUtils.getExtension(file.fileName.toString())) })
+                    .getOrElse { getMimeType(FilenameUtils.getExtension(file.fileName.toString())) }
 
     private fun filesProbeContentType(file: Path) =
             Try { Files.probeContentType(file) }
@@ -63,7 +63,7 @@ class MimeTypeService(val tikaProbeContentType: TikaProbeContentType) {
                     .toOption()
 }
 
-class TikaProbeContentType(val tika: Tika) {
+class TikaProbeContentType(private val tika: Tika) {
     fun probeContentType(file: Path) =
             Try { tika.detect(file) }
                     .filter { it != null }

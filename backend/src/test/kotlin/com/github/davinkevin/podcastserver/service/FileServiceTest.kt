@@ -12,19 +12,24 @@ import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Percentage.withPercentage
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.FileSystemUtils
@@ -33,6 +38,7 @@ import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -47,7 +53,8 @@ import java.util.*
 class FileServiceTest {
 
     @Autowired lateinit var fileService: FileService
-    @MockBean lateinit var p: PodcastServerParameters
+    @Autowired lateinit var p: PodcastServerParameters
+    @Autowired lateinit var mimeTypeService: MimeTypeService
 
     private val tempFolder = Paths.get("/tmp", "podcast-server", "FileService")
 
@@ -232,6 +239,47 @@ class FileServiceTest {
             assertThat(file).exists()
             assertThat(file).hasDigest("MD5", "1cc21d3dce8bfedbda2d867a3238e8db")
         }
+    }
+
+    @Nested
+    @DisplayName("should delegate the mimeType calls")
+    inner class ShouldDelegateTheMimeTypeCalls {
+
+        @Test
+        fun `with success`() {
+            /* Given */
+            val file = Paths.get("/foo/bar/file.mp3")
+            whenever(mimeTypeService.probeContentType(file)).thenReturn("audio/mp3")
+            /* When */
+            StepVerifier.create(fileService.probeContentType(file))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext("audio/mp3")
+                    .verifyComplete()
+        }
+    }
+
+    @Nested
+    @DisplayName("should get size of a file")
+    inner class ShouldGetSizeOfAFile {
+        @Test
+        fun `with success`(@TempDir dir: Path) {
+            /* Given */
+            val file = Files.createTempFile(dir, "foo", "bar")
+            Files.write(file, "foo".toByteArray())
+            /* When */
+            StepVerifier.create(fileService.size(file))
+            /* Then */
+                    .expectSubscription()
+                    .assertNext { assertThat(it).isCloseTo(3, withPercentage(1.toDouble())) }
+                    .verifyComplete()
+        }
+    }
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun podcastServerParameters() = mock<PodcastServerParameters>()
+        @Bean fun mimeTypeService() = mock<MimeTypeService>()
     }
 }
 

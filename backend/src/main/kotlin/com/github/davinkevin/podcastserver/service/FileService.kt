@@ -23,7 +23,11 @@ import java.nio.file.Paths
  * Created by kevin on 2019-02-09
  */
 @Service
-class FileService(private val p: PodcastServerParameters, private val wcb: WebClient.Builder) {
+class FileService(
+        private val p: PodcastServerParameters,
+        private val mimeTypeService: MimeTypeService,
+        private val wcb: WebClient.Builder
+) {
 
     private val log = LoggerFactory.getLogger(FileService::class.java)
 
@@ -91,6 +95,8 @@ class FileService(private val p: PodcastServerParameters, private val wcb: WebCl
     }
 
     fun size(file: Path): Mono<Long> = Files.size(file).toMono()
+
+    fun probeContentType(file: Path): Mono<String> = mimeTypeService.probeContentType(file).toMono()
 }
 
 private fun Path.create() = if (Files.exists(this)) this else Files.createDirectory(this)

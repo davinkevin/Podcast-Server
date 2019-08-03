@@ -27,6 +27,7 @@ import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
 import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
+import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
 /**
  * Created by kevin on 2019-02-12
@@ -41,7 +42,7 @@ class ItemServiceTest {
     @MockBean lateinit var p: PodcastServerParameters
     @MockBean lateinit var fileService: FileService
     @MockBean lateinit var idm: ItemDownloadManager
-    @MockBean lateinit var podcastService: PodcastService
+    @MockBean lateinit var podcastRepository: PodcastRepository
     @MockBean lateinit var coverRepositoryV2: CoverRepository
     @MockBean lateinit var mimeTypeService: MimeTypeService
 
