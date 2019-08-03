@@ -1,13 +1,12 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvExtractor
-import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayExtractor
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliExtractor
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalExtractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.PassThroughExtractor
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayExtractor
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -36,7 +35,6 @@ class ExtractorSelectorTest {
     @MockBean lateinit var gulliExtractor: GulliExtractor
     @MockBean lateinit var myCanalExtractor: MyCanalExtractor
     @MockBean lateinit var passThroughExtractor: PassThroughExtractor
-    @MockBean lateinit var sixPlayExtractor: SixPlayExtractor
     @MockBean lateinit var tf1ReplayExtractor: TF1ReplayExtractor
 
     @Autowired lateinit var applicationContext: ApplicationContext
@@ -49,7 +47,6 @@ class ExtractorSelectorTest {
                 gulliExtractor,
                 myCanalExtractor,
                 passThroughExtractor,
-                sixPlayExtractor,
                 tf1ReplayExtractor)
 
         extractors.forEach { whenever(it.compatibility(any())).thenCallRealMethod() }
@@ -87,7 +84,6 @@ class ExtractorSelectorTest {
                         Arguments.of("http://www.jeuxvideo.com/chroniques-video.htm", PassThroughExtractor::class),
                         Arguments.of("http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html", MyCanalExtractor::class),
                         Arguments.of("http://foo.bar.com/to/rss/file.xml", PassThroughExtractor::class),
-                        Arguments.of("http://www.6play.fr/videos/foo/bar", SixPlayExtractor::class),
                         Arguments.of("http://www.tf1.fr/videos/foo/bar", TF1ReplayExtractor::class),
                         Arguments.of("http://www.youtube.com/channel/UC_ioajefokjFAOI", PassThroughExtractor::class)
                 )

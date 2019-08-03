@@ -13,7 +13,8 @@ import com.sapher.youtubedl.YoutubeDLRequest
 import com.sapher.youtubedl.YoutubeDLResponse
 import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
-import org.apache.commons.io.FilenameUtils.*
+import org.apache.commons.io.FilenameUtils.getExtension
+import org.apache.commons.io.FilenameUtils.removeExtension
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -85,6 +86,7 @@ class YoutubeDlDownloader(
 
         val url = downloadingItem.urls.first().toLowerCase()
         return if ("youtube.com" in url || "www.france.tv" in url) 5
+        else if ("www.6play.fr" in url) 5
         else Integer.MAX_VALUE
     }
 
