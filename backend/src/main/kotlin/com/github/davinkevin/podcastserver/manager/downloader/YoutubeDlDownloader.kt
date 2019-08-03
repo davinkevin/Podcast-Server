@@ -125,7 +125,7 @@ class YoutubeDlService(externalTools: ExternalTools) {
         val r = YoutubeDLRequest(url, downloadLocation).apply {
             setOption("retries", 10)
             setOption("output", name)
-            setOption("format", "bestvideo[ext=webm]+bestaudio/best[ext=mp4]+bestaudio/best[ext=webm]/best[ext=mp4]")
+            setOption("format", "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]")
         }
 
         return YoutubeDL.execute(r) { progress, etaInSeconds ->
