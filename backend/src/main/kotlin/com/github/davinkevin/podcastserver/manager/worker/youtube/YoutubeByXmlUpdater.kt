@@ -10,6 +10,8 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.jdom2.Element
 import org.jdom2.Namespace
@@ -29,7 +31,7 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
         log.info("Youtube Update by RSS")
 
         val url = playlistUrlOf(podcast.url.toASCIIString())
@@ -52,35 +54,35 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
             if (isPlaylist(url)) PLAYLIST_RSS_BASE.format(playlistIdOf(url))
             else CHANNEL_RSS_BASE.format(channelIdOf(htmlService, url))
 
-    private fun toItem(e: Element, dn: Namespace): Item {
+    private fun toItem(e: Element, dn: Namespace): ItemFromUpdate {
         val mediaGroup = e.getChild("group", MEDIA_NAMESPACE)
-        return Item().apply {
-            title = e.getChildText("title", dn)
-            description = mediaGroup.getChildText("description", MEDIA_NAMESPACE)
+        return ItemFromUpdate(
+            title = e.getChildText("title", dn),
+            description = mediaGroup.getChildText("description", MEDIA_NAMESPACE),
 
             //2013-12-20T22:30:01.000Z
-            pubDate = ZonedDateTime.parse(e.getChildText("published", dn), DateTimeFormatter.ISO_DATE_TIME)
+            pubDate = ZonedDateTime.parse(e.getChildText("published", dn), DateTimeFormatter.ISO_DATE_TIME),
 
-            url = urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url"))
+            url = urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")),
             cover = coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE))
-        }
+        )
     }
 
     private fun coverOf(thumbnail: Element?) =
             Option.fromNullable(thumbnail)
-                    .map { Cover().apply {
-                        url = it.getAttributeValue("url")
-                        width = it.getAttributeValue("width").toInt()
+                    .map { CoverFromUpdate(
+                        url = URI(it.getAttributeValue("url")),
+                        width = it.getAttributeValue("width").toInt(),
                         height = it.getAttributeValue("height").toInt()
-                    } }
-                    .getOrElse { Cover.DEFAULT_COVER }
+                    ) }
+                    .orNull()
 
-    private fun urlOf(embeddedVideoPage: String): String {
+    private fun urlOf(embeddedVideoPage: String): URI {
         val idVideo = embeddedVideoPage
                 .substringAfterLast("/")
                 .substringBefore("?")
 
-        return URL_PAGE_BASE.format(idVideo)
+        return URI(URL_PAGE_BASE.format(idVideo))
     }
 
     override fun signatureOf(url: URI): String {

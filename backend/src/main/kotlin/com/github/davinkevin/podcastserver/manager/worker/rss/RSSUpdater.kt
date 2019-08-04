@@ -1,22 +1,18 @@
 package com.github.davinkevin.podcastserver.manager.worker.rss
 
-import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.*
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.lang.Exception
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -26,7 +22,7 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: PodcastToUpdate) =
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             jdomService.parse(podcast.url.toASCIIString())
                     .k()
                     .flatMap { it.rootElement.getChild("channel").toOption() }
@@ -41,15 +37,14 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
                     item.getChild("origEnclosureLink", FEED_BURNER) != null
 
     private fun extractItem(item: Element) =
-            Item().apply {
-                title = item.getChildText("title")
-                pubDate = getPubDate(item)
-                description = item.getChildText("description")
-                mimeType = item.getChild("enclosure").getAttributeValue("type")
-                length = lengthOf(item)
-                cover = coverOf(item)
-                url = urlOf(item)
-            }
+            ItemFromUpdate(
+                title = item.getChildText("title"),
+                pubDate = getPubDate(item),
+                description = item.getChildText("description"),
+                length = lengthOf(item),
+                cover = coverOf(item)?.toCoverFromUpdate(),
+                url = URI(urlOf(item))
+            )
 
     private fun lengthOf(item: Element) =
             if (!item.getChild("enclosure").getAttributeValue("length").isNullOrEmpty())
@@ -63,28 +58,29 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
             else
                 element.getChild("enclosure").getAttributeValue("url")
 
-    private fun coverOf(element: Element): Cover {
+    private fun coverOf(element: Element): CoverInformation? {
         return element.getChild("thumbnail", MEDIA)
                 .toOption()
                 .map { it.getAttributeValue("url").toOption().getOrElse { it.text } }
-                .flatMap { imageService.getCoverFromURL(it).toOption() }
-                .getOrElse { Cover.DEFAULT_COVER }
+                .flatMap { imageService.fetchCoverInformation(it).toOption() }
+                .getOrElse { null }
     }
 
     private fun getPubDate(item: Element): ZonedDateTime? {
-        val pubdate = item.getChildText("pubDate") ?: ""
+        val pubDate = item.getChildText("pubDate") ?: ""
         val date = when {
-            "EDT" in pubdate -> pubdate.replace("EDT".toRegex(), "+0600")
-            "PST" in pubdate -> pubdate.replace("PST".toRegex(), "+0800")
-            "PDT" in pubdate -> pubdate.replace("PDT".toRegex(), "+0900")
-            else -> pubdate
+            "EDT" in pubDate -> pubDate.replace("EDT", "+0600")
+            "PST" in pubDate -> pubDate.replace("PST", "+0800")
+            "PDT" in pubDate -> pubDate.replace("PDT", "+0900")
+            else -> pubDate
         }
 
-        return Try { ZonedDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME) }
-                .getOrElse {
-                    log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), it.message)
-                    null
-                }
+        return try {
+            ZonedDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
+        } catch (e: Exception) {
+            log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), e.message)
+            null
+        }
     }
 
     override fun signatureOf(url: URI) = signatureService.fromUrl(url.toASCIIString())

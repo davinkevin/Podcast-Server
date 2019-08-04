@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.entity.Cover
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.InputStream
+import java.net.URI
 import javax.imageio.ImageIO
 
 /**
@@ -33,6 +34,13 @@ class ImageService(val urlService: UrlService) {
                     null
                 }
     }
+
+    fun fetchCoverInformation(imageUrl: String?): CoverInformation? {
+        val c = getCoverFromURL(imageUrl) ?: return null
+        return CoverInformation(c.width!!, c.height!!, URI(c.url!!))
+    }
 }
+
+data class CoverInformation(val width: Int, val height: Int, val url: URI)
 
 private fun InputStream.toBufferedImage() = ImageIO.read(ImageIO.createImageInputStream(this))!!

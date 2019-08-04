@@ -12,6 +12,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,19 +22,21 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
+import java.util.*
 
 /**
  * Created by kevin on 16/09/2018
  */
 @ExtendWith(MockitoExtension::class)
 class YoutubeByXmlUpdaterTest {
-    
-    @Mock lateinit var jdomService: JdomService
-    @Mock lateinit var htmlService: HtmlService
-    @Mock lateinit var signatureService: SignatureService
-    @InjectMocks lateinit var updater: YoutubeByXmlUpdater
+
+    @Mock private lateinit var jdomService: JdomService
+    @Mock private lateinit var htmlService: HtmlService
+    @Mock private lateinit var signatureService: SignatureService
+    @InjectMocks private lateinit var updater: YoutubeByXmlUpdater
 
     @Test
     fun `should be of type youtube`() {
@@ -49,9 +52,7 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should get items for channel`() {
         /* Given */
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/user/androiddevelopers"
-        }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
         whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).then { fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml") }
 
@@ -59,18 +60,16 @@ class YoutubeByXmlUpdaterTest {
         val items = updater.findItems(podcast)
 
         /* Then */
-        assertThat<Item>(items).hasSize(15)
-        verify(jdomService, Mockito.only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")
-        verify(htmlService, Mockito.only()).get("https://www.youtube.com/user/androiddevelopers")
+        assertThat(items).hasSize(15)
+        verify(jdomService, only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")
+        verify(htmlService, only()).get("https://www.youtube.com/user/androiddevelopers")
     }
 
 
     @Test
     fun `should get items for playlist`() {
         /* Given */
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/playlist?list=PLAD454F0807B6CB80"
-        }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/playlist?list=PLAD454F0807B6CB80"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(jdomService.parse(any())).thenReturn(fileAsXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml"))
 
@@ -78,28 +77,26 @@ class YoutubeByXmlUpdaterTest {
         val items = updater.findItems(podcast)
 
         /* Then */
-        assertThat<Item>(items).hasSize(15)
-        verify(jdomService, Mockito.only()).parse("https://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
+        assertThat(items).hasSize(15)
+        verify(jdomService, only()).parse("https://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
     }
 
     @Test
     fun `should generate signature`() {
         /* Given */
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/user/androiddevelopers"
-        }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).thenReturn( fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"))
         whenever(signatureService.fromText(any())).thenReturn("Signature")
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("Signature")
-        verify(jdomService, Mockito.only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")
-        verify(htmlService, Mockito.only()).get("https://www.youtube.com/user/androiddevelopers")
+        verify(jdomService, only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")
+        verify(htmlService, only()).get("https://www.youtube.com/user/androiddevelopers")
     }
 
     @Test
@@ -121,9 +118,7 @@ class YoutubeByXmlUpdaterTest {
     @Test
     fun `should return empty if parsing error`() {
         /* Given */
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D"
-        }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
@@ -132,15 +127,13 @@ class YoutubeByXmlUpdaterTest {
         val items = updater.findItems(podcast)
 
         /* Then */
-        assertThat<Item>(items).hasSize(0)
+        assertThat(items).hasSize(0)
     }
 
     @Test
     fun `should return empty set because html page not found`() {
         /* Given */
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/user/androiddevelopers"
-        }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
@@ -149,15 +142,13 @@ class YoutubeByXmlUpdaterTest {
         val items = updater.findItems(podcast)
 
         /* Then */
-        assertThat<Item>(items).hasSize(0)
+        assertThat(items).hasSize(0)
     }
 
     @Test
     fun `should return empty set because of data tag not find`() {
         /* Given */
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/user/androiddevelopers"
-        }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
@@ -166,9 +157,9 @@ class YoutubeByXmlUpdaterTest {
         val items = updater.findItems(podcast)
 
         /* Then */
-        assertThat<Item>(items).hasSize(0)
-        verify(jdomService, Mockito.only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=")
-        verify(htmlService, Mockito.only()).get("https://www.youtube.com/user/androiddevelopers")
+        assertThat(items).hasSize(0)
+        verify(jdomService, only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=")
+        verify(htmlService, only()).get("https://www.youtube.com/user/androiddevelopers")
     }
 
     @Test
@@ -193,5 +184,5 @@ class YoutubeByXmlUpdaterTest {
         /* Then */
         assertThat(compatibility).isEqualTo(1)
     }
-    
+
 }

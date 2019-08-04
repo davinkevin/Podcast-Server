@@ -16,6 +16,9 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.defaultItem
+import com.github.davinkevin.podcastserver.podcast.PodcastForUpdate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,6 +26,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
+import java.util.*
 import javax.validation.Validator
 
 /**
@@ -31,26 +35,25 @@ import javax.validation.Validator
 @ExtendWith(MockitoExtension::class)
 class JeuxVideoComUpdaterTest {
 
-    @Mock lateinit var podcastServerParameters: PodcastServerParameters
     @Mock lateinit var signatureService: SignatureService
-    @Mock lateinit var validator: Validator
     @Mock lateinit var htmlService: HtmlService
     @Mock lateinit var imageService: ImageService
     @InjectMocks lateinit var updater: JeuxVideoComUpdater
 
-    val podcast = Podcast().apply {
-        title = "Chronique Video HD"
-        url = "http://www.jeuxvideo.com/chroniques-video.htm"
-    }
+    val podcast = PodcastToUpdate (
+            id = UUID.randomUUID(),
+            url = URI("http://www.jeuxvideo.com/chroniques-video.htm"),
+            signature = "old_sign"
+    )
 
     @Test
     fun `should sign podcast`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("chroniques-video.htm")))
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("216e430c392256d2954d3903e2c8ee00")
@@ -59,10 +62,10 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should error during sign`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("")
@@ -71,7 +74,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should get items`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("chroniques-video.htm")))
         configureForAllPage("/remote/podcast/JeuxVideoCom/chroniques-video.htm")
 
         /* When */
@@ -84,7 +87,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should return empty list if not found`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(None.toVΛVΓ())
 
         /* When */
         val items = updater.findItems(podcast)
@@ -96,7 +99,7 @@ class JeuxVideoComUpdaterTest {
     @Test
     fun `should get items with exception`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("chroniques-video.htm")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("chroniques-video.htm")))
         configureForAllPage(from("chroniques-video.htm"))
         whenever(htmlService.get("http://www.jeuxvideo.com/videos/chroniques/452234/seul-face-aux-tenebres-le-rodeur-de-la-bibliotheque.htm"))
                 .thenReturn(None.toVΛVΓ())
@@ -107,7 +110,7 @@ class JeuxVideoComUpdaterTest {
         /* Then */
         assertThat(items)
                 .hasSize(42)
-                .contains(Item.DEFAULT_ITEM)
+                .contains(defaultItem)
     }
 
     @Test

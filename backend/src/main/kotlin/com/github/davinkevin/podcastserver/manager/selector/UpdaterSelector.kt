@@ -12,7 +12,7 @@ import java.net.URI
 @Service
 class UpdaterSelector(val updaters: Set<Updater>) {
 
-    fun of(url: URI): Updater = updaters.minBy { updater -> updater.compatibility(url) }!!
+    fun of(url: URI): Updater = updaters.minBy { updater -> updater.compatibility(url.toASCIIString()) }!!
     fun types(): Set<Type> = updaters.map { it.type() }.toSet()
 
     companion object {

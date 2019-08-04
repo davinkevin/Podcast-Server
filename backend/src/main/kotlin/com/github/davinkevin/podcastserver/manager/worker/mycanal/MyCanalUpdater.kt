@@ -6,8 +6,6 @@ import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -16,7 +14,7 @@ import com.github.davinkevin.podcastserver.utils.toTry
 import com.jayway.jsonpath.TypeRef
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.*
 import lan.dk.podcastserver.service.JsonService
 import lan.dk.podcastserver.service.JsonService.to
 import org.jsoup.select.Elements
@@ -29,12 +27,11 @@ import java.net.URI
 @Scope(SCOPE_PROTOTYPE)
 class MyCanalUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService, val htmlService: HtmlService) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate) =
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             itemsAsJsonFrom(URI(podcast.url.toASCIIString()))
                     .getOrElse { setOf() }
                     .flatMap { findDetails(it).toList() }
-                    .map { it.first to toItem(it.second) }
-                    .map { it.second.apply { url = DOMAIN + it.first.onClick.path } }
+                    .map { toItem(it.second, DOMAIN + it.first.onClick.path) }
                     .toSet()
 
     override fun signatureOf(url: URI): String {
@@ -78,18 +75,19 @@ class MyCanalUpdater(val signatureService: SignatureService, val jsonService: Js
 
     override fun compatibility(url: String?) = myCanalCompatibility(url)
 
-    private fun toItem(i: MyCanalDetailsItem): Item {
+    private fun toItem(i: MyCanalDetailsItem, url: String): ItemFromUpdate {
         val infos = i.infos
         val titrage = infos.titrage
         val publication = infos.publication
 
-        return Item().apply {
-            title = titrage.titre
-            description = titrage.sous_titre
-            length = i.duration
-            cover = i.media.images.cover().map { imageService.getCoverFromURL(it) }.getOrElse { Cover.DEFAULT_COVER }
-            pubDate = publication.asZonedDateTime()
-        }
+        return ItemFromUpdate(
+            title = titrage.titre,
+            description = titrage.sous_titre,
+            length = i.duration,
+            cover = i.media.images.cover().map { imageService.fetchCoverInformation(it) }.getOrElse { null }?.toCoverFromUpdate(),
+            pubDate = publication.asZonedDateTime(),
+            url = URI(url)
+        )
     }
 
     companion object {

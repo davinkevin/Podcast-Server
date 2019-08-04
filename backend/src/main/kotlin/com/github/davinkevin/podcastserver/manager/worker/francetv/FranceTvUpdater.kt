@@ -7,9 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -33,13 +31,18 @@ import java.time.ZonedDateTime
  * Created by kevin on 30/06/2017.
  */
 @Component
-class FranceTvUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService, val jsonService: JsonService) : Updater {
+class FranceTvUpdater(
+        val signatureService: SignatureService,
+        val htmlService: HtmlService,
+        val imageService: ImageService,
+        val jsonService: JsonService
+) : Updater {
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
 
-        val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url!!)
+        val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url.toASCIIString())
 
         return htmlService
                 .get(toReplayUrl(podcast.url.toASCIIString())).k()
@@ -55,7 +58,7 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
 
     private fun toReplayUrl(url: String): String = "$url/replay-videos/ajax/?page=0"
 
-    private fun urlToItem(itemUrl: String): Item =
+    private fun urlToItem(itemUrl: String): ItemFromUpdate =
             htmlService
                     .get(itemUrl)
                     .map { it.select("script") }
@@ -73,14 +76,14 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
                     .map { CATALOG_URL.format(it.videoId)}
                     .flatMap { jsonService.parseUrl(it).k() }
                     .map { JsonService.to(FranceTvItem::class.java).apply(it) }
-                    .map { ftv -> Item().apply {
-                        title = ftv.title()
-                        description = ftv.synopsis
-                        pubDate = ftv.pubDate()
-                        url = itemUrl
-                        cover = imageService.getCoverFromURL(ftv.image)
-                    } }
-                    .getOrElse { Item.DEFAULT_ITEM }
+                    .map { ftv -> ItemFromUpdate(
+                        title = ftv.title()!!,
+                        description = ftv.synopsis!!,
+                        pubDate = ftv.pubDate(),
+                        url = URI(itemUrl),
+                        cover = imageService.fetchCoverInformation(ftv.image)?.toCoverFromUpdate()
+                    ) }
+                    .getOrElse { defaultItem }
 
     override fun signatureOf(url: URI): String {
 

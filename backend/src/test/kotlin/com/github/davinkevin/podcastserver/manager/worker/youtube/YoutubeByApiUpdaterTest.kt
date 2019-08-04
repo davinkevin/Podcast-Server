@@ -9,6 +9,7 @@ import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
+import java.util.*
 
 /**
  * Created by kevin on 16/09/2018
@@ -28,29 +30,29 @@ import java.net.URI
 @ExtendWith(MockitoExtension::class)
 class YoutubeByApiUpdaterTest {
 
-    @Mock lateinit var htmlService: HtmlService
-    @Mock lateinit var jsonService: JsonService
-    @Mock lateinit var api: Api
-    @Mock lateinit var signatureService: SignatureService
-    @InjectMocks lateinit var updater: YoutubeByApiUpdater
+    @Mock private lateinit var htmlService: HtmlService
+    @Mock private lateinit var jsonService: JsonService
+    @Mock private lateinit var api: Api
+    @Mock private lateinit var signatureService: SignatureService
+    @InjectMocks private lateinit var updater: YoutubeByApiUpdater
 
     @Test
     fun `should get items with API from channel`() {
         /* Given */
         val page1 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO"
         val page2 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO&pageToken=CDIQAA"
-        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = mutableSetOf() }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(api.youtube).thenReturn("FOO")
         doAnswer{ fileAsJson("/remote/podcast/youtube/joueurdugrenier.json")   }.whenever(jsonService).parseUrl(page1)
         doAnswer{ fileAsJson("/remote/podcast/youtube/joueurdugrenier.2.json") }.whenever(jsonService).parseUrl(page2)
-        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
 
         /* When */
         val items = updater.findItems(podcast)
 
         /* Then */
-        assertThat(items).hasSize(87)
+        assertThat(items).hasSize(88)
         verify(jsonService, times(2)).parseUrl(any())
     }
 
@@ -58,10 +60,11 @@ class YoutubeByApiUpdaterTest {
     fun `should handle error during fetch items`() {
         /* Given */
         whenever(api.youtube).thenReturn("FOO")
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/user/androiddevelopers"
-            items = mutableSetOf()
-        }
+        val podcast = PodcastToUpdate (
+                url = URI("https://www.youtube.com/user/androiddevelopers"),
+                id = UUID.randomUUID(),
+                signature = "noSign"
+        )
 
         whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
@@ -78,15 +81,15 @@ class YoutubeByApiUpdaterTest {
     fun `should sign with api key`() {
         /* Given */
         val page1 = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=FOO"
-        val podcast = Podcast().apply { url = "https://www.youtube.com/user/joueurdugrenier"; items = mutableSetOf() }
+        val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
 
         whenever(api.youtube).thenReturn("FOO")
-        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
         doAnswer{ fileAsJson("/remote/podcast/youtube/joueurdugrenier.json")   }.whenever(jsonService).parseUrl(page1)
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("64cc064a14dba90a0df24218db758479")

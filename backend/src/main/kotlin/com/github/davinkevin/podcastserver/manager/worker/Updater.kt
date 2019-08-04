@@ -1,14 +1,14 @@
 package com.github.davinkevin.podcastserver.manager.worker
 
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import org.slf4j.LoggerFactory
 import java.net.URI
-import java.net.URL
+import java.time.ZonedDateTime
 import java.util.*
 
 val log = LoggerFactory.getLogger(Updater::class.java)!!
-val NO_MODIFICATION = UpdatePodcastInformation(Podcast.DEFAULT_PODCAST, setOf(), null)
+val defaultPodcast = PodcastToUpdate(id = UUID.randomUUID(), url = URI("https://localhost/"), signature = "")
+val NO_MODIFICATION = UpdatePodcastInformation(defaultPodcast, setOf(), null)
 
 interface Updater {
 
@@ -27,7 +27,7 @@ interface Updater {
         }
     }
 
-    fun findItems(podcast: PodcastToUpdate): Set<Item>
+    fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate>
 
     fun signatureOf(url: URI): String
 
@@ -37,5 +37,21 @@ interface Updater {
 }
 
 
-class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<Item>, val newSignature: String?)
-class PodcastToUpdate(val id: UUID, val url: URI, val signature: String)
+class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<ItemFromUpdate>, val newSignature: String?)
+data class PodcastToUpdate(val id: UUID, val url: URI, val signature: String)
+data class ItemFromUpdate(
+        val title: String?,
+        val pubDate: ZonedDateTime?,
+        val length: Long? = null,
+        val url: URI,
+        val description: String?,
+        val cover: CoverFromUpdate?
+)
+data class CoverFromUpdate(val width: Int, val height: Int, val url: URI)
+fun CoverInformation.toCoverFromUpdate() = CoverFromUpdate (
+    height = this@toCoverFromUpdate.height,
+    width = this@toCoverFromUpdate.width,
+    url = this@toCoverFromUpdate.url
+)
+
+val defaultItem = ItemFromUpdate(null, ZonedDateTime.now(), null, URI("http://foo.bar"), null, null)

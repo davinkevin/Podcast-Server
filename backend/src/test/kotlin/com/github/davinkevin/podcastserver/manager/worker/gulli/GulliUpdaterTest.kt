@@ -7,6 +7,9 @@ import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.defaultItem
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -22,6 +25,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
+import java.util.*
 import javax.validation.Validator
 
 /**
@@ -30,26 +34,25 @@ import javax.validation.Validator
 @ExtendWith(MockitoExtension::class)
 class GulliUpdaterTest {
 
-    @Mock lateinit var podcastServerParameters: PodcastServerParameters
     @Mock lateinit var signatureService: SignatureService
-    @Mock lateinit var validator: Validator
     @Mock lateinit var htmlService: HtmlService
     @Mock lateinit var imageService: ImageService
     @InjectMocks lateinit var gulliUpdater: GulliUpdater
 
-    val podcast = Podcast().apply {
-        url = "http://replay.gulli.fr/dessins-animes/Pokemon3"
-        title = "Pokemon"
-    }
+    val podcast = PodcastToUpdate (
+            id = UUID.randomUUID(),
+            url = URI("http://replay.gulli.fr/dessins-animes/Pokemon3"),
+            signature = "old_sign"
+    )
 
     @Test
     fun `should get signature`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(fileAsHtml(from("pokemon.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.html")))
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = gulliUpdater.signatureOf(URI(podcast.url!!))
+        val signature = gulliUpdater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("4d0bb11a29d851eabf10245b00d4cabe")
@@ -61,7 +64,7 @@ class GulliUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = gulliUpdater.signatureOf(URI(podcast.url!!))
+        val signature = gulliUpdater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("")
@@ -70,10 +73,11 @@ class GulliUpdaterTest {
     @Test
     fun `should return list of items`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.html")))
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
-        whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
+        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation (url = URI(it.getArgument(0)), height = 200, width = 200) }
+
         /* When */
         val items = gulliUpdater.findItems(podcast)
         val first = items.firstOption { it.title!!.contains("13") }.getOrElse { throw RuntimeException("Episode 13 Not Found") }
@@ -83,20 +87,20 @@ class GulliUpdaterTest {
         assertThat(items).isNotEmpty.hasSize(2)
 
         assertThat(first.title).isEqualTo("Saison 19, Episode 13 : Voyages croisés")
-        assertThat(first.url).isEqualTo("http://replay.gulli.fr/jwplayer/embed/VOD68526621555000")
+        assertThat(first.url).isEqualTo(URI("http://replay.gulli.fr/jwplayer/embed/VOD68526621555000"))
         assertThat(first.description).isEqualTo("Sacha et Liam livrent un combat, et Amphinobi et Jungko, maintenant évolués, sont passionnés par cette revanche ! Non loin de là, Alain, qui est en voyage pour étudier la Méga-Évolution, s'arrête pour regarder le combat, et il est très intrigué de voir qu'Amphinobi semble se transformer, juste avant de vaincre Jungko. Alain veut en savoir davantage sur les possibilités de l'Amphinobi de Sacha, et il le met au défi de combattre son Dracaufeu. Lorsque Dracaufeu méga-évolue et qu'Amphinobi change à nouveau d'apparence, le combat devient intense ! Amphinobi finit par être vaincu mais tous souhaitent en savoir plus sur cette mystérieuse transformation ! Pendant ce temps, les expériences de la Team Flare semblent progresser...")
-        assertThat(first.cover!!.url).isEqualTo("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621555000_20161007-141504.png")
+        assertThat(first.cover!!.url).isEqualTo(URI("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621555000_20161007-141504.png"))
 
         assertThat(second.title).isEqualTo("Saison 19, Episode 14 : Une opération explosive")
-        assertThat(second.url).isEqualTo("http://replay.gulli.fr/jwplayer/embed/VOD68526621609000")
+        assertThat(second.url).isEqualTo(URI("http://replay.gulli.fr/jwplayer/embed/VOD68526621609000"))
         assertThat(second.description).isEqualTo("À la recherche de la Team Flare et de Pouic, la Team Rocket rencontre un Pokémon qui lui ressemble, celui que l'on connait sous le nom de Z2...et la Team Flare est sur ses traces ! Les deux équipes s'affrontent, et Z2 change plusieurs fois de ravisseurs jusqu'au moment où il fusionne avec de nombreuses Cellules pour devenir un Pokémon reptilien puissant et menaçant, dont les attaques bousculent ses ravisseurs ! Z2 prend l'avantage, mais Lysandre a appelé du renfort ! Avec l'aide d'Alain et de son Méga-Dracaufeu, la Team Flare affronte Z2 et l'enferme dans une cage. Pendant ce temps, au campement de nos héros, Clem câline un Pouic triste et inquiet, en essayant de comprendre ce qui ne va pas...")
-        assertThat(second.cover!!.url).isEqualTo("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621609000_20161007-142635.png")
+        assertThat(second.cover!!.url).isEqualTo(URI("http://resize1-gulli.ladmedia.fr/r/280,210,smartcrop,center-top/img/var/storage/imports/replay/images/custom/thumbnails/snapshot_VOD68526621609000_20161007-142635.png"))
     }
 
     @Test
     fun `should return empty list if video selector is not found`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-format.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-format.html")))
         /* When */
         val items = gulliUpdater.findItems(podcast)
         /* Then */
@@ -106,7 +110,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return empty list if page isn't available`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(None.toVΛVΓ())
         /* When */
         val items = gulliUpdater.findItems(podcast)
         /* Then */
@@ -116,9 +120,10 @@ class GulliUpdaterTest {
     @Test
     fun `should handle item with different structure`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-item-format.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-item-format.html")))
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
-        whenever(imageService.getCoverFromURL(any())).then { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
+        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation ( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
+
         /* When */
         val items = gulliUpdater.findItems(podcast)
         /* Then */
@@ -128,14 +133,15 @@ class GulliUpdaterTest {
     @Test
     fun `should handle item without cover`() {
         /* Given */
-        whenever(htmlService.get(podcast.url!!)).thenReturn(IOUtils.fileAsHtml(from("pokemon.without-cover.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.without-cover.html")))
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
-        whenever(imageService.getCoverFromURL(any())).thenReturn(null)
+        whenever(imageService.fetchCoverInformation(any())).thenReturn(null)
+
         /* When */
         val items = gulliUpdater.findItems(podcast)
         /* Then */
         assertThat(items).hasSize(1)
-        assertThat(items.toList()[0].cover).isEqualTo(Cover.DEFAULT_COVER)
+        assertThat(items.toList()[0].cover).isEqualTo(null)
     }
 
     @Test

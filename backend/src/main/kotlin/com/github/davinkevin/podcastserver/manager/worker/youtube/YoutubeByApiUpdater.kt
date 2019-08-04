@@ -4,7 +4,6 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -13,7 +12,8 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.*
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import lan.dk.podcastserver.service.JsonService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -31,7 +31,7 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
         log.info("Youtube Update by API")
 
         val playlistId = findPlaylistId(podcast.url.toASCIIString())
@@ -98,13 +98,13 @@ internal data class YoutubeApiResponse(val items: List<YoutubeApiItem>, val next
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class YoutubeApiItem(val snippet: Snippet) {
-    fun toItem() = Item().apply {
-        title = snippet.title
-        description = snippet.description
-        pubDate = snippet.pubDate()
-        url = snippet.resourceId.url()
+    fun toItem() = ItemFromUpdate(
+        title = snippet.title,
+        description = snippet.description,
+        pubDate = snippet.pubDate(),
+        url = URI(snippet.resourceId.url()),
         cover = snippet.cover()
-    }
+    )
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -112,8 +112,8 @@ internal data class Snippet(val title: String, val resourceId: ResourceId, val d
     fun pubDate() = ZonedDateTime.parse(publishedAt, DateTimeFormatter.ISO_DATE_TIME)!!
     fun cover() = this.thumbnails
             .betterThumbnail()
-            .map { Cover().apply { url = it.url; width = it.width; height = it.height } }
-            .getOrElse { Cover.DEFAULT_COVER }
+            .map { CoverFromUpdate (url = URI(it.url!!), width = it.width!!, height = it.height!! ) }
+            .orNull()
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

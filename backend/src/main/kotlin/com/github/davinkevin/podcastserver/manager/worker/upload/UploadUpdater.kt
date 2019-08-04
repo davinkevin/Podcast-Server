@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.springframework.stereotype.Component
 import java.net.URI
@@ -14,7 +15,7 @@ import java.net.URI
 @Component
 class UploadUpdater : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate) = setOf<Item>()
+    override fun findItems(podcast: PodcastToUpdate) = setOf<ItemFromUpdate>()
 
     override fun signatureOf(url: URI) = ""
 

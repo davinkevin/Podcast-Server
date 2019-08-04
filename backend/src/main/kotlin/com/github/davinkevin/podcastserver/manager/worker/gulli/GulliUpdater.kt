@@ -5,8 +5,6 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -14,6 +12,8 @@ import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.*
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -25,10 +25,14 @@ import java.time.ZonedDateTime
  * Created by kevin on 05/10/2016 for Podcast Server
  */
 @Component
-class GulliUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService) : Updater {
+class GulliUpdater(
+        val signatureService: SignatureService,
+        val htmlService: HtmlService,
+        val imageService: ImageService
+) : Updater {
 
-    override fun findItems(podcast: Podcast) =
-            htmlService.get(podcast.url!!).k()
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
+            htmlService.get(podcast.url.toASCIIString()).k()
                     .map { it.select("div.all-videos ul li.col-md-3") }
                     .getOrElse{ Elements() }
                     .flatMap { findDetailsInFromPage(it).toList() }
@@ -41,26 +45,26 @@ class GulliUpdater(val signatureService: SignatureService, val htmlService: Html
                     .flatMap { it.select(".bloc_streaming").firstOption() }
                     .flatMap { htmlToItem(it, coverOf(e)) }
 
-    private fun htmlToItem(block: Element, aCover: Cover) =
+    private fun htmlToItem(block: Element, aCover: CoverInformation?) =
             block.select("script")
                     .firstOption { it.html().contains("iframe") }
                     .map { it.html() }
                     .flatMap { FRAME_EXTRACTOR.on(it).group(1).k() }
                     .map { anUrl ->
-                        Item().apply {
-                            title = block.select(".episode_title").text()
-                            description = block.select(".description").text()
-                            url = anUrl
-                            pubDate = ZonedDateTime.now()
-                            cover = aCover
-                        }
+                        ItemFromUpdate(
+                            title = block.select(".episode_title").text(),
+                            description = block.select(".description").text(),
+                            url = URI(anUrl),
+                            pubDate = ZonedDateTime.now(),
+                            cover = aCover?.toCoverFromUpdate()
+                        )
                     }
 
     private fun coverOf(block: Element) =
             Option(block)
                     .map { it.select("img").attr("src") }
-                    .flatMap { imageService.getCoverFromURL(it).toOption() }
-                    .getOrElse { Cover.DEFAULT_COVER }
+                    .flatMap { imageService.fetchCoverInformation(it).toOption() }
+                    .getOrElse { null }
 
     override fun signatureOf(url: URI)=
             htmlService.get(url.toASCIIString()).k()

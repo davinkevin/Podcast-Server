@@ -6,9 +6,8 @@ import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.item.ItemForCreation
+import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -33,13 +32,13 @@ import java.util.*
 @Component
 class SixPlayUpdater(private val signatureService: SignatureService, private val htmlService: HtmlService, private val jsonService: JsonService, private val imageService: ImageService) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate) =
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             htmlService.get(podcast.url.toASCIIString())
                     .map { it.select("script") }
                     .map { extractItems(it) }
                     .getOrElse { setOf() }
 
-    private fun extractItems(script: Elements): Set<Item> {
+    private fun extractItems(script: Elements): Set<ItemFromUpdate> {
         val root6Play = extractJson(script)
                 .getOrElse { throw RuntimeException("No parsable JS found in the page") }
 
@@ -62,14 +61,14 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
     }
 
     private fun convertToItem(i: SixPlayItem, basePath: String) =
-            Item().apply {
-                title =  i.title!!
-                pubDate =  i.getLastDiffusion()
-                length =  i.duration
-                url =  i.url(basePath)
-                description =  i.description
-                cover =  i.cover().map { imageService.getCoverFromURL(it ) }.orNull()
-            }
+            ItemFromUpdate (
+                title =  i.title!!,
+                pubDate =  i.getLastDiffusion(),
+                length =  i.duration,
+                url =  URI(i.url(basePath)),
+                description =  i.description,
+                cover =  i.cover().map { imageService.fetchCoverInformation(it)}.orNull()?.toCoverFromUpdate()
+            )
 
     private fun extractJson(elements: Elements): Option<DocumentContext> =
             elements

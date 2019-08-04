@@ -1,11 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.NO_MODIFICATION
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.*
 import java.net.URI
 
 /**
@@ -15,7 +12,7 @@ class NoOpUpdater : Updater {
 
     override fun update(podcast: PodcastToUpdate) = NO_MODIFICATION
 
-    override fun findItems(podcast: PodcastToUpdate) = setOf<Item>()
+    override fun findItems(podcast: PodcastToUpdate) = setOf<ItemFromUpdate>()
 
     override fun signatureOf(url: URI) = ""
 

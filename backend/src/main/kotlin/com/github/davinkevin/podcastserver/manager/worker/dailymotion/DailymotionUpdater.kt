@@ -2,16 +2,12 @@ package com.github.davinkevin.podcastserver.manager.worker.dailymotion
 
 import arrow.core.getOrElse
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.TypeRef
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Component
 import java.net.URI
@@ -26,20 +22,19 @@ import java.time.ZonedDateTime
 @Component
 class DailymotionUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Set<Item> =
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             USER_NAME_EXTRACTOR.on(podcast.url.toASCIIString()).group(1).k()
                     .map { API_LIST_OF_ITEMS.format(it) }
                     .flatMap { jsonService.parseUrl(it).k() }
                     .map { it.read("list", LIST_DAILYMOTION_VIDEO_DETAIL_TYPE) }
                     .getOrElse { setOf() }
-                    .map { Item().apply {
-                        url = ITEM_URL.format(it.id)
-                        cover = imageService.getCoverFromURL(it.cover)
-                        title = it.title
-                        pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(it.creationDate!!), ZoneId.of("Europe/Paris"))
-                        description = it.description
-                    }
-                    }
+                    .map { ItemFromUpdate(
+                        url = URI(ITEM_URL.format(it.id)),
+                        cover = imageService.fetchCoverInformation(it.cover)?.toCoverFromUpdate(),
+                        title = it.title!!,
+                        pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(it.creationDate!!), ZoneId.of("Europe/Paris")),
+                        description = it.description!!
+                    ) }
                     .toSet()
 
     override fun signatureOf(url: URI): String {

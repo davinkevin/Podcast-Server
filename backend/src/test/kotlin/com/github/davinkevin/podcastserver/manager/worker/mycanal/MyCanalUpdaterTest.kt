@@ -12,6 +12,9 @@ import com.nhaarman.mockitokotlin2.*
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -39,12 +42,11 @@ class MyCanalUpdaterTest {
     @Mock lateinit var imageService: ImageService
     @InjectMocks lateinit var updater: MyCanalUpdater
 
-    private val podcast = Podcast().apply {
-        id = UUID.randomUUID()
-        url = "https://www.mycanal.fr/url/fake"
-        title = "A MyCanal Podcast"
-        items = mutableSetOf()
-    }
+    private val podcast = PodcastToUpdate (
+            id = UUID.randomUUID(),
+            url = URI("https://www.mycanal.fr/url/fake"),
+            signature = "old_sign"
+    )
 
     @Test
     fun `should sign podcast`() {
@@ -54,7 +56,7 @@ class MyCanalUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("6ca1b384c76f88ae24d6bfd423333333")
@@ -67,7 +69,7 @@ class MyCanalUpdaterTest {
         whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(URI(podcast.url!!)) }
+        assertThatThrownBy { updater.signatureOf(podcast.url) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("Error during signature of podcast with url https://www.mycanal.fr/url/fake")
     }
@@ -86,7 +88,7 @@ class MyCanalUpdaterTest {
                 "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_736856_H.jpg", "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_736309_H.jpg",
                 "http://media.canal-plus.com/image/23/0/734230.jpg", "http://media.canal-plus.com/image/36/8/737368.jpg",
                 "http://media.canal-plus.com/wwwplus/image/4/59/2/VIGNETTE_AUTO_733381_H.jpg", "http://media.canal-plus.com/image/89/4/732894.jpg")
-                .forEach { it -> doReturn(Cover().apply { url = it; height = 200; width = 200 }).whenever(imageService).getCoverFromURL(it) }
+                .forEach { it -> doReturn(CoverInformation( url = URI(it), height = 200, width = 200 )).whenever(imageService).fetchCoverInformation(it) }
 
         /* When */
         val items = updater.findItems(podcast)
@@ -101,8 +103,8 @@ class MyCanalUpdaterTest {
         whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(fileAsHtml(from("l-info-du-vrai.html")))
         whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(jsonService.parseUrl(any())).then { fileAsJson(withId(it)) }
-        doAnswer { Cover().apply { url = it.getArgument(0); height = 200; width = 200 } }
-                .whenever(imageService).getCoverFromURL(argWhere { it in imageUrls })
+        doAnswer { CoverInformation( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
+                .whenever(imageService).fetchCoverInformation(argWhere { it in imageUrls })
 
         /* When */
         val items = updater.findItems(podcast)
@@ -142,10 +144,9 @@ class MyCanalUpdaterTest {
 
     companion object {
 
-        private fun coherent(): Condition<Item> {
-            return object : Condition<Item>() {
-                override fun matches(value: Item): Boolean {
-                    assertThat(value.url).isNotEmpty()
+        private fun coherent(): Condition<ItemFromUpdate> {
+            return object : Condition<ItemFromUpdate>() {
+                override fun matches(value: ItemFromUpdate): Boolean {
                     assertThat(value.cover).isNotNull()
                     assertThat(value.pubDate).isNotNull()
                     assertThat(value.title).isNotEmpty()

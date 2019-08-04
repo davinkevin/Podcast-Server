@@ -25,6 +25,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
+import java.net.URI
 import java.util.stream.Stream
 
 @ExtendWith(MockitoExtension::class)
@@ -75,16 +76,9 @@ class UpdaterSelectorTest {
     @ParameterizedTest(name = "{1} updater for {0}")
     fun `should return matching updater`(url: String, type: String) {
         /* When */
-        val updaterClass = updaterSelector.of(url)
+        val updaterClass = updaterSelector.of(URI(url))
         /* Then */
         assertThat(updaterClass.type().key).isEqualTo(type)
-    }
-
-    @Test
-    fun `should reject empty or null url`() {
-        /* When */
-        assertThat(updaterSelector.of(null)).isEqualTo(UpdaterSelector.NO_OP_UPDATER)
-        assertThat(updaterSelector.of("")).isEqualTo(UpdaterSelector.NO_OP_UPDATER)
     }
 
     @Test

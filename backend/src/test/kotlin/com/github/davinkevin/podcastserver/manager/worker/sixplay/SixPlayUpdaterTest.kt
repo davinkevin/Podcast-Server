@@ -3,8 +3,9 @@ package com.github.davinkevin.podcastserver.manager.worker.sixplay
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -22,6 +23,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
 import java.time.ZonedDateTime
+import java.util.*
 import java.util.function.Predicate
 
 /**
@@ -35,26 +37,33 @@ class SixPlayUpdaterTest {
     @Mock lateinit var jsonService: JsonService
     @Mock lateinit var imageService: ImageService
     @InjectMocks lateinit var updater: SixPlayUpdater
-    
-    private val show = Podcast().apply {
-            title = "Custom Show"
-            url = "http://www.6play.fr/custom-show"
-    }
+
+    private val show = PodcastToUpdate (
+            id = UUID.randomUUID(),
+            url = URI("http://www.6play.fr/custom-show"),
+            signature = "noSign"
+    )
 
     @Test
     fun `should extract items`() {
         /* Given */
         whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
-        whenever(imageService.getCoverFromURL(any())).thenReturn(Cover.DEFAULT_COVER)
+        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation(
+                url = URI(it.getArgument(0)),
+                width = 200,
+                height = 200
+        ) }
 
         /* When */
         val items = updater.findItems(show)
 
         /* Then */
-        assertThat(items)
-                .hasSize(2)
-                .are(allValid())
+        assertThat(items).hasSize(2)
+                .are(withTitle)
+                .are(withCover)
+                .are(withLength)
+                .are(withPubDate)
     }
 
     @Test
@@ -114,20 +123,24 @@ class SixPlayUpdaterTest {
         val now = ZonedDateTime.now()
         whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-with-specific-item.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
-        whenever(imageService.getCoverFromURL(any())).thenReturn(Cover.DEFAULT_COVER)
+        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation(
+                url = URI(it.getArgument(0)),
+                width = 200,
+                height = 200
+        ) }
 
         /* When */
         val items = updater.findItems(show)
 
         /* Then */
         assertThat(items).hasSize(2)
-        val i = items.first { it.url == "http://www.6play.fr/sport-6-p_1380/emission-du-12-aout-a-2005" }
+        val i = items.first { it.url == URI("http://www.6play.fr/sport-6-p_1380/emission-du-12-aout-a-2005") }
         assertThat(i.pubDate)
                 .isAfterOrEqualTo(now)
                 .isBeforeOrEqualTo(ZonedDateTime.now())
 
     }
-    
+
     @Test
     fun `should do signature`() {
         /* GIVEN */
@@ -136,7 +149,7 @@ class SixPlayUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
-        val signature = updater.signatureOf(URI(show.url!!))
+        val signature = updater.signatureOf(show.url)
 
         /* THEN  */
         assertThat(signature).isNotEmpty()
@@ -148,7 +161,7 @@ class SixPlayUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(URI(show.url!!)) }
+        assertThatThrownBy { updater.signatureOf(show.url) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -162,7 +175,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(URI(show.url!!)) }
+        assertThatThrownBy { updater.signatureOf(show.url) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -177,8 +190,8 @@ class SixPlayUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
-        val s1 = updater.signatureOf(URI(show.url!!))
-        val s2 = updater.signatureOf(URI(show.url!!))
+        val s1 = updater.signatureOf(show.url)
+        val s2 = updater.signatureOf(show.url)
 
         /* THEN  */
         assertThat(s1).isEqualToIgnoringCase(s2)
@@ -197,14 +210,8 @@ class SixPlayUpdaterTest {
         assertThat(updater.compatibility("http://www.6play.fr/test")).isEqualTo(1)
     }
 
-    private fun allValid(): Condition<Item> {
-        val p = Predicate<Item>{ it.url != null }
-                .and { it.title!!.isNotEmpty() }
-                .and { it.pubDate != null }
-                .and { it.url!!.isNotEmpty() }
-                .and { it.length != null }
-                .and { it.cover != null }
-
-        return Condition(p, "Should have coherent fields")
-    }
+    private val withTitle = Condition<ItemFromUpdate> ( Predicate { it.title!!.isNotEmpty() }, "should have title not empty")
+    private val withPubDate = Condition<ItemFromUpdate> ( Predicate { it.pubDate != null }, "should have pubDate not null")
+    private val withLength = Condition<ItemFromUpdate> ( Predicate { it.length != null }, "should have length not null")
+    private val withCover = Condition<ItemFromUpdate> ( Predicate { it.cover != null }, "should have cover not null")
 }

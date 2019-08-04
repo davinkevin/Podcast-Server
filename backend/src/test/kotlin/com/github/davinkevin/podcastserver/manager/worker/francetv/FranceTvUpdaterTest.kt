@@ -1,18 +1,20 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
 import arrow.core.None
-import arrow.core.toOption
 import com.github.davinkevin.podcastserver.IOUtils
-import com.github.davinkevin.podcastserver.IOUtils.stringAsHtml
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.defaultItem
+import com.github.davinkevin.podcastserver.service.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argWhere
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import io.vavr.control.Option
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
@@ -29,6 +31,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
+import java.util.*
 import java.util.function.Predicate
 import javax.validation.Validator
 
@@ -38,13 +41,17 @@ import javax.validation.Validator
 @ExtendWith(SpringExtension::class)
 class FranceTvUpdaterTest {
 
-    @Autowired lateinit var podcastServerParameters: PodcastServerParameters
     @Autowired lateinit var signatureService: SignatureService
-    @Autowired lateinit var validator: Validator
     @Autowired lateinit var htmlService: HtmlService
     @Autowired lateinit var imageService: ImageService
     @Autowired lateinit var jsonService: JsonService
     @Autowired lateinit var franceTvUpdater: FranceTvUpdater
+
+    private var podcast = PodcastToUpdate(
+            id = UUID.randomUUID(),
+            url = URI("https://www.france.tv/france-2/secrets-d-histoire"),
+            signature = "old_signature"
+    )
 
     @Nested
     @DisplayName("should sign")
@@ -60,7 +67,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
+            val signature = franceTvUpdater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -75,7 +82,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
+            val signature = franceTvUpdater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -90,7 +97,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
+            val signature = franceTvUpdater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -106,7 +113,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
+            val signature = franceTvUpdater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -120,7 +127,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
+            val signature = franceTvUpdater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -148,10 +155,10 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(argWhere { it != firstPageUrl })).then { pageItemUrlToHtml(it.getArgument(0))  }
             whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
             whenever(jsonService.parseUrl(any())).then { loadJsonCatalog(it) }
-            whenever(imageService.getCoverFromURL(any())).thenReturn(Cover())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 400, URI("https://foo.bar.com/img.png")))
 
             /* When */
-            val items = franceTvUpdater.findItems(PODCAST)
+            val items = franceTvUpdater.findItems(podcast)
 
             /* Then */
             assertThat(items)
@@ -166,12 +173,12 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(itemUrl)).then { None.toVΛVΓ()  }
 
             /* When */
-            val items = franceTvUpdater.findItems(PODCAST)
+            val items = franceTvUpdater.findItems(podcast)
 
             /* Then */
             assertThat(items)
                     .hasSize(1)
-                    .contains(Item.DEFAULT_ITEM)
+                    .contains(defaultItem)
         }
 
         @Test
@@ -180,7 +187,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
 
             /* When */
-            val items = franceTvUpdater.findItems(PODCAST)
+            val items = franceTvUpdater.findItems(podcast)
 
             /* Then */
             assertThat(items)
@@ -220,18 +227,14 @@ class FranceTvUpdaterTest {
     }
 
     companion object {
-        private const val FRANCETV_URL = "https://www.france.tv/france-2/secrets-d-histoire"
-        private var PODCAST = Podcast().apply { url = FRANCETV_URL }
 
 
         internal fun from(name: String) = "/remote/podcast/francetv/$name"
 
-        private fun allValid(): Condition<Item> {
-            val p = Predicate<Item>{ !it.url.isNullOrEmpty() }
-                    .and { !it.title.isNullOrEmpty() }
+        private fun allValid(): Condition<ItemFromUpdate> {
+            val p = Predicate<ItemFromUpdate>{ !it.title.isNullOrEmpty() }
                     .and { !it.description.isNullOrEmpty() }
                     .and { it.cover != null }
-                    .and { it.pubDate != null }
 
             return Condition(p, "Should have coherent fields")
         }

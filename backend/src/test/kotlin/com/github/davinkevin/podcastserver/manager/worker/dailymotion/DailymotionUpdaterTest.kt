@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
+import java.util.*
 
 /**
  * Created by kevin on 22/02/2016 for Podcast Server
@@ -27,10 +29,11 @@ class DailymotionUpdaterTest {
     @Mock lateinit var imageService: ImageService
     @InjectMocks lateinit var updater: DailymotionUpdater
 
-    val podcast = Podcast().apply {
-            title = "Karim Debbache"
-            url = "http://www.dailymotion.com/karimdebbache"
-    }
+    val podcast = PodcastToUpdate(
+        id = UUID.randomUUID(),
+        url = URI("http://www.dailymotion.com/karimdebbache"),
+        signature = ""
+    )
 
     @Test
     fun `should sign from url`() {
@@ -39,7 +42,7 @@ class DailymotionUpdaterTest {
                 .thenReturn("aSignature")
 
         /* When */
-        val s = updater.signatureOf(URI(podcast.url!!))
+        val s = updater.signatureOf(podcast.url)
 
         /* Then */
         assertThat(s).isEqualTo("aSignature")
@@ -75,10 +78,10 @@ class DailymotionUpdaterTest {
     @Test
     fun `should get empty list if error of parsing url`() {
         /* Given */
-        podcast.url = "http://foo.bar/goo"
+        val otherPodcast = podcast.copy(url = URI("http://foo.bar/goo"))
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(URI(podcast.url!!)) }
+        assertThatThrownBy { updater.signatureOf(otherPodcast.url) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("Username not Found")
     }

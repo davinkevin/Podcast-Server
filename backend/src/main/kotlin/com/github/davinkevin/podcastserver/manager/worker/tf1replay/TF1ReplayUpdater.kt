@@ -7,9 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
@@ -30,7 +28,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
 
     private val log = LoggerFactory.getLogger(TF1ReplayUpdater::class.java)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
         val baseVideoUrl = extractBaseVideoUrl(podcast.url)
         val url = generateQueryUrl(podcast.url)
 
@@ -87,13 +85,13 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         return "$endpoint?id=$searchQueryId&variables=$queryEncoded"
     }
 
-    private fun toItem(video: TF1Video, baseVideoUrl: String ): Item = Item().apply {
-        title = video.title
-        description = video.decoration.description
-        pubDate = video.date
-        url = "$baseVideoUrl/${video.slug}.html"
-        cover = video.bestCover().flatMap { Option.fromNullable(coverService.getCoverFromURL(it)) }.getOrElse { Cover.DEFAULT_COVER }
-    }
+    private fun toItem(video: TF1Video, baseVideoUrl: String ): ItemFromUpdate = ItemFromUpdate(
+        title = video.title,
+        description = video.decoration.description,
+        pubDate = video.date,
+        url = URI("$baseVideoUrl/${video.slug}.html"),
+        cover = video.bestCover().flatMap { Option.fromNullable(coverService.fetchCoverInformation(it)) }.orNull()?.toCoverFromUpdate()
+    )
 
     override fun signatureOf(url: URI): String {
         val podcastUrl = generateQueryUrl(url)

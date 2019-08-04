@@ -8,10 +8,7 @@ import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import com.github.davinkevin.podcastserver.manager.worker.NO_MODIFICATION
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
-import com.github.davinkevin.podcastserver.manager.worker.Updater.Companion.NO_MODIFICATION
+import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.k
@@ -108,7 +105,7 @@ class UpdatePodcastBusiness(
                 .map { wait(it) }
                 .filter { it != NO_MODIFICATION }
                 .peek { changeAndCommunicateUpdate(true) }
-                .map { attachNewItemsToPodcast(it.podcast, it.items, it.p) }
+                .map { attachNewItemsToPodcast(it.podcast, it.items, it.newSignature!!) }
                 .flatMap { it.stream() }
                 .forEach { coverBusiness.download(it) }
 
@@ -130,8 +127,11 @@ class UpdatePodcastBusiness(
                         NO_MODIFICATION
                     }
 
-    private fun attachNewItemsToPodcast(p: PodcastToUpdate, items: Set<Item>, filter: (Item) -> Boolean): Set<Item> {
+    private fun attachNewItemsToPodcast(p: PodcastToUpdate, items: Set<ItemFromUpdate>, signature: String): Set<Item> {
         val podcast = podcastRepository.findByIdOrNull(p.id)!!
+        val pItems = podcast.items ?: setOf<Item>()
+        podcast.signature = signature
+
 
         if (items.isEmpty()) {
             log.info("Reset of signature in order to force the next update: {}", podcast.title)
@@ -141,14 +141,22 @@ class UpdatePodcastBusiness(
         }
 
         val itemsToAdd = items
-                .filter(filter)
-                .map { it.apply { podcast = podcast } }
+                .asSequence()
+                .map { it.toItem() }
+                .filter { !pItems.contains(it) }
+                .map { it.apply {
+                    this.podcast = podcast
+                    this.cover = this.cover ?: Cover().apply {
+                        url = podcast.cover!!.url
+                        width = podcast.cover!!.width
+                        height = podcast.cover!!.height
+                    }
+                } }
                 .filter { validator.validate(it).isEmpty() }
-                .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) podcast?.cover else it.cover } }
+                .toList()
 
         if (itemsToAdd.isEmpty()) {
-            return itemsToAdd
-                    .toSet()
+            return itemsToAdd.toSet()
         }
 
         itemRepository.saveAll(
@@ -183,4 +191,19 @@ class UpdatePodcastBusiness(
     companion object {
         private const val WS_TOPIC_UPDATING = "/topic/updating"
     }
+}
+
+private fun CoverFromUpdate.toCover(): Cover = Cover().apply {
+    height = this@toCover.height
+    width = this@toCover.width
+    url = this@toCover.url.toASCIIString()
+}
+
+private fun ItemFromUpdate.toItem(): Item = Item().apply {
+    title =  this@toItem.title
+    pubDate =  this@toItem.pubDate
+    length =  this@toItem.length
+    url =  this@toItem.url.toASCIIString()
+    description =  this@toItem.description
+    cover = this@toItem.cover?.toCover()
 }
