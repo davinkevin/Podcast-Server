@@ -53,6 +53,7 @@ stages:
   image: openjdk:8
   script:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate test -Ddatabase.url=jdbc:h2:/tmp/podcast-server jacoco:report
+    - ./mvnw -f backend/pom.xml coveralls:report
   cache:
     key: "$CI_PIPELINE_ID-backend"
     policy: pull
@@ -70,3 +71,17 @@ stages:
     paths:
       - .yarn
       - frontend-angular/node_modules/
+
+📦 backend:
+  stage: 📦 packaging
+  image: openjdk:8
+  script:
+    - ./mvnw -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate package -Ddatabase.url=jdbc:h2:/tmp/podcast-server
+  artifacts:
+    paths:
+      - backend/target/Podcast-Server.jar
+  cache:
+    key: "$CI_PIPELINE_ID-backend"
+    policy: pull
+    paths:
+      - .m2/
