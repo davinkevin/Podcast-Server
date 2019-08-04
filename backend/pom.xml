@@ -476,21 +476,6 @@
                     <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
                 </configuration>
             </plugin>
-            <!-- Code Coverage : publishing to Coveralls.io -->
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.3.0</version>
-                <configuration>
-                    <sourceDirectories>
-                        <sourceDirectory>src/main/kotlin</sourceDirectory>
-                        <sourceDirectory>src/main/java</sourceDirectory>
-                        <sourceDirectory>target/generated-sources/jooq</sourceDirectory>
-                        <sourceDirectory>target/generated-sources/kapt/compile</sourceDirectory>
-                        <sourceDirectory>target/classes</sourceDirectory>
-                    </sourceDirectories>
-                </configuration>
-            </plugin>
             <!-- Code Coverage : generating coverage Report -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -508,6 +493,13 @@
                         <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
