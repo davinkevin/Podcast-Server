@@ -13,6 +13,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 import java.util.UUID
 import javax.validation.Validator
 import kotlin.collections.HashSet
@@ -49,6 +50,7 @@ class UpdaterTest {
     fun should_update_the_podcast() {
         /* Given */
         val podcast = Podcast().apply {
+            url = "http://foo.bar.com"
             id = UUID.randomUUID()
             signature = "XYZ"
         }
@@ -112,8 +114,8 @@ private class SimpleUpdater : Updater {
             Item().apply { id = UUID.randomUUID() }
     )
 
-    override fun signatureOf(podcast: Podcast) = when {
-        podcast.id === ERROR_UUID -> throw RuntimeException()
+    override fun signatureOf(url: URI) = when {
+        url === URI("http://foo.bar") -> throw RuntimeException()
         else -> "123456789"
     }
 

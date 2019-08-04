@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 import java.time.ZonedDateTime
 import java.util.function.Predicate
 
@@ -135,7 +136,7 @@ class SixPlayUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
-        val signature = updater.signatureOf(show)
+        val signature = updater.signatureOf(URI(show.url!!))
 
         /* THEN  */
         assertThat(signature).isNotEmpty()
@@ -147,11 +148,11 @@ class SixPlayUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(show) }
+        assertThatThrownBy { updater.signatureOf(URI(show.url!!)) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Error during signature of podcast Custom Show")
+                .hasMessage("Error during signature of podcast with url http://www.6play.fr/custom-show")
     }
 
     @Test
@@ -161,7 +162,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(show) }
+        assertThatThrownBy { updater.signatureOf(URI(show.url!!)) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -176,8 +177,8 @@ class SixPlayUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
-        val s1 = updater.signatureOf(show)
-        val s2 = updater.signatureOf(show)
+        val s1 = updater.signatureOf(URI(show.url!!))
+        val s2 = updater.signatureOf(URI(show.url!!))
 
         /* THEN  */
         assertThat(s1).isEqualToIgnoringCase(s2)

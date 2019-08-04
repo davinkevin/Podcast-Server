@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 import javax.validation.Validator
 
 /**
@@ -48,7 +49,7 @@ class GulliUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = gulliUpdater.signatureOf(podcast)
+        val signature = gulliUpdater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("4d0bb11a29d851eabf10245b00d4cabe")
@@ -60,7 +61,7 @@ class GulliUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = gulliUpdater.signatureOf(podcast)
+        val signature = gulliUpdater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("")

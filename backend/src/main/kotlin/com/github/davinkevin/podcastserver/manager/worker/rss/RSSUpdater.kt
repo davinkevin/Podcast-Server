@@ -16,6 +16,7 @@ import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -85,7 +86,7 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
                 }
     }
 
-    override fun signatureOf(podcast: Podcast) = signatureService.fromUrl(podcast.url!!)
+    override fun signatureOf(url: URI) = signatureService.fromUrl(url.toASCIIString())
 
     override fun type() = Type("RSS", "RSS")
 

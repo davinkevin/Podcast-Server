@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.springframework.stereotype.Component
+import java.net.URI
 
 /**
  * Created by kevin on 15/05/15 for HackerRank problem
@@ -14,7 +15,7 @@ class UploadUpdater : Updater {
 
     override fun findItems(podcast: Podcast) = podcast.items!!
 
-    override fun signatureOf(podcast: Podcast) = ""
+    override fun signatureOf(url: URI) = ""
 
     override fun notIn(podcast: Podcast): (Item) -> Boolean = { false }
 

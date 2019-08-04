@@ -24,6 +24,7 @@ import org.mockito.Mockito.only
 import org.mockito.Mockito.verify
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 import java.util.*
 
 /**
@@ -53,7 +54,7 @@ class MyCanalUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("6ca1b384c76f88ae24d6bfd423333333")
@@ -66,9 +67,9 @@ class MyCanalUpdaterTest {
         whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(podcast) }
+        assertThatThrownBy { updater.signatureOf(URI(podcast.url!!)) }
                 .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Error during signature of ${podcast.title} with url ${podcast.url}")
+                .hasMessage("Error during signature of podcast with url https://www.mycanal.fr/url/fake")
     }
 
     @Test

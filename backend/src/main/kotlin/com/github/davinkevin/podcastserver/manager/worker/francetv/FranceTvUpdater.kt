@@ -23,6 +23,7 @@ import org.jsoup.select.Elements
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
+import java.net.URI
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -80,13 +81,13 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
                     } }
                     .getOrElse { Item.DEFAULT_ITEM }
 
-    override fun signatureOf(podcast: Podcast): String {
+    override fun signatureOf(url: URI): String {
 
         val listOfIds = htmlService
-                .get(toReplayUrl(podcast.url!!)).k()
+                .get(toReplayUrl(url.toASCIIString())).k()
                 .map { it.select("a[href]") }
                 .getOrElse {
-                    log.error("No items found for ${podcast.title} at ${podcast.url}, the layout may have changed")
+                    log.error("No items found for podcast with url $url, the layout may have changed")
                     listOf<Element>()
                 }
                 .map { it.attr("href") }

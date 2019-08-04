@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.ZonedDateTime
 
 /**
@@ -61,8 +62,8 @@ class GulliUpdater(val signatureService: SignatureService, val htmlService: Html
                     .flatMap { imageService.getCoverFromURL(it).toOption() }
                     .getOrElse { Cover.DEFAULT_COVER }
 
-    override fun signatureOf(podcast: Podcast)=
-            htmlService.get(podcast.url!!).k()
+    override fun signatureOf(url: URI)=
+            htmlService.get(url.toASCIIString()).k()
                     .flatMap { it.select("div.all-videos ul").firstOption() }
                     .map { it.html() }
                     .map { signatureService.fromText(it) }

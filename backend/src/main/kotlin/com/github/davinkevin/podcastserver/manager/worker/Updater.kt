@@ -3,12 +3,14 @@ package com.github.davinkevin.podcastserver.manager.worker
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.slf4j.LoggerFactory
+import java.net.URI
+import java.net.URL
 
 interface Updater {
 
     fun update(podcast: Podcast): UpdatePodcastInformation {
         return try {
-            val signature = signatureOf(podcast)
+            val signature = signatureOf(URI(podcast.url!!))
             if (signature == podcast.signature) {
                 log.info(""""{}" hasn't change""", podcast.title)
                 return NO_MODIFICATION
@@ -23,7 +25,7 @@ interface Updater {
 
     fun findItems(podcast: Podcast): Set<Item>
 
-    fun signatureOf(podcast: Podcast): String
+    fun signatureOf(url: URI): String
 
     fun notIn(podcast: Podcast): (Item) -> Boolean = { item -> !podcast.contains(item) }
 
@@ -39,3 +41,4 @@ interface Updater {
 
 
 class UpdatePodcastInformation(val podcast: Podcast, val items: Set<Item>, val p: (Item) -> Boolean)
+class PodcastToUpdate(val url: URL, val signature: String)

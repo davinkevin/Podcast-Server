@@ -17,6 +17,7 @@ import lan.dk.podcastserver.service.JsonService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -43,8 +44,8 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
                 .toSet()
     }
 
-    override fun signatureOf(podcast: Podcast): String {
-        val playlistId = findPlaylistId(podcast.url!!)
+    override fun signatureOf(url: URI): String {
+        val playlistId = findPlaylistId(url.toASCIIString())
 
         val ids = jsonService.parseUrl(asApiPlaylistUrl(playlistId)).k()
                 .map { JsonService.to(YoutubeApiResponse::class.java).apply(it) }

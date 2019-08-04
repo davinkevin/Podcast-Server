@@ -13,6 +13,7 @@ import com.github.davinkevin.podcastserver.entity.Item
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -52,8 +53,8 @@ class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlServic
         }
     }
 
-    override fun signatureOf(podcast: Podcast) =
-            htmlService.get(podcast.url!!).k()
+    override fun signatureOf(url: URI) =
+            htmlService.get(url.toASCIIString()).k()
                     .map { it.select("article").html() }
                     .map { signatureService.fromText(it) }
                     .getOrElse { "" }

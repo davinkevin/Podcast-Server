@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 import javax.validation.Validator
 
 /**
@@ -49,7 +50,7 @@ class JeuxVideoComUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("216e430c392256d2954d3903e2c8ee00")
@@ -61,7 +62,7 @@ class JeuxVideoComUpdaterTest {
         whenever(htmlService.get(podcast.url!!)).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("")

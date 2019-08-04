@@ -18,6 +18,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 import java.time.ZoneOffset
 
 /**
@@ -82,7 +83,7 @@ class RSSUpdaterTest {
     @Test
     fun `should call signature from url`() {
         /* When */
-        updater.signatureOf(rssAppload)
+        updater.signatureOf(URI(rssAppload.url!!))
         /* Then */
         verify(signatureService, times(1)).fromUrl("http://mockUrl.com/")
     }

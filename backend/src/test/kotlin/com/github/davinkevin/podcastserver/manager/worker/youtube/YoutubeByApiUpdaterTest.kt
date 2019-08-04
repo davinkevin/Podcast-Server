@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 
 /**
  * Created by kevin on 16/09/2018
@@ -85,7 +86,7 @@ class YoutubeByApiUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("64cc064a14dba90a0df24218db758479")
@@ -101,7 +102,7 @@ class YoutubeByApiUpdaterTest {
         whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEmpty()

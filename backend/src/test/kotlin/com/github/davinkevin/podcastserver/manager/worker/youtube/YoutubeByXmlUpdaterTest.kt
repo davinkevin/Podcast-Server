@@ -22,6 +22,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 
 /**
  * Created by kevin on 16/09/2018
@@ -93,7 +94,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(signatureService.fromText(any())).thenReturn("Signature")
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEqualTo("Signature")
@@ -111,7 +112,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = updater.signatureOf(podcast)
+        val signature = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEmpty()

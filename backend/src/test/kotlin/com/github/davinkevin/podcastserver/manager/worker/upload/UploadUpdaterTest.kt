@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.net.URI
 import java.util.*
 
 /**
@@ -15,6 +16,7 @@ class UploadUpdaterTest {
     private val item2 = Item().apply { id = UUID.randomUUID() }
     private val item3 = Item().apply { id = UUID.randomUUID() }
     private var podcast: Podcast = Podcast().apply {
+        url = "http://foo.bar.com"
         add(item1)
         add(item2)
         add(item3)
@@ -31,7 +33,7 @@ class UploadUpdaterTest {
 
     @Test
     fun `should generate an empty signature`() {
-        assertThat(updater.signatureOf(podcast))
+        assertThat(updater.signatureOf(URI(podcast.url!!)))
                 .isEmpty()
     }
 

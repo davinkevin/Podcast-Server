@@ -22,28 +22,29 @@ import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
+import java.net.URI
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
 class MyCanalUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService, val htmlService: HtmlService) : Updater {
 
     override fun findItems(podcast: Podcast) =
-            itemsAsJsonFrom(podcast)
+            itemsAsJsonFrom(URI(podcast.url!!))
                     .getOrElse { setOf() }
                     .flatMap { findDetails(it).toList() }
                     .map { it.first to toItem(it.second) }
                     .map { it.second.apply { url = DOMAIN + it.first.onClick.path } }
                     .toSet()
 
-    override fun signatureOf(podcast: Podcast): String {
-        return itemsAsJsonFrom(podcast)
+    override fun signatureOf(url: URI): String {
+        return itemsAsJsonFrom(url)
                 .map { items -> items.map { it.contentID }.sorted().joinToString(",") }
                 .map { signatureService.fromText(it) }
-                .getOrElse { throw RuntimeException("Error during signature of " + podcast.title + " with url " + podcast.url) }
+                .getOrElse { throw RuntimeException("Error during signature of podcast with url " + url.toASCIIString()) }
     }
 
-    private fun itemsAsJsonFrom(p: Podcast) =
-            htmlService.get(p.url!!).k()
+    private fun itemsAsJsonFrom(url: URI) =
+            htmlService.get(url.toASCIIString()).k()
                     .map { it.body() }
                     .map { it.select("script") }
                     .getOrElse { Elements() }

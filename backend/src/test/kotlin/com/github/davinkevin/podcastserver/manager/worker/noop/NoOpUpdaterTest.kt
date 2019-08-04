@@ -4,7 +4,8 @@ import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.entity.Podcast
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import java.net.URI
 
 /**
  * Created by kevin on 17/03/2016 for Podcast Server
@@ -27,7 +28,7 @@ class NoOpUpdaterTest {
 
     @Test
     fun `should return an empty signature`() {
-        assertThat(noOpUpdater.signatureOf(Podcast())).isEmpty()
+        assertThat(noOpUpdater.signatureOf(URI("http://foo.bar.com"))).isEmpty()
     }
 
     @Test

@@ -17,7 +17,7 @@ import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.service.JsonService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import java.net.URL
+import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
@@ -32,7 +32,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
 
     override fun findItems(podcast: Podcast): Set<Item> {
         val baseVideoUrl = extractBaseVideoUrl(podcast.url!!)
-        val url = generateQueryUrl(podcast)
+        val url = generateQueryUrl(URI(podcast.url!!))
 
         return jsonService
                 .parseUrl(url).k()
@@ -61,12 +61,12 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         return "$url/videos"
     }
 
-    private fun extractProgram(podcast: Podcast): String {
-        val path = URL(podcast.url).path
+    private fun extractProgram(url: URI): String {
+        val path = url.path
 
         return SLUG_EXTRACTOR.on(path)
                 .group(1)
-                .getOrElse { throw RuntimeException("Slug not found in ${podcast.title} with ${podcast.url}") }
+                .getOrElse { throw RuntimeException("Slug not found in podcast with ${url.toASCIIString()}") }
     }
 
     private fun extractTypeFromUrl(url: String): Set<String>? {
@@ -77,9 +77,9 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         return null
     }
 
-    private fun generateQueryUrl(podcast: Podcast): String {
-        val types = extractTypeFromUrl(podcast.url!!)
-        val program = extractProgram(podcast)
+    private fun generateQueryUrl(url: URI): String {
+        val types = extractTypeFromUrl(url.toASCIIString())
+        val program = extractProgram(url)
 
         val query = TF1GraphqlQuery(programSlug = program, offset = 0, limit = 50, sort = defaultQuerySort, types = types)
         val queryEncoded = URLEncoder.encode(om.writeValueAsString(query), StandardCharsets.UTF_8.toString())
@@ -94,15 +94,15 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         cover = video.bestCover().flatMap { Option.fromNullable(coverService.getCoverFromURL(it)) }.getOrElse { Cover.DEFAULT_COVER }
     }
 
-    override fun signatureOf(podcast: Podcast): String {
-        val url = generateQueryUrl(podcast)
+    override fun signatureOf(url: URI): String {
+        val podcastUrl = generateQueryUrl(url)
 
         return jsonService
-                .parseUrl(url).k()
+                .parseUrl(podcastUrl).k()
                 .map { JsonService.extract<List<String>>("data.programBySlug.videos.items[*].streamId").apply(it) }
                 .map { it.sorted().joinToString() }
                 .map { signatureService.fromText(it) }
-                .getOrElse { throw RuntimeException("Error during signature of podcast " + podcast.title) }
+                .getOrElse { throw RuntimeException("Error during signature of podcast with url ${url.toASCIIString()}") }
     }
 
     override fun type() = Type("TF1Replay", "TF1 Replay")

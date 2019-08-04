@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.net.URI
 
 /**
  * Created by kevin on 22/02/2016 for Podcast Server
@@ -38,7 +39,7 @@ class DailymotionUpdaterTest {
                 .thenReturn("aSignature")
 
         /* When */
-        val s = updater.signatureOf(podcast)
+        val s = updater.signatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(s).isEqualTo("aSignature")
@@ -77,7 +78,7 @@ class DailymotionUpdaterTest {
         podcast.url = "http://foo.bar/goo"
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(podcast) }
+        assertThatThrownBy { updater.signatureOf(URI(podcast.url!!)) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("Username not Found")
     }

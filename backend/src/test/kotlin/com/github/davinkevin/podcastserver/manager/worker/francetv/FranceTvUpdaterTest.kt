@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.net.URI
 import java.util.function.Predicate
 import javax.validation.Validator
 
@@ -59,7 +60,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(PODCAST)
+            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
 
             /* Then */
             assertThat(signature)
@@ -74,7 +75,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(PODCAST)
+            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
 
             /* Then */
             assertThat(signature)
@@ -89,7 +90,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(PODCAST)
+            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
 
             /* Then */
             assertThat(signature)
@@ -105,7 +106,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(PODCAST)
+            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
 
             /* Then */
             assertThat(signature)
@@ -119,7 +120,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(PODCAST)
+            val signature = franceTvUpdater.signatureOf(URI(PODCAST.url!!))
 
             /* Then */
             assertThat(signature)

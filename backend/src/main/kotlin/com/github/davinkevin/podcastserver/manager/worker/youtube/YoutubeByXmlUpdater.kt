@@ -15,6 +15,7 @@ import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -81,9 +82,9 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
         return URL_PAGE_BASE.format(idVideo)
     }
 
-    override fun signatureOf(podcast: Podcast): String {
-        val url = playlistUrlOf(podcast.url!!)
-        val parsedXml = jdomService.parse(url).k()
+    override fun signatureOf(url: URI): String {
+        val podcastUrl = playlistUrlOf(url.toASCIIString())
+        val parsedXml = jdomService.parse(podcastUrl).k()
 
         val dn = parsedXml
                 .map { it.rootElement }

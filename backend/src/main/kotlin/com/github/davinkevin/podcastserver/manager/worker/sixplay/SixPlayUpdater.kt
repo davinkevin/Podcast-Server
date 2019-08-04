@@ -19,6 +19,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -84,13 +85,13 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
             .removeSuffix(";")
             .cleanForJsonSerialization()
 
-    override fun signatureOf(podcast: Podcast) =
-            htmlService.get(podcast.url!!).k()
+    override fun signatureOf(url: URI) =
+            htmlService.get(url.toASCIIString()).k()
                     .map { it.select("script") }
                     .flatMap { extractJson(it) }
                     .map { JsonService.extract<Any>("video.programVideosBySubCategory").apply(it) }
                     .map { signatureService.fromText(it.toString()) }
-                    .getOrElse { throw RuntimeException("Error during signature of podcast " + podcast.title) }
+                    .getOrElse { throw RuntimeException("Error during signature of podcast with url ${url.toASCIIString()}") }
 
     override fun type() = Type("SixPlay", "6Play")
 

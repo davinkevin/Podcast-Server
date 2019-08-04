@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.net.URI
 
 /**
  * Created by kevin on 21/07/2016
@@ -56,7 +57,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast)
+                val signature = updater.signatureOf(URI(podcast.url!!))
 
                 /* Then */
                 assertThat(signature).isEqualTo("0d1b85d92442090ce4d7320f2176e8cf")
@@ -71,7 +72,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast)
+                val signature = updater.signatureOf(URI(podcast.url!!))
 
                 /* Then */
                 assertThat(signature).isEqualTo("0d1b85d92442090ce4d7320f2176e8cf")
@@ -86,7 +87,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast)
+                val signature = updater.signatureOf(URI(podcast.url!!))
 
                 /* Then */
                 assertThat(signature).isEqualTo("ff820660b80d0f315685de6a519830c4")
@@ -101,7 +102,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast)
+                val signature = updater.signatureOf(URI(podcast.url!!))
 
                 /* Then */
                 assertThat(signature).isEqualTo("841e49d6c64251982a93eba1a291ace9")
@@ -116,7 +117,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast)
+                val signature = updater.signatureOf(URI(podcast.url!!))
 
                 /* Then */
                 assertThat(signature).isEqualTo("90df9fa6e2aae2e66d5043142f8a90ee")
@@ -137,10 +138,10 @@ class TF1ReplayUpdaterTest {
                 }
 
                 /* When */
-                assertThatThrownBy { updater.signatureOf(podcast) }
+                assertThatThrownBy { updater.signatureOf(URI(podcast.url!!)) }
                         /* Then */
                         .isInstanceOf(RuntimeException::class.java)
-                        .hasMessage("Error during signature of podcast a podcast")
+                        .hasMessage("Error during signature of podcast with url https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/bonus")
             }
 
             @Test
@@ -152,10 +153,10 @@ class TF1ReplayUpdaterTest {
                 }
 
                 /* When */
-                assertThatThrownBy { updater.signatureOf(podcast) }
+                assertThatThrownBy { updater.signatureOf(URI(podcast.url!!)) }
                         /* Then */
                         .isInstanceOf(RuntimeException::class.java)
-                        .hasMessage("Slug not found in a podcast with http://www.tf1.fr/ieafjoefjeaoijfoejifaa")
+                        .hasMessage("Slug not found in podcast with http://www.tf1.fr/ieafjoefjeaoijfoejifaa")
             }
         }
 
@@ -329,7 +330,7 @@ class TF1ReplayUpdaterTest {
                 assertThatThrownBy { updater.findItems(podcast) }
                         /* Then */
                         .isInstanceOf(RuntimeException::class.java)
-                        .hasMessage("Slug not found in a podcast with http://www.tf1.fr/ieafjoefjeaoijfoejifaa")
+                        .hasMessage("Slug not found in podcast with http://www.tf1.fr/ieafjoefjeaoijfoejifaa")
             }
         }
 

@@ -13,6 +13,7 @@ import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -40,8 +41,8 @@ class DailymotionUpdater(val signatureService: SignatureService, val jsonService
                     }
                     .toSet()
 
-    override fun signatureOf(podcast: Podcast): String {
-        return USER_NAME_EXTRACTOR.on(podcast.url!!).group(1).k()
+    override fun signatureOf(url: URI): String {
+        return USER_NAME_EXTRACTOR.on(url.toASCIIString()).group(1).k()
                 .map { API_LIST_OF_ITEMS.format(it) }
                 .map { signatureService.fromUrl(it) }
                 .getOrElse { throw RuntimeException("Username not Found") }
