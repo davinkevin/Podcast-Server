@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.davinkevin</groupId>
-    <artifactId>podcastserver</artifactId>
+    <artifactId>podcast-server</artifactId>
     <version>2019.1.0</version>
     <packaging>pom</packaging>
 
