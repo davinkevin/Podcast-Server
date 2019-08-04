@@ -12,6 +12,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
@@ -25,8 +26,8 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: Podcast) =
-            jdomService.parse(podcast.url!!)
+    override fun findItems(podcast: PodcastToUpdate) =
+            jdomService.parse(podcast.url.toASCIIString())
                     .k()
                     .flatMap { it.rootElement.getChild("channel").toOption() }
                     .map { it.getChildren("item") }

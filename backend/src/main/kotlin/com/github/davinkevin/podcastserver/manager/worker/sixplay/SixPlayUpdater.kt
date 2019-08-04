@@ -6,6 +6,7 @@ import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -32,8 +33,8 @@ import java.util.*
 @Component
 class SixPlayUpdater(private val signatureService: SignatureService, private val htmlService: HtmlService, private val jsonService: JsonService, private val imageService: ImageService) : Updater {
 
-    override fun findItems(podcast: Podcast) =
-            htmlService.get(podcast.url!!)
+    override fun findItems(podcast: PodcastToUpdate) =
+            htmlService.get(podcast.url.toASCIIString())
                     .map { it.select("script") }
                     .map { extractItems(it) }
                     .getOrElse { setOf() }

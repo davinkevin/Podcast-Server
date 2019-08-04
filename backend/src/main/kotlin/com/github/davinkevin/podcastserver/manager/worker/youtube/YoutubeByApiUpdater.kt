@@ -13,6 +13,7 @@ import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -30,10 +31,10 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: Podcast): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
         log.info("Youtube Update by API")
 
-        val playlistId = findPlaylistId(podcast.url!!)
+        val playlistId = findPlaylistId(podcast.url.toASCIIString())
         val fetch = fetchWithCache()
 
         return generateSequence(fetch(asApiPlaylistUrl(playlistId))) { fetch(asApiPlaylistUrl(playlistId, it.nextPageToken)) }

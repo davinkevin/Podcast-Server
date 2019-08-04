@@ -8,8 +8,9 @@ import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.worker.NO_MODIFICATION
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.UpdatePodcastInformation
-import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.Updater.Companion.NO_MODIFICATION
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -18,9 +19,11 @@ import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.net.URI
 import java.nio.file.Files
 import java.time.ZonedDateTime
 import java.util.*
@@ -98,6 +101,8 @@ class UpdatePodcastBusiness(
         log.info("About to update {} podcast(s)", podcasts.size)
 
         podcasts
+                .filter { it.url != null }
+                .map { PodcastToUpdate(it.id!!, URI(it.url!!), it.signature ?: "") }
                 .map { supplyAsync(Supplier { updaterSelector.of(it.url).update(it) }, selectedExecutor) }
                 .stream()
                 .map { wait(it) }
@@ -122,21 +127,22 @@ class UpdatePodcastBusiness(
                     .getOrElse {
                         log.error("Error during update", it)
                         future.cancel(true)
-                        Updater.NO_MODIFICATION
+                        NO_MODIFICATION
                     }
 
-    private fun attachNewItemsToPodcast(p: Podcast, items: Set<Item>, filter: (Item) -> Boolean): Set<Item> {
+    private fun attachNewItemsToPodcast(p: PodcastToUpdate, items: Set<Item>, filter: (Item) -> Boolean): Set<Item> {
+        val podcast = podcastRepository.findByIdOrNull(p.id)!!
 
         if (items.isEmpty()) {
-            log.info("Reset of signature in order to force the next update: {}", p.title)
-            p.signature = ""
-            podcastRepository.save(p)
+            log.info("Reset of signature in order to force the next update: {}", podcast.title)
+            podcast.signature = ""
+            podcastRepository.save(podcast)
             return setOf()
         }
 
         val itemsToAdd = items
                 .filter(filter)
-                .map { it.apply { podcast = p } }
+                .map { it.apply { podcast = podcast } }
                 .filter { validator.validate(it).isEmpty() }
                 .map { it.apply { cover = if (cover == Cover.DEFAULT_COVER) podcast?.cover else it.cover } }
 
@@ -148,10 +154,10 @@ class UpdatePodcastBusiness(
         itemRepository.saveAll(
                 itemsToAdd
                         .map { it.apply { numberOfFail = 0; status = Status.NOT_DOWNLOADED } }
-                        .map { p.add(it); it }
+                        .map { podcast.add(it); it }
         )
 
-        podcastRepository.save(p.lastUpdateToNow())
+        podcastRepository.save(podcast.lastUpdateToNow())
 
         return itemsToAdd.toSet()
     }

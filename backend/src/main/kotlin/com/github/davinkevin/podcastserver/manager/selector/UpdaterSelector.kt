@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.manager.worker.noop.NoOpUpdater
 import org.springframework.stereotype.Service
+import java.net.URI
 
 /**
  * Created by kevin on 06/03/15.
@@ -11,13 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class UpdaterSelector(val updaters: Set<Updater>) {
 
-    fun of(url: String?): Updater =
-            if(url.isNullOrEmpty()) {
-                NO_OP_UPDATER
-            } else {
-                updaters.minBy { updater -> updater.compatibility(url) }!!
-            }
-
+    fun of(url: URI): Updater = updaters.minBy { updater -> updater.compatibility(url) }!!
     fun types(): Set<Type> = updaters.map { it.type() }.toSet()
 
     companion object {

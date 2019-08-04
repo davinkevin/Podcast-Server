@@ -10,6 +10,7 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
@@ -28,10 +29,10 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: Podcast): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
         log.info("Youtube Update by RSS")
 
-        val url = playlistUrlOf(podcast.url!!)
+        val url = playlistUrlOf(podcast.url.toASCIIString())
         val parsedXml = jdomService.parse(url).k()
 
         val dn = parsedXml

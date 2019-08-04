@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -36,15 +37,15 @@ class FranceTvUpdater(val signatureService: SignatureService, val htmlService: H
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)!!
 
-    override fun findItems(podcast: Podcast): Set<Item> {
+    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
 
         val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url!!)
 
         return htmlService
-                .get(toReplayUrl(podcast.url!!)).k()
+                .get(toReplayUrl(podcast.url.toASCIIString())).k()
                 .map { it.select("a[href]") }
                 .getOrElse {
-                    log.error("No items found for ${podcast.title} at ${podcast.url}, the layout may have changed")
+                    log.error("No items found for podcast ${podcast.id} at ${podcast.url}, the layout may have changed")
                     listOf<Element>()
                 }
                 .map { urlBuilder.replacePath(it.attr("href")).toUriString() }

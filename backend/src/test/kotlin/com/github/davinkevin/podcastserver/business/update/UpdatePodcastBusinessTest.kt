@@ -102,8 +102,8 @@ class UpdatePodcastBusinessTest {
             whenever(podcastRepository.findByUrlIsNotNull()).thenReturn(podcasts.toVΛVΓ())
             whenever(updaterSelector.of(argWhere { podcasts.map{it.url}.contains(it) })).thenReturn(updater)
             whenever(updater.notIn(any())).then { { item: Item -> !it.getArgument<Podcast>(0).contains(item) } }
-            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, generateItems(10, p), updater.notIn(p)) }.whenever(updater).update(podcast3)
-            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, p.items!!, updater.notIn(p)) }.whenever(updater).update(argWhere { it != podcast3 })
+            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, generateItems(10, p), updater.notIn(p), "foo") }.whenever(updater).update(podcast3)
+            doAnswer { val p = it.getArgument<Podcast>(0); UpdatePodcastInformation(p, p.items!!, updater.notIn(p), "foo") }.whenever(updater).update(argWhere { it != podcast3 })
             whenever(validator.validate(any<Item>())).thenReturn(setOf<ConstraintViolation<Item>>())
 
             /* When */
@@ -138,7 +138,7 @@ class UpdatePodcastBusinessTest {
             whenever(updaterSelector.of(podcast.url)).thenReturn(updater)
             whenever(updater.update(any())).then {
                 val p = it.getArgument<Podcast>(0)
-                UpdatePodcastInformation(p, generateItems(10, p)) { false }
+                UpdatePodcastInformation(p, generateItems(10, p), { false }, "foo")
             }
 
             /* When */
@@ -162,7 +162,7 @@ class UpdatePodcastBusinessTest {
             whenever(updater.notIn(any())).then { { item: Item -> !it.getArgument<Podcast>(0).contains(item) } }
             whenever(updater.update(any())).then {
                 val p = it.getArgument<Podcast>(0)
-                UpdatePodcastInformation(p, items.toJavaSet(), updater.notIn(p))
+                UpdatePodcastInformation(p, items.toJavaSet(), updater.notIn(p), "foo")
             }
             whenever(validator.validate(any<Item>())).thenReturn(setOf<ConstraintViolation<Item>>())
 
@@ -233,7 +233,7 @@ class UpdatePodcastBusinessTest {
                 }
                 whenever(updater.update(any())).then {
                     val podcast = it.getArgument<Podcast>(0)
-                    UpdatePodcastInformation(podcast, generateItems(7, p), updater.notIn(podcast))
+                    UpdatePodcastInformation(podcast, generateItems(7, p), updater.notIn(podcast), "foo")
                 }
                 whenever(podcastRepository.findById(any())).thenReturn(Optional.of(p))
                 whenever(podcastRepository.save(any())).thenReturn(p)

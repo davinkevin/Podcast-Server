@@ -16,6 +16,7 @@ import com.github.davinkevin.podcastserver.utils.toTry
 import com.jayway.jsonpath.TypeRef
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import lan.dk.podcastserver.service.JsonService.to
 import org.jsoup.select.Elements
@@ -28,8 +29,8 @@ import java.net.URI
 @Scope(SCOPE_PROTOTYPE)
 class MyCanalUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService, val htmlService: HtmlService) : Updater {
 
-    override fun findItems(podcast: Podcast) =
-            itemsAsJsonFrom(URI(podcast.url!!))
+    override fun findItems(podcast: PodcastToUpdate) =
+            itemsAsJsonFrom(URI(podcast.url.toASCIIString()))
                     .getOrElse { setOf() }
                     .flatMap { findDetails(it).toList() }
                     .map { it.first to toItem(it.second) }

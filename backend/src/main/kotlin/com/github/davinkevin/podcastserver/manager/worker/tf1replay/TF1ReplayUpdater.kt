@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.ImageService
@@ -30,35 +30,36 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
 
     private val log = LoggerFactory.getLogger(TF1ReplayUpdater::class.java)!!
 
-    override fun findItems(podcast: Podcast): Set<Item> {
-        val baseVideoUrl = extractBaseVideoUrl(podcast.url!!)
-        val url = generateQueryUrl(URI(podcast.url!!))
+    override fun findItems(podcast: PodcastToUpdate): Set<Item> {
+        val baseVideoUrl = extractBaseVideoUrl(podcast.url)
+        val url = generateQueryUrl(podcast.url)
 
         return jsonService
                 .parseUrl(url).k()
                 .map { JsonService.to("data.programBySlug.videos", TF1VideosConnector::class.java).apply(it) }
                 .map { it.items }
                 .getOrElse {
-                    log.error("No items found for ${podcast.title} at ${podcast.url}, the layout may have changed")
+                    log.error("No items found for podcast with id ${podcast.id} at ${podcast.url}, the layout may have changed")
                     setOf()
                 }
                 .map { toItem(it, baseVideoUrl) }
                 .toSet()
     }
 
-    private fun extractBaseVideoUrl(url: String): String {
+    private fun extractBaseVideoUrl(url: URI): String {
+        val urlAscii = url.toASCIIString()
         val endsWithSection = allowedTypes
                 .asSequence()
-                .any { url.endsWith(it) }
+                .any { urlAscii.endsWith(it) }
 
         if (endsWithSection) {
-            return url.substringBeforeLast("/")
+            return urlAscii.substringBeforeLast("/")
         }
 
-        if (url.endsWith("videos"))
-            return url
+        if (urlAscii.endsWith("videos"))
+            return urlAscii
 
-        return "$url/videos"
+        return "$urlAscii/videos"
     }
 
     private fun extractProgram(url: URI): String {

@@ -63,7 +63,7 @@ class UpdaterTest {
         assertThat(result.podcast).isSameAs(podcast)
         assertThat(result.items).isInstanceOf(HashSet::class.java).hasSize(3)
         assertThat(result.p).isNotNull
-        assertThat(result.podcast.signature).isEqualTo("123456789")
+        assertThat(result.newSignature).isEqualTo("123456789")
     }
 
     @Test

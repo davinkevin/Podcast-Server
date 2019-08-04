@@ -10,6 +10,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.springframework.stereotype.Component
@@ -25,8 +26,8 @@ import java.time.format.DateTimeFormatter
 @Component("JeuxVideoComUpdater")
 class JeuxVideoComUpdater(val signatureService: SignatureService, val htmlService: HtmlService, val imageService: ImageService) : Updater {
 
-    override fun findItems(podcast: Podcast) =
-            htmlService.get(podcast.url!!).k()
+    override fun findItems(podcast: PodcastToUpdate) =
+            htmlService.get(podcast.url.toASCIIString()).k()
                     .map { it.select("article") }
                     .map { htmlToItems(it) }
                     .getOrElse { setOf() }

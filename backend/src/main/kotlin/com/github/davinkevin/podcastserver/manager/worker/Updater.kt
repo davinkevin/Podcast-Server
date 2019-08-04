@@ -5,40 +5,37 @@ import com.github.davinkevin.podcastserver.entity.Podcast
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.URL
+import java.util.*
+
+val log = LoggerFactory.getLogger(Updater::class.java)!!
+val NO_MODIFICATION = UpdatePodcastInformation(Podcast.DEFAULT_PODCAST, setOf(), null)
 
 interface Updater {
 
-    fun update(podcast: Podcast): UpdatePodcastInformation {
+
+    fun update(podcast: PodcastToUpdate): UpdatePodcastInformation {
         return try {
-            val signature = signatureOf(URI(podcast.url!!))
+            val signature = signatureOf(podcast.url)
             if (signature == podcast.signature) {
-                log.info(""""{}" hasn't change""", podcast.title)
+                log.info(""""{}" hasn't change""", podcast.url)
                 return NO_MODIFICATION
             }
-            podcast.signature = signature
-            UpdatePodcastInformation(podcast, findItems(podcast), notIn(podcast))
+            UpdatePodcastInformation(podcast, findItems(podcast), signature)
         } catch (e: Exception) {
-            log.info(""""{}" triggered the following error during update""", podcast.title, e)
+            log.info("""podcast with id "{}" and url {} triggered the following error during update""", podcast.id, podcast.url, e)
             NO_MODIFICATION
         }
     }
 
-    fun findItems(podcast: Podcast): Set<Item>
+    fun findItems(podcast: PodcastToUpdate): Set<Item>
 
     fun signatureOf(url: URI): String
-
-    fun notIn(podcast: Podcast): (Item) -> Boolean = { item -> !podcast.contains(item) }
 
     fun type(): Type
 
     fun compatibility(url: String?): Int
-
-    companion object {
-        val log = LoggerFactory.getLogger(Updater::class.java)
-        val NO_MODIFICATION = UpdatePodcastInformation(Podcast.DEFAULT_PODCAST, setOf()) { true }
-    }
 }
 
 
-class UpdatePodcastInformation(val podcast: Podcast, val items: Set<Item>, val p: (Item) -> Boolean)
-class PodcastToUpdate(val url: URL, val signature: String)
+class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<Item>, val newSignature: String?)
+class PodcastToUpdate(val id: UUID, val url: URI, val signature: String)
