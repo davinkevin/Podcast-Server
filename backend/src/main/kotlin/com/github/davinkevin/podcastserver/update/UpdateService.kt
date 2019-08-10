@@ -1,0 +1,125 @@
+package com.github.davinkevin.podcastserver.update
+
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.item.ItemForCreation
+import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.NO_MODIFICATION
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
+import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.MessagingTemplate
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
+import reactor.core.scheduler.Schedulers
+import reactor.util.function.component1
+import reactor.util.function.component2
+import java.net.URI
+import java.time.OffsetDateTime
+import java.util.*
+import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
+import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
+
+class UpdateService(
+        private val podcastRepository: PodcastRepository,
+        private val itemRepository: ItemRepository,
+        private val updaters: UpdaterSelector,
+        private val liveUpdate: MessagingTemplate,
+        private val fileService: FileService,
+        private val parameters: PodcastServerParameters
+) {
+
+    val log = LoggerFactory.getLogger(UpdateService::class.java)!!
+
+    fun updateAll(force: Boolean): Mono<Void> {
+
+        liveUpdate.isUpdating(true)
+
+        podcastRepository
+                .findAll()
+                .parallel(parameters.maxUpdateParallels)
+                .runOn(Schedulers.parallel())
+                .filter { it.url != null }
+                .map {
+                    val signature = if(force || it.signature == null) "" else it.signature
+                    PodcastToUpdate(it.id, URI(it.url!!), signature)
+                }
+                .map {pu ->
+                        log.info("update of ${pu.url}")
+                        updaters.of(pu.url).update(pu)
+                                .also { log.info("end of update of ${pu.url}") }
+
+                }
+                .filter { it != NO_MODIFICATION }
+                .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
+                .sequential()
+                .doOnTerminate { liveUpdate.isUpdating(false).also { log.info("End of the global update") } }
+                .subscribe()
+
+        return Mono.empty()
+    }
+
+    fun update(podcastId: UUID): Mono<Void> {
+        liveUpdate.isUpdating(true)
+
+        podcastRepository
+                .findById(podcastId)
+                .filter { it.url != null }
+                .map { PodcastToUpdate(it.id, URI(it.url!!), "") }
+                .map {pu ->
+                    log.info("update of ${pu.url}")
+                    updaters.of(pu.url).update(pu)
+
+                }
+                .filter { it != NO_MODIFICATION }
+                .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
+                .doOnTerminate { liveUpdate.isUpdating(false) }
+                .subscribe()
+
+        return Mono.empty()
+    }
+
+    private fun saveSignatureAndCreateItems(podcast: PodcastToUpdate, items: Set<ItemFromUpdate>, signature: String) =
+            Mono.zip(
+                    Mono.defer {
+                        val realSignature = if (items.isEmpty()) "" else signature
+                        podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
+                    },
+                    items.toFlux()
+                            .parallel()
+                            .runOn(Schedulers.parallel())
+                            .flatMap { podcastRepository.findCover(podcast.id).zipWith(it.toMono()) }
+                            .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
+                            .flatMap { itemRepository.create(it) }
+                            .flatMap { item -> fileService.downloadItemCover(item).then(item.toMono()) }
+                            .sequential()
+                            .collectList()
+            )
+}
+
+
+private fun ItemFromUpdate.toCreation(podcastId: UUID, cover: CoverForCreation) = ItemForCreation(
+        title = this.title!!,
+        url = this.url.toASCIIString(),
+
+        pubDate = this.pubDate?.toOffsetDateTime(),
+        downloadDate = null,
+        creationDate = OffsetDateTime.now(),
+
+        description = this.description ?: "",
+        mimeType = null,
+        length = this.length,
+        fileName = null,
+        status = Status.NOT_DOWNLOADED,
+
+        podcastId = podcastId,
+        cover = this.cover?.toCreation() ?: cover
+)
+
+private fun CoverFromUpdate.toCreation() = CoverForCreation(width, height, url)
+private fun CoverForPodcast.toCreation() = CoverForCreation(width, height, url)

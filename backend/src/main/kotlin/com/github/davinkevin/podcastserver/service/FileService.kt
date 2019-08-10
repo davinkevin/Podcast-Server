@@ -77,6 +77,23 @@ class FileService(
                 .then()
     }
 
+    fun downloadItemCover(item: Item): Mono<Void> =
+            wcb.clone()
+                    .baseUrl(item.cover.url)
+                    .build()
+                    .get()
+                    .accept(MediaType.APPLICATION_OCTET_STREAM)
+                    .retrieve()
+                    .bodyToMono(ByteArrayResource::class.java)
+                    .map { val file = p.rootfolder
+                            .resolve(item.podcast.title)
+                            .create()
+                            .resolve("${item.id}.${item.cover.extension()}")
+
+                        log.debug("Save file ${file.toAbsolutePath()}")
+                        Files.write(file, it.byteArray) }
+                    .then()
+
     fun movePodcast(oldPodcast: Podcast, newTitle: String): Mono<Void> = Mono.defer {
         val oldLocation = p.rootfolder.resolve(oldPodcast.title)
         val newLocation = p.rootfolder.resolve(newTitle)

@@ -72,10 +72,9 @@ class ItemService(
                 .flatMap { podcast -> Mono.zip(
                         fileService.size(p.rootfolder.resolve(podcast.title).resolve(filename)),
                         fileService.probeContentType(p.rootfolder.resolve(podcast.title).resolve(filename)),
-                        coverRepository.save(podcast.cover.toCoverForCreation()),
                         podcast.toMono()
                 ) }
-                .map { (length, mimeType, cover, podcast) ->
+                .map { (length, mimeType, podcast) ->
                     val (_, p2, p3) = file.filename().split(" - ")
                     val title = p3.substringBeforeLast(".")
                     val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -97,7 +96,7 @@ class ItemService(
                             status = Status.FINISH,
 
                             podcastId = podcast.id,
-                            coverId = cover.id
+                            cover = podcast.cover.toCoverForCreation()
                     )
                 }
                 .flatMap { repository.create(it) }

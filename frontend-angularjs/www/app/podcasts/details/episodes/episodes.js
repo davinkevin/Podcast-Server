@@ -45,6 +45,14 @@ export default class PodcastItemsListComponent {
             .filter(item => this.podcast.items.some(elem => elem.id === item.id))
             .subscribe(item => this.$scope.$evalAsync(() => Object.assign(this.podcast.items.find(elem => elem.id === item.id), item)));
 
+        this.updating = this.DownloadManager
+            .updating$
+            .filter(v => v == false)
+            .subscribe(() => {
+                console.log("ends update")
+                this.currentPage = 1; this.loadPage();
+            })
+
         this.$scope.$on("podcastItems:refresh", () => { this.currentPage = 1; this.loadPage(); });
 
         this.hotkeys

@@ -23,10 +23,11 @@ fun <R: Record> ResultQuery<R>.fetchAsFlux(): Flux<R> = Flux.defer {
     Mono.fromCompletionStage(this.fetchAsync()).flatMapMany { Flux.fromIterable(it) }
 }
 
-fun <R: Record> ResultQuery<R>.fetchOneAsMono(): Mono<R> =
-        Mono.fromCompletionStage(this.fetchAsync())
-                .flatMapMany { Flux.fromIterable(it) }
-                .toMono()
+fun <R: Record> ResultQuery<R>.fetchOneAsMono(): Mono<R> = Mono.defer {
+    Mono.fromCompletionStage(this.fetchAsync())
+            .flatMapMany { Flux.fromIterable(it) }
+            .toMono()
+}
 
 private fun <R: Record> CompletionStage<Result<R>>.toFlux(): Flux<R> =
         Mono.fromCompletionStage(this).flatMapMany { Flux.fromIterable(it) }

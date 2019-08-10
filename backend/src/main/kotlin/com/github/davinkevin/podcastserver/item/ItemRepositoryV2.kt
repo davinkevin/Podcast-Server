@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.database.Keys.CONSTRAINT_2273
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
@@ -191,9 +192,17 @@ class ItemRepositoryV2(private val query: DSLContext) {
     }
 
     fun create(item: ItemForCreation): Mono<Item> {
-        val id = UUID.randomUUID()
 
-        return query.insertInto(ITEM)
+        val coverId = UUID.randomUUID()
+        val insertCover = query.insertInto(COVER)
+                .set(COVER.ID, coverId)
+                .set(COVER.HEIGHT, item.cover.height)
+                .set(COVER.WIDTH, item.cover.width)
+                .set(COVER.URL, item.cover.url.toASCIIString())
+                .executeAsyncAsMono()
+
+        val id = UUID.randomUUID()
+        val insertItem = query.insertInto(ITEM)
                 .set(ITEM.ID, id)
                 .set(ITEM.TITLE, item.title)
                 .set(ITEM.URL, item.url)
@@ -206,8 +215,14 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .set(ITEM.FILE_NAME, item.fileName)
                 .set(ITEM.STATUS, item.status.toString())
                 .set(ITEM.PODCAST_ID, item.podcastId)
-                .set(ITEM.COVER_ID, item.coverId)
+                .set(ITEM.COVER_ID, coverId)
+                .onConflictOnConstraint(CONSTRAINT_2273)
+                .doNothing()
                 .executeAsyncAsMono()
+
+
+        return insertCover
+                .then(insertItem)
                 .then(findById(id))
     }
 }

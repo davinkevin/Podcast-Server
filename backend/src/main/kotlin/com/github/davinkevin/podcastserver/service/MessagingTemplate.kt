@@ -19,6 +19,10 @@ class MessagingTemplate(val publisher: ApplicationEventPublisher) {
             s == "/topic/download" && value is Item -> publisher.publishEvent(DownloadingItemMessage(value))
         }
     }
+
+    fun isUpdating(value: Boolean) {
+        publisher.publishEvent(UpdateMessage(value))
+    }
 }
 
 sealed class Message<T>(val topic: String, val value: T)

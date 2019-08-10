@@ -55,10 +55,10 @@ export default class PodcastService  {
     }
 
     refresh(id) {
-        return this.$http.get(`/api/podcasts/${id}/update`);
+        return this.$http.get(`/api/v1/podcasts/${id}/update`);
     }
 
     forceRefresh(id) {
-        return this.$http.get(`/api/podcasts/${id}/update/force`);
+        return this.$http.get(`/api/v1/podcasts/${id}/update`);
     }
 }

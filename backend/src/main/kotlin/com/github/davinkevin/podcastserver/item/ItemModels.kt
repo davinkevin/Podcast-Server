@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
 import java.nio.file.Paths
 import java.time.OffsetDateTime
@@ -98,5 +99,5 @@ data class ItemForCreation(
         val status: Status,
 
         val podcastId: UUID,
-        val coverId: UUID
+        val cover: CoverForCreation
 )

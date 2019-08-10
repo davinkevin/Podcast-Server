@@ -602,12 +602,11 @@
                             <includeTables>true</includeTables>
                             <includeRoutines>true</includeRoutines>
                             <includePackages>false</includePackages>
-                            <includeUDTs>false</includeUDTs>
+                            <includeUDTs>true</includeUDTs>
                             <includeSequences>true</includeSequences>
                             <includePrimaryKeys>true</includePrimaryKeys>
                             <includeUniqueKeys>true</includeUniqueKeys>
                             <includeForeignKeys>true</includeForeignKeys>
-
                         </database>
 
                         <target>

@@ -8,7 +8,7 @@ import java.util.*
 
 val log = LoggerFactory.getLogger(Updater::class.java)!!
 val defaultPodcast = PodcastToUpdate(id = UUID.randomUUID(), url = URI("https://localhost/"), signature = "")
-val NO_MODIFICATION = UpdatePodcastInformation(defaultPodcast, setOf(), null)
+val NO_MODIFICATION = UpdatePodcastInformation(defaultPodcast, setOf(), "")
 
 interface Updater {
 
@@ -37,7 +37,11 @@ interface Updater {
 }
 
 
-class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<ItemFromUpdate>, val newSignature: String?)
+class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<ItemFromUpdate>, val newSignature: String) {
+    operator fun component1() = podcast
+    operator fun component2() = items
+    operator fun component3() = newSignature
+}
 data class PodcastToUpdate(val id: UUID, val url: URI, val signature: String)
 data class ItemFromUpdate(
         val title: String?,

@@ -50,16 +50,4 @@ public class PodcastController {
     public Podcast fetchPodcastInfoByUrl(@RequestBody(required=false) String url) {
         return findPodcastBusiness.fetchPodcastInfoByUrl(url);
     }
-
-    @GetMapping("{id}/update")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updatePodcast (@PathVariable UUID id) {
-        updatePodcastBusiness.updatePodcast(id);
-    }
-
-    @GetMapping("{id}/update/force")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updatePodcastForced (@PathVariable UUID id) {
-        updatePodcastBusiness.forceUpdatePodcast(id);
-    }
 }

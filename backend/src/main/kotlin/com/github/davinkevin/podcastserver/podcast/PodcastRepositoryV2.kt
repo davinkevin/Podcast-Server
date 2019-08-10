@@ -28,7 +28,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
     fun findById(id: UUID) = Mono.zip(
             Mono.defer { query
                     .select(
-                            PODCAST.ID, PODCAST.TITLE, PODCAST.DESCRIPTION, PODCAST.URL,
+                            PODCAST.ID, PODCAST.TITLE, PODCAST.DESCRIPTION, PODCAST.SIGNATURE, PODCAST.URL,
                             PODCAST.HAS_TO_BE_DELETED, PODCAST.LAST_UPDATE,
                             PODCAST.TYPE,
                             COVER.ID, COVER.URL, COVER.HEIGHT, COVER.WIDTH
@@ -43,7 +43,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 val c = CoverForPodcast(p[COVER.ID], URI(p[COVER.URL]), p[COVER.WIDTH], p[COVER.HEIGHT])
 
                 Podcast (
-                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.URL],
+                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.SIGNATURE], p[PODCAST.URL],
                         p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE].toUTC(),
                         p[PODCAST.TYPE],
 
@@ -67,7 +67,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 .select(
                         PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
                         PODCAST.HAS_TO_BE_DELETED, PODCAST.LAST_UPDATE,
-                        PODCAST.TYPE, PODCAST.DESCRIPTION,
+                        PODCAST.TYPE, PODCAST.DESCRIPTION, PODCAST.SIGNATURE,
 
                         COVER.ID, COVER.URL, COVER.HEIGHT, COVER.WIDTH,
 
@@ -94,7 +94,7 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                                 val c = CoverForPodcast(p[COVER.ID], URI(p[COVER.URL]), p[COVER.WIDTH], p[COVER.HEIGHT])
 
                                 Podcast (
-                                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.URL],
+                                        p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.SIGNATURE] ,p[PODCAST.URL],
                                         p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE].toUTC(),
                                         p[PODCAST.TYPE],
 
@@ -199,4 +199,23 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 .then(insertNewTags)
                 .then(findById(id))
     }
+
+    fun updateSignature(podcastId: UUID, newSignature: String): Mono<Void> = query
+            .update(PODCAST)
+            .set(PODCAST.SIGNATURE, newSignature)
+            .where(PODCAST.ID.eq(podcastId))
+            .executeAsyncAsMono()
+            .then()
+
+    fun findCover(id: UUID): Mono<CoverForPodcast> = query
+            .select(COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+            .from(PODCAST.innerJoin(COVER).on(PODCAST.COVER_ID.eq(COVER.ID)))
+            .where(PODCAST.ID.eq(id))
+            .fetchOneAsMono()
+            .map { CoverForPodcast(
+                    id = it[COVER.ID],
+                    url = URI(it[COVER.URL]),
+                    height = it[COVER.HEIGHT],
+                    width = it[COVER.WIDTH]
+            ) }
 }

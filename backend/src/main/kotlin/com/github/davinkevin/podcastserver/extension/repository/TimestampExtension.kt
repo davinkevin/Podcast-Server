@@ -10,4 +10,4 @@ import java.time.ZoneOffset
 private val oppositeOffset = ZoneOffset.ofTotalSeconds(-OffsetDateTime.now().offset.totalSeconds)
 
 fun Timestamp?.toUTC(): OffsetDateTime? = this?.toInstant()?.atOffset(ZoneOffset.UTC)?.withOffsetSameLocal(oppositeOffset)
-fun OffsetDateTime?.toTimestamp() = Timestamp.valueOf(this?.atZoneSameInstant(ZoneOffset.UTC)?.toLocalDateTime())
+fun OffsetDateTime?.toTimestamp() = if(this == null) null else Timestamp.valueOf(atZoneSameInstant(ZoneOffset.UTC)?.toLocalDateTime())
