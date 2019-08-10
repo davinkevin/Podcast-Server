@@ -117,5 +117,9 @@ class FileService(
 }
 
 private fun Path.create() = if (Files.exists(this)) this else Files.createDirectory(this)
-private fun CoverForPodcast.extension() = FilenameUtils.getExtension(url.toASCIIString()) ?: "jpg"
+private fun CoverForPodcast.extension(): String {
+    val ext = FilenameUtils.getExtension(url.toASCIIString())
+
+    return if(ext.isBlank()) "jpg" else ext
+}
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"

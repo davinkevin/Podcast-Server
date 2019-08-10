@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
+import com.github.davinkevin.podcastserver.item.CoverForItem
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
@@ -123,10 +124,16 @@ private data class PodcastHAL(val id: UUID,
 private data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
 private data class TagHAL(val id: UUID, val name: String)
 
+private fun CoverForPodcast.extension(): String {
+    val ext = FilenameUtils.getExtension(url.path)
+
+    return if(ext.isNullOrBlank()) "jpg" else ext
+}
+
 private fun toPodcastHAL(p: Podcast): PodcastHAL {
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", p.id.toString(), "cover." + FilenameUtils.getExtension(p.cover.url.path))
+            .pathSegment("api", "v1", "podcasts", p.id.toString(), "cover." + p.cover.extension())
             .build(true)
             .toUri()
 
