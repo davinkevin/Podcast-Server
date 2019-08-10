@@ -50,7 +50,7 @@ class FileService(
     private fun exists(path: Path) = Mono.defer {
         val file = p.rootfolder.resolve(path)
         val exists = Files.exists(file)
-        log.info("the file $file exists: $exists")
+        log.debug("the file $file exists: $exists")
 
         exists
                 .toMono()
