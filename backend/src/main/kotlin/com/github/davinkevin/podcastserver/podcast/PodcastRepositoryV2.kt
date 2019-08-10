@@ -3,10 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
-import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
-import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
-import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
-import com.github.davinkevin.podcastserver.extension.repository.toUTC
+import com.github.davinkevin.podcastserver.extension.repository.*
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.jooq.DSLContext
 import org.jooq.TableField
@@ -20,6 +17,8 @@ import reactor.util.function.component2
 import java.net.URI
 import java.sql.Timestamp
 import java.time.Duration
+import java.time.OffsetDateTime
+import java.time.OffsetDateTime.now
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -218,4 +217,13 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                     height = it[COVER.HEIGHT],
                     width = it[COVER.WIDTH]
             ) }
+
+    fun updateLastUpdate(podcastId: UUID): Mono<Void> {
+        return query
+                .update(PODCAST)
+                .set(PODCAST.LAST_UPDATE, now().toTimestamp())
+                .where(PODCAST.ID.eq(podcastId))
+                .executeAsyncAsMono()
+                .then()
+    }
 }

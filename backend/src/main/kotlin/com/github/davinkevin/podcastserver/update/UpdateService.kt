@@ -13,7 +13,6 @@ import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
@@ -62,7 +61,7 @@ class UpdateService(
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .sequential()
                 .doOnTerminate { liveUpdate.isUpdating(false).also { log.info("End of the global update") } }
-                .doOnTerminate { idm.launchDownload() }
+                .doOnTerminate { if (download) idm.launchDownload() }
                 .subscribe()
 
         return Mono.empty()
@@ -103,6 +102,7 @@ class UpdateService(
                             .flatMap { item -> fileService.downloadItemCover(item).then(item.toMono()) }
                             .sequential()
                             .collectList()
+                            .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
             )
 }
 

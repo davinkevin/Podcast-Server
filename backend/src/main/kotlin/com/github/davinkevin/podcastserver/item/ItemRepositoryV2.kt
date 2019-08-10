@@ -11,6 +11,7 @@ import org.jooq.impl.DSL.*
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toFlux
 import reactor.util.function.component1
 import reactor.util.function.component2
@@ -192,6 +193,16 @@ class ItemRepositoryV2(private val query: DSLContext) {
     }
 
     fun create(item: ItemForCreation): Mono<Item> {
+        val v: Optional<UUID> = query
+                .select(ITEM.ID)
+                .from(ITEM)
+                .where(ITEM.URL.eq(item.url))
+                .and(ITEM.PODCAST_ID.eq(item.podcastId))
+                .fetchOptional()
+                .map { it[ITEM.ID] }
+
+        if (v.isPresent)
+            return Mono.empty()
 
         val coverId = UUID.randomUUID()
         val insertCover = query.insertInto(COVER)
@@ -216,8 +227,6 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .set(ITEM.STATUS, item.status.toString())
                 .set(ITEM.PODCAST_ID, item.podcastId)
                 .set(ITEM.COVER_ID, coverId)
-                .onConflictOnConstraint(CONSTRAINT_2273)
-                .doNothing()
                 .executeAsyncAsMono()
 
 
