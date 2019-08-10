@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter
  * Created by kevin on 11/09/2018
  */
 @Component
-@ConditionalOnProperty(name = ["podcastserver.api.youtube"], matchIfMissing = true)
+@ConditionalOnProperty(name = ["podcastserver.api.youtube"], havingValue = "", matchIfMissing = true)
 class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlService, val signatureService: SignatureService) : Updater {
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
