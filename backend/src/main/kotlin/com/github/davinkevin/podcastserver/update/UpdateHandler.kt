@@ -5,7 +5,6 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 import java.util.*
 
 class UpdateHandler(
@@ -15,14 +14,10 @@ class UpdateHandler(
 
     fun updateAll(r: ServerRequest): Mono<ServerResponse> {
         val force = r.queryParam("force").map { it!!.toBoolean() }.orElse(false)
-        val download = r.queryParam("download").map { it!!.toBoolean() }.orElse(false)
+        val withDownload = r.queryParam("download").map { it!!.toBoolean() }.orElse(false)
 
         return update
-                .updateAll(force)
-                .then( Mono.defer {
-                    if (download) idm.launchDownload().toMono().then()
-                    else Mono.empty()
-                })
+                .updateAll(force, withDownload)
                 .then(ok().build())
     }
 

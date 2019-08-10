@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.update
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.item.ItemForCreation
+import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
@@ -12,6 +13,7 @@ import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
@@ -31,12 +33,13 @@ class UpdateService(
         private val updaters: UpdaterSelector,
         private val liveUpdate: MessagingTemplate,
         private val fileService: FileService,
-        private val parameters: PodcastServerParameters
+        private val parameters: PodcastServerParameters,
+        private val idm: ItemDownloadManager
 ) {
 
     val log = LoggerFactory.getLogger(UpdateService::class.java)!!
 
-    fun updateAll(force: Boolean): Mono<Void> {
+    fun updateAll(force: Boolean, download: Boolean): Mono<Void> {
 
         liveUpdate.isUpdating(true)
 
@@ -59,6 +62,7 @@ class UpdateService(
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .sequential()
                 .doOnTerminate { liveUpdate.isUpdating(false).also { log.info("End of the global update") } }
+                .doOnTerminate { idm.launchDownload() }
                 .subscribe()
 
         return Mono.empty()
