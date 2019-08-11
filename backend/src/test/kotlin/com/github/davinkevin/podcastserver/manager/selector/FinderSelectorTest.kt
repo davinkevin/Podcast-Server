@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.manager.worker.dailymotion.Dailymotio
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvFinder
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliFinder
 import com.github.davinkevin.podcastserver.manager.worker.itunes.ItunesFinder
-import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComFinder
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalFinder
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayFinder
@@ -38,7 +37,6 @@ class FinderSelectorTest {
     @Mock lateinit var franceTvFinder: FranceTvFinder
     @Mock lateinit var gulliFinder: GulliFinder
     @Mock lateinit var itunesFinder: ItunesFinder
-    @Mock lateinit var jeuxVideoComFinder: JeuxVideoComFinder
     @Mock lateinit var myCanalFinder: MyCanalFinder
     @Mock lateinit var rssFinder: RSSFinder
     @Mock lateinit var sixPlayFinder: SixPlayFinder
@@ -53,14 +51,13 @@ class FinderSelectorTest {
         whenever(franceTvFinder.compatibility(any())).thenCallRealMethod()
         whenever(gulliFinder.compatibility(any())).thenCallRealMethod()
         whenever(itunesFinder.compatibility(any())).thenCallRealMethod()
-        whenever(jeuxVideoComFinder.compatibility(any())).thenCallRealMethod()
         whenever(myCanalFinder.compatibility(any())).thenCallRealMethod()
         whenever(rssFinder.compatibility(any())).thenCallRealMethod()
         whenever(sixPlayFinder.compatibility(any())).thenCallRealMethod()
         whenever(tf1ReplayFinder.compatibility(any())).thenCallRealMethod()
         whenever(youtubeFinder.compatibility(any())).thenCallRealMethod()
 
-        finderSelector = FinderSelector(setOf(myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, itunesFinder, jeuxVideoComFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder))
+        finderSelector = FinderSelector(setOf(myCanalFinder, dailymotionFinder, franceTvFinder, gulliFinder, itunesFinder, rssFinder, sixPlayFinder, tf1ReplayFinder, youtubeFinder))
     }
 
     @Test
@@ -97,7 +94,6 @@ class FinderSelectorTest {
                         Arguments.of("http://www.france.tv/videos/comment_ca_va_bien.html", FranceTvFinder::class),
                         Arguments.of("http://replay.gulli.fr/videos/foo/bar", GulliFinder::class),
                         Arguments.of("https://itunes.apple.com/fr/podcast/cauet-sl%C3%A2che/id1278255446?l=en&mt=2", ItunesFinder::class),
-                        Arguments.of("http://www.jeuxvideo.com/chroniques-video.htm", JeuxVideoComFinder::class),
                         Arguments.of("http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html", MyCanalFinder::class),
                         Arguments.of("http://foo.bar.com/to/rss/file.xml", RSSFinder::class),
                         Arguments.of("http://www.6play.fr/videos/foo/bar", SixPlayFinder::class),

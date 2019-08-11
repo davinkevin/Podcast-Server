@@ -72,12 +72,13 @@ class UpdateService(
 
         podcastRepository
                 .findById(podcastId)
+                .log()
                 .filter { it.url != null }
                 .map { PodcastToUpdate(it.id, URI(it.url!!), "") }
                 .map {pu ->
                     log.info("update of ${pu.url}")
                     updaters.of(pu.url).update(pu)
-
+                            .also { log.debug("update of ${pu.url} finished with ${it.items}") }
                 }
                 .filter { it != NO_MODIFICATION }
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }

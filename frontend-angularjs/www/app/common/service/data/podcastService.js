@@ -39,7 +39,7 @@ export default class PodcastService  {
 
     findInfo(url) {
         let headers = {'Content-Type': 'text/plain'};
-        return this.$http.post(`/api/podcasts/fetch`, url, { headers }).then(r => r.data);
+        return this.$http.post(`/api/v1/podcasts/find`, url, { headers }).then(r => r.data);
     }
 
     statsByPubDate(id, numberOfMonth = 6) {

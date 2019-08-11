@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.manager.selector
 import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
-import com.github.davinkevin.podcastserver.manager.worker.jeuxvideocom.JeuxVideoComUpdater
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import com.github.davinkevin.podcastserver.manager.worker.rss.RSSUpdater
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
@@ -37,7 +36,6 @@ class UpdaterSelectorTest {
     @Mock lateinit var dailymotionUpdater: DailymotionUpdater
     @Mock lateinit var franceTvUpdater: FranceTvUpdater
     @Mock lateinit var gulliUpdater: GulliUpdater
-    @Mock lateinit var jeuxVideoComUpdater: JeuxVideoComUpdater
     @Mock lateinit var myCanalUpdater: MyCanalUpdater
     @Mock lateinit var rssUpdater: RSSUpdater
     @Mock lateinit var sixPlayUpdater: SixPlayUpdater
@@ -53,7 +51,6 @@ class UpdaterSelectorTest {
                 dailymotionUpdater,
                 franceTvUpdater, 
                 gulliUpdater,
-                jeuxVideoComUpdater, 
                 myCanalUpdater, 
                 rssUpdater, 
                 sixPlayUpdater,
@@ -88,7 +85,6 @@ class UpdaterSelectorTest {
                 dailymotionUpdater,
                 franceTvUpdater,
                 gulliUpdater,
-                jeuxVideoComUpdater,
                 myCanalUpdater,
                 rssUpdater,
                 sixPlayUpdater,
@@ -105,7 +101,7 @@ class UpdaterSelectorTest {
         /* Then */
         assertThat(types)
                 .isNotEmpty
-                .hasSize(10)
+                .hasSize(9)
                 .containsAll(uTypes)
     }
 
@@ -116,7 +112,6 @@ class UpdaterSelectorTest {
                         Arguments.of("http://www.dailymotion.com/showname", "Dailymotion"),
                         Arguments.of("http://www.france.tv/show/for/dummies", "FranceTv"),
                         Arguments.of("http://replay.gulli.fr/showname", "Gulli"),
-                        Arguments.of("http://www.jeuxvideo.com/show/for/dummies", "JeuxVideoCom"),
                         Arguments.of("http://www.mycanal.fr/show/for/dummies", "MyCanal"),
                         Arguments.of("http://www.link.to.rss/feeds", "RSS"),
                         Arguments.of("http://www.6play.fr/turbo_test", "SixPlay"),

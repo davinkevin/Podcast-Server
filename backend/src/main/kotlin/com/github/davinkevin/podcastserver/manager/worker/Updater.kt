@@ -37,11 +37,7 @@ interface Updater {
 }
 
 
-class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<ItemFromUpdate>, val newSignature: String) {
-    operator fun component1() = podcast
-    operator fun component2() = items
-    operator fun component3() = newSignature
-}
+data class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<ItemFromUpdate>, val newSignature: String)
 data class PodcastToUpdate(val id: UUID, val url: URI, val signature: String)
 data class ItemFromUpdate(
         val title: String?,

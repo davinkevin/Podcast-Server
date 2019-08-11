@@ -41,16 +41,9 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
                 title = item.getChildText("title"),
                 pubDate = getPubDate(item),
                 description = item.getChildText("description"),
-                length = lengthOf(item),
                 cover = coverOf(item)?.toCoverFromUpdate(),
                 url = URI(urlOf(item))
             )
-
-    private fun lengthOf(item: Element) =
-            if (!item.getChild("enclosure").getAttributeValue("length").isNullOrEmpty())
-                item.getChild("enclosure").getAttributeValue("length").toLong()
-            else
-                0L
 
     private fun urlOf(element: Element) =
             if (element.getChild("origEnclosureLink", FEED_BURNER) != null)
