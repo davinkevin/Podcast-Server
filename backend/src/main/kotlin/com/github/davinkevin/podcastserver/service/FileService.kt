@@ -10,11 +10,13 @@ import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
+import reactor.netty.http.client.HttpClient
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -26,10 +28,13 @@ import java.nio.file.Paths
 class FileService(
         private val p: PodcastServerParameters,
         private val mimeTypeService: MimeTypeService,
-        private val wcb: WebClient.Builder
+        wcbs: WebClient.Builder
 ) {
 
     private val log = LoggerFactory.getLogger(FileService::class.java)
+
+    private val wcb = wcbs
+            .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
 
     fun deleteItem(item: DeleteItemInformation) = Mono.defer {
         val file = p.rootfolder.resolve(item.path)
