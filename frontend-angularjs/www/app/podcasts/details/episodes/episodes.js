@@ -48,10 +48,7 @@ export default class PodcastItemsListComponent {
         this.updating = this.DownloadManager
             .updating$
             .filter(v => v == false)
-            .subscribe(() => {
-                console.log("ends update")
-                this.currentPage = 1; this.loadPage();
-            })
+            .subscribe(() => { this.currentPage = 1; this.loadPage(); });
 
         this.$scope.$on("podcastItems:refresh", () => { this.currentPage = 1; this.loadPage(); });
 
