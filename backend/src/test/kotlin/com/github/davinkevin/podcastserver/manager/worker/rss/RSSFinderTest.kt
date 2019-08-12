@@ -14,9 +14,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.okXml
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.Extensions
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
@@ -26,81 +30,107 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.test.StepVerifier
 import java.net.URI
 
-@Extensions(value = [ExtendWith(SpringExtension::class), ExtendWith(MockServer::class)])
 @Import(RSSFinder::class)
 @AutoConfigureWebClient
+@ExtendWith(SpringExtension::class)
 class RSSFinderTest {
 
     @Autowired lateinit var imageService: ImageService
     @Autowired lateinit var rssFinder: RSSFinder
 
-    private val podcastUrl = "http://localhost:5555/rss.xml"
+    @Nested
+    @DisplayName("should find")
+    @ExtendWith(MockServer::class)
+    inner class ShouldFind {
 
-    @Test
-    fun `should find information about an rss podcast with his url`(backend: WireMockServer) {
-        /* Given */
-        backend.stubFor(get("/rss.xml")
-                .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
-        whenever(imageService.fetchCoverInformation(COVER_URL)).thenReturn(CoverInformation(100, 100, URI(COVER_URL)))
+        private val podcastUrl = "http://localhost:5555/rss.xml"
 
-        /* When */
-        StepVerifier.create(rssFinder.findInformation(podcastUrl))
-                /* Then */
-                .expectSubscription()
-                .assertNext { podcast ->
-                    assertThat(podcast.title).isEqualToIgnoringCase("Les Grandes Gueules du Sport")
-                    assertThat(podcast.description).isEqualToIgnoringCase("Grand en gueule, fort en sport ! ")
-                    assertThat(podcast.cover).isNotNull
-                    assertThat(podcast.cover!!.url).isEqualTo(URI(COVER_URL))
-                }
-                .verifyComplete()
+        @Test
+        fun `information about an rss podcast with his url`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
+            whenever(imageService.fetchCoverInformation(COVER_URL)).thenReturn(CoverInformation(100, 100, URI(COVER_URL)))
+
+            /* When */
+            StepVerifier.create(rssFinder.findInformation(podcastUrl))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext { podcast ->
+                        assertThat(podcast.title).isEqualToIgnoringCase("Les Grandes Gueules du Sport")
+                        assertThat(podcast.description).isEqualToIgnoringCase("Grand en gueule, fort en sport ! ")
+                        assertThat(podcast.cover).isNotNull
+                        assertThat(podcast.cover!!.url).isEqualTo(URI(COVER_URL))
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `information with itunes cover`(backend: WireMockServer) {
+            // Given
+            whenever(imageService.fetchCoverInformation(COVER_URL)).thenReturn(CoverInformation(100, 100, URI(COVER_URL)))
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withItunesCover.xml")))))
+
+            //When
+            StepVerifier.create(rssFinder.findInformation(podcastUrl))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext { podcast ->
+                        assertThat(podcast.cover).isNotNull
+                        assertThat(podcast.cover!!.url).isEqualTo(URI(COVER_URL))
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `information without any cover`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withoutAnyCover.xml")))))
+
+            /* When */
+            StepVerifier.create(rssFinder.findInformation(podcastUrl))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext { podcast ->
+                        assertThat(podcast.cover).isNull()
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `and reject if not found`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(rssFinder.findInformation("http://localhost:3578"))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext { podcast ->
+                        assertThat(podcast).isEqualTo(FindPodcastInformation(title = "", url = URI("http://localhost:3578"), type = "RSS", cover = null, description = ""))
+                    }
+                    .verifyComplete()
+        }
     }
 
-    @Test
-    fun `should find information with itunes cover`(backend: WireMockServer) {
-        // Given
-        whenever(imageService.fetchCoverInformation(COVER_URL)).thenReturn(CoverInformation(100, 100, URI(COVER_URL)))
-        backend.stubFor(get("/rss.xml")
-                .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withItunesCover.xml")))))
+    @Nested
+    @DisplayName("should be compatible")
+    inner class ShouldBeCompatible {
 
-        //When
-        StepVerifier.create(rssFinder.findInformation(podcastUrl))
-                /* Then */
-                .expectSubscription()
-                .assertNext { podcast ->
-                    assertThat(podcast.cover).isNotNull
-                    assertThat(podcast.cover!!.url).isEqualTo(URI(COVER_URL))
-                }
-                .verifyComplete()
-    }
+        @ParameterizedTest
+        @ValueSource(strings = [
+            "http://localhost:3578/foo/bar.rss",
+            "http://another.format/foo/bar.rss",
+            "http://no.one.else/a.rss"
+        ])
+        fun `with every url format`(url: String) {
+            /* Given */
+            /* When */
+            val compatibility = rssFinder.compatibility(url)
+            /* Then */
+            assertThat(compatibility).isEqualTo(Integer.MAX_VALUE-1)
+        }
 
-    @Test
-    fun `should find information without any cover`(backend: WireMockServer) {
-        /* Given */
-        backend.stubFor(get("/rss.xml")
-                .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withoutAnyCover.xml")))))
-
-        /* When */
-        StepVerifier.create(rssFinder.findInformation(podcastUrl))
-                /* Then */
-                .expectSubscription()
-                .assertNext { podcast ->
-                    assertThat(podcast.cover).isNull()
-                }
-                .verifyComplete()
-    }
-
-    @Test
-    fun `should reject if not found`() {
-        /* Given */
-        /* When */
-        StepVerifier.create(rssFinder.findInformation("http://localhost:3578"))
-                /* Then */
-                .expectSubscription()
-                .assertNext { podcast ->
-                    assertThat(podcast).isEqualTo(FindPodcastInformation(title = "", url = URI("http://localhost:3578"), type = "RSS", cover = null, description = ""))
-                }
-                .verifyComplete()
     }
 
     companion object {

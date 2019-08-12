@@ -1,23 +1,18 @@
 package com.github.davinkevin.podcastserver.manager.worker.rss
 
-import arrow.core.Option
-import arrow.core.getOrElse
-import arrow.core.orElse
 import com.github.davinkevin.podcastserver.service.ImageService
-import com.github.davinkevin.podcastserver.service.JdomService
-import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.service.CoverInformation
 import org.jdom2.Element
+import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toMono
 import java.io.ByteArrayInputStream
 import java.net.URI
@@ -31,6 +26,8 @@ class RSSFinder(
         val wcb: WebClient.Builder
 ) : Finder {
 
+    private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!
+
     override fun find(url: String): Podcast {
         TODO("not required anymore") //To change body of created functions use File | Settings | File Templates.
     }
@@ -42,7 +39,7 @@ class RSSFinder(
             .retrieve()
             .bodyToMono<String>()
             .map { SAXBuilder().build(ByteArrayInputStream(it.toByteArray(Charsets.UTF_8))) }
-            .map { it.rootElement.getChild(CHANNEL) }
+            .map { it.rootElement.getChild("channel") }
             .filter { it != null }
             .map { xmlToPodcast(it, url) }
             .onErrorResume {
@@ -54,36 +51,21 @@ class RSSFinder(
             FindPodcastInformation(
                 type = "RSS",
                 url = URI(anUrl),
-                title = element.getChildText(TITLE),
-                description = element.getChildText(DESCRIPTION),
+                title = element.getChildText("title"),
+                description = element.getChildText("description"),
                 cover = coverUrlOf(element)?.toFindCover()
             )
 
     private fun coverUrlOf(channelElement: Element): CoverInformation? {
-        return getRssImage(channelElement)
-                .orElse { getItunesImage(channelElement) }
-                .map { imageService.fetchCoverInformation(it) }
-                .getOrElse{ null }
+        val rss = channelElement.getChild("image")?.getChildText("url")
+        val itunes = channelElement.getChild("image", itunesNS)?.getAttributeValue("href")
+
+        val url = rss ?: itunes ?: return null
+
+        return imageService.fetchCoverInformation(url)
     }
-
-    private fun getItunesImage(channelElement: Element) =
-            Option.fromNullable(channelElement.getChild(IMAGE, JdomService.ITUNES_NAMESPACE))
-                    .map { it.getAttributeValue(HREF) }
-
-    private fun getRssImage(channelElement: Element) =
-            Option.fromNullable(channelElement.getChild(IMAGE))
-                    .map { it.getChildText(URL) }
 
     override fun compatibility(url: String?) = Integer.MAX_VALUE - 1
-
-    companion object {
-        private const val CHANNEL = "channel"
-        private const val TITLE = "title"
-        private const val DESCRIPTION = "description"
-        private const val IMAGE = "image"
-        private const val URL = "url"
-        private const val HREF = "href"
-    }
 }
 
 private fun CoverInformation.toFindCover() = FindCoverInformation(height, width, url)
