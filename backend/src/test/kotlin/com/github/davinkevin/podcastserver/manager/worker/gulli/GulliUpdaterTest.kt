@@ -76,7 +76,7 @@ class GulliUpdaterTest {
         whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.html")))
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
-        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation (url = URI(it.getArgument(0)), height = 200, width = 200) }
+        whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation (url = URI(it.getArgument(0)), height = 200, width = 200) }
 
         /* When */
         val items = gulliUpdater.findItems(podcast)
@@ -122,7 +122,7 @@ class GulliUpdaterTest {
         /* Given */
         whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-item-format.html")))
         doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
-        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation ( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
+        whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation ( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
 
         /* When */
         val items = gulliUpdater.findItems(podcast)
@@ -135,7 +135,7 @@ class GulliUpdaterTest {
         /* Given */
         whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.without-cover.html")))
         doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
-        whenever(imageService.fetchCoverInformation(any())).thenReturn(null)
+        whenever(imageService.fetchCoverInformation(any<String>())).thenReturn(null)
 
         /* When */
         val items = gulliUpdater.findItems(podcast)

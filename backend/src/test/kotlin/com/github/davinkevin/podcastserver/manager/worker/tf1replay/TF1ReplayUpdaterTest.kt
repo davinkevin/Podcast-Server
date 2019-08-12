@@ -223,7 +223,7 @@ class TF1ReplayUpdaterTest {
                 assertThat(DigestUtils.md5Hex(items.sortedBy { it.url }.joinToString { it.url.toASCIIString() } ))
                         .isEqualTo("054a119583f45ccfd7252652ed4a5e1b")
 
-                verify(imageService, atLeast(1)).fetchCoverInformation(any())
+                verify(imageService, atLeast(1)).fetchCoverInformation(any<String>())
             }
 
             @Test
@@ -241,7 +241,7 @@ class TF1ReplayUpdaterTest {
                 assertThat(DigestUtils.md5Hex(items.sortedBy { it.url }.joinToString { it.url.toASCIIString() }))
                         .isEqualTo("054a119583f45ccfd7252652ed4a5e1b")
 
-                verify(imageService, atLeast(1)).fetchCoverInformation(any())
+                verify(imageService, atLeast(1)).fetchCoverInformation(any<String>())
             }
 
             @Test
@@ -259,7 +259,7 @@ class TF1ReplayUpdaterTest {
                 assertThat(DigestUtils.md5Hex(items.sortedBy { it.url }.joinToString { it.url.toASCIIString() }))
                         .isEqualTo("9b96b965b24bfed3a0a7df7e9e9f1d57")
 
-                verify(imageService, atLeast(1)).fetchCoverInformation(any())
+                verify(imageService, atLeast(1)).fetchCoverInformation(any<String>())
             }
 
             @Test
@@ -277,7 +277,7 @@ class TF1ReplayUpdaterTest {
                 assertThat(DigestUtils.md5Hex(items.sortedBy { it.url }.joinToString { it.url.toASCIIString() }))
                         .isEqualTo("945c72b65698da67432427200b0651be")
 
-                verify(imageService, atLeast(1)).fetchCoverInformation(any())
+                verify(imageService, atLeast(1)).fetchCoverInformation(any<String>())
             }
 
             @Test
@@ -295,7 +295,7 @@ class TF1ReplayUpdaterTest {
                 assertThat(DigestUtils.md5Hex(items.map { it.url.toASCIIString() }.sortedBy { it }.joinToString { it.toString() }))
                         .isEqualTo("db4a54834b5cfed50ecd23c7db6f5f2e")
 
-                verify(imageService, atLeast(1)).fetchCoverInformation(any())
+                verify(imageService, atLeast(1)).fetchCoverInformation(any<String>())
             }
 
             @Test

@@ -49,7 +49,7 @@ class SixPlayUpdaterTest {
         /* Given */
         whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
-        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation(
+        whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation(
                 url = URI(it.getArgument(0)),
                 width = 200,
                 height = 200
@@ -123,7 +123,7 @@ class SixPlayUpdaterTest {
         val now = ZonedDateTime.now()
         whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-with-specific-item.html"))
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
-        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation(
+        whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation(
                 url = URI(it.getArgument(0)),
                 width = 200,
                 height = 200

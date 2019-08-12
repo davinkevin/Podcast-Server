@@ -104,7 +104,7 @@ class MyCanalUpdaterTest {
         whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(jsonService.parseUrl(any())).then { fileAsJson(withId(it)) }
         doAnswer { CoverInformation( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
-                .whenever(imageService).fetchCoverInformation(argWhere { it in imageUrls })
+                .whenever(imageService).fetchCoverInformation(argWhere<String> { it in imageUrls })
 
         /* When */
         val items = updater.findItems(podcast)

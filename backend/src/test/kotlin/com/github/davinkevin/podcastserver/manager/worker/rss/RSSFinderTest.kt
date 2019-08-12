@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
@@ -50,7 +51,7 @@ class RSSFinderTest {
             /* Given */
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
-            whenever(imageService.fetchCoverInformation(COVER_URL)).thenReturn(CoverInformation(100, 100, URI(COVER_URL)))
+            whenever(imageService.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
 
             /* When */
             StepVerifier.create(rssFinder.findInformation(podcastUrl))
@@ -68,7 +69,7 @@ class RSSFinderTest {
         @Test
         fun `information with itunes cover`(backend: WireMockServer) {
             // Given
-            whenever(imageService.fetchCoverInformation(COVER_URL)).thenReturn(CoverInformation(100, 100, URI(COVER_URL)))
+            whenever(imageService.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withItunesCover.xml")))))
 
@@ -106,10 +107,8 @@ class RSSFinderTest {
             StepVerifier.create(rssFinder.findInformation("http://localhost:3578"))
                     /* Then */
                     .expectSubscription()
-                    .assertNext { podcast ->
-                        assertThat(podcast).isEqualTo(FindPodcastInformation(title = "", url = URI("http://localhost:3578"), type = "RSS", cover = null, description = ""))
-                    }
-                    .verifyComplete()
+                    .expectError()
+                    .verify()
         }
     }
 

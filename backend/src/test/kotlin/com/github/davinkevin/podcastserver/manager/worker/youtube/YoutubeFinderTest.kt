@@ -13,6 +13,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -30,6 +31,8 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
@@ -50,7 +53,10 @@ class YoutubeFinderTest {
         fun `information about a youtube podcast with its url`(backend: WireMockServer) {
             /* Given */
             val url = "http://localhost:5555/user/cauetofficiel"
-            whenever(imageService.fetchCoverInformation("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg")).thenReturn(CoverInformation(100, 100, URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg")))
+            val coverUrl = URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg")
+            whenever(imageService.fetchCoverInformation(coverUrl))
+                    .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
+
             backend.stubFor(get("/user/cauetofficiel")
                     .willReturn(ok(fileAsString("/remote/podcast/youtube/youtube.cauetofficiel.html"))))
 
@@ -63,7 +69,7 @@ class YoutubeFinderTest {
                         assertThat(podcast.description).isEqualTo("La chaîne officielle de Cauet, c'est toujours plus de kiff et de partage ! Des vidéos exclusives de C'Cauet sur NRJ tous les soirs de 19h à 22h. Des défis in...")
 
                         assertThat(podcast.cover).isNotNull
-                        assertThat(podcast.cover!!.url).isEqualTo(URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg"))
+                        assertThat(podcast.cover!!.url).isEqualTo(coverUrl)
                     }
                     .verifyComplete()
         }

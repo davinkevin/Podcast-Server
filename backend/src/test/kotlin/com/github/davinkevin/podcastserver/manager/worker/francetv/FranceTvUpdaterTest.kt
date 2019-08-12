@@ -155,7 +155,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(argWhere { it != firstPageUrl })).then { pageItemUrlToHtml(it.getArgument(0))  }
             whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
             whenever(jsonService.parseUrl(any())).then { loadJsonCatalog(it) }
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 400, URI("https://foo.bar.com/img.png")))
+            whenever(imageService.fetchCoverInformation(any<String>())).thenReturn(CoverInformation(100, 400, URI("https://foo.bar.com/img.png")))
 
             /* When */
             val items = franceTvUpdater.findItems(podcast)

@@ -46,7 +46,7 @@ class RSSUpdaterTest {
         /* Given */
         val podcastUrl = "http://mockUrl.com/"
         whenever(jdomService.parse(podcastUrl)).thenReturn(fileAsXml("/remote/podcast/rss/rss.appload.xml"))
-        whenever(imageService.fetchCoverInformation(any())).then { CoverInformation (
+        whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation (
                 url = URI(it.getArgument(0)),
                 height = 200,
                 width = 200
@@ -65,7 +65,7 @@ class RSSUpdaterTest {
         assertThat(items.filter { it.pubDate?.offset == ZoneOffset.ofHours(9) }).hasSize(1)
 
         verify(jdomService, times(1)).parse(podcastUrl)
-        verify(imageService, times(2)).fetchCoverInformation(any())
+        verify(imageService, times(2)).fetchCoverInformation(any<String>())
     }
 
     @Test

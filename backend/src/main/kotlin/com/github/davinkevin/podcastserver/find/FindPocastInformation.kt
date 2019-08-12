@@ -1,5 +1,9 @@
 package com.github.davinkevin.podcastserver.find
 
+import arrow.core.Option
+import reactor.core.publisher.Mono
+import reactor.core.publisher.switchIfEmpty
+import reactor.core.publisher.toMono
 import java.net.URI
 
 /**
@@ -14,3 +18,7 @@ data class FindPodcastInformation(
 )
 
 data class FindCoverInformation(val height: Int, val width: Int, val url: URI)
+
+fun Mono<FindCoverInformation>.toMonoOption() = this
+        .map { Option.just(it) }
+        .switchIfEmpty { Option.empty<FindCoverInformation>().toMono() }
