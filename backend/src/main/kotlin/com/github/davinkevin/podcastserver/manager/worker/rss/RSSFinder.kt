@@ -27,7 +27,6 @@ import java.net.URI
  */
 @Service
 class RSSFinder(
-        val jdomService: JdomService,
         val imageService: ImageService,
         val wcb: WebClient.Builder
 ) : Finder {
@@ -46,7 +45,7 @@ class RSSFinder(
             .map { it.rootElement.getChild(CHANNEL) }
             .filter { it != null }
             .map { xmlToPodcast(it, url) }
-            .switchIfEmpty {
+            .onErrorResume {
                 FindPodcastInformation(title = "", url = URI(url), type = "RSS", cover = null, description = "")
                         .toMono()
             }
