@@ -8,7 +8,6 @@ class MockServer: BeforeAllCallback, AfterAllCallback, ParameterResolver {
     private lateinit var server: WireMockServer
 
     override fun beforeAll(context: ExtensionContext) {
-        println("launch server")
         server = WireMockServer(5555)
         server.start()
     }
