@@ -53,7 +53,7 @@ class YoutubeFinderTest {
         fun `information about a youtube podcast with its url`(backend: WireMockServer) {
             /* Given */
             val url = "http://localhost:5555/user/cauetofficiel"
-            val coverUrl = URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s100-c-k-no/photo.jpg")
+            val coverUrl = URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s1400-c-k-no/photo.jpg")
             whenever(imageService.fetchCoverInformation(coverUrl))
                     .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
 

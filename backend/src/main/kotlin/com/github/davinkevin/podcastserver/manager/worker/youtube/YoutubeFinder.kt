@@ -55,6 +55,7 @@ class YoutubeFinder(
         val coverUrl = page
                 .select("img.channel-header-profile-image")
                 .attr("src")
+                .replace("s100", "s1400")
 
         return  if(coverUrl.isEmpty()) Mono.empty()
                 else imageService.fetchCoverInformation(URI(coverUrl))
