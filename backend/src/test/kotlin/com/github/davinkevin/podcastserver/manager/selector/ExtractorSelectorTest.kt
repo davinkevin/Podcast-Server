@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvExtra
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliExtractor
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalExtractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.PassThroughExtractor
-import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayExtractor
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
@@ -35,7 +34,6 @@ class ExtractorSelectorTest {
     @MockBean lateinit var gulliExtractor: GulliExtractor
     @MockBean lateinit var myCanalExtractor: MyCanalExtractor
     @MockBean lateinit var passThroughExtractor: PassThroughExtractor
-    @MockBean lateinit var tf1ReplayExtractor: TF1ReplayExtractor
 
     @Autowired lateinit var applicationContext: ApplicationContext
     lateinit var extractor: ExtractorSelector
@@ -46,8 +44,7 @@ class ExtractorSelectorTest {
                 franceTvExtractor,
                 gulliExtractor,
                 myCanalExtractor,
-                passThroughExtractor,
-                tf1ReplayExtractor)
+                passThroughExtractor)
 
         extractors.forEach { whenever(it.compatibility(any())).thenCallRealMethod() }
 
@@ -84,7 +81,6 @@ class ExtractorSelectorTest {
                         Arguments.of("http://www.jeuxvideo.com/chroniques-video.htm", PassThroughExtractor::class),
                         Arguments.of("http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html", MyCanalExtractor::class),
                         Arguments.of("http://foo.bar.com/to/rss/file.xml", PassThroughExtractor::class),
-                        Arguments.of("http://www.tf1.fr/videos/foo/bar", TF1ReplayExtractor::class),
                         Arguments.of("http://www.youtube.com/channel/UC_ioajefokjFAOI", PassThroughExtractor::class)
                 )
     }
