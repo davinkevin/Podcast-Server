@@ -72,7 +72,6 @@ class UpdateService(
 
         podcastRepository
                 .findById(podcastId)
-                .log()
                 .filter { it.url != null }
                 .map { PodcastToUpdate(it.id, URI(it.url!!), "") }
                 .map {pu ->
