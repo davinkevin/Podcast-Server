@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvExtractor
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliExtractor
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalExtractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.PassThroughExtractor
@@ -30,7 +29,6 @@ import kotlin.reflect.KClass
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ExtractorSelectorTest {
 
-    @MockBean lateinit var franceTvExtractor: FranceTvExtractor
     @MockBean lateinit var gulliExtractor: GulliExtractor
     @MockBean lateinit var myCanalExtractor: MyCanalExtractor
     @MockBean lateinit var passThroughExtractor: PassThroughExtractor
@@ -41,7 +39,6 @@ class ExtractorSelectorTest {
     @BeforeEach
     fun beforeEach() {
         val extractors = setOf(
-                franceTvExtractor,
                 gulliExtractor,
                 myCanalExtractor,
                 passThroughExtractor)
@@ -76,7 +73,6 @@ class ExtractorSelectorTest {
                 Stream.of(
                         Arguments.of("http://www.beinsports.com/france/replay/lexpresso", PassThroughExtractor::class),
                         Arguments.of("http://www.dailymotion.com/foo/bar", PassThroughExtractor::class),
-                        Arguments.of("http://www.france.tv/videos/comment_ca_va_bien.html", FranceTvExtractor::class),
                         Arguments.of("http://replay.gulli.fr/videos/foo/bar", GulliExtractor::class),
                         Arguments.of("http://www.jeuxvideo.com/chroniques-video.htm", PassThroughExtractor::class),
                         Arguments.of("http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html", MyCanalExtractor::class),

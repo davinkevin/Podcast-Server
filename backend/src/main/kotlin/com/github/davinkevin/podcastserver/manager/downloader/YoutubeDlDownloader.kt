@@ -88,6 +88,7 @@ class YoutubeDlDownloader(
         return if ("youtube.com" in url || "www.france.tv" in url) 5
         else if ("www.6play.fr" in url) 5
         else if ("www.tf1.fr" in url) 5
+        else if ("www.france.tv" in url) 5
         else Integer.MAX_VALUE
     }
 
