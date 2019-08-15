@@ -21,6 +21,8 @@
                 <version>0.0.29</version>
                 <configuration>
                     <installDirectory>target</installDirectory>
+                    <nodeVersion>v6.2.0</nodeVersion>
+                    <npmVersion>2.15.6</npmVersion>
                 </configuration>
 
                 <executions>
@@ -45,6 +47,59 @@
                             <arguments>run build</arguments>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>install-node-and-npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jspm-config</id>
+                        <goals>
+                            <goal>jspm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>config registries.github.auth ${jspm_token}</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jspm-install</id>
+                        <goals>
+                            <goal>jspm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-less</id>
+                        <goals>
+                            <goal>gulp</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>less</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-app</id>
+                        <goals>
+                            <goal>gulp</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
 

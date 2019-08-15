@@ -6,7 +6,7 @@ variables:
 stages:
   - ⬇ download
   - 🧪 test
-  - 📦 packaging
+  - 👷‍ build
 
 ⬇ backend:
   stage: ⬇ download
@@ -21,20 +21,16 @@ stages:
 
 ⬇ ui-v1:
   stage: ⬇ download
-  image: node:6
-  before_script:
-    - npm install -g jspm@0.16.34
-    - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
-    - cd frontend-angularjs
+  image: openjdk:8
   script:
-    - npm install
-    - ./node_modules/.bin/jspm install
+    - ./mvnw $MAVEN_CLI_OPTS -f frontend-angularjs/pom.xml frontend:install-node-and-npm frontend:npm@npm-install frontend:jspm@jspm-config frontend:jspm@jspm-install -Djspm_token=$JSPM_GITHUB_AUTH_TOKEN
   cache:
     key: "$CI_PIPELINE_ID-ui-v1"
     policy: push
     paths:
       - frontend-angularjs/node_modules/
       - frontend-angularjs/www/jspm_packages/
+      - frontend-angularjs/target/
 
 ⬇ ui-v2:
   stage: ⬇ download
@@ -72,8 +68,8 @@ stages:
       - .yarn
       - frontend-angular/node_modules/
 
-📦 backend:
-  stage: 📦 packaging
+👷 backend:
+  stage: 👷‍ build
   image: openjdk:8
   script:
     - ./mvnw -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate package -Ddatabase.url=jdbc:h2:/tmp/podcast-server
@@ -85,3 +81,34 @@ stages:
     policy: pull
     paths:
       - .m2/
+
+👷 ui-v1:
+  stage: 👷‍ build
+  image: openjdk:8
+  script:
+    - ./mvnw $MAVEN_CLI_OPTS -f frontend-angularjs/pom.xml frontend:gulp@build-less frontend:gulp@build-app
+  artifacts:
+    paths:
+      - frontend-angularjs/target/dist/
+  cache:
+    key: "$CI_PIPELINE_ID-ui-v1"
+    policy: pull
+    paths:
+      - frontend-angularjs/node_modules/
+      - frontend-angularjs/www/jspm_packages/
+      - frontend-angularjs/target/
+
+👷 ui-v2:
+  stage: 👷‍ build
+  image: node:11
+  script:
+    - yarn --cwd frontend-angular build
+  artifacts:
+    paths:
+      - frontend-angular/dist/
+  cache:
+    key: "$CI_PIPELINE_ID-ui-v2"
+    policy: pull
+    paths:
+      - .yarn
+      - frontend-angular/node_modules/
