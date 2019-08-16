@@ -8,6 +8,7 @@ stages:
   - ⬇ download
   - 🧪 test
   - 👷‍ build
+  - 🐳 packaging
 
 ⬇ backend:
   stage: ⬇ download
@@ -70,11 +71,25 @@ stages:
       - .yarn
       - frontend-angular/node_modules/
 
+👷 backend-base-image:
+  stage: 👷‍ build
+  image: docker:19.03.1
+  services:
+    - docker:19.03.1-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - echo "$DOCKER_IO_PASSWORD" | docker login -u davinkevin --password-stdin
+  script:
+    - docker build -t davinkevin/podcast-server:base-image -f backend/src/main/docker/base-image/Dockerfile .
+    - docker push davinkevin/podcast-server:base-image
+
 👷 backend:
   stage: 👷‍ build
   image: openjdk:8
   script:
-    - ./mvnw -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate package -Ddatabase.url=jdbc:h2:/tmp/podcast-server
+    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate package -Ddatabase.url=jdbc:h2:/tmp/podcast-server
   artifacts:
     paths:
       - backend/target/Podcast-Server.jar
