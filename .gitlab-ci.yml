@@ -84,6 +84,7 @@ stages:
   script:
     - docker build -t davinkevin/podcast-server:base-image -f backend/src/main/docker/base-image/Dockerfile .
     - docker push davinkevin/podcast-server:base-image
+  allow_failure: true
 
 👷 backend:
   stage: 👷‍ build
