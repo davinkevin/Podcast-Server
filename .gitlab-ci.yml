@@ -130,3 +130,14 @@ stages:
     paths:
       - .yarn
       - frontend-angular/node_modules/
+
+🐳 backend:
+  stage: 🐳 packaging
+  image: openjdk:8
+  script:
+    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate compile jib:build -Ddatabase.url=jdbc:h2:/tmp/podcast-server -Dtag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+  cache:
+    key: "$CI_PIPELINE_ID-backend"
+    policy: pull
+    paths:
+      - .m2/
