@@ -21,3 +21,9 @@ RUN apt-get update && apt-get install python rtmpdump -y --no-install-recommends
       youtube-dl --version && \
       rtmpdump --help 2>&1 | head -n 1
 
+
+ENV PODCASTSERVER_EXTERNALTOOLS_FFMPEG    "/opt/ffmpeg/ffmpeg"
+ENV PODCASTSERVER_EXTERNALTOOLS_FFPROBE   "/opt/ffmpeg/ffprobe"
+ENV PODCASTSERVER_EXTERNALTOOLS_RTMPDUMP  "/usr/bin/rtmpdump"
+
+ENV SPRING_DATASOURCE_URL                 "jdbc:h2:mem:"
