@@ -23,6 +23,7 @@
         <database.url><![CDATA[jdbc:h2:tcp://localhost:1521/podcast-server]]></database.url>
         <database.user>sa</database.user>
         <database.password/>
+        <tag>${maven.build.timestamp}</tag>
     </properties>
 
     <repositories>
@@ -613,6 +614,23 @@
                             <directory>target/generated-sources/jooq/</directory>
                         </target>
                     </generator>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <from>
+                        <image>davinkevin/podcast-server-base-image:latest</image>
+                    </from>
+                    <to>
+                        <image>davinkevin/podcast-server:${tag}</image>
+                        <auth>
+                            <username>${env.DOCKER_IO_USER}</username>
+                            <password>${env.DOCKER_IO_PASSWORD}</password>
+                        </auth>
+                    </to>
                 </configuration>
             </plugin>
         </plugins>
