@@ -23,6 +23,8 @@
         <database.url><![CDATA[jdbc:h2:tcp://localhost:1521/podcast-server]]></database.url>
         <database.user>sa</database.user>
         <database.password/>
+
+        <maven.build.timestamp.format>yyyyMMdd-HHmmssSSS</maven.build.timestamp.format>
         <tag>${maven.build.timestamp}</tag>
     </properties>
 
