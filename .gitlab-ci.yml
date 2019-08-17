@@ -80,7 +80,7 @@ stages:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
-    - echo "$DOCKER_IO_PASSWORD" | docker login -u davinkevin --password-stdin
+    - echo "$DOCKER_IO_PASSWORD" | docker login -u "$DOCKER_IO_USER" --password-stdin
   script:
     - docker build -t davinkevin/podcast-server:base-image -f backend/src/main/docker/base-image/Dockerfile .
     - docker push davinkevin/podcast-server:base-image
