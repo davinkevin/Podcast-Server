@@ -71,7 +71,7 @@ stages:
       - .yarn
       - frontend-angular/node_modules/
 
-👷 backend-base-image:
+.👷 backend-base-image:
   stage: 👷‍ build
   image: docker:19.03.1
   services:
