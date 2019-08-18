@@ -1,6 +1,9 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.database.Tables.COVER
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
@@ -9,7 +12,9 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.count
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -18,7 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
+import java.net.URI
+import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.*
 import java.util.*
 import java.util.UUID.fromString
 import javax.sql.DataSource
@@ -959,4 +968,99 @@ class ItemRepositoryV2Test {
         }
 
     }
+
+    @Nested
+    @DisplayName("should create")
+    inner class ShouldCreate {
+
+        @BeforeEach
+        fun prepare() {
+            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
+            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
+
+            dbSetupTracker.launchIfNecessary(dbSetup)
+        }
+
+        @Test
+        fun `a simple item`() {
+            /* Given */
+            val item = ItemForCreation(
+                    title = "an item",
+                    url = "http://foo.bar.com/an_item",
+
+                    pubDate = now(),
+                    downloadDate = now(),
+                    creationDate = now(),
+
+                    description = "a description",
+                    mimeType = "audio/mp3",
+                    length = 1234,
+                    fileName = "ofejeaoijefa.mp3",
+                    status = FINISH,
+
+                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+            )
+            val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
+            val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
+
+            /* When */
+            StepVerifier.create(repository.create(item))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.title).isEqualTo("an item")
+                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                        assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.description).isEqualTo("a description")
+                        assertThat(it.mimeType).isEqualTo("audio/mp3")
+                        assertThat(it.length).isEqualTo(1234)
+                        assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
+                        assertThat(it.status).isEqualTo(FINISH)
+
+                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                        assertThat(it.cover.height).isEqualTo(100)
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.url).isEqualTo("http://foo.bar.com/cover/item.jpg")
+                    }
+                    .verifyComplete()
+
+            assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+            assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+        }
+
+        @Test
+        fun `but found an already existing item so don't do anything and return empty`() {
+            /* Given */
+            val item = ItemForCreation(
+                    title = "an item",
+                    url = "http://fakeurl.com/geekinc.123.mp3",
+
+                    pubDate = now(),
+                    downloadDate = now(),
+                    creationDate = now(),
+
+                    description = "a description",
+                    mimeType = "audio/mp3",
+                    length = 1234,
+                    fileName = "ofejeaoijefa.mp3",
+                    status = FINISH,
+
+                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+            )
+            /* When */
+            StepVerifier.create(repository.create(item))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+    }
+
+
 }
