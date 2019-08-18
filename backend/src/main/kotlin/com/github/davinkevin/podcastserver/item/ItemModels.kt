@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.math.ceil
 
 /**
  * Created by kevin on 2019-02-09
@@ -65,7 +66,7 @@ data class PageItem(
 
         fun of(content: Collection<Item>, totalElements: Int, page: ItemPageRequest): PageItem {
 
-            val totalPages = Math.ceil(totalElements.toDouble() / page.size.toDouble()).toInt()
+            val totalPages = ceil(totalElements.toDouble() / page.size.toDouble()).toInt()
 
             return PageItem(
                     content = content,
