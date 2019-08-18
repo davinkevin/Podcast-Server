@@ -20,7 +20,7 @@
         <kotlin.version>1.3.21</kotlin.version>
 
         <!-- Database default values -->
-        <database.url><![CDATA[jdbc:h2:tcp://localhost:1521/podcast-server]]></database.url>
+        <database.url><![CDATA[jdbc:h2:/tmp/${maven.build.timestamp}]]></database.url>
         <database.user>sa</database.user>
         <database.password/>
 
