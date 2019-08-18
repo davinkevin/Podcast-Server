@@ -85,11 +85,13 @@ class YoutubeDlDownloader(
         }
 
         val url = downloadingItem.urls.first().toLowerCase()
-        return if ("youtube.com" in url || "www.france.tv" in url) 5
-        else if ("www.6play.fr" in url) 5
-        else if ("www.tf1.fr" in url) 5
-        else if ("www.france.tv" in url) 5
-        else Integer.MAX_VALUE
+        return when {
+            "youtube.com" in url -> 5
+            "www.6play.fr" in url -> 5
+            "www.tf1.fr" in url -> 5
+            "www.france.tv" in url -> 5
+            else -> Integer.MAX_VALUE
+        }
     }
 
     override fun getFileName(item: Item) = youtubeDl.extractName(item.url!!)
