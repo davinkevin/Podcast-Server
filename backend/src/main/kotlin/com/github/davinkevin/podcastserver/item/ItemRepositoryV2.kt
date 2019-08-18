@@ -195,7 +195,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun create(item: ItemForCreation): Mono<Item> {
         val id = UUID.randomUUID()
 
-        return Mono.fromCompletionStage(query.transactionResultAsync {
+        return query.transactionResultMono {
             val coverId = UUID.randomUUID()
             query.insertInto(COVER)
                     .set(COVER.ID, coverId)
@@ -219,7 +219,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                     .set(ITEM.PODCAST_ID, item.podcastId)
                     .set(ITEM.COVER_ID, coverId)
                     .execute()
-        })
+        }
                 .then(findById(id))
                 .onErrorResume { Mono.empty() }
     }
