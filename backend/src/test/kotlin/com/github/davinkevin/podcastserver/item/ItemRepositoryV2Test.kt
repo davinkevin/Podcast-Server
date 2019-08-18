@@ -1054,11 +1054,17 @@ class ItemRepositoryV2Test {
                     podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                     cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
             )
+            val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
+            val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
+
             /* When */
             StepVerifier.create(repository.create(item))
                     /* Then */
                     .expectSubscription()
                     .verifyComplete()
+
+            assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+            assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
         }
     }
 

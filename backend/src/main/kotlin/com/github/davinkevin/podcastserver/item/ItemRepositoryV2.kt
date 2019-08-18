@@ -192,46 +192,37 @@ class ItemRepositoryV2(private val query: DSLContext) {
 
     }
 
-    fun create(item: ItemForCreation): Mono<Item> = query
-            .select(ITEM.ID)
-            .from(ITEM)
-            .where(ITEM.URL.eq(item.url))
-            .and(ITEM.PODCAST_ID.eq(item.podcastId))
-            .fetchOneAsMono()
-            .map { it[ITEM.ID] }
-            .hasElement()
-            .filter { it == false }
-            .flatMap {
-                val coverId = UUID.randomUUID()
-                val insertCover = query.insertInto(COVER)
-                        .set(COVER.ID, coverId)
-                        .set(COVER.HEIGHT, item.cover.height)
-                        .set(COVER.WIDTH, item.cover.width)
-                        .set(COVER.URL, item.cover.url.toASCIIString())
-                        .executeAsyncAsMono()
+    fun create(item: ItemForCreation): Mono<Item> {
+        val id = UUID.randomUUID()
 
-                val id = UUID.randomUUID()
-                val insertItem = query.insertInto(ITEM)
-                        .set(ITEM.ID, id)
-                        .set(ITEM.TITLE, item.title)
-                        .set(ITEM.URL, item.url)
-                        .set(ITEM.PUB_DATE, item.pubDate.toTimestamp())
-                        .set(ITEM.DOWNLOAD_DATE, item.downloadDate.toTimestamp())
-                        .set(ITEM.CREATION_DATE, item.creationDate.toTimestamp())
-                        .set(ITEM.DESCRIPTION, item.description)
-                        .set(ITEM.MIME_TYPE, item.mimeType)
-                        .set(ITEM.LENGTH, item.length)
-                        .set(ITEM.FILE_NAME, item.fileName)
-                        .set(ITEM.STATUS, item.status.toString())
-                        .set(ITEM.PODCAST_ID, item.podcastId)
-                        .set(ITEM.COVER_ID, coverId)
-                        .executeAsyncAsMono()
+        return Mono.fromCompletionStage(query.transactionResultAsync {
+            val coverId = UUID.randomUUID()
+            query.insertInto(COVER)
+                    .set(COVER.ID, coverId)
+                    .set(COVER.HEIGHT, item.cover.height)
+                    .set(COVER.WIDTH, item.cover.width)
+                    .set(COVER.URL, item.cover.url.toASCIIString())
+                    .execute()
 
-
-                insertCover
-                        .then(insertItem)
-                        .then(findById(id))
-            }
+            query.insertInto(ITEM)
+                    .set(ITEM.ID, id)
+                    .set(ITEM.TITLE, item.title)
+                    .set(ITEM.URL, item.url)
+                    .set(ITEM.PUB_DATE, item.pubDate.toTimestamp())
+                    .set(ITEM.DOWNLOAD_DATE, item.downloadDate.toTimestamp())
+                    .set(ITEM.CREATION_DATE, item.creationDate.toTimestamp())
+                    .set(ITEM.DESCRIPTION, item.description)
+                    .set(ITEM.MIME_TYPE, item.mimeType)
+                    .set(ITEM.LENGTH, item.length)
+                    .set(ITEM.FILE_NAME, item.fileName)
+                    .set(ITEM.STATUS, item.status.toString())
+                    .set(ITEM.PODCAST_ID, item.podcastId)
+                    .set(ITEM.COVER_ID, coverId)
+                    .execute()
+        })
+                .then(findById(id))
+                .onErrorResume { Mono.empty() }
+    }
 }
 
 private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Timestamp, String, String, Long, String, String, UUID, String, String, UUID, String, Int, Int>): Item {
