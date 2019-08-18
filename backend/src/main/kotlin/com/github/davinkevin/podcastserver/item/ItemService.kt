@@ -27,7 +27,6 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as Podcas
 class ItemService(
         private val repository: ItemRepository,
         private val podcastRepository: PodcastRepository,
-        private val coverRepository: CoverRepository,
 
         private val idm: ItemDownloadManager,
         private val p: PodcastServerParameters,

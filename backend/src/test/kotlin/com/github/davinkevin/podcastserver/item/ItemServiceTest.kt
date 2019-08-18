@@ -43,7 +43,6 @@ class ItemServiceTest {
     @MockBean lateinit var fileService: FileService
     @MockBean lateinit var idm: ItemDownloadManager
     @MockBean lateinit var podcastRepository: PodcastRepository
-    @MockBean lateinit var coverRepositoryV2: CoverRepository
     @MockBean lateinit var mimeTypeService: MimeTypeService
 
     val item = Item(
