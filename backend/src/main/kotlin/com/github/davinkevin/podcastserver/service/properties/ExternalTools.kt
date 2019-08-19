@@ -9,5 +9,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class ExternalTools(
         var ffmpeg: String = "/usr/local/bin/ffmpeg",
         var rtmpdump: String = "/usr/local/bin/rtmpdump",
-        val youtubedl: String = "/usr/local/bin/youtube-dl"
+        var youtubedl: String = "/usr/local/bin/youtube-dl"
 )
