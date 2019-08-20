@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  template:
+    spec:
+      containers:
+        - name: database
+          volumeMounts:
+            - name: database
+              mountPath: /opt/h2-data
+      volumes:
+        - name: database
+          hostPath:
+            path: /opt/podcast-server/database/
+            type: Directory
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: database-backup
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: database
+              hostPath:
+                path: /opt/podcast-server/database/
+                type: Directory
+            - name: backup
+              hostPath:
+                path: /opt/podcast-server/database/backup/
+                type: Directory

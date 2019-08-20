@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  labels:
+    app: database
+spec:
+  ports:
+    - name: jdbc-h2-port
+      port: 1521
+      targetPort: 1521
+      protocol: TCP
+  selector:
+    app: database
+    module: backend
+    serving: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  selector:
+    matchLabels:
+      run: database
+      app: database
+      serving: "true"
+  template:
+    metadata:
+      labels:
+        run: database
+        app: database
+        module: backend
+        serving: "true"
+    spec:
+      containers:
+        - image: oscarfonts/h2:latest
+          imagePullPolicy: Always
+          name: database
+          ports:
+            - name: http-port
+              containerPort: 1521
+              protocol: TCP
+          volumeMounts:
+            - name: database
+              mountPath: /opt/h2-data
+      volumes:
+        - name: database
+          hostPath:
+            path: /opt/podcast-server/database/
+            type: Directory
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: database-backup
+spec:
+  schedule: "03 4 * * *"
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: database-backup
+              imagePullPolicy: Never
+              image: oscarfonts/h2:latest
+              args:
+                - /bin/sh
+                - -c
+                - java -cp /opt/h2/bin/h2-1.4.199.jar org.h2.tools.Script -url jdbc:h2:tcp://database:1521/podcast-server -user sa && tar zcvf backup/podcast-server-$(date +"%Y-%m-%dT%H-%M-%S").tar.gz *.sql && rm backup.sql
+              volumeMounts:
+                - name: database
+                  mountPath: /opt/h2-data
+                - name: backup
+                  mountPath: /opt/h2-data/backup
+          restartPolicy: OnFailure
