@@ -17,9 +17,9 @@ cp frontend-angular/dist/* ${UI_FOLDER}/target/docker/podcast-server/v2/
 
 cd ${UI_FOLDER}/target/docker/ || exit 1
 docker build -t podcastserver/ui:"${VERSION}" .
-docker push podcastserver/ui:"${VERSION}" .
+[ -n "$CI" ] &&  docker push podcastserver/ui:"${VERSION}" .
 
 if [ "$VERSION" == "master" ]; then
-  docker tag podcastserver/ui:"${VERSION}" podcastserver/ui:latest
-  docker push podcastserver/ui:latest
+   docker tag podcastserver/ui:"${VERSION}" podcastserver/ui:latest
+   [ -n "$CI" ] && docker push podcastserver/ui:latest
 fi
