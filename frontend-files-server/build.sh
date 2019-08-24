@@ -10,4 +10,4 @@ cp -r ${FS_FOLDER}/src/docker/Dockerfile \
     ${FS_FOLDER}/target/docker
 
 cd ${FS_FOLDER}/target/docker/ || exit 1
-docker build -t davinkevin/podcast-server:fs-"${CI_COMMIT_TAG:-${CI_COMMIT_REF_SLUG:-$(date +"%s")}}" .
+docker build -t podcast-server/file-system:"${CI_COMMIT_TAG:-${CI_COMMIT_REF_SLUG:-$(date +"%s")}}" .

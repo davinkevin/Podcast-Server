@@ -15,4 +15,4 @@ mkdir -p ${UI_FOLDER}/target/docker/podcast-server/v2/
 cp frontend-angular/dist/* ${UI_FOLDER}/target/docker/podcast-server/v2/
 
 cd ${UI_FOLDER}/target/docker/
-docker build -t davinkevin/podcast-server/ui .
+docker build -t podcastserver/ui .
