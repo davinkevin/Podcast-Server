@@ -139,8 +139,10 @@ stages:
   stage: 🐳 packaging
   image: openjdk:8
   needs: [👷 backend, 👷 backend-base-image]
+  before_script:
   script:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml jib:build -Dtag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG} -Dbase-image-tag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - if [ "$CI_COMMIT_REF_SLUG" == "master" ]; then ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml jib:build -Dtag=latest -Dbase-image-tag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG} ; fi
   cache:
     key: "$CI_PIPELINE_ID-backend"
     policy: pull
