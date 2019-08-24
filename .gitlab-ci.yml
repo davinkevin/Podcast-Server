@@ -73,7 +73,7 @@ stages:
       - .yarn
       - frontend-angular/node_modules/
 
-.👷 backend-base-image:
+👷 backend-base-image:
   stage: 👷‍ build
   image: docker:19.03.1
   services:
@@ -86,7 +86,6 @@ stages:
   script:
     - docker build -t davinkevin/podcast-server:base-image -f backend/src/main/docker/base-image/Dockerfile .
     - docker push davinkevin/podcast-server:base-image
-  allow_failure: true
 
 👷 backend:
   stage: 👷‍ build
@@ -139,7 +138,7 @@ stages:
 🐳 backend:
   stage: 🐳 packaging
   image: openjdk:8
-  needs: [👷 backend]
+  needs: [👷 backend, 👷 backend-base-image]
   script:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate compile jib:build -Ddatabase.url=jdbc:h2:/tmp/podcast-server -Dtag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
   cache:
