@@ -26,7 +26,7 @@
 
         <maven.build.timestamp.format>yyyyMMdd-HHmmssSSS</maven.build.timestamp.format>
         <tag>${maven.build.timestamp}</tag>
-        <base-image-tag>latest</base-image-tag>
+        <base-image-tag>master</base-image-tag>
     </properties>
 
     <repositories>

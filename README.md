@@ -19,16 +19,18 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 
 ## Run in local env: 
 
-### Building components: 
+### Building components for local use: 
 
-* building base-image: `docker build -t davinkevin/podcast-server-base-image:latest -f backend/src/main/docker/base-image/Dockerfile .`
+* building base-image: `docker build -t podcastserver/backend-base-image:master -f backend/src/main/docker/base-image/Dockerfile .`
 * building backend: `mvn clean liquibase:dropAll liquibase:update jooq-codegen:generate compile jib:dockerBuild -Ddatabase.url=jdbc:h2:/tmp/podcast-server -Dtag=local-dev`
+* building ui: `env CI_COMMIT_TAG=latest ./ui/build.sh` (with both front already built before)
+* building fs: `env CI_COMMIT_TAG=latest ./files-system/build.sh`
 
 ### Start components one by one
 
-* backend: `docker run --rm -it --link podcast-server-database:podcast-server-database -p 8080:8080 -v /tmp/podcast-server:/tmp/podcast-server -e SPRING_DATASOURCE_URL="jdbc:h2:tcp://podcast-server-database:1521/podcast-server" davinkevin/podcast-server:local-dev`
-* nginx file server: `docker run --rm -it -p 8181:80 -v /tmp/podcast-server/:/var/www/podcast-server-files/data/ davinkevin/podcast-server/files-server:latest`
-* h2 database: `docker run --rm -it -p 8999:81 -p 1521:1521 -v /tmp/h2-podcast-server:/opt/h2-data --name podcast-server-database davinkevin/podcast-server/database:latest`
+* backend: `docker run --rm -it --link ps-database:ps-database -p 8080:8080 -v /tmp/podcast-server:/tmp/podcast-server -e SPRING_DATASOURCE_URL="jdbc:h2:tcp://ps-database:1521/podcast-server" davinkevin/podcast-server:local-dev`
+* file-system: `docker run --rm -it -p 8181:80 -v /tmp/podcast-server/:/var/www/podcast-server-files/data/ --name ps-fs podcastserver/file-system:latest`
+* h2 database: `docker run --rm -it -p 8999:81 -p 1521:1521 -v /tmp/h2-podcast-server:/opt/h2-data --name ps-database oscarfonts/h2:latest`
 * Update model of the database: `mvn -f backend/pom.xml liquibase:dropAll liquibase:update -Ddatabase.url=jdbc:h2:tcp://localhost:1521/podcast-server` 
 * frontend: `./target/node/npm run serve`
 
