@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.worker.youtube
 
-import arrow.core.Option
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
@@ -10,16 +9,18 @@ import com.github.davinkevin.podcastserver.service.CoverInformation
 import com.github.davinkevin.podcastserver.service.ImageService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.slf4j.LoggerFactory
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toMono
-import java.io.ByteArrayInputStream
-import java.net.URI
+import reactor.netty.http.client.HttpClient
 import reactor.util.function.component1
 import reactor.util.function.component2
+import java.io.ByteArrayInputStream
+import java.net.URI
 
 /**
  * Created by kevin on 22/02/15
@@ -31,6 +32,7 @@ class YoutubeFinder(
 ) : Finder {
 
     override fun findInformation(url: String) = wcb
+            .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
             .baseUrl(url)
             .build()
             .get()
