@@ -16,3 +16,4 @@ cp frontend-angular/dist/* ${UI_FOLDER}/target/docker/podcast-server/v2/
 
 cd ${UI_FOLDER}/target/docker/ || exit 1
 docker build -t podcastserver/ui:"${CI_COMMIT_TAG:-${CI_COMMIT_REF_SLUG:-$(date +"%s")}}" .
+docker push podcastserver/ui:"${CI_COMMIT_TAG:-${CI_COMMIT_REF_SLUG:-$(date +"%s")}}" .
