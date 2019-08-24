@@ -147,7 +147,7 @@ stages:
     paths:
       - .m2/
 
-🐳 file-server:
+🐳 file-system:
   stage: 🐳 packaging
   image: docker:19.03.1
   services:
@@ -158,4 +158,4 @@ stages:
   before_script:
     - echo "$DOCKER_IO_PASSWORD" | docker login -u "$DOCKER_IO_USER" --password-stdin
   script:
-    - ./frontend-files-server/build.sh
+    - ./files-system/build.sh

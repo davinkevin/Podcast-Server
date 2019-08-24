@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-FS_FOLDER=frontend-files-server
+FS_FOLDER=files-system
 
 rm -rf ${FS_FOLDER}/target
 mkdir -p ${FS_FOLDER}/target/docker
