@@ -4,7 +4,7 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
+import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory

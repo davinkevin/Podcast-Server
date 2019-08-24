@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.podcast
 
 import arrow.core.Option
 import arrow.core.getOrElse
-import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
+import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemPageRequest
 import com.github.davinkevin.podcastserver.item.ItemService

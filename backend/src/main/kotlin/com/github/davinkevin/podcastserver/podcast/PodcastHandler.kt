@@ -1,8 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
-import com.github.davinkevin.podcastserver.extension.ServerRequest.extractHost
-import com.github.davinkevin.podcastserver.item.CoverForItem
+import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory

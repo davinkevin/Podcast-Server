@@ -1,8 +1,5 @@
-package com.github.davinkevin.podcastserver.extension.ServerRequest
+package com.github.davinkevin.podcastserver.extension.serverRequest
 
-import arrow.core.orElse
-import arrow.syntax.collections.firstOption
-import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.server.ServerRequest
 import java.net.URI
 
