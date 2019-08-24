@@ -12,10 +12,10 @@ cp -r ${FS_FOLDER}/src/docker/Dockerfile \
 
 cd ${FS_FOLDER}/target/docker/ || exit 1
 docker build -t podcastserver/file-system:"${VERSION}" .
-[ -n "$CI" ] && docker push podcastserver/file-system:"${VERSION}"
+[ -n "$CI" ] && docker push "podcastserver/file-system:${VERSION}"
 
 if [ "$VERSION" == "master" ]; then
-  docker tag podcastserver/file-system:"${VERSION}" podcastserver/file-system:latest
+  docker tag "podcastserver/file-system:${VERSION}" podcastserver/file-system:latest
   [ -n "$CI" ] && docker push podcastserver/file-system:latest
 fi
 
