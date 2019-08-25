@@ -15,7 +15,7 @@ Application design to be your Podcast local proxy in your lan network.
 
 It also works on many sources like Youtube, Dailymotion, CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
 
-The application is available in [fat-jar](https://github.com/davinkevin/Podcast-Server/releases) format or in [docker images](https://hub.docker.com/r/davinkevin/podcast-server/) 
+The application is available in [fat-jar](https://github.com/davinkevin/Podcast-Server/releases) format or in [docker images](https://hub.docker.com/r/podcastserver/) 
 
 ## Run in local env: 
 
