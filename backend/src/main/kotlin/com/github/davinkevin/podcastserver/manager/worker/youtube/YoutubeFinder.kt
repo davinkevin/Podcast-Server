@@ -28,11 +28,15 @@ import java.net.URI
 @Service
 class YoutubeFinder(
         private val imageService: ImageService,
-        private val wcb: WebClient.Builder
+        wcbs: WebClient.Builder
 ) : Finder {
 
+    private val wcb = wcbs
+            .clientConnector(ReactorClientHttpConnector(reactor.netty.http.client.HttpClient.create().followRedirect { _, res -> res.status().code() in 300..399 }))
+            .clone()
+
     override fun findInformation(url: String) = wcb
-            .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect { _, res -> res.status().code() in 300..399  }))
             .baseUrl(url)
             .build()
             .get()
