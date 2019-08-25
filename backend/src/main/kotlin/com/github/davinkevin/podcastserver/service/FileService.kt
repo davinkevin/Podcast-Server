@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
+import reactor.core.scheduler.Schedulers
 import reactor.netty.http.client.HttpClient
 import java.nio.file.Files
 import java.nio.file.Path
@@ -62,6 +63,7 @@ class FileService(
                 .filter { it }
                 .map { path }
                 .map { it.toString().substringAfterLast("/") }
+                .subscribeOn(Schedulers.elastic())
     }
 
     fun downloadPodcastCover(podcast: Podcast): Mono<Void> {
