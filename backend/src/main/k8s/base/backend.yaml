@@ -39,8 +39,8 @@ spec:
         serving: "true"
     spec:
       containers:
-        - image: davinkevin/podcast-server:k3s
-          imagePullPolicy: Never
+        - image: podcastserver/backend:master
+          imagePullPolicy: Always
           name: app
           ports:
             - name: http-port
