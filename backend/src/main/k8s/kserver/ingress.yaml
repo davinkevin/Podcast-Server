@@ -4,6 +4,10 @@ metadata:
   name: ingress
   namespace: podcast-server
 spec:
+  tls:
+    - hosts:
+        - podcast-server.tk
+      secretName: podcast-server-tls
   rules:
     - host: podcast-server.tk
       http:
