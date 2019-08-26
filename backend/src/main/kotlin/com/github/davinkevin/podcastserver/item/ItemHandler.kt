@@ -8,12 +8,15 @@ import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import reactor.core.publisher.switchIfEmpty
@@ -58,6 +61,7 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
                 }
                 .doOnNext { log.debug("Redirect content playabe to {}", it)}
                 .flatMap { seeOther(it).build() }
+                .switchIfEmpty { ResponseStatusException(NOT_FOUND, "No item found for id $id").toMono() }
     }
 
     fun cover(s: ServerRequest): Mono<ServerResponse> {

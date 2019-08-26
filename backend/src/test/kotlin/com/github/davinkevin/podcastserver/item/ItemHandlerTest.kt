@@ -2,9 +2,7 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
@@ -122,6 +120,24 @@ class ItemHandlerTest {
                     .expectStatus().isSeeOther
                     .expectHeader()
                     .valueEquals("Location", "https://external.domain.tld/foo/bar.mp4")
+        }
+
+        @Test
+        fun `and throw 404 if nothing is found`() {
+            /* Given */
+            whenever(itemService.findById(item.id)).thenReturn(Mono.empty())
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isNotFound
+                    .expectBody()
+                    .assertThatJson {
+                        inPath("status").isEqualTo(404)
+                        inPath("message").isEqualTo("No item found for id ${item.id}")
+                    }
 
         }
     }
