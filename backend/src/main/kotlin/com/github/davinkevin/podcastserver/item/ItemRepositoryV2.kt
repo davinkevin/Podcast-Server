@@ -246,12 +246,10 @@ private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Time
 }
 
 private fun ItemSort.toOrderBy() = when(field) {
-    "pubDate" -> ITEM.PUB_DATE
     "downloadDate" -> ITEM.DOWNLOAD_DATE
     else -> ITEM.PUB_DATE
 }.let { when(direction.toUpperCase()) {
     "ASC" -> it.asc()
-    "DESC" -> it.desc()
     else -> it.desc()
 } }
 
