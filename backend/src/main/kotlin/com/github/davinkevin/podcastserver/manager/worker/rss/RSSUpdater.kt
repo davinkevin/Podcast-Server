@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.manager.worker.*
-import com.github.davinkevin.podcastserver.service.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory

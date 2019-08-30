@@ -4,6 +4,7 @@ import arrow.core.Option
 import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -66,7 +67,5 @@ class ImageService(
                 .onErrorResume { Mono.empty() }
     }
 }
-
-data class CoverInformation(val width: Int, val height: Int, val url: URI)
 
 private fun InputStream.toBufferedImage() = ImageIO.read(ImageIO.createImageInputStream(this))!!

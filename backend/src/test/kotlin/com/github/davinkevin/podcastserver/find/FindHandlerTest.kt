@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.service.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName

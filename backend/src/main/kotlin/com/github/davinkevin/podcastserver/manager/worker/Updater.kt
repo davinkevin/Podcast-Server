@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.worker
 
-import com.github.davinkevin.podcastserver.service.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.ZonedDateTime

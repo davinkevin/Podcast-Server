@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.toMonoOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.service.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.ImageService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

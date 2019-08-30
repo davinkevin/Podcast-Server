@@ -4,7 +4,9 @@ import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
+import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinder
+import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfig
+import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
@@ -14,10 +16,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.toMono
@@ -28,6 +31,7 @@ import java.net.URI
  * Created by kevin on 12/05/2018
  */
 @ExtendWith(SpringExtension::class, MockServer::class)
+@AutoConfigureJson
 class ItunesFinderTest {
 
     @Autowired private lateinit var rssFinder: RSSFinder
@@ -75,7 +79,8 @@ class ItunesFinderTest {
                 cover = FindCoverInformation(height = 140, width = 140, url = URI("http://frenchspin.com/sites/positron/audio/positron140.png") ),
                 type = "RSS"
         )
-        whenever(rssFinder.findInformation("http://feeds.feedburner.com/emissionpositron")).thenReturn(podcastInformation.toMono())
+        whenever(rssFinder.findInformation("http://feeds.feedburner.com/emissionpositron"))
+                .thenReturn(podcastInformation.toMono())
 
         /* WHEN  */
         StepVerifier.create(finder.findInformation(url))
@@ -83,13 +88,12 @@ class ItunesFinderTest {
                 .expectSubscription()
                 .assertNext { assertThat(it).isSameAs(podcastInformation) }
                 .verifyComplete()
-
     }
 
     @TestConfiguration
-    @Import(ItunesFinder::class)
+    @Import(ItunesFinderConfig::class)
     class LocalTestConfiguration {
-        @Bean fun mockRssFinder() = mock<RSSFinder>()
-        @Bean fun localhostWebClient() = WebClient.builder().baseUrl("http://localhost:5555").build()
+        @Bean @Primary fun mockRssFinder() = mock<RSSFinder>()
+        @Bean fun localhostWebClientBuilder() = WebClient.builder().baseUrl("http://localhost:5555")
     }
 }

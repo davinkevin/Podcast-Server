@@ -1,12 +1,10 @@
 package com.github.davinkevin.podcastserver.manager.worker.rss
 
-import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.service.CoverInformation
+import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
+import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.extension.Extensions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,12 +24,11 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
-@Import(RSSFinder::class)
-@AutoConfigureWebClient
 @ExtendWith(SpringExtension::class)
 class RSSFinderTest {
 
@@ -138,7 +134,9 @@ class RSSFinderTest {
     }
 
     @TestConfiguration
+    @Import(RSSFinderConfig::class)
     class LocalTestConfiguration {
         @Bean fun imageService() = mock<ImageService>()
+        @Bean fun webClient() = WebClient.builder()
     }
 }
