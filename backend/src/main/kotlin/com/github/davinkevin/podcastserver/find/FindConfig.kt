@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
+import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -28,7 +29,8 @@ class FindRoutingConfig {
         FindService::class,
 
         RSSFinderConfig::class,
-        ItunesFinderConfig::class
+        ItunesFinderConfig::class,
+        YoutubeFinderConfig::class
 )
 class FindConfig
 

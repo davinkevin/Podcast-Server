@@ -1,19 +1,15 @@
 package com.github.davinkevin.podcastserver.manager.worker.youtube
 
-import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinder
+import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderConfig
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
-import com.github.davinkevin.podcastserver.service.ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -22,22 +18,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
 @AutoConfigureWebClient
-@Import(YoutubeFinder::class)
 @ExtendWith(SpringExtension::class)
 class YoutubeFinderTest {
 
@@ -130,6 +121,7 @@ class YoutubeFinderTest {
     }
 
     @TestConfiguration
+    @Import(YoutubeFinderConfig::class)
     class LocalTestConfiguration {
         @Bean fun imageService() = mock<ImageService>()
     }
