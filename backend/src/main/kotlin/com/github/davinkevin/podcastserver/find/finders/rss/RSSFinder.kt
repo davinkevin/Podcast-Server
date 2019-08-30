@@ -1,32 +1,30 @@
-package com.github.davinkevin.podcastserver.manager.worker.rss
+package com.github.davinkevin.podcastserver.find.finders.rss
 
-import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.toMonoOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.service.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
-import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.io.ByteArrayInputStream
-import java.net.URI
 import reactor.util.function.component1
 import reactor.util.function.component2
+import java.io.ByteArrayInputStream
+import java.net.URI
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
 /**
  * Created by kevin on 22/02/15
  */
-@Service
 class RSSFinder(
-        val imageService: ImageService,
-        val wcb: WebClient.Builder
+        private val imageService: ImageService,
+        private val wcb: WebClient.Builder
 ) : Finder {
 
     private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!

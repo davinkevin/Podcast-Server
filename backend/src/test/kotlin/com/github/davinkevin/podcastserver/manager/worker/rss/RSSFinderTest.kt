@@ -4,8 +4,8 @@ import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
-import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okXml
@@ -19,10 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.toMono
@@ -136,7 +136,7 @@ class RSSFinderTest {
     @TestConfiguration
     @Import(RSSFinderConfig::class)
     class LocalTestConfiguration {
-        @Bean fun imageService() = mock<ImageService>()
+        @Bean @Primary fun mockImageService() = mock<ImageService>()
         @Bean fun webClient() = WebClient.builder()
     }
 }

@@ -1,17 +1,15 @@
-package com.github.davinkevin.podcastserver.find.finders
+package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.reactor.toMono
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
+import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
-import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
-import java.nio.charset.Charset
 
 class ItunesFinder(private val rssFinder: RSSFinder, private val wc: WebClient) : Finder {
 

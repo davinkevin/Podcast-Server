@@ -1,7 +1,8 @@
-package com.github.davinkevin.podcastserver.find.finders
+package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.davinkevin.podcastserver.manager.worker.rss.RSSFinder
+import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
+import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -14,7 +15,7 @@ import reactor.netty.http.client.HttpClient
 import java.nio.charset.Charset
 
 @Configuration
-@Import(RSSFinder::class)
+@Import(RSSFinderConfig::class)
 class ItunesFinderConfig {
 
     @Bean
