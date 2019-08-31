@@ -16,6 +16,10 @@ spec:
             backend:
               serviceName: podcast-server
               servicePort: 8080
+          - path: /actuator
+            backend:
+              serviceName: podcast-server
+              servicePort: 8080
           - path: /data
             backend:
               serviceName: fs
