@@ -4,7 +4,7 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.core.toOption
-import com.github.davinkevin.podcastserver.manager.worker.youtube.YOUTUBE
+import com.github.davinkevin.podcastserver.update.updaters.youtube.YOUTUBE
 import com.github.davinkevin.podcastserver.entity.Item
 import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika

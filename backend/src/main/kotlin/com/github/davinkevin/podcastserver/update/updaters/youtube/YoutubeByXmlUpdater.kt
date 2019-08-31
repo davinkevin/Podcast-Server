@@ -1,18 +1,15 @@
-package com.github.davinkevin.podcastserver.manager.worker.youtube
+package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import arrow.core.Option
 import arrow.core.getOrElse
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.manager.worker.Updater
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.service.JdomService
-import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.service.HtmlService
+import com.github.davinkevin.podcastserver.service.JdomService
+import com.github.davinkevin.podcastserver.utils.k
+import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
@@ -25,9 +22,10 @@ import java.time.format.DateTimeFormatter
 /**
  * Created by kevin on 11/09/2018
  */
-@Component
-@ConditionalOnProperty(name = ["podcastserver.api.youtube"], havingValue = "", matchIfMissing = true)
-class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlService, val signatureService: SignatureService) : Updater {
+class YoutubeByXmlUpdater(
+        val jdomService: JdomService,
+        val htmlService: HtmlService
+) : Updater {
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
@@ -101,7 +99,7 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
                 .joinToString { it.getChildText("id", dn) }
 
         return if(joinedIds.isEmpty()) joinedIds
-        else signatureService.fromText(joinedIds)
+        else DigestUtils.md5Hex(joinedIds)
     }
 
     override fun type() = _type()

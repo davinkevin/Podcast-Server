@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.manager.worker.youtube
+package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
@@ -12,7 +12,7 @@ import java.util.*
  * Created by kevin on 13/09/2018
  */
 
-internal const val PLAYLIST_URL_PART = "www.youtube.com/playlist?list="
+internal const val PLAYLIST_URL_PART = "playlist?list="
 
 internal fun playlistIdOf(url: String): String = url.substringAfter("list=")
 internal fun isPlaylist(url: String) = url.contains(PLAYLIST_URL_PART)

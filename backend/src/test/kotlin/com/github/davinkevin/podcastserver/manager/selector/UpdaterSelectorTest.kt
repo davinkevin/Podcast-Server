@@ -8,8 +8,8 @@ import com.github.davinkevin.podcastserver.manager.worker.rss.RSSUpdater
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
-import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByApiUpdater
-import com.github.davinkevin.podcastserver.manager.worker.youtube.YoutubeByXmlUpdater
+import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater
+import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat

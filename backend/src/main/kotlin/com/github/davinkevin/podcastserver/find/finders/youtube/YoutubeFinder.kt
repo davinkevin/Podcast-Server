@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.toMonoOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.manager.worker.youtube._compatibility
+import com.github.davinkevin.podcastserver.update.updaters.youtube._compatibility
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

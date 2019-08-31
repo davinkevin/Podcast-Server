@@ -12,6 +12,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -33,7 +34,6 @@ class YoutubeByXmlUpdaterTest {
 
     @Mock private lateinit var jdomService: JdomService
     @Mock private lateinit var htmlService: HtmlService
-    @Mock private lateinit var signatureService: SignatureService
     @InjectMocks private lateinit var updater: YoutubeByXmlUpdater
 
     @Test
@@ -86,13 +86,12 @@ class YoutubeByXmlUpdaterTest {
 
         whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).thenReturn( fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"))
-        whenever(signatureService.fromText(any())).thenReturn("Signature")
 
         /* When */
         val signature = updater.blockingSignatureOf(podcast.url)
 
         /* Then */
-        assertThat(signature).isEqualTo("Signature")
+        assertThat(signature).isEqualTo("e2ceb3426f7631396a49f16942270c02")
         verify(jdomService, only()).parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCVHFbqXqoYvEWM1Ddxl0QDg")
         verify(htmlService, only()).get("https://www.youtube.com/user/androiddevelopers")
     }

@@ -14,6 +14,7 @@ class MockServer: BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
     override fun afterAll(context: ExtensionContext?) {
         server.stop()
+        server.resetAll()
     }
 
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {

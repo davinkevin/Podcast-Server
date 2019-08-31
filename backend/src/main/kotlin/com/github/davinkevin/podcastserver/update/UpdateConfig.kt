@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update
 
+import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeUpdaterConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -21,5 +22,11 @@ class UpdateRouterConfig {
 }
 
 @Configuration
-@Import(UpdateRouterConfig::class, UpdateHandler::class, UpdateService::class)
+@Import(
+        UpdateRouterConfig::class,
+        UpdateHandler::class,
+        UpdateService::class,
+
+        YoutubeUpdaterConfig::class
+)
 class UpdateConfig
