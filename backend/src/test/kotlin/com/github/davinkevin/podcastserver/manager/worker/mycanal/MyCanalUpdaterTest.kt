@@ -9,9 +9,6 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
@@ -56,7 +53,7 @@ class MyCanalUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(podcast.url)
+        val signature = updater.blockingSignatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("6ca1b384c76f88ae24d6bfd423333333")
@@ -69,7 +66,7 @@ class MyCanalUpdaterTest {
         whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(podcast.url) }
+        assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("Error during signature of podcast with url https://www.mycanal.fr/url/fake")
     }
@@ -91,7 +88,7 @@ class MyCanalUpdaterTest {
                 .forEach { it -> doReturn(CoverInformation( url = URI(it), height = 200, width = 200 )).whenever(imageService).fetchCoverInformation(it) }
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(16).are(coherent())
@@ -107,7 +104,7 @@ class MyCanalUpdaterTest {
                 .whenever(imageService).fetchCoverInformation(argWhere<String> { it in imageUrls })
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(120).are(coherent())
@@ -119,7 +116,7 @@ class MyCanalUpdaterTest {
         whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).isEmpty()

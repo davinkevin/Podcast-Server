@@ -31,7 +31,7 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
         log.info("Youtube Update by RSS")
 
         val url = playlistUrlOf(podcast.url.toASCIIString())
@@ -85,7 +85,7 @@ class YoutubeByXmlUpdater(val jdomService: JdomService, val htmlService: HtmlSer
         return URI(URL_PAGE_BASE.format(idVideo))
     }
 
-    override fun signatureOf(url: URI): String {
+    override fun blockingSignatureOf(url: URI): String {
         val podcastUrl = playlistUrlOf(url.toASCIIString())
         val parsedXml = jdomService.parse(podcastUrl).k()
 

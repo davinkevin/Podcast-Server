@@ -5,7 +5,6 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
@@ -42,7 +41,7 @@ class DailymotionUpdaterTest {
                 .thenReturn("aSignature")
 
         /* When */
-        val s = updater.signatureOf(podcast.url)
+        val s = updater.blockingSignatureOf(podcast.url)
 
         /* Then */
         assertThat(s).isEqualTo("aSignature")
@@ -56,7 +55,7 @@ class DailymotionUpdaterTest {
                 .then { fileAsJson("/remote/podcast/dailymotion/user.karimdebbache.json") }
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(10)
@@ -69,7 +68,7 @@ class DailymotionUpdaterTest {
         whenever(jsonService.parseUrl(karimdebbache)).thenReturn(arrow.core.None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).isEmpty()
@@ -81,7 +80,7 @@ class DailymotionUpdaterTest {
         val otherPodcast = podcast.copy(url = URI("http://foo.bar/goo"))
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(otherPodcast.url) }
+        assertThatThrownBy { updater.blockingSignatureOf(otherPodcast.url) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("Username not Found")
     }

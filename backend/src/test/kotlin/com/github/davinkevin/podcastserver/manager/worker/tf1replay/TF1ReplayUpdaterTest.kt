@@ -58,7 +58,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast.url)
+                val signature = updater.blockingSignatureOf(podcast.url)
 
                 /* Then */
                 assertThat(signature).isEqualTo("0d1b85d92442090ce4d7320f2176e8cf")
@@ -73,7 +73,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast.url)
+                val signature = updater.blockingSignatureOf(podcast.url)
 
                 /* Then */
                 assertThat(signature).isEqualTo("0d1b85d92442090ce4d7320f2176e8cf")
@@ -88,7 +88,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast.url)
+                val signature = updater.blockingSignatureOf(podcast.url)
 
                 /* Then */
                 assertThat(signature).isEqualTo("ff820660b80d0f315685de6a519830c4")
@@ -103,7 +103,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast.url)
+                val signature = updater.blockingSignatureOf(podcast.url)
 
                 /* Then */
                 assertThat(signature).isEqualTo("841e49d6c64251982a93eba1a291ace9")
@@ -118,7 +118,7 @@ class TF1ReplayUpdaterTest {
                 whenever(signatureService.fromText(any())).thenCallRealMethod()
 
                 /* When */
-                val signature = updater.signatureOf(podcast.url)
+                val signature = updater.blockingSignatureOf(podcast.url)
 
                 /* Then */
                 assertThat(signature).isEqualTo("90df9fa6e2aae2e66d5043142f8a90ee")
@@ -140,7 +140,7 @@ class TF1ReplayUpdaterTest {
                 )
 
                 /* When */
-                assertThatThrownBy { updater.signatureOf(podcast.url) }
+                assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
                         /* Then */
                         .isInstanceOf(RuntimeException::class.java)
                         .hasMessage("Error during signature of podcast with url https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/bonus")
@@ -156,7 +156,7 @@ class TF1ReplayUpdaterTest {
                 )
 
                 /* When */
-                assertThatThrownBy { updater.signatureOf(podcast.url) }
+                assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
                         /* Then */
                         .isInstanceOf(RuntimeException::class.java)
                         .hasMessage("Slug not found in podcast with http://www.tf1.fr/ieafjoefjeaoijfoejifaa")
@@ -216,7 +216,7 @@ class TF1ReplayUpdaterTest {
                         .then { fileAsJson("/remote/podcast/tf1replay/quotidien.query.root.json") }
 
                 /* When */
-                val items = updater.findItems(podcast)
+                val items = updater.blockingFindItems(podcast)
 
                 /* Then */
                 assertThat(items).hasSize(50)
@@ -234,7 +234,7 @@ class TF1ReplayUpdaterTest {
                         .then { fileAsJson("/remote/podcast/tf1replay/quotidien.query.root.json") }
 
                 /* When */
-                val items = updater.findItems(podcast)
+                val items = updater.blockingFindItems(podcast)
 
                 /* Then */
                 assertThat(items).hasSize(50)
@@ -252,7 +252,7 @@ class TF1ReplayUpdaterTest {
                         .then { fileAsJson("/remote/podcast/tf1replay/quotidien.query.replay.json") }
 
                 /* When */
-                val items = updater.findItems(podcast)
+                val items = updater.blockingFindItems(podcast)
 
                 /* Then */
                 assertThat(items).hasSize(50)
@@ -270,7 +270,7 @@ class TF1ReplayUpdaterTest {
                         .then { fileAsJson("/remote/podcast/tf1replay/quotidien.query.extract.json") }
 
                 /* When */
-                val items = updater.findItems(podcast)
+                val items = updater.blockingFindItems(podcast)
 
                 /* Then */
                 assertThat(items).hasSize(50)
@@ -288,7 +288,7 @@ class TF1ReplayUpdaterTest {
                         .then { fileAsJson("/remote/podcast/tf1replay/quotidien.query.bonus.json") }
 
                 /* When */
-                val items = updater.findItems(podcast)
+                val items = updater.blockingFindItems(podcast)
 
                 /* Then */
                 assertThat(items).hasSize(50)
@@ -309,7 +309,7 @@ class TF1ReplayUpdaterTest {
                 )
 
                 /* When */
-                val items = updater.findItems(podcast)
+                val items = updater.blockingFindItems(podcast)
 
                 /* Then */
                 assertThat(items).hasSize(0)
@@ -332,7 +332,7 @@ class TF1ReplayUpdaterTest {
                 )
 
                 /* When */
-                assertThatThrownBy { updater.findItems(podcast) }
+                assertThatThrownBy { updater.blockingFindItems(podcast) }
                         /* Then */
                         .isInstanceOf(RuntimeException::class.java)
                         .hasMessage("Slug not found in podcast with http://www.tf1.fr/ieafjoefjeaoijfoejifaa")

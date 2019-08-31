@@ -67,7 +67,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(podcast.url)
+            val signature = franceTvUpdater.blockingSignatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -82,7 +82,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(podcast.url)
+            val signature = franceTvUpdater.blockingSignatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -97,7 +97,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(podcast.url)
+            val signature = franceTvUpdater.blockingSignatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -113,7 +113,7 @@ class FranceTvUpdaterTest {
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(podcast.url)
+            val signature = franceTvUpdater.blockingSignatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -127,7 +127,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
 
             /* When */
-            val signature = franceTvUpdater.signatureOf(podcast.url)
+            val signature = franceTvUpdater.blockingSignatureOf(podcast.url)
 
             /* Then */
             assertThat(signature)
@@ -158,7 +158,7 @@ class FranceTvUpdaterTest {
             whenever(imageService.fetchCoverInformation(any<String>())).thenReturn(CoverInformation(100, 400, URI("https://foo.bar.com/img.png")))
 
             /* When */
-            val items = franceTvUpdater.findItems(podcast)
+            val items = franceTvUpdater.blockingFindItems(podcast)
 
             /* Then */
             assertThat(items)
@@ -173,7 +173,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(itemUrl)).then { None.toVΛVΓ()  }
 
             /* When */
-            val items = franceTvUpdater.findItems(podcast)
+            val items = franceTvUpdater.blockingFindItems(podcast)
 
             /* Then */
             assertThat(items)
@@ -187,7 +187,7 @@ class FranceTvUpdaterTest {
             whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
 
             /* When */
-            val items = franceTvUpdater.findItems(podcast)
+            val items = franceTvUpdater.blockingFindItems(podcast)
 
             /* Then */
             assertThat(items)

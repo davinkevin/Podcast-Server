@@ -27,14 +27,14 @@ import java.net.URI
 @Scope(SCOPE_PROTOTYPE)
 class MyCanalUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService, val htmlService: HtmlService) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             itemsAsJsonFrom(URI(podcast.url.toASCIIString()))
                     .getOrElse { setOf() }
                     .flatMap { findDetails(it).toList() }
                     .map { toItem(it.second, DOMAIN + it.first.onClick.path) }
                     .toSet()
 
-    override fun signatureOf(url: URI): String {
+    override fun blockingSignatureOf(url: URI): String {
         return itemsAsJsonFrom(url)
                 .map { items -> items.map { it.contentID }.sorted().joinToString(",") }
                 .map { signatureService.fromText(it) }

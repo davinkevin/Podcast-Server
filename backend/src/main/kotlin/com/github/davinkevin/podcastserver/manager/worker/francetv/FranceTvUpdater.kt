@@ -40,7 +40,7 @@ class FranceTvUpdater(
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
 
         val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url.toASCIIString())
 
@@ -85,7 +85,7 @@ class FranceTvUpdater(
                     ) }
                     .getOrElse { defaultItem }
 
-    override fun signatureOf(url: URI): String {
+    override fun blockingSignatureOf(url: URI): String {
 
         val listOfIds = htmlService
                 .get(toReplayUrl(url.toASCIIString())).k()

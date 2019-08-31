@@ -31,7 +31,7 @@ class GulliUpdater(
         val imageService: ImageService
 ) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             htmlService.get(podcast.url.toASCIIString()).k()
                     .map { it.select("div.all-videos ul li.col-md-3") }
                     .getOrElse{ Elements() }
@@ -66,7 +66,7 @@ class GulliUpdater(
                     .flatMap { imageService.fetchCoverInformation(it).toOption() }
                     .getOrElse { null }
 
-    override fun signatureOf(url: URI)=
+    override fun blockingSignatureOf(url: URI)=
             htmlService.get(url.toASCIIString()).k()
                     .flatMap { it.select("div.all-videos ul").firstOption() }
                     .map { it.html() }

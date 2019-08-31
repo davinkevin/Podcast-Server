@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsXml
-import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.SignatureService
@@ -21,7 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
@@ -57,7 +55,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).then { fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml") }
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(15)
@@ -74,7 +72,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(fileAsXml("/remote/podcast/youtube/joueurdugrenier.playlist.xml"))
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(15)
@@ -91,7 +89,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(signatureService.fromText(any())).thenReturn("Signature")
 
         /* When */
-        val signature = updater.signatureOf(podcast.url)
+        val signature = updater.blockingSignatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("Signature")
@@ -109,7 +107,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.blockingSignatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEmpty()
@@ -124,7 +122,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(0)
@@ -139,7 +137,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(0)
@@ -154,7 +152,7 @@ class YoutubeByXmlUpdaterTest {
         whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(0)

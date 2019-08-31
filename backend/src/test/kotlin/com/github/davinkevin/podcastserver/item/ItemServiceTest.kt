@@ -94,7 +94,6 @@ class ItemServiceTest {
         StepVerifier.create(itemService.deleteOldEpisodes())
                 .expectSubscription()
                 .then {
-                    val paths = items.map { it.path }
                     val ids = items.map { it.id }
 
                     verify(repository).findAllToDelete(limit.toOffsetDateTime())

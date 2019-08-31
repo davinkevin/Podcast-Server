@@ -31,7 +31,7 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
         log.info("Youtube Update by API")
 
         val playlistId = findPlaylistId(podcast.url.toASCIIString())
@@ -45,7 +45,7 @@ class YoutubeByApiUpdater(val htmlService: HtmlService, val jsonService: JsonSer
                 .toSet()
     }
 
-    override fun signatureOf(url: URI): String {
+    override fun blockingSignatureOf(url: URI): String {
         val playlistId = findPlaylistId(url.toASCIIString())
 
         val ids = jsonService.parseUrl(asApiPlaylistUrl(playlistId)).k()

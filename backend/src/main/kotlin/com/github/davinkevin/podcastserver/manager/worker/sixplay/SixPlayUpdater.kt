@@ -32,7 +32,7 @@ import java.util.*
 @Component
 class SixPlayUpdater(private val signatureService: SignatureService, private val htmlService: HtmlService, private val jsonService: JsonService, private val imageService: ImageService) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             htmlService.get(podcast.url.toASCIIString())
                     .map { it.select("script") }
                     .map { extractItems(it) }
@@ -85,7 +85,7 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
             .removeSuffix(";")
             .cleanForJsonSerialization()
 
-    override fun signatureOf(url: URI) =
+    override fun blockingSignatureOf(url: URI) =
             htmlService.get(url.toASCIIString()).k()
                     .map { it.select("script") }
                     .flatMap { extractJson(it) }

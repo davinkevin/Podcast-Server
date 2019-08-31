@@ -28,7 +28,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
 
     private val log = LoggerFactory.getLogger(TF1ReplayUpdater::class.java)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
         val baseVideoUrl = extractBaseVideoUrl(podcast.url)
         val url = generateQueryUrl(podcast.url)
 
@@ -93,7 +93,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         cover = video.bestCover().flatMap { Option.fromNullable(coverService.fetchCoverInformation(it)) }.orNull()?.toCoverFromUpdate()
     )
 
-    override fun signatureOf(url: URI): String {
+    override fun blockingSignatureOf(url: URI): String {
         val podcastUrl = generateQueryUrl(url)
 
         return jsonService

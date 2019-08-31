@@ -22,7 +22,7 @@ import java.time.ZonedDateTime
 @Component
 class DailymotionUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService) : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             USER_NAME_EXTRACTOR.on(podcast.url.toASCIIString()).group(1).k()
                     .map { API_LIST_OF_ITEMS.format(it) }
                     .flatMap { jsonService.parseUrl(it).k() }
@@ -37,7 +37,7 @@ class DailymotionUpdater(val signatureService: SignatureService, val jsonService
                     ) }
                     .toSet()
 
-    override fun signatureOf(url: URI): String {
+    override fun blockingSignatureOf(url: URI): String {
         return USER_NAME_EXTRACTOR.on(url.toASCIIString()).group(1).k()
                 .map { API_LIST_OF_ITEMS.format(it) }
                 .map { signatureService.fromUrl(it) }

@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.worker.upload
 
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -23,12 +21,12 @@ class UploadUpdaterTest {
 
     @Test
     fun `should serve items`() {
-        assertThat(updater.findItems(podcast)).isEmpty()
+        assertThat(updater.blockingFindItems(podcast)).isEmpty()
     }
 
     @Test
     fun `should generate an empty signature`() {
-        assertThat(updater.signatureOf(podcast.url)).isEmpty()
+        assertThat(updater.blockingSignatureOf(podcast.url)).isEmpty()
     }
 
     @Test

@@ -2,6 +2,10 @@ package com.github.davinkevin.podcastserver.manager.worker
 
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
 import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
@@ -12,24 +16,34 @@ val NO_MODIFICATION = UpdatePodcastInformation(defaultPodcast, setOf(), "")
 
 interface Updater {
 
+    fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate>
 
-    fun update(podcast: PodcastToUpdate): UpdatePodcastInformation {
-        return try {
-            val signature = signatureOf(podcast.url)
-            if (signature == podcast.signature) {
-                log.info(""""{}" hasn't change""", podcast.url)
-                return NO_MODIFICATION
-            }
-            UpdatePodcastInformation(podcast, findItems(podcast), signature)
-        } catch (e: Exception) {
-            log.info("""podcast with id "{}" and url {} triggered the following error during update""", podcast.id, podcast.url, e)
-            NO_MODIFICATION
-        }
+    fun blockingSignatureOf(url: URI): String
+
+    fun update(podcast: PodcastToUpdate): Mono<UpdatePodcastInformation> {
+        log.info("podcast {} starts update", podcast.url)
+        return signatureOf(podcast.url)
+                .filter { sign ->  (podcast.signature != sign)
+                        .also {
+                            if (it) log.debug("podcast {} has new signature {}", podcast.url, sign)
+                            else log.debug("podcast {} hasn't change", podcast.url)
+                        }
+                }
+                .flatMap { sign ->
+                    findItems(podcast)
+                            .collectList()
+                            .map { it.toSet() }
+                            .doOnNext { log.debug("podcast {} has {} items found", podcast.url, it.size) }
+                            .map { items -> UpdatePodcastInformation(podcast, items, sign) }
+                }
+                .onErrorResume { Mono.empty() }
+                .doOnSuccess { log.info("podcast {} ends update", podcast.url) }
+                .doOnError { log.error("podcast {} ends with error", podcast.url, it) }
     }
 
-    fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate>
+    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = blockingFindItems(podcast).toFlux()
 
-    fun signatureOf(url: URI): String
+    fun signatureOf(url: URI): Mono<String> = blockingSignatureOf(url).toMono()
 
     fun type(): Type
 
@@ -49,9 +63,9 @@ data class ItemFromUpdate(
 )
 data class CoverFromUpdate(val width: Int, val height: Int, val url: URI)
 fun CoverInformation.toCoverFromUpdate() = CoverFromUpdate (
-    height = this@toCoverFromUpdate.height,
-    width = this@toCoverFromUpdate.width,
-    url = this@toCoverFromUpdate.url
+        height = this@toCoverFromUpdate.height,
+        width = this@toCoverFromUpdate.width,
+        url = this@toCoverFromUpdate.url
 )
 
 val defaultItem = ItemFromUpdate(null, ZonedDateTime.now(), null, URI("http://foo.bar"), null, null)

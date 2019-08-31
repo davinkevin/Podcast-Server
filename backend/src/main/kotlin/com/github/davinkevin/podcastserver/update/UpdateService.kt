@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.NO_MODIFICATION
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.service.FileService
@@ -51,13 +50,7 @@ class UpdateService(
                     val signature = if(force || it.signature == null) "" else it.signature
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
-                .map {pu ->
-                        log.info("update of ${pu.url}")
-                        updaters.of(pu.url).update(pu)
-                                .also { log.info("end of update of ${pu.url}") }
-
-                }
-                .filter { it != NO_MODIFICATION }
+                .flatMap {pu -> updaters.of(pu.url).update(pu) }
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .sequential()
                 .doOnTerminate { liveUpdate.isUpdating(false).also { log.info("End of the global update") } }
@@ -74,12 +67,7 @@ class UpdateService(
                 .findById(podcastId)
                 .filter { it.url != null }
                 .map { PodcastToUpdate(it.id, URI(it.url!!), "") }
-                .map {pu ->
-                    log.info("update of ${pu.url}")
-                    updaters.of(pu.url).update(pu)
-                            .also { log.debug("update of ${pu.url} finished with ${it.items}") }
-                }
-                .filter { it != NO_MODIFICATION }
+                .flatMap { updaters.of(it.url).update(it) }
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .doOnTerminate { liveUpdate.isUpdating(false) }
                 .subscribe()

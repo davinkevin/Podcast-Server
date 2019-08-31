@@ -5,15 +5,11 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.defaultItem
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -26,7 +22,6 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
 import java.util.*
-import javax.validation.Validator
 
 /**
  * Created by kevin on 14/10/2016
@@ -52,7 +47,7 @@ class GulliUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = gulliUpdater.signatureOf(podcast.url)
+        val signature = gulliUpdater.blockingSignatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("4d0bb11a29d851eabf10245b00d4cabe")
@@ -64,7 +59,7 @@ class GulliUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = gulliUpdater.signatureOf(podcast.url)
+        val signature = gulliUpdater.blockingSignatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("")
@@ -79,7 +74,7 @@ class GulliUpdaterTest {
         whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation (url = URI(it.getArgument(0)), height = 200, width = 200) }
 
         /* When */
-        val items = gulliUpdater.findItems(podcast)
+        val items = gulliUpdater.blockingFindItems(podcast)
         val first = items.firstOption { it.title!!.contains("13") }.getOrElse { throw RuntimeException("Episode 13 Not Found") }
         val second = items.firstOption { it.title!!.contains("14") }.getOrElse { throw RuntimeException("Episode 14 Not Found") }
 
@@ -102,7 +97,7 @@ class GulliUpdaterTest {
         /* Given */
         whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(IOUtils.fileAsHtml(from("pokemon.with-different-format.html")))
         /* When */
-        val items = gulliUpdater.findItems(podcast)
+        val items = gulliUpdater.blockingFindItems(podcast)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -112,7 +107,7 @@ class GulliUpdaterTest {
         /* Given */
         whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(None.toVΛVΓ())
         /* When */
-        val items = gulliUpdater.findItems(podcast)
+        val items = gulliUpdater.blockingFindItems(podcast)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -125,7 +120,7 @@ class GulliUpdaterTest {
         whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation ( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
 
         /* When */
-        val items = gulliUpdater.findItems(podcast)
+        val items = gulliUpdater.blockingFindItems(podcast)
         /* Then */
         assertThat(items).hasSize(1)
     }
@@ -138,7 +133,7 @@ class GulliUpdaterTest {
         whenever(imageService.fetchCoverInformation(any<String>())).thenReturn(null)
 
         /* When */
-        val items = gulliUpdater.findItems(podcast)
+        val items = gulliUpdater.blockingFindItems(podcast)
         /* Then */
         assertThat(items).hasSize(1)
         assertThat(items.toList()[0].cover).isEqualTo(null)

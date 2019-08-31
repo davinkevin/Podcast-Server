@@ -33,7 +33,7 @@ class ItemHandler(val itemService: ItemService, val fileService: FileService) {
 
     private var log = LoggerFactory.getLogger(ItemHandler::class.java)
 
-    fun clean(s: ServerRequest) =
+    fun clean(@Suppress("UNUSED_PARAMETER") s: ServerRequest) =
             itemService
                     .deleteOldEpisodes()
                     .then(ok().build())

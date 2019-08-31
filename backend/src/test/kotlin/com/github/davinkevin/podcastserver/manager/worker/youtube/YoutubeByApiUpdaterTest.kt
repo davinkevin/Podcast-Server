@@ -49,7 +49,7 @@ class YoutubeByApiUpdaterTest {
         whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml("/remote/podcast/youtube/joueurdugrenier.html"))
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(88)
@@ -70,7 +70,7 @@ class YoutubeByApiUpdaterTest {
         whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcast)
+        val items = updater.blockingFindItems(podcast)
 
         /* Then */
         assertThat(items).hasSize(0)
@@ -89,7 +89,7 @@ class YoutubeByApiUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
-        val signature = updater.signatureOf(podcast.url)
+        val signature = updater.blockingSignatureOf(podcast.url)
 
         /* Then */
         assertThat(signature).isEqualTo("64cc064a14dba90a0df24218db758479")
@@ -105,7 +105,7 @@ class YoutubeByApiUpdaterTest {
         whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val signature = updater.signatureOf(URI(podcast.url!!))
+        val signature = updater.blockingSignatureOf(URI(podcast.url!!))
 
         /* Then */
         assertThat(signature).isEmpty()

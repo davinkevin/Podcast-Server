@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.manager.worker.noop
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.*
+import reactor.core.publisher.toMono
 import java.net.URI
 
 /**
@@ -10,11 +11,11 @@ import java.net.URI
  */
 class NoOpUpdater : Updater {
 
-    override fun update(podcast: PodcastToUpdate) = NO_MODIFICATION
+    override fun update(podcast: PodcastToUpdate) = NO_MODIFICATION.toMono()
 
-    override fun findItems(podcast: PodcastToUpdate) = setOf<ItemFromUpdate>()
+    override fun blockingFindItems(podcast: PodcastToUpdate) = setOf<ItemFromUpdate>()
 
-    override fun signatureOf(url: URI) = ""
+    override fun blockingSignatureOf(url: URI) = ""
 
     override fun type() = Type("NoOpUpdater", "NoOpUpdater")
 

@@ -8,8 +8,6 @@ import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Cover
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.assertj.core.api.Assertions.assertThat
@@ -53,7 +51,7 @@ class RSSUpdaterTest {
         ) }
 
         /* When */
-        val items = updater.findItems(rssAppload)
+        val items = updater.blockingFindItems(rssAppload)
 
         /* Then */
         assertThat(items).hasSize(217)
@@ -75,7 +73,7 @@ class RSSUpdaterTest {
         whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        val items = updater.findItems(podcastNotUpdatable)
+        val items = updater.blockingFindItems(podcastNotUpdatable)
 
         /* Then */
         assertThat(items).isEmpty()
@@ -84,7 +82,7 @@ class RSSUpdaterTest {
     @Test
     fun `should call signature from url`() {
         /* When */
-        updater.signatureOf(rssAppload.url)
+        updater.blockingSignatureOf(rssAppload.url)
 
         /* Then */
         verify(signatureService, times(1)).fromUrl("http://mockUrl.com/")

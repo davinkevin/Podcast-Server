@@ -15,9 +15,9 @@ import java.net.URI
 @Component
 class UploadUpdater : Updater {
 
-    override fun findItems(podcast: PodcastToUpdate) = setOf<ItemFromUpdate>()
+    override fun blockingFindItems(podcast: PodcastToUpdate) = setOf<ItemFromUpdate>()
 
-    override fun signatureOf(url: URI) = ""
+    override fun blockingSignatureOf(url: URI) = ""
 
     override fun type(): Type = TYPE
 

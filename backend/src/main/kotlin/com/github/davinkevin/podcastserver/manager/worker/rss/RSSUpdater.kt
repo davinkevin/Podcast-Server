@@ -22,7 +22,7 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    override fun findItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
             jdomService.parse(podcast.url.toASCIIString())
                     .k()
                     .flatMap { it.rootElement.getChild("channel").toOption() }
@@ -76,7 +76,7 @@ class RSSUpdater(val signatureService: SignatureService, val jdomService: JdomSe
         }
     }
 
-    override fun signatureOf(url: URI) = signatureService.fromUrl(url.toASCIIString())
+    override fun blockingSignatureOf(url: URI) = signatureService.fromUrl(url.toASCIIString())
 
     override fun type() = Type("RSS", "RSS")
 

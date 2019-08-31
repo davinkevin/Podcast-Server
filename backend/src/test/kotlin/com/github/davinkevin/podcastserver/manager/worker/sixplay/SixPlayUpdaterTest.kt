@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils
-import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
@@ -56,7 +55,7 @@ class SixPlayUpdaterTest {
         ) }
 
         /* When */
-        val items = updater.findItems(show)
+        val items = updater.blockingFindItems(show)
 
         /* Then */
         assertThat(items).hasSize(2)
@@ -71,7 +70,7 @@ class SixPlayUpdaterTest {
         /* Given */
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
         /* When */
-        val items = updater.findItems(show)
+        val items = updater.blockingFindItems(show)
         /* Then */
         assertThat(items).isEmpty()
     }
@@ -83,7 +82,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
-        assertThatThrownBy { updater.findItems(show) }
+        assertThatThrownBy { updater.blockingFindItems(show) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -96,7 +95,7 @@ class SixPlayUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-without-js.html"))
 
         /* When */
-        assertThatThrownBy { updater.findItems(show) }
+        assertThatThrownBy { updater.blockingFindItems(show) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -110,7 +109,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
 
         /* When */
-        assertThatThrownBy { updater.findItems(show) }
+        assertThatThrownBy { updater.blockingFindItems(show) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -130,7 +129,7 @@ class SixPlayUpdaterTest {
         ) }
 
         /* When */
-        val items = updater.findItems(show)
+        val items = updater.blockingFindItems(show)
 
         /* Then */
         assertThat(items).hasSize(2)
@@ -149,7 +148,7 @@ class SixPlayUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
-        val signature = updater.signatureOf(show.url)
+        val signature = updater.blockingSignatureOf(show.url)
 
         /* THEN  */
         assertThat(signature).isNotEmpty()
@@ -161,7 +160,7 @@ class SixPlayUpdaterTest {
         whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(show.url) }
+        assertThatThrownBy { updater.blockingSignatureOf(show.url) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -175,7 +174,7 @@ class SixPlayUpdaterTest {
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
-        assertThatThrownBy { updater.signatureOf(show.url) }
+        assertThatThrownBy { updater.blockingSignatureOf(show.url) }
 
                 /* Then */
                 .isInstanceOf(RuntimeException::class.java)
@@ -190,8 +189,8 @@ class SixPlayUpdaterTest {
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
-        val s1 = updater.signatureOf(show.url)
-        val s2 = updater.signatureOf(show.url)
+        val s1 = updater.blockingSignatureOf(show.url)
+        val s2 = updater.blockingSignatureOf(show.url)
 
         /* THEN  */
         assertThat(s1).isEqualToIgnoringCase(s2)
