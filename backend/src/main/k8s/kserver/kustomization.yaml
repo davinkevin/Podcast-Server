@@ -5,12 +5,12 @@ namespace: podcast-server
 
 resources:
   - ../base/
-  - ingress.yaml
 
 patchesStrategicMerge:
   - backend.yaml
   - database.yaml
   - fs.yaml
+  - ingress.yaml
 
 configMapGenerator:
   - files:

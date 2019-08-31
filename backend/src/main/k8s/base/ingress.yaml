@@ -3,19 +3,11 @@ kind: Ingress
 metadata:
   name: podcast-server
 spec:
-  tls:
-    - hosts:
-        - podcast-server.tk
-      secretName: podcast-server-tls
   rules:
-    - host: podcast-server.tk
+    - name: podcast-server
       http:
         paths:
           - path: /api
-            backend:
-              serviceName: podcast-server
-              servicePort: 8080
-          - path: /actuator
             backend:
               serviceName: podcast-server
               servicePort: 8080

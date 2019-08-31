@@ -6,3 +6,4 @@ resources:
   - database.yaml
   - ui.yaml
   - fs.yaml
+  - ingress.yaml
