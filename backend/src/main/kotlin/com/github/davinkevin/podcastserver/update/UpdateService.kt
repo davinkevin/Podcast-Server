@@ -22,6 +22,7 @@ import reactor.util.function.component2
 import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.random.Random
 import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
@@ -47,7 +48,7 @@ class UpdateService(
                 .runOn(Schedulers.parallel())
                 .filter { it.url != null }
                 .map {
-                    val signature = if(force || it.signature == null) "" else it.signature
+                    val signature = if(force || it.signature == null) UUID.randomUUID().toString() else it.signature
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
                 .flatMap {pu -> updaters.of(pu.url).update(pu) }
@@ -66,7 +67,7 @@ class UpdateService(
         podcastRepository
                 .findById(podcastId)
                 .filter { it.url != null }
-                .map { PodcastToUpdate(it.id, URI(it.url!!), "") }
+                .map { PodcastToUpdate(it.id, URI(it.url!!), UUID.randomUUID().toString()) }
                 .flatMap { updaters.of(it.url).update(it) }
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .doOnTerminate { liveUpdate.isUpdating(false) }
