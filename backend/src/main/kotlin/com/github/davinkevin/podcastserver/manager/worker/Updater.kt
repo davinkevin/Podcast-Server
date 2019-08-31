@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
+import java.lang.Exception
 import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
@@ -36,14 +37,18 @@ interface Updater {
                             .doOnNext { log.debug("podcast {} has {} items found", podcast.url, it.size) }
                             .map { items -> UpdatePodcastInformation(podcast, items, sign) }
                 }
-                .onErrorResume { Mono.empty() }
                 .doOnSuccess { log.info("podcast {} ends update", podcast.url) }
                 .doOnError { log.error("podcast {} ends with error", podcast.url, it) }
+                .onErrorResume { Mono.empty() }
     }
 
-    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = blockingFindItems(podcast).toFlux()
+    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = try {
+        blockingFindItems(podcast).toFlux()
+    } catch (e: Exception) { Flux.error(e) }
 
-    fun signatureOf(url: URI): Mono<String> = blockingSignatureOf(url).toMono()
+    fun signatureOf(url: URI): Mono<String> = try {
+        blockingSignatureOf(url).toMono()
+    } catch (e: Exception) { Mono.error(e) }
 
     fun type(): Type
 
