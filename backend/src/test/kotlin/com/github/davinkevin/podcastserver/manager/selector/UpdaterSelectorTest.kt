@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.manager.worker.dailymotion.Dailymotio
 import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
-import com.github.davinkevin.podcastserver.manager.worker.rss.RSSUpdater
+import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
