@@ -4,8 +4,7 @@ metadata:
   name: podcast-server
 spec:
   rules:
-    - name: podcast-server
-      http:
+    - http:
         paths:
           - path: /api
             backend:
