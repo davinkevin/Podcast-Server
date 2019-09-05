@@ -18,6 +18,8 @@ configMapGenerator:
     name: podcast-server
   - files:
       - local-ingress/default.conf
+      - local-ingress/localhost.crt
+      - local-ingress/localhost.key
     name: local-ingress
 
 secretGenerator:
