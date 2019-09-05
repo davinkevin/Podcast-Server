@@ -26,13 +26,12 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 * building ui: `env CI_COMMIT_TAG=latest ./ui/build.sh` (with both front already built before)
 * building fs: `env CI_COMMIT_TAG=latest ./files-system/build.sh`
 
-### Start components one by one
+### Start components with Skaffold:
 
-* backend: `docker run --rm -it --link ps-database:ps-database -p 8080:8080 -v /tmp/podcast-server:/tmp/podcast-server -e SPRING_DATASOURCE_URL="jdbc:h2:tcp://ps-database:1521/podcast-server" davinkevin/podcast-server:local-dev`
-* file-system: `docker run --rm -it -p 8181:80 -v /tmp/podcast-server/:/var/www/podcast-server-files/data/ --name ps-fs podcastserver/file-system:latest`
-* h2 database: `docker run --rm -it -p 8999:81 -p 1521:1521 -v /tmp/h2-podcast-server:/opt/h2-data --name ps-database oscarfonts/h2:latest`
-* Update model of the database: `mvn -f backend/pom.xml liquibase:dropAll liquibase:update -Ddatabase.url=jdbc:h2:tcp://localhost:1521/podcast-server` 
-* frontend: `./target/node/npm run serve`
+* Create root file system: `mkdir -p /tmp/podcast-server/files/ /tmp/podcast-server/database/ /tmp/podcast-server/database/backup/ /tmp/podcast-server/files/`
+* Init the database: `mvn -f backend/pom.xml liquibase:dropAll liquibase:update -Ddatabase.url=jdbc:h2:/tmp/podcast-server/database/podcast-server`
+* Start every components: `skaffold dev`
+* Access the application on `http:localhost/` and/or define a name alias in your `/etc/hosts` file
 
 ## License
 

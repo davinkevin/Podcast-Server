@@ -1,0 +1,16 @@
+apiVersion: skaffold/v1beta13
+kind: Config
+build:
+  artifacts:
+    - image: podcastserver/backend
+      context: backend
+      jibMaven:
+        args:
+          - liquibase:dropAll
+          - liquibase:update
+          - jooq-codegen:generate
+          - compile
+          - -Dmaven.test.skip
+deploy:
+  kustomize:
+    path: backend/src/main/k8s/docker-for-mac/

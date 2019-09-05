@@ -1,0 +1,47 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: local-ingress
+spec:
+  selector:
+    app: local-ingress
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http
+    - protocol: TCP
+      port: 443
+      name: https
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: local-ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: local-ingress
+  template:
+    metadata:
+      labels:
+        app: local-ingress
+    spec:
+      containers:
+        - image: nginx:latest
+          name: local-ingress
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          volumeMounts:
+            - name: local-ingress
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: local-ingress
+          configMap:
+            name: local-ingress
+

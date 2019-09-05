@@ -1,0 +1,11 @@
+
+podcastserver:
+  rootfolder: /podcasts
+  concurrent-download: 40
+  max-update-parallels: 256
+  number-of-day-to-download: 30
+  number-of-day-to-save-cover: 30
+
+spring:
+  datasource.url: jdbc:h2:tcp://database:1521/podcast-server
+  jpa.hibernate.ddl-auto: none
