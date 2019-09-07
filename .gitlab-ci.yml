@@ -144,6 +144,24 @@ stages:
     policy: pull
     paths:
       - .m2/
+  environment:
+    name: backend/$CI_COMMIT_REF_SLUG
+    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/backend/tags
+    on_stop: 🗑 backend
+
+🗑 backend:
+  stage: 🐳 packaging
+  image: tutum/curl
+  dependencies: []
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/backend/tags/$CI_COMMIT_REF_SLUG/
+    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/backend-base-image/tags/$CI_COMMIT_REF_SLUG/
+  when: manual
+  environment:
+    name: backend/$CI_COMMIT_REF_SLUG
+    action: stop
 
 🐳 file-system:
   stage: 🐳 packaging
@@ -159,6 +177,23 @@ stages:
     - export PROJECT_DIR=$CI_PROJECT_DIR/files-system/target/docker/
     - /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/files-system/target/docker/Dockerfile --destination podcastserver/file-system:${VERSION}
     - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/files-system/target/docker/Dockerfile --destination podcastserver/file-system:latest ; fi
+  environment:
+    name: file-system/$CI_COMMIT_REF_SLUG
+    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/file-system/tags
+    on_stop: 🗑 file-system
+
+🗑 file-system:
+  stage: 🐳 packaging
+  image: tutum/curl
+  dependencies: []
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/file-system/tags/$CI_COMMIT_REF_SLUG/
+  when: manual
+  environment:
+    name: file-system/$CI_COMMIT_REF_SLUG
+    action: stop
 
 🐳 ui:
   stage: 🐳 packaging
@@ -174,3 +209,20 @@ stages:
     - export PROJECT_DIR=$CI_PROJECT_DIR/ui/target/docker/
     - /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/ui/target/docker/Dockerfile --destination podcastserver/ui:${VERSION}
     - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/files-system/target/docker/Dockerfile --destination podcastserver/ui:latest ; fi
+  environment:
+    name: ui/$CI_COMMIT_REF_SLUG
+    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/ui/tags
+    on_stop: 🗑 ui
+
+🗑 ui:
+  stage: 🐳 packaging
+  image: tutum/curl
+  dependencies: []
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/ui/tags/$CI_COMMIT_REF_SLUG/
+  when: manual
+  environment:
+    name: ui/$CI_COMMIT_REF_SLUG
+    action: stop
