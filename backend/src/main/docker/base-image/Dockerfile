@@ -3,7 +3,7 @@ FROM debian:10 AS downloader
 WORKDIR /opt
 
 RUN apt-get update && \
-    apt-get install tree curl xz-utils python -y && \
+    apt-get install tree curl xz-utils -y && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /opt/ffmpeg && \
