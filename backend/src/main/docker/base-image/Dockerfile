@@ -12,7 +12,7 @@ RUN mkdir /opt/ffmpeg && \
     curl -qsSL https://yt-dl.org/downloads/latest/youtube-dl -o /opt/youtube-dl/youtube-dl && chmod +x /opt/youtube-dl/youtube-dl && \
     tree /opt/
 
-FROM openjdk:8-slim as base-image
+FROM openjdk:11-slim as base-image
 RUN apt-get update && apt-get install python rtmpdump -y --no-install-recommends && \
       rm -rf /var/lib/apt/lists/* && \
       apt-get autoremove

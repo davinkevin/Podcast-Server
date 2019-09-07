@@ -38,18 +38,6 @@ class ProcessServiceTest {
     }
 
     @Test
-    fun `should return invalid value if not on unix`() {
-        /* Given */
-        val process = mock<Process>()
-
-        /* When */
-        val pid = processService.pidOf(process)
-
-        /* Then */
-        assertThat(pid).isEqualTo(-1)
-    }
-
-    @Test
     fun `should start a process`() {
         /* Given */
         val processBuilder = ProcessBuilder("echo", "foo")

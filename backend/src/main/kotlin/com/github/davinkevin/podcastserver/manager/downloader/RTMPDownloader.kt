@@ -31,7 +31,7 @@ class RTMPDownloader(
 
     private val log = LoggerFactory.getLogger(RTMPDownloader::class.java)
 
-    internal var pid = 0
+    internal var pid = 0L
     private var p: Process? = null
 
     override fun download(): Item {

@@ -149,7 +149,7 @@ class RTMPDownloaderTest {
             private val pb = mock<ProcessBuilder>()
             private val p = mock<Process>()
             private val parameters = arrayOf("/usr/local/bin/rtmpdump","-r", item.url!!, "-o", destination.toAbsolutePath().toString())
-            private val pid = 1234
+            private val pid = 1234L
 
             @BeforeEach
             fun beforeEach() {
