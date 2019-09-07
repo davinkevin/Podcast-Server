@@ -175,8 +175,8 @@ stages:
     - sh ./files-system/compile.sh
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
     - export PROJECT_DIR=$CI_PROJECT_DIR/files-system/target/docker/
-    - /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/files-system/target/docker/Dockerfile --destination podcastserver/file-system:${VERSION}
-    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/files-system/target/docker/Dockerfile --destination podcastserver/file-system:latest ; fi
+    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/file-system:${VERSION}
+    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/file-system:latest ; fi
   environment:
     name: file-system/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/file-system/tags
@@ -207,8 +207,8 @@ stages:
     - sh ./ui/compile.sh
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
     - export PROJECT_DIR=$CI_PROJECT_DIR/ui/target/docker/
-    - /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/ui/target/docker/Dockerfile --destination podcastserver/ui:${VERSION}
-    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $CI_PROJECT_DIR/files-system/target/docker/Dockerfile --destination podcastserver/ui:latest ; fi
+    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:${VERSION}
+    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:latest ; fi
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/ui/tags
