@@ -166,7 +166,7 @@ class Item {
                 .getOrElse { null }
 
     fun addATry() {
-        this.numberOfFail = this.numberOfFail!!+1
+        this.numberOfFail = (this.numberOfFail ?: 0) +1
     }
 
     override fun equals(other: Any?): Boolean {
