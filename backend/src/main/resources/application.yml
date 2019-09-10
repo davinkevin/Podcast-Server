@@ -56,11 +56,6 @@ podcastserver:
  #download-extension: .psdownload
  #rss-default-number-item: 50
  update-and-download.refresh.cron: 0 0 0 * * ?
- backup :
-  location: /tmp/podcast-server/backup/
-  cron: 0 30 4 * * ?
-  binary: false
-  enabled: false
  externaltools:
   #rtmpdump: /usr/local/bin/rtmpdump
   #ffmpeg: /usr/local/bin/ffmpeg
