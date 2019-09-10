@@ -25,6 +25,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
+import java.net.URL
 import java.time.ZoneOffset
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
@@ -147,6 +148,20 @@ class RSSUpdaterTest {
                     .expectSubscription()
                     .verifyComplete()
         }
+
+        @Test
+        fun `should support url with space in it by replacing it with + char`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast).filter { it.url.toASCIIString().contains("+") })
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextCount(1)
+                    .verifyComplete()
+        }
     }
 
     @Nested
@@ -164,7 +179,7 @@ class RSSUpdaterTest {
             StepVerifier.create(updater.signatureOf(podcast.url))
                     /* Then */
                     .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("055d69324c495fe43fa84a3aceb61a0f") }
+                    .assertNext { assertThat(it).isEqualTo("9fd84a178f4b4d93384e4affb55b7d10") }
                     .verifyComplete()
         }
 

@@ -66,7 +66,7 @@ class RSSUpdater(
         else
             element.getChild("enclosure").getAttributeValue("url")
 
-        return URI(url)
+        return URI(url.replace(" ", "+"))
     }
 
     private fun getPubDate(item: Element): ZonedDateTime? {
