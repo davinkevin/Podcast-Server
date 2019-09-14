@@ -1,17 +1,16 @@
 package com.github.davinkevin.podcastserver.item
 
-import com.github.davinkevin.podcastserver.database.Keys.CONSTRAINT_2273
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.entity.Status.FINISH
+import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.extension.repository.*
 import org.jooq.DSLContext
 import org.jooq.Record18
 import org.jooq.impl.DSL.*
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toFlux
 import reactor.util.function.component1
 import reactor.util.function.component2
@@ -22,8 +21,9 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-03
  */
-@Repository
 class ItemRepositoryV2(private val query: DSLContext) {
+
+    private val log = LoggerFactory.getLogger(ItemRepositoryV2::class.java)
 
     fun findById(id: UUID) = Mono.defer {
         query
@@ -66,7 +66,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun updateAsDeleted(items: Collection<UUID>) = Mono.defer {
         query
                 .update(ITEM)
-                .set(ITEM.STATUS, Status.DELETED.toString())
+                .set(ITEM.STATUS, DELETED.toString())
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .where(ITEM.ID.`in`(items))
                 .executeAsyncAsMono()
@@ -85,7 +85,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun resetById(id: UUID): Mono<Item> = Mono.defer {
         query
                 .update(ITEM)
-                .set(ITEM.STATUS, Status.NOT_DOWNLOADED.toString())
+                .set(ITEM.STATUS, NOT_DOWNLOADED.toString())
                 .set(ITEM.DOWNLOAD_DATE, value<Timestamp>(null))
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .set(ITEM.NUMBER_OF_FAIL, 0)
@@ -232,6 +232,19 @@ class ItemRepositoryV2(private val query: DSLContext) {
                         .then(insertItem)
                         .then(findById(id))
             }
+
+    fun resetItemWithDownloadingState(): Mono<Void> = Mono.defer {
+        query
+                .update(ITEM)
+                .set(ITEM.STATUS, NOT_DOWNLOADED.toString())
+                .where(ITEM.STATUS.`in`(
+                        STARTED.toString(),
+                        PAUSED.toString()
+                ))
+                .executeAsyncAsMono()
+                .then()
+                .doOnTerminate { log.info("Reset of item with downloading state done") }
+    }
 }
 
 private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Timestamp, String, String, Long, String, String, UUID, String, String, UUID, String, Int, Int>): Item {

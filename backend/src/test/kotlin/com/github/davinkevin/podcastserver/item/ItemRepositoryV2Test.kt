@@ -3,8 +3,8 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.database.Tables.COVER
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.entity.Status.Companion.of
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
@@ -24,10 +24,8 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
 import java.net.URI
-import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
-import java.time.temporal.ChronoUnit
-import java.time.temporal.ChronoUnit.*
+import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
 import javax.sql.DataSource
@@ -1068,5 +1066,52 @@ class ItemRepositoryV2Test {
         }
     }
 
+    @Nested
+    @DisplayName("should find item in downloading state")
+    inner class ShouldFindItemInDownloadingState {
+
+        private val itemDownloadStartedAndPaused = sequenceOf(
+                insertInto("ITEM")
+                        .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION")
+                        .values(fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 140", "http://fakeurl.com/geekinc.140.mp3", "geekinc.140.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter), now().minusMonths(2).format(formatter), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "geekinc.141.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), PAUSED, now().minusDays(1).format(formatter), null, now().minusWeeks(2).format(formatter), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "geekinc.142.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(1).format(formatter), null, now().minusWeeks(1).format(formatter), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .build()
+        )
+
+        @BeforeEach
+        fun prepare() {
+            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA, itemDownloadStartedAndPaused)
+            DbSetup(DataSourceDestination(dataSource), operation).launch()
+        }
+
+        @Test
+        fun `with success`() {
+            /* Given */
+            val ids = listOf(
+                    fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"),
+                    fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"),
+                    fromString("0a674614-c867-44df-b7e0-5e5af31f7b56")
+            )
+            /* When */
+            StepVerifier.create(repository.resetItemWithDownloadingState())
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            val statuses = query
+                    .selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
+                    .map { of(it[ITEM.STATUS]) }
+
+             val others = query
+                    .selectFrom(ITEM).where(ITEM.ID.notIn(ids)).orderBy(ITEM.ID.asc()).fetch()
+                    .map { it[ITEM.STATUS] }
+                    .filterNotNull().map(::of).toSet()
+
+            assertThat(statuses).containsOnly(NOT_DOWNLOADED)
+            assertThat(others).containsOnly(FINISH, NOT_DOWNLOADED, DELETED, FINISH, FAILED)
+        }
+
+    }
 
 }

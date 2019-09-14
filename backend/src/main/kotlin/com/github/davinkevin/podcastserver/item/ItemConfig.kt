@@ -1,14 +1,17 @@
 package com.github.davinkevin.podcastserver.item
 
+import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.web.reactive.function.server.router
+import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
 
 /**
  * Created by kevin on 2019-02-03
  */
 @Configuration
+@Import(ItemHandler::class)
 class ItemRoutingConfig {
 
     @Bean
@@ -32,5 +35,14 @@ class ItemRoutingConfig {
 }
 
 @Configuration
-@Import(ItemRepositoryV2::class, ItemRoutingConfig::class, ItemService::class, ItemHandler::class)
-class ItemConfig
+@Import(ItemRepository::class, ItemRoutingConfig::class, ItemService::class)
+class ItemConfig {
+
+    @Bean
+    fun onStartupCleanInvalidStateItems(item: ItemRepository) = CommandLineRunner {
+        item
+                .resetItemWithDownloadingState()
+                .block()
+    }
+
+}
