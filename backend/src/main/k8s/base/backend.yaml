@@ -75,7 +75,7 @@ kind: CronJob
 metadata:
   name: podcast-server-delete-old-covers
 spec:
-  schedule: "0 4 * * *"
+  schedule: "30 4 * * *"
   successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
