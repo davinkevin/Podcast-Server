@@ -33,6 +33,8 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 * Start every components: `skaffold dev`
 * Access the application on `https://localhost/` and/or define a name alias in your `/etc/hosts` file
 
+OR, you can execute the `dev.sh` file 🤩.
+
 ## License
 
 Copyright 2018 DAVIN KEVIN
