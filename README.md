@@ -31,7 +31,7 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 * Create root file system: `mkdir -p /tmp/podcast-server/files/ /tmp/podcast-server/database/ /tmp/podcast-server/database/backup/ /tmp/podcast-server/files/`
 * Init the database: `mvn -f backend/pom.xml liquibase:dropAll liquibase:update -Ddatabase.url=jdbc:h2:/tmp/podcast-server/database/podcast-server`
 * Start every components: `skaffold dev`
-* Access the application on `http:localhost/` and/or define a name alias in your `/etc/hosts` file
+* Access the application on `https://localhost/` and/or define a name alias in your `/etc/hosts` file
 
 ## License
 
