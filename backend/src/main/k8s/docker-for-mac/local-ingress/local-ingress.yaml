@@ -9,6 +9,9 @@ spec:
     - protocol: TCP
       port: 443
       name: https
+    - protocol: TCP
+      port: 80
+      name: http
   type: LoadBalancer
 ---
 apiVersion: apps/v1
