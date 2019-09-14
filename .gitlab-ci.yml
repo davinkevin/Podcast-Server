@@ -49,7 +49,7 @@ stages:
 
 🧪 backend:
   stage: 🧪 test
-  image: openjdk:11-slim
+  image: openjdk:11
   needs: [⬇ backend]
   script:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate test -Ddatabase.url=jdbc:h2:/tmp/podcast-server jacoco:report
