@@ -39,8 +39,7 @@ spec:
         serving: "true"
     spec:
       containers:
-        - image: podcastserver/backend:master
-          imagePullPolicy: Always
+        - image: podcastserver/backend
           name: app
           ports:
             - name: http-port

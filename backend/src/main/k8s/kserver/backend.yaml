@@ -7,6 +7,8 @@ spec:
     spec:
       containers:
         - name: app
+          image: podcastserver/backend:latest
+          imagePullPolicy: Always
           env:
             - name: PODCASTSERVER_API_YOUTUBE
               valueFrom:
