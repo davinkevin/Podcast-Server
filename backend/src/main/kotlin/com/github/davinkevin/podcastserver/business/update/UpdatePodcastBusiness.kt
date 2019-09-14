@@ -38,20 +38,10 @@ class UpdatePodcastBusiness(
         val podcastRepository: PodcastRepository,
         val itemRepository: ItemRepository,
         val template: MessagingTemplate,
-        val podcastServerParameters: PodcastServerParameters,
-        val coverBusiness: CoverBusiness
+        val podcastServerParameters: PodcastServerParameters
 ) {
 
     val log = LoggerFactory.getLogger(this.javaClass.name)!!
-
-    fun deleteOldCover() {
-        log.info("Deletion of old covers item")
-
-        itemRepository
-                .findAllToDelete(podcastServerParameters.limitToKeepCoverOnDisk())
-                .flatMap { coverBusiness.getCoverPathOf(it) }
-                .forEach { Try { Files.deleteIfExists(it) } }
-    }
 
     @PostConstruct
     fun resetItemWithIncorrectState() {

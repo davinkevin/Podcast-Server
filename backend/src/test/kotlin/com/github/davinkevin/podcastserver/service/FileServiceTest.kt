@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.service
 
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.item.CoverForItem
 import com.github.davinkevin.podcastserver.item.DeleteItemInformation
@@ -10,7 +12,6 @@ import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -28,13 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.FileSystemUtils
-import reactor.core.publisher.Hooks
-import reactor.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.nio.file.Files
@@ -56,7 +54,7 @@ class FileServiceTest {
     @Autowired lateinit var p: PodcastServerParameters
     @Autowired lateinit var mimeTypeService: MimeTypeService
 
-    private val tempFolder = Paths.get("/tmp", "podcast-server", "FileService")
+    private val tempFolder = Paths.get("/tmp", "podcast-server-testing-folder", "FileService")
 
     @BeforeEach
     fun beforeEach() {
@@ -66,7 +64,7 @@ class FileServiceTest {
 
     @AfterEach
     fun afterEach() {
-        FileSystemUtils.deleteRecursively(tempFolder.toFile())
+        FileSystemUtils.deleteRecursively(tempFolder)
     }
 
     @Test
@@ -276,6 +274,52 @@ class FileServiceTest {
                     .assertNext { assertThat(it).isCloseTo(3, withPercentage(1.toDouble())) }
                     .verifyComplete()
         }
+    }
+
+    @Nested
+    @DisplayName("should delete cover")
+    inner class ShouldDeleteCover {
+
+        private val podcastName = "podcastCoverToDelete"
+        private val podcastPath = tempFolder.resolve(podcastName)
+
+        @BeforeEach
+        fun beforeEach() {
+            Files.createDirectory(tempFolder.resolve(podcastName))
+        }
+
+        @Test
+        fun `when cover exists`() {
+            /* Given */
+            val itemId = UUID.randomUUID()
+            Files.createFile(podcastPath.resolve("$itemId.png"))
+            /* When */
+            StepVerifier.create(fileService.deleteCover(DeleteCoverInformation(
+                    UUID.randomUUID(), "png",
+                    ItemInformation(itemId, "foo"),
+                    PodcastInformation(UUID.randomUUID(), podcastName)
+            )))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(true)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `when cover does not exist`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(fileService.deleteCover(DeleteCoverInformation(
+                    UUID.randomUUID(), "png",
+                    ItemInformation(UUID.randomUUID(), "foo"),
+                    PodcastInformation(UUID.randomUUID(), podcastName)
+            )))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(false)
+                    .verifyComplete()
+        }
+
     }
 
     @TestConfiguration

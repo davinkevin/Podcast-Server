@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.service
 
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation
 import com.github.davinkevin.podcastserver.item.CoverForItem
 import com.github.davinkevin.podcastserver.item.DeleteItemInformation
 import com.github.davinkevin.podcastserver.item.Item
@@ -21,6 +22,7 @@ import reactor.netty.http.client.HttpClient
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 
 /**
  * Created by kevin on 2019-02-09
@@ -45,13 +47,21 @@ class FileService(
                 .toMono()
     }
 
-    fun coverExists(p: Podcast): Mono<String> = exists(
-            Paths.get(p.title).resolve("${p.id}.${p.cover.extension()}")
-    )
+    fun deleteCover(cover: DeleteCoverInformation): Mono<Boolean> {
+        val file = p.rootfolder
+                .resolve(cover.podcast.title)
+                .resolve(cover.item.id.toString() + "." + cover.extension)
 
-    fun coverExists(i: Item): Mono<String> = exists(
-            Paths.get(i.podcast.title).resolve("${i.id}.${i.cover.extension()}")
-    )
+        log.info("Deletion of file {}", file)
+
+        return Files.deleteIfExists(file)
+                .toMono()
+    }
+
+    fun coverExists(p: Podcast): Mono<String> = coverExists(p.title, p.id, p.cover.extension())
+    fun coverExists(i: Item): Mono<String> = coverExists(i.podcast.title, i.id, i.cover.extension())
+    fun coverExists(podcastTitle: String, itemId: UUID, extension: String): Mono<String> =
+            exists(Paths.get(podcastTitle).resolve("$itemId.$extension"))
 
     private fun exists(path: Path) = Mono.defer {
         val file = p.rootfolder.resolve(path)
