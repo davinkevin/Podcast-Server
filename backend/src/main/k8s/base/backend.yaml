@@ -90,3 +90,24 @@ spec:
                 - -c
                 - curl -qsL -X DELETE http://podcast-server.podcast-server.svc.cluster.local:8080/api/v1/covers
           restartPolicy: OnFailure
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: podcast-server-delete-old-items
+spec:
+  schedule: "30 5 * * *"
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: podcast-server-delete-old-items
+              image: tutum/curl
+              imagePullPolicy: IfNotPresent
+              args:
+                - /bin/sh
+                - -c
+                - curl -qsL -X DELETE http://podcast-server.podcast-server.svc.cluster.local:8080/v1/items/clean
+          restartPolicy: OnFailure
