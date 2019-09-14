@@ -27,14 +27,14 @@ class DownloaderSelectorTest {
     @MockBean lateinit var httpDownloader: HTTPDownloader
     @MockBean lateinit var ffmpegDownloader: FfmpegDownloader
     @MockBean lateinit var rtmpDownloader: RTMPDownloader
-    @MockBean lateinit var youtubeDownloader: YoutubeDownloader
+    @MockBean lateinit var youtubeDLownloader: YoutubeDlDownloader
 
     @Autowired lateinit var applicationContext: ApplicationContext
     lateinit var selector: DownloaderSelector
 
     @BeforeEach
     fun beforeEach() {
-        val downloaders = setOf(httpDownloader, ffmpegDownloader, rtmpDownloader, youtubeDownloader)
+        val downloaders = setOf(httpDownloader, ffmpegDownloader, rtmpDownloader, youtubeDLownloader)
 
         downloaders.forEach { whenever(it.compatibility(any())).thenCallRealMethod()}
 
@@ -64,7 +64,7 @@ class DownloaderSelectorTest {
                         DownloaderArgument("http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/tnt/tnt1217/tnt1217.mp3", HTTPDownloader::class),
                         DownloaderArgument("http://foo.bar.com/a/path/with/file.m3u8", FfmpegDownloader::class),
                         DownloaderArgument("rtmp://ma.video.free.fr/video.mp4/audio/tnt/tnt1217/tnt1217.mp3", RTMPDownloader::class),
-                        DownloaderArgument("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata", YoutubeDownloader::class)
+                        DownloaderArgument("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata", YoutubeDlDownloader::class)
                 )
     }
 }
