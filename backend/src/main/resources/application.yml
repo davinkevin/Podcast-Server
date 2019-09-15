@@ -50,8 +50,6 @@ podcastserver:
  #concurrent-download: 2
  max-update-parallels: 256
  #cover-default-name: cover
- number-of-day-to-download: 30
- number-of-day-to-save-cover: 30
  #number-of-try: 10
  #download-extension: .psdownload
  #rss-default-number-item: 50

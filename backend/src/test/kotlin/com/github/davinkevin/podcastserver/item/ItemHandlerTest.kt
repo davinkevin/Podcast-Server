@@ -3,10 +3,7 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.service.FileService
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -15,14 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.nio.file.Path
+import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
 
@@ -35,8 +35,8 @@ import java.util.*
 class ItemHandlerTest {
 
     @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var itemService: ItemService
-    @MockBean lateinit var fileService: FileService
+    @Autowired lateinit var itemService: ItemService
+    @Autowired lateinit var fileService: FileService
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
@@ -71,13 +71,26 @@ class ItemHandlerTest {
     inner class ShouldDelete {
 
         @Test
-        fun `and returns ok`() {
+        fun `with the default number of days to keep because no parameters`() {
             /* Given */
-            whenever(itemService.deleteOldEpisodes()).thenReturn(Mono.just(1).then())
+            whenever(itemService.deleteItemOlderThan(fixedDate.minusDays(30))).thenReturn(Mono.empty())
 
             /* When */
             rest.delete()
-                    .uri("/api/v1/items/clean")
+                    .uri("/api/v1/items")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+        }
+
+        @Test
+        fun `with number of days to keep on the url query params`() {
+            /* Given */
+            whenever(itemService.deleteItemOlderThan(fixedDate.minusDays(60))).thenReturn(Mono.empty())
+
+            /* When */
+            rest.delete()
+                    .uri("/api/v1/items?days=60")
                     .exchange()
                     /* Then */
                     .expectStatus().isOk
@@ -602,5 +615,12 @@ class ItemHandlerTest {
         }
     }
 
-
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun mockItemService(): ItemService = mock()
+        @Bean fun mockFileService(): FileService = mock()
+        @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
+    }
 }
+
+private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)

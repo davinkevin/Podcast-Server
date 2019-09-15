@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Component
@@ -22,6 +21,7 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.switchIfEmpty
 import reactor.core.publisher.toMono
 import java.net.URI
+import java.time.Clock
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -29,14 +29,26 @@ import java.util.*
  * Created by kevin on 2019-02-09
  */
 @Component
-class ItemHandler(val itemService: ItemService, val fileService: FileService) {
+class ItemHandler(
+        private val itemService: ItemService,
+        private val fileService: FileService,
+        private val clock: Clock
+) {
 
     private var log = LoggerFactory.getLogger(ItemHandler::class.java)
 
-    fun clean(@Suppress("UNUSED_PARAMETER") s: ServerRequest) =
-            itemService
-                    .deleteOldEpisodes()
-                    .then(ok().build())
+    fun clean(r: ServerRequest): Mono<ServerResponse> {
+        val retentionNumberOfDays = r.queryParam("days")
+                .map { it.toLong() }
+                .orElse(30L)
+
+        val date = OffsetDateTime.now(clock)
+                .minusDays(retentionNumberOfDays)
+
+        return itemService
+                .deleteItemOlderThan(date)
+                .then(ok().build())
+    }
 
     fun reset(s: ServerRequest): Mono<ServerResponse> {
         val id = UUID.fromString(s.pathVariable("id"))

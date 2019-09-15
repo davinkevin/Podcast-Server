@@ -20,6 +20,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import reactor.core.publisher.Mono
+import java.time.Clock
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 
 class ItemConfigTest {
@@ -62,4 +66,7 @@ class ItemDependencyMockConfig {
     @Bean @Primary fun mockPodcastRepository(): PodcastRepositoryV2 = mock()
     @Bean @Primary fun mockIDM(): ItemDownloadManager = mock()
     @Bean @Primary fun mockPodcastProps(): PodcastServerParameters = mock()
+    @Bean @Primary fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
 }
+
+private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)

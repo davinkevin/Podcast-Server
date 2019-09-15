@@ -13,11 +13,9 @@ import reactor.core.publisher.toMono
 import reactor.util.function.component1
 import reactor.util.function.component2
 import reactor.util.function.component3
-import reactor.util.function.component4
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
-import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
 import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
@@ -36,12 +34,13 @@ class ItemService(
 
     private val log = LoggerFactory.getLogger(ItemService::class.java)!!
 
-    fun deleteOldEpisodes() = repository.
-            findAllToDelete( p.limitDownloadDate().toOffsetDateTime() )
-            .doOnSubscribe { log.info("Deletion of old items") }
+    fun deleteItemOlderThan(date: OffsetDateTime) = repository.
+            findAllToDelete(date)
+            .doOnSubscribe { log.info("Deletion of items older than {}", date) }
             .delayUntil { fileService.deleteItem(it) }
+            .map { v -> v.id }
             .collectList()
-            .flatMap { repository.updateAsDeleted(it.map { v -> v.id }) }
+            .flatMap { repository.updateAsDeleted(it) }
 
     fun findById(id: UUID) = repository.findById(id)
 

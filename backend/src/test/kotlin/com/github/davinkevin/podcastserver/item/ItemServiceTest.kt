@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import com.github.davinkevin.podcastserver.podcast.PodcastService
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -26,7 +25,6 @@ import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
-import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
 /**
@@ -77,26 +75,25 @@ class ItemServiceTest {
     @Test
     fun `should delete old items`() {
         /* Given */
-        val limit = ZonedDateTime.now().minusDays(30)
-        whenever(p.limitDownloadDate()).thenReturn(limit)
+        val limit = OffsetDateTime.now().minusDays(30)
         val items = listOf(
                 DeleteItemInformation(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), "foo", "bar"),
                 DeleteItemInformation(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), "num1", "num2"),
                 DeleteItemInformation(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), "itemT", "podcastT")
         )
         val repoResponse = Flux.fromIterable(items)
-        whenever(repository.findAllToDelete(limit.toOffsetDateTime())).thenReturn(repoResponse)
+        whenever(repository.findAllToDelete(limit)).thenReturn(repoResponse)
         whenever(fileService.
                 deleteItem(any())).thenReturn(Mono.empty())
         whenever(repository.updateAsDeleted(any())).thenReturn(Mono.empty())
 
         /* When */
-        StepVerifier.create(itemService.deleteOldEpisodes())
+        StepVerifier.create(itemService.deleteItemOlderThan(limit))
                 .expectSubscription()
                 .then {
                     val ids = items.map { it.id }
 
-                    verify(repository).findAllToDelete(limit.toOffsetDateTime())
+                    verify(repository).findAllToDelete(limit)
                     verify(fileService, times(3)).deleteItem(argWhere { it in items })
                     verify(repository).updateAsDeleted(argWhere { it == ids })
                 }
