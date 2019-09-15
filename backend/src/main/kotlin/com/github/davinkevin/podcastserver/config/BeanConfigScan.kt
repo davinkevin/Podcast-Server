@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
 import com.github.davinkevin.podcastserver.service.TikaProbeContentType
 import com.github.davinkevin.podcastserver.service.properties.Api
-import com.github.davinkevin.podcastserver.service.properties.Backup
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.TagConfig
@@ -32,7 +31,7 @@ import java.nio.file.Paths
  */
 @EnableCaching
 @Configuration
-@EnableConfigurationProperties(PodcastServerParameters::class, Api::class, Backup::class, ExternalTools::class)
+@EnableConfigurationProperties(PodcastServerParameters::class, Api::class, ExternalTools::class)
 @Import(
         ItemConfig::class,
         UpdateConfig::class,

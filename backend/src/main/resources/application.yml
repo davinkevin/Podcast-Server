@@ -53,7 +53,6 @@ podcastserver:
  #number-of-try: 10
  #download-extension: .psdownload
  #rss-default-number-item: 50
- update-and-download.refresh.cron: 0 0 0 * * ?
  externaltools:
   #rtmpdump: /usr/local/bin/rtmpdump
   #ffmpeg: /usr/local/bin/ffmpeg
