@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.entity.Status.Companion.of
 import com.ninja_squad.dbsetup.DbSetup
-import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
@@ -21,6 +20,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
 import java.net.URI
@@ -41,22 +42,16 @@ class ItemRepositoryV2Test {
 
     @Autowired lateinit var query: DSLContext
     @Autowired lateinit var repository: ItemRepository
-    @Autowired lateinit var dataSource: DataSource
+    @Autowired lateinit var db: DataSourceDestination
 
-    private val dbSetupTracker = DbSetupTracker()
+    private val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
 
     @Nested
     @DisplayName("Should find")
     inner class ShouldFindById {
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-            dbSetupTracker.skipNextLaunch()
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `by id and return one matching element`() {
@@ -91,17 +86,11 @@ class ItemRepositoryV2Test {
     inner class ShouldFindAll {
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `to delete`() {
             /* Given */
-            dbSetupTracker.skipNextLaunch()
             val today = now()
 
             /* When */
@@ -119,12 +108,7 @@ class ItemRepositoryV2Test {
     inner class ShouldDelete {
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `by id`() {
@@ -154,12 +138,7 @@ class ItemRepositoryV2Test {
     inner class ShouldUpdateAsDeleted {
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `as deleted`() {
@@ -188,12 +167,7 @@ class ItemRepositoryV2Test {
     inner class ShouldReset {
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `by Id`() {
@@ -226,15 +200,8 @@ class ItemRepositoryV2Test {
     @DisplayName("should find if item has to be deleted")
     inner class HasToBeDeleted {
 
-
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-            dbSetupTracker.skipNextLaunch()
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `and return true because its parent podcast has to`() {
@@ -267,56 +234,47 @@ class ItemRepositoryV2Test {
     @DisplayName("should search with pagination")
     inner class ShouldSearchWithPagination {
 
-        private val coverDb = insertInto("COVER")
-                .columns("ID", "URL", "WIDTH", "HEIGHT")
-                .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/Appload/cover.png", 100, 100)
-                .values(fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "http://fake.url.com/geekinchd/cover.png", 100, 100)
-                .values(fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "http://fake.url.com/foopodcast/cover.png", 100, 100)
-                .values(fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "http://fake.url.com/otherpodcast/cover.png", 100, 100)
-                .build()!!
-
-        private val podcastDb = insertInto("PODCAST")
-                .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
-                .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Appload", "http://fake.url.com/appload/rss", "YOUTUBE", true)
-                .values(fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), "Geek Inc HD", "http://fake.url.com/geekinchd/rss", "YOUTUBE", true)
-                .values(fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), "Foo podcast", "http://fake.url.com/foo/rss", "YOUTUBE", true)
-                .values(fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), "Other Podcast", "http://fake.url.com/other/rss", "YOUTUBE", true)
-                .build()!!
-
-        private val itemsDb = insertInto("ITEM")
-                .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION").apply {
-                    val max = 50
-                    (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc") }
-                    (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc") }
-                    (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc") }
-                    (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc") }
-                }.build()!!
-
-        private val tagsDb = insertInto("TAG")
-                .columns("ID", "NAME")
-                .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "T1")
-                .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "T2")
-                .values(fromString("6936b895-0de6-43f6-acaa-678511d3c37b"), "T3")
-                .values(fromString("4cff2eb7-6398-43cf-96b7-f5699377fdb4"), "T4")
-                .build()!!
-
-        private val podcastToTags = insertInto("PODCAST_TAGS")
-                .columns("PODCASTS_ID", "TAGS_ID")
-                .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
-                .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
-                .values(fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), fromString("6936b895-0de6-43f6-acaa-678511d3c37b"))
-                .values(fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
-                .build()
+        private val searchOperations = sequenceOf(DELETE_ALL,
+                insertInto("COVER")
+                        .columns("ID", "URL", "WIDTH", "HEIGHT")
+                        .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/Appload/cover.png", 100, 100)
+                        .values(fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "http://fake.url.com/geekinchd/cover.png", 100, 100)
+                        .values(fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "http://fake.url.com/foopodcast/cover.png", 100, 100)
+                        .values(fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "http://fake.url.com/otherpodcast/cover.png", 100, 100)
+                        .build()!!,
+                insertInto("PODCAST")
+                        .columns("ID", "TITLE", "URL", "TYPE", "HAS_TO_BE_DELETED")
+                        .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Appload", "http://fake.url.com/appload/rss", "YOUTUBE", true)
+                        .values(fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), "Geek Inc HD", "http://fake.url.com/geekinchd/rss", "YOUTUBE", true)
+                        .values(fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), "Foo podcast", "http://fake.url.com/foo/rss", "YOUTUBE", true)
+                        .values(fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), "Other Podcast", "http://fake.url.com/other/rss", "YOUTUBE", true)
+                        .build()!!,
+                insertInto("ITEM")
+                        .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION").apply {
+                            val max = 50
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc") }
+                        }.build()!!,
+                insertInto("TAG")
+                        .columns("ID", "NAME")
+                        .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "T1")
+                        .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "T2")
+                        .values(fromString("6936b895-0de6-43f6-acaa-678511d3c37b"), "T3")
+                        .values(fromString("4cff2eb7-6398-43cf-96b7-f5699377fdb4"), "T4")
+                        .build()!!,
+                insertInto("PODCAST_TAGS")
+                        .columns("PODCASTS_ID", "TAGS_ID")
+                        .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                        .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
+                        .values(fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), fromString("6936b895-0de6-43f6-acaa-678511d3c37b"))
+                        .values(fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
+                        .build()
+        )
 
         @BeforeEach
-        fun prepare() {
-
-            val operation = sequenceOf(DELETE_ALL, coverDb, podcastDb, itemsDb, tagsDb, podcastToTags)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-            dbSetupTracker.skipNextLaunch()
-        }
+        fun prepare() = DbSetup(db, searchOperations).launch()
 
         @Nested
         @DisplayName("with no tags and no specific statuses")
@@ -542,8 +500,6 @@ class ItemRepositoryV2Test {
                         }
                         .verifyComplete()
             }
-
-
         }
 
         @Nested
@@ -678,8 +634,6 @@ class ItemRepositoryV2Test {
                         }
                         .verifyComplete()
             }
-
-
         }
 
         @Nested
@@ -786,8 +740,6 @@ class ItemRepositoryV2Test {
                         }
                         .verifyComplete()
             }
-
-
         }
 
         @Nested
@@ -964,7 +916,6 @@ class ItemRepositoryV2Test {
                         .verifyComplete()
             }
         }
-
     }
 
     @Nested
@@ -972,12 +923,7 @@ class ItemRepositoryV2Test {
     inner class ShouldCreate {
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
-            val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-            dbSetupTracker.launchIfNecessary(dbSetup)
-        }
+        fun prepare() = DbSetup(db, operation).launch()
 
         @Test
         fun `a simple item`() {
@@ -1070,20 +1016,17 @@ class ItemRepositoryV2Test {
     @DisplayName("should find item in downloading state")
     inner class ShouldFindItemInDownloadingState {
 
-        private val itemDownloadStartedAndPaused = sequenceOf(
+        private val itemDownloadingStateOperation = sequenceOf(operation, sequenceOf(
                 insertInto("ITEM")
                         .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION")
                         .values(fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 140", "http://fakeurl.com/geekinc.140.mp3", "geekinc.140.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter), now().minusMonths(2).format(formatter), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
                         .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "geekinc.141.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), PAUSED, now().minusDays(1).format(formatter), null, now().minusWeeks(2).format(formatter), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
                         .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "geekinc.142.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(1).format(formatter), null, now().minusWeeks(1).format(formatter), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
                         .build()
-        )
+        ))
 
         @BeforeEach
-        fun prepare() {
-            val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA, itemDownloadStartedAndPaused)
-            DbSetup(DataSourceDestination(dataSource), operation).launch()
-        }
+        fun prepare() = DbSetup(db, itemDownloadingStateOperation).launch()
 
         @Test
         fun `with success`() {
@@ -1103,7 +1046,7 @@ class ItemRepositoryV2Test {
                     .selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
                     .map { of(it[ITEM.STATUS]) }
 
-             val others = query
+            val others = query
                     .selectFrom(ITEM).where(ITEM.ID.notIn(ids)).orderBy(ITEM.ID.asc()).fetch()
                     .map { it[ITEM.STATUS] }
                     .filterNotNull().map(::of).toSet()
@@ -1114,4 +1057,8 @@ class ItemRepositoryV2Test {
 
     }
 
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun db(datasource: DataSource) = DataSourceDestination(datasource)
+    }
 }
