@@ -29,45 +29,49 @@ export default class DownloadManager {
         });
     }
 
+    download(item) {
+        return this.$http.post(`/api/v1/podcasts/${item.podcast.id}/items/${item.id}/download`);
+    }
+
     downloading() {
-        return this.$http.get(`/api/task/downloadManager/downloading`).then(r => r.data);
+        return this.$http.get(`/api/v1/downloads/downloading`).then(r => r.data.items);
+    }
+
+    stopAllDownload () {
+        return this.$http.post(`/api/v1/downloads/stop`);
+    }
+    pauseAllDownload () {
+        return this.$http.post(`/api/v1/downloads/pause`);
+    }
+    restartAllDownload() {
+        return this.$http.post(`/api/v1/downloads/restart`);
+    }
+
+    updateNumberOfSimDl(number) {
+        return this.$http.post(`/api/v1/downloads/limit`, number);
+    }
+    getNumberOfSimDl() {
+        return this.$http.get(`/api/v1/downloads/limit`).then(r => r.data);
     }
 
     queue() {
-        return this.$http.get(`/api/task/downloadManager/queue`).then(r => r.data);
-    }
-
-    download(item) {
-        return this.$http.get(`/api/items/${item.id}/addtoqueue`);
-    }
-    stopAllDownload () {
-        return this.$http.get(`/api/task/downloadManager/stopAllDownload`);
-    }
-    pauseAllDownload () {
-        return this.$http.get(`/api/task/downloadManager/pauseAllDownload`);
-    }
-    restartAllDownload() {
-        return this.$http.get(`/api/task/downloadManager/restartAllDownload`);
-    }
-    removeFromQueue (item) {
-        return this.$http.delete(`/api/task/downloadManager/queue/${item.id}`);
-    }
-    updateNumberOfSimDl(number) {
-        return this.$http.post(`/api/task/downloadManager/limit`, number);
-    }
-    dontDonwload (item) {
-        return this.$http.delete(`/api/task/downloadManager/queue/${item.id}/andstop`);
-    }
-    getNumberOfSimDl() {
-        return this.$http.get(`/api/task/downloadManager/limit`).then(r => r.data);
+        return this.$http.get(`/api/v1/downloads/queue`).then(r => r.data.items);
     }
     moveInWaitingList(item, position) {
-        return this.$http.post(`/api/task/downloadManager/move`, {id : item.id, position });
+        return this.$http.post(`/api/v1/downloads/queue`, {id : item.id, position });
     }
+    dontDonwload (item) {
+        return this.$http.delete(`/api/v1/downloads/queue/${item.id}?stop=true`);
+    }
+    removeFromQueue (item) {
+        return this.$http.delete(`/api/v1/downloads/queue/${item.id}`);
+    }
+
+
     toggle(item) {
-      return this.$http.post(`/api/task/downloadManager/toogleDownload/${item.id}`);
+      return this.$http.post(`/api/v1/downloads/${item.id}/toggle`);
     }
     stop(item) {
-      return this.$http.post(`/api/task/downloadManager/stopDownload/${item.id}`);
+      return this.$http.post(`/api/v1/downloads/${item.id}/stop`);
     }
 }

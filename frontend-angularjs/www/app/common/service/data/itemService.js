@@ -26,11 +26,6 @@ export default class ItemService {
         const sort = searchParams.sort.map(o => `${o.property},${o.direction}`);
 
         const params = Object.assign(searchParams, {tags, status, sort});
-      //
-      // console.log (params);
-      // if (params.q != null && params.q !== "") {
-      //     return this.$http.get(`/api/items/search`, { params }).then(r => r.data);
-      //   }
 
         return this.$http.get(`/api/v1/items/search`, { params }).then(r => r.data);
     }
@@ -54,7 +49,7 @@ export default class ItemService {
     }
 
     download(item) {
-        return this.$http.get(`/api/podcasts/${item.podcastId}/items/${item.id}/addtoqueue`).then(r => r.data);
+        return this.$http.post(`/api/v1/podcasts/${item.podcastId}/items/${item.id}/download`).then(r => r.data);
     }
 
     upload(podcast, file) {

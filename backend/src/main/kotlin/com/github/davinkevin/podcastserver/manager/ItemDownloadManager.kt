@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import reactor.core.publisher.Flux
+import reactor.core.publisher.toFlux
 import java.util.*
 import java.util.concurrent.CompletableFuture.runAsync
 import java.util.concurrent.locks.ReentrantLock
@@ -45,6 +47,12 @@ class ItemDownloadManager (
 
     val waitingQueue: Queue<Item>
         get() = Queue.ofAll(_waitingQueue)
+
+    val queue: Flux<Item>
+        get() = _waitingQueue.toFlux()
+
+    val downloading: Flux<Item>
+        get() = _downloadingQueue.keys.toFlux()
 
     val downloadingQueue: io.vavr.collection.Map<Item, Downloader>
         get() = HashMap.ofAll(_downloadingQueue)
@@ -285,6 +293,6 @@ private fun <T> ArrayDeque<T>.enqueue(item: T): ArrayDeque<T> {
     return ArrayDeque(joined)
 }
 private fun <T> ArrayDeque<T>.delete(item: T): ArrayDeque<T> {
-    val joined = this.toMutableList().filter { it == item }
+    val joined = this.toMutableList().filter { it != item }
     return ArrayDeque(joined)
 }

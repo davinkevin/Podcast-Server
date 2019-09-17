@@ -50,7 +50,7 @@ export default class DownloadCtrl {
 
         this.waitingSub = this.DonwloadManager
             .waiting$
-            .filter(v => v)
+            .filter(v => !!v)
             .subscribe(m => this.$scope.$evalAsync(() => this.waitingItems = m));
     }
 
@@ -96,9 +96,6 @@ export default class DownloadCtrl {
     }
 
     /** Spécifique aux éléments de la liste : **/
-    download(item){
-        this.DonwloadManager.download(item);
-    }
     stopDownload(item){
         this.DonwloadManager.stop(item);
     }

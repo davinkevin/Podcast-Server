@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.config
 
 import com.github.davinkevin.podcastserver.cover.CoverConfig
+import com.github.davinkevin.podcastserver.download.DownloadConfig
 import com.github.davinkevin.podcastserver.find.FindConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
@@ -39,7 +40,8 @@ import java.nio.file.Paths
         PodcastConfig::class,
         TagConfig::class,
         CoverConfig::class,
-        WatchListConfig::class
+        WatchListConfig::class,
+        DownloadConfig::class
 )
 @ComponentScan(basePackages = [
     "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager", "com.github.davinkevin.podcastserver.config",

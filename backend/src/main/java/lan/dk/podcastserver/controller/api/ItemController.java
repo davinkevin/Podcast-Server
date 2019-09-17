@@ -25,12 +25,10 @@ import java.util.UUID;
 public class ItemController {
 
     private final ItemBusiness itemBusiness;
-    private final ItemDownloadManager itemDownloadManager;
     private final WatchListBusiness watchListBusiness;
 
-    public ItemController(ItemBusiness itemBusiness, ItemDownloadManager itemDownloadManager, WatchListBusiness watchListBusiness) {
+    public ItemController(ItemBusiness itemBusiness, WatchListBusiness watchListBusiness) {
         this.itemBusiness = itemBusiness;
-        this.itemDownloadManager = itemDownloadManager;
         this.watchListBusiness = watchListBusiness;
     }
 
@@ -44,10 +42,5 @@ public class ItemController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(value = "id") UUID id) {
         itemBusiness.delete(id);
-    }
-
-    @GetMapping("{id}/addtoqueue")
-    public void addToDownloadList(@PathVariable("id") UUID id) {
-        itemDownloadManager.addItemToQueue(id);
     }
 }

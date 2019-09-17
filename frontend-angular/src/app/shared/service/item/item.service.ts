@@ -31,7 +31,7 @@ export class ItemService {
   }
 
 	download(itemId: uuid, podcastId: uuid): Observable<void> {
-    return this.http.get<void>(`/api/podcasts/${podcastId}/items/${itemId}/addtoqueue`);
+    return this.http.post<void>(`/api/podcasts/${podcastId}/items/${itemId}/download`, null);
   }
 
   reset(itemId: uuid, podcastId: uuid): Observable<void> {
