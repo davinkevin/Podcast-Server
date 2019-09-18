@@ -6,6 +6,7 @@ namespace: podcast-server
 resources:
   - ../base/
   - local-ingress/local-ingress.yaml
+  - ui-v1.yaml
 
 patchesStrategicMerge:
   - backend.yaml

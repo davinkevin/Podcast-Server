@@ -99,6 +99,24 @@
                             <arguments>build</arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>skaffold</id>
+                        <goals>
+                            <goal>gulp</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>skaffold:build</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>skaffold-watch</id>
+                        <goals>
+                            <goal>gulp</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>skaffold</arguments>
+                        </configuration>
+                    </execution>
 
                 </executions>
             </plugin>

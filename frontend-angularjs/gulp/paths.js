@@ -5,6 +5,7 @@ import path from 'path';
 
 const appName = 'app';
 const srcDirName = 'www';
+const target = 'target';
 const releaseDirName = 'target/dist';
 const root = path.dirname(__dirname);
 const fontsExtension = '{eot,woff2,woff,ttf,svg}';
@@ -17,6 +18,7 @@ export default {
   changeLog : `${root}/CHANGELOG.md`,
   srcDir: `${root}/${srcDirName}`,
   releaseDir: `${root}/${releaseDirName}`,
+  target: `${root}/${target}`,
   release : {
     root : `${root}/${releaseDirName}`,
     fonts : `${root}/${releaseDirName}/fonts`

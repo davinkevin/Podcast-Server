@@ -113,7 +113,8 @@
     "build": "gulp build",
     "release": "gulp release --type $(type)",
     "serve": "gulp serve",
-    "serve:dev": "gulp serve:dev"
+    "serve:dev": "gulp serve:dev",
+    "skaffold": "gulp skaffold"
   },
   "config": {
     "unsafe-perm": true

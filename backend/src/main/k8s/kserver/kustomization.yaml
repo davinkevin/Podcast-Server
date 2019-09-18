@@ -5,6 +5,7 @@ namespace: podcast-server
 
 resources:
   - ../base/
+  - ui.yaml
 
 patchesStrategicMerge:
   - backend.yaml

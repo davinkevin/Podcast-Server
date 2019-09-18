@@ -11,6 +11,8 @@ build:
           - jooq-codegen:generate
           - compile
           - -Dmaven.test.skip
+    - image: podcastserver/ui-v1
+      context: frontend-angularjs/target/
 deploy:
   kustomize:
     path: backend/src/main/k8s/docker-for-mac/
