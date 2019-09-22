@@ -28,12 +28,10 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 
 ### Start components with Skaffold:
 
-* Create root file system: `mkdir -p /tmp/podcast-server/files/ /tmp/podcast-server/database/ /tmp/podcast-server/database/backup/ /tmp/podcast-server/files/`
-* Init the database: `mvn -f backend/pom.xml liquibase:dropAll liquibase:update -Ddatabase.url=jdbc:h2:/tmp/podcast-server/database/podcast-server`
-* Start every components: `skaffold dev`
+* Set up your kubernetes context to `docker-for-desktop`
+* Start every components: `./dev.sh`
 * Access the application on `https://localhost/` and/or define a name alias in your `/etc/hosts` file
-
-OR, you can execute the `dev.sh` file 🤩.
+* (optional) if you want to rebuild the frontend (ui-v1) on change, execute `./mvnw -f frontend-angularjs/pom.xml frontend:gulp@skaffold-watch` in another terminal
 
 ## License
 
