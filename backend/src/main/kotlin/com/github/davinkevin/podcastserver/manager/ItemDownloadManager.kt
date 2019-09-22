@@ -1,28 +1,24 @@
+@file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
+
 package com.github.davinkevin.podcastserver.manager
 
-import arrow.core.Failure
-import arrow.core.Success
-import arrow.core.getOrElse
-import arrow.data.mapOf
-import arrow.syntax.collections.firstOption
+import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
 import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import io.vavr.collection.HashMap
-import io.vavr.collection.Queue
-import lan.dk.podcastserver.repository.ItemRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import java.util.*
 import java.util.concurrent.CompletableFuture.runAsync
@@ -32,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock
 @Transactional
 class ItemDownloadManager (
         private val template: MessagingTemplate,
-        private val itemRepository: ItemRepository,
+        private val downloadRepository: DownloadRepository,
         private val podcastServerParameters: PodcastServerParameters,
         private val downloaderSelector: DownloaderSelector,
         private val extractorSelector: ExtractorSelector,
@@ -42,30 +38,23 @@ class ItemDownloadManager (
     private val log = LoggerFactory.getLogger(ItemDownloadManager::class.java)!!
     private val mainLock = ReentrantLock()
 
-    var _waitingQueue = ArrayDeque<Item>()
-    var _downloadingQueue = mapOf<Item, Downloader>()
+    var waitingQueue = ArrayDeque<DownloadingItem>()
+    var downloadingQueue = mapOf<DownloadingItem, Downloader>()
 
-    val waitingQueue: Queue<Item>
-        get() = Queue.ofAll(_waitingQueue)
+    val queue: Flux<DownloadingItem>
+        get() = waitingQueue.toFlux()
 
-    val queue: Flux<Item>
-        get() = _waitingQueue.toFlux()
-
-    val downloading: Flux<Item>
-        get() = _downloadingQueue.keys.toFlux()
-
-    val downloadingQueue: io.vavr.collection.Map<Item, Downloader>
-        get() = HashMap.ofAll(_downloadingQueue)
+    val downloading: Flux<DownloadingItem>
+        get() = this.downloadingQueue.values
+                .map { it.downloadingInformation.item }
+                .toFlux()
 
     /* GETTER & SETTER */
     val limitParallelDownload: Int
         get() = downloadExecutor.corePoolSize
 
-    val numberOfCurrentDownload: Int
-        get() = _downloadingQueue.size
-
-    val itemsInDownloadingQueue: io.vavr.collection.Set<Item>
-        get() = _downloadingQueue.keys.toVΛVΓ()
+    val downloadingItems: Set<DownloadingItem>
+        get() = this.downloadingQueue.keys
 
     init {
         Item.rootFolder = podcastServerParameters.rootfolder
@@ -82,13 +71,13 @@ class ItemDownloadManager (
 
         manageDownloadLock.lock()
         try {
-            while (_downloadingQueue.size < downloadExecutor.corePoolSize && !_waitingQueue.isEmpty()) {
+            while (this.downloadingQueue.size < downloadExecutor.corePoolSize && !waitingQueue.isEmpty()) {
 
-                val (currentItem, newQueue) = _waitingQueue.dequeue()
-                _waitingQueue = newQueue
+                val (currentItem, newQueue) = waitingQueue.dequeue()
+                waitingQueue = newQueue
 
                 if (!isStartedOrFinished(currentItem)) {
-                    getDownloaderByTypeAndRun(currentItem)
+                    launchDownloadFor(currentItem)
                 }
             }
         } finally {
@@ -98,53 +87,56 @@ class ItemDownloadManager (
         this.convertAndSendWaitingQueue()
     }
 
-    private fun isStartedOrFinished(currentItem: Item) =
+    private fun isStartedOrFinished(currentItem: DownloadingItem) =
             Status.STARTED == currentItem.status || Status.FINISH == currentItem.status
 
-    private fun initDownload() {
-        val newItemsToEnqueue = itemRepository.findAllToDownload(podcastServerParameters.limitDownloadDate(), podcastServerParameters.numberOfTry)
-                .filter { it !in _waitingQueue }
-                .toJavaSet()
-
-        _waitingQueue = _waitingQueue.enqueueAll(newItemsToEnqueue)
+    private fun initDownload(): Mono<List<DownloadingItem>> {
+        return downloadRepository.findAllToDownload(podcastServerParameters.limitDownloadDate().toOffsetDateTime(), podcastServerParameters.numberOfTry)
+                .filter { it !in waitingQueue }
+                .log()
+                .collectList()
     }
 
     fun launchDownload() {
-        this.initDownload()
-        this.manageDownload()
+        initDownload().subscribe {
+            log.info("add ${it.size} to waiting queue")
+            waitingQueue = waitingQueue.enqueueAll(it)
+            manageDownload()
+        }
     }
 
-    fun stopAllDownload() = _downloadingQueue.values.forEach { it.stopDownload() }
-    fun pauseAllDownload() = _downloadingQueue.values.forEach { it.pauseDownload() }
+    fun stopAllDownload() = this.downloadingQueue.values.forEach { it.stopDownload() }
+    fun pauseAllDownload() = this.downloadingQueue.values.forEach { it.pauseDownload() }
 
     fun restartAllDownload() {
-        _downloadingQueue
+        this.downloadingQueue
                 .values
-                .filter { Status.PAUSED == it.item.status }
-                .forEach { d -> runAsync { getDownloaderByTypeAndRun(d.item) } }
+                .toFlux()
+                .filter { Status.PAUSED == it.downloadingInformation.item.status }
+                .map { it.downloadingInformation.item }
+                .subscribe { runAsync { launchDownloadFor(it) } }
     }
 
     // Change State of id identified download
-    fun stopDownload(id: UUID) = getDownloaderOfItemWithId(id).toList().forEach { it.stopDownload() }
-    fun pauseDownload(id: UUID) = getDownloaderOfItemWithId(id).toList().forEach { it.pauseDownload() }
+    fun stopDownload(id: UUID) = findDownloaderOfItem(id)?.stopDownload()
+    fun pauseDownload(id: UUID) = findDownloaderOfItem(id)?.pauseDownload()
 
-    private fun getDownloaderOfItemWithId(id: UUID) =
-            _downloadingQueue
-                    .entries
-                    .firstOption { it.key.id == id }
-                    .map { it.value }
+    private fun findDownloaderOfItem(id: UUID): Downloader? {
+        return downloadingQueue
+                .filterKeys { it.id == id }
+                .values
+                .firstOrNull()
+    }
 
-    fun restartDownload(id: UUID) {
-        getDownloaderOfItemWithId(id)
-                .map { it.item }
-                .toList()
-                .forEach { getDownloaderByTypeAndRun(it) }
+    private fun restartDownload(id: UUID) {
+        val downloader = findDownloaderOfItem(id) ?: error("downloader not found for item with id $id")
+        downloadRepository.findDownloadingItemById(downloader.downloadingInformation.item.id)
+                .subscribe { launchDownloadFor(it) }
     }
 
     fun toggleDownload(id: UUID) {
-        val item = getDownloaderOfItemWithId(id)
-                .map { it.item }
-                .getOrElse { throw RuntimeException("Item not with $id not found in download list") }
+        val downloader = findDownloaderOfItem(id) ?: error("downloader not found for item with id $id")
+        val item = downloader.downloadingInformation.item
 
         when {
             Status.PAUSED == item.status -> restartDownload(id).also { log.debug("restart du download") }
@@ -152,52 +144,47 @@ class ItemDownloadManager (
         }
     }
 
-    fun addItemToQueue(id: UUID) =
-            addItemToQueue(itemRepository.findById(id).orElseThrow { RuntimeException("Item with ID $id not found") })
+    fun addItemToQueue(id: UUID) {
+        downloadRepository.findDownloadingItemById(id).subscribe { addItemToQueue(it) }
+    }
 
-    fun addItemToQueue(item: Item) {
-        if (item in _waitingQueue || isInDownloadingQueue(item)) {
+    internal fun addItemToQueue(item: DownloadingItem) {
+        if (item in waitingQueue || isInDownloadingQueue(item)) {
             return
         }
 
-        _waitingQueue = _waitingQueue.enqueue(item)
+        waitingQueue = waitingQueue.enqueue(item)
 
         manageDownload()
     }
 
     @Transactional
     fun removeItemFromQueue(id: UUID, stopItem: Boolean) {
-        val item = itemRepository.findById(id).orElseThrow { RuntimeException("Item with ID $id not found") }
-        removeItemFromQueue(item)
+        removeItemFromQueue(id)
 
         if (stopItem) {
-            itemRepository.save(item.apply { status = Status.STOPPED })
+            downloadRepository
+                    .stopItem(id)
+                    .subscribe()
         }
 
         convertAndSendWaitingQueue()
     }
 
-    private fun removeItemFromQueue(item: Item) {
-        _waitingQueue = _waitingQueue.delete(item)
+    private fun removeItemFromQueue(id: UUID) {
+        waitingQueue = waitingQueue.delete(id)
     }
 
-    fun removeACurrentDownload(item: Item) {
-        val pairs = _downloadingQueue.map { it.toPair() }.filter { it.first != item }.toTypedArray()
-        _downloadingQueue = mapOf(*pairs)
+    fun removeACurrentDownload(id: UUID) {
+        val pairs = this.downloadingQueue.map { it.toPair() }.filter { it.first.id != id }.toTypedArray()
+        this.downloadingQueue = mapOf(*pairs)
 
         manageDownload()
     }
 
-    fun getItemInDownloadingQueue(id: UUID): Item {
-        return _downloadingQueue
-                .keys
-                .firstOption { it.id == id}
-                .getOrElse { Item.DEFAULT_ITEM }
-    }
-
-    private fun getDownloaderByTypeAndRun(item: Item) {
+    private fun launchDownloadFor(item: DownloadingItem) {
         when {
-            isInDownloadingQueue(item) -> (_downloadingQueue[item] ?: DownloaderSelector.NO_OP_DOWNLOADER)
+            isInDownloadingQueue(item) -> (downloadingQueue[item] ?: DownloaderSelector.NO_OP_DOWNLOADER)
                     .restartDownload()
                     .also { log.debug("Restart Item : " + item.title) }
 
@@ -205,74 +192,48 @@ class ItemDownloadManager (
         }
     }
 
-    private fun launchWithNewWorkerFrom(item: Item) {
-        val downloadingItem = arrow.core.Try { this.extractorSelector.of(item.url).extract(item) }
+    private fun launchWithNewWorkerFrom(item: DownloadingItem) {
 
-        val dlItem = when(downloadingItem) {
-            is Failure -> {
-                log.error("Error during extraction of {}", item.url, downloadingItem.exception)
-                manageDownload()
-                return
-            }
-            is Success -> downloadingItem.value
-        }
+        val dlItem = try { extractorSelector.of(item.url).extract(item) }
+                catch (e: Exception) {
+                    log.error("Error during extraction of {}", item.url, e)
+                    manageDownload()
+                    return
+                }
 
         val downloader = downloaderSelector.of(dlItem)
                 .apply { with(dlItem, this@ItemDownloadManager) }
 
-        val pairs = _downloadingQueue.map { it.toPair() }.filter { it.first != item }
-                .toMutableList()
-                .apply { this.add(Pair(item, downloader)) }
-                .toTypedArray()
-
-        _downloadingQueue = mapOf(*pairs)
+        this.downloadingQueue = downloadingQueue.filterKeys { it != item } + Pair(item, downloader)
         downloadExecutor.execute(downloader)
     }
 
-    fun resetDownload(item: Item) {
-        if (!isInDownloadingQueue(item) || !canBeReset(item))
-            return
-
-        item.addATry()
-        launchWithNewWorkerFrom(item)
-    }
-
-    fun removeItemFromQueueAndDownload(itemToRemove: Item) {
+    fun removeItemFromQueueAndDownload(id: UUID) {
         when {
-            isInDownloadingQueue(itemToRemove) -> stopDownload(itemToRemove.id!!)
-            itemToRemove in _waitingQueue -> removeItemFromQueue(itemToRemove)
+            isInDownloadingQueueById(id) -> stopDownload(id)
+            isInWaitingQueueById(id) -> removeItemFromQueue(id)
         }
         this.convertAndSendWaitingQueue()
     }
 
-    private fun convertAndSendWaitingQueue() = template.convertAndSend(WS_TOPIC_WAITING_LIST, waitingQueue)
+    private fun convertAndSendWaitingQueue() = template.sendWaitingQueue(waitingQueue.toList())
 
-    fun canBeReset(item: Item) = item.numberOfFail!! + 1 <= podcastServerParameters.numberOfTry
-
-    fun isInDownloadingQueue(item: Item) = _downloadingQueue.containsKey(item)
-    fun isInDownloadingQueueById(id: UUID) = _downloadingQueue.keys.asSequence().map { it.id }.any { it == id }
+    fun isInDownloadingQueue(item: DownloadingItem) = this.downloadingQueue.containsKey(item)
+    fun isInDownloadingQueueById(id: UUID) = this.downloadingQueue.keys.asSequence().map { it.id }.any { it == id }
+    fun isInWaitingQueueById(id: UUID) = waitingQueue.asSequence().map { it.id }.any { it == id }
 
     fun moveItemInQueue(itemId: UUID, position: Int) {
-        val copyWL = _waitingQueue.toMutableList()
+        val itemToMove = waitingQueue
+                .firstOrNull { it.id == itemId }
+                ?: error("Moving element in waiting list not authorized : Element wasn't in the list")
 
-        val itemToMove = copyWL
-                .firstOption { it.id == itemId }
-                .getOrElse { throw RuntimeException("Moving element in waiting list not authorized : Element wasn't in the list") }
-
-        val reorderList = copyWL.asSequence().filter { it.id != itemId }.toMutableList()
-        reorderList.add(position, itemToMove)
-
-        _waitingQueue = ArrayDeque(reorderList)
+        waitingQueue = waitingQueue
+                .filter { it.id != itemId }
+                .toMutableList()
+                .apply { add(position, itemToMove) }
+                .let { ArrayDeque(it) }
 
         convertAndSendWaitingQueue()
-    }
-
-    fun clearWaitingQueue() {
-        _waitingQueue = ArrayDeque()
-    }
-
-    companion object {
-        private const val WS_TOPIC_WAITING_LIST = "/topic/waiting"
     }
 }
 
@@ -292,7 +253,7 @@ private fun <T> ArrayDeque<T>.enqueue(item: T): ArrayDeque<T> {
     joined.add(item)
     return ArrayDeque(joined)
 }
-private fun <T> ArrayDeque<T>.delete(item: T): ArrayDeque<T> {
-    val joined = this.toMutableList().filter { it != item }
+private fun ArrayDeque<DownloadingItem>.delete(id: UUID): ArrayDeque<DownloadingItem> {
+    val joined = this.toMutableList().filter { it.id != id }
     return ArrayDeque(joined)
 }

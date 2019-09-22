@@ -1,49 +1,43 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 
-import arrow.core.getOrElse
-import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import lan.dk.podcastserver.repository.ItemRepository
-import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import org.springframework.transaction.annotation.Transactional
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.PathMatcher
 import java.nio.file.attribute.PosixFilePermission.*
-import java.time.ZonedDateTime
-import java.util.concurrent.atomic.AtomicBoolean
+import java.time.Clock
+import java.time.OffsetDateTime
 import javax.annotation.PostConstruct
 
 abstract class AbstractDownloader(
-        val itemRepository: ItemRepository,
-        val podcastRepository: PodcastRepository,
-        val podcastServerParameters: PodcastServerParameters,
-        val template: MessagingTemplate,
-        val mimeTypeService: MimeTypeService
+        private val downloadRepository: DownloadRepository,
+        private val podcastServerParameters: PodcastServerParameters,
+        private val template: MessagingTemplate,
+        private val mimeTypeService: MimeTypeService,
+        private val clock: Clock
 ) : Runnable, Downloader {
 
     private val log = LoggerFactory.getLogger(AbstractDownloader::class.java)
 
-    override lateinit var item: Item
-    internal lateinit var downloadingItem: DownloadingItem
+    override lateinit var downloadingInformation: DownloadingInformation
     internal lateinit var itemDownloadManager: ItemDownloadManager
 
-    internal lateinit var temporaryExtension: String
-    private lateinit var hasTempExtensionMatcher: PathMatcher
     internal var target: Path? = null
-    internal var stopDownloading = AtomicBoolean(false)
 
-    override fun with(item: DownloadingItem, itemDownloadManager: ItemDownloadManager) {
-        this.downloadingItem = item
-        this.item = downloadingItem.item
+    internal val temporaryExtension: String = podcastServerParameters.downloadExtension
+    private val hasTempExtensionMatcher: PathMatcher = FileSystems.getDefault().getPathMatcher("glob:*$temporaryExtension")
+
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager) {
+        this.downloadingInformation = information
         this.itemDownloadManager = itemDownloadManager
     }
 
@@ -53,10 +47,9 @@ abstract class AbstractDownloader(
     }
 
     override fun startDownload() {
-        item.status = Status.STARTED
-        stopDownloading.set(false)
-        saveSyncWithPodcast()
-        convertAndSaveBroadcast()
+        downloadingInformation = downloadingInformation.status(Status.STARTED)
+        saveStateOfItem(downloadingInformation.item)
+        broadcast(downloadingInformation.item)
         try { download() }
         catch (e: Exception) {
             log.error("Error during download", e)
@@ -65,38 +58,35 @@ abstract class AbstractDownloader(
     }
 
     override fun pauseDownload() {
-        item.status = Status.PAUSED
-        stopDownloading.set(true)
-        saveSyncWithPodcast()
-        convertAndSaveBroadcast()
+        downloadingInformation = downloadingInformation.status(Status.PAUSED)
+        saveStateOfItem(downloadingInformation.item)
+        broadcast(downloadingInformation.item)
     }
 
     override fun stopDownload() {
-        item.status = Status.STOPPED
-        stopDownloading.set(true)
-        saveSyncWithPodcast()
-        itemDownloadManager.removeACurrentDownload(item)
+        downloadingInformation = downloadingInformation.status(Status.STOPPED)
+        saveStateOfItem(downloadingInformation.item)
+        itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
 
-        if (target != null)
-            Files.deleteIfExists(target)
+        target?.let { Files.deleteIfExists(it) }
 
-        convertAndSaveBroadcast()
+        broadcast(downloadingInformation.item)
     }
 
     override fun failDownload() {
-        item.status = Status.FAILED
-        stopDownloading.set(true)
-        item.addATry()
-        saveSyncWithPodcast()
-        itemDownloadManager.removeACurrentDownload(item)
-        if (target != null)
-            Files.deleteIfExists(target)
-        convertAndSaveBroadcast()
+        downloadingInformation = downloadingInformation
+                .status(Status.FAILED)
+                .addATry()
+        saveStateOfItem(downloadingInformation.item)
+        itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
+
+        target?.let { Files.deleteIfExists(it) }
+
+        broadcast(downloadingInformation.item)
     }
 
-    @Transactional
     override fun finishDownload() {
-        itemDownloadManager.removeACurrentDownload(item)
+        itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
         var t = target
 
         if (t == null) {
@@ -106,12 +96,12 @@ abstract class AbstractDownloader(
 
         try {
             if (hasTempExtensionMatcher.matches(t.fileName)) {
-                val targetWithoutExtension = t.resolveSibling(t.fileName.toString().replace(temporaryExtension, ""))!!
+                val targetWithoutExtension = t.resolveSibling(t.fileName.toString().replace(temporaryExtension, ""))
 
                 Files.deleteIfExists(targetWithoutExtension)
                 Files.move(t, targetWithoutExtension)
 
-                t = targetWithoutExtension
+                t = targetWithoutExtension ?: error("Error when returning target without extension")
             }
         } catch (e:Exception) {
             failDownload()
@@ -125,26 +115,26 @@ abstract class AbstractDownloader(
             log.warn("Modification of read/write access not made")
         }
 
-        item.apply {
-            status = Status.FINISH
-            length = Files.size(t)
-            mimeType = mimeTypeService.probeContentType(t)
-            fileName = FilenameUtils.getName(t.fileName.toString())
-            downloadDate = ZonedDateTime.now()
-        }
+        downloadRepository.finishDownload(
+                id = downloadingInformation.item.id,
+                length = Files.size(t),
+                mimeType = mimeTypeService.probeContentType(t),
+                fileName = FilenameUtils.getName(t.fileName.toString()),
+                downloadDate = OffsetDateTime.now(clock)
+        )
+                .subscribe()
 
         target = t
-        saveSyncWithPodcast()
-        convertAndSaveBroadcast()
+
+        downloadingInformation = downloadingInformation.status(Status.FINISH)
+        broadcast(downloadingInformation.item)
     }
 
-    @Transactional
-    open fun getTargetFile(item: Item): Path {
+    internal fun computeTargetFile(info: DownloadingInformation): Path {
         val t = target
-
         if (t != null) return t
 
-        val finalFile = getDestinationFile(item)
+        val finalFile = computeDestinationFile(info)
         log.debug("Creation of file : {}", finalFile.toFile().absolutePath)
 
         try {
@@ -156,7 +146,7 @@ abstract class AbstractDownloader(
                 return finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
             }
 
-            log.info("Doublon sur le fichier en lien avec {} - {}, {}", item.podcast?.title, item.id, item.title)
+            log.info("Doublon sur le fichier en lien avec {} - {}, {}", info.item.podcast.title, info.item.id, info.item.title)
             return generateTempFileNextTo(finalFile)
         } catch (e: Exception) {
             failDownload()
@@ -172,36 +162,15 @@ abstract class AbstractDownloader(
         return Files.createTempFile(finalFile.parent, "$name-", ".$extension$temporaryExtension")
     }
 
-    private fun getDestinationFile(item: Item): Path {
-        val fileName = downloadingItem.filename ?: getFileName(item)
-        return podcastServerParameters.rootfolder.resolve(item.podcast?.title).resolve(fileName)
+    private fun computeDestinationFile(info: DownloadingInformation): Path {
+        return podcastServerParameters.rootfolder.resolve(info.item.podcast.title).resolve(info.filename)
     }
 
-    @Transactional
-    open fun saveSyncWithPodcast() {
-        try {
-            val podcast = podcastRepository.findById(item.podcast?.id!!).orElseThrow { RuntimeException("Podcast with ID " + item.podcast?.id + " not found") }
-            item.podcast = podcast
-            itemRepository.save(item)
-        } catch (e: Exception) {
-            log.error("Error during save and Sync of the item {}", item, e)
-        }
+    internal fun saveStateOfItem(item: DownloadingItem) {
+        downloadRepository.updateDownloadItem(item).subscribe()
     }
 
-    @Transactional
-    open fun convertAndSaveBroadcast() {
-        template.convertAndSend(WS_TOPIC_DOWNLOAD, item)
-    }
-
-    override fun getItemUrl(item: Item) = downloadingItem.url().getOrElse { item.url }!!
-
-    @PostConstruct
-    fun postConstruct() {
-        temporaryExtension = podcastServerParameters.downloadExtension
-        hasTempExtensionMatcher = FileSystems.getDefault().getPathMatcher("glob:*$temporaryExtension")
-    }
-
-    companion object {
-        /* Change visibility after kotlin Migration */  const val WS_TOPIC_DOWNLOAD = "/topic/download"
+    internal fun broadcast(item: DownloadingItem) {
+        template.sendItem(item)
     }
 }

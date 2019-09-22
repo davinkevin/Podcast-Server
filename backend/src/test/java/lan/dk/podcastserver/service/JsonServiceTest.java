@@ -1,11 +1,11 @@
 package lan.dk.podcastserver.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.davinkevin.podcastserver.IOUtils;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
 import io.vavr.control.Option;
-import com.github.davinkevin.podcastserver.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +14,6 @@ import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -35,7 +34,7 @@ public class JsonServiceTest {
     @Test
     public void should_read_json_from_files() throws URISyntaxException, IOException {
         /* Given */
-        when(urlService.asReader(anyString())).thenReturn(IOUtils.fileAsReader("/remote/podcast/dailymotion/user.karimdebbache.json"));
+        when(urlService.asReader(any())).thenReturn(IOUtils.fileAsReader("/remote/podcast/dailymotion/user.karimdebbache.json"));
 
         /* When */
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");
@@ -47,7 +46,7 @@ public class JsonServiceTest {
     @Test
     public void should_return_empty_if_error_during_parsing() throws IOException {
         /* Given */
-        doThrow(UncheckedIOException.class).when(urlService).asReader(anyString());
+        doThrow(UncheckedIOException.class).when(urlService).asReader(any());
 
         /* When */
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");

@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.download
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.apache.commons.io.FilenameUtils
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -98,6 +99,7 @@ private data class DownloadingItemHAL(
         val id: UUID,
         val title: String,
         val status: Status,
+        val progression: Int,
         val podcast: Podcast,
         val cover: Cover
 ) {
@@ -105,25 +107,26 @@ private data class DownloadingItemHAL(
     data class Cover(val id: UUID, val url: URI)
 }
 
-private fun toDownloadingItem(item: Item): DownloadingItemHAL {
-    val extension = (FilenameUtils.getExtension(item.cover?.url) ?: "jpg")
+private fun toDownloadingItem(item: DownloadingItem): DownloadingItemHAL {
+    val extension = (FilenameUtils.getExtension(item.cover.url.toASCIIString()) ?: "jpg")
             .substringBeforeLast("?")
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", item.podcast?.id.toString(), "items", item.id.toString(), "cover.$extension")
+            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$extension")
             .build(true)
             .toUri()
 
     return DownloadingItemHAL(
-            id = item.id ?: error("item id is not defined"),
-            title = item.title ?: error("item title is not defined"),
+            id = item.id,
+            title = item.title,
             status = item.status,
+            progression = item.progression,
             podcast = DownloadingItemHAL.Podcast(
-                    id = item.podcast?.id ?: error("podcast id not defined"),
-                    title = item.podcast?.title ?: error("podcast title not defined")
+                    id = item.podcast.id,
+                    title = item.podcast.title
             ),
             cover = DownloadingItemHAL.Cover(
-                    id = item.cover?.id ?: error("cover id not defined"),
+                    id = item.cover.id,
                     url = coverUrl
             )
     )

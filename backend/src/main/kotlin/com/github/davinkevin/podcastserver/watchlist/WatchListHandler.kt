@@ -10,7 +10,7 @@ class WatchListHandler(
         private val watchListService: WatchListService
 ) {
 
-    fun findAll(r: ServerRequest): Mono<ServerResponse> =
+    fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
             watchListService
                     .findAll()
                     .map { WatchListHAL(it.id, it.name) }

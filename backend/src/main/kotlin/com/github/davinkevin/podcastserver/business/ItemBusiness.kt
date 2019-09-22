@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
+@Suppress("SpringJavaInjectionPointsAutowiringInspection")
 @Component
 @Transactional
 class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val itemRepository: ItemRepository) {
@@ -15,7 +16,7 @@ class ItemBusiness(val itemDownloadManager: ItemDownloadManager, val itemReposit
                 .orElseThrow { RuntimeException("Item with ID $id not found") }
 
         //* Si le téléchargement est en cours ou en attente : *//
-        itemDownloadManager.removeItemFromQueueAndDownload(itemToDelete)
+        itemDownloadManager.removeItemFromQueueAndDownload(itemToDelete.id!!)
         itemToDelete.podcast?.items!!.remove(itemToDelete)
         itemRepository.delete(itemToDelete)
     }

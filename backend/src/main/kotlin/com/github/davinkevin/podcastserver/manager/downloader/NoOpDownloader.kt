@@ -9,23 +9,21 @@ import com.github.davinkevin.podcastserver.entity.Item
 class NoOpDownloader : Downloader {
 
 
-    override val item: Item = Item.DEFAULT_ITEM
-    private lateinit var downloadingItem: DownloadingItem
+    override lateinit var downloadingInformation: DownloadingInformation
     private lateinit var itemDownloadManager: ItemDownloadManager
 
-    override fun with(item: DownloadingItem, itemDownloadManager: ItemDownloadManager) {
-        this.downloadingItem = item
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager) {
+        this.downloadingInformation = information
         this.itemDownloadManager = itemDownloadManager
     }
 
-    override fun download(): Item = Item.DEFAULT_ITEM
-    override fun getItemUrl(item: Item): String = item.url!!
+    override fun download(): DownloadingItem = downloadingInformation.item
     override fun startDownload() = failDownload()
     override fun pauseDownload() {}
     override fun restartDownload() {}
     override fun stopDownload() {}
     override fun finishDownload() {}
-    override fun failDownload() = itemDownloadManager.removeACurrentDownload(downloadingItem.item)
-    override fun compatibility(downloadingItem: DownloadingItem) = -1
+    override fun failDownload() = itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
+    override fun compatibility(downloadingInformation: DownloadingInformation) = -1
     override fun run() = startDownload()
 }

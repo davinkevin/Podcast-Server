@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 import arrow.core.Try
 import arrow.core.getOrElse
-import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
@@ -11,8 +11,6 @@ import com.sapher.youtubedl.DownloadProgressCallback
 import com.sapher.youtubedl.YoutubeDL
 import com.sapher.youtubedl.YoutubeDLRequest
 import com.sapher.youtubedl.YoutubeDLResponse
-import lan.dk.podcastserver.repository.ItemRepository
-import lan.dk.podcastserver.repository.PodcastRepository
 import org.apache.commons.io.FilenameUtils.getExtension
 import org.apache.commons.io.FilenameUtils.removeExtension
 import org.slf4j.LoggerFactory
@@ -21,42 +19,46 @@ import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.Clock
 import kotlin.math.roundToInt
 import kotlin.streams.asSequence
 
 /**
  * Created by kevin on 2019-07-21
  */
+@Suppress("SpringJavaInjectionPointsAutowiringInspection")
 @Component("YoutubeDLDownloader")
 @Scope("prototype")
 class YoutubeDlDownloader(
-        itemRepository: ItemRepository,
-        podcastRepository: PodcastRepository,
+        downloadRepository: DownloadRepository,
         podcastServerParameters: PodcastServerParameters,
         template: MessagingTemplate,
         mimeTypeService: MimeTypeService,
+        clock: Clock,
         val youtubeDl: YoutubeDlService
-) : AbstractDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService) {
+) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
 
     private val log = LoggerFactory.getLogger(YoutubeDlDownloader::class.java)
 
-    override fun download(): Item {
-        log.info("Starting download of ${item.url}")
-        val url = downloadingItem.urls.first()
+    override fun download(): DownloadingItem {
+        log.info("Starting download of ${downloadingInformation.item.url}")
 
-        target = getTargetFile(item)
+        val url = downloadingInformation.url()
+        downloadingInformation = downloadingInformation.fileName(youtubeDl.extractName(url))
+
+        target = computeTargetFile(downloadingInformation)
 
         Try.invoke { youtubeDl.download(url, target!!, DownloadProgressCallback { p, _ ->
-            val broadcast = (item.progression ?: 0) < p.roundToInt()
-            item.progression = p.roundToInt()
+            val broadcast = downloadingInformation.item.progression < p.roundToInt()
             if (broadcast) {
-                convertAndSaveBroadcast()
+                downloadingInformation = downloadingInformation.progression(p.roundToInt())
+                broadcast(downloadingInformation.item)
             }
         }) }.getOrElse { RuntimeException(it) }
 
         finishDownload()
 
-        return item
+        return downloadingInformation.item
     }
 
     override fun finishDownload() {
@@ -73,18 +75,18 @@ class YoutubeDlDownloader(
             val fileNameWithoutAnyExtension = removeExtension(removeExtension(t.fileName.toString()));
 
             target = t.resolveSibling("$fileNameWithoutAnyExtension.$realExtension$temporaryExtension")
-            Try.invoke { Files.move(savedPath, target) }
+            Try.invoke { Files.move(savedPath, target!!) }
         }
 
         super.finishDownload()
     }
 
-    override fun compatibility(downloadingItem: DownloadingItem): Int {
-        if (downloadingItem.urls.size > 1) {
+    override fun compatibility(downloadingInformation: DownloadingInformation): Int {
+        if (downloadingInformation.urls.size > 1) {
             return Int.MAX_VALUE
         }
 
-        val url = downloadingItem.urls.first().toLowerCase()
+        val url = downloadingInformation.urls.first().toLowerCase()
         return when {
             "youtube.com" in url -> 5
             "www.6play.fr" in url -> 5
@@ -94,8 +96,6 @@ class YoutubeDlDownloader(
             else -> Integer.MAX_VALUE
         }
     }
-
-    override fun getFileName(item: Item) = youtubeDl.extractName(item.url!!)
 }
 
 @Service

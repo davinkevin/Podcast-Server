@@ -9,16 +9,11 @@ import org.apache.commons.lang3.StringUtils
 
 interface Downloader : Runnable {
 
-    val item: Item
+    val downloadingInformation: DownloadingInformation
 
-    fun with(item: DownloadingItem, itemDownloadManager: ItemDownloadManager)
+    fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager)
 
-    fun download(): Item
-    fun getItemUrl(item: Item): String
-    fun getFileName(item: Item) = Some(getItemUrl(item))
-            .map { StringUtils.substringBefore(it, "?") }
-            .map{ FilenameUtils.getName(it) }
-            .getOrElse { "" }!!
+    fun download(): DownloadingItem
 
     fun startDownload()
     fun pauseDownload()
@@ -27,5 +22,5 @@ interface Downloader : Runnable {
     fun failDownload()
     fun finishDownload()
 
-    fun compatibility(downloadingItem: DownloadingItem): Int
+    fun compatibility(downloadingInformation: DownloadingInformation): Int
 }

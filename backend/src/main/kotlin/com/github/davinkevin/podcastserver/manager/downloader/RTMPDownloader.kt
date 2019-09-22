@@ -1,64 +1,65 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 
-import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import lan.dk.podcastserver.repository.ItemRepository
-import lan.dk.podcastserver.repository.PodcastRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.io.File
+import java.time.Clock
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
 class RTMPDownloader(
-        itemRepository: ItemRepository,
-        podcastRepository: PodcastRepository,
+        downloadRepository: DownloadRepository,
         podcastServerParameters: PodcastServerParameters,
         template: MessagingTemplate,
         mimeTypeService: MimeTypeService,
+        clock: Clock,
         val processService: ProcessService,
         val externalTools: ExternalTools
-) : AbstractDownloader(itemRepository, podcastRepository, podcastServerParameters, template, mimeTypeService) {
+) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
 
     private val log = LoggerFactory.getLogger(RTMPDownloader::class.java)
 
     internal var pid = 0L
     private var p: Process? = null
+    private val stopDownloading = AtomicBoolean(false)
 
-    override fun download(): Item {
+    override fun download(): DownloadingItem {
         log.debug("Download")
 
         try {
-            target = getTargetFile(item)
+            target = computeTargetFile(downloadingInformation)
             log.debug("out file : {}", target!!.toAbsolutePath().toString())
 
             val processToExecute = processService
-                    .newProcessBuilder(externalTools.rtmpdump, "-r", getItemUrl(item), "-o", target!!.toAbsolutePath().toString())
+                    .newProcessBuilder(externalTools.rtmpdump, "-r", downloadingInformation.url(), "-o", target!!.toAbsolutePath().toString())
                     .directory(File("/tmp"))
                     .redirectErrorStream(true)
 
             p = processService.start(processToExecute)
             pid = processService.pidOf(p!!)
 
-            listenLogs(p!!, item)
+            listenLogs(p!!)
 
             p!!.waitFor()
             pid = 0
         } catch (e: Exception) { throw RuntimeException(e) }
 
-        return item
+        return downloadingInformation.item
     }
 
-    fun listenLogs(process: Process, i: Item) {
+    fun listenLogs(process: Process) {
         log.debug("Reading output of RTMPDump")
 
         process.inputStream
@@ -67,7 +68,7 @@ class RTMPDownloader(
                 .forEach {
                     val (isProgression, progression) = isProgressionLine(it)
                     if (isProgression) {
-                        broadcastProgression(i, progression)
+                        broadcastProgression(downloadingInformation.item, progression)
                         return@forEach
                     }
 
@@ -78,34 +79,42 @@ class RTMPDownloader(
                     }
                 }
 
-        if (i.status != Status.FINISH && !stopDownloading.get()) {
+        if (downloadingInformation.item.status != Status.FINISH && !stopDownloading.get()) {
             throw RuntimeException("Unexpected ending, failed download")
         }
     }
 
-    override fun pauseDownload() =
-            try {
-                val stopProcess = processService.newProcessBuilder("kill", "-STOP", pid.toString())
-                processService.start(stopProcess)
-                super.pauseDownload()
-            } catch (e: Exception) {
-                log.error("IOException :", e)
-                failDownload()
-            }
+    override fun startDownload() {
+        stopDownloading.set(false)
+        super.startDownload()
+    }
+
+    override fun pauseDownload() {
+        try {
+            stopDownloading.set(true)
+            val stopProcess = processService.newProcessBuilder("kill", "-STOP", pid.toString())
+            processService.start(stopProcess)
+            super.pauseDownload()
+        } catch (e: Exception) {
+            log.error("IOException :", e)
+            failDownload()
+        }
+    }
 
     override fun restartDownload() =
             try {
                 val restart = processService.newProcessBuilder("kill", "-SIGCONT", "" + pid.toString())
                 processService.start(restart)
-                item.status = Status.STARTED
-                saveSyncWithPodcast()
-                convertAndSaveBroadcast()
+                downloadingInformation = downloadingInformation.status(Status.STARTED)
+                saveStateOfItem(downloadingInformation.item)
+                broadcast(downloadingInformation.item)
             } catch (e: Exception) {
                 log.error("Error during restart of process :", e)
                 failDownload()
             }
 
     override fun stopDownload() {
+        stopDownloading.set(true)
         destroyProcess()
         super.stopDownload()
     }
@@ -115,17 +124,18 @@ class RTMPDownloader(
     }
 
     override fun failDownload() {
+        stopDownloading.set(true)
         destroyProcess()
         super.failDownload()
     }
 
-    override fun compatibility(downloadingItem: DownloadingItem) =
-            if (downloadingItem.urls.size == 1 && downloadingItem.urls.first().startsWith("rtmp://")) 1
+    override fun compatibility(downloadingInformation: DownloadingInformation) =
+            if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().startsWith("rtmp://")) 1
             else Integer.MAX_VALUE
 
-    private fun broadcastProgression(item: Item, progression: Int) {
+    private fun broadcastProgression(item: DownloadingItem, progression: Int) {
         if (item.progression != progression)
-            convertAndSaveBroadcast()
+            broadcast(downloadingInformation.item)
     }
 
     private fun isProgressionLine(line: String): Pair<Boolean, Int> {

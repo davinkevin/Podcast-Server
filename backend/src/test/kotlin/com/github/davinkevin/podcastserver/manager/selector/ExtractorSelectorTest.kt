@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.net.URI
 import java.util.stream.Stream
 import kotlin.reflect.KClass
 
@@ -30,50 +31,47 @@ class ExtractorSelectorTest {
 
     @MockBean lateinit var myCanalExtractor: MyCanalExtractor
     @MockBean lateinit var passThroughExtractor: PassThroughExtractor
-
     @Autowired lateinit var applicationContext: ApplicationContext
+
     lateinit var extractor: ExtractorSelector
 
     @BeforeEach
     fun beforeEach() {
-        val extractors = setOf(
-                myCanalExtractor,
-                passThroughExtractor)
+        val extractors = setOf(myCanalExtractor, passThroughExtractor)
 
         extractors.forEach { whenever(it.compatibility(any())).thenCallRealMethod() }
 
-        extractor = ExtractorSelector(applicationContext, extractors
-        )
+        extractor = ExtractorSelector(applicationContext, extractors)
     }
 
     @Test
     fun `should return no op if empty string`() {
         /* When  */
-        val extractorClass = extractor.of("")
+        val extractorClass = extractor.of(URI("https://foo.bar.com"))
         /* Then  */
-        assertThat(extractorClass).isEqualTo(ExtractorSelector.NO_OP_EXTRACTOR)
+        assertThat(extractorClass).isInstanceOf(PassThroughExtractor::class.java)
     }
 
     @MethodSource("urlToExtractor")
     @DisplayName("should return")
     @ParameterizedTest(name = "{1} finder for {0}")
-    fun `should return matching updater`(url: String, type: KClass<*>) {
+    fun `should return matching updater`(url: URI, type: KClass<*>) {
         /* When */
-        val finderClass = extractor.of(url)
+        val extractorClass = extractor.of(url)
         /* Then */
-        assertThat(finderClass).isInstanceOf(type.java)
+        assertThat(extractorClass).isInstanceOf(type.java)
     }
 
     companion object {
         @JvmStatic
         fun urlToExtractor() =
                 Stream.of(
-                        Arguments.of("http://www.beinsports.com/france/replay/lexpresso", PassThroughExtractor::class),
-                        Arguments.of("http://www.dailymotion.com/foo/bar", PassThroughExtractor::class),
-                        Arguments.of("http://www.jeuxvideo.com/chroniques-video.htm", PassThroughExtractor::class),
-                        Arguments.of("http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html", MyCanalExtractor::class),
-                        Arguments.of("http://foo.bar.com/to/rss/file.xml", PassThroughExtractor::class),
-                        Arguments.of("http://www.youtube.com/channel/UC_ioajefokjFAOI", PassThroughExtractor::class)
+                        Arguments.of(URI("http://www.beinsports.com/france/replay/lexpresso"), PassThroughExtractor::class),
+                        Arguments.of(URI("http://www.dailymotion.com/foo/bar"), PassThroughExtractor::class),
+                        Arguments.of(URI("http://www.jeuxvideo.com/chroniques-video.htm"), PassThroughExtractor::class),
+                        Arguments.of(URI("http://www.mycanal.fr/c-divertissement/c-le-grand-journal/pid5411-le-grand-journal.html"), MyCanalExtractor::class),
+                        Arguments.of(URI("http://foo.bar.com/to/rss/file.xml"), PassThroughExtractor::class),
+                        Arguments.of(URI("http://www.youtube.com/channel/UC_ioajefokjFAOI"), PassThroughExtractor::class)
                 )
     }
 

@@ -47,7 +47,7 @@ class ItemBusinessTest {
         /* Given */
         val idOfItem = UUID.randomUUID()
         val p = Podcast().apply { items = mutableSetOf() }
-        val item = Item().apply { podcast = p }
+        val item = Item().apply { id = idOfItem; podcast = p }
         p.items!!.add(item)
 
         whenever(itemRepository.findById(idOfItem)).thenReturn(Optional.of(item))
@@ -57,7 +57,7 @@ class ItemBusinessTest {
 
         /* Then */
         verify(itemRepository, times(1)).findById(idOfItem)
-        verify(itemDownloadManager, times(1)).removeItemFromQueueAndDownload(item)
+        verify(itemDownloadManager, times(1)).removeItemFromQueueAndDownload(item.id!!)
         verify(itemRepository, times(1)).delete(item)
         assertThat(p.items).isEmpty()
     }

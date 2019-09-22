@@ -8,7 +8,6 @@ import org.jooq.DSLContext
 import org.jooq.Record18
 import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux

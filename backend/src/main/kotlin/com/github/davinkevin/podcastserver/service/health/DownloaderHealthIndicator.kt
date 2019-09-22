@@ -12,14 +12,17 @@ import org.springframework.stereotype.Component
 class DownloaderHealthIndicator(val itemDownloadManager: ItemDownloadManager) : AbstractHealthIndicator() {
 
     override fun doHealthCheck(builder: Health.Builder) {
+        val waiting = itemDownloadManager.waitingQueue
+        val items = itemDownloadManager.downloadingItems
+
         // @formatter:off
         builder.up()
-            .withDetail("isDownloading", itemDownloadManager.numberOfCurrentDownload > 0)
+            .withDetail("isDownloading", items.isNotEmpty())
             .withDetail("numberOfParallelDownloads", itemDownloadManager.limitParallelDownload)
-            .withDetail("numberOfDownloading", itemDownloadManager.numberOfCurrentDownload)
-            .withDetail("downloadingItems", itemDownloadManager.itemsInDownloadingQueue)
-            .withDetail("numberInQueue", itemDownloadManager.waitingQueue.length())
-            .withDetail("waitingItems", itemDownloadManager.waitingQueue)
+            .withDetail("numberOfDownloading", items.size)
+            .withDetail("downloadingItems", items)
+            .withDetail("numberInQueue", waiting.size)
+            .withDetail("waitingItems", waiting)
         .build()
         // @formatter:on
     }

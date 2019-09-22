@@ -21,15 +21,6 @@ public class PodcastController {
         this.podcastBusiness = podcastBusiness;
     }
 
-    @JsonView(Podcast.PodcastDetailsView.class)
-    @PatchMapping("{id}")
-    public Podcast patchUpdate(@RequestBody Podcast podcast, @PathVariable("id") UUID id) {
-        podcast.setId(id);
-        Podcast patchedPodcast = podcastBusiness.patchUpdate(podcast);
-        patchedPodcast.setItems(null);
-        return patchedPodcast;
-    }
-
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete (@PathVariable UUID id) {

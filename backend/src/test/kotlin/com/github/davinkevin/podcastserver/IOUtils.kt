@@ -44,7 +44,7 @@ object IOUtils {
     )).build())
 
     const val TEMPORARY_EXTENSION = ".psdownload"
-    @JvmField val ROOT_TEST_PATH = Paths.get("/tmp/podcast-server-test/")!!
+    @JvmField val ROOT_TEST_PATH: Path = Paths.get("/tmp/podcast-server-test/")
 
 
     @JvmStatic fun toPath(uri: String): arrow.core.Try<Path> =

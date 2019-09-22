@@ -146,18 +146,4 @@ public class WatchListRepositoryTest {
         /* Then */
         assertThat(fetchedWatchList.getItems()).hasSize(1);
     }
-
-    @Test
-    public void should_find_all_to_delete() {
-        /* Given */
-        dbSetupTracker.skipNextLaunch();
-        /* When */
-        Set<Item> allToDelete = itemRepository.findAllToDelete(now());
-        /* Then */
-        assertThat(allToDelete).isEmpty();
-    }
-
-
-
-
 }

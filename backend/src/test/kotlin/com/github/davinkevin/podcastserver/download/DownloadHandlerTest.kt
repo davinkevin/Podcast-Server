@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
+import java.net.URI
 import java.util.*
 
 @WebFluxTest(controllers = [DownloadHandler::class])
@@ -35,34 +37,39 @@ class DownloadHandlerTest {
     @Autowired private lateinit var idm: ItemDownloadManager
     @Autowired private lateinit var rest: WebTestClient
 
-    private val p = Podcast().apply {
-        id = UUID.fromString("acaba8f2-4f2f-49f0-a520-a48bc628d81f")
-        title = "podcast"
-    }
+     private val item1 = DownloadingItem(
+            id = UUID.fromString("6c05149f-a3e1-4302-ab1f-83324c75ad70"),
+            url = URI("https://foo.bar.com/1"),
+            title = "item1",
+            status = Status.PAUSED,
+            progression = 0,
+            numberOfFail = 0,
+            podcast = DownloadingItem.Podcast(
+                    id = UUID.fromString("acaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                    title = "podcast"
+            ),
+            cover = DownloadingItem.Cover(
+                    id = UUID.fromString("cc05149f-a3e1-4302-ab1f-83324c75ad70"),
+                    url = URI("https://foo.bar.com/item1/url.png")
+            )
+    )
 
-    private val item1 = Item().apply {
-        id = UUID.fromString("6c05149f-a3e1-4302-ab1f-83324c75ad70")
-        url = "https://foo.bar.com/1"
-        title = "item1"
-        status = Status.PAUSED
-        podcast = p
-        cover = Cover().apply {
-            id = UUID.fromString("cc05149f-a3e1-4302-ab1f-83324c75ad70")
-            url = "https://foo.bar.com/item1/url.png"
-        }
-    }
-
-    private val item2 = Item().apply {
-        id = UUID.fromString("7caba8f2-4f2f-49f0-a520-a48bc628d81f")
-        url = "https://foo.bar.com/2"
-        title = "item2"
-        status = Status.STARTED
-        podcast = p
-        cover = Cover().apply {
-            id = UUID.fromString("ccaba8f2-4f2f-49f0-a520-a48bc628d81f")
-            url = "https://foo.bar.com/item2/url.png"
-        }
-    }
+    private val item2 = DownloadingItem(
+            id = UUID.fromString("7caba8f2-4f2f-49f0-a520-a48bc628d81f"),
+            url = URI("https://foo.bar.com/2"),
+            title = "item2",
+            status = Status.STARTED,
+            progression = 10,
+            numberOfFail = 0,
+            podcast = DownloadingItem.Podcast(
+                    id = UUID.fromString("acaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                    title = "podcast"
+            ),
+            cover = DownloadingItem.Cover(
+                    id = UUID.fromString("ccaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                    url = URI("https://foo.bar.com/item2/url.png")
+            )
+    )
 
     @Nested
     @DisplayName("should download item")
@@ -109,6 +116,7 @@ class DownloadHandlerTest {
                                  "id":"6c05149f-a3e1-4302-ab1f-83324c75ad70",
                                  "title":"item1",
                                  "status":"PAUSED",
+                                 "progression": 0,
                                  "podcast":{
                                     "id":"acaba8f2-4f2f-49f0-a520-a48bc628d81f",
                                     "title":"podcast"
@@ -122,6 +130,7 @@ class DownloadHandlerTest {
                                  "id":"7caba8f2-4f2f-49f0-a520-a48bc628d81f",
                                  "title":"item2",
                                  "status":"STARTED",
+                                 "progression": 10,
                                  "podcast":{
                                     "id":"acaba8f2-4f2f-49f0-a520-a48bc628d81f",
                                     "title":"podcast"
@@ -312,6 +321,7 @@ class DownloadHandlerTest {
                                  "id":"6c05149f-a3e1-4302-ab1f-83324c75ad70",
                                  "title":"item1",
                                  "status":"PAUSED",
+                                 "progression": 0,
                                  "podcast":{
                                     "id":"acaba8f2-4f2f-49f0-a520-a48bc628d81f",
                                     "title":"podcast"
@@ -325,6 +335,7 @@ class DownloadHandlerTest {
                                  "id":"7caba8f2-4f2f-49f0-a520-a48bc628d81f",
                                  "title":"item2",
                                  "status":"STARTED",
+                                 "progression": 10,
                                  "podcast":{
                                     "id":"acaba8f2-4f2f-49f0-a520-a48bc628d81f",
                                     "title":"podcast"

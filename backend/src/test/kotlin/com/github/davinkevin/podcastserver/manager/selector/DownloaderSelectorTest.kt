@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.entity.Item
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.net.URI
+import java.util.*
 import java.util.stream.Stream
 import kotlin.reflect.KClass
 
@@ -44,7 +47,7 @@ class DownloaderSelectorTest {
     @Test
     fun `should reject empty url`() {
         /* When */
-        assertThat(selector.of(DownloadingItem(Item.DEFAULT_ITEM, listOf(), null, null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
+        assertThat(selector.of(DownloadingInformation(dItem, listOf(), "file.mp4", null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
     }
 
     @MethodSource("urlToDownloader")
@@ -69,8 +72,26 @@ class DownloaderSelectorTest {
     }
 }
 
+private val dItem: DownloadingItem = DownloadingItem (
+        id = UUID.randomUUID(),
+        title = "Title",
+        status = Status.NOT_DOWNLOADED,
+        url = URI("http://a.fake.url/with/file.mp4?param=1"),
+        numberOfFail = 0,
+        progression = 0,
+        podcast = DownloadingItem.Podcast(
+                id = UUID.randomUUID(),
+                title = "A Fake ffmpeg Podcast"
+        ),
+        cover = DownloadingItem.Cover(
+                id = UUID.randomUUID(),
+                url = URI("https://bar/foo/cover.jpg")
+        )
+)
+
+
 class DownloaderArgument(val url: String, val clazz: KClass<*>) {
-    val item = DownloadingItem(Item.DEFAULT_ITEM, listOf(url), null, null)
+    val item = DownloadingInformation(dItem, listOf(url), "file.mp4", null)
 
     override fun toString(): String {
         return "${clazz.simpleName} for $url"

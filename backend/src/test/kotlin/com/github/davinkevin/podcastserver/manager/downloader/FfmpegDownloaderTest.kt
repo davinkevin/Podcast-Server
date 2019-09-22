@@ -4,8 +4,10 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.*
@@ -27,15 +29,24 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Spy
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.util.FileSystemUtils
+import reactor.core.publisher.Mono
+import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.time.Clock
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
+
+private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
 /**
  * Created by kevin on 20/02/2016 for Podcast Server
@@ -43,46 +54,51 @@ import java.util.concurrent.TimeUnit.SECONDS
 @ExtendWith(MockitoExtension::class)
 class FfmpegDownloaderTest {
 
-    @Mock lateinit var podcastRepository: PodcastRepository
-    @Mock lateinit var itemRepository: ItemRepository
-    @Mock lateinit var podcastServerParameters: PodcastServerParameters
-    @Mock lateinit var template: MessagingTemplate
-    @Mock lateinit var mimeTypeService: MimeTypeService
-    @Mock lateinit var itemDownloadManager: ItemDownloadManager
-
-    @Mock lateinit var urlService: UrlService
-    @Mock lateinit var m3U8Service: M3U8Service
-    @Mock lateinit var ffmpegService: FfmpegService
-    @Mock lateinit var processService: ProcessService
-
-    @InjectMocks lateinit var downloader: FfmpegDownloader
-
-    val aPodcast: Podcast = Podcast().apply {
-        id = UUID.randomUUID()
-        title = "M3U8Podcast"
-    }
-    val item: Item = Item().apply {
-        title = "item title"
-        podcast = aPodcast
-        url = "http://foo.bar/com.m3u8"
-        status = STARTED
-        numberOfFail = 0
-    }
+    private val item: DownloadingItem = DownloadingItem (
+            id = UUID.randomUUID(),
+            title = "Title",
+            status = Status.NOT_DOWNLOADED,
+            url = URI("http://a.fake.url/with/file.mp4?param=1"),
+            numberOfFail = 0,
+            progression = 0,
+            podcast = DownloadingItem.Podcast(
+                    id = UUID.randomUUID(),
+                    title = "A Fake ffmpeg Podcast"
+            ),
+            cover = DownloadingItem.Cover(
+                    id = UUID.randomUUID(),
+                    url = URI("https://bar/foo/cover.jpg")
+            )
+    )
 
     @Nested
     inner class DownloaderTest {
 
+        @Mock lateinit var downloadRepository: DownloadRepository
+        @Mock lateinit var podcastServerParameters: PodcastServerParameters
+        @Mock lateinit var template: MessagingTemplate
+        @Mock lateinit var mimeTypeService: MimeTypeService
+
+        @Mock lateinit var itemDownloadManager: ItemDownloadManager
+
+        @Mock lateinit var ffmpegService: FfmpegService
+        @Mock lateinit var processService: ProcessService
+        @Spy val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
+
+        lateinit var downloader: FfmpegDownloader
+
+
         @BeforeEach
         fun beforeEach() {
-            downloader.with(DownloadingItem(item, listOf(item.url!!, "http://foo.bar.com/end.mp4"), null, "Fake UserAgent"), itemDownloadManager)
-
             whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
-            whenever(podcastRepository.findById(aPodcast.id!!)).thenReturn(Optional.of(aPodcast))
-            whenever(itemRepository.save(any())).then { it.arguments[0] }
 
-            FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(aPodcast.title).toFile())
+            downloader = FfmpegDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, ffmpegService, processService)
+
+            downloader
+                    .with(DownloadingInformation(item, listOf(item.url.toASCIIString(), "http://foo.bar.com/end.mp4"), "file.mp4", "Fake UserAgent"), itemDownloadManager)
+
+            FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(item.podcast.title).toFile())
             Try { Files.createDirectories(ROOT_TEST_PATH) }
-            downloader.postConstruct()
         }
 
         @Nested
@@ -91,6 +107,7 @@ class FfmpegDownloaderTest {
             @BeforeEach
             fun beforeEach() {
                 whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
             }
 
             @Test
@@ -102,19 +119,27 @@ class FfmpegDownloaderTest {
                     (0..100).map { it * 5L }.forEach { sendProgress(i, it)}
                     mock<Process>()
                 }
-                whenever(processService.waitFor(any())).thenReturn(arrow.core.Try.Success(1))
+                whenever(processService.waitFor(any())).thenReturn(Try.Success(1))
                 doAnswer { writeEmptyFileTo(it.getArgument<Path>(0).toString()); null
                 }.whenever(ffmpegService).concat(any(), anyVararg())
+                whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
+                whenever(downloadRepository.finishDownload(
+                        id = item.id,
+                        length = 0,
+                        mimeType = "video/mp4",
+                        fileName = "file.mp4",
+                        downloadDate = fixedDate
+                )).thenReturn(Mono.empty())
+
 
                 /* When */
-                val downloaded = downloader.download()
+                downloader.run()
 
                 /* Then */
-                assertThat(ROOT_TEST_PATH.resolve(aPodcast.title).resolve(item.fileName)).exists()
-                assertThat(downloaded).isSameAs(item)
-                assertThat(downloaded.status).isSameAs(FINISH)
-                assertThat(item.progression).isEqualTo(100)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(aPodcast.title)))
+                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4")).exists()
+                assertThat(downloader.downloadingInformation.item.status).isEqualTo(FINISH)
+                assertThat(downloader.downloadingInformation.item.progression).isEqualTo(100)
+                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
                         .isEqualTo(1)
             }
 
@@ -126,18 +151,18 @@ class FfmpegDownloaderTest {
                 doAnswer { i -> writeEmptyFileTo(outputPath(i))
                     (0..100).map { it * 5L }.forEach { sendProgress(i, it)}
                     mock<Process>()
-                }
-                        .whenever(ffmpegService).download(eq(item.url!!), any(), any())
+                }.whenever(ffmpegService).download(eq(item.url.toASCIIString()), any(), any())
+
                 doAnswer { throw RuntimeException("Error during download of other url") }
                         .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
 
-                whenever(processService.waitFor(any())).thenReturn(arrow.core.Try.Success(1))
+                whenever(processService.waitFor(any())).thenReturn(Try.Success(1))
 
                 /* When */
                 downloader.run()
 
                 /* Then */
-                assertThat(item.status).isSameAs(FAILED)
+                assertThat(downloader.downloadingInformation.item.status).isSameAs(FAILED)
             }
 
             @Test
@@ -149,7 +174,7 @@ class FfmpegDownloaderTest {
                     (0..100).map { it * 5L }.forEach { sendProgress(i, it)}
                     mock<Process>()
                 }
-                        .whenever(ffmpegService).download(eq(item.url!!), any(), any())
+                        .whenever(ffmpegService).download(eq(item.url.toASCIIString()), any(), any())
                 doAnswer { throw RuntimeException("Error during download of other url") }
                         .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
                 whenever(processService.waitFor(any())).thenReturn(Try.Success(1))
@@ -158,7 +183,7 @@ class FfmpegDownloaderTest {
                 downloader.run()
 
                 /* Then */
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(aPodcast.title)))
+                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
                         .isEqualTo(0)
             }
 
@@ -182,7 +207,7 @@ class FfmpegDownloaderTest {
                 downloader.run()
 
                 /* Then */
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(aPodcast.title)))
+                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
                         .isEqualTo(0)
             }
 
@@ -204,17 +229,18 @@ class FfmpegDownloaderTest {
             fun should_restart_a_current_download() {
                 /* Given */
                 val restartProcessBuilder = mock<ProcessBuilder>()
-                item.status = PAUSED
+                downloader.downloadingInformation = downloader.downloadingInformation.status(PAUSED)
                 downloader.process = mock()
                 whenever(processService.newProcessBuilder(anyVararg())).thenReturn(restartProcessBuilder)
                 whenever(processService.start(restartProcessBuilder)).thenReturn(mock())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
 
                 /* When */
                 downloader.restartDownload()
 
                 /* Then */
                 await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(item.status).isEqualTo(STARTED)
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(STARTED)
                 }
             }
 
@@ -222,18 +248,19 @@ class FfmpegDownloaderTest {
             fun should_failed_to_restart() {
                 /* Given */
                 val restartProcessBuilder = mock<ProcessBuilder>()
-                item.status = PAUSED
+                downloader.downloadingInformation = downloader.downloadingInformation.status(PAUSED)
                 downloader.process = mock()
                 whenever(processService.newProcessBuilder(anyVararg())).thenReturn(restartProcessBuilder)
                 doAnswer { throw RuntimeException("Error when executing process") }
                         .whenever(processService).start(restartProcessBuilder)
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
 
                 /* When */
                 downloader.restartDownload()
 
                 /* Then */
                 await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(item.status).isEqualTo(FAILED)
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(FAILED)
                 }
             }
 
@@ -241,51 +268,54 @@ class FfmpegDownloaderTest {
             fun should_paused_a_download() {
                 /* Given */
                 val pauseProcess = mock<ProcessBuilder>()
-                item.status = STARTED
+                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
                 downloader.process = mock()
                 whenever(processService.newProcessBuilder(anyVararg())).thenReturn(pauseProcess)
                 whenever(processService.start(pauseProcess)).thenReturn(mock())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
 
                 /* When */
                 downloader.pauseDownload()
 
                 /* Then */
                 await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(item.status).isEqualTo(PAUSED)
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(PAUSED)
                 }
             }
-
+            //
             @Test
             fun should_failed_to_pause() {
                 /* Given */
                 val pauseProcess = mock<ProcessBuilder>()
-                item.status = STARTED
+                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
                 downloader.process = mock()
                 whenever(processService.newProcessBuilder(anyVararg())).thenReturn(pauseProcess)
                 doAnswer { throw RuntimeException("Error when executing process") }
                         .whenever(processService).start(pauseProcess)
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
 
                 /* When */
                 downloader.pauseDownload()
 
                 /* Then */
                 await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(item.status).isEqualTo(FAILED)
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(FAILED)
                 }
             }
 
             @Test
             fun should_stop_a_download() {
                 /* Given */
-                item.status = STARTED
+                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
                 downloader.process = mock()
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
 
                 /* When */
                 downloader.stopDownload()
 
                 /* Then */
                 await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(item.status).isEqualTo(STOPPED)
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(STOPPED)
                     verify(downloader.process).destroy()
                 }
             }
@@ -293,31 +323,49 @@ class FfmpegDownloaderTest {
             @Test
             fun should_failed_to_stop_a_download() {
                 /* Given */
-                item.status = STARTED
+                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
                 downloader.process = mock()
                 doAnswer { throw RuntimeException("Error when executing process") }
                         .whenever(downloader.process).destroy()
-
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
                 /* When */
                 downloader.stopDownload()
 
                 /* Then */
                 await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(item.status).isEqualTo(FAILED)
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(FAILED)
                 }
             }
 
         }
-
     }
 
     @Nested
     inner class CompatibilityTest {
 
+        @Mock lateinit var downloadRepository: DownloadRepository
+        @Mock lateinit var podcastServerParameters: PodcastServerParameters
+        @Mock lateinit var template: MessagingTemplate
+        @Mock lateinit var mimeTypeService: MimeTypeService
+
+        @Mock lateinit var itemDownloadManager: ItemDownloadManager
+
+        @Mock lateinit var ffmpegService: FfmpegService
+        @Mock lateinit var processService: ProcessService
+        @Spy val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
+
+        lateinit var downloader: FfmpegDownloader
+
+        @BeforeEach
+        fun beforeEach() {
+            whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
+            downloader = FfmpegDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, ffmpegService, processService)
+        }
+
         @Test
         fun `should be compatible with multiple urls ending with M3U8 and MP4`() {
             /* Given */
-            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4"), null, null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4"), "end.mp4", null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -327,7 +375,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with only urls ending with M3U8`() {
             /* Given */
-            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8"), null, null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8"), "end.mp4", null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -337,7 +385,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with only urls ending with mp4`() {
             /* Given */
-            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4"), null, null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4"), "end.mp4", null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -349,7 +397,7 @@ class FfmpegDownloaderTest {
         @ValueSource(strings = ["m3u8", "mp4"])
         fun `should be compatible with only one url with extension`(ext: String) {
             /* Given */
-            val di = DownloadingItem(item, listOf("http://foo.bar.com/end.$ext"), null, null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.$ext"), "end.mp4", null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -361,7 +409,7 @@ class FfmpegDownloaderTest {
         @ValueSource(strings = ["http://foo.bar.com/end.webm", "http://foo.bar.com/end.manifest"])
         fun `should not be compatible with`(url: String) {
             /* Given */
-            val di = DownloadingItem(item, listOf(url), null, null)
+            val di = DownloadingInformation(item, listOf(url), "end.mp4", null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
