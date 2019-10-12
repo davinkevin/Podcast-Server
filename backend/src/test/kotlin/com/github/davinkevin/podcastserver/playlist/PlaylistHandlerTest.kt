@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.watchlist
+package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.nhaarman.mockitokotlin2.whenever
@@ -18,13 +18,13 @@ import java.util.*
 /**
  * Created by kevin on 2019-07-06
  */
-@WebFluxTest(controllers = [WatchListHandler::class])
-@Import(WatchListRoutingConfig::class, WatchListHandler::class)
+@WebFluxTest(controllers = [PlaylistHandler::class])
+@Import(PlaylistRoutingConfig::class, PlaylistHandler::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-class WatchListHandlerTest {
+class PlaylistHandlerTest {
 
     @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var service: WatchListService
+    @MockBean lateinit var service: PlaylistService
 
     @Nested
     @DisplayName("should find all")
@@ -37,7 +37,7 @@ class WatchListHandlerTest {
             /* When */
             rest
                     .get()
-                    .uri("/api/v1/watchlists")
+                    .uri("/api/v1/playlists")
                     .exchange()
                     /* Then */
                     .expectStatus().isOk
@@ -51,15 +51,15 @@ class WatchListHandlerTest {
         fun `with watch lists in results`() {
             /* Given */
             whenever(service.findAll()).thenReturn(Flux.just(
-                    WatchList(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
-                    WatchList(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
-                    WatchList(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
+                    Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
+                    Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
+                    Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
             ))
 
             /* When */
             rest
                     .get()
-                    .uri("/api/v1/watchlists")
+                    .uri("/api/v1/playlists")
                     .exchange()
                     /* Then */
                     .expectStatus().isOk

@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.watchlist
+package com.github.davinkevin.podcastserver.playlist
 
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -6,12 +6,12 @@ import org.springframework.web.reactive.function.server.ServerResponse.ok
 import reactor.core.publisher.Mono
 import java.util.*
 
-class WatchListHandler(
-        private val watchListService: WatchListService
+class PlaylistHandler(
+        private val playlistService: PlaylistService
 ) {
 
     fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            watchListService
+            playlistService
                     .findAll()
                     .map { WatchListHAL(it.id, it.name) }
                     .collectList()

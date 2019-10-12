@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Created by kevin on 19/03/2016 for Podcast Server
  */
-class WatchListTest {
+class PlaylistTest {
 
     @Test
     fun `should have getters and setters`() {

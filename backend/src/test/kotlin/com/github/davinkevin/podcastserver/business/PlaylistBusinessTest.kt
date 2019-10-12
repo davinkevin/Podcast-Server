@@ -30,7 +30,7 @@ import java.util.*
  * Created by kevin on 17/01/2016 for PodcastServer
  */
 @ExtendWith(MockitoExtension::class)
-class WatchListBusinessTest {
+class PlaylistBusinessTest {
 
     @Mock lateinit var watchListRepository: WatchListRepository
     @Mock lateinit var itemRepository: ItemRepository

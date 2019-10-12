@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.watchlist
+package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
@@ -19,17 +19,16 @@ import reactor.test.StepVerifier
 import java.time.ZonedDateTime.now
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
-import java.util.*
 import java.util.UUID.*
 import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.watchlist.WatchListRepositoryV2 as WatchListRepository
+import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as WatchListRepository
 
 /**
  * Created by kevin on 2019-07-06
  */
 @JooqTest
 @Import(WatchListRepository::class)
-class WatchListRepositoryV2Test {
+class PlaylistRepositoryV2Test {
 
     @Autowired lateinit var query: DSLContext
     @Autowired lateinit var repository: WatchListRepository
@@ -102,8 +101,8 @@ class WatchListRepositoryV2Test {
             StepVerifier.create(repository.findAll())
                     /* Then */
                     .expectSubscription()
-                    .expectNext(WatchList(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"))
-                    .expectNext(WatchList(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"))
+                    .expectNext(Playlist(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"))
+                    .expectNext(Playlist(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"))
                     .verifyComplete()
         }
 

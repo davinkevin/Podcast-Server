@@ -12,7 +12,7 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import com.github.davinkevin.podcastserver.tag.TagConfig
 import com.github.davinkevin.podcastserver.update.UpdateConfig
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import com.github.davinkevin.podcastserver.watchlist.WatchListConfig
+import com.github.davinkevin.podcastserver.playlist.PlaylistConfig
 import io.vavr.collection.Set
 import org.apache.tika.Tika
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding
@@ -40,7 +40,7 @@ import java.nio.file.Paths
         PodcastConfig::class,
         TagConfig::class,
         CoverConfig::class,
-        WatchListConfig::class,
+        PlaylistConfig::class,
         DownloadConfig::class
 )
 @ComponentScan(basePackages = [

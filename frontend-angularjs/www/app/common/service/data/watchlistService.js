@@ -23,7 +23,7 @@ export default class WatchListService {
     }
 
     findAll() {
-        return this.$http.get('/api/v1/watchlists').then(res => res.data).then(v => v.content);
+        return this.$http.get('/api/v1/playlists').then(res => res.data).then(v => v.content);
     }
 
     delete(id){
