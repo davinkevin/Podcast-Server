@@ -38,48 +38,6 @@ class WatchListBusinessTest {
     @InjectMocks lateinit var watchListBusiness: WatchListBusiness
 
     @Test
-    fun `should find all playlist with specified item`() {
-        /* Given */
-        val uuid = UUID.randomUUID()
-        val item = Item().apply { id = uuid }
-        val p1 = WatchList().apply {
-            id = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-            name = "First"
-        }
-        val p2 = WatchList().apply {
-            id = UUID.fromString("86faa982-f462-400a-bc9b-91eb299910b6")
-            name = "Second"
-        }
-        val watchLists = Set(p1, p2)
-
-        whenever(itemRepository.findById(eq(uuid))).thenReturn(Optional.of(item))
-        whenever(watchListRepository.findContainsItem(eq(item))).thenReturn(watchLists)
-
-        /* When */
-        val watchListOfItem = watchListBusiness.findContainsItem(uuid)
-
-        /* Then */
-        assertThat(watchListOfItem).isSameAs(watchLists)
-        verify(itemRepository, only()).findById(eq(uuid))
-        verify(watchListRepository, only()).findContainsItem(eq(item))
-    }
-
-    @Test
-    fun `should return empty result if item wasn't found`() {
-        /* Given */
-        val uuid = UUID.randomUUID()
-
-        whenever(itemRepository.findById(eq(uuid))).thenReturn(Optional.empty())
-
-        /* When */
-        val watchListOfItem = watchListBusiness.findContainsItem(uuid)
-
-        /* Then */
-        assertThat(watchListOfItem).isEmpty()
-        verify(itemRepository, only()).findById(eq(uuid))
-    }
-
-    @Test
     fun `should add item to playlist`() {
         /* Given */
         val uuid = UUID.randomUUID()

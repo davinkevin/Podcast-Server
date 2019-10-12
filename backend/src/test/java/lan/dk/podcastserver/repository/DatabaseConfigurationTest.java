@@ -80,6 +80,17 @@ public class DatabaseConfigurationTest {
                     .columns("PODCASTS_ID", "TAGS_ID")
                     .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
+                    .build(),
+            insertInto("WATCH_LIST")
+                    .columns("ID", "NAME")
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind")
+                    .build(),
+            insertInto("WATCH_LIST_ITEMS")
+                    .columns("WATCH_LISTS_ID", "ITEMS_ID")
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"))
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .build()
     );
 

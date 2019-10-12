@@ -1057,6 +1057,59 @@ class ItemRepositoryV2Test {
 
     }
 
+    @Nested
+    @DisplayName("should find all playlists containing an item by id")
+    inner class ShouldFindAllPlaylistsContainingAnItemById {
+
+        @BeforeEach
+        fun prepare() = DbSetup(db, operation).launch()
+
+        @Test
+        fun `and find no playlists because nothing is associated to this item`() {
+            /* Given */
+            val uuid = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
+            /* When */
+            StepVerifier.create(repository.findPlaylistsContainingItem(uuid))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `and find one playlist`() {
+            /* Given */
+            val uuid = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            /* When */
+            StepVerifier.create(repository.findPlaylistsContainingItem(uuid))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("Humour Playlist")
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `and find many playlists`() {
+            /* Given */
+            val uuid = fromString("0a774611-c867-44df-b7e0-5e5af31f7b56")
+            /* When */
+            StepVerifier.create(repository.findPlaylistsContainingItem(uuid))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("Humour Playlist")
+                        assertThat(it.id).isEqualTo(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"))
+                    }
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("Conférence Rewind")
+                        assertThat(it.id).isEqualTo(fromString("24248480-bd04-11e5-a837-0800200c9a66"))
+                    }
+                    .verifyComplete()
+        }
+
+    }
+
     @TestConfiguration
     class LocalTestConfiguration {
         @Bean fun db(datasource: DataSource) = DataSourceDestination(datasource)

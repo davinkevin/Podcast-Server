@@ -244,6 +244,19 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .then()
                 .doOnTerminate { log.info("Reset of item with downloading state done") }
     }
+
+    fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> {
+        return query
+                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
+                .from(WATCH_LIST
+                        .innerJoin(WATCH_LIST_ITEMS)
+                        .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
+                )
+                .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+                .orderBy(WATCH_LIST.ID)
+                .fetchAsFlux()
+                .map { ItemPlaylist(it[WATCH_LIST.ID], it[WATCH_LIST.NAME]) }
+    }
 }
 
 private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Timestamp, String, String, Long, String, String, UUID, String, String, UUID, String, Int, Int>): Item {

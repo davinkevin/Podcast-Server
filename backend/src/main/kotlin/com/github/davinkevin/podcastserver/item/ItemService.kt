@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import org.springframework.http.codec.multipart.FilePart
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import reactor.util.function.component1
@@ -100,6 +101,9 @@ class ItemService(
                 .flatMap { repository.create(it) }
                 .delayUntil { podcastRepository.updateLastUpdate(podcastId) }
     }
+
+    fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> =
+            repository.findPlaylistsContainingItem(itemId)
 }
 
 private fun CoverForPodcast.toCoverForCreation() = CoverForCreation(width, height, url)

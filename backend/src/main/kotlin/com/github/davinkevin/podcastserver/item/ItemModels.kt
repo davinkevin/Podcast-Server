@@ -102,3 +102,5 @@ data class ItemForCreation(
         val podcastId: UUID,
         val cover: CoverForCreation
 )
+
+data class ItemPlaylist(val id: UUID, val name: String)

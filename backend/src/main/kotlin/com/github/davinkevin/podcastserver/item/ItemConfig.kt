@@ -27,6 +27,7 @@ class ItemRoutingConfig {
             "/items/{id}".nest {
                 GET("/", item::findById)
                 GET("/cover.{ext}", item::cover)
+                GET("/playlists", item::playlists)
                 GET("/{file}", item::file)
                 POST("/reset", item::reset)
             }

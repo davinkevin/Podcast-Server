@@ -280,4 +280,43 @@ class ItemServiceTest {
                     .verifyComplete()
         }
     }
+
+    @Nested
+    @DisplayName("should find all playlists containing an item by id")
+    inner class ShouldFindAllPlaylistsContainingAnItemById {
+
+        @Test
+        fun `and return nothing because no playlist contains this item`() {
+            /* Given */
+            val uuid = UUID.randomUUID()
+            whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(Flux.empty())
+            /* When */
+            StepVerifier.create(itemService.findPlaylistsContainingItem(uuid))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+        }
+
+        @Test
+        fun `and return 3 playlist associated to this item`() {
+            /* Given */
+            val uuid = UUID.randomUUID()
+            whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(Flux.just(
+                    ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
+                    ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
+                    ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
+            ))
+
+            /* When */
+            StepVerifier.create(itemService.findPlaylistsContainingItem(uuid))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"))
+                    .expectNext(ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"))
+                    .expectNext(ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other"))
+                    .verifyComplete()
+        }
+
+    }
 }

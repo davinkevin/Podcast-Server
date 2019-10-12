@@ -179,6 +179,16 @@ class ItemHandler(
                 .flatMap { created(URI("${host}api/v1/items/${it.id}")).syncBody(it) }
     }
 
+    fun playlists(r: ServerRequest): Mono<ServerResponse> {
+        val itemId = UUID.fromString(r.pathVariable("id"))
+
+        return itemService
+                .findPlaylistsContainingItem(itemId)
+                .map { PlaylistHAL(it.id, it.name) }
+                .collectList()
+                .map { PlaylistsHAL(it) }
+                .flatMap { ok().syncBody(it) }
+    }
 }
 
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
@@ -258,3 +268,6 @@ private fun toPageItemHAL(p: PageItem) = PageItemHAL(
         totalElements = p.totalElements,
         totalPages = p.totalPages
 )
+
+data class PlaylistsHAL(val content: Collection<PlaylistHAL>)
+data class PlaylistHAL(val id: UUID, val name: String)

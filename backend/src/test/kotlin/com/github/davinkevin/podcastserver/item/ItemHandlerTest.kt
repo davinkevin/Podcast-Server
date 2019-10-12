@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.nio.file.Path
@@ -613,6 +614,91 @@ class ItemHandlerTest {
                         }""")
                     }
         }
+    }
+
+    @Nested
+    @DisplayName("should find watchLists associated to an item")
+    inner class ShouldFindWatchListsAssociatedToAnItem {
+
+        val item = Item(
+                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+                title = "Foo",
+                url = "https://external.domain.tld/foo/bar.mp4",
+
+                pubDate = now(),
+                downloadDate = now(),
+                creationDate = now(),
+
+                description = "desc",
+                mimeType = null,
+                length = 100,
+                fileName = null,
+                status = Status.NOT_DOWNLOADED,
+
+                podcast = PodcastForItem(
+                        id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                        title = "Podcast Bar",
+                        url = "https://external.domain.tld/bar.rss"
+                ),
+                cover = CoverForItem(
+                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                        url = "https://external.domain.tld/foo/bar.png",
+                        width = 200,
+                        height = 200
+                )
+        )
+
+        @Test
+        fun `with no watch list associated to this item`() {
+            /* Given */
+            whenever(itemService.findPlaylistsContainingItem(item.id))
+                    .thenReturn(Flux.empty())
+
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/podcasts/{podcastId}/items/{id}/playlists", item.podcast.id, item.id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                          "content": []
+                        }""")
+                    }
+        }
+
+        @Test
+        fun `with 3 playlists associated to this item`() {
+            /* Given */
+            whenever(itemService.findPlaylistsContainingItem(item.id)).thenReturn(Flux.just(
+                    ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
+                    ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
+                    ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
+            ))
+
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/podcasts/{podcastId}/items/{id}/playlists", item.podcast.id, item.id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                          "content": [
+                              {"id":"50958264-d5ed-4a9a-a875-5173bb207720","name":"foo"}, 
+                              {"id":"e053b63c-dc1d-4a3a-9c95-8f616a74d2aa","name":"bar"}, 
+                              {"id":"6761208b-85e7-4098-817a-2db7c4de7ceb","name":"other"}
+                          ]
+                        }""")
+                    }
+        }
+
+
+
     }
 
     @TestConfiguration

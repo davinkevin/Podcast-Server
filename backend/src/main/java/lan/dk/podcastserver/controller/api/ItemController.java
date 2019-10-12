@@ -32,12 +32,6 @@ public class ItemController {
         this.watchListBusiness = watchListBusiness;
     }
 
-    @GetMapping("{id}/watchlists")
-    @JsonView(Object.class)
-    public Set<WatchList> getWatchListOfItem(@PathVariable("id") UUID id) {
-        return watchListBusiness.findContainsItem(id);
-    }
-
     @DeleteMapping("{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(value = "id") UUID id) {
