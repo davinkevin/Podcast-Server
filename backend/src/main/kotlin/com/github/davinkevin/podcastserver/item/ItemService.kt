@@ -98,6 +98,7 @@ class ItemService(
                     )
                 }
                 .flatMap { repository.create(it) }
+                .delayUntil { podcastRepository.updateLastUpdate(podcastId) }
     }
 }
 
