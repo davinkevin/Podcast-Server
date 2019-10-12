@@ -41,7 +41,7 @@ export default class ItemService {
     }
 
     delete(item) {
-        return this.$http.delete(`/api/podcasts/${item.podcastId}/items/${item.id}`);
+        return this.$http.delete(`/api/v1/podcasts/${item.podcastId}/items/${item.id}`);
     }
 
     reset(item) {

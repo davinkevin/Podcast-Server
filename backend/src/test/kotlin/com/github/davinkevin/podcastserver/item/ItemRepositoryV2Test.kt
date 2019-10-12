@@ -110,27 +110,71 @@ class ItemRepositoryV2Test {
         @BeforeEach
         fun prepare() = DbSetup(db, operation).launch()
 
-        @Test
-        fun `by id`() {
-            /* Given */
-            val item1 = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
-            val item2 = fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
-            val item3 = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+        @Nested
+        @DisplayName("ById")
+        inner class ById {
 
-            /* When */
-            StepVerifier.create(repository.deleteById(listOf(item1, item2, item3)))
-                    .expectSubscription()
-                    /* Then */
-                    .verifyComplete()
+            @Test
+            fun `on a item deletable from disk`() {
+                /* Given */
+                val id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56")
 
-            val items = query.select(ITEM.ID).from(ITEM).fetch { it[ITEM.ID] }
-            assertThat(items).hasSize(4).contains(
-                    fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
-                    fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
-                    fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"),
-                    fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
-            )
+                /* When */
+                StepVerifier.create(repository.deleteById(id))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNext(DeleteItemInformation(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), "geekinc.124.mp3", "Geek Inc HD"))
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `on a item not deletable from disk`() {
+                /* Given */
+                val id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+
+                /* When */
+                StepVerifier.create(repository.deleteById(id))
+                        /* Then */
+                        .expectSubscription()
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `and check it remains other items in database`() {
+                /* Given */
+                val id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+
+                /* When */
+                StepVerifier.create(repository.deleteById(id))
+                        /* Then */
+                        .expectSubscription()
+                        .verifyComplete()
+
+                val items = query.select(ITEM.ID).from(ITEM).fetch { it[ITEM.ID] }
+                assertThat(items).hasSize(6).contains(
+                        fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"),
+                        fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
+                        fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"),
+                        fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"),
+                        fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                        fromString("0a774611-c867-44df-b7e0-5e5af31f7b56")
+                )
+            }
+
+            @Test
+            fun `on item in a playlist`() {
+                /* Given */
+                val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+
+                /* When */
+                StepVerifier.create(repository.deleteById(id))
+                        .expectSubscription()
+                        /* Then */
+                        .expectNext(DeleteItemInformation(fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), "geekinc.126.mp3", "Geek Inc HD"))
+                        .verifyComplete()
+            }
         }
+
     }
 
     @Nested

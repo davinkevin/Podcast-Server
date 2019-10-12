@@ -104,6 +104,16 @@ class ItemService(
 
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> =
             repository.findPlaylistsContainingItem(itemId)
+
+    fun deleteById(itemId: UUID): Mono<Void> {
+
+        idm.removeItemFromQueueAndDownload(itemId)
+
+        return repository
+                .deleteById(itemId)
+                .delayUntil { fileService.deleteItem(it) }
+                .then()
+    }
 }
 
 private fun CoverForPodcast.toCoverForCreation() = CoverForCreation(width, height, url)

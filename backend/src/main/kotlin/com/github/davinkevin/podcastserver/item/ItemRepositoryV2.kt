@@ -54,12 +54,23 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .toFlux()
     }
 
-    fun deleteById(items: Collection<UUID>) = Mono.defer {
-        query
-                .deleteFrom(ITEM)
-                .where(ITEM.ID.`in`(items))
+    fun deleteById(id: UUID) = Flux.defer {
+        val removeFromPlaylist = query
+                .delete(WATCH_LIST_ITEMS)
+                .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(id))
                 .executeAsyncAsMono()
-                .then()
+
+        val delete = query
+                .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE, PODCAST.HAS_TO_BE_DELETED)
+                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+                .where(ITEM.ID.eq(id))
+                .fetchOneAsMono()
+                .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) to it[PODCAST.HAS_TO_BE_DELETED] }
+                .delayUntil { (d, _) -> query.delete(ITEM).where(ITEM.ID.eq(d.id)).executeAsyncAsMono() }
+                .filter { it.second }
+                .map { it.first }
+
+        removeFromPlaylist.then(delete)
     }
 
     fun updateAsDeleted(items: Collection<UUID>) = Mono.defer {

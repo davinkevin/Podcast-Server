@@ -30,6 +30,7 @@ class ItemRoutingConfig {
                 GET("/playlists", item::playlists)
                 GET("/{file}", item::file)
                 POST("/reset", item::reset)
+                DELETE("/", item::delete)
             }
         }
     }

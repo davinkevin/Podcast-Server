@@ -189,6 +189,15 @@ class ItemHandler(
                 .map { PlaylistsHAL(it) }
                 .flatMap { ok().syncBody(it) }
     }
+
+    fun delete(r: ServerRequest): Mono<ServerResponse> {
+        val itemId = UUID.fromString(r.pathVariable("id"))
+
+        return itemService
+                .deleteById(itemId)
+                .flatMap { ok().build() }
+
+    }
 }
 
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"

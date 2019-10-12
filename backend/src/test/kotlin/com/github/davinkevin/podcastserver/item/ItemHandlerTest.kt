@@ -696,9 +696,25 @@ class ItemHandlerTest {
                         }""")
                     }
         }
+    }
 
+    @Nested
+    @DisplayName("should delete item")
+    inner class ShouldDeleteItem {
 
-
+        @Test
+        fun `by id`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            whenever(itemService.deleteById(id)).thenReturn(Mono.empty())
+            /* When */
+            rest
+                    .delete()
+                    .uri("/api/v1/podcasts/5957cb8a-a05c-4ac3-bb03-94f473d38273/items/{id}", id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+        }
     }
 
     @TestConfiguration

@@ -317,6 +317,44 @@ class ItemServiceTest {
                     .expectNext(ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other"))
                     .verifyComplete()
         }
+    }
 
+    @Nested
+    @DisplayName("should delete by id")
+    inner class ShouldDeleteById {
+
+        @BeforeEach
+        fun beforeEach() = Mockito.reset(fileService, repository)
+
+        @Test
+        fun `an item which should not be deleted from disk`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            whenever(repository.deleteById(id)).thenReturn(Flux.empty())
+            /* When */
+            StepVerifier.create(itemService.deleteById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            verify(fileService, never()).deleteItem(any())
+        }
+
+        @Test
+        fun `an item which should be deleted from disk`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            val deleteItem = DeleteItemInformation(id, "foo", "bar")
+            whenever(repository.deleteById(id)).thenReturn(Flux.just(deleteItem))
+            whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
+
+            /* When */
+            StepVerifier.create(itemService.deleteById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            verify(fileService, times(1)).deleteItem(deleteItem)
+        }
     }
 }
