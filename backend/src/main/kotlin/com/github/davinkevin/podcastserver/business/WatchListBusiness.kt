@@ -15,12 +15,9 @@ import java.util.*
 @Component
 class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRepository: ItemRepository, val jdomService: JdomService) {
 
-    fun findOne(id: UUID): WatchList =
-            watchListRepository.findById(id).k()
-                    .getOrElse { throw RuntimeException("Watchlist not found") }
-
     fun add(watchListId: UUID, itemId: UUID): WatchList {
-        val watchList = findOne(watchListId)
+        val watchList = watchListRepository.findById(watchListId).k()
+                .getOrElse { throw RuntimeException("Watchlist not found") }
         val item = itemRepository.findById(itemId).k()
                 .getOrElse { throw RuntimeException("Item with ID $itemId not found") }
 
@@ -28,7 +25,8 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
     }
 
     fun remove(watchListId: UUID, itemId: UUID): WatchList {
-        val watchList = findOne(watchListId)
+        val watchList = watchListRepository.findById(watchListId).k()
+                .getOrElse { throw RuntimeException("Watchlist not found") }
         val item = itemRepository.findById(itemId).k()
                 .getOrElse { throw RuntimeException("Item with ID $itemId not found") }
 

@@ -32,11 +32,6 @@ public class WatchListController {
         return watchListBusiness.save(entity);
     }
 
-    @GetMapping("{id}")
-    public WatchList findOne(@PathVariable UUID id) {
-        return watchListBusiness.findOne(id);
-    }
-
     @DeleteMapping("{id}")
     public void delete(@PathVariable UUID id) {
         watchListBusiness.delete(id);

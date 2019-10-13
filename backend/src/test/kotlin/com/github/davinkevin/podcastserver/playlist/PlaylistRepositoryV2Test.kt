@@ -7,6 +7,7 @@ import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
+import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -14,24 +15,28 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
+import java.net.URI
 import java.time.ZonedDateTime.now
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
+import java.util.*
 import java.util.UUID.*
 import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as WatchListRepository
+import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as PlaylistRepository
 
 /**
  * Created by kevin on 2019-07-06
  */
 @JooqTest
-@Import(WatchListRepository::class)
+@Import(PlaylistRepository::class)
 class PlaylistRepositoryV2Test(
     @Autowired val query: DSLContext,
-    @Autowired val repository: WatchListRepository,
-    @Autowired val dataSource: DataSource
+    @Autowired val repository: PlaylistRepository,
+    @Autowired val datasourceDestination: DataSourceDestination
 ) {
 
     private val dbSetupTracker = DbSetupTracker()
@@ -72,6 +77,7 @@ class PlaylistRepositoryV2Test(
                     .columns("ID", "NAME")
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind")
+                    .values(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist")
                     .build(),
             insertInto("WATCH_LIST_ITEMS")
                     .columns("WATCH_LISTS_ID", "ITEMS_ID")
@@ -83,28 +89,130 @@ class PlaylistRepositoryV2Test(
 
     @BeforeEach
     fun beforeEach() {
-        val operation = sequenceOf(DELETE_ALL, insertPlaylistData)
-        val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-        dbSetupTracker.launchIfNecessary(dbSetup)
+        DbSetup(datasourceDestination, sequenceOf(DELETE_ALL, insertPlaylistData)).launch()
     }
 
     @Nested
     @DisplayName("should find all")
     inner class ShouldFindAll {
-
         @Test
         fun `with watch lists in results`() {
             /* Given */
-            dbSetupTracker.skipNextLaunch()
             /* When */
             StepVerifier.create(repository.findAll())
                     /* Then */
                     .expectSubscription()
-                    .expectNext(Playlist(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"))
                     .expectNext(Playlist(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"))
+                    .expectNext(Playlist(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"))
+                    .expectNext(Playlist(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist"))
+                    .verifyComplete()
+        }
+    }
+
+    @Nested
+    @DisplayName("should find by id")
+    inner class ShouldFindById {
+
+        @Test
+        fun `with no item`() {
+            /* Given */
+            val id = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            /* When */
+            StepVerifier.create(repository.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("empty playlist")
+                        assertThat(it.id).isEqualTo(id)
+                        assertThat(it.items).isEmpty()
+                    }
                     .verifyComplete()
         }
 
+        @Test
+        fun `with 1 item`() {
+            /* Given */
+            val id = fromString("24248480-bd04-11e5-a837-0800200c9a66")
+            /* When */
+            StepVerifier.create(repository.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("Conférence Rewind")
+                        assertThat(it.id).isEqualTo(id)
+                        assertThat(it.items).hasSize(1).containsOnly(
+                                PlaylistWithItems. Item(
+                                        id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                                        title = "Geek INC 124",
+                                        fileName = "geekinc.124.mp3",
+                                        description = "desc",
+                                        mimeType = null,
+                                        podcast = PlaylistWithItems.Item.Podcast(
+                                                id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                                                title = "Geek Inc HD"
+                                        ),
+                                        cover = PlaylistWithItems.Item.Cover(
+                                                id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
+                                                width = 100,
+                                                height = 100,
+                                                url = URI("http://fake.url.com/geekinc/cover.png")))
+                        )
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with 2 items`() {
+            /* Given */
+            val id = fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+            /* When */
+            StepVerifier.create(repository.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("Humour Playlist")
+                        assertThat(it.id).isEqualTo(id)
+                        assertThat(it.items).hasSize(2).containsOnly(
+                                PlaylistWithItems.Item(
+                                        id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"),
+                                        title = "Appload 3",
+                                        fileName = "appload.3.mp3",
+                                        description = "desc",
+                                        mimeType = null,
+                                        podcast = PlaylistWithItems.Item.Podcast(
+                                                id = fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"),
+                                                title = "AppLoad"
+                                        ),
+                                        cover = PlaylistWithItems.Item.Cover(
+                                                id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                                                width = 100,
+                                                height = 100,
+                                                url = URI("http://fake.url.com/appload/cover.png")
+                                        )
+                                ),
+                                PlaylistWithItems. Item(
+                                        id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                                        title = "Geek INC 124",
+                                        fileName = "geekinc.124.mp3",
+                                        description = "desc",
+                                        mimeType = null,
+                                        podcast = PlaylistWithItems.Item.Podcast(
+                                                id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                                                title = "Geek Inc HD"
+                                        ),
+                                        cover = PlaylistWithItems.Item.Cover(
+                                                id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
+                                                width = 100,
+                                                height = 100,
+                                                url = URI("http://fake.url.com/geekinc/cover.png")))
+                        )
+                    }
+                    .verifyComplete()
+        }
+    }
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun datasourceDestination(dataSource: DataSource) =  DataSourceDestination(dataSource)
     }
 }

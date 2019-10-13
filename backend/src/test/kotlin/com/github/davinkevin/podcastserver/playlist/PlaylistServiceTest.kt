@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.util.*
 import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as WatchListRepository
@@ -57,6 +59,38 @@ class PlaylistServiceTest(
                     .expectNext(Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"))
                     .expectNext(Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"))
                     .expectNext(Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third"))
+                    .verifyComplete()
+        }
+    }
+
+    @Nested
+    @DisplayName("should find by Id")
+    inner class ShouldFindById {
+
+        @Test
+        fun `with no playlist`() {
+            /* Given */
+            val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            whenever(repository.findById(id)).thenReturn(Mono.empty())
+            /* When */
+            StepVerifier.create(service.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with one playlist`() {
+            /* Given */
+            val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
+            whenever(repository.findById(id)).thenReturn(playlist.toMono())
+
+            /* When */
+            StepVerifier.create(service.findById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(playlist)
                     .verifyComplete()
         }
     }

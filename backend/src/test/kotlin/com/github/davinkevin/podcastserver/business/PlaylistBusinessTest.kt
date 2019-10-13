@@ -175,42 +175,6 @@ class PlaylistBusinessTest {
     }
 
     @Test
-    fun `should find one by id`() {
-        /* Given */
-        val wId = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-        val watchList = WatchList().apply {
-            id = wId
-            name = "First"
-            items = mutableSetOf()
-        }
-
-        whenever(watchListRepository.findById(eq(wId))).thenReturn(Optional.of(watchList))
-
-        /* When */
-        val aWatchList = watchListBusiness.findOne(wId)
-
-        /* Then */
-        assertThat(aWatchList).isSameAs(watchList)
-        verify(watchListRepository, only()).findById(eq(wId))
-    }
-
-    @Test
-    fun `should throw exception if not found`() {
-        /* Given */
-        val otherUUID = UUID.fromString("16f7a430-8d4c-45d4-b4ec-67c807b82634")
-
-        whenever(watchListRepository.findById(eq(otherUUID))).thenReturn(Optional.empty())
-
-        /* When */
-        assertThatThrownBy { watchListBusiness.findOne(otherUUID) }
-
-        /* Then */
-                .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Watchlist not found")
-        verify(watchListRepository, only()).findById(eq(otherUUID))
-    }
-
-    @Test
     fun `should generate watchlist as xml`() {
         /* Given */
         val uuid = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")

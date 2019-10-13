@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import java.util.*
 import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as WatchListRepository
 
 class PlaylistService(
@@ -8,5 +10,6 @@ class PlaylistService(
 ) {
 
     fun findAll(): Flux<Playlist> = repository.findAll()
+    fun findById(id: UUID): Mono<PlaylistWithItems> = repository.findById(id)
 
 }
