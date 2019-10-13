@@ -85,5 +85,11 @@ class PodcastService(
                 }
                 .delayUntil { title }
     }
+
+    fun deleteById(id: UUID): Mono<Void> =
+            repository
+                    .deleteById(id)
+                    .delayUntil { fileService.deletePodcast(it) }
+                    .then()
 }
 

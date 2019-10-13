@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
+import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
@@ -14,6 +15,7 @@ import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_PODCAST_
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_TAG_DATA
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter
 import org.assertj.core.api.Assertions.assertThat
+import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -39,6 +41,7 @@ class PodcastRepositoryV2Test {
 
     @Autowired lateinit var repository: PodcastRepository
     @Autowired lateinit var dataSource: DataSource
+    @Autowired lateinit var query: DSLContext
 
     private val dbSetupTracker = DbSetupTracker()
 
@@ -632,5 +635,197 @@ class PodcastRepositoryV2Test {
                     }
                     .verifyComplete()
         }
+    }
+
+    @Nested
+    @DisplayName("should delete")
+    inner class ShouldDelete {
+
+        @Test
+        fun `a podcast with cover`() {
+            /* Given */
+            val podcastCovers = insertInto("COVER")
+                    .columns("ID", "URL", "WIDTH", "HEIGHT")
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 100, 100)
+                    .build()!!
+
+            val podcastInDb = insertInto("PODCAST")
+                    .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE")
+                    .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload",      "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD",  "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true,  "RSS")
+                    .build()!!
+
+            DbSetup(DataSourceDestination(dataSource), sequenceOf(DELETE_ALL, podcastCovers, podcastInDb)).launch()
+
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(query.selectFrom(COVER).fetch().map { it[COVER.ID] }).containsOnly(
+                    fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2")
+            )
+            assertThat(query.selectFrom(PODCAST).fetch().map { it[PODCAST.ID] }).containsOnly(
+                    fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")
+            )
+        }
+
+        @Test
+        fun `a podcast with cover and should be deleted`() {
+            /* Given */
+            val podcastCovers = insertInto("COVER")
+                    .columns("ID", "URL", "WIDTH", "HEIGHT")
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 100, 100)
+                    .build()!!
+
+            val podcastInDb = insertInto("PODCAST")
+                    .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE")
+                    .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload",      "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD",  "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true,  "RSS")
+                    .build()!!
+
+            DbSetup(DataSourceDestination(dataSource), sequenceOf(DELETE_ALL, podcastCovers, podcastInDb)).launch()
+
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(DeletePodcastInformation(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD"))
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `a podcast with cover and tags`() {
+            /* Given */
+            val podcastCovers = insertInto("COVER")
+                    .columns("ID", "URL", "WIDTH", "HEIGHT")
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 100, 100)
+                    .build()!!
+
+            val podcastInDb = insertInto("PODCAST")
+                    .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE")
+                    .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload",      "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD",  "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true,  "RSS")
+                    .build()!!
+
+            val tagsInDb = sequenceOf(
+                    insertInto("TAG")
+                            .columns("ID", "NAME")
+                            .values(fromString("1c526048-f240-4db9-9526-6cc037fdc851"), "First")
+                            .values(fromString("2c526048-f240-4db9-9526-6cc037fdc851"), "Second")
+                            .values(fromString("3c526048-f240-4db9-9526-6cc037fdc851"), "Third")
+                            .build(),
+                    insertInto("PODCAST_TAGS")
+                            .columns("PODCASTS_ID", "TAGS_ID")
+                            .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("1c526048-f240-4db9-9526-6cc037fdc851"))
+                            .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("2c526048-f240-4db9-9526-6cc037fdc851"))
+                            .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("3c526048-f240-4db9-9526-6cc037fdc851"))
+                            .build()
+            )
+
+            DbSetup(DataSourceDestination(dataSource), sequenceOf(DELETE_ALL, podcastCovers, podcastInDb, tagsInDb)).launch()
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(query.selectFrom(PODCAST_TAGS).fetch().map { it[PODCAST_TAGS.PODCASTS_ID] to it[PODCAST_TAGS.TAGS_ID]  }).containsOnly(
+                    fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d") to fromString("3c526048-f240-4db9-9526-6cc037fdc851")
+            )
+        }
+
+        @Test
+        fun `a podcast with cover and items`() {
+            /* Given */
+            val podcastCovers = insertInto("COVER")
+                    .columns("ID", "URL", "WIDTH", "HEIGHT")
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"), "http://fake.url.com/a-podcast-to-update/cover_3.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "http://fake.url.com/a-podcast-to-update/cover_4.png", 100, 100)
+                    .build()!!
+
+            val podcastInDb = insertInto("PODCAST")
+                    .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE")
+                    .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload",      "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD",  "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true,  "RSS")
+                    .build()!!
+
+            val itemsInDb = sequenceOf(insertInto("ITEM")
+                    .columns("ID", "TITLE", "URL", "PODCAST_ID", "COVER_ID")
+                    .values(fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 1", "http://fakeurl.com/item.1.mp3", fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"))
+                    .values(fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 2", "http://fakeurl.com/item.2.mp3", fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"))
+                    .build()
+            )
+
+            DbSetup(DataSourceDestination(dataSource), sequenceOf(DELETE_ALL, podcastCovers, podcastInDb, itemsInDb)).launch()
+
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(query.selectFrom(ITEM).fetch().map { it[ITEM.ID] }).containsOnly(
+                    fromString("2b83a383-25ec-4aeb-8e82-f317449da37b")
+            )
+        }
+
+        @Test
+        fun `a podcast with cover and items in playlist`() {
+            /* Given */
+            val podcastCovers = insertInto("COVER")
+                    .columns("ID", "URL", "WIDTH", "HEIGHT")
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"), "http://fake.url.com/a-podcast-to-update/cover_3.png", 100, 100)
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "http://fake.url.com/a-podcast-to-update/cover_4.png", 100, 100)
+                    .build()!!
+
+            val podcastInDb = insertInto("PODCAST")
+                    .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE")
+                    .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload",      "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
+                    .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD",  "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true,  "RSS")
+                    .build()!!
+
+            val itemsInDb = sequenceOf(insertInto("ITEM")
+                    .columns("ID", "TITLE", "URL", "PODCAST_ID", "COVER_ID")
+                    .values(fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 1", "http://fakeurl.com/item.1.mp3", fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"))
+                    .values(fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 2", "http://fakeurl.com/item.2.mp3", fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"))
+                    .build()
+            )
+
+            val playlistInDb = sequenceOf(
+                    insertInto("WATCH_LIST")
+                            .columns("ID", "NAME")
+                            .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
+                            .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind")
+                            .build(),
+                    insertInto("WATCH_LIST_ITEMS")
+                            .columns("WATCH_LISTS_ID", "ITEMS_ID")
+                            .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"))
+                            .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"))
+                            .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"))
+                            .build()
+            )
+
+            DbSetup(DataSourceDestination(dataSource), sequenceOf(DELETE_ALL, podcastCovers, podcastInDb, itemsInDb, playlistInDb)).launch()
+
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82")))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(query.selectFrom(WATCH_LIST_ITEMS).fetch().map { it[WATCH_LIST_ITEMS.WATCH_LISTS_ID] to it[WATCH_LIST_ITEMS.ITEMS_ID] }).containsOnly(
+                    fromString("dc024a30-bd02-11e5-a837-0800200c9a66") to fromString("2b83a383-25ec-4aeb-8e82-f317449da37b")
+            )
+        }
+
     }
 }

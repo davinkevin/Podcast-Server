@@ -9,8 +9,6 @@ import com.github.axet.wget.info.ex.DownloadMultipartError
 import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
@@ -19,14 +17,11 @@ import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.factory.WGetFactory
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.repository.ItemRepository
-import lan.dk.podcastserver.repository.PodcastRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension

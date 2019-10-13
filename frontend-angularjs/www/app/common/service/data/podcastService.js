@@ -34,7 +34,7 @@ export default class PodcastService  {
     }
 
     delete(podcast) {
-        return this.$http.delete(`/api/podcasts/${podcast.id}`);
+        return this.$http.delete(`/api/v1/podcasts/${podcast.id}`);
     }
 
     findInfo(url) {

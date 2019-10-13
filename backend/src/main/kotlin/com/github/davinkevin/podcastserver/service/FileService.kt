@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.item.CoverForItem
 import com.github.davinkevin.podcastserver.item.DeleteItemInformation
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
+import com.github.davinkevin.podcastserver.podcast.DeletePodcastInformation
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
@@ -38,6 +39,18 @@ class FileService(
 
     private val wcb = wcbs
             .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
+
+    fun deletePodcast(podcast: DeletePodcastInformation) = Mono.defer {
+        val file = p.rootfolder.resolve(podcast.title)
+        log.info("Deletion of podcast {}", podcast.title)
+
+        Files.walk(file)
+                .sorted(Comparator.reverseOrder())
+                .forEach { Files.deleteIfExists(it) }
+
+        Files.deleteIfExists(file)
+                .toMono()
+    }
 
     fun deleteItem(item: DeleteItemInformation) = Mono.defer {
         val file = p.rootfolder.resolve(item.path)

@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
+import reactor.core.publisher.*
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.LocalDate
@@ -721,6 +718,46 @@ class PodcastServiceTest {
                 verify(fileService, times(1)).movePodcast(p, pToUpdate.title)
             }
 
+        }
+    }
+
+    @Nested
+    @DisplayName("should delete")
+    inner class ShouldDelete {
+
+        @BeforeEach
+        fun beforeEach() = Mockito.reset(repository, fileService)
+
+        @Test
+        fun `a podcast which has to be deleted`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            val information = DeletePodcastInformation(id, "foo")
+            whenever(repository.deleteById(id)).thenReturn(information.toMono())
+            whenever(fileService.deletePodcast(information)).thenReturn(Mono.empty())
+
+            /* When */
+            StepVerifier.create(service.deleteById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            verify(fileService, times(1)).deletePodcast(information)
+        }
+
+        @Test
+        fun `a podcast which should not be deleted`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            whenever(repository.deleteById(id)).thenReturn(Mono.empty())
+
+            /* When */
+            StepVerifier.create(service.deleteById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            verify(fileService, never()).deletePodcast(any())
         }
     }
 }

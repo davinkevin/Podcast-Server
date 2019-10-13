@@ -450,6 +450,26 @@ class PodcastHandlerTest {
     }
 
     @Nested
+    @DisplayName("should delete")
+    inner class ShouldDelete {
+
+        @Test
+        fun `a podcast by id`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            whenever(podcastService.deleteById(id)).thenReturn(Mono.empty())
+            /* When */
+            rest
+                    .delete()
+                    .uri("/api/v1/podcasts/{id}", id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isNoContent
+        }
+
+    }
+
+    @Nested
     @DisplayName("should find cover")
     inner class ShouldFindCover {
 

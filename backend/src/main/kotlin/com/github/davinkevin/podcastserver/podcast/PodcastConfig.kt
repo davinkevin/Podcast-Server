@@ -26,6 +26,8 @@ class PodcastRoutingConfig {
                 GET("/cover.{ext}", podcast::cover)
                 GET("/rss", xml::rss)
 
+                DELETE("/", podcast::delete)
+
                 "/stats".nest {
                     GET("/byPubDate", podcast::findStatByPodcastIdAndPubDate)
                     GET("/byDownloadDate", podcast::findStatByPodcastIdAndDownloadDate)

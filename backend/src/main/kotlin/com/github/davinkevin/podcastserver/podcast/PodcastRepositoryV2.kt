@@ -12,12 +12,13 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
+import reactor.util.function.Tuples
 import reactor.util.function.component1
 import reactor.util.function.component2
+import reactor.util.function.component3
 import java.net.URI
 import java.sql.Timestamp
 import java.time.Duration
-import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.time.ZonedDateTime
 import java.util.*
@@ -225,5 +226,44 @@ class PodcastRepositoryV2(private val query: DSLContext) {
                 .where(PODCAST.ID.eq(podcastId))
                 .executeAsyncAsMono()
                 .then()
+    }
+
+    fun deleteById(id: UUID): Mono<DeletePodcastInformation> {
+        val removeItemFromPlaylist = query
+                .delete(WATCH_LIST_ITEMS)
+                .where(WATCH_LIST_ITEMS.ITEMS_ID.`in`(query
+                                .select(ITEM.ID)
+                                .from(ITEM)
+                                .where(ITEM.PODCAST_ID.eq(id)))
+                )
+                .executeAsyncAsMono()
+
+        val removePodcastTags = query
+                .delete(PODCAST_TAGS)
+                .where(PODCAST_TAGS.PODCASTS_ID.eq(id))
+                .executeAsyncAsMono()
+
+        val removeItems = query
+                .delete(ITEM)
+                .where(ITEM.PODCAST_ID.eq(id))
+                .executeAsyncAsMono()
+
+        val deletePodcast = query
+                .select(PODCAST.ID, PODCAST.TITLE, PODCAST.HAS_TO_BE_DELETED, PODCAST.COVER_ID)
+                .from(PODCAST)
+                .where(PODCAST.ID.eq(id))
+                .fetchOneAsMono()
+                .delayUntil {
+                    val deletePodcast = query.delete(PODCAST).where(PODCAST.ID.eq(id)).executeAsyncAsMono()
+                    val deleteCover = query.delete(COVER).where(COVER.ID.eq(it[PODCAST.COVER_ID])).executeAsyncAsMono()
+
+                    deletePodcast.then(deleteCover)
+                }
+                .filter { it[PODCAST.HAS_TO_BE_DELETED] }
+                .map { DeletePodcastInformation(it[PODCAST.ID], it[PODCAST.TITLE]) }
+
+        return removeItemFromPlaylist
+                .then(Mono.zip(removePodcastTags, removeItems))
+                .then(deletePodcast)
     }
 }

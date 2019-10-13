@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.ServerResponse.seeOther
+import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Flux
@@ -59,6 +58,14 @@ class PodcastHandler(
             .flatMap { podcastService.update(it) }
             .map(::toPodcastHAL)
             .flatMap { ok().syncBody(it) }
+
+    fun delete(r: ServerRequest): Mono<ServerResponse> {
+        val podcastId = UUID.fromString(r.pathVariable("id"))
+
+        return podcastService
+                .deleteById(podcastId)
+                .then(noContent().build())
+    }
 
     fun cover(r: ServerRequest): Mono<ServerResponse> {
         val host = r.extractHost()
