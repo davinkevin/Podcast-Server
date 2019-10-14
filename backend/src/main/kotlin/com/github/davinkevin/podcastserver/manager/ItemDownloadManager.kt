@@ -93,7 +93,6 @@ class ItemDownloadManager (
     private fun initDownload(): Mono<List<DownloadingItem>> {
         return downloadRepository.findAllToDownload(podcastServerParameters.limitDownloadDate().toOffsetDateTime(), podcastServerParameters.numberOfTry)
                 .filter { it !in waitingQueue }
-                .log()
                 .collectList()
     }
 
