@@ -35,9 +35,9 @@ class DownloadRepository(private val query: DSLContext) {
                 .where(
                         ITEM.PUB_DATE.gt(Timestamp.valueOf(fromDate.toLocalDateTime()))
                                 .and(
-                                        ITEM.STATUS.isNull
-                                                .or(ITEM.STATUS.eq(Status.NOT_DOWNLOADED.toString()))
-                                                .or(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry)))
+                                        ITEM.STATUS.isNull.or(ITEM.STATUS.eq(Status.NOT_DOWNLOADED.toString()))
+                                )
+                                .and(ITEM.NUMBER_OF_FAIL.isNull.or(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry)))
                 )
                 .fetchAsFlux()
                 .map { DownloadingItem(
