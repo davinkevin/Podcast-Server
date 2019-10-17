@@ -134,7 +134,7 @@ internal data class YoutubeApiResponse(val items: List<YoutubeApiItem>, val next
 internal data class YoutubeApiItem(val snippet: Snippet) {
     fun toItem() = ItemFromUpdate(
             title = snippet.title,
-            description = "snippet.description",
+            description = snippet.description,
             pubDate = snippet.pubDate(),
             url = URI(snippet.resourceId.url()),
             cover = snippet.cover()
