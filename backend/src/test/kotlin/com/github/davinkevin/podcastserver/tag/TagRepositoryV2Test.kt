@@ -16,6 +16,7 @@ import lan.dk.podcastserver.repository.DatabaseConfigurationTest
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
+import org.jooq.impl.DSL.count
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -125,7 +126,30 @@ class TagRepositoryV2Test {
                         assertThat(it.name).isEqualTo(name)
 
                         val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
+                        val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
                         assertThat(tagRecord.id).isEqualTo(it.id)
+                        assertThat(numberOfTag).isEqualTo(4)
+                    }
+                    .verifyComplete()
+
+        }
+
+        @Test
+        fun `an item already existing`() {
+            /* Given */
+            val name = "Foo"
+            /* When */
+            StepVerifier.create(repository.save(name))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.name).isEqualTo(name)
+
+                        val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
+                        val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
+                        assertThat(tagRecord.id).isEqualTo(it.id)
+                        assertThat(numberOfTag).isEqualTo(3)
                     }
                     .verifyComplete()
 
