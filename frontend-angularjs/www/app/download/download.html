@@ -21,7 +21,7 @@
             <button ng-click="dc.stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
         </div>
 
-        <a class="pull-left" ng-href="{{ '/podcasts/' + item.podcastId + '/items/' + item.id }}">
+        <a class="pull-left" ng-href="{{ '/podcasts/' + item.podcast.id + '/items/' + item.id }}">
             <img ng-src="{{::item.cover.url}}" >
         </a>
 
