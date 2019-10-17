@@ -7,6 +7,8 @@ import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
+import reactor.core.scheduler.Schedulers
 import java.util.*
 
 @Repository
@@ -27,15 +29,19 @@ class TagRepositoryV2(val query: DSLContext) {
             .fetchAsFlux()
             .map { Tag(it[TAG.ID], it[TAG.NAME]) }
 
-    fun save(name: String): Mono<Tag> {
+    fun save(name: String): Mono<Tag> = Mono.defer {
         val id = UUID.randomUUID()
 
-        return query
+        query
                 .insertInto(TAG)
                 .set(TAG.ID, id)
                 .set(TAG.NAME, name)
-                .executeAsyncAsMono()
-                .map { Tag(id, name) }
+                .onConflictDoNothing()
+                .returning(TAG.ID, TAG.NAME)
+                .fetchOne()
+                .toMono()
+                .map { Tag(it[TAG.ID], it[TAG.NAME]) }
     }
+            .subscribeOn(Schedulers.elastic())
 
 }
