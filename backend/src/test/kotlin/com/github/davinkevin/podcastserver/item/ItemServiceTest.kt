@@ -330,7 +330,7 @@ class ItemServiceTest {
         fun `an item which should not be deleted from disk`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(repository.deleteById(id)).thenReturn(Flux.empty())
+            whenever(repository.deleteById(id)).thenReturn(Mono.empty())
             /* When */
             StepVerifier.create(itemService.deleteById(id))
                     /* Then */
@@ -345,7 +345,7 @@ class ItemServiceTest {
             /* Given */
             val id = UUID.randomUUID()
             val deleteItem = DeleteItemInformation(id, "foo", "bar")
-            whenever(repository.deleteById(id)).thenReturn(Flux.just(deleteItem))
+            whenever(repository.deleteById(id)).thenReturn(Mono.just(deleteItem))
             whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
 
             /* When */

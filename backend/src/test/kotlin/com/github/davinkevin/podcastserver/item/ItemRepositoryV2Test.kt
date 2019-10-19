@@ -162,7 +162,7 @@ class ItemRepositoryV2Test {
             }
 
             @Test
-            fun `on item in a playlist`() {
+            fun `an item in a playlist`() {
                 /* Given */
                 val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
 
@@ -170,7 +170,6 @@ class ItemRepositoryV2Test {
                 StepVerifier.create(repository.deleteById(id))
                         .expectSubscription()
                         /* Then */
-                        .expectNext(DeleteItemInformation(fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), "geekinc.126.mp3", "Geek Inc HD"))
                         .verifyComplete()
             }
         }
