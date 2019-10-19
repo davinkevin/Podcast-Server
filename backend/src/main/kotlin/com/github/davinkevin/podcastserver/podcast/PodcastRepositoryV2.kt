@@ -10,12 +10,10 @@ import org.jooq.TableField
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
-import reactor.util.function.Tuples
-import reactor.util.function.component1
-import reactor.util.function.component2
-import reactor.util.function.component3
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.sql.Timestamp
 import java.time.Duration

@@ -1,10 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.service.FileService
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -25,10 +22,10 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 @WebFluxTest(controllers = [CoverHandler::class])
 @Import(CoverRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-internal class CoverHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var cover: CoverService
+class CoverHandlerTest(
+    @Autowired val rest: WebTestClient,
+    @Autowired val cover: CoverService
+) {
 
     @Nested
     @DisplayName("should delete cover")
@@ -74,6 +71,7 @@ internal class CoverHandlerTest {
     @TestConfiguration
     class LocalTestConfiguration {
         @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
+        @Bean fun cover() = mock<CoverService>()
     }
 
 }

@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 /**

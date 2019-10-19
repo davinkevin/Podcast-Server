@@ -34,13 +34,11 @@ import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepos
  */
 @JooqTest
 @Import(CoverRepository::class)
-class CoverRepositoryV2Test {
-
-    @Autowired lateinit var query: DSLContext
-    @Autowired lateinit var repository: CoverRepository
-    @Autowired lateinit var db: DataSourceDestination
-
-    private val dbSetupTracker = DbSetupTracker()
+class CoverRepositoryV2Test(
+    @Autowired val query: DSLContext,
+    @Autowired val repository: CoverRepository,
+    @Autowired val db: DataSourceDestination
+) {
 
     @Nested
     @DisplayName("should find cover older than")

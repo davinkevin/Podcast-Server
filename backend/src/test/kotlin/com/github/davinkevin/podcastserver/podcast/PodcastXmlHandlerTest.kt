@@ -23,19 +23,19 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
-import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
 @WebFluxTest(controllers = [PodcastXmlHandler::class])
-class PodcastXmlHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var podcastService: PodcastService
-    @MockBean lateinit var itemService: ItemService
+class PodcastXmlHandlerTest(
+    @Autowired val rest: WebTestClient,
+    @Autowired val podcastService: PodcastService,
+    @Autowired val itemService: ItemService
+) {
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -289,6 +289,8 @@ class PodcastXmlHandlerTest {
     @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
     class LocalTestConfiguration {
         @Bean fun fileService() = mock<FileService>()
+        @Bean fun itemService() = mock<ItemService>()
+        @Bean fun podcastService() = mock<PodcastService>()
     }
 
 

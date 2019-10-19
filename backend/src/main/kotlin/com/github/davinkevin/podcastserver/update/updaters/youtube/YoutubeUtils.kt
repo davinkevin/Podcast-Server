@@ -4,7 +4,6 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.utils.k
-import io.vavr.collection.Stream
 import com.github.davinkevin.podcastserver.manager.worker.Type
 import java.util.*
 
@@ -26,8 +25,7 @@ internal fun channelIdOf(htmlService: HtmlService, url: String) =
                 .getOrElse { "" }
 
 internal fun isYoutubeUrl(url: String?) =
-        Stream
-                .of("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
+                sequenceOf("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
                 .any { url?.contains(it) == true }
 
 const val YOUTUBE = "Youtube"

@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.utils.custom.ffmpeg
 
-import org.assertj.core.api.Java6Assertions.assertThat
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
-internal class CustomRunProcessFuncTest {
+class CustomRunProcessFuncTest {
 
     @Test
     fun `should get process from listener`() {

@@ -32,18 +32,19 @@ class PodcastServerParametersTest {
     fun should_have_modified_values() {
         /* Given */
         val rootFolder = Paths.get("/tmp/bar")
-        val parameters = PodcastServerParameters()
+        val parameters = PodcastServerParameters(
+            rootfolder = rootFolder,
+            coverDefaultName = "default",
+            downloadExtension = ".bardownload",
+            maxUpdateParallels = 5,
+            concurrentDownload = 5,
+            numberOfTry = 20,
+            numberOfDayToDownload = 5L,
+            numberOfDayToSaveCover = 5L,
+            rssDefaultNumberItem = 25L
+        )
 
         /* When */
-        parameters.rootfolder = rootFolder
-        parameters.coverDefaultName = "default"
-        parameters.downloadExtension = ".bardownload"
-        parameters.maxUpdateParallels = 5
-        parameters.concurrentDownload = 5
-        parameters.numberOfTry = 20
-        parameters.numberOfDayToDownload = 5L
-        parameters.numberOfDayToSaveCover = 5L
-        parameters.rssDefaultNumberItem = 25L
 
         /* Then */
         assertThat(parameters.downloadExtension).isEqualTo(".bardownload")

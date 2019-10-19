@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
@@ -32,11 +32,10 @@ import java.net.URI
  */
 @ExtendWith(SpringExtension::class, MockServer::class)
 @AutoConfigureJson
-class ItunesFinderTest {
-
-    @Autowired private lateinit var rssFinder: RSSFinder
-    @Autowired private lateinit var finder: ItunesFinder
-
+class ItunesFinderTest(
+    @Autowired val rssFinder: RSSFinder,
+    @Autowired val finder: ItunesFinder
+) {
     @Test
     fun `should be compatible with "podcasts dot apple dot com" url`() {
         /* GIVEN */

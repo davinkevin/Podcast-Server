@@ -1,12 +1,15 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
@@ -19,10 +22,10 @@ import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as Watc
  */
 @ExtendWith(SpringExtension::class)
 @Import(PlaylistService::class)
-class PlaylistServiceTest {
-
-    @MockBean private lateinit var repository: WatchListRepository
-    @Autowired private lateinit var service: PlaylistService
+class PlaylistServiceTest(
+    @Autowired val repository: WatchListRepository,
+    @Autowired val service: PlaylistService
+) {
 
     @Nested
     @DisplayName("should find all")
@@ -56,7 +59,10 @@ class PlaylistServiceTest {
                     .expectNext(Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third"))
                     .verifyComplete()
         }
+    }
 
-
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun repository() = mock<WatchListRepository>()
     }
 }

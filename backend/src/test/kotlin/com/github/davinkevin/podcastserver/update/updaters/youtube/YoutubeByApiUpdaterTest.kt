@@ -26,9 +26,9 @@ import java.util.*
  * Created by kevin on 31/08/2019
  */
 @ExtendWith(SpringExtension::class)
-class YoutubeByApiUpdaterTest {
-
-    @Autowired private lateinit var updater: YoutubeByApiUpdater
+class YoutubeByApiUpdaterTest(
+    @Autowired val updater: YoutubeByApiUpdater
+) {
 
     @Nested
     @DisplayName("should find items")

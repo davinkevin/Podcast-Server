@@ -5,16 +5,12 @@ import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.TypeRef
-import io.vavr.collection.List
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
@@ -126,7 +122,7 @@ private class FranceTvItem {
     var saison: String? = null
     var episode: String? = null
     var diffusion = Diffusion()
-    var videos: List<Video> = List.empty()
+    var videos: List<Video> = emptyList()
     @JsonProperty("image_secure") var image: String? = null
     @JsonProperty("sous_titre") private val sousTitre: String? = null
 

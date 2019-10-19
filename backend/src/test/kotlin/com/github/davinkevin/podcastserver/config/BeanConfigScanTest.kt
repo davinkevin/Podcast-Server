@@ -14,17 +14,6 @@ class BeanConfigScanTest {
     private val beanConfigScan: BeanConfigScan = BeanConfigScan()
 
     @Test
-    fun should_get_validator() {
-        /* Given */
-        /* When */
-        val validator = beanConfigScan.validator()
-        /* Then */
-        assertThat(validator)
-                .isNotNull
-                .isInstanceOf(LocalValidatorFactoryBean::class.java)
-    }
-
-    @Test
     @Throws(NoSuchMethodException::class)
     fun should_have_tika_probecontentType() {
         /* Given */
@@ -49,18 +38,5 @@ class BeanConfigScanTest {
         /* Then */
         assertThat(convertedPath)
                 .isEqualTo(Paths.get(path))
-    }
-
-    @Test
-    fun should_provide_a_converter_from_string_to_vavr_set() {
-        /* GIVEN */
-        val converter = beanConfigScan.stringToSet()
-        val multiValueSeparatedByComma = "foo,bar,another"
-
-        /* WHEN  */
-        val strings = converter.convert(multiValueSeparatedByComma)!!.toJavaSet()
-
-        /* THEN  */
-        assertThat(strings).contains("foo", "bar", "another")
     }
 }

@@ -6,14 +6,15 @@ import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
 import io.vavr.control.Option;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 /**
@@ -25,7 +26,7 @@ public class JsonServiceTest {
     private JsonService jsonService;
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void beforeEach() {
         urlService = mock(UrlService.class);
         jsonService = new JsonService(urlService, mapper);
@@ -77,14 +78,15 @@ public class JsonServiceTest {
         assertThat(parse.read("foo[0].bar", String.class)).isEqualTo("bar");
     }
 
-    @Test(expected = InvalidJsonException.class)
+    @Test
     public void should_return_empty_if_error_during_parsing_string() {
         /* Given */
         String object = "}{{{";
 
         /* When */
-        jsonService.parse(object);
+        assertThatThrownBy(() -> jsonService.parse(object))
+                /* Then */
+                .isInstanceOf(InvalidJsonException.class);
 
-        /* Then @See annotation */
     }
 }

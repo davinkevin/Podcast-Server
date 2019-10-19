@@ -16,16 +16,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toFlux
 import java.util.*
 import java.util.concurrent.CompletableFuture.runAsync
 import java.util.concurrent.locks.ReentrantLock
 
 @Service
-@Transactional
 class ItemDownloadManager (
         private val template: MessagingTemplate,
         private val downloadRepository: DownloadRepository,
@@ -157,7 +155,6 @@ class ItemDownloadManager (
         manageDownload()
     }
 
-    @Transactional
     fun removeItemFromQueue(id: UUID, stopItem: Boolean) {
         removeItemFromQueue(id)
 

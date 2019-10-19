@@ -34,12 +34,12 @@ import java.util.*
  */
 
 @ExtendWith(SpringExtension::class)
-class TF1ReplayUpdaterTest {
-
-    @Autowired lateinit var signatureService: SignatureService
-    @Autowired lateinit var imageService: ImageService
-    @Autowired lateinit var jsonService: JsonService
-    @Autowired lateinit var updater: TF1ReplayUpdater
+class TF1ReplayUpdaterTest(
+    @Autowired val signatureService: SignatureService,
+    @Autowired val imageService: ImageService,
+    @Autowired val jsonService: JsonService,
+    @Autowired val updater: TF1ReplayUpdater
+) {
 
     @Nested
     @DisplayName("should sign")

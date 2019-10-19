@@ -2,13 +2,13 @@ package com.github.davinkevin.podcastserver.utils.custom.ffmpeg
 
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
-internal class ProcessListenerTest {
+class ProcessListenerTest {
 
     @Test
     fun `should wait if no process until one is present`() {

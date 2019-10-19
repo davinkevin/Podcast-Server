@@ -48,12 +48,11 @@ import java.util.*
 @ExtendWith(SpringExtension::class)
 @Import(FileService::class)
 @ImportAutoConfiguration(WebClientAutoConfiguration::class)
-class FileServiceTest {
-
-    @Autowired lateinit var fileService: FileService
-    @Autowired lateinit var p: PodcastServerParameters
-    @Autowired lateinit var mimeTypeService: MimeTypeService
-
+class FileServiceTest(
+    @Autowired val fileService: FileService,
+    @Autowired val p: PodcastServerParameters,
+    @Autowired val mimeTypeService: MimeTypeService
+) {
     private val tempFolder = Paths.get("/tmp", "podcast-server-testing-folder", "FileService")
 
     @BeforeEach

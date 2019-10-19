@@ -32,15 +32,15 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
                     .map { toDownloadingItem(it) }
                     .collectList()
                     .map { DownloadingItemsHAL(it) }
-                    .flatMap { ok().syncBody(it) }
+                    .flatMap { ok().bodyValue(it) }
 
     fun findLimit(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            ok().syncBody(downloadService.limitParallelDownload)
+            ok().bodyValue(downloadService.limitParallelDownload)
 
     fun updateLimit(r: ServerRequest): Mono<ServerResponse> =
             r.bodyToMono<Int>()
                     .delayUntil { downloadService.setLimitParallelDownload(it); Mono.empty<Void>() }
-                    .flatMap { ok().syncBody(it) }
+                    .flatMap { ok().bodyValue(it) }
 
     fun stopAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
         downloadService.stopAllDownload()
@@ -75,7 +75,7 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
                     .map { toDownloadingItem(it) }
                     .collectList()
                     .map { QueueItemsHAL(it) }
-                    .flatMap { ok().syncBody(it) }
+                    .flatMap { ok().bodyValue(it) }
 
 
     fun moveInQueue(r: ServerRequest): Mono<ServerResponse> =

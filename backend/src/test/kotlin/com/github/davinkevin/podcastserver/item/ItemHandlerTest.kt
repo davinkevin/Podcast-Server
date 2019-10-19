@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -33,11 +33,11 @@ import java.util.*
 @WebFluxTest(controllers = [ItemHandler::class])
 @Import(ItemRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-class ItemHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @Autowired lateinit var itemService: ItemService
-    @Autowired lateinit var fileService: FileService
+class ItemHandlerTest(
+    @Autowired val rest: WebTestClient,
+    @Autowired val itemService: ItemService,
+    @Autowired val fileService: FileService
+) {
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),

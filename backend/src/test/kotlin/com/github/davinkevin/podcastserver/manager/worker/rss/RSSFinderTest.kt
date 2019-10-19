@@ -25,15 +25,15 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
-class RSSFinderTest {
-
-    @Autowired lateinit var imageService: ImageService
-    @Autowired lateinit var rssFinder: RSSFinder
+class RSSFinderTest(
+    @Autowired val imageService: ImageService,
+    @Autowired val rssFinder: RSSFinder
+) {
 
     @Nested
     @DisplayName("should find")

@@ -16,7 +16,7 @@ class PlaylistHandler(
                     .map { WatchListHAL(it.id, it.name) }
                     .collectList()
                     .map { FindAllWatchListHAL(it) }
-                    .flatMap { ok().syncBody(it) }
+                    .flatMap { ok().bodyValue(it) }
 
 }
 

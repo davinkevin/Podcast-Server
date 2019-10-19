@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toFlux
 import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -26,12 +26,11 @@ import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepos
 @ExtendWith(SpringExtension::class)
 @Import(CoverService::class)
 @Suppress("UnassignedFluxMonoInstance")
-class CoverServiceTest {
-
-    @Autowired private lateinit var cover: CoverRepository
-    @Autowired private lateinit var file: FileService
-    @Autowired private lateinit var service: CoverService
-
+class CoverServiceTest (
+    @Autowired val cover: CoverRepository,
+    @Autowired val file: FileService,
+    @Autowired val service: CoverService
+) {
     private val date = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
     @Nested

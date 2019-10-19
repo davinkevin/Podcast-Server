@@ -2,8 +2,8 @@ package com.github.davinkevin.podcastserver.entity
 
 import io.vavr.collection.HashSet
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
 import java.nio.file.Files
@@ -18,7 +18,7 @@ class PodcastTest {
     private lateinit var podcast: Podcast
     private lateinit var anId: UUID
 
-    @Before
+    @BeforeEach
     fun init() {
         Podcast.rootFolder = Paths.get("/tmp")
 

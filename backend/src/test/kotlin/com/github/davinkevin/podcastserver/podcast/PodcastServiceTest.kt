@@ -4,22 +4,21 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argThat
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.LocalDate
@@ -35,13 +34,13 @@ import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
  */
 @ExtendWith(SpringExtension::class)
 @Import(PodcastService::class)
-class PodcastServiceTest {
-
-    @Autowired lateinit var service: PodcastService
-    @MockBean lateinit var coverRepository: CoverRepository
-    @MockBean lateinit var tagRepository: TagRepository
-    @MockBean lateinit var repository: PodcastRepository
-    @MockBean lateinit var fileService: FileService
+class PodcastServiceTest(
+    @Autowired val service: PodcastService,
+    @Autowired val coverRepository: CoverRepository,
+    @Autowired val tagRepository: TagRepository,
+    @Autowired val repository: PodcastRepository,
+    @Autowired val fileService: FileService
+) {
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -759,6 +758,14 @@ class PodcastServiceTest {
 
             verify(fileService, never()).deletePodcast(any())
         }
+    }
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun coverRepository() = mock<CoverRepository>()
+        @Bean fun tagRepository() = mock<TagRepository>()
+        @Bean fun repository() = mock<PodcastRepository>()
+        @Bean fun fileService() = mock<FileService>()
     }
 }
 

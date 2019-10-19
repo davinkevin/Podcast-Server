@@ -6,7 +6,6 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.transaction.annotation.EnableTransactionManagement
 import java.time.ZonedDateTime.now
 import java.time.temporal.TemporalAccessor
 import java.util.*
@@ -17,7 +16,6 @@ import java.util.*
 @Configuration
 @EntityScan(basePackages = ["lan.dk.podcastserver.entity", "com.github.davinkevin.podcastserver.entity"])
 @ComponentScan("lan.dk.podcastserver.repository")
-@EnableTransactionManagement
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 class DataSourceConfig {
 

@@ -2,10 +2,10 @@ package com.github.davinkevin.podcastserver.utils
 
 import io.vavr.API
 import org.assertj.core.api.Assertions
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.regex.Pattern
 
-internal class MatcherExtractorTest {
+class MatcherExtractorTest {
 
     @Test
     fun `should extract value`() {

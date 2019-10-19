@@ -38,11 +38,11 @@ import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemReposito
 
 @JooqTest
 @Import(ItemRepository::class)
-class ItemRepositoryV2Test {
-
-    @Autowired lateinit var query: DSLContext
-    @Autowired lateinit var repository: ItemRepository
-    @Autowired lateinit var db: DataSourceDestination
+class ItemRepositoryV2Test(
+    @Autowired val query: DSLContext,
+    @Autowired val repository: ItemRepository,
+    @Autowired val db: DataSourceDestination
+){
 
     private val operation = sequenceOf(DELETE_ALL, INSERT_ITEM_DATA)
 

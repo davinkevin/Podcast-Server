@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -9,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
@@ -21,10 +24,10 @@ import java.util.*
 @WebFluxTest(controllers = [PlaylistHandler::class])
 @Import(PlaylistRoutingConfig::class, PlaylistHandler::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-class PlaylistHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var service: PlaylistService
+class PlaylistHandlerTest (
+    @Autowired val rest: WebTestClient,
+    @Autowired val service: PlaylistService
+) {
 
     @Nested
     @DisplayName("should find all")
@@ -77,4 +80,8 @@ class PlaylistHandlerTest {
 
     }
 
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun service() = mock<PlaylistService>()
+    }
 }

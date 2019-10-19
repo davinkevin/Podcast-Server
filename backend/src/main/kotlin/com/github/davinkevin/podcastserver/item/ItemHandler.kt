@@ -18,8 +18,8 @@ import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -55,7 +55,7 @@ class ItemHandler(
 
         return itemService.reset(id)
                 .map(::toItemHAL)
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 
     fun file(s: ServerRequest): Mono<ServerResponse> {
@@ -99,7 +99,7 @@ class ItemHandler(
 
         return itemService.findById(id)
                 .map(::toItemHAL)
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 
     fun search(s: ServerRequest): Mono<ServerResponse> {
@@ -131,7 +131,7 @@ class ItemHandler(
                 podcastId = null
         )
                 .map(::toPageItemHAL)
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
 
     }
 
@@ -163,7 +163,7 @@ class ItemHandler(
                 podcastId = podcastId
         )
                 .map(::toPageItemHAL)
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 
     fun upload(r: ServerRequest): Mono<ServerResponse> {
@@ -176,7 +176,7 @@ class ItemHandler(
                 .map { it["file"] as FilePart }
                 .doOnNext { log.info("upload of file ${it.filename()}") }
                 .flatMap { itemService.upload(podcastId, it) }
-                .flatMap { created(URI("${host}api/v1/items/${it.id}")).syncBody(it) }
+                .flatMap { created(URI("${host}api/v1/items/${it.id}")).bodyValue(it) }
     }
 
     fun playlists(r: ServerRequest): Mono<ServerResponse> {
@@ -187,7 +187,7 @@ class ItemHandler(
                 .map { PlaylistHAL(it.id, it.name) }
                 .collectList()
                 .map { PlaylistsHAL(it) }
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 
     fun delete(r: ServerRequest): Mono<ServerResponse> {

@@ -1,13 +1,13 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.github.davinkevin.podcastserver.IOUtils
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.item.*
+import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.Tag
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -24,8 +24,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.nio.file.Path
 import java.time.LocalDate
@@ -37,12 +37,12 @@ import java.util.*
  * Created by kevin on 2019-02-16
  */
 @WebFluxTest(controllers = [PodcastHandler::class])
-class PodcastHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var podcastService: PodcastService
-    @MockBean lateinit var p: PodcastServerParameters
-    @MockBean lateinit var fileService: FileService
+class PodcastHandlerTest(
+        @Autowired val rest: WebTestClient,
+        @Autowired val podcastService: PodcastService,
+        @Autowired val parameters: PodcastServerParameters,
+        @Autowired val fileService: FileService
+) {
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -255,8 +255,8 @@ class PodcastHandlerTest {
             rest
                     .post()
                     .uri("/api/v1/podcasts")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .syncBody(""" {
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(""" {
                         "title": "foo",
                         "url": "http://foo.bar.com/val.rss",
                         "type": "RSS",
@@ -326,8 +326,8 @@ class PodcastHandlerTest {
             rest
                     .post()
                     .uri("/api/v1/podcasts")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .syncBody(""" {
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(""" {
                         "title": "foo",
                         "type": "upload",
                         "tags": [],
@@ -395,8 +395,8 @@ class PodcastHandlerTest {
             rest
                     .put()
                     .uri("/api/v1/podcasts/${p.id}")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .syncBody(""" {
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(""" {
                         "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
                         "title": "foo",
                         "url": "http://foo.bar.com/val.rss",
@@ -480,7 +480,7 @@ class PodcastHandlerTest {
             whenever(fileService.coverExists(any<Podcast>())).then {
                 FilenameUtils.getName(it.getArgument<Podcast>(0).cover.url.toASCIIString()).toMono()
             }
-            whenever(p.coverDefaultName).thenReturn("cover")
+            whenever(parameters.coverDefaultName).thenReturn("cover")
             /* When */
             rest
                     .get()
@@ -859,16 +859,15 @@ class PodcastHandlerTest {
             }
 
         }
-
-
     }
 
     @TestConfiguration
     @Import(PodcastRoutingConfig::class, PodcastXmlHandler::class)
     @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
     class LocalTestConfiguration {
-
         @Bean fun itemService() = mock<ItemService>()
-
+        @Bean fun podcastService() = mock<PodcastService>()
+        @Bean fun parameters() = mock<PodcastServerParameters>()
+        @Bean fun fileService() = mock<FileService>()
     }
 }

@@ -17,9 +17,9 @@ import java.net.URI
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
 @ExtendWith(SpringExtension::class, MockServer::class)
-class ImageServiceV2Test {
-
-    @Autowired private lateinit var imageService: ImageService
+class ImageServiceV2Test(
+        @Autowired val imageService: ImageService
+) {
 
     @Test
     fun `should serve cover information`(backend: WireMockServer) {

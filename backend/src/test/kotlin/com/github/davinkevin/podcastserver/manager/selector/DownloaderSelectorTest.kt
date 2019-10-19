@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.*
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -15,8 +16,10 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Bean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.util.*
@@ -25,14 +28,14 @@ import kotlin.reflect.KClass
 
 @ExtendWith(SpringExtension::class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class DownloaderSelectorTest {
+class DownloaderSelectorTest(
+    @Autowired val httpDownloader: HTTPDownloader,
+    @Autowired val ffmpegDownloader: FfmpegDownloader,
+    @Autowired val rtmpDownloader: RTMPDownloader,
+    @Autowired val youtubeDLownloader: YoutubeDlDownloader,
+    @Autowired val applicationContext: ApplicationContext
+) {
 
-    @MockBean lateinit var httpDownloader: HTTPDownloader
-    @MockBean lateinit var ffmpegDownloader: FfmpegDownloader
-    @MockBean lateinit var rtmpDownloader: RTMPDownloader
-    @MockBean lateinit var youtubeDLownloader: YoutubeDlDownloader
-
-    @Autowired lateinit var applicationContext: ApplicationContext
     lateinit var selector: DownloaderSelector
 
     @BeforeEach
@@ -69,6 +72,14 @@ class DownloaderSelectorTest {
                         DownloaderArgument("rtmp://ma.video.free.fr/video.mp4/audio/tnt/tnt1217/tnt1217.mp3", RTMPDownloader::class),
                         DownloaderArgument("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata", YoutubeDlDownloader::class)
                 )
+    }
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun httpDownloader() = mock<HTTPDownloader>()
+        @Bean fun ffmpegDownloader() = mock<FfmpegDownloader>()
+        @Bean fun rtmpDownloader() = mock<RTMPDownloader>()
+        @Bean fun youtubeDLownloader() = mock<YoutubeDlDownloader>()
     }
 }
 

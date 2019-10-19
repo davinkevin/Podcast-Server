@@ -23,11 +23,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
  * Created by kevin on 21/07/2016.
  */
 @ExtendWith(SpringExtension::class)
-class TF1ReplayFinderTest {
-
-    @Autowired lateinit var htmlService: HtmlService
-    @Autowired lateinit var imageService: ImageService
-    @Autowired lateinit var finder: TF1ReplayFinder
+class TF1ReplayFinderTest(
+    @Autowired val htmlService: HtmlService,
+    @Autowired val imageService: ImageService,
+    @Autowired val finder: TF1ReplayFinder
+) {
 
     @Test
     fun `should fetch from html page`() {

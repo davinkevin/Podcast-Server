@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.tag
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -9,21 +10,23 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 @WebFluxTest(controllers = [TagHandler::class])
 @Import(TagRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-class TagHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @MockBean lateinit var tagService: TagService
+class TagHandlerTest(
+    @Autowired val rest: WebTestClient,
+    @Autowired val tagService: TagService
+) {
 
     @Nested
     @DisplayName("should find tag by id")
@@ -180,10 +183,10 @@ class TagHandlerTest {
                         """)
                     }
         }
+    }
 
-
-
-
-
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun tagService() = mock<TagService>()
     }
 }

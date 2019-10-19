@@ -5,14 +5,14 @@ import com.github.davinkevin.podcastserver.manager.worker.Type
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 
 @Component
 class TypeHandler(updaterSelector: UpdaterSelector) {
 
     private val types by lazy { updaterSelector.types().map { TypeHAL(it.key, it.name) } }
 
-    fun findAll(r: ServerRequest) = ok().syncBody(TypeResponse(types))
+    fun findAll(r: ServerRequest) = ok().bodyValue(TypeResponse(types))
 }
 
 data class TypeHAL(val key: String, val name: String)

@@ -12,8 +12,8 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toMono
 import reactor.netty.http.client.HttpClient
 import java.io.InputStream
 import java.net.URI

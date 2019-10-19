@@ -13,8 +13,8 @@ import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
@@ -35,7 +35,7 @@ class PodcastHandler(
 
         return podcastService.findById(id)
                 .map(::toPodcastHAL)
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 
     fun findAll(r: ServerRequest): Mono<ServerResponse> =
@@ -43,21 +43,21 @@ class PodcastHandler(
                     .map(::toPodcastHAL)
                     .collectList()
                     .map { FindAllPodcastHAL(it) }
-                    .flatMap { ok().syncBody(it) }
+                    .flatMap { ok().bodyValue(it) }
 
     fun create(r: ServerRequest): Mono<ServerResponse> = r
             .bodyToMono<PodcastCreationHAL>()
             .map { it.toPodcastCreation() }
             .flatMap { podcastService.save(it) }
             .map(::toPodcastHAL)
-            .flatMap { ok().syncBody(it) }
+            .flatMap { ok().bodyValue(it) }
 
     fun update(r: ServerRequest): Mono<ServerResponse> = r
             .bodyToMono<PodcastUpdateHAL>()
             .map { it.toPodcastUpdate() }
             .flatMap { podcastService.update(it) }
             .map(::toPodcastHAL)
-            .flatMap { ok().syncBody(it) }
+            .flatMap { ok().bodyValue(it) }
 
     fun delete(r: ServerRequest): Mono<ServerResponse> {
         val podcastId = UUID.fromString(r.pathVariable("id"))
@@ -97,7 +97,7 @@ class PodcastHandler(
 
         return proj(id, numberOfMonths)
                 .collectList()
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 
     fun findStatByTypeAndCreationDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndCreationDate(number) }
@@ -109,7 +109,7 @@ class PodcastHandler(
 
         return proj(numberOfMonths)
                 .collectList()
-                .flatMap { ok().syncBody(StatsPodcastTypeWrapperHAL(it)) }
+                .flatMap { ok().bodyValue(StatsPodcastTypeWrapperHAL(it)) }
     }
 }
 

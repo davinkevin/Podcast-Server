@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.entity
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.*
 
 

@@ -13,14 +13,14 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @WebFluxTest(controllers = [FindHandler::class])
-class FindHandlerTest {
-
-    @Autowired lateinit var rest: WebTestClient
-    @Autowired lateinit var finder: FindService
+class FindHandlerTest(
+    @Autowired val rest: WebTestClient,
+    @Autowired val finder: FindService
+) {
 
     @Nested
     @DisplayName("should find")
@@ -43,7 +43,7 @@ class FindHandlerTest {
             rest
                     .post()
                     .uri("/api/v1/podcasts/find")
-                    .syncBody(url.toASCIIString())
+                    .bodyValue(url.toASCIIString())
                     .exchange()
                     /* Then */
                     .expectStatus().isOk

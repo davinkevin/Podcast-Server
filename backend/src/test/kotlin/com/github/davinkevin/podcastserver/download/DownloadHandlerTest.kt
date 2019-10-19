@@ -32,12 +32,12 @@ import java.util.*
 @WebFluxTest(controllers = [DownloadHandler::class])
 @Import(DownloadRouterConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-class DownloadHandlerTest {
+class DownloadHandlerTest(
+        @Autowired val idm: ItemDownloadManager,
+        @Autowired val rest: WebTestClient
+) {
 
-    @Autowired private lateinit var idm: ItemDownloadManager
-    @Autowired private lateinit var rest: WebTestClient
-
-     private val item1 = DownloadingItem(
+    private val item1 = DownloadingItem(
             id = UUID.fromString("6c05149f-a3e1-4302-ab1f-83324c75ad70"),
             url = URI("https://foo.bar.com/1"),
             title = "item1",
@@ -181,7 +181,7 @@ class DownloadHandlerTest {
             rest
                     .post()
                     .uri("/api/v1/downloads/limit")
-                    .syncBody(12)
+                    .bodyValue(12)
                     .exchange()
                     /* Then */
                     .expectStatus().isOk
@@ -362,7 +362,7 @@ class DownloadHandlerTest {
             rest
                     .post()
                     .uri("/api/v1/downloads/queue")
-                    .syncBody(operation)
+                    .bodyValue(operation)
                     .exchange()
                     /* Then */
                     .expectStatus().isNoContent

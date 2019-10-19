@@ -11,6 +11,6 @@ class FindHandler(private val finderService: FindService) {
             .bodyToMono<String>()
             .map { URI(it) }
             .flatMap { finderService.find(it) }
-            .flatMap { ok().syncBody(it) }
+            .flatMap { ok().bodyValue(it) }
 
 }

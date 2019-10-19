@@ -2,13 +2,11 @@ package lan.dk.podcastserver;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lan.dk.podcastserver.service.JsonService;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 
@@ -18,8 +16,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * Created by kevin on 15/06/2016 for Podcast Server
  */
-@Ignore("Should have FFmpeg installed to be executed")
-@RunWith(SpringRunner.class)
+@Disabled("Should have FFmpeg installed to be executed")
 @SpringBootTest(classes = Application.class, webEnvironment=DEFINED_PORT)
 public class ApplicationTest {
 

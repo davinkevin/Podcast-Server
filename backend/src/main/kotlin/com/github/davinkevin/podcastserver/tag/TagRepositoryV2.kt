@@ -7,8 +7,7 @@ import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.core.scheduler.Schedulers
 import java.util.*
 

@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.net.URL
@@ -34,10 +34,10 @@ import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as Image
  * Created by kevin on 28/06/15 for Podcast Server
  */
 @ExtendWith(SpringExtension::class)
-class RSSUpdaterTest {
-
-    @Autowired private lateinit var imageService: ImageService
-    @Autowired private lateinit var updater: RSSUpdater
+class RSSUpdaterTest(
+    @Autowired val imageService: ImageService,
+    @Autowired val updater: RSSUpdater
+){
 
     private val podcast = PodcastToUpdate(UUID.randomUUID(), URI("http://localhost:5555/rss.xml"), "noSign")
 

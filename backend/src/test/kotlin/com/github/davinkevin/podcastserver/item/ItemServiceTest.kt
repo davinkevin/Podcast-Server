@@ -15,12 +15,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime
@@ -33,15 +35,15 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as Podcas
 @ExtendWith(SpringExtension::class)
 @Import(ItemService::class)
 @Suppress("UnassignedFluxMonoInstance")
-class ItemServiceTest {
-
-    @Autowired lateinit var itemService: ItemService
-    @MockBean lateinit var repository: ItemRepositoryV2
-    @MockBean lateinit var p: PodcastServerParameters
-    @MockBean lateinit var fileService: FileService
-    @MockBean lateinit var idm: ItemDownloadManager
-    @MockBean lateinit var podcastRepository: PodcastRepository
-    @MockBean lateinit var mimeTypeService: MimeTypeService
+class ItemServiceTest(
+        @Autowired val itemService: ItemService,
+        @Autowired val repository: ItemRepositoryV2,
+        @Autowired val p: PodcastServerParameters,
+        @Autowired val fileService: FileService,
+        @Autowired val idm: ItemDownloadManager,
+        @Autowired val podcastRepository: PodcastRepository,
+        @Autowired val mimeTypeService: MimeTypeService
+) {
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
@@ -356,5 +358,16 @@ class ItemServiceTest {
 
             verify(fileService, times(1)).deleteItem(deleteItem)
         }
+    }
+
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun repository() = mock<ItemRepositoryV2>()
+        @Bean fun p() = mock<PodcastServerParameters>()
+        @Bean fun fileService() = mock<FileService>()
+        @Bean fun idm() = mock<ItemDownloadManager>()
+        @Bean fun podcastRepository() = mock<PodcastRepository>()
+        @Bean fun mimeTypeService() = mock<MimeTypeService>()
     }
 }

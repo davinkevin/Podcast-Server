@@ -21,9 +21,9 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.util.function.component1
-import reactor.util.function.component2
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -41,7 +41,7 @@ class PodcastXmlHandler(
                 .sort { a,b -> a.title.compareTo(b.title) }
                 .collectList()
                 .map { Opml(it).toXML() }
-                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).syncBody(it) }
+                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
     }
 
     fun rss(r: ServerRequest): Mono<ServerResponse> {
@@ -82,7 +82,7 @@ class PodcastXmlHandler(
 
                     XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
                 }
-                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).syncBody(it) }
+                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
     }
 
 

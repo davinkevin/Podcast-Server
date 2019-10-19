@@ -8,10 +8,10 @@ import com.github.davinkevin.podcastserver.tag.TagRepositoryV2
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
-import reactor.util.function.component1
-import reactor.util.function.component2
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import java.util.*
 import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 

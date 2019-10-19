@@ -28,11 +28,11 @@ import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as Watc
  */
 @JooqTest
 @Import(WatchListRepository::class)
-class PlaylistRepositoryV2Test {
-
-    @Autowired lateinit var query: DSLContext
-    @Autowired lateinit var repository: WatchListRepository
-    @Autowired lateinit var dataSource: DataSource
+class PlaylistRepositoryV2Test(
+    @Autowired val query: DSLContext,
+    @Autowired val repository: WatchListRepository,
+    @Autowired val dataSource: DataSource
+) {
 
     private val dbSetupTracker = DbSetupTracker()
     private val formatter = DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter()

@@ -12,7 +12,6 @@ import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
 import io.vavr.control.Option
-import io.vavr.jackson.datatype.VavrModule
 import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.input.SAXBuilder
 import org.jsoup.Jsoup
@@ -38,7 +37,6 @@ object IOUtils {
                                     .enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING)
                                     .disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION),
                             JavaTimeModule(),
-                            VavrModule(),
                             KotlinModule()
                     )
     )).build())

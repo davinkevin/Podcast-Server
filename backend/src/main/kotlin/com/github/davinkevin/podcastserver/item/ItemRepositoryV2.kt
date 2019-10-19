@@ -10,9 +10,9 @@ import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.util.function.component1
-import reactor.util.function.component2
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.util.*

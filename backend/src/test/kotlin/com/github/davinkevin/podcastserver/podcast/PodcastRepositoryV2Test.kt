@@ -37,11 +37,11 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as Podcas
  */
 @JooqTest
 @Import(PodcastRepository::class)
-class PodcastRepositoryV2Test {
-
-    @Autowired lateinit var repository: PodcastRepository
-    @Autowired lateinit var dataSource: DataSource
-    @Autowired lateinit var query: DSLContext
+class PodcastRepositoryV2Test(
+    @Autowired val repository: PodcastRepository,
+    @Autowired val dataSource: DataSource,
+    @Autowired val query: DSLContext
+) {
 
     private val dbSetupTracker = DbSetupTracker()
 

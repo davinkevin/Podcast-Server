@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.manager.selector
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalExtractor
 import com.github.davinkevin.podcastserver.manager.worker.noop.PassThroughExtractor
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -15,8 +16,10 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Bean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.util.stream.Stream
@@ -27,11 +30,11 @@ import kotlin.reflect.KClass
  */
 @ExtendWith(SpringExtension::class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class ExtractorSelectorTest {
-
-    @MockBean lateinit var myCanalExtractor: MyCanalExtractor
-    @MockBean lateinit var passThroughExtractor: PassThroughExtractor
-    @Autowired lateinit var applicationContext: ApplicationContext
+class ExtractorSelectorTest(
+    @Autowired val myCanalExtractor: MyCanalExtractor,
+    @Autowired val passThroughExtractor: PassThroughExtractor,
+    @Autowired val applicationContext: ApplicationContext
+) {
 
     lateinit var extractor: ExtractorSelector
 
@@ -73,6 +76,12 @@ class ExtractorSelectorTest {
                         Arguments.of(URI("http://foo.bar.com/to/rss/file.xml"), PassThroughExtractor::class),
                         Arguments.of(URI("http://www.youtube.com/channel/UC_ioajefokjFAOI"), PassThroughExtractor::class)
                 )
+    }
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun myCanalExtractor() = mock<MyCanalExtractor>()
+        @Bean fun passThroughExtractor() = mock<PassThroughExtractor>()
     }
 
 }

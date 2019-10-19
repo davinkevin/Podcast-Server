@@ -15,9 +15,7 @@ import java.time.ZonedDateTime
  */
 @ExtendWith(SpringExtension::class)
 @Import(JacksonConfig::class)
-class JacksonConfigTest {
-
-    @Autowired private lateinit var mapper: ObjectMapper
+class JacksonConfigTest (@Autowired val mapper: ObjectMapper) {
 
     @Test
     fun `should serialize date as iso 8601`() {

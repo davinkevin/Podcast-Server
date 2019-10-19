@@ -17,7 +17,7 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toMono
 import reactor.core.scheduler.Schedulers
 import reactor.netty.http.client.HttpClient
 import java.nio.file.Files

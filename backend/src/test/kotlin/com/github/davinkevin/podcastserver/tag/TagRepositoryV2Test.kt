@@ -28,11 +28,11 @@ import java.util.*
  */
 @JooqTest
 @Import(TagRepository::class)
-class TagRepositoryV2Test {
-
-    @Autowired lateinit var query: DSLContext
-    @Autowired lateinit var repository: TagRepository
-    @Autowired lateinit var dataSource: DataSource
+class TagRepositoryV2Test(
+    @Autowired val query: DSLContext,
+    @Autowired val repository: TagRepository,
+    @Autowired val dataSource: DataSource
+) {
 
     private val dbSetupTracker = DbSetupTracker()
 

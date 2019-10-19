@@ -4,8 +4,8 @@ import org.jooq.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.util.concurrent.CompletionStage
 
 /**
@@ -37,6 +37,3 @@ fun <R: Record> UpdateResultStep<R>.fetchOneAsMono(): Mono<R> =
 
 fun <R: Record> UpdateResultStep<R>.fetchAsFlux(): Flux<R> =
         Mono.justOrEmpty(this.fetch()).flatMapMany { it.toFlux() }
-
-fun <T> DSLContext.transactionResultMono(transactional: () -> T) =
-        Mono.fromCompletionStage(transactionResultAsync { transactional() })

@@ -39,15 +39,15 @@ import javax.validation.Validator
  * Created by kevin on 01/07/2017.
  */
 @ExtendWith(SpringExtension::class)
-class FranceTvUpdaterTest {
+class FranceTvUpdaterTest(
+    @Autowired val signatureService: SignatureService,
+    @Autowired val htmlService: HtmlService,
+    @Autowired val imageService: ImageService,
+    @Autowired val jsonService: JsonService,
+    @Autowired val franceTvUpdater: FranceTvUpdater
+) {
 
-    @Autowired lateinit var signatureService: SignatureService
-    @Autowired lateinit var htmlService: HtmlService
-    @Autowired lateinit var imageService: ImageService
-    @Autowired lateinit var jsonService: JsonService
-    @Autowired lateinit var franceTvUpdater: FranceTvUpdater
-
-    private var podcast = PodcastToUpdate(
+    private val podcast = PodcastToUpdate(
             id = UUID.randomUUID(),
             url = URI("https://www.france.tv/france-2/secrets-d-histoire"),
             signature = "old_signature"
@@ -216,7 +216,6 @@ class FranceTvUpdaterTest {
     @TestConfiguration
     @Import(FranceTvUpdater::class)
     class LocalTestConfiguration {
-
         @Bean fun podcastServerParameters() = mock<PodcastServerParameters>()
         @Bean fun signatureService() = mock<SignatureService>()
         @Bean fun validator() = mock<Validator>()
@@ -227,10 +226,7 @@ class FranceTvUpdaterTest {
     }
 
     companion object {
-
-
         internal fun from(name: String) = "/remote/podcast/francetv/$name"
-
         private fun allValid(): Condition<ItemFromUpdate> {
             val p = Predicate<ItemFromUpdate>{ !it.title.isNullOrEmpty() }
                     .and { !it.description.isNullOrEmpty() }
@@ -238,8 +234,5 @@ class FranceTvUpdaterTest {
 
             return Condition(p, "Should have coherent fields")
         }
-
-
     }
-
 }

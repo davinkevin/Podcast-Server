@@ -6,7 +6,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.notFound
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import reactor.core.publisher.Mono
-import reactor.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.switchIfEmpty
 import java.util.*
 
 /**
@@ -21,7 +21,7 @@ class TagHandler(private val tagService: TagService) {
         return tagService
                 .findById(id)
                 .map { TagHAL(it.id, it.name) }
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
                 .switchIfEmpty { notFound().build() }
     }
 
@@ -33,7 +33,7 @@ class TagHandler(private val tagService: TagService) {
                 .map { TagHAL(it.id, it.name) }
                 .collectList()
                 .map { TagsResponse(it) }
-                .flatMap { ok().syncBody(it) }
+                .flatMap { ok().bodyValue(it) }
     }
 }
 

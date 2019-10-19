@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.service.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.ZonedDateTime.now
