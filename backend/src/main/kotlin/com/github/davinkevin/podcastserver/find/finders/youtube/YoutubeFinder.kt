@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.find.finders.youtube
 
-import arrow.core.Option
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
+import com.github.davinkevin.podcastserver.find.orNull
 import com.github.davinkevin.podcastserver.find.toMonoOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.update.updaters.youtube._compatibility
@@ -17,6 +17,7 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
+import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
 /**
@@ -45,7 +46,7 @@ class YoutubeFinder(
 
     override fun find(url: String): Podcast = TODO("not required anymore")
 
-    private fun findCover(page: Document): Mono<Option<FindCoverInformation>> {
+    private fun findCover(page: Document): Mono<Optional<FindCoverInformation>> {
         return page
                 .select("img.channel-header-profile-image")
                 .attr("src")

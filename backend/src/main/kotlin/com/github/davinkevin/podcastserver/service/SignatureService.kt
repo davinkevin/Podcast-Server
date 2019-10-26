@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.service
 
-import arrow.core.Try
-import arrow.core.getOrElse
 import org.apache.commons.codec.digest.DigestUtils
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
@@ -9,14 +7,13 @@ import org.springframework.stereotype.Service
 @Service
 class SignatureService(val urlService: UrlService) {
 
-    val log = getLogger(this.javaClass.name)!!
+    private val log = getLogger(SignatureService::class.java)
 
     fun fromUrl(url: String): MD5 {
-        return Try {
+        return try {
             urlService.asStream(url).use { DigestUtils.md5Hex(it) }
-        }
-        .getOrElse {
-            log.error("Error during signature of podcast at url {}", url, it)
+        } catch (e: Exception) {
+            log.error("Error during signature of podcast at url {}", url, e)
             ""
         }
     }

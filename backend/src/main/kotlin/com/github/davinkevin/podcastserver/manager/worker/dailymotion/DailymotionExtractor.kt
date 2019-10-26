@@ -7,12 +7,11 @@ import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
 import com.github.davinkevin.podcastserver.utils.k
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE

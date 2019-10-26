@@ -1,8 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
-import arrow.core.Option
-import arrow.core.getOrElse
-import arrow.core.toOption
+import com.github.davinkevin.podcastserver.find.orNull
 import com.github.davinkevin.podcastserver.manager.worker.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.Element
@@ -16,10 +14,10 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
-import java.io.ByteArrayInputStream
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
 class RSSUpdater(
@@ -43,8 +41,8 @@ class RSSUpdater(
                         .map { URI(it) }
                         .flatMap { imageService.fetchCoverInformation(it) }
                         .map { it.toCoverFromUpdate() }
-                        .map { Option.just(it) }
-                        .switchIfEmpty { Option.empty<CoverFromUpdate>().toMono() }
+                        .map { Optional.of(it) }
+                        .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
                         .map { ItemFromUpdate(
                                 title = elem.getChildText("title"),
                                 pubDate = getPubDate(elem),

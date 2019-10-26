@@ -1,14 +1,12 @@
 package com.github.davinkevin.podcastserver.item
 
-import arrow.core.Option
-import arrow.core.getOrElse
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyExtractors
@@ -212,11 +210,11 @@ data class ItemHAL(
 
     val proxyURL: URI
         get() {
-            val extension = Option.fromNullable(fileName)
+            val extension = Optional.ofNullable(fileName)
                     .map { FilenameUtils.getExtension(it) }
                     .map { it.substringBeforeLast("?") }
                     .map { ".$it" }
-                    .getOrElse { "" }
+                    .orElse("")
 
             val title = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 

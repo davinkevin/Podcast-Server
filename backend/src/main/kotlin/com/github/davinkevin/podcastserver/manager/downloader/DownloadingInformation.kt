@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
-import arrow.core.getOrElse
-import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.entity.Status
 import java.net.URI
 import java.util.*

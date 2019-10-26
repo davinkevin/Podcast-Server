@@ -1,8 +1,5 @@
 package com.github.davinkevin.podcastserver.service
 
-import arrow.core.Option
-import arrow.core.Try
-import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
@@ -12,12 +9,9 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toMono
 import reactor.netty.http.client.HttpClient
 import java.io.InputStream
 import java.net.URI
-import java.nio.file.Files
 import javax.imageio.ImageIO
 
 /**
@@ -38,17 +32,13 @@ class ImageService(
             return null
         }
 
-
-        return Try { urlService.asStream(imageUrl).use { it.toBufferedImage() } }
-                .map { Cover().apply {
-                    url = imageUrl
-                    height = it.height
-                    width = it.width
-                } }
-                .getOrElse {
-                    log.error("Error during fetching Cover information for {}", imageUrl)
-                    null
-                }
+        return try {
+            val image = urlService.asStream(imageUrl).use { it.toBufferedImage() }
+                Cover().apply { url = imageUrl; height = image.height; width = image.width }
+        } catch (e: Exception) {
+            log.error("Error during fetching Cover information for {}", imageUrl)
+            null
+        }
     }
 
     fun fetchCoverInformation(imageUrl: String?): CoverInformation? {

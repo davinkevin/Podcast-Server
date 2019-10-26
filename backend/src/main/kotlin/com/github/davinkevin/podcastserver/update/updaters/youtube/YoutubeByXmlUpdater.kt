@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import arrow.core.Option
 import arrow.core.getOrElse
+import com.github.davinkevin.podcastserver.find.orNull
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
@@ -13,8 +13,6 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -67,7 +65,7 @@ class YoutubeByXmlUpdater(
     }
 
     private fun coverOf(thumbnail: Element?) =
-            Option.fromNullable(thumbnail)
+            java.util.Optional.ofNullable(thumbnail)
                     .map { CoverFromUpdate(
                         url = URI(it.getAttributeValue("url")),
                         width = it.getAttributeValue("width").toInt(),

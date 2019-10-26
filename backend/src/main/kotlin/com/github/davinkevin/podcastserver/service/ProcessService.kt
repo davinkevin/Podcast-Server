@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.service
 
 import arrow.core.Try
-import arrow.core.getOrDefault
 import org.springframework.stereotype.Service
 
 /**

@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.find.finders.rss
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
+import com.github.davinkevin.podcastserver.find.orNull
 import com.github.davinkevin.podcastserver.find.toMonoOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.service.image.CoverInformation

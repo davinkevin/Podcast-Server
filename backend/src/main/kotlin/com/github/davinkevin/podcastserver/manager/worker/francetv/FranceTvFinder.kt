@@ -1,16 +1,14 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
-import arrow.core.Option
-import arrow.core.getOrElse
-import arrow.core.toOption
 import com.github.davinkevin.podcastserver.entity.Cover
+import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.UrlService
-import com.github.davinkevin.podcastserver.entity.Podcast
 import org.jsoup.nodes.Document
 import org.springframework.stereotype.Service
+import java.util.*
 
 
 /**
@@ -36,11 +34,11 @@ class FranceTvFinder(val htmlService: HtmlService, val imageService: ImageServic
             }
 
     private fun getCover(p: Document) =
-            Option.fromNullable(p.select("meta[property=og:image]"))
+            Optional.ofNullable(p.select("meta[property=og:image]"))
                     .map { it.attr("content") }
                     .map { it.addProtocolIfNecessary("https:") }
-                    .flatMap { imageService.getCoverFromURL(it).toOption() }
-                    .getOrElse { Cover.DEFAULT_COVER }
+                    .flatMap { Optional.ofNullable(imageService.getCoverFromURL(it)) }
+                    .orElse(Cover.DEFAULT_COVER)
 
     override fun compatibility(url: String?) = FranceTvUpdater.isFromFranceTv(url)
 }
