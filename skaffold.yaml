@@ -1,10 +1,10 @@
-apiVersion: skaffold/v1beta13
+apiVersion: skaffold/v1beta17
 kind: Config
 build:
   artifacts:
     - image: podcastserver/backend
       context: backend
-      jibMaven:
+      jib:
         args:
           - liquibase:dropAll
           - liquibase:update
