@@ -35,10 +35,10 @@ export default class WatchListService {
     }
 
     addItemToWatchList(watchlist, item) {
-        return this.$http.post(`/api/watchlists/${watchlist.id}/${item.id}`);
+        return this.$http.post(`/api/v1/playlists/${watchlist.id}/items/${item.id}`);
     }
 
     removeItemFromWatchList(watchlist, item) {
-        return this.$http.delete(`/api/watchlists/${watchlist.id}/${item.id}`);
+        return this.$http.delete(`/api/v1/playlists/${watchlist.id}/items/${item.id}`);
     }
 }

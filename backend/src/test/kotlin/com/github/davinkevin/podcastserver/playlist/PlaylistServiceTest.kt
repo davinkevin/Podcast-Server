@@ -116,6 +116,48 @@ class PlaylistServiceTest(
 
     }
 
+    @Nested
+    @DisplayName("should add")
+    inner class ShouldAdd {
+
+        @Test
+        fun `to playlist`() {
+            /* Given */
+            val playlistId = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+            val itemId = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            val playlist = PlaylistWithItems(id = playlistId, name = "foo", items = emptyList())
+            whenever(repository.addToPlaylist(playlistId, itemId)).thenReturn(playlist.toMono())
+            /* When */
+            StepVerifier.create(service.addToPlaylist(playlistId, itemId))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(playlist)
+                    .verifyComplete()
+        }
+
+    }
+
+    @Nested
+    @DisplayName("should remove")
+    inner class ShouldRemove {
+
+        @Test
+        fun `from playlist`() {
+            /* Given */
+            val playlistId = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+            val itemId = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            val playlist = PlaylistWithItems(id = playlistId, name = "foo", items = emptyList())
+            whenever(repository.removeFromPlaylist(playlistId, itemId)).thenReturn(playlist.toMono())
+            /* When */
+            StepVerifier.create(service.addToPlaylist(playlistId, itemId))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(playlist)
+                    .verifyComplete()
+        }
+
+    }
+
     @TestConfiguration
     class LocalTestConfiguration {
         @Bean fun repository() = mock<WatchListRepository>()

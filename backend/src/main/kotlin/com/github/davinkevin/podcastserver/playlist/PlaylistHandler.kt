@@ -48,6 +48,34 @@ class PlaylistHandler(
                 .flatMap { ok().bodyValue(it) }
     }
 
+    fun addToPlaylist(r: ServerRequest): Mono<ServerResponse> {
+        val playlistId = UUID.fromString(r.pathVariable("id"))
+        val itemId = UUID.fromString(r.pathVariable("itemId"))
+
+        return playlistService
+                .addToPlaylist(playlistId, itemId)
+                .map { PlaylistWithItemsHAL(
+                        id = it.id,
+                        name = it.name,
+                        items = it.items.map(PlaylistWithItems.Item::toHAL)
+                ) }
+                .flatMap { ok().bodyValue(it) }
+    }
+
+    fun removeFromPlaylist(r: ServerRequest): Mono<ServerResponse> {
+        val playlistId = UUID.fromString(r.pathVariable("id"))
+        val itemId = UUID.fromString(r.pathVariable("itemId"))
+
+        return playlistService
+                .removeFromPlaylist(playlistId, itemId)
+                .map { PlaylistWithItemsHAL(
+                        id = it.id,
+                        name = it.name,
+                        items = it.items.map(PlaylistWithItems.Item::toHAL)
+                ) }
+                .flatMap { ok().bodyValue(it) }
+    }
+
 }
 
 private class SavePlaylist(val name: String)

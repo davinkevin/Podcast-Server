@@ -1,26 +1,21 @@
 package com.github.davinkevin.podcastserver.business
 
 
-import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.WatchList
 import com.github.davinkevin.podcastserver.service.JdomService
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.only
 import com.nhaarman.mockitokotlin2.same
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
-import io.vavr.API.Set
-import lan.dk.podcastserver.repository.ItemRepository
 import lan.dk.podcastserver.repository.WatchListRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -33,117 +28,8 @@ import java.util.*
 class PlaylistBusinessTest {
 
     @Mock lateinit var watchListRepository: WatchListRepository
-    @Mock lateinit var itemRepository: ItemRepository
     @Mock lateinit var jdomService: JdomService
     @InjectMocks lateinit var watchListBusiness: WatchListBusiness
-
-    @Test
-    fun `should add item to playlist`() {
-        /* Given */
-        val uuid = UUID.randomUUID()
-        val item = Item().apply {
-                id = uuid
-                watchLists = mutableSetOf()
-        }
-        val wId = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-        val watchList = WatchList().apply {
-                id = wId
-                name = "First"
-                items = mutableSetOf()
-        }
-
-        whenever(itemRepository.findById(eq(uuid))).thenReturn(Optional.of(item))
-        whenever(watchListRepository.findById(eq(wId))).thenReturn(Optional.of(watchList))
-        whenever(watchListRepository.save(any<WatchList>())).then { it.arguments[0] }
-
-        /* When */
-        val watchListOfItem = watchListBusiness.add(wId, uuid)
-
-        /* Then */
-        assertThat(watchListOfItem).isSameAs(watchList)
-        assertThat(watchListOfItem.items).contains(item)
-        verify(itemRepository, only()).findById(eq(uuid))
-        verify(watchListRepository, times(1)).findById(eq(wId))
-        verify(watchListRepository, times(1)).save(eq(watchList))
-    }
-
-    @Test
-    fun `should throw exception when trying to add a non existing item to playlist`() {
-        /* Given */
-        val uuid = UUID.randomUUID()
-        val wId = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-        val watchList = WatchList().apply {
-            id = wId
-            name = "First"
-            items = mutableSetOf()
-        }
-
-        whenever(itemRepository.findById(eq(uuid))).thenReturn(Optional.empty())
-        whenever(watchListRepository.findById(eq(wId))).thenReturn(Optional.of(watchList))
-
-        /* When */
-        assertThatThrownBy { watchListBusiness.add(wId, uuid) }
-                .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Item with ID $uuid not found")
-
-        /* Then */
-        verify(watchListRepository, times(1)).findById(eq(wId))
-        verify(itemRepository, only()).findById(eq(uuid))
-    }
-
-    @Test
-    fun `should remove item to playlist`() {
-        /* Given */
-        val uuid = UUID.randomUUID()
-        val item = Item().apply {
-            id = uuid
-            watchLists = mutableSetOf()
-        }
-        val wId = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-        val watchList = WatchList().apply {
-            id = wId
-            name = "First"
-            items = mutableSetOf()
-        }
-
-        whenever(itemRepository.findById(eq(uuid))).thenReturn(Optional.of(item))
-        whenever(watchListRepository.findById(eq(wId))).thenReturn(Optional.of(watchList))
-        whenever(watchListRepository.save(any<WatchList>())).then { it.arguments[0] }
-
-        /* When */
-        val watchListOfItem = watchListBusiness.remove(wId, uuid)
-
-        /* Then */
-        assertThat(watchListOfItem).isSameAs(watchList)
-        assertThat(watchListOfItem.items).doesNotContain(item)
-        verify(itemRepository, only()).findById(ArgumentMatchers.eq(uuid))
-        verify(watchListRepository, times(1)).findById(eq(wId))
-        verify(watchListRepository, times(1)).save(eq(watchList))
-    }
-
-    @Test
-    fun `should throw exception when trying to remove a non existing item to playlist`() {
-        /* Given */
-        val uuid = UUID.randomUUID()
-        val wId = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-        val watchList = WatchList().apply {
-            id = wId
-            name = "First"
-            items = mutableSetOf()
-        }
-
-        whenever(itemRepository.findById(eq(uuid))).thenReturn(Optional.empty())
-        whenever(watchListRepository.findById(eq(wId))).thenReturn(Optional.of(watchList))
-
-        /* When */
-        assertThatThrownBy { watchListBusiness.remove(wId, uuid) }
-                .isInstanceOf(RuntimeException::class.java)
-                .hasMessage("Item with ID $uuid not found")
-
-        /* Then */
-        verify(watchListRepository, times(1)).findById(eq(wId))
-        verify(itemRepository, only()).findById(eq(uuid))
-    }
 
     @Test
     fun `should delete`() {
@@ -197,7 +83,7 @@ class PlaylistBusinessTest {
 
     @AfterEach
     fun afterEach() {
-        verifyNoMoreInteractions(watchListRepository, itemRepository)
+        verifyNoMoreInteractions(watchListRepository)
     }
 
 }

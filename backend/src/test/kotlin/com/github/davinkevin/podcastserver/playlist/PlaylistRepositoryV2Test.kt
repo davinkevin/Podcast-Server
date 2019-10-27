@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.entity.WatchList
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
@@ -26,7 +25,6 @@ import java.net.URI
 import java.time.ZonedDateTime.now
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
-import java.util.*
 import java.util.UUID.*
 import javax.sql.DataSource
 import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as PlaylistRepository
@@ -253,6 +251,93 @@ class PlaylistRepositoryV2Test(
             val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
             assertThat(numberOfPlaylist).isEqualTo(3)
         }
+    }
+
+    @Nested
+    @DisplayName("should add")
+    inner class ShouldAdd {
+
+        @Test
+        fun `item to playlist`() {
+            /* Given */
+            val playlistId = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            val itemId = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            /* When */
+            StepVerifier.create(repository.addToPlaylist(playlistId, itemId))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.items).hasSize(1).containsOnly(
+                                PlaylistWithItems. Item(
+                                        id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"),
+                                        title = "Geek INC 126",
+                                        fileName = "geekinc.126.mp3",
+                                        description = "desc",
+                                        mimeType = null,
+                                        podcast = PlaylistWithItems.Item.Podcast(
+                                                id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                                                title = "Geek Inc HD"
+                                        ),
+                                        cover = PlaylistWithItems.Item.Cover(
+                                                id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
+                                                width = 100,
+                                                height = 100,
+                                                url = URI("http://fake.url.com/geekinc/cover.png")))
+                        )
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `item to playlist which already exist`() {
+            /* Given */
+            val playlistId = fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+            val itemId = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            /* When */
+            StepVerifier.create(repository.addToPlaylist(playlistId, itemId))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.items).hasSize(2)
+                    }
+                    .verifyComplete()
+        }
+    }
+
+    @Nested
+    @DisplayName("should remove")
+    inner class ShouldRemove {
+
+        @Test
+        fun `item from playlist`() {
+            /* Given */
+            val playlistId = fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+            val itemId = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+            /* When */
+            StepVerifier.create(repository.removeFromPlaylist(playlistId, itemId))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.items).hasSize(1)
+                    }
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `item from playlist which wasn't linked`() {
+            /* Given */
+            val playlistId = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            val itemId = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
+            /* When */
+            StepVerifier.create(repository.removeFromPlaylist(playlistId, itemId))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.items).hasSize(0)
+                    }
+                    .verifyComplete()
+        }
+
     }
 
     @TestConfiguration

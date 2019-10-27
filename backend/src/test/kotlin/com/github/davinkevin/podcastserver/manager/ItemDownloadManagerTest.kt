@@ -1,38 +1,10 @@
 package com.github.davinkevin.podcastserver.manager
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.downloader.NoOpDownloader
-import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
-import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
-import com.github.davinkevin.podcastserver.manager.worker.noop.PassThroughExtractor
-import com.github.davinkevin.podcastserver.service.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.*
-import lan.dk.podcastserver.repository.ItemRepository
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito
-import org.mockito.verification.VerificationMode
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
 import java.net.URI
-import java.time.Instant.now
-import java.time.ZonedDateTime
-import java.util.*
 
 /**
  * Created by kevin on 06/05/15

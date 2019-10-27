@@ -31,18 +31,6 @@ public class WatchListController {
         watchListBusiness.delete(id);
     }
 
-    @JsonView(WatchListDetailsListView.class)
-    @PostMapping("{id}/{itemId}")
-    public WatchList add(@PathVariable UUID id, @PathVariable UUID itemId) {
-        return watchListBusiness.add(id, itemId);
-    }
-
-    @JsonView(WatchListDetailsListView.class)
-    @DeleteMapping("{id}/{itemId}")
-    public WatchList remove(@PathVariable UUID id, @PathVariable UUID itemId) {
-        return watchListBusiness.remove(id, itemId);
-    }
-
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String asRss(@PathVariable UUID id, ServerWebExchange request) {
         return watchListBusiness.asRss(id, UrlService.getDomainFromRequest(request).toASCIIString());

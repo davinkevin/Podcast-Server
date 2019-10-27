@@ -13,4 +13,7 @@ class PlaylistService(
     fun findById(id: UUID): Mono<PlaylistWithItems> = repository.findById(id)
     fun save(name: String): Mono<PlaylistWithItems> = repository.save(name)
 
+    fun addToPlaylist(playlistId: UUID, itemId: UUID) = repository.addToPlaylist(playlistId, itemId)
+    fun removeFromPlaylist(playlistId: UUID, itemId: UUID) = repository.removeFromPlaylist(playlistId, itemId)
+
 }

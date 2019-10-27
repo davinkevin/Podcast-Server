@@ -37,7 +37,6 @@ public class WatchListRepositoryTest {
 
     @Autowired DataSource dataSource;
     @Autowired WatchListRepository watchListRepository;
-    @Autowired ItemRepository itemRepository;
 
     private final static DbSetupTracker dbSetupTracker = new DbSetupTracker();
 
@@ -76,35 +75,5 @@ public class WatchListRepositoryTest {
         assertThat(watchList.getItems()).hasSize(2);
         assertThat(watchList.getId()).isEqualTo(id);
         assertThat(watchList.getName()).isEqualTo("Humour Playlist");
-    }
-
-    @Test
-    public void should_add_a_item_to_playlist() {
-        /* Given */
-        Item item = itemRepository.findById(UUID.fromString("b721a6b6-896a-48fc-b820-28aeafddbb53")).get();
-        WatchList watchList = watchListRepository.findById(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66")).get();
-        watchList.add(item);
-        /* When */
-        watchListRepository.save(watchList);
-        watchListRepository.flush();
-        WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("24248480-bd04-11e5-a837-0800200c9a66")).get();
-
-        /* Then */
-        assertThat(fetchedWatchList.getItems()).hasSize(2);
-    }
-
-    @Test
-    public void should_remove_item_from_playlist() {
-        /* Given */
-        Item thirdItem = itemRepository.findById(UUID.fromString("0a774611-c867-44df-b7e0-5e5af31f7b56")).get();
-        WatchList watchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
-        watchList.remove(thirdItem);
-        /* When */
-        watchListRepository.save(watchList);
-        watchListRepository.flush();
-        WatchList fetchedWatchList = watchListRepository.findById(UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")).get();
-
-        /* Then */
-        assertThat(fetchedWatchList.getItems()).hasSize(1);
     }
 }

@@ -97,4 +97,23 @@ class PlaylistRepositoryV2(
 
     }
 
+    fun addToPlaylist(playlistId: UUID, itemId: UUID): Mono<PlaylistWithItems> = Mono.defer {
+        query
+                .insertInto(WATCH_LIST_ITEMS)
+                .set(WATCH_LIST_ITEMS.WATCH_LISTS_ID, playlistId)
+                .set(WATCH_LIST_ITEMS.ITEMS_ID, itemId)
+                .onConflictDoNothing()
+                .executeAsyncAsMono()
+                .then(findById(playlistId))
+    }
+
+    fun removeFromPlaylist(playlistId: UUID, itemId: UUID): Mono<PlaylistWithItems> = Mono.defer {
+        query
+                .deleteFrom(WATCH_LIST_ITEMS)
+                .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(playlistId))
+                .and(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+                .executeAsyncAsMono()
+                .then(findById(playlistId))
+    }
+
 }
