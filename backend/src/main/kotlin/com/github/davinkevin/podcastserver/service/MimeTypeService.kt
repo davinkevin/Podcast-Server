@@ -4,8 +4,6 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.orElse
 import arrow.core.toOption
-import com.github.davinkevin.podcastserver.update.updaters.youtube.YOUTUBE
-import com.github.davinkevin.podcastserver.entity.Item
 import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika
 import org.springframework.stereotype.Service
@@ -35,20 +33,6 @@ class MimeTypeService(val tikaProbeContentType: TikaProbeContentType) {
         return mimeMap[extension]
                 .toOption()
                 .getOrElse { "unknown/$extension" }
-    }
-
-    fun getExtension(item: Item): String {
-        if (item.mimeType != null) {
-            return item.mimeType!!
-                    .replace("audio/", ".")
-                    .replace("video/", ".")
-        }
-
-        if (item.podcast!!.type == YOUTUBE || !item.url!!.contains(".") ) {
-            return ".mp4"
-        }
-
-        return "." + FilenameUtils.getExtension(item.url)
     }
 
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/

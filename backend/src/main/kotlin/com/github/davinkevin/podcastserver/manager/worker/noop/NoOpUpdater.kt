@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
-import com.github.davinkevin.podcastserver.entity.Item
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.*
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI

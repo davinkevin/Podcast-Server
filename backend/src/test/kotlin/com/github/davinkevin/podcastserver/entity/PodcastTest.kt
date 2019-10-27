@@ -34,11 +34,7 @@ class PodcastTest {
             cover = COVER
             description = "A long Description"
             hasToBeDeleted = true
-            items = HashSet.empty<Item>().toJavaSet()
-            tags = HashSet.empty<Tag>().toJavaSet()
         }
-
-        PODCAST_TO_STRING = "Podcast{id=$anId, title='PodcastDeTest', url='http://nowhere.com', signature='ae4b93a7e8249d6be591649c936dbe7d', type='Youtube', lastUpdate=%s}"
 
         FileSystemUtils.deleteRecursively(Podcast.rootFolder!!.resolve(podcast.title).toFile())
     }
@@ -55,14 +51,6 @@ class PodcastTest {
         assertThat(podcast.cover).isEqualTo(COVER)
         assertThat(podcast.description).isEqualTo("A long Description")
         assertThat(podcast.hasToBeDeleted).isEqualTo(true)
-        assertThat(podcast.items).isEmpty()
-        assertThat(podcast.tags).isEmpty()
-    }
-
-    @Test
-    fun should_have_toString() {
-        assertThat(podcast.toString())
-                .isEqualTo(String.format(PODCAST_TO_STRING, NOW))
     }
 
     @Test
@@ -85,27 +73,6 @@ class PodcastTest {
     }
 
     @Test
-    fun should_add_an_item() {
-        val itemToAdd = Item()
-        /* When */
-        podcast.add(itemToAdd)
-        /* Then */
-        assertThat(itemToAdd.podcast).isEqualTo(podcast)
-        assertThat(podcast.items).containsOnly(itemToAdd)
-    }
-
-    @Test
-    fun should_contains_item() {
-        val itemToAdd = Item().apply { id = UUID.randomUUID() }
-        val itemToAdd2 = Item().apply { id = UUID.randomUUID() }
-        podcast.add(itemToAdd)
-
-        assertThat(podcast.contains(itemToAdd)).isTrue()
-        assertThat(podcast.contains(itemToAdd2)).isFalse()
-    }
-
-
-    @Test
     fun should_provide_cover_path() {
         /* GIVEN */
         /* WHEN  */
@@ -123,7 +90,6 @@ class PodcastTest {
                 url = "ACover.jpg"
             }
         }
-        private lateinit var PODCAST_TO_STRING: String
     }
 
 }

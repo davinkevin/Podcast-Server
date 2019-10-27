@@ -3,7 +3,6 @@
 package com.github.davinkevin.podcastserver.manager
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
@@ -55,7 +54,6 @@ class ItemDownloadManager (
         get() = this.downloadingQueue.keys
 
     init {
-        Item.rootFolder = podcastServerParameters.rootfolder
         Podcast.rootFolder = podcastServerParameters.rootfolder
     }
 

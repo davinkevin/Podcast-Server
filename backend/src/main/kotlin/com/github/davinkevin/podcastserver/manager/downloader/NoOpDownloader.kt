@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import com.github.davinkevin.podcastserver.entity.Item
 
 /**
  * Created by kevin on 10/03/2016 for Podcast Server

@@ -1,9 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.noop
 
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
-import com.github.davinkevin.podcastserver.manager.worker.Extractor
-import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import org.apache.commons.io.FilenameUtils
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component

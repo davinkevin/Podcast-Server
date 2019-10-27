@@ -30,9 +30,7 @@ class RSSFinder(
 
     private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!
 
-    override fun find(url: String): Podcast {
-        TODO("not required anymore") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> = wcb
             .baseUrl(url)

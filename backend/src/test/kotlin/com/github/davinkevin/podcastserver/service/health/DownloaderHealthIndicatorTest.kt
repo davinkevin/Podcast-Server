@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.service.health
 
-import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.entity.Status.PAUSED
 import com.github.davinkevin.podcastserver.entity.Status.STARTED
 import com.nhaarman.mockitokotlin2.whenever

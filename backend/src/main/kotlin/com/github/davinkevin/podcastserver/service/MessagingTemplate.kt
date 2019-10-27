@@ -1,9 +1,7 @@
 package com.github.davinkevin.podcastserver.service
 
-import com.github.davinkevin.podcastserver.entity.Item
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.stereotype.Service
 
 /**
  * Created by kevin on 2018-11-25
