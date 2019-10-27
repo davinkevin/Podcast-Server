@@ -4,6 +4,7 @@ import org.apache.commons.io.FilenameUtils
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
+import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
@@ -12,6 +13,19 @@ import java.util.*
 class PlaylistHandler(
         private val playlistService: PlaylistService
 ) {
+
+    fun save(r: ServerRequest): Mono<ServerResponse> {
+        return r
+                .bodyToMono<SavePlaylist>()
+                .flatMap { playlistService.save(it.name) }
+                .map { PlaylistWithItemsHAL(
+                        id = it.id,
+                        name = it.name,
+                        items = it.items.map(PlaylistWithItems.Item::toHAL)
+                ) }
+                .flatMap { ok().bodyValue(it) }
+
+    }
 
     fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
             playlistService
@@ -35,6 +49,8 @@ class PlaylistHandler(
     }
 
 }
+
+private class SavePlaylist(val name: String)
 
 private class FindAllPlaylistHAL(val content: Collection<PlaylistHAL>)
 private class PlaylistHAL(val id: UUID, val name: String)

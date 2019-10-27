@@ -15,7 +15,7 @@ export default class WatchListService {
     }
 
     create(watchlist) {
-        return this.$http.post('/api/watchlists', watchlist).then(res => res.data);
+        return this.$http.post('/api/v1/playlists', watchlist).then(res => res.data);
     }
 
     findOne(id) {

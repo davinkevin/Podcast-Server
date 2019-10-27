@@ -158,23 +158,6 @@ class PlaylistBusinessTest {
     }
 
     @Test
-    fun `should save`() {
-        /* Given */
-        val watchList = WatchList().apply {
-            id = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-            name = "First"
-            items = mutableSetOf()
-        }
-        whenever(watchListRepository.save(watchList)).thenReturn(watchList)
-
-        /* When */
-        watchListBusiness.save(watchList)
-
-        /* Then */
-        verify(watchListRepository, only()).save(watchList)
-    }
-
-    @Test
     fun `should generate watchlist as xml`() {
         /* Given */
         val uuid = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")

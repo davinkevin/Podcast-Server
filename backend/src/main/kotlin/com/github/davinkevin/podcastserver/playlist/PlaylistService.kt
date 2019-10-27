@@ -11,5 +11,6 @@ class PlaylistService(
 
     fun findAll(): Flux<Playlist> = repository.findAll()
     fun findById(id: UUID): Mono<PlaylistWithItems> = repository.findById(id)
+    fun save(name: String): Mono<PlaylistWithItems> = repository.save(name)
 
 }

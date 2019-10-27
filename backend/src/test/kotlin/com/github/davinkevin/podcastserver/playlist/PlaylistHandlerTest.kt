@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.kotlin.core.publisher.toMono
@@ -30,6 +31,36 @@ class PlaylistHandlerTest (
     @Autowired val rest: WebTestClient,
     @Autowired val service: PlaylistService
 ) {
+
+    @Nested
+    @DisplayName("should save")
+    inner class ShouldSave {
+
+        @Test
+        fun `with a name`() {
+            /* Given */
+            val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
+            whenever(service.save("foo")).thenReturn(playlist.toMono())
+            /* When */
+            rest
+                    .post()
+                    .uri("/api/v1/playlists")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""{"name":"${playlist.name}"}""")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                            "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
+                            "name":"foo",
+                            "items":[]
+                        }""")
+                    }
+        }
+    }
+
 
     @Nested
     @DisplayName("should find all")
@@ -265,8 +296,6 @@ class PlaylistHandlerTest (
                         }""")
                     }
         }
-
-
     }
 
     @TestConfiguration

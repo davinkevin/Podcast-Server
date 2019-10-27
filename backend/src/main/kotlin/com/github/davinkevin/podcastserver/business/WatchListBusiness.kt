@@ -35,8 +35,6 @@ class WatchListBusiness(val watchListRepository: WatchListRepository, val itemRe
 
     fun delete(uuid: UUID) = watchListRepository.deleteById(uuid)
 
-    fun save(watchList: WatchList) = watchListRepository.save(watchList)
-
     fun asRss(id: UUID, domainFromRequest: String) = watchListRepository.findById(id).k()
             .map { jdomService.watchListToXml(it, domainFromRequest) }
             .getOrElse { throw RuntimeException("Rss generation of watchlist $id caused Error") }

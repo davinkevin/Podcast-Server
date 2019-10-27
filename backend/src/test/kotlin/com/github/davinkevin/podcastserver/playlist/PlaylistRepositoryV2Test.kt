@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.WatchList
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
@@ -9,6 +11,7 @@ import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.count
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -208,6 +211,47 @@ class PlaylistRepositoryV2Test(
                         )
                     }
                     .verifyComplete()
+        }
+    }
+
+    @Nested
+    @DisplayName("should save")
+    inner class ShouldSave {
+
+        @Test
+        fun `with a name`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repository.save("foo"))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.name).isEqualTo("foo")
+                        assertThat(it.items).isEmpty()
+                    }
+                    .verifyComplete()
+
+            val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
+            assertThat(numberOfPlaylist).isEqualTo(4)
+        }
+
+        @Test
+        fun `with an already existing name`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repository.save("Humour Playlist"))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.name).isEqualTo("Humour Playlist")
+                        assertThat(it.items).hasSize(2)
+                    }
+                    .verifyComplete()
+
+            val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
+            assertThat(numberOfPlaylist).isEqualTo(3)
         }
     }
 

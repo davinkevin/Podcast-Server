@@ -95,6 +95,27 @@ class PlaylistServiceTest(
         }
     }
 
+    @Nested
+    @DisplayName("should save")
+    inner class ShouldSave {
+
+        @Test
+        fun `with a name`() {
+            /* Given */
+            val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
+            whenever(repository.save("foo")).thenReturn(playlist.toMono())
+
+            /* When */
+            StepVerifier.create(repository.save("foo"))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(playlist)
+                    .verifyComplete()
+        }
+
+    }
+
     @TestConfiguration
     class LocalTestConfiguration {
         @Bean fun repository() = mock<WatchListRepository>()

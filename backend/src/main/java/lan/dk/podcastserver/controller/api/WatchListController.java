@@ -26,12 +26,6 @@ public class WatchListController {
         this.watchListBusiness = watchListBusiness;
     }
 
-    @JsonView(WatchListDetailsListView.class)
-    @PostMapping
-    public WatchList create(@RequestBody WatchList entity) {
-        return watchListBusiness.save(entity);
-    }
-
     @DeleteMapping("{id}")
     public void delete(@PathVariable UUID id) {
         watchListBusiness.delete(id);

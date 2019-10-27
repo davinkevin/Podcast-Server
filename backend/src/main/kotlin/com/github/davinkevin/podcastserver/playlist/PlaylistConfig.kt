@@ -15,6 +15,7 @@ class PlaylistRoutingConfig {
     fun watchlistRouter(playlist: PlaylistHandler) = router {
         "/api/v1/playlists".nest {
             GET("/", playlist::findAll)
+            POST("/", playlist::save)
             GET("/{id}", playlist::findById)
         }
     }

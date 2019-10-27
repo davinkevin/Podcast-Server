@@ -1,10 +1,12 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
+import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
 import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
 import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
@@ -71,6 +73,28 @@ class PlaylistRepositoryV2(
                         name = pl[WATCH_LIST.NAME],
                         items = items
                 ) }
+    }
+
+    fun save(name: String): Mono<PlaylistWithItems> = Mono.defer {
+        val id = UUID.randomUUID()
+
+        query
+                .insertInto(WATCH_LIST)
+                .set(WATCH_LIST.ID, id)
+                .set(WATCH_LIST.NAME, name)
+                .onConflictDoNothing()
+                .executeAsyncAsMono()
+                .filter { it == 1 }
+                .map { PlaylistWithItems(id, name, emptyList()) }
+                .switchIfEmpty {
+                    query
+                            .select(WATCH_LIST.ID)
+                            .from(WATCH_LIST)
+                            .where(WATCH_LIST.NAME.eq(name))
+                            .fetchOneAsMono()
+                            .flatMap { findById(it[WATCH_LIST.ID]) }
+                }
+
     }
 
 }
