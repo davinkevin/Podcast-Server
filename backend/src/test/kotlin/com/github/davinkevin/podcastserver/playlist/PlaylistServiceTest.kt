@@ -158,6 +158,22 @@ class PlaylistServiceTest(
 
     }
 
+    @Nested
+    @DisplayName("should delete")
+    inner class ShouldDelete {
+        @Test
+        fun `by id`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            whenever(repository.deleteById(id)).thenReturn(Mono.empty())
+            /* When */
+            StepVerifier.create(repository.deleteById(id))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+        }
+    }
+
     @TestConfiguration
     class LocalTestConfiguration {
         @Bean fun repository() = mock<WatchListRepository>()

@@ -17,6 +17,7 @@ class PlaylistRoutingConfig {
             GET("/", playlist::findAll)
             POST("/", playlist::save)
             GET("/{id}", playlist::findById)
+            DELETE("/{id}", playlist::deleteById)
             "{id}/items/{itemId}".nest {
                 POST("/", playlist::addToPlaylist)
                 DELETE("/", playlist::removeFromPlaylist)

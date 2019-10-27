@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST
+import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST_ITEMS
 import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
@@ -40,9 +41,7 @@ class PlaylistRepositoryV2Test(
     @Autowired val datasourceDestination: DataSourceDestination
 ) {
 
-    private val dbSetupTracker = DbSetupTracker()
     private val formatter = DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter()
-
     private val insertPlaylistData = sequenceOf(
             insertInto("COVER")
                     .columns("ID", "URL", "WIDTH", "HEIGHT")
@@ -250,6 +249,36 @@ class PlaylistRepositoryV2Test(
 
             val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
             assertThat(numberOfPlaylist).isEqualTo(3)
+        }
+    }
+
+    @Nested
+    @DisplayName("should delete")
+    inner class ShouldDelete {
+        @Test
+        fun `by id with no items`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(query.selectCount().from(WATCH_LIST).fetchOne(count())).isEqualTo(2)
+            assertThat(query.selectCount().from(WATCH_LIST_ITEMS).fetchOne(count())).isEqualTo(3)
+        }
+
+        @Test
+        fun `by id with items`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repository.deleteById(fromString("dc024a30-bd02-11e5-a837-0800200c9a66")))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(query.selectCount().from(WATCH_LIST).fetchOne(count())).isEqualTo(2)
+            assertThat(query.selectCount().from(WATCH_LIST_ITEMS).fetchOne(count())).isEqualTo(1)
         }
     }
 

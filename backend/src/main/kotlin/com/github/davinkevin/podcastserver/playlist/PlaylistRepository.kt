@@ -116,4 +116,17 @@ class PlaylistRepositoryV2(
                 .then(findById(playlistId))
     }
 
+    fun deleteById(id: UUID): Mono<Void> = Mono.defer {
+        query
+                .deleteFrom(WATCH_LIST_ITEMS)
+                .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(id))
+                .executeAsyncAsMono()
+                .then(query
+                        .deleteFrom(WATCH_LIST)
+                        .where(WATCH_LIST.ID.eq(id))
+                        .executeAsyncAsMono()
+                )
+                .then()
+    }
+
 }

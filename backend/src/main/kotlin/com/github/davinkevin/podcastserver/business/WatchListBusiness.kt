@@ -13,8 +13,6 @@ import java.util.*
 @Component
 class WatchListBusiness(val watchListRepository: WatchListRepository, val jdomService: JdomService) {
 
-    fun delete(uuid: UUID) = watchListRepository.deleteById(uuid)
-
     fun asRss(id: UUID, domainFromRequest: String) = watchListRepository.findById(id).k()
             .map { jdomService.watchListToXml(it, domainFromRequest) }
             .getOrElse { throw RuntimeException("Rss generation of watchlist $id caused Error") }

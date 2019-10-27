@@ -26,11 +26,6 @@ public class WatchListController {
         this.watchListBusiness = watchListBusiness;
     }
 
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable UUID id) {
-        watchListBusiness.delete(id);
-    }
-
     @GetMapping(value="{id}/rss", produces = "application/xml; charset=utf-8")
     public String asRss(@PathVariable UUID id, ServerWebExchange request) {
         return watchListBusiness.asRss(id, UrlService.getDomainFromRequest(request).toASCIIString());

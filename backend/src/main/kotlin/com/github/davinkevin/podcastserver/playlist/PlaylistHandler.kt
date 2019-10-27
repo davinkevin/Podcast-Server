@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.playlist
 import org.apache.commons.io.FilenameUtils
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.ServerResponse.noContent
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
@@ -46,6 +47,14 @@ class PlaylistHandler(
                         items = it.items.map(PlaylistWithItems.Item::toHAL)
                 ) }
                 .flatMap { ok().bodyValue(it) }
+    }
+
+    fun deleteById(r: ServerRequest): Mono<ServerResponse> {
+        val id = UUID.fromString(r.pathVariable("id"))
+
+        return playlistService
+                .deleteById(id)
+                .then(noContent().build())
     }
 
     fun addToPlaylist(r: ServerRequest): Mono<ServerResponse> {

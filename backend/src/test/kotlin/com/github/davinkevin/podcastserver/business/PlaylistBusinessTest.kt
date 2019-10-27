@@ -32,18 +32,6 @@ class PlaylistBusinessTest {
     @InjectMocks lateinit var watchListBusiness: WatchListBusiness
 
     @Test
-    fun `should delete`() {
-        /* Given */
-        val id = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")
-
-        /* When */
-        watchListBusiness.delete(id)
-
-        /* Then */
-        verify(watchListRepository, only()).deleteById(eq(id))
-    }
-
-    @Test
     fun `should generate watchlist as xml`() {
         /* Given */
         val uuid = UUID.fromString("16f7a430-8d4c-45d4-b4ec-68c807b82634")

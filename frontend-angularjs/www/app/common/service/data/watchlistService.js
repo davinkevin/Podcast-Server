@@ -27,7 +27,7 @@ export default class WatchListService {
     }
 
     delete(id){
-        return this.$http.delete(`/api/watchlists/${id}`);
+        return this.$http.delete(`/api/v1/playlists/${id}`);
     }
 
     findAllWithItem(item) {

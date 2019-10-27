@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -297,6 +298,24 @@ class PlaylistHandlerTest (
         }
     }
 
+    @Nested
+    @DisplayName("should delete")
+    inner class ShouldDelete {
+
+        @Test
+        fun `by id`() {
+            /* Given */
+            val id = UUID.randomUUID()
+            whenever(service.deleteById(id)).thenReturn(Mono.empty())
+            /* When */
+            rest
+                    .delete()
+                    .uri("/api/v1/playlists/{id}", id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isNoContent
+        }
+    }
 
     @Nested
     @DisplayName("should add")
