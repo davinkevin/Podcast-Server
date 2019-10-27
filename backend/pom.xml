@@ -56,10 +56,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jooq</artifactId>
         </dependency>
         <dependency>
@@ -77,11 +73,6 @@
         </dependency>
         <!--User Type Mapping-->
         <!-- https://mvnrepository.com/artifact/org.jadira.usertype/usertype.extended -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-java8</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -187,10 +178,6 @@
             <version>0.6.1</version>
         </dependency>
         <!-- Mapper JSON -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate5</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
@@ -310,13 +297,7 @@
                     <compilerPlugins>
                         <plugin>spring</plugin>
                         <plugin>no-arg</plugin>
-                        <plugin>jpa</plugin>
                     </compilerPlugins>
-
-                    <pluginOptions>
-                        <!-- Each annotation is placed on its own line -->
-                        <option>no-arg:annotation=javax.persistence.Entity</option>
-                    </pluginOptions>
 
                 </configuration>
                 <dependencies>
@@ -422,26 +403,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- Test : Assertion Generation -->
-            <plugin>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-                <version>2.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>generate-assertions</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <classes>
-                        <param>org.springframework.data.domain.Page</param>
-                    </classes>
-                    <entryPointClassPackage>lan.dk.podcastserver.assertion</entryPointClassPackage>
-                </configuration>
             </plugin>
             <!-- Surefire -->
             <plugin>

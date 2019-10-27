@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.entity
 
-import arrow.core.getOrElse
-import arrow.syntax.collections.firstOption
 import com.fasterxml.jackson.annotation.JsonCreator
 
 enum class Status {

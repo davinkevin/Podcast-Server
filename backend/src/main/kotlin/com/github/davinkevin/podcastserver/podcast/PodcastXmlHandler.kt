@@ -136,6 +136,7 @@ private class OpmlOutline(p: Podcast, host: URI) {
 
 private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
 private val mediaNS = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
+private val ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
 
 private fun toRssItem(item: Item, host: URI): Element {
 
@@ -216,7 +217,7 @@ private fun toRssChannel(podcast: Podcast, host: URI): Element {
             addContent(Element("pubDate").addContent(d))
         }
 
-        val itunesImage = Element("image", JdomService.ITUNES_NAMESPACE).apply { addContent(Text(coverUrl)) }
+        val itunesImage = Element("image", ITUNES_NAMESPACE).apply { addContent(Text(coverUrl)) }
 
         val image = Element("image").apply {
             addContent(Element("height").addContent(podcast.cover.height.toString()))

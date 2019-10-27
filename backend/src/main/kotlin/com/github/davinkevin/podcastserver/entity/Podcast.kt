@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.entity
 
 
-import arrow.core.getOrElse
 import arrow.core.toOption
 import com.fasterxml.jackson.annotation.*
 import com.github.davinkevin.podcastserver.utils.toVΛVΓ
@@ -9,30 +8,21 @@ import io.vavr.control.Option
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import org.springframework.util.FileSystemUtils
 import java.io.Serializable
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.util.*
-import javax.persistence.*
 
-@Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
 @JsonIgnoreProperties(ignoreUnknown = true, value = ["signature", "items", "contains", "add", "lastUpdateToNow"])
 open class Podcast : Serializable {
 
-    @Id
-    @GeneratedValue
-    @Column(columnDefinition = "UUID")
     var id: UUID? = null
 
     @JsonView(PodcastListingView::class)
     var title: String? = null
 
-    @Column(length = 65535)
     @JsonView(PodcastDetailsView::class)
     var url: String? = null
     var signature: String? = null
@@ -43,16 +33,11 @@ open class Podcast : Serializable {
     @JsonView(PodcastListingView::class)
     var lastUpdate: ZonedDateTime? = null
 
-    @OneToMany(mappedBy = "podcast", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    @OrderBy("PUB_DATE DESC")
-    @Fetch(FetchMode.SUBSELECT)
     var items: MutableSet<Item>? = HashSet()
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH], orphanRemoval = true)
     var cover: Cover? = null
 
-    @Column(length = 65535)
     @JsonView(PodcastDetailsView::class)
     var description: String? = null
 
@@ -60,9 +45,6 @@ open class Podcast : Serializable {
     var hasToBeDeleted: Boolean? = null
 
     @JsonView(PodcastDetailsView::class)
-    @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE], fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(name = "PODCAST_TAGS", joinColumns = [JoinColumn(name = "PODCASTS_ID")], inverseJoinColumns = [JoinColumn(name = "TAGS_ID")])
     var tags: Set<Tag> = HashSet()
 
     val coverPath: Option<Path>
@@ -148,17 +130,6 @@ open class Podcast : Serializable {
                 .append(signature)
                 .append(lastUpdate)
                 .toHashCode()
-    }
-
-    @PostRemove
-    fun postRemove() {
-
-        if (hasToBeDeleted == null || hasToBeDeleted == false) return
-
-        val folder = rootFolder!!.resolve(title)
-
-        try { FileSystemUtils.deleteRecursively(folder.toFile()) }
-        catch (e: Exception) { log.error("Error during deletion of podcast of {}", this, e) }
     }
 
     fun contains(item: Item): Boolean {

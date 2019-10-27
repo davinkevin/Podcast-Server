@@ -12,18 +12,6 @@ spring:
   username: foo
   password: bar
   driver-class-name: org.h2.Driver
- jpa:
-  database-platform: org.hibernate.dialect.H2Dialect
-  show-sql: false
-  hibernate.ddl-auto: update
-  properties :
-   jadira.usertype.autoRegisterUserTypes: true
-   hibernate:
-    format_sql: true
-    search.default:
-      indexmanager: near-real-time
-      directory_provider: ram
-      indexBase: /tmp/lucene
  servlet.multipart:
   location: /tmp/podcast-server/
   max-file-size: 512MB
@@ -36,9 +24,10 @@ server:
   mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
 logging:
- path: /tmp/podcastserver.log
  level:
   lan.dk.podcastserver : DEBUG
+ file:
+  path: /tmp/podcast-server/podcast-server.log
 
 management.endpoint.health.show-details: always
 
@@ -56,12 +45,6 @@ podcastserver:
  #number-of-try: 10
  #download-extension: .psdownload
  #rss-default-number-item: 50
- update-and-download.refresh.cron: 0 0 0 * * ?
- backup :
-  enabled: true
-  location: /tmp/
-  cron: 0 30 4 * * ?
-  binary: false
  externaltools:
   #rtmpdump: /usr/local/bin/rtmpdump
   #ffmpeg: /usr/local/bin/ffmpeg

@@ -8,20 +8,6 @@ spring:
   url: jdbc:h2:/tmp/podcast-server
   username: sa
   driver-class-name: org.h2.Driver
- jpa:
-  database-platform: org.hibernate.dialect.H2Dialect
-  show-sql: false
-  hibernate.ddl-auto: update
-  properties :
-   jadira.usertype.autoRegisterUserTypes: true
-   hibernate:
-    jdbc.time_zone: UTC
-    event.merge.entity_copy_observer: allow
-    format_sql: true
-    search.default:
-      indexmanager: near-real-time
-      directory_provider: local-heap
-      indexBase: /tmp/podcast-server/lucene
  servlet.multipart:
   location: ${java.io.tmpdir}
   max-file-size: 512MB
@@ -31,9 +17,10 @@ server:
  port: 8080
 
 logging:
- path: /tmp/podcast-server/podcast-server.log
  level:
   lan.dk.podcastserver : DEBUG
+ file:
+  path: /tmp/podcast-server/podcast-server.log
 
 management:
   endpoint:

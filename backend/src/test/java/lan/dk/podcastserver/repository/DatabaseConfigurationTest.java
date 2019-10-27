@@ -4,21 +4,13 @@ import com.github.davinkevin.podcastserver.entity.Status;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.CompositeOperation;
 import com.ninja_squad.dbsetup.operation.Operation;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.Optional;
 import java.util.UUID;
 
-import static com.ninja_squad.dbsetup.Operations.deleteAllFrom;
-import static com.ninja_squad.dbsetup.Operations.insertInto;
-import static com.ninja_squad.dbsetup.Operations.sequenceOf;
+import static com.ninja_squad.dbsetup.Operations.*;
 import static java.time.ZonedDateTime.now;
 import static java.util.UUID.fromString;
 
@@ -26,9 +18,6 @@ import static java.util.UUID.fromString;
  * Created by kevin on 17/08/15 for Podcast Server
  */
 @Configuration
-@EnableJpaRepositories(basePackages = "lan.dk.podcastserver.repository")
-@EntityScan(basePackages = {"lan.dk.podcastserver.entity", "com.github.davinkevin.podcastserver.entity"})
-@EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
 public class DatabaseConfigurationTest {
 
     private static final Operation DELETE_ALL_PODCASTS = deleteAllFrom("PODCAST");
@@ -45,10 +34,6 @@ public class DatabaseConfigurationTest {
             DELETE_ALL_PODCASTS,
             DELETE_ALL_COVERS
     );
-
-    @Bean DateTimeProvider dateTimeProvider() {
-        return () -> Optional.of(now());
-    }
 
     public static final Operation INSERT_ITEM_DATA = CompositeOperation.sequenceOf(
             insertInto("COVER")

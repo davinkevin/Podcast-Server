@@ -101,20 +101,6 @@ class ItemTest {
     }
 
     @Test
-    fun `should_have a valid url`() {
-        assertThat(ITEM.hasValidURL()).isTrue()
-
-        PODCAST.type = "upload"
-        ITEM.url = ""
-        assertThat(ITEM.hasValidURL()).isTrue()
-
-        PODCAST.type = "Youtube"
-        ITEM.url = ""
-        assertThat(ITEM.hasValidURL()).isFalse()
-
-    }
-
-    @Test
     fun `should_report parent podcast id`() {
         assertThat(ITEM.podcastId).isEqualTo(PODCAST.id)
 
@@ -205,40 +191,6 @@ class ItemTest {
         assertThat(ITEM.toString())
                 .isEqualTo("Item{id=$ID, title='Fake Item', url='http://fakeItem.com', pubDate=$NOW, description='Fake item description', mimeType='video/mp4', length=123456, status='NOT_DOWNLOADED', progression=0, downloaddate=null, podcast=Podcast{id=$PODCAST_ID, title='Fake Podcast', url='null', signature='null', type='Youtube', lastUpdate=null}, numberOfTry=0}")
 
-    }
-
-    @Test
-    fun `should delete`() {
-        /* Given */
-        ITEM.status = Status.FINISH
-        /* When  */
-        ITEM.deleteDownloadedFile()
-        /* Then  */
-        assertThat(ITEM.fileName).isEqualTo(null)
-        assertThat(ITEM.status).isEqualTo(Status.DELETED)
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun `should preremove`() {
-        /* Given */
-        val fileToDelete = ITEM.localPath
-
-        /* When */
-        ITEM.preRemove()
-
-        /* Then */
-        assertThat(fileToDelete).doesNotExist()
-    }
-
-    @Test
-    fun `should_generate exception on deletion`() {
-        /* Given */
-        Item.rootFolder = Paths.get("/")
-        PODCAST.title = "sbin"
-        ITEM.fileName = "fsck"
-
-        /* When */  ITEM.deleteDownloadedFile()
     }
 
     companion object {

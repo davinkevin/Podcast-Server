@@ -104,49 +104,6 @@ class PodcastTest {
         assertThat(podcast.contains(itemToAdd2)).isFalse()
     }
 
-    @Test
-    fun should_be_update_now() {
-        /* When */
-        podcast.lastUpdateToNow()
-        /* Then */
-        assertThat(podcast.lastUpdate?.isAfter(NOW)).isTrue()
-    }
-
-    @Test
-    fun should_delete_on_post_remove() {
-        /* Given */
-        Podcast.rootFolder = Paths.get("/tmp")
-        podcast.hasToBeDeleted = true
-        val podcastFolder = Podcast.rootFolder!!.resolve("PodcastDeTest")
-        val coverFile = podcastFolder.resolve("cover.jpg")
-        Files.createDirectory(podcastFolder)
-        Files.createFile(coverFile)
-
-        /* When */
-        podcast.postRemove()
-
-        /* Then */
-        assertThat(coverFile).doesNotExist()
-        assertThat(podcastFolder).doesNotExist()
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun should_not_delete_if_podcast_is_not_auto_delete() {
-        Podcast.rootFolder = Paths.get("/tmp")
-        podcast.hasToBeDeleted = false
-        val podcastFolder = Podcast.rootFolder!!.resolve("PodcastDeTest")
-        val coverFile = podcastFolder.resolve("cover.jpg")
-        Files.createDirectory(podcastFolder)
-        Files.createFile(coverFile)
-
-        /* When */
-        podcast.postRemove()
-
-        /* Then */
-        assertThat(coverFile).exists()
-        assertThat(podcastFolder).exists()
-    }
 
     @Test
     fun should_provide_cover_path() {
