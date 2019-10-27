@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.*
 
 /**
@@ -17,6 +18,9 @@ data class PlaylistWithItems(val id: UUID, val name: String, val items: Collecti
 
             val description: String?,
             val mimeType: String?,
+            val length: Long?,
+
+            val pubDate: OffsetDateTime?,
 
             val podcast: Podcast,
             val cover: Cover) {

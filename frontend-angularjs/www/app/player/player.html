@@ -32,7 +32,7 @@
         <div class="watch-lists clearfix" ng-if="pc.watchLists" ng-repeat="watchList in pc.watchLists | orderBy:'name' track by watchList.id">
             <button ng-click="pc.removeWatchList(watchList)" type="button" class="pull-right close"><i class="ionicons ion-close"></i></button>
 
-            <a ng-href="{{ ::'/api/watchlists/' + watchList.id + '/rss' }}" target="_blank" class="pull-left rss"><span class="ionicons ion-social-rss"></span></a>
+            <a ng-href="{{ ::'/api/v1/playlists/' + watchList.id + '/rss' }}" target="_blank" class="pull-left rss"><span class="ionicons ion-social-rss"></span></a>
             <div class="watch-lists-body" ng-click="pc.selectWatchList(watchList)">
                 <p>{{ ::watchList.name }}</p>
             </div>

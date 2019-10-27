@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.extension.repository.executeAsyncAsMono
 import com.github.davinkevin.podcastserver.extension.repository.fetchAsFlux
 import com.github.davinkevin.podcastserver.extension.repository.fetchOneAsMono
+import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
@@ -30,7 +31,7 @@ class PlaylistRepositoryV2(
         val items = query
                 .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
 
-                        ITEM.FILE_NAME, ITEM.DESCRIPTION, ITEM.MIME_TYPE,
+                        ITEM.FILE_NAME, ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.PUB_DATE,
 
                         PODCAST.ID, PODCAST.TITLE,
                         COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
@@ -48,6 +49,8 @@ class PlaylistRepositoryV2(
                         fileName = it[ITEM.FILE_NAME],
                         description = it[ITEM.DESCRIPTION],
                         mimeType = it[ITEM.MIME_TYPE],
+                        length = it[ITEM.LENGTH],
+                        pubDate = it[ITEM.PUB_DATE].toUTC(),
                         podcast = PlaylistWithItems.Item.Podcast(
                                 id = it[PODCAST.ID],
                                 title = it[PODCAST.TITLE]
