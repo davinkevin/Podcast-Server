@@ -23,6 +23,8 @@ class MatcherExtractor(private val matcher: Matcher, private val isFind: Boolean
         else -> Option(matcher.group(i))
     }
 
+    fun groupk(i: Int): String? = group(i).orNull
+
     fun groups(): Option<List<String>> = when {
         !isFind -> None()
         else -> Option((1..matcher.groupCount()).asSequence().map { matcher.group(it) }.toList())
