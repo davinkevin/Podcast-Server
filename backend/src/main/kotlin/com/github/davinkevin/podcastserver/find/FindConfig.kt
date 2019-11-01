@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.find
 
+import com.github.davinkevin.podcastserver.find.finders.francetv.FranceTvFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderConfig
@@ -28,6 +29,7 @@ class FindRoutingConfig {
         FindRoutingConfig::class,
         FindService::class,
 
+        FranceTvFinderConfig::class,
         RSSFinderConfig::class,
         ItunesFinderConfig::class,
         YoutubeFinderConfig::class

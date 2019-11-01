@@ -1,0 +1,62 @@
+package com.github.davinkevin.podcastserver.find.finders.francetv
+
+import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.find.FindCoverInformation
+import com.github.davinkevin.podcastserver.find.FindPodcastInformation
+import com.github.davinkevin.podcastserver.find.orNull
+import com.github.davinkevin.podcastserver.find.toMonoOption
+import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
+import java.net.URI
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+
+/**
+ * Created by kevin on 01/11/2019
+ */
+class FranceTvFinder(
+        private val client: WebClient,
+        private val image: ImageService
+): Finder {
+
+    override fun find(url: String): Podcast = TODO("not required anymore")
+
+    override fun findInformation(url: String): Mono<FindPodcastInformation> {
+        val path = url.substringAfterLast("www.france.tv")
+
+        return client
+                .get()
+                .uri(path)
+                .retrieve()
+                .bodyToMono<String>()
+                .map { Jsoup.parse(it, url) }
+                .flatMap { d -> findCover(d).map { it.toFindCover() }.toMonoOption().zipWith(d.toMono()) }
+                .map { (cover, d) -> FindPodcastInformation(
+                        title = d.select("meta[property=og:title]").attr("content"),
+                        description = d.select("meta[property=og:description]").attr("content"),
+                        type = "FranceTv",
+                        url = URI(d.select("meta[property=og:url]").attr("content")),
+                        cover = cover.orNull()
+                ) }
+    }
+
+    private fun findCover(d: Document): Mono<CoverInformation> {
+        val coverUrl = URI(d.select("meta[property=og:image]").attr("content"))
+
+        return image.fetchCoverInformation(coverUrl)
+    }
+
+    override fun compatibility(url: String?): Int {
+        return if((url ?: "").contains("www.france.tv")) 1
+        else Int.MAX_VALUE
+    }
+}
+
+private fun CoverInformation.toFindCover() = FindCoverInformation(height, width, url)
