@@ -150,6 +150,6 @@ class FranceTvFinderTest(
 
         @Bean fun imageService() = mock<ImageService>()
         @Bean fun webClientBuilder() = WebClient.builder()
-                .filter(remapToMockServer("www.france.tv"))
+                .filter(remapToMockServer("www.6play.fr"))
     }
 }

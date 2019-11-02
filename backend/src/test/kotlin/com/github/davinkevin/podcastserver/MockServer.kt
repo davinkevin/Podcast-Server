@@ -7,16 +7,16 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
-class MockServer: BeforeAllCallback, AfterAllCallback, ParameterResolver {
+class MockServer: BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     private lateinit var server: WireMockServer
 
-    override fun beforeAll(context: ExtensionContext) {
+    override fun beforeEach(p0: ExtensionContext?) {
         server = WireMockServer(5555)
         server.start()
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun afterEach(context: ExtensionContext?) {
         server.stop()
         server.resetAll()
     }

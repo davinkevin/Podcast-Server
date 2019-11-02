@@ -72,15 +72,18 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
                     .toSet()
                     .firstOption { it.html().contains("root.") }
                     .map { it.html() }
-                    .map { it.substringBetween(" = ", "}(this));")!!}
+                    .map { it.substringAfter("=")
+                            .substringBefore("}(this));")
+                    }
                     .map { it.removeJs() }
                     .map { jsonService.parse(it) }
 
     private fun String.removeJs() = this
             .trim { v -> v <= ' ' }
             .replace("function [^}]*".toRegex(), "{}")
-            .removeSuffix(";")
-            .cleanForJsonSerialization()
+            .replace("\\\"", "\"")
+            .replace("\\\\\"", "\\\"")
+            .trim(';', '"', ' ')
 
     override fun blockingSignatureOf(url: URI) =
             htmlService.get(url.toASCIIString()).k()
