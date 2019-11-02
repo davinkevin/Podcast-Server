@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.find.finders.noop
 
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -59,7 +59,7 @@ class NoOpFinderTest(
     fun `should do nothing on old implementation`() {
         /* Given */
         /* When */
-        Assertions.assertThatThrownBy { finder.find("") }
+        assertThatThrownBy { finder.find("") }
                 /* Then */
                 .hasMessage("An operation is not implemented: not required anymore")
     }

@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.finders.francetv.FranceTvFinderConfig
+import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -172,17 +173,7 @@ class DailymotionFinderTest(
 
         @Bean @Primary fun imageService() = mock<ImageService>()
         @Bean fun webClientBuilder() = WebClient.builder()
-                .filter { c, next ->
-                    val mockServerUrl = c.url().toASCIIString()
-                            .replace("https", "http")
-                            .replace("api.dailymotion.com", "localhost:5555")
-
-                    val newRequest = ClientRequest.from(c)
-                            .url(URI(mockServerUrl))
-                            .build()
-
-                    next.exchange(newRequest)
-                }
+                .filter(remapToMockServer("api.dailymotion.com"))
     }
 
 }

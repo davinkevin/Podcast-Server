@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
+import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
@@ -12,7 +13,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -135,7 +135,7 @@ class GulliFinderTest(
     fun `should do nothing on old implementation`() {
         /* Given */
         /* When */
-        Assertions.assertThatThrownBy { finder.find("") }
+        assertThatThrownBy { finder.find("") }
                 /* Then */
                 .hasMessage("An operation is not implemented: not required anymore")
     }
@@ -144,18 +144,9 @@ class GulliFinderTest(
     @Import(GulliFinderConfig::class)
     class LocalTestConfiguration {
         @Bean @Primary fun imageService() = mock<ImageService>()
-        @Bean fun webClientBuilder() = WebClient.builder()
-                .filter { c, next ->
-                    val mockServerUrl = c.url().toASCIIString()
-                            .replace("https", "http")
-                            .replace("replay.gulli.fr", "localhost:5555")
-
-                    val newRequest = ClientRequest.from(c)
-                            .url(URI(mockServerUrl))
-                            .build()
-
-                    next.exchange(newRequest)
-                }
+        @Bean fun webClientBuilder() = WebClient
+                .builder()
+                .filter(remapToMockServer("replay.gulli.fr"))
 
     }
 }
