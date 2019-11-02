@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import arrow.core.getOrElse
-import com.github.davinkevin.podcastserver.find.orNull
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
@@ -21,8 +21,8 @@ import java.time.format.DateTimeFormatter
  * Created by kevin on 11/09/2018
  */
 class YoutubeByXmlUpdater(
-        val jdomService: JdomService,
-        val htmlService: HtmlService
+        private val jdomService: JdomService,
+        private val htmlService: HtmlService
 ) : Updater {
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!

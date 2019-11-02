@@ -1,12 +1,11 @@
 package com.github.davinkevin.podcastserver.find.finders.rss
 
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.orNull
-import com.github.davinkevin.podcastserver.find.toMonoOption
+import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
@@ -18,6 +17,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.io.ByteArrayInputStream
 import java.net.URI
+import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
 /**
@@ -40,27 +40,23 @@ class RSSFinder(
             .bodyToMono<String>()
             .map { SAXBuilder().build(ByteArrayInputStream(it.toByteArray(Charsets.UTF_8))) }
             .map { it.rootElement.getChild("channel") }
-            .flatMap { elem -> findCover(elem).map { it.toFindCover() }.toMonoOption().zipWith(elem.toMono()) }
-            .map { (cover, elem) -> toPodcast(elem, url, cover.orNull()) }
+            .flatMap { findCover(it).zipWith(it.toMono()) }
+            .map { (cover, elem) -> FindPodcastInformation(
+                    type = "RSS",
+                    url = URI(url),
+                    title = elem.getChildText("title"),
+                    description = elem.getChildText("description"),
+                    cover = cover.orNull()
+            ) }
 
-    private fun toPodcast(element: Element, anUrl: String, cover: FindCoverInformation?) = FindPodcastInformation(
-            type = "RSS",
-            url = URI(anUrl),
-            title = element.getChildText("title"),
-            description = element.getChildText("description"),
-            cover = cover
-    )
-
-    private fun findCover(channelElement: Element): Mono<CoverInformation> {
+    private fun findCover(channelElement: Element): Mono<Optional<FindCoverInformation>> {
         val rss = channelElement.getChild("image")?.getChildText("url")
         val itunes = channelElement.getChild("image", itunesNS)?.getAttributeValue("href")
 
-        val url = rss ?: itunes ?: return Mono.empty()
+        val url = rss ?: itunes ?: return Optional.empty<FindCoverInformation>().toMono()
 
-        return imageService.fetchCoverInformation(URI(url))
+        return imageService.fetchCoverInformationOrOption(URI(url))
     }
 
     override fun compatibility(url: String?) = Integer.MAX_VALUE - 1
 }
-
-private fun CoverInformation.toFindCover() = FindCoverInformation(height, width, url)

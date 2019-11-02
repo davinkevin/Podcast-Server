@@ -1,12 +1,11 @@
 package com.github.davinkevin.podcastserver.find.finders.francetv
 
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.orNull
-import com.github.davinkevin.podcastserver.find.toMonoOption
+import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
@@ -16,6 +15,7 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
+import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
 /**
@@ -37,7 +37,7 @@ class FranceTvFinder(
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, url) }
-                .flatMap { d -> findCover(d).map { it.toFindCover() }.toMonoOption().zipWith(d.toMono()) }
+                .flatMap { d -> findCover(d).zipWith(d.toMono()) }
                 .map { (cover, d) -> FindPodcastInformation(
                         title = d.select("meta[property=og:title]").attr("content"),
                         description = d.select("meta[property=og:description]").attr("content"),
@@ -47,10 +47,10 @@ class FranceTvFinder(
                 ) }
     }
 
-    private fun findCover(d: Document): Mono<CoverInformation> {
+    private fun findCover(d: Document): Mono<Optional<FindCoverInformation>> {
         val coverUrl = URI(d.select("meta[property=og:image]").attr("content"))
 
-        return image.fetchCoverInformation(coverUrl)
+        return image.fetchCoverInformationOrOption(coverUrl)
     }
 
     override fun compatibility(url: String?): Int {
@@ -58,5 +58,3 @@ class FranceTvFinder(
         else Int.MAX_VALUE
     }
 }
-
-private fun CoverInformation.toFindCover() = FindCoverInformation(height, width, url)

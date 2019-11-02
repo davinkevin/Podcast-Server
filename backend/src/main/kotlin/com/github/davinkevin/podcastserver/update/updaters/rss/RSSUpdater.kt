@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
-import com.github.davinkevin.podcastserver.find.orNull
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.Element

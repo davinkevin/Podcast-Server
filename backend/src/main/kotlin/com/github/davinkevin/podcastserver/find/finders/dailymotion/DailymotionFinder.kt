@@ -3,14 +3,11 @@ package com.github.davinkevin.podcastserver.find.finders.dailymotion
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.find.FindCoverInformation
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.orNull
-import com.github.davinkevin.podcastserver.find.toMonoOption
+import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
-import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
@@ -43,9 +40,7 @@ class DailymotionFinder(
                 .retrieve()
                 .bodyToMono<DailymotionUserDetail>()
                 .flatMap { p -> image
-                        .fetchCoverInformation(URI(p.avatar))
-                        .map { it.toFindCover() }
-                        .toMonoOption()
+                        .fetchCoverInformationOrOption(URI(p.avatar))
                         .zipWith(p.toMono())
                 }
                 .map { (cover, podcast) -> FindPodcastInformation(
@@ -61,8 +56,6 @@ class DailymotionFinder(
         return if ((url ?: "").contains("www.dailymotion.com")) 1
         else Int.MAX_VALUE
     }
-
-
 }
 
 private val USER_NAME_EXTRACTOR = MatcherExtractor.from("^.+dailymotion.com/(.*)")
@@ -73,5 +66,3 @@ private class DailymotionUserDetail(
         val username: String,
         val description: String?
 )
-
-private fun CoverInformation.toFindCover() = FindCoverInformation(height, width, url)

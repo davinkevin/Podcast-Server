@@ -1,18 +1,19 @@
 package com.github.davinkevin.podcastserver.find.finders.youtube
 
 import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.orNull
-import com.github.davinkevin.podcastserver.find.toMonoOption
+import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.update.updaters.youtube._compatibility
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.update.updaters.youtube._compatibility
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
@@ -53,9 +54,8 @@ class YoutubeFinder(
                 .replace("s100", "s1400")
                 .toMono()
                 .filter { it.isNotEmpty() }
-                .flatMap { imageService.fetchCoverInformation(URI(it)) }
-                .map { it.toFindCover() }
-                .toMonoOption()
+                .flatMap { imageService.fetchCoverInformationOrOption(URI(it)) }
+                .switchIfEmpty { Optional.empty<FindCoverInformation>().toMono() }
     }
 
     override fun compatibility(url: String?) = _compatibility(url)

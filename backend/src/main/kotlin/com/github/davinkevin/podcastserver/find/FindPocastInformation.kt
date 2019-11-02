@@ -18,9 +18,3 @@ data class FindPodcastInformation(
 )
 
 data class FindCoverInformation(val height: Int, val width: Int, val url: URI)
-
-fun Mono<FindCoverInformation>.toMonoOption() = this
-        .map { Optional.of(it) }
-        .switchIfEmpty { Optional.empty<FindCoverInformation>().toMono() }
-
-fun <T> Optional<T>.orNull(): T? = this.orElse(null)
