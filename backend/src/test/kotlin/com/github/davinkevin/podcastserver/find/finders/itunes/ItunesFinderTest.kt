@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.find.finders
+package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
@@ -12,6 +12,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -87,6 +88,15 @@ class ItunesFinderTest(
                 .expectSubscription()
                 .assertNext { assertThat(it).isSameAs(podcastInformation) }
                 .verifyComplete()
+    }
+
+    @Test
+    fun `should do nothing on old implementation`() {
+        /* Given */
+        /* When */
+        Assertions.assertThatThrownBy { finder.find("") }
+                /* Then */
+                .hasMessage("An operation is not implemented: not required anymore")
     }
 
     @TestConfiguration

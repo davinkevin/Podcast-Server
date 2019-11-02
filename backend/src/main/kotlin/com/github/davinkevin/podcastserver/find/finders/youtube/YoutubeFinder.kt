@@ -62,4 +62,3 @@ class YoutubeFinder(
 }
 
 private fun Document.meta(s: String) = this.select("meta[name=$s]").attr("content")
-private fun CoverInformation.toFindCover() = FindCoverInformation(height, width, url)

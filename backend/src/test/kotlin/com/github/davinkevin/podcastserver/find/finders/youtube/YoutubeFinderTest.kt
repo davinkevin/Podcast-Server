@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.manager.worker.youtube
+package com.github.davinkevin.podcastserver.find.finders.youtube
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.mock
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -118,6 +119,15 @@ class YoutubeFinderTest(
         val compatibility = finder.compatibility(url)
         /* Then */
         assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
+    }
+
+    @Test
+    fun `should do nothing on old implementation`() {
+        /* Given */
+        /* When */
+        Assertions.assertThatThrownBy { finder.find("") }
+                /* Then */
+                .hasMessage("An operation is not implemented: not required anymore")
     }
 
     @TestConfiguration

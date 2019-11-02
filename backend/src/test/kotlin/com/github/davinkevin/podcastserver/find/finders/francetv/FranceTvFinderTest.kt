@@ -10,7 +10,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -131,6 +132,15 @@ class FranceTvFinderTest(
         val compatibility = finder.compatibility(url)
         /* Then */
         assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
+    }
+
+    @Test
+    fun `should do nothing on old implementation`() {
+        /* Given */
+        /* When */
+        assertThatThrownBy { finder.find("") }
+                /* Then */
+                .hasMessage("An operation is not implemented: not required anymore")
     }
 
     @TestConfiguration

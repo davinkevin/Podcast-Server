@@ -1,9 +1,7 @@
-package com.github.davinkevin.podcastserver.manager.worker.rss
+package com.github.davinkevin.podcastserver.find.finders.rss
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
-import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -11,6 +9,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okXml
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -32,7 +31,7 @@ import java.net.URI
 @ExtendWith(SpringExtension::class)
 class RSSFinderTest(
     @Autowired val imageService: ImageService,
-    @Autowired val rssFinder: RSSFinder
+    @Autowired val finder: RSSFinder
 ) {
 
     @Nested
@@ -50,7 +49,7 @@ class RSSFinderTest(
             whenever(imageService.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
 
             /* When */
-            StepVerifier.create(rssFinder.findInformation(podcastUrl))
+            StepVerifier.create(finder.findInformation(podcastUrl))
                     /* Then */
                     .expectSubscription()
                     .assertNext { podcast ->
@@ -70,7 +69,7 @@ class RSSFinderTest(
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withItunesCover.xml")))))
 
             //When
-            StepVerifier.create(rssFinder.findInformation(podcastUrl))
+            StepVerifier.create(finder.findInformation(podcastUrl))
                     /* Then */
                     .expectSubscription()
                     .assertNext { podcast ->
@@ -87,7 +86,7 @@ class RSSFinderTest(
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withoutAnyCover.xml")))))
 
             /* When */
-            StepVerifier.create(rssFinder.findInformation(podcastUrl))
+            StepVerifier.create(finder.findInformation(podcastUrl))
                     /* Then */
                     .expectSubscription()
                     .assertNext { podcast ->
@@ -100,7 +99,7 @@ class RSSFinderTest(
         fun `and reject if not found`() {
             /* Given */
             /* When */
-            StepVerifier.create(rssFinder.findInformation("http://localhost:3578"))
+            StepVerifier.create(finder.findInformation("http://localhost:3578"))
                     /* Then */
                     .expectSubscription()
                     .expectError()
@@ -121,11 +120,19 @@ class RSSFinderTest(
         fun `with every url format`(url: String) {
             /* Given */
             /* When */
-            val compatibility = rssFinder.compatibility(url)
+            val compatibility = finder.compatibility(url)
             /* Then */
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE-1)
         }
+    }
 
+    @Test
+    fun `should do nothing on old implementation`() {
+        /* Given */
+        /* When */
+        Assertions.assertThatThrownBy { finder.find("") }
+                /* Then */
+                .hasMessage("An operation is not implemented: not required anymore")
     }
 
     companion object {

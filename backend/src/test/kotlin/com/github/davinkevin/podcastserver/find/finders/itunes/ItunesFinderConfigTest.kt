@@ -1,7 +1,5 @@
-package com.github.davinkevin.podcastserver.find.finders
+package com.github.davinkevin.podcastserver.find.finders.itunes
 
-import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinder
-import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfig
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
