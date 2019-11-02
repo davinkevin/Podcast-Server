@@ -79,9 +79,8 @@ class GulliFinderTest(
             /* Given */
             val podcastUrl = "http://replay.gulli.fr/dessins-animes/Pokemon3"
 
-            whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
             backend.stubFor(get("/dessins-animes/Pokemon3")
-                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/gulli/pokemon.html")))
+                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/gulli/pokemon.without-cover.html")))
             )
 
             /* When */
@@ -127,6 +126,15 @@ class GulliFinderTest(
     fun `should not be compatible`(/* Given */ url: String) {
         /* When */
         val compatibility = finder.compatibility(url)
+        /* Then */
+        assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
+    }
+
+    @Test
+    fun `should not be compatible with null value`() {
+        /* Given */
+        /* When */
+        val compatibility = finder.compatibility(null)
         /* Then */
         assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
     }
