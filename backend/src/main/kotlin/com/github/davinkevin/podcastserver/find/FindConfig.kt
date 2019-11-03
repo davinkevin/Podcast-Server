@@ -3,8 +3,10 @@ package com.github.davinkevin.podcastserver.find
 import com.github.davinkevin.podcastserver.find.finders.dailymotion.DailymotionFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.francetv.FranceTvFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfig
+import com.github.davinkevin.podcastserver.find.finders.mycanal.MyCanalFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.noop.NoopConfig
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
+import com.github.davinkevin.podcastserver.find.finders.sixplay.SixPlayFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,8 +35,10 @@ class FindRoutingConfig {
 
         DailymotionFinderConfig::class,
         FranceTvFinderConfig::class,
-        RSSFinderConfig::class,
         ItunesFinderConfig::class,
+        MyCanalFinderConfig::class,
+        RSSFinderConfig::class,
+        SixPlayFinderConfig::class,
         YoutubeFinderConfig::class,
 
         NoopConfig::class
