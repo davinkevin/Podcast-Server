@@ -9,7 +9,6 @@ build:
           - liquibase:dropAll
           - liquibase:update
           - jooq-codegen:generate
-          - compile
           - -Dmaven.test.skip
     - image: podcastserver/ui-v1
       context: frontend-angularjs/target/
