@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -132,7 +131,7 @@ class TF1ReplayUpdaterTest(
             @Test
             fun `due to no response from json call`() {
                 /* Given */
-                whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
+                whenever(jsonService.parseUrl(any())).thenReturn(None)
                 val podcast = PodcastToUpdate (
                         url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/bonus"),
                         signature = "noSign",
@@ -301,7 +300,7 @@ class TF1ReplayUpdaterTest(
             @Test
             fun `with no items because layout change`() {
                 /* Given */
-                whenever(jsonService.parseUrl(any())).thenReturn(None.toVΛVΓ())
+                whenever(jsonService.parseUrl(any())).thenReturn(None)
                 val podcast = PodcastToUpdate (
                         url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/bonus"),
                         signature = "noSign",

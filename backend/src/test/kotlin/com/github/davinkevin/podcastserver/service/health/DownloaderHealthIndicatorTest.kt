@@ -2,11 +2,9 @@ package com.github.davinkevin.podcastserver.service.health
 
 import com.github.davinkevin.podcastserver.entity.Status.PAUSED
 import com.github.davinkevin.podcastserver.entity.Status.STARTED
-import com.nhaarman.mockitokotlin2.whenever
-import io.vavr.API.Set
-import io.vavr.collection.Queue
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test

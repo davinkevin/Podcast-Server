@@ -1,12 +1,12 @@
 package com.github.davinkevin.podcastserver.manager.worker.dailymotion
 
 import arrow.core.getOrElse
+import arrow.core.toOption
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
-import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.service.JsonService
 import org.springframework.stereotype.Component
@@ -22,23 +22,27 @@ import java.time.ZonedDateTime
 @Component
 class DailymotionUpdater(val signatureService: SignatureService, val jsonService: JsonService, val imageService: ImageService) : Updater {
 
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
-            USER_NAME_EXTRACTOR.on(podcast.url.toASCIIString()).group(1).k()
-                    .map { API_LIST_OF_ITEMS.format(it) }
-                    .flatMap { jsonService.parseUrl(it).k() }
-                    .map { it.read("list", LIST_DAILYMOTION_VIDEO_DETAIL_TYPE) }
-                    .getOrElse { setOf() }
-                    .map { ItemFromUpdate(
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
+        return USER_NAME_EXTRACTOR
+                .on(podcast.url.toASCIIString()).group(1)
+                .toOption()
+                .map { API_LIST_OF_ITEMS.format(it) }
+                .flatMap { jsonService.parseUrl(it) }
+                .map { it.read("list", LIST_DAILYMOTION_VIDEO_DETAIL_TYPE) }
+                .getOrElse { setOf() }
+                .map { ItemFromUpdate(
                         url = URI(ITEM_URL.format(it.id)),
                         cover = imageService.fetchCoverInformation(it.cover)?.toCoverFromUpdate(),
                         title = it.title!!,
                         pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(it.creationDate!!), ZoneId.of("Europe/Paris")),
                         description = it.description!!
-                    ) }
-                    .toSet()
+                ) }
+                .toSet()
+    }
 
     override fun blockingSignatureOf(url: URI): String {
-        return USER_NAME_EXTRACTOR.on(url.toASCIIString()).group(1).k()
+        return USER_NAME_EXTRACTOR.on(url.toASCIIString()).group(1)
+                .toOption()
                 .map { API_LIST_OF_ITEMS.format(it) }
                 .map { signatureService.fromUrl(it) }
                 .getOrElse { throw RuntimeException("Username not Found") }

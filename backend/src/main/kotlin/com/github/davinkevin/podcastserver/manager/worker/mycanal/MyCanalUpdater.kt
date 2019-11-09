@@ -1,15 +1,11 @@
 package com.github.davinkevin.podcastserver.manager.worker.mycanal
 
-import arrow.core.Option
-import arrow.core.Try
-import arrow.core.getOrElse
-import arrow.core.orElse
+import arrow.core.*
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.utils.toTry
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.service.JsonService
@@ -39,19 +35,19 @@ class MyCanalUpdater(val signatureService: SignatureService, val jsonService: Js
     }
 
     private fun itemsAsJsonFrom(url: URI) =
-            htmlService.get(url.toASCIIString()).k()
+            htmlService.get(url.toASCIIString())
                     .map { it.body() }
                     .map { it.select("script") }
                     .getOrElse { Elements() }
                     .asSequence()
                     .map { it.html() }
                     .firstOption { "__data" in it }
-                    .flatMap { extractJsonConfig(it).k() }
+                    .flatMap { extractJsonConfig(it).toOption() }
                     .map { jsonService.parse(it) }
                     .map { to("landing.strates[*].contents[*]", SET_OF_MY_CANAL_ITEM).apply(it) }
 
     private fun findDetails(item: MyCanalItem): Option<Pair<MyCanalItem, MyCanalDetailsItem>> {
-        val json = jsonService.parseUrl(URL_DETAILS.format(item.contentID)).k().toTry()
+        val json = jsonService.parseUrl(URL_DETAILS.format(item.contentID)).toTry()
 
         val fromCollection = {
             json

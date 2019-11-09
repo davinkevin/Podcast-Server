@@ -9,7 +9,6 @@ import com.github.davinkevin.podcastserver.manager.worker.*
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.k
 import com.jayway.jsonpath.TypeRef
 import lan.dk.podcastserver.service.JsonService
 import org.apache.commons.lang3.StringUtils
@@ -41,7 +40,7 @@ class FranceTvUpdater(
         val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url.toASCIIString())
 
         return htmlService
-                .get(toReplayUrl(podcast.url.toASCIIString())).k()
+                .get(toReplayUrl(podcast.url.toASCIIString()))
                 .map { it.select("a[href]") }
                 .getOrElse {
                     log.error("No items found for podcast ${podcast.id} at ${podcast.url}, the layout may have changed")
@@ -70,7 +69,7 @@ class FranceTvUpdater(
                     .getOrElse { setOf() }
                     .firstOption { it.contentId in itemUrl }
                     .map { CATALOG_URL.format(it.videoId)}
-                    .flatMap { jsonService.parseUrl(it).k() }
+                    .flatMap { jsonService.parseUrl(it) }
                     .map { JsonService.to(FranceTvItem::class.java).apply(it) }
                     .map { ftv -> ItemFromUpdate(
                         title = ftv.title()!!,
@@ -84,7 +83,7 @@ class FranceTvUpdater(
     override fun blockingSignatureOf(url: URI): String {
 
         val listOfIds = htmlService
-                .get(toReplayUrl(url.toASCIIString())).k()
+                .get(toReplayUrl(url.toASCIIString()))
                 .map { it.select("a[href]") }
                 .getOrElse {
                     log.error("No items found for podcast with url $url, the layout may have changed")

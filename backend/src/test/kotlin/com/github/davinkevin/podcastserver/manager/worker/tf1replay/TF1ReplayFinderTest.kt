@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -69,7 +68,7 @@ class TF1ReplayFinderTest(
     fun `should return default podcast if request end up without result`() {
         /* Given */
         val anUrl = "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/replay"
-        whenever(htmlService.get(anUrl)).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(anUrl)).thenReturn(None)
 
         /* When */
         val podcast = finder.find(anUrl)

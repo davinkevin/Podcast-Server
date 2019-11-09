@@ -31,7 +31,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         val url = generateQueryUrl(podcast.url)
 
         return jsonService
-                .parseUrl(url).k()
+                .parseUrl(url)
                 .map { JsonService.to("data.programBySlug.videos", TF1VideosConnector::class.java).apply(it) }
                 .map { it.items }
                 .getOrElse {
@@ -60,10 +60,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
 
     private fun extractProgram(url: URI): String {
         val path = url.path
-
-        return SLUG_EXTRACTOR.on(path)
-                .group(1)
-                .getOrElse { throw RuntimeException("Slug not found in podcast with ${url.toASCIIString()}") }
+        return SLUG_EXTRACTOR.on(path).group(1) ?: throw RuntimeException("Slug not found in podcast with ${url.toASCIIString()}")
     }
 
     private fun extractTypeFromUrl(url: String): Set<String>? {
@@ -95,7 +92,7 @@ class TF1ReplayUpdater(val signatureService: SignatureService, val om: ObjectMap
         val podcastUrl = generateQueryUrl(url)
 
         return jsonService
-                .parseUrl(podcastUrl).k()
+                .parseUrl(podcastUrl)
                 .map { JsonService.extract<List<String>>("data.programBySlug.videos.items[*].streamId").apply(it) }
                 .map { it.sorted().joinToString() }
                 .map { signatureService.fromText(it) }

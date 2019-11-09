@@ -5,21 +5,13 @@ import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.data.k
 import arrow.syntax.collections.firstOption
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.io.InputStream
 
 @Service
 class M3U8Service(val urlService: UrlService) {
 
     val log = LoggerFactory.getLogger(this.javaClass.name)!!
-
-    fun findBestQuality(inputStream: InputStream): io.vavr.control.Option<String> =
-            Try { inputStream.bufferedReader().useLines { it.toList() } }
-                    .toOption()
-                    .flatMap { findBestQuality(it) }
-                    .toVΛVΓ()
 
     private fun findBestQuality(lines: List<String>): Option<String> =
             lines.k()

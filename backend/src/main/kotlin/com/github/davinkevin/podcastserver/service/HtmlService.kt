@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.service
 
 import arrow.core.Failure
+import arrow.core.Option
 import arrow.core.Try
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -20,7 +20,7 @@ class HtmlService(var urlService: UrlService) {
 
     val log = LoggerFactory.getLogger(this.javaClass.name)!!
 
-    fun get(url: String): io.vavr.control.Option<Document> {
+    fun get(url: String): Option<Document> {
 
         val r = Try { urlService.get(url).header(UrlService.USER_AGENT_KEY, UrlService.USER_AGENT_DESKTOP).asBinary() }
                 .filter { it.status < 400 }
@@ -31,7 +31,7 @@ class HtmlService(var urlService: UrlService) {
             log.error("Error during HTML Fetching of {}", url, r.exception)
         }
 
-        return r.toOption().toVΛVΓ()
+        return r.toOption()
     }
 
     fun parse(html: String): Document = Jsoup.parse(html)

@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.service.JsonService
@@ -66,7 +65,7 @@ class MyCanalExtractorTest {
     @Test
     fun `should throw error if no result for html request`() {
         /* Given */
-        whenever(htmlService.get("https://www.mycanal.fr/divertissement/le-tube-du-23-12-best-of/p/1474195")).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get("https://www.mycanal.fr/divertissement/le-tube-du-23-12-best-of/p/1474195")).thenReturn(None)
         /* When */
         assertThatThrownBy { extractor.extract(item) }
         /* Then */

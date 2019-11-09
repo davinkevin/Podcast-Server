@@ -6,11 +6,10 @@ import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
@@ -56,7 +55,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return empty string if error during signature`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(any())).thenReturn(None)
 
         /* When */
         val signature = gulliUpdater.blockingSignatureOf(podcast.url)
@@ -105,7 +104,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return empty list if page isn't available`() {
         /* Given */
-        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(None)
         /* When */
         val items = gulliUpdater.blockingFindItems(podcast)
         /* Then */

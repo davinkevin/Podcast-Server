@@ -1,12 +1,12 @@
 package com.github.davinkevin.podcastserver.manager.worker.mycanal
 
 import arrow.core.getOrElse
+import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.utils.k
 import lan.dk.podcastserver.service.JsonService
 import org.jsoup.select.Elements
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
@@ -22,16 +22,16 @@ import java.net.URI
 class MyCanalExtractor(val htmlService: HtmlService, val jsonService: JsonService) : Extractor {
 
     override fun extract(item: DownloadingItem): DownloadingInformation =
-            htmlService.get(item.url.toASCIIString()).k()
+            htmlService.get(item.url.toASCIIString())
                     .map { it.body() }
                     .map { it.select("script") }
                     .getOrElse { Elements() }
                     .firstOption { it.html().contains("__data") }
                     .map { it.html() }
-                    .flatMap { extractJsonConfig(it).k() }
+                    .flatMap { extractJsonConfig(it).toOption() }
                     .map { jsonService.parse(it) }
                     .map { JsonService.to("detailPage.body.contentID", String::class.java).apply(it) }
-                    .flatMap { jsonService.parseUrl(URL_DETAILS.format(it)).k() }
+                    .flatMap { jsonService.parseUrl(URL_DETAILS.format(it)) }
                     .map { JsonService.to("MEDIA.VIDEOS", MyCanalVideoItem::class.java).apply(it) }
                     .map { DownloadingInformation(item, listOf(it.hls), getFileName(item.url), null) }
                     .getOrElse { throw RuntimeException("Error during extraction of ${item.title} at url ${item.url}") }

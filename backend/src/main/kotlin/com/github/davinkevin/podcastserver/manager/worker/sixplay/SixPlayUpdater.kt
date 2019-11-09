@@ -86,7 +86,7 @@ class SixPlayUpdater(private val signatureService: SignatureService, private val
             .trim(';', '"', ' ')
 
     override fun blockingSignatureOf(url: URI) =
-            htmlService.get(url.toASCIIString()).k()
+            htmlService.get(url.toASCIIString())
                     .map { it.select("script") }
                     .flatMap { extractJson(it) }
                     .map { JsonService.extract<Any>("video.programVideosBySubCategory").apply(it) }

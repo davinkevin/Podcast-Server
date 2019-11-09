@@ -3,16 +3,14 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsXml
+import com.github.davinkevin.podcastserver.entity.Podcast
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
-import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,7 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.only
 import org.mockito.junit.jupiter.MockitoExtension
 import java.net.URI
 import java.util.*
@@ -103,7 +101,7 @@ class YoutubeByXmlUpdaterTest {
         }
 
         whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
-        whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
+        whenever(jdomService.parse(any())).thenReturn(null)
 
         /* When */
         val signature = updater.blockingSignatureOf(URI(podcast.url!!))
@@ -117,8 +115,8 @@ class YoutubeByXmlUpdaterTest {
         /* Given */
         val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/feeds/videos.xml?playlist_id=PLYMLK0zkSFQTblsW2biu2m4suKvoomN5D"), id = UUID.randomUUID(), signature = "noSign" )
 
-        whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
-        whenever(jdomService.parse(any())).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(any())).thenReturn(None)
+        whenever(jdomService.parse(any())).thenReturn(null)
 
         /* When */
         val items = updater.blockingFindItems(podcast)
@@ -132,8 +130,8 @@ class YoutubeByXmlUpdaterTest {
         /* Given */
         val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
 
-        whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
-        whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(any())).thenReturn(None)
+        whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(null)
 
         /* When */
         val items = updater.blockingFindItems(podcast)
@@ -147,8 +145,8 @@ class YoutubeByXmlUpdaterTest {
         /* Given */
         val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
 
-        whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
-        whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(any())).thenReturn(None)
+        whenever(jdomService.parse("https://www.youtube.com/feeds/videos.xml?channel_id=")).thenReturn(null)
 
         /* When */
         val items = updater.blockingFindItems(podcast)

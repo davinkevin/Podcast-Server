@@ -1,15 +1,13 @@
 package com.github.davinkevin.podcastserver.entity
 
-import io.vavr.collection.HashSet
+import arrow.core.getOrElse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.util.FileSystemUtils
-import java.io.IOException
-import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 /**
  * Created by kevin on 15/06/15 for HackerRank problem
@@ -76,10 +74,10 @@ class PodcastTest {
     fun should_provide_cover_path() {
         /* GIVEN */
         /* WHEN  */
-        val coverPath = podcast.coverPath
+        val coverPath = podcast.coverPath.getOrElse { throw IllegalStateException("extract value only") }
 
         /* THEN  */
-        assertThat(coverPath).contains(Podcast.rootFolder!!.resolve(podcast.title).resolve("cover.jpg"))
+        assertThat(coverPath).isEqualTo(Podcast.rootFolder!!.resolve(podcast.title).resolve("cover.jpg"))
     }
 
     companion object {

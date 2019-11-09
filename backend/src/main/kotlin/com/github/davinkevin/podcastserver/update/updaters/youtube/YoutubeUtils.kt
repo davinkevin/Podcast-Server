@@ -18,7 +18,7 @@ internal fun isPlaylist(url: String) = url.contains(PLAYLIST_URL_PART)
 
 internal fun channelIdOf(htmlService: HtmlService, url: String) =
         htmlService
-                .get(url).k()
+                .get(url)
                 .flatMap { it.select("[data-channel-external-id]").firstOption() }
                 .filter { Objects.nonNull(it) }
                 .map { it.attr("data-channel-external-id") }

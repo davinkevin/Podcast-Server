@@ -6,7 +6,6 @@ import arrow.core.toOption
 import com.mashape.unirest.http.Unirest
 import com.mashape.unirest.request.GetRequest
 import com.mashape.unirest.request.HttpRequestWithBody
-import io.vavr.API.Set
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -89,7 +88,7 @@ open class UrlService {
         const val PROTOCOL_SEPARATOR = "://"
         private const val MAX_NUMBER_OF_REDIRECTION = 10
         val NO_OP = Consumer<HttpURLConnection> { Function.identity<Any>().apply(it) }
-        private val EMPTY_PORT = Set(80, 443)
+        private val EMPTY_PORT = setOf(80, 443)
 
         @JvmStatic fun getDomainFromRequest(ex: ServerWebExchange): URI {
             val origin = ex.request.headers["Origin"]?.firstOrNull()

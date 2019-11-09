@@ -5,12 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
-import io.vavr.control.Option
 import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.input.SAXBuilder
 import org.jsoup.Jsoup
@@ -22,6 +20,7 @@ import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 
 /**
  * Created by kevin on 23/07/2016.
@@ -46,22 +45,21 @@ object IOUtils {
                     .map { it.toURI() }
                     .map { Paths.get(it) }
 
-    @JvmStatic fun fileAsXml(uri: String): Option<org.jdom2.Document> {
+    @JvmStatic fun fileAsXml(uri: String): org.jdom2.Document? {
         return toPath(uri)
                 .map { it.toFile() }
                 .map { f -> SAXBuilder().build(f) }
                 .toOption()
-                .toVΛVΓ()
+                .orNull()
     }
 
     @JvmStatic
     @JvmOverloads
-    fun fileAsHtml(uri: String, baseUri: String = ""): Option<Document> {
+    fun fileAsHtml(uri: String, baseUri: String = ""): arrow.core.Option<Document> {
         return toPath(uri)
                 .map { it.toFile() }
                 .map { Jsoup.parse(it, "UTF-8", baseUri) }
                 .toOption()
-                .toVΛVΓ()
     }
 
     @JvmStatic fun fileAsString(uri: String): String {
@@ -71,18 +69,13 @@ object IOUtils {
                 .getOrElse { throw RuntimeException("Error during file fetching", it) }
     }
 
-    @JvmStatic fun fileAsJson(path: String): Option<DocumentContext> {
+    @JvmStatic fun fileAsJson(path: String): arrow.core.Option<DocumentContext> {
         return arrow.core.Option.just(path)
                 .flatMap { arrow.core.Option.fromNullable(IOUtils::class.java.getResource(it)) }
                 .map { it.toURI() }
                 .map { Paths.get(it) }
                 .map { it.toFile() }
                 .map { PARSER.parse(it) }
-                .toVΛVΓ()
-    }
-
-    @JvmStatic fun fileAsStream(file: String): InputStream {
-        return IOUtils::class.java.getResourceAsStream(file)
     }
 
     @JvmStatic fun fileAsReader(file: String): BufferedReader {
@@ -112,3 +105,5 @@ object IOUtils {
         return DigestUtils.md5Hex(text)
     }
 }
+
+fun <T> arrow.core.Option<T>.toJavaOptional(): Optional<T> = this.map { Optional.of(it) }.getOrElse { Optional.empty() }

@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.service
 
+import arrow.core.None
+import arrow.core.getOrElse
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -45,7 +47,7 @@ class HtmlServiceTest {
         /* When */
         val document = htmlService.get("$LOCALHOST/page/foo.html")
         /* Then */
-        assertThat(document).isEmpty()
+        assertThat(document).isEqualTo(None)
     }
 
     @Test
@@ -60,9 +62,9 @@ class HtmlServiceTest {
         val document = htmlService.get("$LOCALHOST/page/file.html")
 
         /* Then */
-        assertThat(document.isDefined).isTrue()
-        assertThat(document.map { it.head().select("title").text() })
-                .contains("JSOUP Example")
+        assertThat(document.isDefined()).isTrue()
+        assertThat(document.map { it.head().select("title").text() }.getOrElse { "" })
+                .isEqualTo("JSOUP Example")
     }
 
     @Test

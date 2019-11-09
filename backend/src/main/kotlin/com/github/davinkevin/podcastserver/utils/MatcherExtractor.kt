@@ -1,8 +1,5 @@
 package com.github.davinkevin.podcastserver.utils
 
-import io.vavr.API.None
-import io.vavr.API.Option
-import io.vavr.control.Option
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -18,16 +15,9 @@ class MatcherExtractor(private val matcher: Matcher, private val isFind: Boolean
         fun from(s: String) = PatternExtractor(s.toPattern())
     }
 
-    fun group(i: Int): Option<String> = when {
-        !isFind -> None()
-        else -> Option(matcher.group(i))
-    }
-
-    fun groupk(i: Int): String? = group(i).orNull
-
-    fun groups(): Option<List<String>> = when {
-        !isFind -> None()
-        else -> Option((1..matcher.groupCount()).asSequence().map { matcher.group(it) }.toList())
+    fun group(i: Int): String? = when {
+        !isFind -> null
+        else -> matcher.group(i)
     }
 
     class PatternExtractor(private val p: Pattern) {

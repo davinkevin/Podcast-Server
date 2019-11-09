@@ -4,11 +4,10 @@ import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.service.JsonService
@@ -68,7 +67,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should return empty if no response from http request`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(any())).thenReturn(None)
         /* When */
         val items = updater.blockingFindItems(show)
         /* Then */
@@ -157,7 +156,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should throw error if signature can't be done`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get(any())).thenReturn(None)
 
         /* When */
         assertThatThrownBy { updater.blockingSignatureOf(show.url) }

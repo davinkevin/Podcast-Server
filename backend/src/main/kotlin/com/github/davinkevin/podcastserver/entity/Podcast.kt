@@ -1,10 +1,9 @@
 package com.github.davinkevin.podcastserver.entity
 
 
+import arrow.core.getOrElse
 import arrow.core.toOption
 import com.fasterxml.jackson.annotation.*
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import io.vavr.control.Option
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
@@ -28,13 +27,12 @@ open class Podcast : Serializable {
     var cover: Cover? = null
     var description: String? = null
     var hasToBeDeleted: Boolean? = null
-    val coverPath: Option<Path>
+    val coverPath: arrow.core.Option<Path>
         @JsonIgnore
         get() = arrow.core.Option.fromNullable(cover)
                 .flatMap { it.url.toOption() }
                 .map { FilenameUtils.getExtension(it) }
                 .map { ext -> rootFolder!!.resolve(title).resolve("cover.$ext") }
-                .toVΛVΓ()
 
     var coverOfPodcast: Cover
         @JsonProperty("cover")
@@ -52,7 +50,6 @@ open class Podcast : Serializable {
                                     id = c.id
                                 }
                             }
-                            .toVΛVΓ()
                     }
                     .getOrElse { cover!! }
         }

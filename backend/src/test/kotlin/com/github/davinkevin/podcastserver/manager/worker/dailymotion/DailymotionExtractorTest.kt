@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.M3U8Service
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
 import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
@@ -75,7 +74,7 @@ class DailymotionExtractorTest {
     @Test
     fun `should throw error if no result found from html remote call`() {
         /* GIVEN */
-        whenever(htmlService.get(item.url.toASCIIString())).then { None.toVΛVΓ() }
+        whenever(htmlService.get(item.url.toASCIIString())).then { None }
 
         /* When */
         assertThatThrownBy { extractor.extract(item) }
@@ -110,7 +109,7 @@ class DailymotionExtractorTest {
                 .then { fileAsHtml(from("karimdebbache.chroma.s01e11.html")) }
         whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(jsonService.parseUrl("https://www.dailymotion.com/player/metadata/video/x5ikng3?embedder=https%3A%2F%2Fwww.dailymotion.com%2Fvideo%2Fx5ikng3&locale=en&integration=inline&GK_PV5_NEON=1"))
-                .then { None.toVΛVΓ() }
+                .then { None }
 
         /* When */
         assertThatThrownBy { extractor.extract(item) }

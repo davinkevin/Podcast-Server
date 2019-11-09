@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.utils
 
-import io.vavr.API
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.regex.Pattern
 
@@ -17,7 +16,7 @@ class MatcherExtractorTest {
         val v = MatcherExtractor.from(p).on(s).group(1)
 
         /* THEN  */
-        Assertions.assertThat(v).containsExactly("foo")
+        assertThat(v).isEqualTo("foo")
     }
 
     @Test
@@ -30,6 +29,6 @@ class MatcherExtractorTest {
         val v = MatcherExtractor.from(p).on(s).group(1)
 
         /* THEN  */
-        Assertions.assertThat(v).isEqualTo(API.None<Any>())
+        assertThat(v).isNull()
     }
 }

@@ -1,34 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
-import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils
-import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
-import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import lan.dk.podcastserver.service.JsonService
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertAll
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
-import org.springframework.test.context.junit.jupiter.SpringExtension
-
 /**
  * Created by kevin on 24/12/2017
  */

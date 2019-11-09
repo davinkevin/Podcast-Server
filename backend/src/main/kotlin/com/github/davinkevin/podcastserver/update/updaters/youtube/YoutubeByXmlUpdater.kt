@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import arrow.core.getOrElse
+import arrow.core.toOption
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
@@ -31,7 +32,7 @@ class YoutubeByXmlUpdater(
         log.info("Youtube Update by RSS")
 
         val url = playlistUrlOf(podcast.url.toASCIIString())
-        val parsedXml = jdomService.parse(url).k()
+        val parsedXml = jdomService.parse(url).toOption()
 
         val dn = parsedXml
                 .map { it.rootElement }
@@ -83,7 +84,7 @@ class YoutubeByXmlUpdater(
 
     override fun blockingSignatureOf(url: URI): String {
         val podcastUrl = playlistUrlOf(url.toASCIIString())
-        val parsedXml = jdomService.parse(podcastUrl).k()
+        val parsedXml = jdomService.parse(podcastUrl).toOption()
 
         val dn = parsedXml
                 .map { it.rootElement }

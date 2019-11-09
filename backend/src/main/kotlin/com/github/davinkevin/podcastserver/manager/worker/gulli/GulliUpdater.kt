@@ -10,7 +10,6 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
-import com.github.davinkevin.podcastserver.utils.k
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -29,7 +28,7 @@ class GulliUpdater(
 ) : Updater {
 
     override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> =
-            htmlService.get(podcast.url.toASCIIString()).k()
+            htmlService.get(podcast.url.toASCIIString())
                     .map { it.select("div.all-videos ul li.col-md-3") }
                     .getOrElse{ Elements() }
                     .flatMap { findDetailsInFromPage(it).toList() }
@@ -38,7 +37,7 @@ class GulliUpdater(
     private fun findDetailsInFromPage(e: Element) =
             e.select("a").firstOption()
                     .map { it.attr("href") }
-                    .flatMap { htmlService.get(it).k() }
+                    .flatMap { htmlService.get(it) }
                     .flatMap { it.select(".bloc_streaming").firstOption() }
                     .flatMap { htmlToItem(it, coverOf(e)) }
 
@@ -46,7 +45,7 @@ class GulliUpdater(
             block.select("script")
                     .firstOption { it.html().contains("iframe") }
                     .map { it.html() }
-                    .flatMap { FRAME_EXTRACTOR.on(it).group(1).k() }
+                    .flatMap { FRAME_EXTRACTOR.on(it).group(1).toOption() }
                     .map { anUrl ->
                         ItemFromUpdate(
                             title = block.select(".episode_title").text(),
@@ -64,7 +63,7 @@ class GulliUpdater(
                     .getOrElse { null }
 
     override fun blockingSignatureOf(url: URI)=
-            htmlService.get(url.toASCIIString()).k()
+            htmlService.get(url.toASCIIString())
                     .flatMap { it.select("div.all-videos ul").firstOption() }
                     .map { it.html() }
                     .map { signatureService.fromText(it) }

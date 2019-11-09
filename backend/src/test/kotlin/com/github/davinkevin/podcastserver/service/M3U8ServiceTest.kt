@@ -24,32 +24,6 @@ class M3U8ServiceTest {
     @InjectMocks lateinit var m3U8Service: M3U8Service
 
     @Test
-    fun `should select best audio video url`() {
-        /* Given */
-        val m3u8FileStream = IOUtils.fileAsStream("/remote/podcast/tf1replay/13184238.m3u8")
-
-        /* When */
-        val bestQuality = m3U8Service.findBestQuality(m3u8FileStream)
-
-        /* Then */
-        assertThat(bestQuality.toJavaOptional())
-                .isPresent
-                .hasValue("13184238-audio%3D64000-video%3D2500299.m3u8?vk=MTMxODQyMzgubTN1OA==&st=D79oBJFWiP__EA4uMJAejg&e=1469146222&t=1469135422&min_bitrate=")
-    }
-
-    @Test
-    fun `should not select video url`() {
-        /* Given */
-        val inputStream = mock<InputStream>()
-
-        /* When */
-        val bestQuality = m3U8Service.findBestQuality(inputStream)
-
-        /* Then */
-        assertThat(bestQuality).isEmpty()
-    }
-
-    @Test
     fun `should get last m3u8 url`() {
         /* Given */
         val resourcePath = "/__files/service/urlService/canalplus.lepetitjournal.20150707.m3u8"

@@ -1,15 +1,15 @@
 package lan.dk.podcastserver.service;
 
+import arrow.core.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
@@ -34,12 +34,14 @@ public class JsonService {
         return parserContext.parse(json);
     }
 
-    public Option<DocumentContext> parseUrl(String url) {
-        return Try.withResources(() -> urlService.asReader(url))
-                .of(reader -> reader.lines().collect(joining()))
-                .mapTry(this::parse)
-                .onFailure(e -> log.error("Error during fetching of each items of {}", url, e))
-                .toOption();
+    public arrow.core.Option<DocumentContext> parseUrl(String url) {
+        try(var page = urlService.asReader(url)) {
+            var asJson = parse(page.lines().collect(joining()));
+            return Option.Companion.fromNullable(asJson);
+        } catch (Exception e) {
+            log.error("Error during fetching of each items of {}", url, e);
+            return Option.Companion.empty();
+        }
     }
 
     public static <T> Function<DocumentContext, T> to(Class<T> clazz) {
@@ -60,5 +62,5 @@ public class JsonService {
 
     public static <T> Function<DocumentContext, T> extract(String path) {
         return d -> d.read(path);
-    };
+    }
 }

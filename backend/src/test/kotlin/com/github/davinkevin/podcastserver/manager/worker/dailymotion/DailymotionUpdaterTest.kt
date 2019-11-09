@@ -1,11 +1,11 @@
 package com.github.davinkevin.podcastserver.manager.worker.dailymotion
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.utils.k
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -65,7 +65,7 @@ class DailymotionUpdaterTest {
     fun `should get empty list if error during fetching`() {
         /* Given */
         val karimdebbache = API_LIST_OF_ITEMS.format("karimdebbache")
-        whenever(jsonService.parseUrl(karimdebbache)).thenReturn(arrow.core.None.toVΛVΓ())
+        whenever(jsonService.parseUrl(karimdebbache)).thenReturn(arrow.core.None)
 
         /* When */
         val items = updater.blockingFindItems(podcast)

@@ -1,17 +1,15 @@
 package lan.dk.podcastserver.service;
 
+import arrow.core.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.davinkevin.podcastserver.IOUtils;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
-import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -33,7 +31,7 @@ public class JsonServiceTest {
     }
 
     @Test
-    public void should_read_json_from_files() throws URISyntaxException, IOException {
+    public void should_read_json_from_files() {
         /* Given */
         when(urlService.asReader(any())).thenReturn(IOUtils.fileAsReader("/remote/podcast/dailymotion/user.karimdebbache.json"));
 
@@ -41,11 +39,11 @@ public class JsonServiceTest {
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");
 
         /* Then */
-        assertThat(aFakeUrl.toJavaOptional()).isPresent();
+        assertThat(aFakeUrl.isDefined()).isTrue();
     }
 
     @Test
-    public void should_return_empty_if_error_during_parsing() throws IOException {
+    public void should_return_empty_if_error_during_parsing() {
         /* Given */
         doThrow(UncheckedIOException.class).when(urlService).asReader(any());
 
@@ -53,7 +51,7 @@ public class JsonServiceTest {
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");
 
         /* Then */
-        assertThat(aFakeUrl.toJavaOptional()).isEmpty();
+        assertThat(aFakeUrl.isEmpty()).isTrue();
     }
     
     @Test

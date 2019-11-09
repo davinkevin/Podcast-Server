@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.davinkevin.podcastserver.entity.Podcast
-import com.github.davinkevin.podcastserver.extension.reactor.toMono
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.manager.worker.Finder
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
@@ -16,9 +15,10 @@ class ItunesFinder(private val rssFinder: RSSFinder, private val wc: WebClient) 
     override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> =
-            ARTIST_ID.on(url)
+            Mono.justOrEmpty(
+                    ARTIST_ID.on(url)
                     .group(1)
-                    .toMono()
+            )
                     .flatMap { id -> wc.get()
                             .uri { it.path("lookup").queryParam("id", id).build() }
                             .retrieve()

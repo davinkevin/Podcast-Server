@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 class TF1ReplayFinder(val htmlService: HtmlService, val imageService: ImageService) : Finder {
 
     override fun find(url: String): Podcast {
-        return htmlService.get(url).k()
+        return htmlService.get(url)
                 .map { toPodcast(it, url) }
                 .getOrElse { Podcast.DEFAULT_PODCAST }
     }

@@ -28,7 +28,7 @@ class DailymotionFinder(
     override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> {
-        val userName = USER_NAME_EXTRACTOR.on(url).groupk(1) ?: return RuntimeException("username not found int url $url").toMono()
+        val userName = USER_NAME_EXTRACTOR.on(url).group(1) ?: return RuntimeException("username not found int url $url").toMono()
 
         return wc.get()
                 .uri { it

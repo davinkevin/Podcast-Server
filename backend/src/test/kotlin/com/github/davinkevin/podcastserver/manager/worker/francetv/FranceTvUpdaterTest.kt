@@ -5,17 +5,17 @@ import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.defaultItem
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
+import com.github.davinkevin.podcastserver.utils.k
+import com.jayway.jsonpath.DocumentContext
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argWhere
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import io.vavr.control.Option
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Condition
@@ -124,7 +124,7 @@ class FranceTvUpdaterTest(
         @Test
         fun `and return empty list because layout may have changed`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
+            whenever(htmlService.get(firstPageUrl)).thenReturn(None)
 
             /* When */
             val signature = franceTvUpdater.blockingSignatureOf(podcast.url)
@@ -143,7 +143,7 @@ class FranceTvUpdaterTest(
         private val firstPageUrl = "https://www.france.tv/france-2/secrets-d-histoire/replay-videos/ajax/?page=0"
         private val itemUrl = "https://www.france.tv/france-2/secrets-d-histoire/948775-immersion-dans-le-mystere-toutankhamon.html"
 
-        private fun pageItemUrlToHtml(url: String): Option<Document> {
+        private fun pageItemUrlToHtml(url: String): arrow.core.Option<Document> {
             val fileName = url.substringAfterLast("/")
             return IOUtils.fileAsHtml(from(fileName))
         }
@@ -170,7 +170,7 @@ class FranceTvUpdaterTest(
         fun `and return default because the only one present doesnt have any script tag`() {
             /* Given */
             whenever(htmlService.get(firstPageUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2.with-one-item.html")))
-            whenever(htmlService.get(itemUrl)).then { None.toVΛVΓ()  }
+            whenever(htmlService.get(itemUrl)).then { None  }
 
             /* When */
             val items = franceTvUpdater.blockingFindItems(podcast)
@@ -184,7 +184,7 @@ class FranceTvUpdaterTest(
         @Test
         fun `and return empty list because layout may have changed`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(None.toVΛVΓ())
+            whenever(htmlService.get(firstPageUrl)).thenReturn(None)
 
             /* When */
             val items = franceTvUpdater.blockingFindItems(podcast)
@@ -208,7 +208,7 @@ class FranceTvUpdaterTest(
         assertThat(franceTvUpdater.compatibility("http://www.f1a2.tv/show/for/dummies")).isEqualTo(Integer.MAX_VALUE)
     }
 
-    private fun loadJsonCatalog(i: InvocationOnMock): Any {
+    private fun loadJsonCatalog(i: InvocationOnMock): arrow.core.Option<DocumentContext> {
         val url = "${i.getArgument<String>(0).removePrefix("https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=")}.json"
         return IOUtils.fileAsJson(from(url))
     }

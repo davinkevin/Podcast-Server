@@ -28,7 +28,10 @@ public class ApplicationTest {
         /* Given */
         String health = "http://localhost:"+ port +"/system/health";
         /* When */
-        ApplicationHealthStatus status = jsonService.parseUrl(health).map(d -> d.read("$", ApplicationHealthStatus.class)).getOrElseThrow(RuntimeException::new);
+        ApplicationHealthStatus status = jsonService.parseUrl(health)
+                .map(d -> d.read("$", ApplicationHealthStatus.class))
+                .orNull();
+
         /* Then */
         assertThat(status).isNotNull();
         assertThat(status.getStatus()).isEqualTo("UP");

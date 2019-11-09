@@ -57,7 +57,7 @@ class JdomServiceTest {
         val document = jdomService.parse(url)
 
         /* Then */
-        assertThat(document.isDefined).isTrue()
+        assertThat(document).isNotNull
         verify(urlService, only()).asStream(url)
     }
 }

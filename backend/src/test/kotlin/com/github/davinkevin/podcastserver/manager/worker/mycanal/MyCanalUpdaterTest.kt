@@ -4,14 +4,13 @@ import arrow.core.None
 import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
 import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
 import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
+import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
+import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.toVΛVΓ
-import com.nhaarman.mockitokotlin2.*
-import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.nhaarman.mockitokotlin2.*
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -63,7 +62,7 @@ class MyCanalUpdaterTest {
     @Test
     fun `should throw error if fetch operation is empty`() {
         /* Given */
-        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None)
 
         /* When */
         assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
@@ -113,7 +112,7 @@ class MyCanalUpdaterTest {
     @Test
     fun `should return empty set if fetch operation return no elements`() {
         /* Given */
-        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None.toVΛVΓ())
+        whenever(htmlService.get("https://www.mycanal.fr/url/fake")).thenReturn(None)
 
         /* When */
         val items = updater.blockingFindItems(podcast)
