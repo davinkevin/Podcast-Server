@@ -12,23 +12,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 @Configuration
 @EnableAsync
 class ExecutorsConfig(val parameters: PodcastServerParameters) {
-
-    @Bean(name = ["UpdateExecutor"])
-    fun updateExecutor() = ThreadPoolTaskExecutor().apply {
-        corePoolSize = parameters.maxUpdateParallels
-        maxPoolSize = parameters.maxUpdateParallels
-        setThreadNamePrefix("Update-")
-        initialize()
-    }
-
-    @Bean(name = ["ManualUpdater"])
-    fun singleThreadExecutor() = ThreadPoolTaskExecutor().apply {
-        corePoolSize = 1
-        maxPoolSize = 1
-        setThreadNamePrefix("Manual-Update-")
-        initialize()
-    }
-
     @Bean(name = ["DownloadExecutor"])
     fun downloadExecutor() = ThreadPoolTaskExecutor().apply {
         corePoolSize = parameters.concurrentDownload

@@ -20,37 +20,6 @@ class ExecutorsConfigTest {
     @InjectMocks lateinit var executorsConfig: ExecutorsConfig
 
     @Test
-    fun `should generate multi thread executor`() {
-        /* Given */
-        whenever(podcastServerParameters.maxUpdateParallels).thenReturn(10)
-
-        /* When */
-        val executor = executorsConfig.updateExecutor()
-
-        /* Then */
-        executor.apply {
-            assertThat(this).isInstanceOf(ThreadPoolTaskExecutor::class.java)
-            assertThat(corePoolSize).isEqualTo(10)
-            assertThat(maxPoolSize).isEqualTo(10)
-            assertThat(threadNamePrefix).contains("Update")
-        }
-    }
-
-    @Test
-    fun `should generate single thread executor`() {
-        /* When */
-        val executor = executorsConfig.singleThreadExecutor()
-
-        /* Then */
-        executor.apply {
-            assertThat(this).isInstanceOf(ThreadPoolTaskExecutor::class.java)
-            assertThat(corePoolSize).isEqualTo(1)
-            assertThat(maxPoolSize).isEqualTo(1)
-            assertThat(threadNamePrefix).contains("Manual")
-        }
-    }
-
-    @Test
     fun `should generate download thread executor`() {
         /* Given */
         whenever(podcastServerParameters.concurrentDownload).thenReturn(10)

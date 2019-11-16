@@ -13,6 +13,7 @@ import com.github.davinkevin.podcastserver.service.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.core.task.TaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -178,10 +179,9 @@ class ItemDownloadManager (
 
     private fun launchDownloadFor(item: DownloadingItem) {
         when {
-            isInDownloadingQueue(item) -> (downloadingQueue[item] ?: DownloaderSelector.NO_OP_DOWNLOADER)
-                    .restartDownload()
+            isInDownloadingQueue(item) -> downloadingQueue[item]
+                    ?.restartDownload()
                     .also { log.debug("Restart Item : " + item.title) }
-
             else -> launchWithNewWorkerFrom(item)
         }
     }
