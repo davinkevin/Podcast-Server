@@ -109,5 +109,5 @@ spec:
               args:
                 - /bin/sh
                 - -c
-                - curl -qsL -X DELETE http://podcast-server.podcast-server.svc.cluster.local:8080/v1/items
+                - curl -qsL -X DELETE http://podcast-server:8080/api/v1/items
           restartPolicy: OnFailure
