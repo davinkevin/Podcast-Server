@@ -144,7 +144,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                             )
                             .from(ITEM)
                             .where(filterConditions)
-                            .orderBy(page.sort.toOrderBy())
+                            .orderBy(page.sort.toOrderBy(), ITEM.ID.asc())
                             .limit((page.size * page.page), page.size)
                             .asTable("FILTERED_ITEMS")
 
