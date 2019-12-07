@@ -13,6 +13,9 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.input.SAXBuilder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.springframework.http.codec.ClientCodecConfigurer
+import org.springframework.web.reactive.function.client.ExchangeStrategies
+import org.springframework.web.reactive.function.client.WebClient
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -93,10 +96,6 @@ object IOUtils {
         return PARSER.parse(text)
     }
 
-    @JvmStatic fun stringAsHtml(html: String): Document {
-        return arrow.core.Try { Jsoup.parse(html) }.getOrElse { throw RuntimeException("Error during conversion from string to html", it) }
-    }
-
     @JvmStatic fun get(uri: String): Path {
         return Paths.get(IOUtils::class.java.getResource(uri).toURI())
     }
@@ -104,6 +103,7 @@ object IOUtils {
     @JvmStatic fun digest(text: String): String {
         return DigestUtils.md5Hex(text)
     }
+
 }
 
-fun <T> arrow.core.Option<T>.toJavaOptional(): Optional<T> = this.map { Optional.of(it) }.getOrElse { Optional.empty() }
+val largeBufferStrategy = ExchangeStrategies.builder().codecs { it.defaultCodecs().maxInMemorySize(1024 * 10 * 10 * 10 * 10) }.build()

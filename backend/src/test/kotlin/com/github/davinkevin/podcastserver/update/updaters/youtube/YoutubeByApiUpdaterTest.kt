@@ -2,7 +2,13 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.largeBufferStrategy
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.remapToMockServer
+import com.github.davinkevin.podcastserver.service.HtmlService
+import com.github.davinkevin.podcastserver.service.JdomService
+import com.github.davinkevin.podcastserver.service.UrlService
+import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
@@ -14,10 +20,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.test.StepVerifier
 import java.net.URI
 import java.util.*
@@ -27,7 +36,7 @@ import java.util.*
  */
 @ExtendWith(SpringExtension::class)
 class YoutubeByApiUpdaterTest(
-    @Autowired val updater: YoutubeByApiUpdater
+        @Autowired val updater: YoutubeByApiUpdater
 ) {
 
     @Nested
@@ -190,8 +199,12 @@ class YoutubeByApiUpdaterTest(
             /* Given */
             val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
 
-            backend.stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
-                    .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
+            backend.apply {
+                stubFor(get("/user/joueurdugrenier")
+                        .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
+                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
+            }
 
             /* When */
             StepVerifier.create(updater.signatureOf(podcast.url))
@@ -208,8 +221,12 @@ class YoutubeByApiUpdaterTest(
             /* Given */
             val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
 
-            backend.stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
-                    .willReturn(notFound()))
+            backend.apply {
+                stubFor(get("/user/joueurdugrenier")
+                        .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
+                        .willReturn(notFound()))
+            }
 
             /* When */
             StepVerifier.create(updater.signatureOf(podcast.url))
@@ -256,13 +273,15 @@ class YoutubeByApiUpdaterTest(
     }
 
     @TestConfiguration
+    @Import(YoutubeUpdaterConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, JdomService::class, HtmlService::class, UrlService::class)
     class LocalTestConfiguration {
 
-        @Bean fun youtubeByApiUpdater() = YoutubeByApiUpdater(
-                key = "key",
-                youtubeClient = WebClient.builder().clone().baseUrl("http://localhost:5555/").build(),
-                googleApiClient = WebClient.builder().clone().baseUrl("http://localhost:5555/").build()
-        )
+        @Bean fun api(): Api = Api(youtube = "key", dailymotion = "another-value")
+        @Bean fun webClientCustomization() = WebClientCustomizer { it
+                .exchangeStrategies(largeBufferStrategy)
+                .filter(remapToMockServer("www.youtube.com"))
+                .filter(remapToMockServer("www.googleapis.com"))
+        }
 
     }
 }

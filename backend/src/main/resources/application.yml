@@ -12,6 +12,8 @@ spring:
   location: ${java.io.tmpdir}
   max-file-size: 512MB
   max-request-size: 512MB
+ codec:
+  max-in-memory-size: 500MB
 
 server:
  port: 8080

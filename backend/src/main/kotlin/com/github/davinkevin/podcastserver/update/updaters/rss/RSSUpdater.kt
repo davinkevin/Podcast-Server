@@ -86,7 +86,10 @@ class RSSUpdater(
 
     override fun signatureOf(url: URI): Mono<String> = fetchRss(url)
             .map { DigestUtils.md5Hex(it.inputStream) }
-            .onErrorResume { "error_during_update".toMono() }
+            .onErrorResume {
+                log.error("error during update", it)
+                "error_during_update".toMono()
+            }
 
     private fun fetchRss(url: URI): Mono<ByteArrayResource> {
         return wcb

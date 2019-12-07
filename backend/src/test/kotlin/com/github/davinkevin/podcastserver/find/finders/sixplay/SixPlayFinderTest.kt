@@ -1,18 +1,16 @@
 package com.github.davinkevin.podcastserver.find.finders.sixplay
 
-import com.github.davinkevin.podcastserver.IOUtils
-import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.*
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -21,13 +19,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -266,14 +266,15 @@ class SixPlayFinderTest(
                 .hasMessage("An operation is not implemented: not required anymore")
     }
 
-
     @TestConfiguration
-    @AutoConfigureJson
-    @Import(SixPlayFinderConfig::class)
+    @Import(SixPlayFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class)
     class LocalTestConfiguration {
         @Bean @Primary fun imageService() = mock<ImageService>()
-        @Bean fun webClientBuilder() = WebClient.builder()
-                .filter(remapToMockServer("www.6play.fr"))
+        @Bean fun webClientCustomization() = WebClientCustomizer { wcb ->
+            wcb
+                    .exchangeStrategies(largeBufferStrategy)
+                    .filter(remapToMockServer("www.6play.fr"))
+        }
     }
 
 }

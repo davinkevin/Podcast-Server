@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
+import com.github.davinkevin.podcastserver.*
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
-import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -17,18 +17,23 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.http.codec.ClientCodecConfigurer
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
-import java.net.URL
 import java.time.ZoneOffset
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+
 
 /**
  * Created by kevin on 28/06/15 for Podcast Server
@@ -258,11 +263,10 @@ class RSSUpdaterTest(
         }
     }
 
-
     @TestConfiguration
-    @Import(RSSUpdaterConfig::class)
+    @Import(RSSUpdaterConfig::class, WebClientAutoConfiguration::class)
     class LocalTestConfiguration {
         @Bean fun imageService() = mock<ImageService>()
-        @Bean fun webClient() = WebClient.builder().baseUrl("localhost:5555")
+        @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.exchangeStrategies(largeBufferStrategy).baseUrl("http://localhost:5555/") }
     }
 }

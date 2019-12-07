@@ -2,15 +2,13 @@ package com.github.davinkevin.podcastserver.find.finders.youtube
 
 import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
-import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinder
-import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderConfig
+import com.github.davinkevin.podcastserver.largeBufferStrategy
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -20,16 +18,18 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 
-@AutoConfigureWebClient
 @ExtendWith(SpringExtension::class)
 class YoutubeFinderTest(
     @Autowired val imageService: ImageService,
@@ -131,8 +131,9 @@ class YoutubeFinderTest(
     }
 
     @TestConfiguration
-    @Import(YoutubeFinderConfig::class)
+    @Import(YoutubeFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class)
     class LocalTestConfiguration {
         @Bean fun imageService() = mock<ImageService>()
+        @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.exchangeStrategies(largeBufferStrategy) }
     }
 }
