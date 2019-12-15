@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.gulli
 
-import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.remapToMockServer
@@ -9,11 +9,10 @@ import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -27,7 +26,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -53,7 +51,7 @@ class GulliFinderTest(
                     .thenReturn(CoverInformation(123, 456, URI(coverUrl)).toMono())
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
-                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/gulli/pokemon.html")))
+                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.html")))
             )
 
             /* When */
@@ -80,7 +78,7 @@ class GulliFinderTest(
             val podcastUrl = "http://replay.gulli.fr/dessins-animes/Pokemon3"
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
-                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/gulli/pokemon.without-cover.html")))
+                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.without-cover.html")))
             )
 
             /* When */

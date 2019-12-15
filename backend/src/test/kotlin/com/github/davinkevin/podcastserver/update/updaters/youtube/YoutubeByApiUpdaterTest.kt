@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import com.github.davinkevin.podcastserver.IOUtils.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.largeBufferStrategy
+import com.github.davinkevin.podcastserver.config.WebClientConfig
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.HtmlService
@@ -273,12 +273,19 @@ class YoutubeByApiUpdaterTest(
     }
 
     @TestConfiguration
-    @Import(YoutubeUpdaterConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, JdomService::class, HtmlService::class, UrlService::class)
+    @Import(
+            YoutubeUpdaterConfig::class,
+            WebClientAutoConfiguration::class,
+            JacksonAutoConfiguration::class,
+            JdomService::class,
+            HtmlService::class,
+            UrlService::class,
+            WebClientConfig::class
+    )
     class LocalTestConfiguration {
 
         @Bean fun api(): Api = Api(youtube = "key", dailymotion = "another-value")
         @Bean fun webClientCustomization() = WebClientCustomizer { it
-                .exchangeStrategies(largeBufferStrategy)
                 .filter(remapToMockServer("www.youtube.com"))
                 .filter(remapToMockServer("www.googleapis.com"))
         }

@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.manager.worker.dailymotion
 
 import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
-import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
-import com.github.davinkevin.podcastserver.IOUtils.stringAsJson
+import com.github.davinkevin.podcastserver.fileAsHtml
+import com.github.davinkevin.podcastserver.fileAsJson
+import com.github.davinkevin.podcastserver.stringAsJson
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.service.HtmlService

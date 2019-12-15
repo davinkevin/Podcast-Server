@@ -13,9 +13,6 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.input.SAXBuilder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.springframework.http.codec.ClientCodecConfigurer
-import org.springframework.web.reactive.function.client.ExchangeStrategies
-import org.springframework.web.reactive.function.client.WebClient
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -23,87 +20,61 @@ import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 
 /**
  * Created by kevin on 23/07/2016.
  */
-object IOUtils {
+private object IOUtils {}
 
-    private val PARSER = JsonPath.using(Configuration.builder().mappingProvider(JacksonMappingProvider(
-            ObjectMapper()
-                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                    .registerModules(
-                            JavaTimeModule(),
-                            KotlinModule()
-                    )
-    )).build())
+private val PARSER = JsonPath.using(Configuration.builder().mappingProvider(JacksonMappingProvider(
+        ObjectMapper()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .registerModules(
+                        JavaTimeModule(),
+                        KotlinModule()
+                )
+)).build())
 
-    const val TEMPORARY_EXTENSION = ".psdownload"
-    @JvmField val ROOT_TEST_PATH: Path = Paths.get("/tmp/podcast-server-test/")
+const val TEMPORARY_EXTENSION = ".psdownload"
+val ROOT_TEST_PATH: Path = Paths.get("/tmp/podcast-server-test/")
 
-
-    @JvmStatic fun toPath(uri: String): arrow.core.Try<Path> =
-            arrow.core.Try { IOUtils::class.java.getResource(uri) }
-                    .map { it.toURI() }
-                    .map { Paths.get(it) }
-
-    @JvmStatic fun fileAsXml(uri: String): org.jdom2.Document? {
-        return toPath(uri)
-                .map { it.toFile() }
-                .map { f -> SAXBuilder().build(f) }
-                .toOption()
-                .orNull()
-    }
-
-    @JvmStatic
-    @JvmOverloads
-    fun fileAsHtml(uri: String, baseUri: String = ""): arrow.core.Option<Document> {
-        return toPath(uri)
-                .map { it.toFile() }
-                .map { Jsoup.parse(it, "UTF-8", baseUri) }
-                .toOption()
-    }
-
-    @JvmStatic fun fileAsString(uri: String): String {
-        return toPath(uri)
-                .map { Files.newInputStream(it) }
-                .map { it.bufferedReader().use { it.readText() } }
-                .getOrElse { throw RuntimeException("Error during file fetching", it) }
-    }
-
-    @JvmStatic fun fileAsJson(path: String): arrow.core.Option<DocumentContext> {
-        return arrow.core.Option.just(path)
-                .flatMap { arrow.core.Option.fromNullable(IOUtils::class.java.getResource(it)) }
+fun toPath(uri: String): arrow.core.Try<Path> =
+        arrow.core.Try { IOUtils::class.java.getResource(uri) }
                 .map { it.toURI() }
                 .map { Paths.get(it) }
-                .map { it.toFile() }
-                .map { PARSER.parse(it) }
-    }
 
-    @JvmStatic fun fileAsReader(file: String): BufferedReader {
-        return toPath(file)
-                .map { Files.newBufferedReader(it) }
-                .getOrElse{ throw IOException("File $file not found") }
-    }
+fun fileAsXml(uri: String): org.jdom2.Document? = toPath(uri)
+        .map { it.toFile() }
+        .map { f -> SAXBuilder().build(f) }
+        .toOption()
+        .orNull()
 
-    @JvmStatic fun urlAsStream(url: String): InputStream {
-        return arrow.core.Try { URL(url).openStream() }
-                .getOrElse{ throw RuntimeException(it) }
-    }
+fun fileAsHtml(uri: String, baseUri: String = ""): arrow.core.Option<Document> = toPath(uri)
+        .map { it.toFile() }
+        .map { Jsoup.parse(it, "UTF-8", baseUri) }
+        .toOption()
 
-    @JvmStatic fun stringAsJson(text: String): DocumentContext {
-        return PARSER.parse(text)
-    }
-
-    @JvmStatic fun get(uri: String): Path {
-        return Paths.get(IOUtils::class.java.getResource(uri).toURI())
-    }
-
-    @JvmStatic fun digest(text: String): String {
-        return DigestUtils.md5Hex(text)
-    }
-
+fun fileAsString(uri: String): String {
+    return toPath(uri)
+            .map { Files.newInputStream(it) }
+            .map { it.bufferedReader().use { it.readText() } }
+            .getOrElse { throw RuntimeException("Error during file fetching", it) }
 }
 
-val largeBufferStrategy = ExchangeStrategies.builder().codecs { it.defaultCodecs().maxInMemorySize(1024 * 10 * 10 * 10 * 10) }.build()
+fun fileAsJson(path: String): arrow.core.Option<DocumentContext> = arrow.core.Option.just(path)
+        .flatMap { arrow.core.Option.fromNullable(IOUtils::class.java.getResource(it)) }
+        .map { it.toURI() }
+        .map { Paths.get(it) }
+        .map { it.toFile() }
+        .map { PARSER.parse(it) }
+
+fun fileAsReader(file: String): BufferedReader = toPath(file)
+        .map { Files.newBufferedReader(it) }
+        .getOrElse{ throw IOException("File $file not found") }
+
+fun urlAsStream(url: String): InputStream = arrow.core.Try { URL(url).openStream() }
+        .getOrElse{ throw RuntimeException(it) }
+
+fun stringAsJson(text: String): DocumentContext = PARSER.parse(text)
+
+fun digest(text: String): String = DigestUtils.md5Hex(text)

@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.francetv
 
-import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
@@ -60,7 +60,7 @@ class FranceTvFinderTest(
             ).toMono())
 
             backend.stubFor(get("/france-2/secrets-d-histoire/")
-                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))
@@ -87,7 +87,7 @@ class FranceTvFinderTest(
 
             whenever(imageService.fetchCoverInformation(any())).thenReturn(Mono.empty())
             backend.stubFor(get("/france-2/secrets-d-histoire/")
-                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))

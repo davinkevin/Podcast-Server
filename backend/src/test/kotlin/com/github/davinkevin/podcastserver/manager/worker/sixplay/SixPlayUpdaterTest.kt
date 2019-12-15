@@ -1,13 +1,14 @@
 package com.github.davinkevin.podcastserver.manager.worker.sixplay
 
 import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils
+import com.github.davinkevin.podcastserver.fileAsHtml
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.stringAsJson
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.service.JsonService
@@ -45,8 +46,8 @@ class SixPlayUpdaterTest {
     @Test
     fun `should extract items`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
-        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation(
                 url = URI(it.getArgument(0)),
                 width = 200,
@@ -77,7 +78,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should throw exception if problem during get items`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
@@ -91,7 +92,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should throw exception if no js found in the page`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-without-js.html"))
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380-without-js.html"))
 
         /* When */
         assertThatThrownBy { updater.blockingFindItems(show) }
@@ -104,8 +105,8 @@ class SixPlayUpdaterTest {
     @Test
     fun `should throw exception if no programById found`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-without-programid.html"))
-        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380-without-programid.html"))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
 
         /* When */
         assertThatThrownBy { updater.blockingFindItems(show) }
@@ -119,8 +120,8 @@ class SixPlayUpdaterTest {
     fun `should extract items with specific case`() {
         /* Given */
         val now = ZonedDateTime.now()
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380-with-specific-item.html"))
-        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380-with-specific-item.html"))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation(
                 url = URI(it.getArgument(0)),
                 width = 200,
@@ -142,8 +143,8 @@ class SixPlayUpdaterTest {
     @Test
     fun `should do signature`() {
         /* GIVEN */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
-        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */
@@ -169,7 +170,7 @@ class SixPlayUpdaterTest {
     @Test
     fun `should throw parsing exception if problem during signature`() {
         /* Given */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
         whenever(jsonService.parse(any())).thenThrow(RuntimeException("Foo Bar"))
 
         /* When */
@@ -183,8 +184,8 @@ class SixPlayUpdaterTest {
     @Test
     fun `should have the same signature twice`() {
         /* GIVEN */
-        whenever(htmlService.get(any())).thenReturn(IOUtils.fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
-        whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/6play/sport-6-p_1380.html"))
+        whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* WHEN  */

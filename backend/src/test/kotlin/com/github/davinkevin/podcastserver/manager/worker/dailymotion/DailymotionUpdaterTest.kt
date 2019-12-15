@@ -1,10 +1,9 @@
 package com.github.davinkevin.podcastserver.manager.worker.dailymotion
 
-import com.github.davinkevin.podcastserver.IOUtils.fileAsJson
+import com.github.davinkevin.podcastserver.fileAsJson
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
-import com.github.davinkevin.podcastserver.utils.k
 import com.nhaarman.mockitokotlin2.whenever
 import lan.dk.podcastserver.service.JsonService
 import org.assertj.core.api.Assertions.assertThat

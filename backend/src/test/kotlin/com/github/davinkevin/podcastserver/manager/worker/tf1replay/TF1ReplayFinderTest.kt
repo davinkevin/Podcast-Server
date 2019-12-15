@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.worker.tf1replay
 
 import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
+import com.github.davinkevin.podcastserver.fileAsHtml
 import com.github.davinkevin.podcastserver.entity.Cover
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.service.HtmlService

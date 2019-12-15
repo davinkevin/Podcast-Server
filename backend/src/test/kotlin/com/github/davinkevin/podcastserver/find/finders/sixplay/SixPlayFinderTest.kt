@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.sixplay
 
 import com.github.davinkevin.podcastserver.*
+import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
@@ -58,7 +59,7 @@ class SixPlayFinderTest(
             ).toMono())
 
             backend.stubFor(get("/sport-6-p_1380")
-                    .willReturn(ok(IOUtils.fileAsString("/remote/podcast/6play/sport-6-p_1380.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/6play/sport-6-p_1380.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))
@@ -98,7 +99,7 @@ class SixPlayFinderTest(
             fun `because script tag is missing`(backend: WireMockServer) {
                 /* Given */
                 backend.stubFor(get("/sport-6-p_1380")
-                        .willReturn(ok(IOUtils.fileAsString("/remote/podcast/6play/sport-6-p_1380-without-js.html"))))
+                        .willReturn(ok(fileAsString("/remote/podcast/6play/sport-6-p_1380-without-js.html"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
@@ -122,7 +123,7 @@ class SixPlayFinderTest(
             fun `because script tag doesnt have program`(backend: WireMockServer) {
                 /* Given */
                 backend.stubFor(get("/sport-6-p_1380")
-                        .willReturn(ok(IOUtils.fileAsString("/remote/podcast/6play/sport-6-p_1380-without-programid.html"))))
+                        .willReturn(ok(fileAsString("/remote/podcast/6play/sport-6-p_1380-without-programid.html"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
@@ -146,7 +147,7 @@ class SixPlayFinderTest(
             fun `because programsById 1300 doesnt have description`(backend: WireMockServer) {
                 /* Given */
                 backend.stubFor(get("/sport-6-p_1380")
-                        .willReturn(ok(IOUtils.fileAsString("/remote/podcast/6play/sport-6-p_1380-without-description.html"))))
+                        .willReturn(ok(fileAsString("/remote/podcast/6play/sport-6-p_1380-without-description.html"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
@@ -170,7 +171,7 @@ class SixPlayFinderTest(
             fun `because programsById is empty`(backend: WireMockServer) {
                 /* Given */
                 backend.stubFor(get("/sport-6-p_1380")
-                        .willReturn(ok(IOUtils.fileAsString("/remote/podcast/6play/sport-6-p_1380.without-entries-in-programs-by-id.html"))))
+                        .willReturn(ok(fileAsString("/remote/podcast/6play/sport-6-p_1380.without-entries-in-programs-by-id.html"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
@@ -201,7 +202,7 @@ class SixPlayFinderTest(
             fun `because no background image is defined`(backend: WireMockServer) {
                 /* Given */
                 backend.stubFor(get("/sport-6-p_1380")
-                        .willReturn(ok(IOUtils.fileAsString("/remote/podcast/6play/sport-6-p_1380.without-cover.html"))))
+                        .willReturn(ok(fileAsString("/remote/podcast/6play/sport-6-p_1380.without-cover.html"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
@@ -267,14 +268,10 @@ class SixPlayFinderTest(
     }
 
     @TestConfiguration
-    @Import(SixPlayFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class)
+    @Import(SixPlayFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
         @Bean @Primary fun imageService() = mock<ImageService>()
-        @Bean fun webClientCustomization() = WebClientCustomizer { wcb ->
-            wcb
-                    .exchangeStrategies(largeBufferStrategy)
-                    .filter(remapToMockServer("www.6play.fr"))
-        }
+        @Bean fun webClientCustomization() = WebClientCustomizer { it.filter(remapToMockServer("www.6play.fr")) }
     }
 
 }

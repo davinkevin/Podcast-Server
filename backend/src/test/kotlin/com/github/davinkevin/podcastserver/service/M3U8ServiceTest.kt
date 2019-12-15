@@ -1,8 +1,7 @@
 package com.github.davinkevin.podcastserver.service
 
-import com.nhaarman.mockitokotlin2.mock
+import com.github.davinkevin.podcastserver.fileAsReader
 import com.nhaarman.mockitokotlin2.whenever
-import com.github.davinkevin.podcastserver.IOUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -11,7 +10,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import java.io.IOException
-import java.io.InputStream
 import java.io.UncheckedIOException
 
 /**
@@ -27,7 +25,7 @@ class M3U8ServiceTest {
     fun `should get last m3u8 url`() {
         /* Given */
         val resourcePath = "/__files/service/urlService/canalplus.lepetitjournal.20150707.m3u8"
-        whenever(urlService.asReader(resourcePath)).then { IOUtils.fileAsReader(resourcePath) }
+        whenever(urlService.asReader(resourcePath)).then { fileAsReader(resourcePath) }
 
         /* When */
         val lastUrl = m3U8Service.getM3U8UrlFormMultiStreamFile(resourcePath)
@@ -40,7 +38,7 @@ class M3U8ServiceTest {
     fun `should handle relative url`() {
         /* Given */
         val resourcePath = "http://a.custom.dom/__files/service/urlService/relative.m3u8"
-        whenever(urlService.asReader(resourcePath)).then { IOUtils.fileAsReader("/__files/service/urlService/relative.m3u8") }
+        whenever(urlService.asReader(resourcePath)).then { fileAsReader("/__files/service/urlService/relative.m3u8") }
 
         /* When */
         val lastUrl = m3U8Service.getM3U8UrlFormMultiStreamFile(resourcePath)

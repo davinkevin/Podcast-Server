@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 import arrow.core.Try
-import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
-import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
+import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager

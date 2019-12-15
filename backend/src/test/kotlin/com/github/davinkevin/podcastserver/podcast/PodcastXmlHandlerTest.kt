@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.item.*
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -9,7 +9,6 @@ import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -18,7 +17,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -241,7 +239,7 @@ class PodcastXmlHandlerTest(
             whenever(podcastService.findById(podcastId))
                     .thenReturn(podcast.toMono())
 
-            val xml = IOUtils.fileAsString("/xml/podcast-with-50-items.xml")
+            val xml = fileAsString("/xml/podcast-with-50-items.xml")
 
             /* When */
             rest
@@ -266,7 +264,7 @@ class PodcastXmlHandlerTest(
             whenever(podcastService.findById(podcastId))
                     .thenReturn(podcast.toMono())
 
-            val xml = IOUtils.fileAsString("/xml/podcast-with-200-items.xml")
+            val xml = fileAsString("/xml/podcast-with-200-items.xml")
 
             /* When */
             rest

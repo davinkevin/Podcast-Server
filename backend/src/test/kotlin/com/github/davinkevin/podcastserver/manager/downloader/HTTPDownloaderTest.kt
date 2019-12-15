@@ -6,8 +6,8 @@ import com.github.axet.wget.info.DownloadInfo
 import com.github.axet.wget.info.URLInfo
 import com.github.axet.wget.info.ex.DownloadInterruptedError
 import com.github.axet.wget.info.ex.DownloadMultipartError
-import com.github.davinkevin.podcastserver.IOUtils.ROOT_TEST_PATH
-import com.github.davinkevin.podcastserver.IOUtils.TEMPORARY_EXTENSION
+import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
+import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager

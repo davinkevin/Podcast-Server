@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.youtube
 
 import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils.fileAsHtml
-import com.github.davinkevin.podcastserver.IOUtils.fileAsXml
+import com.github.davinkevin.podcastserver.fileAsHtml
+import com.github.davinkevin.podcastserver.fileAsXml
 import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.HtmlService

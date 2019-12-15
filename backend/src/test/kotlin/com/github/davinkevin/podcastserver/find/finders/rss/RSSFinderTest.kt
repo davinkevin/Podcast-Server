@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.find.finders.rss
 
-import com.github.davinkevin.podcastserver.IOUtils.fileAsString
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation

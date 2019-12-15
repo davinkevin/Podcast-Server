@@ -2,7 +2,6 @@ package lan.dk.podcastserver.service;
 
 import arrow.core.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.davinkevin.podcastserver.IOUtils;
 import com.github.davinkevin.podcastserver.service.UrlService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.UncheckedIOException;
 
+import static com.github.davinkevin.podcastserver.IOUtilsKt.fileAsReader;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -33,7 +33,7 @@ public class JsonServiceTest {
     @Test
     public void should_read_json_from_files() {
         /* Given */
-        when(urlService.asReader(any())).thenReturn(IOUtils.fileAsReader("/remote/podcast/dailymotion/user.karimdebbache.json"));
+        when(urlService.asReader(any())).thenReturn(fileAsReader("/remote/podcast/dailymotion/user.karimdebbache.json"));
 
         /* When */
         Option<DocumentContext> aFakeUrl = jsonService.parseUrl("http://foo.com/");

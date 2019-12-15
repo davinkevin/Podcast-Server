@@ -1,7 +1,8 @@
 package com.github.davinkevin.podcastserver.manager.worker.francetv
 
 import arrow.core.None
-import com.github.davinkevin.podcastserver.IOUtils
+import com.github.davinkevin.podcastserver.fileAsHtml
+import com.github.davinkevin.podcastserver.fileAsJson
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.defaultItem
@@ -10,7 +11,7 @@ import com.github.davinkevin.podcastserver.service.ImageService
 import com.github.davinkevin.podcastserver.service.SignatureService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.utils.k
+import com.github.davinkevin.podcastserver.stringAsJson
 import com.jayway.jsonpath.DocumentContext
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argWhere
@@ -63,7 +64,7 @@ class FranceTvUpdaterTest(
         fun `the podcast`() {
             /* Given */
             whenever(htmlService.get(firstPageUrl))
-                    .thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2.html")))
+                    .thenReturn(fileAsHtml(from("secrets-d-histoire.v2.html")))
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
@@ -78,7 +79,7 @@ class FranceTvUpdaterTest(
         @Test
         fun `and have same signature even if duration change`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2_changed.html")))
+            whenever(htmlService.get(firstPageUrl)).thenReturn(fileAsHtml(from("secrets-d-histoire.v2_changed.html")))
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
@@ -93,7 +94,7 @@ class FranceTvUpdaterTest(
         @Test
         fun `and have different sign if podcast has less items`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2_with_less_items.html")))
+            whenever(htmlService.get(firstPageUrl)).thenReturn(fileAsHtml(from("secrets-d-histoire.v2_with_less_items.html")))
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
@@ -109,7 +110,7 @@ class FranceTvUpdaterTest(
         @Test
         fun `podcast with no items`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2_with_no_items.html")))
+            whenever(htmlService.get(firstPageUrl)).thenReturn(fileAsHtml(from("secrets-d-histoire.v2_with_no_items.html")))
             whenever(signatureService.fromText(any())).thenCallRealMethod()
 
             /* When */
@@ -145,15 +146,15 @@ class FranceTvUpdaterTest(
 
         private fun pageItemUrlToHtml(url: String): arrow.core.Option<Document> {
             val fileName = url.substringAfterLast("/")
-            return IOUtils.fileAsHtml(from(fileName))
+            return fileAsHtml(from(fileName))
         }
 
         @Test
         fun `with standard format`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2.html")))
+            whenever(htmlService.get(firstPageUrl)).thenReturn(fileAsHtml(from("secrets-d-histoire.v2.html")))
             whenever(htmlService.get(argWhere { it != firstPageUrl })).then { pageItemUrlToHtml(it.getArgument(0))  }
-            whenever(jsonService.parse(any())).then { IOUtils.stringAsJson(it.getArgument(0)) }
+            whenever(jsonService.parse(any())).then { stringAsJson(it.getArgument(0)) }
             whenever(jsonService.parseUrl(any())).then { loadJsonCatalog(it) }
             whenever(imageService.fetchCoverInformation(any<String>())).thenReturn(CoverInformation(100, 400, URI("https://foo.bar.com/img.png")))
 
@@ -169,7 +170,7 @@ class FranceTvUpdaterTest(
         @Test
         fun `and return default because the only one present doesnt have any script tag`() {
             /* Given */
-            whenever(htmlService.get(firstPageUrl)).thenReturn(IOUtils.fileAsHtml(from("secrets-d-histoire.v2.with-one-item.html")))
+            whenever(htmlService.get(firstPageUrl)).thenReturn(fileAsHtml(from("secrets-d-histoire.v2.with-one-item.html")))
             whenever(htmlService.get(itemUrl)).then { None  }
 
             /* When */
@@ -210,7 +211,7 @@ class FranceTvUpdaterTest(
 
     private fun loadJsonCatalog(i: InvocationOnMock): arrow.core.Option<DocumentContext> {
         val url = "${i.getArgument<String>(0).removePrefix("https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=")}.json"
-        return IOUtils.fileAsJson(from(url))
+        return fileAsJson(from(url))
     }
 
     @TestConfiguration

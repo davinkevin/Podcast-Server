@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.service
 
 import arrow.core.Option
 import arrow.core.getOrElse
-import com.github.davinkevin.podcastserver.IOUtils
+import com.github.davinkevin.podcastserver.toPath
 import com.nhaarman.mockitokotlin2.whenever
 import org.apache.tika.Tika
 import org.assertj.core.api.Assertions.assertThat
@@ -55,7 +55,7 @@ class MimeTypeServiceTest {
         @MockitoSettings(strictness = Strictness.LENIENT)
         fun `should get mimeType with probeContentType`() {
             /* Given */
-            val path = IOUtils.toPath("/__files/service/mimeTypeService/plain.text.txt")
+            val path = toPath("/__files/service/mimeTypeService/plain.text.txt")
                     .getOrElse { throw RuntimeException("Error when fetchin file") }
             whenever(tikaProbeContentType.probeContentType(path)).thenReturn(Option.just("text/plain"))
             whenever(tikaProbeContentType.probeContentType(Paths.get("foo"))).thenReturn(Option.just(""))

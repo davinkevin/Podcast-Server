@@ -1,19 +1,17 @@
 package com.github.davinkevin.podcastserver.find.finders.dailymotion
 
-import com.github.davinkevin.podcastserver.IOUtils
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
-import com.github.davinkevin.podcastserver.find.finders.francetv.FranceTvFinderConfig
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -26,7 +24,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -63,7 +60,7 @@ class DailymotionFinderTest(
 
                 backend.stubFor(get(urlPathEqualTo("/user/karimdebbache"))
                         .withQueryParam("fields", equalTo("avatar_720_url,description,username"))
-                        .willReturn(okJson(IOUtils.fileAsString("/remote/podcast/dailymotion/karimdebbache.json"))))
+                        .willReturn(okJson(fileAsString("/remote/podcast/dailymotion/karimdebbache.json"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
@@ -92,7 +89,7 @@ class DailymotionFinderTest(
 
                 backend.stubFor(get(urlPathEqualTo("/user/karimdebbache"))
                         .withQueryParam("fields", equalTo("avatar_720_url,description,username"))
-                        .willReturn(okJson(IOUtils.fileAsString("/remote/podcast/dailymotion/karimdebbache.json"))))
+                        .willReturn(okJson(fileAsString("/remote/podcast/dailymotion/karimdebbache.json"))))
 
                 /* When */
                 StepVerifier.create(finder.findInformation(url))
