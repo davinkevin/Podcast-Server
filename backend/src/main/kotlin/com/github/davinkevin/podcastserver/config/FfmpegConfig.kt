@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.config
 
+import com.github.davinkevin.podcastserver.service.FfmpegService
+import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import net.bramp.ffmpeg.FFmpeg
 import net.bramp.ffmpeg.FFmpegExecutor
@@ -15,23 +17,16 @@ import org.springframework.context.annotation.Configuration
 class FfmpegConfig {
 
     @Bean
-    fun ffmpegExecutor(ffmpeg: FFmpeg, ffprobe: FFprobe) = FFmpegExecutor(ffmpeg, ffprobe)
+    fun ffmpegService(externalTools: ExternalTools): FfmpegService {
 
-    @Bean
-    fun ffmpeg(
-            @Value("\${podcastserver.externaltools.ffmpeg:/usr/local/bin/ffmpeg}") ffmpegLocation: String,
-            runProcessFunc: CustomRunProcessFunc
-    ) =
-            FFmpeg(ffmpegLocation, runProcessFunc)
+        val processFunc = CustomRunProcessFunc()
 
-    @Bean
-    fun ffprobe(
-            @Value("\${podcastserver.externaltools.ffprobe:/usr/local/bin/ffprobe}") ffprobeLocation: String,
-            runProcessFunc: CustomRunProcessFunc
-    ) =
-            FFprobe(ffprobeLocation, runProcessFunc)
+        val ffmpeg = FFmpeg(externalTools.ffmpeg, processFunc)
+        val ffprobe = FFprobe(externalTools.ffprobe, processFunc)
 
-    @Bean
-    fun runProcessFunc(): CustomRunProcessFunc = CustomRunProcessFunc()
+        val executor = FFmpegExecutor(ffmpeg, ffprobe)
+
+        return FfmpegService(processFunc, executor, ffprobe)
+    }
 
 }

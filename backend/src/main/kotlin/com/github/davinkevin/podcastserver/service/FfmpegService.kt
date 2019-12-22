@@ -21,8 +21,11 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by kevin on 19/07/2014 for Podcast Server
  */
-@Component("FfmpegService")
-class FfmpegService(val runProcessFunc: CustomRunProcessFunc, val ffmpegExecutor: FFmpegExecutor, val ffprobe: FFprobe) {
+class FfmpegService(
+        private val runProcessFunc: CustomRunProcessFunc,
+        private val ffmpegExecutor: FFmpegExecutor,
+        private val ffprobe: FFprobe
+) {
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
     private val separator = System.getProperty("line.separator")

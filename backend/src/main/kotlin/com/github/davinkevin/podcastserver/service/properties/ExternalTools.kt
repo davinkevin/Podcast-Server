@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties("podcastserver.externaltools")
 data class ExternalTools(
         var ffmpeg: String = "/usr/local/bin/ffmpeg",
+        var ffprobe: String = "/usr/local/bin/ffprobe",
         var rtmpdump: String = "/usr/local/bin/rtmpdump",
         var youtubedl: String = "/usr/local/bin/youtube-dl"
 )

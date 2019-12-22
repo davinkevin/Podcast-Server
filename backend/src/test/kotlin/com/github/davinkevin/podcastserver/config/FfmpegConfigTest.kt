@@ -1,9 +1,6 @@
 package com.github.davinkevin.podcastserver.config
 
-import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
-import com.nhaarman.mockitokotlin2.mock
-import net.bramp.ffmpeg.FFmpeg
-import net.bramp.ffmpeg.FFprobe
+import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -17,42 +14,17 @@ class FfmpegConfigTest {
     @Test
     fun `should have a bean for executor`() {
         /* Given */
-        val ffmpeg = mock<FFmpeg>()
-        val ffprobe = mock<FFprobe>()
+        val externalTools = ExternalTools().apply {
+            ffmpeg = "/bin/echo"
+            ffprobe = "/bin/echo"
+        }
 
         /* When */
-        val ffmpegExecutor = ffmpegConfig.ffmpegExecutor(ffmpeg, ffprobe)
+        val service = ffmpegConfig.ffmpegService(externalTools)
 
         /* Then */
-        assertThat(ffmpegExecutor).isNotNull()
+        assertThat(service).isNotNull()
     }
 
-    @Test
-    fun `should generate ffmpeg`() {
-        /* Given */
-        val binary = "/bin/bash"
 
-        /* When */
-        val ffmpeg = ffmpegConfig.ffmpeg(binary, CustomRunProcessFunc())
-
-        /* Then */
-        assertThat(ffmpeg).isNotNull()
-    }
-
-    @Test
-    fun `should generate ffprobe`() {
-        /* Given */
-        val binary = "/bin/bash"
-
-        /* When */
-        val ffprobe = ffmpegConfig.ffprobe(binary, CustomRunProcessFunc())
-
-        /* Then */
-        assertThat(ffprobe).isNotNull()
-    }
-
-    @Test
-    fun `should have a run process func`() {
-        assertThat(ffmpegConfig.runProcessFunc()).isNotNull()
-    }
 }
