@@ -1,20 +1,15 @@
 package com.github.davinkevin.podcastserver.service
 
-import arrow.core.Try
-import arrow.core.getOrElse
-import arrow.core.orElse
-import arrow.core.toOption
 import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika
-import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
 
 /**
  * Created by kevin on 22/07/2018
  */
-@Service
-class MimeTypeService(val tikaProbeContentType: TikaProbeContentType) {
+class MimeTypeService(private val tika: Tika) {
+
     companion object {
         val mimeMap = mapOf(
                 "mp4" to "video/mp4",
@@ -25,31 +20,20 @@ class MimeTypeService(val tikaProbeContentType: TikaProbeContentType) {
         )
     }
 
-    fun getMimeType(extension: String): String {
+    private fun fromExtension(extension: String): String {
         if (extension.isEmpty()) {
             return "application/octet-stream"
         }
 
-        return mimeMap[extension]
-                .toOption()
-                .getOrElse { "unknown/$extension" }
+        return mimeMap[extension] ?: "unknown/$extension"
     }
 
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     fun probeContentType(file: Path): String =
-            filesProbeContentType(file)
-                    .orElse { tikaProbeContentType.probeContentType(file) }
-                    .getOrElse { getMimeType(FilenameUtils.getExtension(file.fileName.toString())) }
+            fileProbeContentType(file)
+            ?: tikaProbeContentType(file)
+            ?: fromExtension(FilenameUtils.getExtension(file.fileName.toString()))
 
-    private fun filesProbeContentType(file: Path) =
-            Try { Files.probeContentType(file) }
-                    .filter { it != null }
-                    .toOption()
-}
-
-class TikaProbeContentType(private val tika: Tika) {
-    fun probeContentType(file: Path) =
-            Try { tika.detect(file) }
-                    .filter { it != null }
-                    .toOption()
+    private fun fileProbeContentType(file: Path): String? = try { Files.probeContentType(file) } catch (e: Exception) { null }
+    private fun tikaProbeContentType(file: Path): String? = try { tika.detect(file) } catch (e: Exception) { null }
 }

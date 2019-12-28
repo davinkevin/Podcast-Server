@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.find.FindConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.playlist.PlaylistConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
-import com.github.davinkevin.podcastserver.service.TikaProbeContentType
+import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -50,7 +50,9 @@ import java.nio.file.Paths
 class BeanConfigScan {
 
     @Bean
-    fun tikaProbeContentType() = TikaProbeContentType(Tika())
+    fun mimeTypeService(): MimeTypeService {
+        return MimeTypeService(Tika())
+    }
 
     @Bean
     @ConfigurationPropertiesBinding

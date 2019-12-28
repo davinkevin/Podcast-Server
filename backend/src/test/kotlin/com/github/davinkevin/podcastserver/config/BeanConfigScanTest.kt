@@ -1,9 +1,8 @@
 package com.github.davinkevin.podcastserver.config
 
-import com.github.davinkevin.podcastserver.service.TikaProbeContentType
+import com.github.davinkevin.podcastserver.service.MimeTypeService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import java.nio.file.Paths
 
 /**
@@ -14,16 +13,15 @@ class BeanConfigScanTest {
     private val beanConfigScan: BeanConfigScan = BeanConfigScan()
 
     @Test
-    @Throws(NoSuchMethodException::class)
-    fun should_have_tika_probecontentType() {
+    fun `should produce mimeTypeService`() {
         /* Given */
         /* When */
-        val tikaProbeContentType = beanConfigScan.tikaProbeContentType()
+        val mimeTypeService = beanConfigScan.mimeTypeService()
 
         /* Then */
-        assertThat(tikaProbeContentType)
+        assertThat(mimeTypeService)
                 .isNotNull
-                .isInstanceOf(TikaProbeContentType::class.java)
+                .isInstanceOf(MimeTypeService::class.java)
     }
 
     @Test
