@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.service
 
+import com.github.davinkevin.podcastserver.extension.java.util.tryOrNull
 import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika
 import java.nio.file.Files
@@ -30,10 +31,10 @@ class MimeTypeService(private val tika: Tika) {
 
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     fun probeContentType(file: Path): String =
-            fileProbeContentType(file)
-            ?: tikaProbeContentType(file)
+            tryOrNull { Files.probeContentType(file) }
+            ?: tryOrNull { tika.detect(file) }
             ?: fromExtension(FilenameUtils.getExtension(file.fileName.toString()))
 
-    private fun fileProbeContentType(file: Path): String? = try { Files.probeContentType(file) } catch (e: Exception) { null }
-    private fun tikaProbeContentType(file: Path): String? = try { tika.detect(file) } catch (e: Exception) { null }
 }
+
+
