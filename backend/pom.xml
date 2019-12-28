@@ -449,6 +449,14 @@
                             <inputSchema>PUBLIC</inputSchema>
                             <excludes>Databasechangelog|Databasechangeloglock</excludes>
 
+                            <forcedTypes>
+                                <forcedType>
+                                    <userType>com.github.davinkevin.podcastserver.entity.Status</userType>
+                                    <converter>com.github.davinkevin.podcastserver.database.StatusConverter</converter>
+                                    <includeExpression>ITEM\.STATUS</includeExpression>
+                                </forcedType>
+                            </forcedTypes>
+
                             <includeTables>true</includeTables>
                             <includeRoutines>true</includeRoutines>
                             <includePackages>false</includePackages>

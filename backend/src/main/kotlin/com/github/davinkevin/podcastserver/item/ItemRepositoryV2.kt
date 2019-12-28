@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.database.StatusConverter
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
@@ -47,7 +48,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
                 .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
                 .where(ITEM.DOWNLOAD_DATE.lessOrEqual(Timestamp.valueOf(date.toLocalDateTime())))
-                .and(ITEM.STATUS.eq(FINISH.toString()))
+                .and(ITEM.STATUS.eq(FINISH))
                 .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
                 .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
                 .fetch { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
@@ -67,7 +68,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .fetchOneAsMono()
                 .delayUntil { query.delete(ITEM).where(ITEM.ID.eq(id)).executeAsyncAsMono() }
                 .filter { it[PODCAST.HAS_TO_BE_DELETED] }
-                .filter { Status.of(it[ITEM.STATUS]) == FINISH }
+                .filter { it[ITEM.STATUS] == FINISH }
                 .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
 
         removeFromPlaylist.then(delete)
@@ -76,7 +77,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun updateAsDeleted(items: Collection<UUID>) = Mono.defer {
         query
                 .update(ITEM)
-                .set(ITEM.STATUS, DELETED.toString())
+                .set(ITEM.STATUS, DELETED)
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .where(ITEM.ID.`in`(items))
                 .executeAsyncAsMono()
@@ -95,7 +96,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun resetById(id: UUID): Mono<Item> = Mono.defer {
         query
                 .update(ITEM)
-                .set(ITEM.STATUS, NOT_DOWNLOADED.toString())
+                .set(ITEM.STATUS, NOT_DOWNLOADED)
                 .set(ITEM.DOWNLOAD_DATE, value<Timestamp>(null))
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .set(ITEM.NUMBER_OF_FAIL, 0)
@@ -148,7 +149,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                             .limit((page.size * page.page), page.size)
                             .asTable("FILTERED_ITEMS")
 
-                    val itemId = i.field(ITEM.ID);
+                    val itemId = i.field(ITEM.ID)
                     val itemTitle = i.field(ITEM.TITLE)
                     val itemURL = i.field(ITEM.URL)
                     val itemPubDate = i.field(ITEM.PUB_DATE)
@@ -181,7 +182,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                                 Item(
                                         it[itemId], it[itemTitle], it[itemURL],
                                         it[itemPubDate].toUTC(), it[itemDownloadDate].toUTC(), it[itemCreationDate].toUTC(),
-                                        it[itemDescription], it[itemMimeType], it[itemLength], it[itemFileName], Status.of(it[itemStatus]),
+                                        it[itemDescription], it[itemMimeType], it[itemLength], it[itemFileName], it[itemStatus],
                                         p, c
                                 )
                             }
@@ -232,7 +233,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                         .set(ITEM.MIME_TYPE, item.mimeType)
                         .set(ITEM.LENGTH, item.length)
                         .set(ITEM.FILE_NAME, item.fileName)
-                        .set(ITEM.STATUS, item.status.toString())
+                        .set(ITEM.STATUS, item.status)
                         .set(ITEM.PODCAST_ID, item.podcastId)
                         .set(ITEM.COVER_ID, coverId)
                         .executeAsyncAsMono()
@@ -246,11 +247,8 @@ class ItemRepositoryV2(private val query: DSLContext) {
     fun resetItemWithDownloadingState(): Mono<Void> = Mono.defer {
         query
                 .update(ITEM)
-                .set(ITEM.STATUS, NOT_DOWNLOADED.toString())
-                .where(ITEM.STATUS.`in`(
-                        STARTED.toString(),
-                        PAUSED.toString()
-                ))
+                .set(ITEM.STATUS, NOT_DOWNLOADED)
+                .where(ITEM.STATUS.`in`(STARTED, PAUSED))
                 .executeAsyncAsMono()
                 .then()
                 .doOnTerminate { log.info("Reset of item with downloading state done") }
@@ -270,13 +268,13 @@ class ItemRepositoryV2(private val query: DSLContext) {
     }
 }
 
-private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Timestamp, String, String, Long, String, String, UUID, String, String, UUID, String, Int, Int>): Item {
+private fun toItem(it: Record18<UUID, String, String, Timestamp, Timestamp, Timestamp, String, String, Long, String, Status, UUID, String, String, UUID, String, Int, Int>): Item {
     val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
     val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
     return Item(
             it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
             it[ITEM.PUB_DATE].toUTC(), it[ITEM.DOWNLOAD_DATE].toUTC(), it[ITEM.CREATION_DATE].toUTC(),
-            it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], Status.of(it[ITEM.STATUS]),
+            it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], it[ITEM.STATUS],
             p, c
     )
 }

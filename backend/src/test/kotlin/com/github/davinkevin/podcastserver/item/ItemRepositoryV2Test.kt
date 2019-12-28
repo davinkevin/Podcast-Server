@@ -198,7 +198,7 @@ class ItemRepositoryV2Test(
 
             val items = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
             assertThat(items).allSatisfy {
-                assertThat(it.status).isEqualTo(DELETED.toString())
+                assertThat(it.status).isEqualTo(DELETED)
                 assertThat(it.fileName).isNull()
             }
         }
@@ -1087,12 +1087,12 @@ class ItemRepositoryV2Test(
 
             val statuses = query
                     .selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
-                    .map { of(it[ITEM.STATUS]) }
+                    .map { it[ITEM.STATUS] }
 
             val others = query
                     .selectFrom(ITEM).where(ITEM.ID.notIn(ids)).orderBy(ITEM.ID.asc()).fetch()
                     .map { it[ITEM.STATUS] }
-                    .filterNotNull().map(::of).toSet()
+                    .filterNotNull().toSet()
 
             assertThat(statuses).containsOnly(NOT_DOWNLOADED)
             assertThat(others).containsOnly(FINISH, NOT_DOWNLOADED, DELETED, FINISH, FAILED)
