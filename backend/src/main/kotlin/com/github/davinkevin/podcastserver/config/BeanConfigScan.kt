@@ -12,6 +12,7 @@ import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.TagConfig
 import com.github.davinkevin.podcastserver.update.UpdateConfig
+import lan.dk.podcastserver.service.JsonService
 import org.apache.tika.Tika
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -36,11 +37,16 @@ import java.nio.file.Paths
         TagConfig::class,
         CoverConfig::class,
         PlaylistConfig::class,
-        DownloadConfig::class
+        DownloadConfig::class,
+
+        JsonService::class
 )
 @ComponentScan(basePackages = [
-    "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager", "com.github.davinkevin.podcastserver.config",
-    "lan.dk.podcastserver.service"])
+    "com.github.davinkevin.podcastserver.service",
+    "com.github.davinkevin.podcastserver.manager",
+    "com.github.davinkevin.podcastserver.config"
+])
+
 class BeanConfigScan {
 
     @Bean
