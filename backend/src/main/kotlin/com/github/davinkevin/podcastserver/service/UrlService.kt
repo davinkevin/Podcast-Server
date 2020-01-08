@@ -45,6 +45,8 @@ open class UrlService {
             this.instanceFollowRedirects = false
         }
 
+        log.debug("status code is ${connection.responseCode}")
+
         val isRedirect = connection.responseCode
                 .toOption()
                 .filter { isARedirection(it) }
