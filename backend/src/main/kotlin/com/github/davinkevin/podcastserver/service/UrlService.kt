@@ -39,27 +39,30 @@ open class UrlService {
         if (MAX_NUMBER_OF_REDIRECTION <= numberOfRedirection) {
             throw RuntimeException("Too many redirects")
         }
+        
+        try {
+            val connection = URL(url).connectOverHttp().apply {
+                connectionModifier.accept(this)
+                this.instanceFollowRedirects = false
+            }
 
-        val connection = URL(url).connectOverHttp().apply {
-            connectionModifier.accept(this)
-            this.instanceFollowRedirects = false
+            val isRedirect = connection.responseCode
+                    .toOption()
+                    .filter { isARedirection(it) }
+
+            val location = isRedirect
+                    .map { addDomainIfRelative(url, connection.getHeaderField("Location")) }
+                    .getOrElse { "" }
+
+            connection.disconnect()
+
+            return isRedirect
+                    .map { getRealURL(location, connectionModifier, numberOfRedirection + 1) }
+                    .getOrElse { url }
+        } catch (e: Exception) {
+            log.error("Error during resolution of real url for $url", e)
+            return url
         }
-
-        log.debug("status code is ${connection.responseCode}")
-
-        val isRedirect = connection.responseCode
-                .toOption()
-                .filter { isARedirection(it) }
-
-        val location = isRedirect
-                .map { addDomainIfRelative(url, connection.getHeaderField("Location")) }
-                .getOrElse { "" }
-
-        connection.disconnect()
-
-        return isRedirect
-                .map { getRealURL(location, connectionModifier, numberOfRedirection + 1) }
-                .getOrElse { url }
     }
 
     private fun isARedirection(status: Int): Boolean {

@@ -142,8 +142,8 @@ internal class UrlServiceTest {
         doRedirection("/my/ressources9.m3u8", host("/my/ressources10.m3u8"))
         doRedirection("/my/ressources10.m3u8", host("/my/ressources11.m3u8"))
 
-        /* When */ assertThatThrownBy { urlService.getRealURL(host("/my/ressources1.m3u8")) }
-                .hasMessage("Too many redirects")
+        /* When */ assertThat(urlService.getRealURL(host("/my/ressources1.m3u8")))
+                .isEqualTo(host("/my/ressources10.m3u8"))
     }
 
     @Test
