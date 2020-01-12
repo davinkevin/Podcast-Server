@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.find.finders.dailymotion.DailymotionF
 import com.github.davinkevin.podcastserver.find.finders.francetv.FranceTvFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.mycanal.MyCanalFinderConfig
+import com.github.davinkevin.podcastserver.find.finders.mytf1.MyTf1FinderConfig
 import com.github.davinkevin.podcastserver.find.finders.noop.NoopConfig
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.sixplay.SixPlayFinderConfig
@@ -37,6 +38,7 @@ class FindRoutingConfig {
         FranceTvFinderConfig::class,
         ItunesFinderConfig::class,
         MyCanalFinderConfig::class,
+        MyTf1FinderConfig::class,
         RSSFinderConfig::class,
         SixPlayFinderConfig::class,
         YoutubeFinderConfig::class,
