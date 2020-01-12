@@ -30,6 +30,7 @@ class YoutubeFinder(
 ) : Finder {
 
     override fun findInformation(url: String) = wcb
+            .clone()
             .baseUrl(url)
             .build()
             .get()
