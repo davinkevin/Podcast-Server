@@ -16,8 +16,10 @@ stages:
   script:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml dependency:resolve dependency:resolve-plugins
   cache:
-    key: "$CI_PIPELINE_ID-backend"
-    policy: push
+    key:
+      files:
+        - backend/pom.xml
+      prefix: "backend"
     paths:
       - .m2/
 
@@ -27,8 +29,11 @@ stages:
   script:
     - ./mvnw $MAVEN_CLI_OPTS -f frontend-angularjs/pom.xml frontend:install-node-and-npm frontend:npm@npm-install frontend:jspm@jspm-config frontend:jspm@jspm-install -Djspm_token=$JSPM_GITHUB_AUTH_TOKEN
   cache:
-    key: "$CI_PIPELINE_ID-ui-v1"
-    policy: push
+    key:
+      files:
+        - frontend-angularjs/npm-shrinkwrap.json
+        - frontend-angularjs/www/config.js
+      prefix: "ui-v1"
     paths:
       - frontend-angularjs/node_modules/
       - frontend-angularjs/www/jspm_packages/
@@ -41,8 +46,10 @@ stages:
   script:
     - yarn --cwd frontend-angular
   cache:
-    key: "$CI_PIPELINE_ID-ui-v2"
-    policy: push
+    key:
+      files:
+        - frontend-angular/yarn.lock
+      prefix: "ui-v2"
     paths:
       - .yarn
       - frontend-angular/node_modules/
@@ -55,7 +62,10 @@ stages:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate test -Ddatabase.url=jdbc:h2:/tmp/podcast-server jacoco:report
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   cache:
-    key: "$CI_PIPELINE_ID-backend"
+    key:
+      files:
+        - backend/pom.xml
+      prefix: "backend"
     policy: pull
     paths:
       - .m2/
@@ -67,7 +77,10 @@ stages:
   script:
     - yarn --cwd frontend-angular test
   cache:
-    key: "$CI_PIPELINE_ID-ui-v2"
+    key:
+      files:
+        - frontend-angular/yarn.lock
+      prefix: "ui-v2"
     policy: pull
     paths:
       - .yarn
@@ -94,8 +107,10 @@ stages:
     paths:
       - backend/target
   cache:
-    key: "$CI_PIPELINE_ID-backend"
-    policy: pull-push
+    key:
+      files:
+        - backend/pom.xml
+      prefix: "backend"
     paths:
       - .m2/
 
@@ -109,7 +124,11 @@ stages:
     paths:
       - frontend-angularjs/target/dist/
   cache:
-    key: "$CI_PIPELINE_ID-ui-v1"
+    key:
+      files:
+        - frontend-angularjs/npm-shrinkwrap.json
+        - frontend-angularjs/www/config.js
+      prefix: "ui-v1"
     policy: pull
     paths:
       - frontend-angularjs/node_modules/
@@ -126,7 +145,10 @@ stages:
     paths:
       - frontend-angular/dist/
   cache:
-    key: "$CI_PIPELINE_ID-ui-v2"
+    key:
+      files:
+        - frontend-angular/yarn.lock
+      prefix: "ui-v2"
     policy: pull
     paths:
       - .yarn
@@ -140,7 +162,10 @@ stages:
     - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml jib:build -Dtag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG} -Dbase-image-tag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - if [ "$CI_COMMIT_REF_SLUG" == "master" ]; then ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml jib:build -Dtag=latest -Dbase-image-tag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG} ; fi
   cache:
-    key: "$CI_PIPELINE_ID-backend"
+    key:
+      files:
+        - backend/pom.xml
+      prefix: "backend"
     policy: pull
     paths:
       - .m2/
