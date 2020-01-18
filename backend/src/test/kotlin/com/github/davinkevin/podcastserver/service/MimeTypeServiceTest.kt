@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -19,10 +20,12 @@ import java.nio.file.Paths
  * Created by kevin on 22/07/2018
  */
 @ExtendWith(SpringExtension::class)
+@Import(MimeTypeService::class)
 class MimeTypeServiceTest(
-        @Autowired val tika: Tika,
         @Autowired val mimeTypeService: MimeTypeService
 ) {
+
+    @MockBean private lateinit var tika: Tika
 
     @Test
     fun `should get mimeType if no extension`() {
@@ -90,11 +93,5 @@ class MimeTypeServiceTest(
         val type = mimeTypeService.probeContentType(file)
         /* Then */
         assertThat(type).isEqualTo("application/octet-stream")
-    }
-
-    @TestConfiguration
-    @Import(MimeTypeService::class)
-    class LocalTestConfiguration {
-        @Bean fun tika() = mock<Tika>()
     }
 }

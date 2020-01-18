@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -29,11 +30,15 @@ import java.time.ZoneOffset
 import java.util.*
 
 @WebFluxTest(controllers = [PodcastXmlHandler::class])
+@Import(PodcastRoutingConfig::class, PodcastHandler::class)
+@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class PodcastXmlHandlerTest(
-    @Autowired val rest: WebTestClient,
-    @Autowired val podcastService: PodcastService,
-    @Autowired val itemService: ItemService
+    @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var fileService: FileService
+    @MockBean private lateinit var itemService: ItemService
+    @MockBean private lateinit var podcastService: PodcastService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -280,17 +285,5 @@ class PodcastXmlHandlerTest(
 
 
     }
-
-
-    @TestConfiguration
-    @Import(PodcastRoutingConfig::class, PodcastHandler::class)
-    @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-    class LocalTestConfiguration {
-        @Bean fun fileService() = mock<FileService>()
-        @Bean fun itemService() = mock<ItemService>()
-        @Bean fun podcastService() = mock<PodcastService>()
-    }
-
-
 }
 

@@ -24,9 +24,10 @@ import java.util.*
 @Import(TagRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class TagHandlerTest(
-    @Autowired val rest: WebTestClient,
-    @Autowired val tagService: TagService
+    @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var tagService: TagService
 
     @Nested
     @DisplayName("should find tag by id")
@@ -183,10 +184,5 @@ class TagHandlerTest(
                         """)
                     }
         }
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun tagService() = mock<TagService>()
     }
 }

@@ -1,12 +1,15 @@
 package com.github.davinkevin.podcastserver.service.image
 
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -55,9 +58,7 @@ class ImageServiceV2Test(
     }
 
     @TestConfiguration
-    @Import(ImageServiceConfig::class)
-    class LocalTestConfiguration {
-        @Bean fun webClient() = WebClient.builder()
-    }
+    @Import(ImageServiceConfig::class, WebClientAutoConfiguration::class, WebClientConfig::class)
+    class LocalTestConfiguration
 
 }

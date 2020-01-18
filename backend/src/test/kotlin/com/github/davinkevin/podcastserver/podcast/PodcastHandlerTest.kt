@@ -37,12 +37,16 @@ import java.util.*
  * Created by kevin on 2019-02-16
  */
 @WebFluxTest(controllers = [PodcastHandler::class])
+@Import(PodcastRoutingConfig::class, PodcastXmlHandler::class)
+@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class PodcastHandlerTest(
-        @Autowired val rest: WebTestClient,
-        @Autowired val podcastService: PodcastService,
-        @Autowired val parameters: PodcastServerParameters,
-        @Autowired val fileService: FileService
+        @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var itemService: ItemService
+    @MockBean private lateinit var podcastService: PodcastService
+    @MockBean private lateinit var parameters: PodcastServerParameters
+    @MockBean private lateinit var fileService: FileService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -859,15 +863,5 @@ class PodcastHandlerTest(
             }
 
         }
-    }
-
-    @TestConfiguration
-    @Import(PodcastRoutingConfig::class, PodcastXmlHandler::class)
-    @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
-    class LocalTestConfiguration {
-        @Bean fun itemService() = mock<ItemService>()
-        @Bean fun podcastService() = mock<PodcastService>()
-        @Bean fun parameters() = mock<PodcastServerParameters>()
-        @Bean fun fileService() = mock<FileService>()
     }
 }

@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.gulli
 
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
@@ -20,7 +21,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
@@ -33,9 +38,11 @@ import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as Image
 
 @ExtendWith(SpringExtension::class)
 class GulliFinderTest(
-        @Autowired val image: ImageService,
         @Autowired val finder: GulliFinder
 ) {
+
+    @MockBean lateinit var image: ImageService
+
     @Nested
     @DisplayName("should find")
     @ExtendWith(MockServer::class)
@@ -147,12 +154,9 @@ class GulliFinderTest(
     }
 
     @TestConfiguration
-    @Import(GulliFinderConfig::class)
+    @Import(GulliFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean @Primary fun imageService() = mock<ImageService>()
-        @Bean fun webClientBuilder() = WebClient
-                .builder()
-                .filter(remapToMockServer("replay.gulli.fr"))
+        @Bean fun webClientCustomization() = WebClientCustomizer { it.filter(remapToMockServer("replay.gulli.fr")) }
 
     }
 }

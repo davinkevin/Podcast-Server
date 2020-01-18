@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -49,10 +50,12 @@ import java.util.*
 @Import(FileService::class)
 @ImportAutoConfiguration(WebClientAutoConfiguration::class)
 class FileServiceTest(
-    @Autowired val fileService: FileService,
-    @Autowired val p: PodcastServerParameters,
-    @Autowired val mimeTypeService: MimeTypeService
+    @Autowired val fileService: FileService
 ) {
+
+    @MockBean private lateinit var p: PodcastServerParameters
+    @MockBean private lateinit var mimeTypeService: MimeTypeService
+
     private val tempFolder = Paths.get("/tmp", "podcast-server-testing-folder", "FileService")
 
     @BeforeEach
@@ -319,12 +322,6 @@ class FileServiceTest(
                     .verifyComplete()
         }
 
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun podcastServerParameters() = mock<PodcastServerParameters>()
-        @Bean fun mimeTypeService() = mock<MimeTypeService>()
     }
 }
 

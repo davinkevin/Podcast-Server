@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.invocation.InvocationOnMock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -40,13 +41,15 @@ import javax.validation.Validator
  * Created by kevin on 01/07/2017.
  */
 @ExtendWith(SpringExtension::class)
+@Import(FranceTvUpdater::class)
 class FranceTvUpdaterTest(
-    @Autowired val signatureService: SignatureService,
-    @Autowired val htmlService: HtmlService,
-    @Autowired val imageService: ImageService,
-    @Autowired val jsonService: JsonService,
     @Autowired val franceTvUpdater: FranceTvUpdater
 ) {
+
+    @MockBean private lateinit var signatureService: SignatureService
+    @MockBean private lateinit var htmlService: HtmlService
+    @MockBean private lateinit var imageService: ImageService
+    @MockBean private lateinit var jsonService: JsonService
 
     private val podcast = PodcastToUpdate(
             id = UUID.randomUUID(),
@@ -212,18 +215,6 @@ class FranceTvUpdaterTest(
     private fun loadJsonCatalog(i: InvocationOnMock): arrow.core.Option<DocumentContext> {
         val url = "${i.getArgument<String>(0).removePrefix("https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=")}.json"
         return fileAsJson(from(url))
-    }
-
-    @TestConfiguration
-    @Import(FranceTvUpdater::class)
-    class LocalTestConfiguration {
-        @Bean fun podcastServerParameters() = mock<PodcastServerParameters>()
-        @Bean fun signatureService() = mock<SignatureService>()
-        @Bean fun validator() = mock<Validator>()
-        @Bean fun htmlService() = mock<HtmlService>()
-        @Bean fun imageService() = mock<ImageService>()
-        @Bean fun jsonService() = mock<JsonService>()
-
     }
 
     companion object {

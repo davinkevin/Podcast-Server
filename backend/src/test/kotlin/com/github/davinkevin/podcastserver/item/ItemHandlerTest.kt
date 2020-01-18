@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -34,10 +35,11 @@ import java.util.*
 @Import(ItemRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class ItemHandlerTest(
-    @Autowired val rest: WebTestClient,
-    @Autowired val itemService: ItemService,
-    @Autowired val fileService: FileService
+    @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var itemService: ItemService
+    @MockBean private lateinit var fileService: FileService
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
@@ -719,8 +721,6 @@ class ItemHandlerTest(
 
     @TestConfiguration
     class LocalTestConfiguration {
-        @Bean fun mockItemService(): ItemService = mock()
-        @Bean fun mockFileService(): FileService = mock()
         @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
     }
 }

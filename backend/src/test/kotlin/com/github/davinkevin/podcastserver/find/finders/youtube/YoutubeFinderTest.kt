@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -21,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.kotlin.core.publisher.toMono
@@ -31,9 +30,10 @@ import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as Image
 
 @ExtendWith(SpringExtension::class)
 class YoutubeFinderTest(
-    @Autowired val imageService: ImageService,
-    @Autowired val finder: YoutubeFinder
+        @Autowired val finder: YoutubeFinder
 ) {
+
+    @MockBean lateinit var image: ImageService
 
     @Nested
     @DisplayName("should find")
@@ -45,7 +45,7 @@ class YoutubeFinderTest(
             /* Given */
             val url = "http://localhost:5555/user/cauetofficiel"
             val coverUrl = URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s1400-c-k-no/photo.jpg")
-            whenever(imageService.fetchCoverInformation(coverUrl))
+            whenever(image.fetchCoverInformation(coverUrl))
                     .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
 
             backend.stubFor(get("/user/cauetofficiel")
@@ -131,7 +131,5 @@ class YoutubeFinderTest(
 
     @TestConfiguration
     @Import(YoutubeFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
-    class LocalTestConfiguration {
-        @Bean fun imageService() = mock<ImageService>()
-    }
+    class LocalTestConfiguration
 }

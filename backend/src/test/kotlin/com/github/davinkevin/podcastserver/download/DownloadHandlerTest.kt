@@ -18,6 +18,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
@@ -30,9 +31,10 @@ import java.util.*
 @Import(DownloadRouterConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class DownloadHandlerTest(
-        @Autowired val idm: ItemDownloadManager,
         @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var idm: ItemDownloadManager
 
     private val item1 = DownloadingItem(
             id = UUID.fromString("6c05149f-a3e1-4302-ab1f-83324c75ad70"),
@@ -421,15 +423,4 @@ class DownloadHandlerTest(
         }
 
     }
-
-
-
-
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean @Primary fun idm() = mock<ItemDownloadManager>()
-        @Bean @Primary fun mockMessageTemplate() = mock<MessagingTemplate>()
-    }
-
 }

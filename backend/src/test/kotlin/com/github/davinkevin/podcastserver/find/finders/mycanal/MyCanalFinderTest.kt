@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.web.reactive.function.client.WebCl
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -41,9 +42,10 @@ import java.net.URI
  */
 @ExtendWith(SpringExtension::class)
 class MyCanalFinderTest (
-        @Autowired val image: ImageServiceV2,
         @Autowired val finder: MyCanalFinder
 ) {
+
+    @MockBean lateinit var image: ImageServiceV2
 
     @Nested
     @DisplayName("should find")
@@ -220,7 +222,6 @@ class MyCanalFinderTest (
     @TestConfiguration
     @Import(MyCanalFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean @Primary fun imageService() = mock<ImageServiceV2>()
         @Bean fun webClientCustomization() = WebClientCustomizer { it.filter(remapToMockServer("www.canalplus.com")) }
     }
 }

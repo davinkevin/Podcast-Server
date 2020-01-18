@@ -25,9 +25,10 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @Import(TypeRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class TypeHandlerTest(
-    @Autowired val rest: WebTestClient,
-    @Autowired val updaterSelector: UpdaterSelector
+    @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var updaterSelector: UpdaterSelector
 
     private val dailymotion = Type("Dailymotion", "Dailymotion")
     private val franceTv = Type("FranceTv", "France•tv")
@@ -71,10 +72,5 @@ class TypeHandlerTest(
                           { "key":"Youtube", "name":"Youtube" }
                     ] } """) }
         }
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun updaterSelector() = mock<UpdaterSelector>()
     }
 }

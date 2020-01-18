@@ -2,12 +2,12 @@ package com.github.davinkevin.podcastserver.find.finders.rss
 
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okXml
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -18,21 +18,22 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
 class RSSFinderTest(
-    @Autowired val imageService: ImageService,
-    @Autowired val finder: RSSFinder
+        @Autowired val finder: RSSFinder
 ) {
+
+    @MockBean lateinit var image: ImageService
 
     @Nested
     @DisplayName("should find")
@@ -46,7 +47,7 @@ class RSSFinderTest(
             /* Given */
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
-            whenever(imageService.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
+            whenever(image.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
 
             /* When */
             StepVerifier.create(finder.findInformation(podcastUrl))
@@ -64,7 +65,7 @@ class RSSFinderTest(
         @Test
         fun `information with itunes cover`(backend: WireMockServer) {
             // Given
-            whenever(imageService.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
+            whenever(image.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withItunesCover.xml")))))
 
@@ -141,9 +142,6 @@ class RSSFinderTest(
     }
 
     @TestConfiguration
-    @Import(RSSFinderConfig::class)
-    class LocalTestConfiguration {
-        @Bean @Primary fun mockImageService() = mock<ImageService>()
-        @Bean fun webClient() = WebClient.builder()
-    }
+    @Import(RSSFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
+    class LocalTestConfiguration
 }

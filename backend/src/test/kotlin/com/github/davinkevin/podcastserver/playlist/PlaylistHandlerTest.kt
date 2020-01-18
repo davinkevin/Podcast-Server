@@ -32,9 +32,11 @@ import java.util.*
 @Import(PlaylistRoutingConfig::class, PlaylistHandler::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class PlaylistHandlerTest (
-    @Autowired val rest: WebTestClient,
-    @Autowired val service: PlaylistService
+    @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean private lateinit var service: PlaylistService
+
     @Nested
     @DisplayName("should save")
     inner class ShouldSave {
@@ -496,10 +498,5 @@ class PlaylistHandlerTest (
                         }""")
                     }
         }
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun service() = mock<PlaylistService>()
     }
 }

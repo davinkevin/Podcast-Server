@@ -25,9 +25,10 @@ import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as Watc
 @ExtendWith(SpringExtension::class)
 @Import(PlaylistService::class)
 class PlaylistServiceTest(
-    @Autowired val repository: WatchListRepository,
     @Autowired val service: PlaylistService
 ) {
+
+    @MockBean private lateinit var repository: WatchListRepository
 
     @Nested
     @DisplayName("should find all")
@@ -172,10 +173,5 @@ class PlaylistServiceTest(
                     .expectSubscription()
                     .verifyComplete()
         }
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun repository() = mock<WatchListRepository>()
     }
 }

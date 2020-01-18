@@ -31,12 +31,13 @@ import kotlin.reflect.KClass
 @ExtendWith(SpringExtension::class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ExtractorSelectorTest(
-    @Autowired val myCanalExtractor: MyCanalExtractor,
-    @Autowired val passThroughExtractor: PassThroughExtractor,
     @Autowired val applicationContext: ApplicationContext
 ) {
 
-    lateinit var extractor: ExtractorSelector
+    @MockBean private lateinit var myCanalExtractor: MyCanalExtractor
+    @MockBean private lateinit var passThroughExtractor: PassThroughExtractor
+
+    private lateinit var extractor: ExtractorSelector
 
     @BeforeEach
     fun beforeEach() {
@@ -76,12 +77,6 @@ class ExtractorSelectorTest(
                         Arguments.of(URI("http://foo.bar.com/to/rss/file.xml"), PassThroughExtractor::class),
                         Arguments.of(URI("http://www.youtube.com/channel/UC_ioajefokjFAOI"), PassThroughExtractor::class)
                 )
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun myCanalExtractor() = mock<MyCanalExtractor>()
-        @Bean fun passThroughExtractor() = mock<PassThroughExtractor>()
     }
 
 }

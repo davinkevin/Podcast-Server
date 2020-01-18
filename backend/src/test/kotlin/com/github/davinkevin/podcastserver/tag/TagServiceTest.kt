@@ -25,9 +25,10 @@ import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
 @ExtendWith(SpringExtension::class)
 @Import(TagService::class)
 class TagServiceTest (
-    @Autowired val repo: TagRepository,
     @Autowired val service: TagService
 ) {
+
+    @MockBean private lateinit var repo: TagRepository
 
     @Nested
     @DisplayName("should find by id")
@@ -92,10 +93,4 @@ class TagServiceTest (
         }
 
     }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun repo() = mock<TagRepository>()
-    }
-
 }

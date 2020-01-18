@@ -9,9 +9,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -22,10 +20,10 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -39,9 +37,10 @@ import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as Image
 @AutoConfigureWebClient
 @ExtendWith(SpringExtension::class)
 class FranceTvFinderTest(
-        @Autowired val imageService: ImageService,
         @Autowired val finder: FranceTvFinder
 ) {
+
+    @MockBean lateinit var image: ImageService
 
     @Nested
     @ExtendWith(MockServer::class)
@@ -53,7 +52,7 @@ class FranceTvFinderTest(
             /* Given */
             val url = "https://www.france.tv/france-2/secrets-d-histoire/"
 
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(
+            whenever(image.fetchCoverInformation(any())).thenReturn(CoverInformation(
                     url = URI("https://foo.bar.com"),
                     height = 123,
                     width = 456
@@ -85,7 +84,7 @@ class FranceTvFinderTest(
             /* Given */
             val url = "https://www.france.tv/france-2/secrets-d-histoire/"
 
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(Mono.empty())
+            whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
             backend.stubFor(get("/france-2/secrets-d-histoire/")
                     .willReturn(ok(fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
 
@@ -147,8 +146,6 @@ class FranceTvFinderTest(
     @TestConfiguration
     @Import(FranceTvFinderConfig::class)
     class LocalTestConfiguration {
-
-        @Bean fun imageService() = mock<ImageService>()
         @Bean fun webClientBuilder() = WebClient.builder()
                 .filter(remapToMockServer("www.france.tv"))
     }

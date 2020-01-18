@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -18,11 +19,13 @@ import reactor.test.StepVerifier
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
+@Import(FindService::class)
 class FindServiceTest(
-        @Autowired private val service: FindService,
-        @Autowired private val firstFinder: Finder,
-        @Autowired private val secondFinder: Finder
+        @Autowired private val service: FindService
 ) {
+
+    @MockBean(name = "firstFinder") private lateinit var firstFinder: Finder
+    @MockBean(name = "secondFinder") private lateinit var secondFinder: Finder
 
     @Test
     fun `should find most compatible finder and delegate to it the find operation`() {
@@ -53,12 +56,5 @@ class FindServiceTest(
                 .expectSubscription()
                 .expectNext(FindPodcastInformation(title = "", url = URI(url), type = "RSS", cover = null, description = ""))
                 .verifyComplete()
-    }
-
-    @TestConfiguration
-    @Import(FindService::class)
-    class LocalTestConfiguration {
-        @Bean fun firstFinder() = mock<Finder>()
-        @Bean fun secondFinder() = mock<Finder>()
     }
 }

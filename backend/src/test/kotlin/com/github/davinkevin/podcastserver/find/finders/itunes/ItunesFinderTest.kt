@@ -1,10 +1,12 @@
 package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
+import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
@@ -15,8 +17,12 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
@@ -32,9 +38,11 @@ import java.net.URI
 @ExtendWith(SpringExtension::class, MockServer::class)
 @AutoConfigureJson
 class ItunesFinderTest(
-    @Autowired val rssFinder: RSSFinder,
     @Autowired val finder: ItunesFinder
 ) {
+
+    @MockBean lateinit var rssFinder: RSSFinder
+
     @Test
     fun `should be compatible with "podcasts dot apple dot com" url`() {
         /* GIVEN */
@@ -98,9 +106,8 @@ class ItunesFinderTest(
     }
 
     @TestConfiguration
-    @Import(ItunesFinderConfig::class)
+    @Import(ItunesFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean @Primary fun mockRssFinder() = mock<RSSFinder>()
-        @Bean fun localhostWebClientBuilder() = WebClient.builder().baseUrl("http://localhost:5555")
+        @Bean fun webClientCustomization() = WebClientCustomizer { it.filter(remapToMockServer("podcasts.apple.com")) }
     }
 }

@@ -35,12 +35,13 @@ import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
 @ExtendWith(SpringExtension::class)
 @Import(PodcastService::class)
 class PodcastServiceTest(
-    @Autowired val service: PodcastService,
-    @Autowired val coverRepository: CoverRepository,
-    @Autowired val tagRepository: TagRepository,
-    @Autowired val repository: PodcastRepository,
-    @Autowired val fileService: FileService
+    @Autowired val service: PodcastService
 ) {
+
+    @MockBean private lateinit var coverRepository: CoverRepository
+    @MockBean private lateinit var tagRepository: TagRepository
+    @MockBean private lateinit var repository: PodcastRepository
+    @MockBean private lateinit var fileService: FileService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -758,14 +759,6 @@ class PodcastServiceTest(
 
             verify(fileService, never()).deletePodcast(any())
         }
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun coverRepository() = mock<CoverRepository>()
-        @Bean fun tagRepository() = mock<TagRepository>()
-        @Bean fun repository() = mock<PodcastRepository>()
-        @Bean fun fileService() = mock<FileService>()
     }
 }
 

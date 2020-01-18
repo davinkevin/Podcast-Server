@@ -21,7 +21,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.atLeast
 import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -33,12 +35,14 @@ import java.util.*
  */
 
 @ExtendWith(SpringExtension::class)
+@Import(TF1ReplayUpdater::class, JacksonAutoConfiguration::class)
 class TF1ReplayUpdaterTest(
-    @Autowired val signatureService: SignatureService,
-    @Autowired val imageService: ImageService,
-    @Autowired val jsonService: JsonService,
     @Autowired val updater: TF1ReplayUpdater
 ) {
+
+    @MockBean private lateinit var signatureService: SignatureService
+    @MockBean private lateinit var jsonService: JsonService
+    @MockBean private lateinit var imageService: ImageService
 
     @Nested
     @DisplayName("should sign")
@@ -351,14 +355,5 @@ class TF1ReplayUpdaterTest(
 
     companion object {
         fun from(s: String) = "/remote/podcast/tf1replay/$s"
-    }
-
-    @TestConfiguration
-    @Import(TF1ReplayUpdater::class)
-    class LocalTestConfiguration {
-        @Bean fun signatureService() = mock<SignatureService>()
-        @Bean fun jsonService() = mock<JsonService>()
-        @Bean fun coverService() = mock<ImageService>()
-        @Bean fun objectMapper() = ObjectMapper()
     }
 }

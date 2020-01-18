@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -27,11 +28,12 @@ import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepos
 @Import(CoverService::class)
 @Suppress("UnassignedFluxMonoInstance")
 class CoverServiceTest (
-    @Autowired val cover: CoverRepository,
-    @Autowired val file: FileService,
     @Autowired val service: CoverService
 ) {
     private val date = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
+
+    @MockBean private lateinit var cover: CoverRepository
+    @MockBean private lateinit var file: FileService
 
     @Nested
     @DisplayName("should delete old covers")
@@ -91,12 +93,6 @@ class CoverServiceTest (
             verify(file, never()).deleteCover(any())
         }
 
-    }
-
-    @TestConfiguration
-    class LocalTestConfiguration {
-        @Bean fun mockCoverRepository() = mock<CoverRepository>()
-        @Bean fun mockFileService() = mock<FileService>()
     }
 
 }

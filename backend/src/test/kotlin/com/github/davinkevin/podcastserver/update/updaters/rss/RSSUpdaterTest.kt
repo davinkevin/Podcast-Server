@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -19,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -36,9 +36,10 @@ import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as Image
  */
 @ExtendWith(SpringExtension::class)
 class RSSUpdaterTest(
-    @Autowired val imageService: ImageService,
-    @Autowired val updater: RSSUpdater
+        @Autowired val updater: RSSUpdater
 ){
+
+    @MockBean lateinit var image: ImageService
 
     private val podcast = PodcastToUpdate(UUID.randomUUID(), URI("http://localhost:5555/rss.xml"), "noSign")
 
@@ -49,7 +50,7 @@ class RSSUpdaterTest(
 
         @BeforeEach
         fun beforeEach() {
-            whenever(imageService.fetchCoverInformation(any())).then { CoverInformation(100, 100, it.getArgument(0)).toMono() }
+            whenever(image.fetchCoverInformation(any())).then { CoverInformation(100, 100, it.getArgument(0)).toMono() }
         }
 
         @Test
@@ -262,7 +263,6 @@ class RSSUpdaterTest(
     @TestConfiguration
     @Import(RSSUpdaterConfig::class, WebClientAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean fun imageService() = mock<ImageService>()
         @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.baseUrl("http://localhost:5555/") }
     }
 }

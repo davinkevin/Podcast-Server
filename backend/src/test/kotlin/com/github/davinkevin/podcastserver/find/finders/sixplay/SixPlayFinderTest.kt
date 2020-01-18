@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -37,9 +38,10 @@ import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as Image
 
 @ExtendWith(SpringExtension::class)
 class SixPlayFinderTest(
-        @Autowired val image: ImageService,
         @Autowired val finder: SixPlayFinder
 ) {
+
+    @MockBean lateinit var image: ImageService
 
     @Nested
     @ExtendWith(MockServer::class)
@@ -270,7 +272,6 @@ class SixPlayFinderTest(
     @TestConfiguration
     @Import(SixPlayFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean @Primary fun imageService() = mock<ImageService>()
         @Bean fun webClientCustomization() = WebClientCustomizer { it.filter(remapToMockServer("www.6play.fr")) }
     }
 

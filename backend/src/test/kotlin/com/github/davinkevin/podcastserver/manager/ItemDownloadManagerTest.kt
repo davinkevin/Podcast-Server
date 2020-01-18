@@ -23,6 +23,7 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
@@ -44,15 +45,15 @@ import java.util.concurrent.TimeUnit.*
  */
 @ExtendWith(SpringExtension::class)
 class ItemDownloadManagerTest(
-        @Autowired val messaging: MessagingTemplate,
-        @Autowired val downloadRepository: DownloadRepository,
-        @Autowired val parameters: PodcastServerParameters,
-        @Autowired val downloaders: DownloaderSelector,
-        @Autowired val extractors: ExtractorSelector,
         @Autowired val downloadExecutor: ThreadPoolTaskExecutor,
-
         @Autowired val idm: ItemDownloadManager
 ) {
+
+    @MockBean private lateinit var messaging: MessagingTemplate
+    @MockBean private lateinit var downloadRepository: DownloadRepository
+    @MockBean private lateinit var parameters: PodcastServerParameters
+    @MockBean private lateinit var downloaders: DownloaderSelector
+    @MockBean private lateinit var extractors: ExtractorSelector
 
     private val date = ZonedDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
@@ -378,12 +379,6 @@ class ItemDownloadManagerTest(
     @TestConfiguration
     @Import(ItemDownloadManager::class)
     class LocalTestConfiguration {
-        @Bean fun messagingTemplateMock() = mock<MessagingTemplate>()
-        @Bean fun downloadRepository() = mock<DownloadRepository>()
-        @Bean fun podcastServerParameters() = mock<PodcastServerParameters>()
-        @Bean fun downloaderSelector() = mock<DownloaderSelector>()
-        @Bean fun extractorSelector() = mock<ExtractorSelector>()
-
         @Bean @Qualifier("DownloadExecutor")
         fun downloadExecutor(): ThreadPoolTaskExecutor = ThreadPoolTaskExecutor().apply {
             corePoolSize = 1

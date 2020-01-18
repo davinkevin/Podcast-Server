@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -17,10 +18,13 @@ import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @WebFluxTest(controllers = [FindHandler::class])
+@Import(FindRoutingConfig::class)
 class FindHandlerTest(
-    @Autowired val rest: WebTestClient,
-    @Autowired val finder: FindService
+    @Autowired val rest: WebTestClient
 ) {
+
+    @MockBean
+    private lateinit var finder: FindService
 
     @Nested
     @DisplayName("should find")
@@ -48,7 +52,8 @@ class FindHandlerTest(
                     /* Then */
                     .expectStatus().isOk
                     .expectBody()
-                    .assertThatJson { isEqualTo(""" {
+                    .assertThatJson {
+                        isEqualTo(""" {
                         "title":"aTitle",
                         "description":"",
                         "url":"http://foo.bar.com/",
@@ -63,11 +68,4 @@ class FindHandlerTest(
         }
 
     }
-
-    @TestConfiguration
-    @Import(FindRoutingConfig::class)
-    class LocalConfiguration {
-        @Bean fun findService() = mock<FindService>()
-    }
-
 }
