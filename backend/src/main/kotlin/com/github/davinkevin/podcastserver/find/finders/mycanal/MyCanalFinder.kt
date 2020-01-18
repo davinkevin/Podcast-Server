@@ -3,18 +3,16 @@ package com.github.davinkevin.podcastserver.find.finders.mycanal
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.service.image.ImageServiceV2
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
@@ -28,8 +26,6 @@ class MyCanalFinder(
         private val image: ImageServiceV2,
         private val mapper: ObjectMapper
 ): Finder {
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> {
         val path = url.substringAfter("www.canalplus.com")

@@ -1,18 +1,18 @@
 package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 
-class ItunesFinder(private val rssFinder: RSSFinder, private val wc: WebClient) : Finder {
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
+class ItunesFinder(
+        private val rssFinder: RSSFinder,
+        private val wc: WebClient
+) : Finder {
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> =
             Mono.justOrEmpty(

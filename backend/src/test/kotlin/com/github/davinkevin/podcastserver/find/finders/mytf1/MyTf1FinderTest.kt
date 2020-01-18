@@ -222,13 +222,4 @@ class MyTf1FinderTest(
         }
     }
 
-    @Test
-    fun `should do nothing on old implementation`() {
-        /* Given */
-        /* When */
-        assertThatThrownBy { finder.find("") }
-                /* Then */
-                .hasMessage("An operation is not implemented: not required anymore")
-    }
-
 }

@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.find
 
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono

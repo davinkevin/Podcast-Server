@@ -1,11 +1,10 @@
 package com.github.davinkevin.podcastserver.find.finders.rss
 
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
@@ -29,8 +28,6 @@ class RSSFinder(
 ) : Finder {
 
     private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> = wcb
             .baseUrl(url)

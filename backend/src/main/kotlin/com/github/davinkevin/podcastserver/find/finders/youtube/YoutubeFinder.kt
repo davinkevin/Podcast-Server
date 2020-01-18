@@ -1,12 +1,10 @@
 package com.github.davinkevin.podcastserver.find.finders.youtube
 
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
-import com.github.davinkevin.podcastserver.manager.worker.Finder
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.update.updaters.youtube._compatibility
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -45,8 +43,6 @@ class YoutubeFinder(
                     description = doc.meta("description"),
                     cover = cover.orNull()
             ) }
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     private fun findCover(page: Document): Mono<Optional<FindCoverInformation>> {
         return page

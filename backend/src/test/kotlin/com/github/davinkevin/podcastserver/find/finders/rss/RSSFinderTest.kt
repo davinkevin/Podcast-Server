@@ -127,15 +127,6 @@ class RSSFinderTest(
         }
     }
 
-    @Test
-    fun `should do nothing on old implementation`() {
-        /* Given */
-        /* When */
-        Assertions.assertThatThrownBy { finder.find("") }
-                /* Then */
-                .hasMessage("An operation is not implemented: not required anymore")
-    }
-
     companion object {
         private const val COVER_URL = "http://podcast.rmc.fr/images/podcast_ggdusportjpg_20120831140437.jpg"
         fun from(s: String) = "/remote/podcast/rss/$s"

@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.manager.worker.youtube
 import arrow.core.None
 import com.github.davinkevin.podcastserver.fileAsHtml
 import com.github.davinkevin.podcastserver.fileAsXml
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
@@ -96,15 +95,13 @@ class YoutubeByXmlUpdaterTest {
 
     @Test
     fun `should handle error during signature`() {
-        val podcast = Podcast().apply {
-            url = "https://www.youtube.com/user/androiddevelopers"
-        }
+        val url = URI("https://www.youtube.com/user/androiddevelopers")
 
         whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
         whenever(jdomService.parse(any())).thenReturn(null)
 
         /* When */
-        val signature = updater.blockingSignatureOf(URI(podcast.url!!))
+        val signature = updater.blockingSignatureOf(url)
 
         /* Then */
         assertThat(signature).isEmpty()

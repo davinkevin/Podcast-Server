@@ -1,11 +1,10 @@
 package com.github.davinkevin.podcastserver.find.finders.gulli
 
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
@@ -22,8 +21,6 @@ class GulliFinder(
         private val client: WebClient,
         private val image: ImageService
 ): Finder {
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> {
         val path = url.substringAfterLast("replay.gulli.fr")

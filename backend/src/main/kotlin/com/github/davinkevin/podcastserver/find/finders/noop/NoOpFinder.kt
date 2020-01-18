@@ -1,8 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.noop
 
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -14,8 +13,6 @@ import java.net.URI
 class NoOpFinder : Finder {
 
     private val log = LoggerFactory.getLogger(NoOpFinder::class.java)
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> {
         log.warn("Using Noop finder for url {}", url)

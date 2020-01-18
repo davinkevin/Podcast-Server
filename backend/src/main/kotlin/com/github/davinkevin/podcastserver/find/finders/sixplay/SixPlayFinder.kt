@@ -3,12 +3,11 @@ package com.github.davinkevin.podcastserver.find.finders.sixplay
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
@@ -27,8 +26,6 @@ class SixPlayFinder(
         private val image: ImageService,
         private val mapper: ObjectMapper
 ): Finder {
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> {
         val path = url.substringAfter("www.6play.fr")

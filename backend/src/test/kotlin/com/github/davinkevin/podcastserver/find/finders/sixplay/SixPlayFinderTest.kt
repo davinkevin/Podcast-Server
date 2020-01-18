@@ -260,15 +260,6 @@ class SixPlayFinderTest(
         assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
     }
 
-    @Test
-    fun `should do nothing on old implementation`() {
-        /* Given */
-        /* When */
-        assertThatThrownBy { finder.find("") }
-                /* Then */
-                .hasMessage("An operation is not implemented: not required anymore")
-    }
-
     @TestConfiguration
     @Import(SixPlayFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {

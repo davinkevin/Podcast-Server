@@ -120,15 +120,6 @@ class YoutubeFinderTest(
         assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
     }
 
-    @Test
-    fun `should do nothing on old implementation`() {
-        /* Given */
-        /* When */
-        Assertions.assertThatThrownBy { finder.find("") }
-                /* Then */
-                .hasMessage("An operation is not implemented: not required anymore")
-    }
-
     @TestConfiguration
     @Import(YoutubeFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration

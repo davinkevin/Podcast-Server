@@ -2,11 +2,10 @@ package com.github.davinkevin.podcastserver.find.finders.dailymotion
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.davinkevin.podcastserver.entity.Podcast
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
-import com.github.davinkevin.podcastserver.manager.worker.Finder
+import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -24,8 +23,6 @@ class DailymotionFinder(
         private val wc: WebClient,
         private val image: ImageService
 ): Finder {
-
-    override fun find(url: String): Podcast = TODO("not required anymore")
 
     override fun findInformation(url: String): Mono<FindPodcastInformation> {
         val userName = USER_NAME_EXTRACTOR.on(url).group(1) ?: return RuntimeException("username not found int url $url").toMono()
