@@ -9,6 +9,19 @@ stages:
   - 🧪 test
   - 👷‍ build
   - 🐳 packaging
+  - 🔎 Security Analysis
+
+⬇ container analysis db:
+  stage: ⬇ download
+  image:
+    name: aquasec/trivy
+    entrypoint: [""]
+  script:
+    - trivy --download-db-only --no-progress --cache-dir .trivy/
+  cache:
+    key: trivy-database
+    paths:
+      - .trivy
 
 ⬇ backend:
   stage: ⬇ download
@@ -251,3 +264,57 @@ stages:
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     action: stop
+
+🔎 backend:
+  stage: 🔎 Security Analysis
+  image:
+    name: aquasec/trivy
+    entrypoint: [""]
+  needs: [⬇ container analysis db, 🐳 backend]
+  script:
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@.ci/gitlab-trivy.tpl" -o gl-container-scanning-report.json podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+  cache:
+    key: trivy-database
+    policy: pull
+    paths:
+      - .trivy
+
+🔎 file-system:
+  stage: 🔎 Security Analysis
+  image:
+    name: aquasec/trivy
+    entrypoint: [""]
+  needs: [⬇ container analysis db, 🐳 file-system]
+  script:
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@.ci/gitlab-trivy.tpl" -o gl-container-scanning-report.json podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+  cache:
+    key: trivy-database
+    policy: pull
+    paths:
+      - .trivy
+
+🔎 ui:
+  stage: 🔎 Security Analysis
+  image:
+    name: aquasec/trivy
+    entrypoint: [""]
+  needs: [⬇ container analysis db, 🐳 ui]
+  script:
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@.ci/gitlab-trivy.tpl" -o gl-container-scanning-report.json podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+  cache:
+    key: trivy-database
+    policy: pull
+    paths:
+      - .trivy
