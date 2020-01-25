@@ -13,9 +13,10 @@ RUN mkdir /opt/ffmpeg && \
     tree /opt/
 
 FROM openjdk:11-slim as base-image
-RUN apt-get update && apt-get install python rtmpdump procps -y --no-install-recommends && \
+RUN apt-get update && apt-get install python3 rtmpdump procps -y --no-install-recommends && \
       rm -rf /var/lib/apt/lists/* && \
-      apt-get autoremove
+      apt-get autoremove && \
+      ln -s /usr/bin/python3 /usr/bin/python
 
 ENV PATH="/opt/ffmpeg:/opt/youtube-dl/:${PATH}"
 COPY --from=downloader /opt/ /opt/
