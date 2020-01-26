@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.item
 
-import com.github.davinkevin.podcastserver.database.StatusConverter
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.sql.Timestamp
@@ -39,7 +39,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                                 .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                 )
                 .where(ITEM.ID.eq(id))
-                .fetchOneAsMono()
+                .toMono()
                 .map(::toItem)
     }
 
@@ -59,14 +59,14 @@ class ItemRepositoryV2(private val query: DSLContext) {
         val removeFromPlaylist = query
                 .delete(WATCH_LIST_ITEMS)
                 .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(id))
-                .executeAsyncAsMono()
+                .toMono()
 
         val delete = query
                 .select(ITEM.ID, ITEM.FILE_NAME, ITEM.STATUS, PODCAST.TITLE, PODCAST.HAS_TO_BE_DELETED)
                 .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
                 .where(ITEM.ID.eq(id))
-                .fetchOneAsMono()
-                .delayUntil { query.delete(ITEM).where(ITEM.ID.eq(id)).executeAsyncAsMono() }
+                .toMono()
+                .delayUntil { query.delete(ITEM).where(ITEM.ID.eq(id)).toMono() }
                 .filter { it[PODCAST.HAS_TO_BE_DELETED] }
                 .filter { it[ITEM.STATUS] == FINISH }
                 .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
@@ -80,7 +80,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .set(ITEM.STATUS, DELETED)
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .where(ITEM.ID.`in`(items))
-                .executeAsyncAsMono()
+                .toMono()
                 .then()
     }
 
@@ -89,7 +89,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .select(PODCAST.HAS_TO_BE_DELETED)
                 .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
                 .where(ITEM.ID.eq(id))
-                .fetchOneAsMono()
+                .toMono()
                 .map { it[PODCAST.HAS_TO_BE_DELETED] }
     }
 
@@ -101,16 +101,18 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .set(ITEM.NUMBER_OF_FAIL, 0)
                 .where(ITEM.ID.eq(id))
-                .executeAsyncAsMono()
+                .toMono()
                 .flatMap { findById(id) }
     }
 
     fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
-        query
-                .select(TAG.ID)
-                .from(TAG)
-                .where(TAG.NAME.`in`(tags))
-                .fetchAsFlux()
+
+        Flux.from(
+                query
+                        .select(TAG.ID)
+                        .from(TAG)
+                        .where(TAG.NAME.`in`(tags))
+        )
                 .map { (v) -> v }
                 .collectList()
                 .flatMap { tagIds ->
@@ -161,7 +163,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                     val itemFileName = i.field(ITEM.FILE_NAME)
                     val itemStatus = i.field(ITEM.STATUS)
 
-                    val content: Mono<List<Item>> = query
+                    val content: Mono<List<Item>> = Flux.from(query
                             .select(
                                     itemId, itemTitle, itemURL,
                                     itemPubDate, itemDownloadDate, itemCreationDate,
@@ -175,7 +177,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                                     i
                                             .innerJoin(COVER).on(i.field(ITEM.COVER_ID).eq(COVER.ID))
                                             .innerJoin(PODCAST).on(i.field(ITEM.PODCAST_ID).eq(PODCAST.ID)))
-                            .fetchAsFlux()
+                    )
                             .map {
                                 val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
                                 val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
@@ -192,7 +194,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                             .select(countDistinct(ITEM.ID))
                             .from(ITEM)
                             .where(filterConditions)
-                            .fetchOneAsMono()
+                            .toMono()
                             .map { (v) -> v }
 
 
@@ -208,7 +210,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
             .from(ITEM)
             .where(ITEM.URL.eq(item.url))
             .and(ITEM.PODCAST_ID.eq(item.podcastId))
-            .fetchOneAsMono()
+            .toMono()
             .map { it[ITEM.ID] }
             .hasElement()
             .filter { it == false }
@@ -219,7 +221,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                         .set(COVER.HEIGHT, item.cover.height)
                         .set(COVER.WIDTH, item.cover.width)
                         .set(COVER.URL, item.cover.url.toASCIIString())
-                        .executeAsyncAsMono()
+                        .toMono()
 
                 val id = UUID.randomUUID()
                 val insertItem = query.insertInto(ITEM)
@@ -236,7 +238,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                         .set(ITEM.STATUS, item.status)
                         .set(ITEM.PODCAST_ID, item.podcastId)
                         .set(ITEM.COVER_ID, coverId)
-                        .executeAsyncAsMono()
+                        .toMono()
 
 
                 insertCover
@@ -249,13 +251,13 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 .update(ITEM)
                 .set(ITEM.STATUS, NOT_DOWNLOADED)
                 .where(ITEM.STATUS.`in`(STARTED, PAUSED))
-                .executeAsyncAsMono()
+                .toMono()
                 .then()
                 .doOnTerminate { log.info("Reset of item with downloading state done") }
     }
 
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> {
-        return query
+        return Flux.from(query
                 .select(WATCH_LIST.ID, WATCH_LIST.NAME)
                 .from(WATCH_LIST
                         .innerJoin(WATCH_LIST_ITEMS)
@@ -263,7 +265,7 @@ class ItemRepositoryV2(private val query: DSLContext) {
                 )
                 .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
                 .orderBy(WATCH_LIST.ID)
-                .fetchAsFlux()
+        )
                 .map { ItemPlaylist(it[WATCH_LIST.ID], it[WATCH_LIST.NAME]) }
     }
 }
