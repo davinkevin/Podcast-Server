@@ -246,7 +246,7 @@ stages:
   before_script:
     - *cicd_utils
   script:
-    - backend-base-image file-system
+    - delete_docker_hub_image file-system
   when: manual
   environment:
     name: file-system/$CI_COMMIT_REF_SLUG
@@ -281,7 +281,7 @@ stages:
   before_script:
     - *cicd_utils
   script:
-    - backend-base-image ui
+    - delete_docker_hub_image ui
   when: manual
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
