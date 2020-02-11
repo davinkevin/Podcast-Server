@@ -4,6 +4,14 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
   MAVEN_USER_HOME: $CI_PROJECT_DIR/.m2
 
+.cicd_utils: &cicd_utils |
+  function delete_docker_hub_image() {
+    COMPONENT=$1
+    JWT_TOKEN=$(curl -s -H 'Content-Type: application/json' -d '{"username": "'${DOCKER_IO_USER}'", "password": "'${DOCKER_IO_PASSWORD}'"}' https://hub.docker.com/v2/users/login/ | sed 's@.*token": "\([^"]*\)".*@\1@g')
+    curl -L -X DELETE -H "Authorization: JWT $JWT_TOKEN" https://hub.docker.com/v2/repositories/podcastserver/$COMPONENT/tags/$CI_COMMIT_REF_SLUG/
+  }
+
+
 stages:
   - ⬇ download
   - 🧪 test
@@ -193,9 +201,11 @@ stages:
   dependencies: []
   variables:
     GIT_STRATEGY: none
+  before_script:
+    - *cicd_utils
   script:
-    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/backend/tags/$CI_COMMIT_REF_SLUG/
-    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/backend-base-image/tags/$CI_COMMIT_REF_SLUG/
+    - delete_docker_hub_image backend
+    - delete_docker_hub_image backend-base-image
   when: manual
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
@@ -226,8 +236,10 @@ stages:
   dependencies: []
   variables:
     GIT_STRATEGY: none
+  before_script:
+    - *cicd_utils
   script:
-    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/file-system/tags/$CI_COMMIT_REF_SLUG/
+    - backend-base-image file-system
   when: manual
   environment:
     name: file-system/$CI_COMMIT_REF_SLUG
@@ -258,8 +270,10 @@ stages:
   dependencies: []
   variables:
     GIT_STRATEGY: none
+  before_script:
+    - *cicd_utils
   script:
-    - curl -X DELETE -u "$DOCKER_IO_USER:$DOCKER_IO_PASSWORD" https://cloud.docker.com/v2/repositories/podcastserver/ui/tags/$CI_COMMIT_REF_SLUG/
+    - backend-base-image ui
   when: manual
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
