@@ -11,6 +11,11 @@ variables:
     curl -L -X DELETE -H "Authorization: JWT $JWT_TOKEN" https://hub.docker.com/v2/repositories/podcastserver/$COMPONENT/tags/$CI_COMMIT_REF_SLUG/
   }
 
+  function kaniko_auth_docker_hub() {
+    TOKEN=$(echo -n $DOCKER_IO_USER:$DOCKER_IO_PASSWORD | base64)
+    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$TOKEN\"}}}" > /kaniko/.docker/config.json
+  }
+
 
 stages:
   - ⬇ download
@@ -114,7 +119,8 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - echo "{\"auths\":{\"index.docker.io\":{\"username\":\"$DOCKER_IO_USER\",\"password\":\"$DOCKER_IO_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - *cicd_utils
+    - kaniko_auth_docker_hub
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/docker/base-image/Dockerfile --destination podcastserver/backend-base-image:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
@@ -218,7 +224,8 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - echo "{\"auths\":{\"index.docker.io\":{\"username\":\"$DOCKER_IO_USER\",\"password\":\"$DOCKER_IO_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - *cicd_utils
+    - kaniko_auth_docker_hub
   script:
     - sh ./files-system/compile.sh
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
@@ -252,7 +259,8 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - echo "{\"auths\":{\"index.docker.io\":{\"username\":\"$DOCKER_IO_USER\",\"password\":\"$DOCKER_IO_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - *cicd_utils
+    - kaniko_auth_docker_hub
   script:
     - sh ./ui/compile.sh
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
