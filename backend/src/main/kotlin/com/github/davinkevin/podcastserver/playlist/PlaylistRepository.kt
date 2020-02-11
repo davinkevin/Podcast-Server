@@ -12,7 +12,7 @@ import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.util.*
 
-class PlaylistRepositoryV2(
+class PlaylistRepository(
         private val query: DSLContext
 ) {
 

@@ -21,5 +21,10 @@ class TagRoutingConfig {
 }
 
 @Configuration
-@Import(TagRepositoryV2::class, TagRoutingConfig::class, TagService::class, TagHandler::class)
+@Import(
+        TagRepository::class,
+        TagRoutingConfig::class,
+        TagService::class,
+        TagHandler::class
+)
 class TagConfig

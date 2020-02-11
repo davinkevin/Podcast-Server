@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.server.router
  * Created by kevin on 2019-02-15
  */
 @Configuration
+@Import(PodcastHandler::class, PodcastXmlHandler::class)
 class PodcastRoutingConfig {
 
     @Bean
@@ -47,5 +48,11 @@ class PodcastRoutingConfig {
 }
 
 @Configuration
-@Import(PodcastRepositoryV2::class, TypeConfig::class, PodcastRoutingConfig::class, PodcastService::class, PodcastHandler::class, PodcastXmlHandler::class)
+@Import(
+        PodcastRoutingConfig::class,
+        PodcastRepository::class,
+        PodcastService::class,
+
+        TypeConfig::class
+)
 class PodcastConfig

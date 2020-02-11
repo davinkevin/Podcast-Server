@@ -5,7 +5,6 @@ import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
@@ -22,7 +21,6 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-15
  */
-@Component
 class PodcastHandler(
         private val podcastService: PodcastService,
         private val fileService: FileService
@@ -38,7 +36,7 @@ class PodcastHandler(
                 .flatMap { ok().bodyValue(it) }
     }
 
-    fun findAll(r: ServerRequest): Mono<ServerResponse> =
+    fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
             podcastService.findAll()
                     .map(::toPodcastHAL)
                     .collectList()

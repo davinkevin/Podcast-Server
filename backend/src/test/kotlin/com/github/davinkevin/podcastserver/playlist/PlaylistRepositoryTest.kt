@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST
 import com.github.davinkevin.podcastserver.database.Tables.WATCH_LIST_ITEMS
 import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
-import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
@@ -25,19 +24,17 @@ import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.time.ZonedDateTime.now
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
-import java.util.UUID.*
+import java.util.UUID.fromString
 import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.playlist.PlaylistRepositoryV2 as PlaylistRepository
 
 /**
  * Created by kevin on 2019-07-06
  */
 @JooqTest
 @Import(PlaylistRepository::class)
-class PlaylistRepositoryV2Test(
+class PlaylistRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: PlaylistRepository,
     @Autowired val datasourceDestination: DataSourceDestination

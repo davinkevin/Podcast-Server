@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
+import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
@@ -17,8 +18,6 @@ import reactor.kotlin.core.util.function.component3
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
-import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
-import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
 /**
  * Created by kevin on 2019-02-09

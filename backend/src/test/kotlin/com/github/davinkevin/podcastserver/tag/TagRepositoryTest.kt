@@ -1,34 +1,32 @@
 package com.github.davinkevin.podcastserver.tag
 
-import com.github.davinkevin.podcastserver.database.tables.Tag.*
+import com.github.davinkevin.podcastserver.database.tables.Tag.TAG
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
-import org.jooq.DSLContext
-import org.junit.jupiter.api.BeforeEach
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
-import org.springframework.context.annotation.Import
-import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.*
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_TAG_DATA
+import org.assertj.core.api.Assertions.assertThat
+import org.jooq.DSLContext
 import org.jooq.impl.DSL.count
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
 import java.util.*
+import javax.sql.DataSource
 
 /**
  * Created by kevin on 2019-03-24
  */
 @JooqTest
 @Import(TagRepository::class)
-class TagRepositoryV2Test(
+class TagRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: TagRepository,
     @Autowired val dataSource: DataSource

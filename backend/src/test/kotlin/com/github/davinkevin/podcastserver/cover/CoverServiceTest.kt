@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.*
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.ItemInformation
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.PodcastInformation
 import com.github.davinkevin.podcastserver.service.FileService
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.AfterEach
@@ -10,9 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
@@ -21,8 +20,7 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.util.UUID.*
-import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
+import java.util.UUID.randomUUID
 
 @ExtendWith(SpringExtension::class)
 @Import(CoverService::class)

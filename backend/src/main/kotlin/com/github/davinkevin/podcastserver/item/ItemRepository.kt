@@ -3,7 +3,8 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
-import com.github.davinkevin.podcastserver.extension.repository.*
+import com.github.davinkevin.podcastserver.extension.repository.toTimestamp
+import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import org.jooq.DSLContext
 import org.jooq.Record18
 import org.jooq.impl.DSL.*
@@ -21,9 +22,9 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-03
  */
-class ItemRepositoryV2(private val query: DSLContext) {
+class ItemRepository(private val query: DSLContext) {
 
-    private val log = LoggerFactory.getLogger(ItemRepositoryV2::class.java)
+    private val log = LoggerFactory.getLogger(ItemRepository::class.java)
 
     fun findById(id: UUID) = Mono.defer {
         query

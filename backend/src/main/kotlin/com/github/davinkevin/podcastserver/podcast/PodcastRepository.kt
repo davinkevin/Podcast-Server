@@ -22,7 +22,7 @@ import java.time.OffsetDateTime.now
 import java.time.ZonedDateTime
 import java.util.*
 
-class PodcastRepositoryV2(private val query: DSLContext) {
+class PodcastRepository(private val query: DSLContext) {
 
     fun findById(id: UUID) = Mono.zip(
             Mono.defer { query

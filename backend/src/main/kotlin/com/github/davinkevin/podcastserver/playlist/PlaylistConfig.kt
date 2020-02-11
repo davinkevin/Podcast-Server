@@ -29,5 +29,10 @@ class PlaylistRoutingConfig {
 }
 
 @Configuration
-@Import(PlaylistRoutingConfig::class, PlaylistHandler::class, PlaylistService::class, PlaylistRepositoryV2::class)
+@Import(
+        PlaylistRoutingConfig::class,
+        PlaylistHandler::class,
+        PlaylistService::class,
+        PlaylistRepository::class
+)
 class PlaylistConfig

@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.database.Tables.COVER
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.entity.Status.*
-import com.github.davinkevin.podcastserver.entity.Status.Companion.of
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
@@ -30,7 +29,6 @@ import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
 import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemRepository
 
 /**
  * Created by kevin on 2019-02-09
@@ -38,7 +36,7 @@ import com.github.davinkevin.podcastserver.item.ItemRepositoryV2 as ItemReposito
 
 @JooqTest
 @Import(ItemRepository::class)
-class ItemRepositoryV2Test(
+class ItemRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: ItemRepository,
     @Autowired val db: DataSourceDestination

@@ -9,11 +9,7 @@ import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_ITEM_DATA
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_PODCAST_DATA
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.INSERT_TAG_DATA
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.formatter
+import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -28,16 +24,15 @@ import java.net.URI
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.UUID.*
+import java.util.UUID.fromString
 import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
 /**
  * Created by kevin on 2019-02-16
  */
 @JooqTest
 @Import(PodcastRepository::class)
-class PodcastRepositoryV2Test(
+class PodcastRepositoryTest(
     @Autowired val repository: PodcastRepository,
     @Autowired val dataSource: DataSource,
     @Autowired val query: DSLContext

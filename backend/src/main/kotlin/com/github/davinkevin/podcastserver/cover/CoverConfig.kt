@@ -19,5 +19,10 @@ class CoverRoutingConfig {
 }
 
 @Configuration
-@Import(CoverRepositoryV2::class, CoverService::class, ClockConfig::class, CoverRoutingConfig::class)
+@Import(
+        CoverRepository::class,
+        CoverService::class,
+        ClockConfig::class,
+        CoverRoutingConfig::class
+)
 class CoverConfig

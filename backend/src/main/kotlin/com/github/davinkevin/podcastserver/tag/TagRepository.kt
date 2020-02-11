@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.tag
 
 import com.github.davinkevin.podcastserver.database.Tables.TAG
 import org.jooq.DSLContext
-import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
@@ -10,8 +9,7 @@ import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
-@Repository
-class TagRepositoryV2(val query: DSLContext) {
+class TagRepository(val query: DSLContext) {
 
     fun findById(id: UUID): Mono<Tag> = Mono.defer {
         query

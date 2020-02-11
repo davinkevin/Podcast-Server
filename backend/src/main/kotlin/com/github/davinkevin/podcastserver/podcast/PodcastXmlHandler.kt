@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemPageRequest
 import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.item.ItemSort
-import com.github.davinkevin.podcastserver.service.JdomService
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
@@ -16,7 +15,6 @@ import org.jdom2.Text
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.util.UriComponentsBuilder
@@ -28,7 +26,6 @@ import java.net.URI
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-@Component
 class PodcastXmlHandler(
         private val podcastService: PodcastService,
         private val itemService: ItemService

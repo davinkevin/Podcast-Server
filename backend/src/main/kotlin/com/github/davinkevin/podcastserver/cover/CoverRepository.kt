@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.tables.Cover.COVER
 import org.jooq.DSLContext
-import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -15,8 +14,7 @@ import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.util.*
 
-@Service
-class CoverRepositoryV2(private val query: DSLContext) {
+class CoverRepository(private val query: DSLContext) {
 
     fun save(cover: CoverForCreation): Mono<Cover> {
         val id = UUID.randomUUID()

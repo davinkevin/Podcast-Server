@@ -1,11 +1,10 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
-import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2
+import com.github.davinkevin.podcastserver.cover.CoverRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
-import com.github.davinkevin.podcastserver.tag.TagRepositoryV2
-import org.springframework.stereotype.Service
+import com.github.davinkevin.podcastserver.tag.TagRepository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
@@ -13,13 +12,11 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.util.*
-import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
 
-@Service
 class PodcastService(
         private val repository: PodcastRepository,
-        private val coverRepository: CoverRepositoryV2,
-        private val tagRepository: TagRepositoryV2,
+        private val coverRepository: CoverRepository,
+        private val tagRepository: TagRepository,
         private val fileService: FileService
 ) {
 

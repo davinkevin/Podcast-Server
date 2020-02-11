@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.web.reactive.function.server.router
 
 @Configuration
+@Import(TypeHandler::class)
 class TypeRoutingConfig {
 
     @Bean
@@ -16,5 +17,8 @@ class TypeRoutingConfig {
 }
 
 @Configuration
-@Import(TypeRoutingConfig::class, TypeHandler::class, UpdaterSelector::class)
+@Import(
+        TypeRoutingConfig::class,
+        UpdaterSelector::class
+)
 class TypeConfig

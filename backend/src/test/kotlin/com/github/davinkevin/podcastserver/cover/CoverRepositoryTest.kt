@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.*
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.ItemInformation
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.PodcastInformation
 import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
-import com.ninja_squad.dbsetup.DbSetupTracker
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation
@@ -27,14 +27,13 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
 import java.time.format.DateTimeFormatterBuilder
 import java.util.UUID.fromString
 import javax.sql.DataSource
-import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
 
 /**
  * Created by kevin on 14/09/2019
  */
 @JooqTest
 @Import(CoverRepository::class)
-class CoverRepositoryV2Test(
+class CoverRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: CoverRepository,
     @Autowired val db: DataSourceDestination

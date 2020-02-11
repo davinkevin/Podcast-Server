@@ -2,17 +2,17 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.cover.CoverRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.tag.Tag
+import com.github.davinkevin.podcastserver.tag.TagRepository
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
@@ -25,9 +25,6 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
-import com.github.davinkevin.podcastserver.cover.CoverRepositoryV2 as CoverRepository
-import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2 as PodcastRepository
-import com.github.davinkevin.podcastserver.tag.TagRepositoryV2 as TagRepository
 
 /**
  * Created by kevin on 2019-02-16

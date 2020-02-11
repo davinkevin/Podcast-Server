@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import com.github.davinkevin.podcastserver.podcast.PodcastRepositoryV2
+import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.nhaarman.mockitokotlin2.mock
@@ -12,9 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.Test
 import org.springframework.boot.CommandLineRunner
-import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.context.annotation.UserConfigurations
-import org.springframework.boot.test.context.FilteredClassLoader
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -24,7 +22,6 @@ import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.util.concurrent.TimeUnit
 
 class ItemConfigTest {
 
@@ -41,7 +38,7 @@ class ItemConfigTest {
                 .run {
                     assertThat(it).hasSingleBean(CommandLineRunner::class.java)
 
-                    val repo = it.getBean(ItemRepositoryV2::class.java)
+                    val repo = it.getBean(ItemRepository::class.java)
                     val clr = it.getBean(CommandLineRunner::class.java)
                     clr.run()
 
@@ -53,7 +50,7 @@ class ItemConfigTest {
 
 @Configuration
 class MockForResetAtStartupConfig {
-    @Bean @Primary fun mockItemRepository(): ItemRepositoryV2 = mock<ItemRepositoryV2>().apply {
+    @Bean @Primary fun mockItemRepository(): ItemRepository = mock<ItemRepository>().apply {
         whenever(this.resetItemWithDownloadingState()).thenReturn(Mono.empty())
     }
 }
@@ -63,7 +60,7 @@ class ItemDependencyMockConfig {
     @Bean @Primary fun mockJOOQ(): DSLContext = mock()
     @Bean @Primary fun mockItemService(): ItemService = mock()
     @Bean @Primary fun mockFileService(): FileService = mock()
-    @Bean @Primary fun mockPodcastRepository(): PodcastRepositoryV2 = mock()
+    @Bean @Primary fun mockPodcastRepository(): PodcastRepository = mock()
     @Bean @Primary fun mockIDM(): ItemDownloadManager = mock()
     @Bean @Primary fun mockPodcastProps(): PodcastServerParameters = mock()
     @Bean @Primary fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
