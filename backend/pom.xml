@@ -138,11 +138,6 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>org.rauschig</groupId>
-            <artifactId>jarchivelib</artifactId>
-            <version>0.7.1</version>
-        </dependency>
-        <dependency>
             <groupId>net.bramp.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>0.6.1</version>
@@ -174,14 +169,12 @@
             <version>2.10.0</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
             <version>2.25.1</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.ninja-squad</groupId>
             <artifactId>DbSetup</artifactId>
