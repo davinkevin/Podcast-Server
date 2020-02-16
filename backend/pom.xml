@@ -129,22 +129,7 @@
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-typeclasses</artifactId>
-            <version>0.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-data</artifactId>
-            <version>0.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-instances-core</artifactId>
-            <version>0.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-instances-data</artifactId>
             <version>0.7.2</version>
         </dependency>
         <dependency>
