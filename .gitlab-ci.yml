@@ -294,7 +294,7 @@ stages:
     entrypoint: [""]
   needs: [⬇ container analysis db, 🐳 backend]
   script:
-    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@.ci/gitlab-trivy.tpl" -o gl-container-scanning-report.json podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
   artifacts:
     reports:
@@ -312,7 +312,7 @@ stages:
     entrypoint: [""]
   needs: [⬇ container analysis db, 🐳 file-system]
   script:
-    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@.ci/gitlab-trivy.tpl" -o gl-container-scanning-report.json podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
   artifacts:
     reports:
@@ -330,7 +330,7 @@ stages:
     entrypoint: [""]
   needs: [⬇ container analysis db, 🐳 ui]
   script:
-    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@.ci/gitlab-trivy.tpl" -o gl-container-scanning-report.json podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
   artifacts:
     reports:
