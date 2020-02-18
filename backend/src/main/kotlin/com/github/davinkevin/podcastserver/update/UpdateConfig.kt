@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update
 
+import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeUpdaterConfig
 import org.springframework.context.annotation.Bean
@@ -28,6 +29,7 @@ class UpdateRouterConfig {
         UpdateHandler::class,
         UpdateService::class,
 
+        FranceTvUpdaterConfig::class,
         RSSUpdaterConfig::class,
         YoutubeUpdaterConfig::class
 )

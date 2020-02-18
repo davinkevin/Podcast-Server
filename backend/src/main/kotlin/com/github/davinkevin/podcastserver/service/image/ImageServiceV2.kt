@@ -14,7 +14,7 @@ class ImageServiceV2 ( private val wcb: WebClient.Builder ) {
     private val log = LoggerFactory.getLogger(ImageServiceV2::class.java)
 
     fun fetchCoverInformation(url: URI): Mono<CoverInformation> {
-        log.info("fetch $url")
+        log.debug("fetch $url")
         return wcb
                 .clone()
                 .baseUrl(url.toASCIIString()).build()

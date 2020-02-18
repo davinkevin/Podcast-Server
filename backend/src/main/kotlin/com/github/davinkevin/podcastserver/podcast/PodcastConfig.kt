@@ -49,10 +49,10 @@ class PodcastRoutingConfig {
 
 @Configuration
 @Import(
+        TypeConfig::class,
+
         PodcastRoutingConfig::class,
         PodcastRepository::class,
-        PodcastService::class,
-
-        TypeConfig::class
+        PodcastService::class
 )
 class PodcastConfig

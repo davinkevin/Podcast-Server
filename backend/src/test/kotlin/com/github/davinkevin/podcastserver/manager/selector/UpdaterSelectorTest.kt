@@ -1,13 +1,13 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionUpdater
-import com.github.davinkevin.podcastserver.manager.worker.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
 import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
+import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
 import com.nhaarman.mockitokotlin2.any

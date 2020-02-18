@@ -25,143 +25,142 @@ import java.time.ZonedDateTime
 /**
  * Created by kevin on 30/06/2017.
  */
-@Component
-class FranceTvUpdater(
-        val signatureService: SignatureService,
-        val htmlService: HtmlService,
-        val imageService: ImageService,
-        val jsonService: JsonService
-) : Updater {
-
-    private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)!!
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
-
-        val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url.toASCIIString())
-
-        return htmlService
-                .get(toReplayUrl(podcast.url.toASCIIString()))
-                .map { it.select("a[href]") }
-                .getOrElse {
-                    log.error("No items found for podcast ${podcast.id} at ${podcast.url}, the layout may have changed")
-                    listOf<Element>()
-                }
-                .map { urlBuilder.replacePath(it.attr("href")).toUriString() }
-                .map { urlToItem(it) }
-                .toSet()
-    }
-
-    private fun toReplayUrl(url: String): String = "$url/replay-videos/ajax/?page=0"
-
-    private fun urlToItem(itemUrl: String): ItemFromUpdate =
-            htmlService
-                    .get(itemUrl)
-                    .map { it.select("script") }
-                    .getOrElse {
-                        log.error("No script found for item $itemUrl")
-                        Elements()
-                    }
-                    .map { it.html() }
-                    .firstOption { it.contains("FTVPlayerVideos") }
-                    .map { it.substringAfter("=").trim(';') }
-                    .flatMap { jsonService.parse(it).toOption() }
-                    .map { JsonService.to(PAGE_ITEM).apply(it) }
-                    .getOrElse { setOf() }
-                    .firstOption { it.contentId in itemUrl }
-                    .map { CATALOG_URL.format(it.videoId)}
-                    .flatMap { jsonService.parseUrl(it) }
-                    .map { JsonService.to(FranceTvItem::class.java).apply(it) }
-                    .map { ftv -> ItemFromUpdate(
-                        title = ftv.title()!!,
-                        description = ftv.synopsis!!,
-                        pubDate = ftv.pubDate(),
-                        url = URI(itemUrl),
-                        cover = imageService.fetchCoverInformation(ftv.image)?.toCoverFromUpdate()
-                    ) }
-                    .getOrElse { defaultItem }
-
-    override fun blockingSignatureOf(url: URI): String {
-
-        val listOfIds = htmlService
-                .get(toReplayUrl(url.toASCIIString()))
-                .map { it.select("a[href]") }
-                .getOrElse {
-                    log.error("No items found for podcast with url $url, the layout may have changed")
-                    listOf<Element>()
-                }
-                .map { it.attr("href") }
-                .sorted()
-                .joinToString("-")
-
-        return signatureService.fromText(listOfIds)
-    }
-
-    override fun type() = Type("FranceTv", "France•tv")
-
-    override fun compatibility(url: String?) = isFromFranceTv(url)
-
-    companion object {
-        const val CATALOG_URL = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s"
-        internal val PAGE_ITEM = object : TypeRef<Set<FranceTvPageItem>>() {}
-
-        fun isFromFranceTv(url: String?) =
-                if (StringUtils.contains(url, "www.france.tv")) 1
-                else Integer.MAX_VALUE
-    }
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-internal class FranceTvPageItem(val contentId: String, val videoId: String)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-private class FranceTvItem {
-
-    var titre: String? = null
-    var synopsis: String? = null
-    var saison: String? = null
-    var episode: String? = null
-    var diffusion = Diffusion()
-    var videos: List<Video> = emptyList()
-    @JsonProperty("image_secure") var image: String? = null
-    @JsonProperty("sous_titre") private val sousTitre: String? = null
-
-    fun title(): String? {
-        var title = titre
-
-        if (!saison.isNullOrEmpty()) {
-            title = "$title - S$saison"
-        }
-
-        if (!episode.isNullOrEmpty()) {
-            title = "${title}E$episode"
-        }
-
-        if (!sousTitre.isNullOrEmpty()) {
-            title = "$title - $sousTitre"
-        }
-
-        return title
-    }
-
-    fun pubDate(): ZonedDateTime =
-            when {
-                diffusion.timestamp == null -> ZonedDateTime.now()
-                else -> ZonedDateTime.ofInstant(Instant.ofEpochSecond(diffusion.timestamp!!), ZONE_ID)
-            }
-
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Diffusion {
-        var timestamp: Long? = null
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Video {
-        private val format: String? = null
-        var url: String? = null
-    }
-
-    companion object {
-        private val ZONE_ID = ZoneId.of("Europe/Paris")
-    }
-}
+//@Component
+//class FranceTvUpdater(
+//        val signatureService: SignatureService,
+//        val htmlService: HtmlService,
+//        val imageService: ImageService,
+//        val jsonService: JsonService
+//) : Updater {
+//
+//    private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)!!
+//
+//    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
+//
+//        val urlBuilder = UriComponentsBuilder.fromHttpUrl(podcast.url.toASCIIString())
+//
+//        return htmlService
+//                .get(toReplayUrl(podcast.url.toASCIIString()))
+//                .map { it.select("a[href]") }
+//                .getOrElse {
+//                    log.error("No items found for podcast ${podcast.id} at ${podcast.url}, the layout may have changed")
+//                    listOf<Element>()
+//                }
+//                .map { urlBuilder.replacePath(it.attr("href")).toUriString() }
+//                .map { urlToItem(it) }
+//                .toSet()
+//    }
+//
+//    private fun toReplayUrl(url: String): String = "$url/replay-videos/ajax/?page=0"
+//
+//    private fun urlToItem(itemUrl: String): ItemFromUpdate =
+//            htmlService
+//                    .get(itemUrl)
+//                    .map { it.select("script") }
+//                    .getOrElse {
+//                        log.error("No script found for item $itemUrl")
+//                        Elements()
+//                    }
+//                    .map { it.html() }
+//                    .firstOption { it.contains("FTVPlayerVideos") }
+//                    .map { it.substringAfter("=").trim(';') }
+//                    .flatMap { jsonService.parse(it).toOption() }
+//                    .map { JsonService.to(PAGE_ITEM).apply(it) }
+//                    .getOrElse { setOf() }
+//                    .firstOption { it.contentId in itemUrl }
+//                    .map { CATALOG_URL.format(it.videoId)}
+//                    .flatMap { jsonService.parseUrl(it) }
+//                    .map { JsonService.to(FranceTvItem::class.java).apply(it) }
+//                    .map { ftv -> ItemFromUpdate(
+//                        title = ftv.title()!!,
+//                        description = ftv.synopsis!!,
+//                        pubDate = ftv.pubDate(),
+//                        url = URI(itemUrl),
+//                        cover = imageService.fetchCoverInformation(ftv.image)?.toCoverFromUpdate()
+//                    ) }
+//                    .getOrElse { defaultItem }
+//
+//    override fun blockingSignatureOf(url: URI): String {
+//
+//        val listOfIds = htmlService
+//                .get(toReplayUrl(url.toASCIIString()))
+//                .map { it.select("a[href]") }
+//                .getOrElse {
+//                    log.error("No items found for podcast with url $url, the layout may have changed")
+//                    listOf<Element>()
+//                }
+//                .map { it.attr("href") }
+//                .sorted()
+//                .joinToString("-")
+//
+//        return signatureService.fromText(listOfIds)
+//    }
+//
+//    override fun type() = Type("FranceTv", "France•tv")
+//
+//    override fun compatibility(url: String?) = isFromFranceTv(url)
+//
+//    companion object {
+//        const val CATALOG_URL = "https://sivideo.webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s"
+//        internal val PAGE_ITEM = object : TypeRef<Set<FranceTvPageItem>>() {}
+//
+//        fun isFromFranceTv(url: String?) =
+//                if (StringUtils.contains(url, "www.france.tv")) 1
+//                else Integer.MAX_VALUE
+//    }
+//}
+//
+//@JsonIgnoreProperties(ignoreUnknown = true)
+//data class FranceTvPageItem(val contentId: String, val videoId: String)
+//
+//@JsonIgnoreProperties(ignoreUnknown = true)
+//internal class FranceTvItem {
+//
+//    var titre: String? = null
+//    var synopsis: String? = null
+//    var saison: String? = null
+//    var episode: String? = null
+//    var diffusion = Diffusion()
+//    var videos: List<Video> = emptyList()
+//    @JsonProperty("image_secure") var image: String? = null
+//    @JsonProperty("sous_titre") private val sousTitre: String? = null
+//
+//    fun title(): String? {
+//        var title = titre
+//
+//        if (!saison.isNullOrEmpty()) {
+//            title = "$title - S$saison"
+//        }
+//
+//        if (!episode.isNullOrEmpty()) {
+//            title = "${title}E$episode"
+//        }
+//
+//        if (!sousTitre.isNullOrEmpty()) {
+//            title = "$title - $sousTitre"
+//        }
+//
+//        return title
+//    }
+//
+//    fun pubDate(): ZonedDateTime {
+//        return if (diffusion.timestamp == null) ZonedDateTime.now()
+//        else ZonedDateTime.ofInstant(Instant.ofEpochSecond(diffusion.timestamp!!), ZONE_ID)
+//    }
+//
+//
+//    @JsonIgnoreProperties(ignoreUnknown = true)
+//    internal class Diffusion {
+//        var timestamp: Long? = null
+//    }
+//
+//    @JsonIgnoreProperties(ignoreUnknown = true)
+//    internal class Video {
+//        private val format: String? = null
+//        var url: String? = null
+//    }
+//
+//    companion object {
+//        private val ZONE_ID = ZoneId.of("Europe/Paris")
+//    }
+//}
