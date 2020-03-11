@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.francetv
 
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.remapToMockServer
@@ -18,13 +19,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
@@ -135,9 +137,8 @@ class FranceTvFinderTest(
     }
 
     @TestConfiguration
-    @Import(FranceTvFinderConfig::class)
+    @Import(FranceTvFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean fun webClientBuilder() = WebClient.builder()
-                .filter(remapToMockServer("www.france.tv"))
+        @Bean fun remapToMockServer() = remapToMockServer("www.france.tv")
     }
 }

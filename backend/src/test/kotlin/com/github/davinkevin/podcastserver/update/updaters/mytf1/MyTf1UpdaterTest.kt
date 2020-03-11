@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.remapToMockServerGlobal
+import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
@@ -49,7 +49,7 @@ class MyTf1UpdaterTest(
             JacksonAutoConfiguration::class
     )
     class LocalTestConfiguration {
-        @Bean fun remapToLocalHost() = remapToMockServerGlobal("www.tf1.fr")
+        @Bean fun remapToLocalHost() = remapToMockServer("www.tf1.fr")
     }
 
     @MockBean lateinit var imageService: ImageService

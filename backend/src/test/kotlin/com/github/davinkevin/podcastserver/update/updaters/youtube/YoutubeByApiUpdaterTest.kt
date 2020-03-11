@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -285,10 +284,8 @@ class YoutubeByApiUpdaterTest(
     class LocalTestConfiguration {
 
         @Bean fun api(): Api = Api(youtube = "key", dailymotion = "another-value")
-        @Bean fun webClientCustomization() = WebClientCustomizer { it
-                .filter(remapToMockServer("www.youtube.com"))
-                .filter(remapToMockServer("www.googleapis.com"))
-        }
+        @Bean fun remapYoutubeToMock() = remapToMockServer("www.youtube.com")
+        @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
 
     }
 }

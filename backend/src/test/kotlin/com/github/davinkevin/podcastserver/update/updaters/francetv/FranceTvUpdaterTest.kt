@@ -20,11 +20,10 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import reactor.test.StepVerifier
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -38,9 +37,8 @@ class FranceTvUpdaterTest(
     @TestConfiguration
     @Import(FranceTvUpdaterConfig::class, WebClientAutoConfiguration::class, WebClientConfig::class, JacksonAutoConfiguration::class)
     class LocalTestConfiguration {
-        @Bean fun webClientBuilder() = WebClient.builder()
-                .filter(remapToMockServer("www.france.tv"))
-                .filter(remapToMockServer("sivideo.webservices.francetelevisions.fr"))
+        @Bean fun remapFranceTvToMock() = remapToMockServer("www.france.tv")
+        @Bean fun remapApiToMock() = remapToMockServer("sivideo.webservices.francetelevisions.fr")
     }
 
     private val podcast = PodcastToUpdate(

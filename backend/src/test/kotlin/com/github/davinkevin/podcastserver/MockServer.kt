@@ -31,7 +31,7 @@ class MockServer: BeforeEachCallback, AfterEachCallback, ParameterResolver {
     }
 }
 
-fun remapToMockServer(host: String) = ExchangeFilterFunction.ofRequestProcessor { c ->
+fun remapToMockServer(host: String) = WebClientCustomizer { it.filter(ExchangeFilterFunction.ofRequestProcessor { c ->
     val mockServerUrl = c.url().toASCIIString()
             .replace("https", "http")
             .replace(host, "localhost:5555")
@@ -40,6 +40,4 @@ fun remapToMockServer(host: String) = ExchangeFilterFunction.ofRequestProcessor 
             .url(URI(mockServerUrl))
             .build()
             .toMono()
-}
-
-fun remapToMockServerGlobal(host: String) = WebClientCustomizer { it.filter(remapToMockServer(host)) }
+}) }
