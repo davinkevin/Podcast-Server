@@ -2,9 +2,7 @@ package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
-import com.github.davinkevin.podcastserver.manager.worker.mycanal.MyCanalUpdater
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
-import com.github.davinkevin.podcastserver.manager.worker.sixplay.SixPlayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
 import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdater
@@ -36,9 +34,7 @@ class UpdaterSelectorTest {
     @Mock lateinit var dailymotionUpdater: DailymotionUpdater
     @Mock lateinit var franceTvUpdater: FranceTvUpdater
     @Mock lateinit var gulliUpdater: GulliUpdater
-    @Mock lateinit var myCanalUpdater: MyCanalUpdater
     @Mock lateinit var rssUpdater: RSSUpdater
-    @Mock lateinit var sixPlayUpdater: SixPlayUpdater
     @Mock lateinit var tf1ReplayUpdater: TF1ReplayUpdater
     @Mock lateinit var uploadUpdater: UploadUpdater
     @Mock lateinit var youtubeByXmlUpdater: YoutubeByXmlUpdater
@@ -51,9 +47,7 @@ class UpdaterSelectorTest {
                 dailymotionUpdater,
                 franceTvUpdater, 
                 gulliUpdater,
-                myCanalUpdater, 
-                rssUpdater, 
-                sixPlayUpdater,
+                rssUpdater,
                 tf1ReplayUpdater, 
                 uploadUpdater, 
                 youtubeByXmlUpdater,
@@ -85,9 +79,7 @@ class UpdaterSelectorTest {
                 dailymotionUpdater,
                 franceTvUpdater,
                 gulliUpdater,
-                myCanalUpdater,
                 rssUpdater,
-                sixPlayUpdater,
                 tf1ReplayUpdater,
                 youtubeByXmlUpdater,
                 youtubeByApiUpdater
@@ -101,7 +93,7 @@ class UpdaterSelectorTest {
         /* Then */
         assertThat(types)
                 .isNotEmpty
-                .hasSize(9)
+                .hasSize(7)
                 .containsAll(uTypes)
     }
 
@@ -112,9 +104,7 @@ class UpdaterSelectorTest {
                         Arguments.of("http://www.dailymotion.com/showname", "Dailymotion"),
                         Arguments.of("http://www.france.tv/show/for/dummies", "FranceTv"),
                         Arguments.of("http://replay.gulli.fr/showname", "Gulli"),
-                        Arguments.of("http://www.mycanal.fr/show/for/dummies", "MyCanal"),
                         Arguments.of("http://www.link.to.rss/feeds", "RSS"),
-                        Arguments.of("http://www.6play.fr/turbo_test", "SixPlay"),
                         Arguments.of("http://www.tf1.fr/title", "TF1Replay"),
                         Arguments.of("http://www.youtube.com/user/fakeUser", "Youtube")
                 )
