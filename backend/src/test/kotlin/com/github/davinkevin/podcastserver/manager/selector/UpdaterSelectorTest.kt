@@ -3,9 +3,9 @@ package com.github.davinkevin.podcastserver.manager.selector
 import com.github.davinkevin.podcastserver.manager.worker.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.manager.worker.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
-import com.github.davinkevin.podcastserver.manager.worker.tf1replay.TF1ReplayUpdater
 import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
 import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdater
+import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
 import com.nhaarman.mockitokotlin2.any
@@ -35,7 +35,7 @@ class UpdaterSelectorTest {
     @Mock lateinit var franceTvUpdater: FranceTvUpdater
     @Mock lateinit var gulliUpdater: GulliUpdater
     @Mock lateinit var rssUpdater: RSSUpdater
-    @Mock lateinit var tf1ReplayUpdater: TF1ReplayUpdater
+    @Mock lateinit var myTf1Updater: MyTf1Updater
     @Mock lateinit var uploadUpdater: UploadUpdater
     @Mock lateinit var youtubeByXmlUpdater: YoutubeByXmlUpdater
     @Mock lateinit var youtubeByApiUpdater: YoutubeByApiUpdater
@@ -48,7 +48,7 @@ class UpdaterSelectorTest {
                 franceTvUpdater, 
                 gulliUpdater,
                 rssUpdater,
-                tf1ReplayUpdater, 
+                myTf1Updater,
                 uploadUpdater, 
                 youtubeByXmlUpdater,
                 youtubeByApiUpdater
@@ -80,7 +80,7 @@ class UpdaterSelectorTest {
                 franceTvUpdater,
                 gulliUpdater,
                 rssUpdater,
-                tf1ReplayUpdater,
+                myTf1Updater,
                 youtubeByXmlUpdater,
                 youtubeByApiUpdater
         )
@@ -105,7 +105,7 @@ class UpdaterSelectorTest {
                         Arguments.of("http://www.france.tv/show/for/dummies", "FranceTv"),
                         Arguments.of("http://replay.gulli.fr/showname", "Gulli"),
                         Arguments.of("http://www.link.to.rss/feeds", "RSS"),
-                        Arguments.of("http://www.tf1.fr/title", "TF1Replay"),
+                        Arguments.of("http://www.tf1.fr/title", "MyTF1"),
                         Arguments.of("http://www.youtube.com/user/fakeUser", "Youtube")
                 )
     }

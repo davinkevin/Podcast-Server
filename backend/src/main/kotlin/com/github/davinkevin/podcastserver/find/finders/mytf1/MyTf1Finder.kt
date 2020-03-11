@@ -41,7 +41,7 @@ class MyTf1Finder(
                         description = d.select("meta[property=og:description]").attr("content"),
                         url = url.let(::URI),
                         cover = cover.orNull(),
-                        type = "TF1Replay"
+                        type = "MyTF1"
                 ) }
     }
 

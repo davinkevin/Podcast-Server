@@ -51,16 +51,4 @@ public class JsonService {
     public static <T> Function<DocumentContext, T> to(String from, Class<T> clazz) {
         return d -> d.read(from, clazz);
     }
-
-    public static <T> Function<DocumentContext, T> to(TypeRef<T> typeRef) {
-        return JsonService.to("$", typeRef);
-    }
-
-    public static <T> Function<DocumentContext, T> to(String from, TypeRef<T> typeRef) {
-        return d -> d.read(from, typeRef);
-    }
-
-    public static <T> Function<DocumentContext, T> extract(String path) {
-        return d -> d.read(path);
-    }
 }

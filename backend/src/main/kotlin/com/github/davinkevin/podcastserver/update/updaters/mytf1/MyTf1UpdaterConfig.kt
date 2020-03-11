@@ -1,0 +1,35 @@
+package com.github.davinkevin.podcastserver.update.updaters.mytf1
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.util.DefaultUriBuilderFactory
+import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode
+import reactor.netty.http.client.HttpClient
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+
+/**
+ * Created by kevin on 11/03/2020
+ */
+@Configuration
+@Import(ImageServiceConfig::class)
+class MyTf1UpdaterConfig {
+
+    @Bean
+    fun myTf1Updater(imageService: ImageService, wcb: WebClient.Builder, om: ObjectMapper): MyTf1Updater {
+        val urlBuilderFactory = DefaultUriBuilderFactory("https://www.tf1.fr/").apply {
+            encodingMode = EncodingMode.NONE
+        }
+
+        val wc = wcb
+                .clone()
+                .uriBuilderFactory(urlBuilderFactory)
+                .build()
+
+        return MyTf1Updater(wc, om, imageService)
+    }
+}

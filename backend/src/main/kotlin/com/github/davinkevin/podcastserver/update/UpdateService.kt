@@ -13,10 +13,12 @@ import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.MessagingTemplate
+import com.github.davinkevin.podcastserver.service.image.ImageServiceV2
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
+import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
@@ -115,3 +117,11 @@ private fun ItemFromUpdate.toCreation(podcastId: UUID, cover: CoverForCreation) 
 
 private fun CoverFromUpdate.toCreation() = CoverForCreation(width, height, url)
 private fun CoverForPodcast.toCreation() = CoverForCreation(width, height, url)
+
+fun ImageServiceV2.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<CoverFromUpdate>> {
+    return Mono.justOrEmpty(url)
+            .flatMap { fetchCoverInformation(url!!) }
+            .map { CoverFromUpdate(it.width, it.height, it.url) }
+            .map { Optional.of<CoverFromUpdate>(it) }
+            .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
+}

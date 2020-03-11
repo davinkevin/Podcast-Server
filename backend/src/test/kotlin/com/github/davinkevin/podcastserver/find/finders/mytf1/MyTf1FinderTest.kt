@@ -6,12 +6,12 @@ import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.remapToMockServer
+import com.github.davinkevin.podcastserver.remapToMockServerGlobal
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -28,7 +28,6 @@ import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -47,7 +46,7 @@ class MyTf1FinderTest(
     @TestConfiguration
     @Import(MyTf1FinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {
-        @Bean fun webClientCustomization() = WebClientCustomizer { it.filter(remapToMockServer("www.tf1.fr")) }
+        @Bean fun webClientCustomization() = remapToMockServerGlobal("www.tf1.fr")
     }
 
     @Nested
@@ -68,7 +67,7 @@ class MyTf1FinderTest(
             ).toMono())
 
             backend.stubFor(get("/tmc/quotidien-avec-yann-barthes").willReturn(
-                    ok(fileAsString("/remote/podcast/tf1replay/quotidien.root.html"))
+                    ok(fileAsString("/remote/podcast/mytf1/quotidien.root.html"))
             ))
 
             /* When */
@@ -84,7 +83,7 @@ class MyTf1FinderTest(
                                     width = 456,
                                     url = URI("https://photos.tf1.fr/1200/0/vignette-portrait-quotidien-2-aa530a-0@1x.png")
                             ),
-                            type= "TF1Replay"
+                            type= "MyTF1"
                     ))
                     .verifyComplete()
         }
@@ -99,7 +98,7 @@ class MyTf1FinderTest(
                 val url = "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"
 
                 backend.stubFor(get("/tmc/quotidien-avec-yann-barthes").willReturn(
-                        ok(fileAsString("/remote/podcast/tf1replay/quotidien.root-without-picture.html"))
+                        ok(fileAsString("/remote/podcast/mytf1/quotidien.root-without-picture.html"))
                 ))
 
                 /* When */
@@ -111,7 +110,7 @@ class MyTf1FinderTest(
                                 description = "Yann Barthès est désormais sur TMC et TF1",
                                 url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
                                 cover = null,
-                                type= "TF1Replay"
+                                type= "MyTF1"
                         ))
                         .verifyComplete()
             }
@@ -122,7 +121,7 @@ class MyTf1FinderTest(
                 val url = "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"
 
                 backend.stubFor(get("/tmc/quotidien-avec-yann-barthes").willReturn(
-                        ok(fileAsString("/remote/podcast/tf1replay/quotidien.root-without-picture-url.html"))
+                        ok(fileAsString("/remote/podcast/mytf1/quotidien.root-without-picture-url.html"))
                 ))
 
                 /* When */
@@ -134,7 +133,7 @@ class MyTf1FinderTest(
                                 description = "Yann Barthès est désormais sur TMC et TF1",
                                 url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
                                 cover = null,
-                                type= "TF1Replay"
+                                type= "MyTF1"
                         ))
                         .verifyComplete()
             }
@@ -152,7 +151,7 @@ class MyTf1FinderTest(
                 ).toMono())
 
                 backend.stubFor(get("/tmc/quotidien-avec-yann-barthes").willReturn(
-                        ok(fileAsString("/remote/podcast/tf1replay/quotidien.root-with-picture-url-relative.html"))
+                        ok(fileAsString("/remote/podcast/mytf1/quotidien.root-with-picture-url-relative.html"))
                 ))
 
                 /* When */
@@ -168,16 +167,12 @@ class MyTf1FinderTest(
                                         width = 456,
                                         url = URI("https://photos.tf1.fr/1200/0/vignette-portrait-quotidien-2-aa530a-0@1x.png")
                                 ),
-                                type= "TF1Replay"
+                                type= "MyTF1"
                         ))
                         .verifyComplete()
             }
 
         }
-
-
-
-
     }
 
     @Nested

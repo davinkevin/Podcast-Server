@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import org.junit.jupiter.api.extension.*
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import reactor.kotlin.core.publisher.toMono
@@ -40,3 +41,5 @@ fun remapToMockServer(host: String) = ExchangeFilterFunction.ofRequestProcessor 
             .build()
             .toMono()
 }
+
+fun remapToMockServerGlobal(host: String) = WebClientCustomizer { it.filter(remapToMockServer(host)) }
