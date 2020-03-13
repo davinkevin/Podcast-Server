@@ -307,7 +307,6 @@ class MyTf1UpdaterTest(
 
     }
 
-
     @Test
     fun `should return MyTf1 type`() {
         /* Given */

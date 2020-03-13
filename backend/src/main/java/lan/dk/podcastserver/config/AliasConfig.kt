@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 @ComponentScan(basePackages = [
-    "com.github.davinkevin.podcastserver.service", "com.github.davinkevin.podcastserver.business", "com.github.davinkevin.podcastserver.manager", "com.github.davinkevin.podcastserver.config",
-    "lan.dk.podcastserver.service"])
+    "com.github.davinkevin.podcastserver.service",
+    "com.github.davinkevin.podcastserver.manager",
+    "com.github.davinkevin.podcastserver.config"
+])
 class AliasConfig

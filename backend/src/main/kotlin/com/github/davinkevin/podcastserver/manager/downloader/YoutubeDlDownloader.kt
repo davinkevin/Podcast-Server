@@ -93,6 +93,7 @@ class YoutubeDlDownloader(
             "www.tf1.fr" in url -> 5
             "www.france.tv" in url -> 5
             "replay.gulli.fr" in url -> 5
+            "dailymotion.com" in url -> 5
             else -> Integer.MAX_VALUE
         }
     }

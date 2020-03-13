@@ -124,9 +124,7 @@ class DailymotionFinderTest(
             }
 
         }
-
     }
-
 
     @DisplayName("shoud be compatible")
     @ParameterizedTest(name = "with {0}")
