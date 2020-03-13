@@ -7,7 +7,7 @@ import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
+import com.github.davinkevin.podcastserver.DELETE_ALL
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.count

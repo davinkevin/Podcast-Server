@@ -8,7 +8,7 @@ import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.DELETE_ALL
+import com.github.davinkevin.podcastserver.DELETE_ALL
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

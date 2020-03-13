@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.INSERT_ITEM_DATA
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.database.Tables.COVER
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
@@ -8,7 +9,8 @@ import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
+import com.github.davinkevin.podcastserver.DELETE_ALL
+import com.github.davinkevin.podcastserver.DB_DATE_FORMATTER
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
@@ -293,10 +295,10 @@ class ItemRepositoryTest(
                 insertInto("ITEM")
                         .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION").apply {
                             val max = 50
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(formatter), now().minusDays(it.toLong()+1).format(formatter), now().minusDays(15.toLong()+2).format(formatter), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc") }
                         }.build()!!,
                 insertInto("TAG")
                         .columns("ID", "NAME")
@@ -1060,9 +1062,9 @@ class ItemRepositoryTest(
         private val itemDownloadingStateOperation = sequenceOf(operation, sequenceOf(
                 insertInto("ITEM")
                         .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION")
-                        .values(fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 140", "http://fakeurl.com/geekinc.140.mp3", "geekinc.140.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(15).format(formatter), now().minusDays(15).format(formatter), now().minusMonths(2).format(formatter), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
-                        .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "geekinc.141.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), PAUSED, now().minusDays(1).format(formatter), null, now().minusWeeks(2).format(formatter), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
-                        .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "geekinc.142.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(1).format(formatter), null, now().minusWeeks(1).format(formatter), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .values(fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 140", "http://fakeurl.com/geekinc.140.mp3", "geekinc.140.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(15).format(DB_DATE_FORMATTER), now().minusDays(15).format(DB_DATE_FORMATTER), now().minusMonths(2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "geekinc.141.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), PAUSED, now().minusDays(1).format(DB_DATE_FORMATTER), null, now().minusWeeks(2).format(DB_DATE_FORMATTER), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "geekinc.142.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(1).format(DB_DATE_FORMATTER), null, now().minusWeeks(1).format(DB_DATE_FORMATTER), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
                         .build()
         ))
 

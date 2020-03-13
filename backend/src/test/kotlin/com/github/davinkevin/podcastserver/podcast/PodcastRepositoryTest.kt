@@ -1,5 +1,8 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.INSERT_ITEM_DATA
+import com.github.davinkevin.podcastserver.INSERT_PODCAST_DATA
+import com.github.davinkevin.podcastserver.INSERT_TAG_DATA
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -9,7 +12,8 @@ import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import lan.dk.podcastserver.repository.DatabaseConfigurationTest.*
+import com.github.davinkevin.podcastserver.DELETE_ALL
+import com.github.davinkevin.podcastserver.DB_DATE_FORMATTER
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -108,9 +112,9 @@ class PodcastRepositoryTest(
                         .build(),
                 insertInto("PODCAST")
                         .columns("ID", "TITLE", "URL", "COVER_ID", "HAS_TO_BE_DELETED", "TYPE", "LAST_UPDATE")
-                        .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/appload.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), false, "RSS", currentNow.minusDays(15).format(formatter))
-                        .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), true, "Youtube", currentNow.minusDays(30).format(formatter))
-                        .values(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"), "Without tags", "http://fake.url.com/notags.rss", fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), true, "Youtube", currentNow.minusDays(45).format(formatter))
+                        .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/appload.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), false, "RSS", currentNow.minusDays(15).format(DB_DATE_FORMATTER))
+                        .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), true, "Youtube", currentNow.minusDays(30).format(DB_DATE_FORMATTER))
+                        .values(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"), "Without tags", "http://fake.url.com/notags.rss", fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), true, "Youtube", currentNow.minusDays(45).format(DB_DATE_FORMATTER))
                         .build(),
                 insertInto("TAG")
                         .columns("ID", "NAME")
