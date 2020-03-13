@@ -24,8 +24,6 @@ server:
   mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
 logging:
- level:
-  lan.dk.podcastserver : DEBUG
  file:
   path: /tmp/podcast-server/podcast-server.log
 

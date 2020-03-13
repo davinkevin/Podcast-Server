@@ -16,12 +16,12 @@ class PodcastRoutingConfig {
     @Bean
     fun podcastRouter(podcast: PodcastHandler, xml: PodcastXmlHandler) = router {
         "/api/v1/podcasts".nest {
-
+            val id = "{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
             GET("/", podcast::findAll)
             GET("/opml", xml::opml)
-            GET("/{id}", podcast::findById)
+            GET("/${id}", podcast::findById)
             POST("/", podcast::create)
-            PUT("/{id}", podcast::update)
+            PUT("/${id}", podcast::update)
 
             "/{id}".nest {
                 GET("/cover.{ext}", podcast::cover)

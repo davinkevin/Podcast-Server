@@ -19,8 +19,6 @@ server:
  port: 8080
 
 logging:
- level:
-  lan.dk.podcastserver : DEBUG
  file:
   path: /tmp/podcast-server/podcast-server.log
 

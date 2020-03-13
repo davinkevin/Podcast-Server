@@ -8,18 +8,7 @@
         </encoder>
     </appender>
 
-    <logger name="lan.dk.podcastserver" level="DEBUG"/>
-    <logger name="lan.dk.podcastserver.utils" level="WARN"/>
-    <logger name="org.hibernate" level="OFF" />
     <logger name="org.springframework" level="OFF" />
-
-    <!-- Spring MVC -->
-    <!-- ORM | Hibernate
-          <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
-          <logger name="org.springframework.transaction" level="TRACE"/>
-          <logger name="org.springframework.web" level="DEBUG"/>
-    -->
-
 
     <root level="info">
         <appender-ref ref="STDOUT" />

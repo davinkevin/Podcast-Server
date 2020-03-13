@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.find.FindConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.playlist.PlaylistConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
+import com.github.davinkevin.podcastserver.podcast.type.TypeConfig
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.core.annotation.Order
 import org.springframework.core.convert.converter.Converter
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -38,12 +40,6 @@ import java.nio.file.Paths
         PlaylistConfig::class,
         DownloadConfig::class
 )
-@ComponentScan(basePackages = [
-    "com.github.davinkevin.podcastserver.service",
-    "com.github.davinkevin.podcastserver.manager",
-    "com.github.davinkevin.podcastserver.config"
-])
-
 class BeanConfigScan {
 
     @Bean

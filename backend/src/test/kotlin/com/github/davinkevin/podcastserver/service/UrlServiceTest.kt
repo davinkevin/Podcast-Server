@@ -1,14 +1,12 @@
-package lan.dk.podcastserver.service
+package com.github.davinkevin.podcastserver.service
 
 
-import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.UrlService.Companion.USER_AGENT_DESKTOP
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
