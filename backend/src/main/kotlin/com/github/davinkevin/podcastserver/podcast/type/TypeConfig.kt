@@ -13,10 +13,6 @@ import org.springframework.web.reactive.function.server.router
 @Import(TypeHandler::class)
 class TypeRoutingConfig {
 
-    init {
-        println("creation of TypeRoutingConfig")
-    }
-
     @Bean
     fun typeRouter(type: TypeHandler) = router {
         GET("/api/v1/podcasts/types", type::findAll)
