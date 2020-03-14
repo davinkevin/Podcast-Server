@@ -19,7 +19,7 @@ class DailymotionUpdaterConfig {
             wcb: WebClient.Builder,
             image: ImageServiceV2
     ): DailymotionUpdater {
-        val wc = wcb.baseUrl("https://api.dailymotion.com").build()
+        val wc = wcb.clone().baseUrl("https://api.dailymotion.com").build()
 
         return DailymotionUpdater(wc, image)
     }
