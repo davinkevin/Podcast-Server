@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 12/01/2020

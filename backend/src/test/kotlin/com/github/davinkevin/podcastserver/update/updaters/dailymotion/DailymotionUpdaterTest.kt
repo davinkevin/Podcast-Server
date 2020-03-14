@@ -27,14 +27,13 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Hooks
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 13/03/2020

@@ -22,7 +22,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 class FranceTvUpdater(
         private val franceTvClient: WebClient,

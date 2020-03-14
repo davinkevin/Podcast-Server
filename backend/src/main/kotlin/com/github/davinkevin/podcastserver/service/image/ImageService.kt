@@ -9,9 +9,9 @@ import java.io.InputStream
 import java.net.URI
 import javax.imageio.ImageIO
 
-class ImageServiceV2 ( private val wcb: WebClient.Builder ) {
+class ImageService (private val wcb: WebClient.Builder ) {
 
-    private val log = LoggerFactory.getLogger(ImageServiceV2::class.java)
+    private val log = LoggerFactory.getLogger(ImageService::class.java)
 
     fun fetchCoverInformation(url: URI): Mono<CoverInformation> {
         log.debug("fetch $url")

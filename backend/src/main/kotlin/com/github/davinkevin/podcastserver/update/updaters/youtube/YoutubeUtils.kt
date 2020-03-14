@@ -2,9 +2,8 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.utils.k
 import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.service.HtmlService
 import java.util.*
 
 /**

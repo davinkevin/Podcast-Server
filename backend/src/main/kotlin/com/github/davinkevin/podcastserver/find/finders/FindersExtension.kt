@@ -5,7 +5,7 @@ import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 internal fun ImageService.fetchCoverInformationOrOption(url: URI) =
         this.fetchCoverInformation(url)

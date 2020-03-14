@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.web.reactive.function.client.WebClient
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 18/02/2020

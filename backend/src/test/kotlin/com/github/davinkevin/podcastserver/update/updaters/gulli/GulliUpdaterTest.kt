@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
@@ -55,7 +55,7 @@ class GulliUpdaterTest(
 
 
     @MockBean
-    lateinit var imageService: ImageServiceV2
+    lateinit var imageService: ImageService
 
     private val podcast = PodcastToUpdate(
             id = UUID.randomUUID(),

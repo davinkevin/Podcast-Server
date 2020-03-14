@@ -9,7 +9,6 @@ import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import org.jsoup.Jsoup
-import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -20,7 +19,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.time.ZonedDateTime
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 14/03/2020

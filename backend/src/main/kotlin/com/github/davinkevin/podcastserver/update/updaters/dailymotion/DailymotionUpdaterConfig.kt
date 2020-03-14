@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.dailymotion
 
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -17,7 +17,7 @@ class DailymotionUpdaterConfig {
     @Bean
     fun dailymotionUpdater(
             wcb: WebClient.Builder,
-            image: ImageServiceV2
+            image: ImageService
     ): DailymotionUpdater {
         val wc = wcb.clone().baseUrl("https://api.dailymotion.com").build()
 

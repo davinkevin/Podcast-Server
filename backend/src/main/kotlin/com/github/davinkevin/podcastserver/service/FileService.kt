@@ -38,6 +38,7 @@ class FileService(
     private val log = LoggerFactory.getLogger(FileService::class.java)
 
     private val wcb = wcbs
+            .clone()
             .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
 
     fun deletePodcast(podcast: DeletePodcastInformation) = Mono.defer {

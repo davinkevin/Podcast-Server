@@ -3,13 +3,12 @@ package com.github.davinkevin.podcastserver.find.finders.rss
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okXml
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

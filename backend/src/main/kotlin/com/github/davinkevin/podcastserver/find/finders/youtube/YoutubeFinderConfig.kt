@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.youtube
 
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -14,12 +14,12 @@ import reactor.netty.http.client.HttpClient
 class YoutubeFinderConfig {
 
     @Bean
-    fun youtubeFinder(imageServiceV2: ImageServiceV2, wcb: WebClient.Builder): YoutubeFinder {
+    fun youtubeFinder(imageService: ImageService, wcb: WebClient.Builder): YoutubeFinder {
         val builder = wcb
                 .clone()
                 .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect { _, res -> res.status().code() in 300..399 }))
 
-        return YoutubeFinder(imageServiceV2, builder)
+        return YoutubeFinder(imageService, builder)
     }
 
 }

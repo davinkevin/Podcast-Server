@@ -10,11 +10,11 @@ import reactor.netty.http.client.HttpClient
 class ImageServiceConfig {
 
     @Bean
-    fun imageServiceV2(wcb: WebClient.Builder): ImageServiceV2 {
+    fun imageServiceV2(wcb: WebClient.Builder): ImageService {
         val builder = wcb
                 .clone()
                 .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
 
-        return ImageServiceV2(builder)
+        return ImageService(builder)
     }
 }

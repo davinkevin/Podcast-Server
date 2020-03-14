@@ -20,7 +20,7 @@ import java.net.URI
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import com.github.davinkevin.podcastserver.service.image.ImageServiceV2 as ImageService
+import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 13/03/2020
