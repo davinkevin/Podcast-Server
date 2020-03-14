@@ -33,18 +33,16 @@ class GulliFinder(
                 .map { Jsoup.parse(it, url) }
                 .flatMap { findCover(it).zipWith(it.toMono()) }
                 .map { (cover, d) -> FindPodcastInformation(
-                    title = d.select("ol.breadcrumb li.active").first().text(),
-                    cover = cover.orNull(),
-                    description = d.select("meta[property=og:description]").attr("content"),
-                    url = URI(d.select("meta[property=og:url]").attr("content")),
-                    type = "Gulli"
+                        title = d.select("ol.breadcrumb li.active").first().text(),
+                        cover = cover.orNull(),
+                        description = d.select(".container_full .description").text(),
+                        url = URI(url),
+                        type = "Gulli"
                 ) }
     }
 
     private fun findCover(d: Document): Mono<Optional<FindCoverInformation>> {
-        val pageUrl = d.select("meta[property=og:url]").attr("content")
-
-        val imgTag = d.select("div.program_gullireplay a[href=$pageUrl] img")
+        val imgTag = d.select(".container_full .visuel img")
                 .firstOrNull() ?: return Optional.empty<FindCoverInformation>().toMono()
 
         return image.fetchCoverInformationOrOption(URI(imgTag.attr("src")))
@@ -53,5 +51,4 @@ class GulliFinder(
     override fun compatibility(url: String?) =
             if ((url ?: "").contains("replay.gulli.fr")) 1
             else Integer.MAX_VALUE
-
 }

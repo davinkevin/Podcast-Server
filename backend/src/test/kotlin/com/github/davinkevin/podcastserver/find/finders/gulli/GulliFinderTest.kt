@@ -47,56 +47,83 @@ class GulliFinderTest(
         fun `podcast by url`(backend: WireMockServer) {
             /* Given */
             val podcastUrl = "http://replay.gulli.fr/dessins-animes/Pokemon3"
-            val coverUrl = "http://resize1-gulli.ladmedia.fr/r/340,255,smartcrop,center-top/img/var/storage/imports/replay/images_programme/pokemon_s19.jpg"
+            val coverUrl = "https://resize-gulli.jnsmedia.fr/rcrop/1900,550,smartcrop,center-top/img//var/jeunesse/storage/images/gulli/chaine-tv/dessins-animes/pokemon/23289795-181-fre-FR/Pokemon.jpg"
 
             whenever(image.fetchCoverInformation(URI(coverUrl)))
                     .thenReturn(CoverInformation(123, 456, URI(coverUrl)).toMono())
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
-                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.html")))
-            )
+                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(podcastUrl))
                     /* Then */
                     .expectSubscription()
-                    .expectNext( FindPodcastInformation(
-                            title = "Pokémon",
-                            url = URI(podcastUrl),
-                            type = "Gulli",
-                            description = "",
-                            cover = FindCoverInformation(
-                                    height = 456,
-                                    width = 123,
-                                    url = URI(coverUrl)
-                            )
-                    ))
+                    .assertNext {
+                        assertThat(it.title).isEqualTo("Pokémon")
+                        assertThat(it.url).isEqualTo(URI(podcastUrl))
+                        assertThat(it.type).isEqualTo("Gulli")
+                        assertThat(it.description).isEqualTo("Saison 22 - Pokémon, la série : Soleil et Lune –Ultra-Légendes Alors que Sacha a réussi trois des quatre Grandes Épreuves de la région d’Alola, de nouvelles aventures se profilent pour lui et ses amis. Ils font l’acquisition de Cristaux Z, se lient d’amitié avec des Pokémon et apprennent à faire du Surf Démanta. En tant qu’Ultra-Gardiens, les étudiants de l’École Pokémon acceptent de protéger le Mont Wela. Sacha rencontre un nouveau rival, Tili, et son Efflèche qui offre à Brindibou un défi de taille. Motisma-Dex vit lui aussi une aventure lorsque nos héros découvrent les coulisses de son programme télévisé favori. Quant au Professeur Euphorbe, son rêve de commencer une Ligue Pokémon à Alola pourrait bien devenir réalité...")
+                        assertThat(it.cover).isEqualTo(FindCoverInformation(
+                                height = 456,
+                                width = 123,
+                                url = URI(coverUrl)
+                        ))
+                    }
                     .verifyComplete()
         }
 
         @Test
-        fun `podcast by url without cover`(backend: WireMockServer) {
+        fun `podcast without cover`(backend: WireMockServer) {
             /* Given */
             val podcastUrl = "http://replay.gulli.fr/dessins-animes/Pokemon3"
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
-                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.without-cover.html")))
-            )
+                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.without-cover.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(podcastUrl))
                     /* Then */
                     .expectSubscription()
-                    .expectNext( FindPodcastInformation(
-                            title = "Pokémon",
-                            url = URI(podcastUrl),
-                            type = "Gulli",
-                            description = "",
-                            cover = null
-                    ))
+                    .assertNext {
+                        assertThat(it.title).isEqualTo("Pokémon")
+                        assertThat(it.url).isEqualTo(URI(podcastUrl))
+                        assertThat(it.type).isEqualTo("Gulli")
+                        assertThat(it.description).isEqualTo("Saison 22 - Pokémon, la série : Soleil et Lune –Ultra-Légendes Alors que Sacha a réussi trois des quatre Grandes Épreuves de la région d’Alola, de nouvelles aventures se profilent pour lui et ses amis. Ils font l’acquisition de Cristaux Z, se lient d’amitié avec des Pokémon et apprennent à faire du Surf Démanta. En tant qu’Ultra-Gardiens, les étudiants de l’École Pokémon acceptent de protéger le Mont Wela. Sacha rencontre un nouveau rival, Tili, et son Efflèche qui offre à Brindibou un défi de taille. Motisma-Dex vit lui aussi une aventure lorsque nos héros découvrent les coulisses de son programme télévisé favori. Quant au Professeur Euphorbe, son rêve de commencer une Ligue Pokémon à Alola pourrait bien devenir réalité...")
+                        assertThat(it.cover).isNull()
+                    }
                     .verifyComplete()
         }
 
+        @Test
+        fun `podcast without description`(backend: WireMockServer) {
+            /* Given */
+            val podcastUrl = "http://replay.gulli.fr/dessins-animes/Pokemon3"
+            val coverUrl = "https://resize-gulli.jnsmedia.fr/rcrop/1900,550,smartcrop,center-top/img//var/jeunesse/storage/images/gulli/chaine-tv/dessins-animes/pokemon/23289795-181-fre-FR/Pokemon.jpg"
+
+            whenever(image.fetchCoverInformation(URI(coverUrl)))
+                    .thenReturn(CoverInformation(123, 456, URI(coverUrl)).toMono())
+
+            backend.stubFor(get("/dessins-animes/Pokemon3")
+                    .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.without-description.html"))))
+
+            /* When */
+            StepVerifier.create(finder.findInformation(podcastUrl))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.title).isEqualTo("Pokémon")
+                        assertThat(it.url).isEqualTo(URI(podcastUrl))
+                        assertThat(it.type).isEqualTo("Gulli")
+                        assertThat(it.description).isEqualTo("")
+                        assertThat(it.cover).isEqualTo(FindCoverInformation(
+                                height = 456,
+                                width = 123,
+                                url = URI(coverUrl)
+                        ))
+                    }
+                    .verifyComplete()
+        }
 
 
     }
