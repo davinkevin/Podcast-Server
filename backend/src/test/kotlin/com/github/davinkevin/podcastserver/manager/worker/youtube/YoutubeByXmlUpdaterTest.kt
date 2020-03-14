@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.worker.youtube
 
 import arrow.core.None
+import arrow.core.toOption
 import com.github.davinkevin.podcastserver.fileAsHtml
 import com.github.davinkevin.podcastserver.fileAsXml
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
@@ -48,7 +49,7 @@ class YoutubeByXmlUpdaterTest {
     fun `should get items for channel`() {
         /* Given */
         val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
-        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html").toOption())
         whenever(jdomService.parse(any())).then { fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml") }
 
         /* When */
@@ -81,7 +82,7 @@ class YoutubeByXmlUpdaterTest {
         /* Given */
         val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
 
-        whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
+        whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html").toOption())
         whenever(jdomService.parse(any())).thenReturn( fileAsXml("/remote/podcast/youtube/youtube.androiddevelopers.xml"))
 
         /* When */
@@ -97,7 +98,7 @@ class YoutubeByXmlUpdaterTest {
     fun `should handle error during signature`() {
         val url = URI("https://www.youtube.com/user/androiddevelopers")
 
-        whenever(htmlService.get(any())).thenReturn( fileAsHtml("/remote/podcast/youtube/androiddevelopers.html"))
+        whenever(htmlService.get(any())).thenReturn(fileAsHtml("/remote/podcast/youtube/androiddevelopers.html").toOption())
         whenever(jdomService.parse(any())).thenReturn(null)
 
         /* When */

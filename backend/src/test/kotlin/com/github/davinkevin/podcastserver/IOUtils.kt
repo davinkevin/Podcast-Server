@@ -1,20 +1,16 @@
 package com.github.davinkevin.podcastserver
 
-import arrow.core.getOrElse
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.jayway.jsonpath.Configuration
-import com.jayway.jsonpath.DocumentContext
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
-import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.input.SAXBuilder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.nio.file.Files
@@ -38,43 +34,30 @@ private val PARSER = JsonPath.using(Configuration.builder().mappingProvider(Jack
 const val TEMPORARY_EXTENSION = ".psdownload"
 val ROOT_TEST_PATH: Path = Paths.get("/tmp/podcast-server-test/")
 
-fun toPath(uri: String): arrow.core.Try<Path> =
-        arrow.core.Try { IOUtils::class.java.getResource(uri) }
-                .map { it.toURI() }
-                .map { Paths.get(it) }
-
-fun fileAsXml(uri: String): org.jdom2.Document? = toPath(uri)
-        .map { it.toFile() }
-        .map { f -> SAXBuilder().build(f) }
-        .toOption()
-        .orNull()
-
-fun fileAsHtml(uri: String, baseUri: String = ""): arrow.core.Option<Document> = toPath(uri)
-        .map { it.toFile() }
-        .map { Jsoup.parse(it, "UTF-8", baseUri) }
-        .toOption()
-
-fun fileAsString(uri: String): String {
-    return toPath(uri)
-            .map { Files.newInputStream(it) }
-            .map { it.bufferedReader().use { it.readText() } }
-            .getOrElse { throw RuntimeException("Error during file fetching", it) }
+fun toPath(uri: String): Path {
+    val file = IOUtils::class.java.getResource(uri).toURI() ?: error("file $uri not found")
+    return Paths.get(file)
 }
 
-fun fileAsJson(path: String): arrow.core.Option<DocumentContext> = arrow.core.Option.just(path)
-        .flatMap { arrow.core.Option.fromNullable(IOUtils::class.java.getResource(it)) }
-        .map { it.toURI() }
-        .map { Paths.get(it) }
-        .map { it.toFile() }
-        .map { PARSER.parse(it) }
+fun fileAsXml(uri: String): org.jdom2.Document? {
+    return SAXBuilder().build(toPath(uri).toFile())
+}
 
-fun fileAsReader(file: String): BufferedReader = toPath(file)
-        .map { Files.newBufferedReader(it) }
-        .getOrElse{ throw IOException("File $file not found") }
+fun fileAsHtml(uri: String, baseUri: String = ""): Document {
+    val file = toPath(uri).toFile()
+    return Jsoup.parse(file, "UTF-8", baseUri)
+}
 
-fun urlAsStream(url: String): InputStream = arrow.core.Try { URL(url).openStream() }
-        .getOrElse{ throw RuntimeException(it) }
+fun fileAsString(uri: String): String {
+    return Files.newInputStream(toPath(uri))
+            .bufferedReader()
+            .use { it.readText() }
+}
 
-fun stringAsJson(text: String): DocumentContext = PARSER.parse(text)
+fun fileAsReader(file: String): BufferedReader {
+    return Files.newBufferedReader(toPath(file)) ?: error("File $file not found")
+}
 
-fun digest(text: String): String = DigestUtils.md5Hex(text)
+fun urlAsStream(url: String): InputStream {
+    return URL(url).openStream()
+}

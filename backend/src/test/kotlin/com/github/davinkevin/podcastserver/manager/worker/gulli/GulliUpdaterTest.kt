@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.manager.worker.gulli
 
 import arrow.core.None
 import arrow.core.getOrElse
+import arrow.core.toOption
 import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.fileAsHtml
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
@@ -41,7 +42,7 @@ class GulliUpdaterTest {
     @Test
     fun `should get signature`() {
         /* Given */
-        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.html")).toOption())
         whenever(signatureService.fromText(any())).thenCallRealMethod()
 
         /* When */
@@ -66,9 +67,9 @@ class GulliUpdaterTest {
     @Test
     fun `should return list of items`() {
         /* Given */
-        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.html")))
-        doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
-        doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.html")).toOption())
+        doReturn(fileAsHtml(from("VOD68526621555000.html")).toOption()).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
+        doReturn(fileAsHtml(from("VOD68526621609000.html")).toOption()).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
         whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation (url = URI(it.getArgument(0)), height = 200, width = 200) }
 
         /* When */
@@ -93,7 +94,7 @@ class GulliUpdaterTest {
     @Test
     fun `should return empty list if video selector is not found`() {
         /* Given */
-        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.with-different-format.html")))
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.with-different-format.html")).toOption())
         /* When */
         val items = gulliUpdater.blockingFindItems(podcast)
         /* Then */
@@ -113,8 +114,8 @@ class GulliUpdaterTest {
     @Test
     fun `should handle item with different structure`() {
         /* Given */
-        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.with-different-item-format.html")))
-        doReturn(fileAsHtml(from("VOD68526621555000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.with-different-item-format.html")).toOption())
+        doReturn(fileAsHtml(from("VOD68526621555000.html")).toOption()).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621555000")
         whenever(imageService.fetchCoverInformation(any<String>())).then { CoverInformation ( url = URI(it.getArgument(0)), height = 200, width = 200 ) }
 
         /* When */
@@ -126,8 +127,8 @@ class GulliUpdaterTest {
     @Test
     fun `should handle item without cover`() {
         /* Given */
-        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.without-cover.html")))
-        doReturn(fileAsHtml(from("VOD68526621609000.html"))).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
+        whenever(htmlService.get(podcast.url.toASCIIString())).thenReturn(fileAsHtml(from("pokemon.without-cover.html")).toOption())
+        doReturn(fileAsHtml(from("VOD68526621609000.html")).toOption()).whenever(htmlService).get("http://replay.gulli.fr/dessins-animes/Pokemon3/VOD68526621609000")
         whenever(imageService.fetchCoverInformation(any<String>())).thenReturn(null)
 
         /* When */
