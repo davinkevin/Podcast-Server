@@ -93,6 +93,7 @@ class RSSUpdater(
 
     private fun fetchRss(url: URI): Mono<ByteArrayResource> {
         return wcb
+                .clone()
                 .baseUrl(url.toASCIIString())
                 .build()
                 .get()

@@ -18,7 +18,7 @@ class FranceTvUpdaterConfig {
     @Bean
     fun franceTvUpdater(wcb: WebClient.Builder, image: ImageService, mapper: ObjectMapper): FranceTvUpdater {
         val franceTvClient = wcb.clone().baseUrl("https://www.france.tv/").build()
-        val franceTvApi = wcb.baseUrl("https://sivideo.webservices.francetelevisions.fr").build()
+        val franceTvApi = wcb.clone().baseUrl("https://sivideo.webservices.francetelevisions.fr").build()
 
         return FranceTvUpdater(franceTvClient, franceTvApi, image, mapper)
     }
