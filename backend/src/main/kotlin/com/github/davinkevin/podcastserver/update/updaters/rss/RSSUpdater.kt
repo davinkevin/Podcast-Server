@@ -2,12 +2,12 @@ package com.github.davinkevin.podcastserver.update.updaters.rss
 
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.*
-import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
+import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
@@ -85,7 +85,7 @@ class RSSUpdater(
     }
 
     override fun signatureOf(url: URI): Mono<String> = fetchRss(url)
-            .map { DigestUtils.md5Hex(it.inputStream) }
+            .map { DigestUtils.md5DigestAsHex(it.inputStream) }
             .onErrorResume {
                 log.error("error during update", it)
                 "error_during_update".toMono()

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.*
-import org.apache.commons.codec.digest.DigestUtils
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
+import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
@@ -108,8 +108,8 @@ class FranceTvUpdater(
                 .map { it.attr("href") }
                 .sort()
                 .reduce { t, u -> """$t-$u""" }
-                .map { DigestUtils.md5Hex(it) }
-                .switchIfEmpty(Mono.just(""))
+                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
+                .switchIfEmpty("".toMono())
     }
 
     override fun type() = Type("FranceTv", "France•tv")

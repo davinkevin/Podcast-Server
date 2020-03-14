@@ -9,11 +9,10 @@ import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.HtmlService
 import com.github.davinkevin.podcastserver.service.JdomService
-import com.github.davinkevin.podcastserver.utils.k
-import org.apache.commons.codec.digest.DigestUtils
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.slf4j.LoggerFactory
+import org.springframework.util.DigestUtils
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -98,7 +97,7 @@ class YoutubeByXmlUpdater(
                 .joinToString { it.getChildText("id", dn) }
 
         return if(joinedIds.isEmpty()) joinedIds
-        else DigestUtils.md5Hex(joinedIds)
+        else DigestUtils.md5DigestAsHex(joinedIds.toByteArray())
     }
 
     override fun type() = _type()

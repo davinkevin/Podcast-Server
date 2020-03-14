@@ -8,9 +8,9 @@ import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
-import org.apache.commons.codec.digest.DigestUtils
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
+import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
@@ -74,7 +74,7 @@ class YoutubeByApiUpdater(
                     .map { it.items }
                     .map { items -> items.joinToString { it.snippet.resourceId.videoId } }
                     .filter { it.isNotEmpty() }
-                    .map { DigestUtils.md5Hex(it) }
+                    .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
                     .switchIfEmpty { "".toMono() }
         }
     }

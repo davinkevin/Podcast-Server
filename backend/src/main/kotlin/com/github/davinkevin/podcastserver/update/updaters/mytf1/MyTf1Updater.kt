@@ -8,7 +8,7 @@ import com.github.davinkevin.podcastserver.manager.worker.Type
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
-import org.apache.commons.codec.digest.DigestUtils
+import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
@@ -73,7 +73,7 @@ class MyTf1Updater(
                 .map { it.streamId }
                 .sort()
                 .reduce { t, u -> """$t, $u""" }
-                .map { DigestUtils.md5Hex(it) }
+                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
                 .switchIfEmpty("".toMono())
     }
 
