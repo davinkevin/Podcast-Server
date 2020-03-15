@@ -39,7 +39,7 @@ class YoutubeByApiUpdater(
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         log.debug("find items of {}", podcast.url)
 
-        return findPlaylistId(podcast.url.toURL().file).flatMapMany { id ->
+        return findPlaylistId(podcast.url).flatMapMany { id ->
             Flux.range(1, MAX_PAGE)
                     .flatMap ({ pageNumber -> Mono
                             .subscriberContext()
@@ -69,7 +69,7 @@ class YoutubeByApiUpdater(
     override fun signatureOf(url: URI): Mono<String> {
         log.debug("signature of {}", url)
 
-        return findPlaylistId(url.toASCIIString()).flatMap { id ->
+        return findPlaylistId(url).flatMap { id ->
             fetchPageWithToken(id)
                     .map { it.items }
                     .map { items -> items.joinToString { it.snippet.resourceId.videoId } }
@@ -98,13 +98,13 @@ class YoutubeByApiUpdater(
                     .bodyToMono<YoutubeApiResponse>()
                     .onErrorResume { YoutubeApiResponse(emptyList()).toMono() }
 
-    private fun findPlaylistId(path: String): Mono<String> {
-        if (isPlaylist(path))
-            return playlistIdOf(path).toMono()
+    private fun findPlaylistId(url: URI): Mono<String> {
+        if (isPlaylist(url))
+            return url.toASCIIString().substringAfter("list=").toMono()
 
         return youtubeClient
                 .get()
-                .uri(path)
+                .uri(url)
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, "https://www.youtube.com") }
@@ -118,7 +118,7 @@ class YoutubeByApiUpdater(
             if (channelId.startsWith("UC")) channelId.replaceFirst("UC".toRegex(), "UU")
             else channelId
 
-    override fun type() = _type()
+    override fun type() = type
     override fun compatibility(url: String?) = _compatibility(url)
 
     companion object {

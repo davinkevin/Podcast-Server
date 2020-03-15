@@ -1,106 +1,126 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import arrow.core.getOrElse
-import arrow.core.toOption
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.manager.worker.Updater
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.service.JdomService
 import org.jdom2.Element
 import org.jdom2.Namespace
-import org.slf4j.LoggerFactory
+import org.jdom2.input.SAXBuilder
+import org.jsoup.Jsoup
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.util.DigestUtils
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 /**
- * Created by kevin on 11/09/2018
+ * Created by kevin on 15/03/2020
  */
 class YoutubeByXmlUpdater(
-        private val jdomService: JdomService,
-        private val htmlService: HtmlService
-) : Updater {
+        private val wc: WebClient
+): Updater {
 
-    private val log = LoggerFactory.getLogger(this.javaClass.name)!!
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> {
-        log.info("Youtube Update by RSS")
-
-        val url = playlistUrlOf(podcast.url.toASCIIString())
-        val parsedXml = jdomService.parse(url).toOption()
-
-        val dn = parsedXml
-                .map { it.rootElement }
-                .map { it.namespace }
-                .getOrElse { Namespace.NO_NAMESPACE }
-
-        return parsedXml
-                .map { it.rootElement }
-                .map { it.getChildren("entry", it.namespace) }
-                .getOrElse { listOf() }
-                .map { toItem(it, dn) }
-                .toSet()
+    override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
+        return fetchXml(podcast.url)
+                .flatMapMany { text ->
+                    val xml = SAXBuilder().build(text.inputStream)
+                    val dn = xml.rootElement.namespace
+                    xml
+                            .rootElement
+                            .getChildren("entry", dn)
+                            .toFlux()
+                            .map { toItem(it, dn) }
+                }
     }
-
-    private fun playlistUrlOf(url: String): String =
-            if (isPlaylist(url)) PLAYLIST_RSS_BASE.format(playlistIdOf(url))
-            else CHANNEL_RSS_BASE.format(channelIdOf(htmlService, url))
 
     private fun toItem(e: Element, dn: Namespace): ItemFromUpdate {
         val mediaGroup = e.getChild("group", MEDIA_NAMESPACE)
-        return ItemFromUpdate(
-            title = e.getChildText("title", dn),
-            description = mediaGroup.getChildText("description", MEDIA_NAMESPACE),
-
-            //2013-12-20T22:30:01.000Z
-            pubDate = ZonedDateTime.parse(e.getChildText("published", dn), DateTimeFormatter.ISO_DATE_TIME),
-
-            url = urlOf(mediaGroup.getChild("content", MEDIA_NAMESPACE).getAttributeValue("url")),
-            cover = coverOf(mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE))
-        )
-    }
-
-    private fun coverOf(thumbnail: Element?) =
-            java.util.Optional.ofNullable(thumbnail)
-                    .map { CoverFromUpdate(
-                        url = URI(it.getAttributeValue("url")),
-                        width = it.getAttributeValue("width").toInt(),
-                        height = it.getAttributeValue("height").toInt()
-                    ) }
-                    .orNull()
-
-    private fun urlOf(embeddedVideoPage: String): URI {
-        val idVideo = embeddedVideoPage
+        val idVideo = mediaGroup.getChild("content", MEDIA_NAMESPACE)
+                .getAttributeValue("url")
                 .substringAfterLast("/")
                 .substringBefore("?")
 
-        return URI(URL_PAGE_BASE.format(idVideo))
+        val thumbnail = mediaGroup.getChild("thumbnail", MEDIA_NAMESPACE)
+
+        return ItemFromUpdate(
+                title = e.getChildText("title", dn),
+                description = mediaGroup.getChildText("description", MEDIA_NAMESPACE),
+
+                //2013-12-20T22:30:01.000Z
+                pubDate = ZonedDateTime.parse(e.getChildText("published", dn), DateTimeFormatter.ISO_DATE_TIME),
+
+                url = URI("https://www.youtube.com/watch?v=$idVideo"),
+                cover = CoverFromUpdate(
+                        url = URI(thumbnail.getAttributeValue("url")),
+                        width = thumbnail.getAttributeValue("width").toInt(),
+                        height = thumbnail.getAttributeValue("height").toInt()
+                )
+        )
     }
 
-    override fun blockingSignatureOf(url: URI): String {
-        val podcastUrl = playlistUrlOf(url.toASCIIString())
-        val parsedXml = jdomService.parse(podcastUrl).toOption()
-
-        val dn = parsedXml
-                .map { it.rootElement }
-                .map { it.namespace }
-                .getOrElse { Namespace.NO_NAMESPACE }
-
-        val joinedIds = parsedXml
-                .map { it.rootElement }
-                .map { it.getChildren("entry", it.namespace) }
-                .getOrElse { listOf() }
-                .joinToString { it.getChildText("id", dn) }
-
-        return if(joinedIds.isEmpty()) joinedIds
-        else DigestUtils.md5DigestAsHex(joinedIds.toByteArray())
+    override fun signatureOf(url: URI): Mono<String> {
+        return fetchXml(url)
+                .flatMapIterable { text ->
+                    val xml = SAXBuilder().build(text.inputStream)
+                    val dn = xml.rootElement.namespace
+                    xml
+                            .rootElement
+                            .getChildren("entry", dn)
+                            .map { it.getChildText("id", dn) }
+                }
+                .sort()
+                .reduce { t, u -> "$t, $u" }
+                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
+                .switchIfEmpty("".toMono())
     }
 
-    override fun type() = _type()
+    private fun fetchXml(url: URI): Mono<ByteArrayResource> {
+        return queryParamsOf(url)
+                .flatMap { (key, value) -> wc
+                        .get()
+                        .uri { it
+                                .path("/feeds/videos.xml")
+                                .queryParam(key, value)
+                                .build()
+                        }
+                        .retrieve()
+                        .bodyToMono<ByteArrayResource>()
+                }
+    }
+
+    private fun queryParamsOf(url: URI): Mono<Pair<String, String>> {
+        val stringUrl = url.toASCIIString()
+
+        if (isPlaylist(url)) {
+            val playlistId = stringUrl.substringAfter("list=")
+            return ("playlist_id" to playlistId).toMono()
+        }
+
+        val path = stringUrl.substringAfterLast("https://www.youtube.com")
+        return wc
+                .get()
+                .uri(path)
+                .retrieve()
+                .bodyToMono<String>()
+                .map {
+                    val html = Jsoup.parse(it, "https://www.youtube.com")
+                    val elem = html.select("[data-channel-external-id]").first()
+                    val id = elem.attr("data-channel-external-id")
+                    "channel_id" to id
+                }
+    }
+
+    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
+    override fun blockingSignatureOf(url: URI): String = TODO("not required anymore...")
+
+    override fun type() = type
     override fun compatibility(url: String?) = _compatibility(url)
 
     companion object {
@@ -109,5 +129,4 @@ class YoutubeByXmlUpdater(
         private const val URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s"
         private val MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
     }
-
 }

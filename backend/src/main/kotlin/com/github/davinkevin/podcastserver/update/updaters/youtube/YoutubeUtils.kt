@@ -1,10 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import arrow.core.getOrElse
-import arrow.syntax.collections.firstOption
 import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.service.HtmlService
-import java.util.*
+import java.net.URI
 
 /**
  * Created by kevin on 13/09/2018
@@ -12,24 +9,10 @@ import java.util.*
 
 internal const val PLAYLIST_URL_PART = "playlist?list="
 
-internal fun playlistIdOf(url: String): String = url.substringAfter("list=")
-internal fun isPlaylist(url: String) = url.contains(PLAYLIST_URL_PART)
+internal fun isPlaylist(url: URI) = url.toASCIIString().contains(PLAYLIST_URL_PART)
 
-internal fun channelIdOf(htmlService: HtmlService, url: String) =
-        htmlService
-                .get(url)
-                .flatMap { it.select("[data-channel-external-id]").firstOption() }
-                .filter { Objects.nonNull(it) }
-                .map { it.attr("data-channel-external-id") }
-                .getOrElse { "" }
-
-internal fun isYoutubeUrl(url: String?) =
-                sequenceOf("youtube.com/channel/", "youtube.com/user/", "youtube.com/", "gdata.youtube.com/feeds/api/playlists/")
-                .any { url?.contains(it) == true }
-
-const val YOUTUBE = "Youtube"
-internal fun _type() = Type(YOUTUBE, YOUTUBE)
+internal val type = Type("Youtube", "Youtube")
 internal fun _compatibility(url: String?) =
-        if (isYoutubeUrl(url)) 1
+        if ((url ?: "").contains("youtube.com/")) 1
         else Integer.MAX_VALUE
 

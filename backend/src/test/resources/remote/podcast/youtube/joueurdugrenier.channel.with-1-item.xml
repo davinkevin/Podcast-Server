@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80"/>
+ <id>yt:playlist:PLAD454F0807B6CB80</id>
+ <yt:playlistId>PLAD454F0807B6CB80</yt:playlistId>
+ <yt:channelId>UC_yP2DpIgs5Y1uWC0T03Chw</yt:channelId>
+ <title>Tests du grenier</title>
+ <author>
+  <name>joueurdugrenier</name>
+  <uri>http://www.youtube.com/channel/UC_yP2DpIgs5Y1uWC0T03Chw</uri>
+ </author>
+ <published>2010-09-20T16:29:36+00:00</published>
+ <entry>
+  <id>yt:video:Xos2M-gTf6g</id>
+  <yt:videoId>Xos2M-gTf6g</yt:videoId>
+  <yt:channelId>UC_yP2DpIgs5Y1uWC0T03Chw</yt:channelId>
+  <title>Joueur du grenier - Des jeux Color Dreams - NES</title>
+  <link rel="alternate" href="http://www.youtube.com/watch?v=Xos2M-gTf6g"/>
+  <author>
+   <name>joueurdugrenier</name>
+   <uri>http://www.youtube.com/channel/UC_yP2DpIgs5Y1uWC0T03Chw</uri>
+  </author>
+  <published>2012-10-11T16:00:09+00:00</published>
+  <updated>2015-11-17T21:52:00+00:00</updated>
+  <media:group>
+   <media:title>Joueur du grenier - Des jeux Color Dreams - NES</media:title>
+   <media:content url="https://www.youtube.com/v/Xos2M-gTf6g?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/Xos2M-gTf6g/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Salut tout le monde ! Voici le 35ème test du grenier avec 2 jeux non licenciés édités par Color Dreams, Raid 2020 et Silent assault sur NES. j'espère que ca vous plaira, un test plus classique avec moins d'effets. Il en faut pour tout les goûts.</media:description>
+   <media:community>
+    <media:starRating count="67880" average="4.93" min="1" max="5"/>
+    <media:statistics views="5070656"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>
