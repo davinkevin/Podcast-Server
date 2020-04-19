@@ -13,6 +13,7 @@ spec:
                 secretKeyRef:
                   name: podcast-server
                   key: api.youtube
+                  optional: true
           volumeMounts:
             - name: podcast-server-config
               mountPath: /application.yaml
