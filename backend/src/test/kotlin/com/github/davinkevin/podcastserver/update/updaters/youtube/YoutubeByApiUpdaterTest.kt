@@ -5,8 +5,6 @@ import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
-import com.github.davinkevin.podcastserver.service.HtmlService
-import com.github.davinkevin.podcastserver.service.JdomService
 import com.github.davinkevin.podcastserver.service.UrlService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -276,9 +274,6 @@ class YoutubeByApiUpdaterTest(
             YoutubeUpdaterConfig::class,
             WebClientAutoConfiguration::class,
             JacksonAutoConfiguration::class,
-            JdomService::class,
-            HtmlService::class,
-            UrlService::class,
             WebClientConfig::class
     )
     class LocalTestConfiguration {
