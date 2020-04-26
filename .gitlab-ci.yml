@@ -212,7 +212,11 @@ stages:
   script:
     - delete_docker_hub_image backend
     - delete_docker_hub_image backend-base-image
-  when: manual
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+      when: never
+    - when: manual
+      allow_failure: true
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     action: stop
@@ -247,7 +251,11 @@ stages:
     - *cicd_utils
   script:
     - delete_docker_hub_image file-system
-  when: manual
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+      when: never
+    - when: manual
+      allow_failure: true
   environment:
     name: file-system/$CI_COMMIT_REF_SLUG
     action: stop
@@ -282,7 +290,11 @@ stages:
     - *cicd_utils
   script:
     - delete_docker_hub_image ui
-  when: manual
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+      when: never
+    - when: manual
+      allow_failure: true
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     action: stop
