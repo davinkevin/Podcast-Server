@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
-import com.github.davinkevin.podcastserver.manager.worker.upload.UploadUpdater
+import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdater
 import com.github.davinkevin.podcastserver.update.updaters.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.update.updaters.gulli.GulliUpdater

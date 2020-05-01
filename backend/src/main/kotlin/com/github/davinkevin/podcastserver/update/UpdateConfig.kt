@@ -4,6 +4,8 @@ import com.github.davinkevin.podcastserver.update.updaters.dailymotion.Dailymoti
 import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1UpdaterConfig
+import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdater
+import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeUpdaterConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,8 +35,9 @@ class UpdateRouterConfig {
 
         DailymotionUpdaterConfig::class,
         FranceTvUpdaterConfig::class,
-        RSSUpdaterConfig::class,
         MyTf1UpdaterConfig::class,
+        RSSUpdaterConfig::class,
+        UploadUpdaterConfig::class,
         YoutubeUpdaterConfig::class
 )
 class UpdateConfig
