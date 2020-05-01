@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.update
 
 import com.github.davinkevin.podcastserver.update.updaters.dailymotion.DailymotionUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdaterConfig
+import com.github.davinkevin.podcastserver.update.updaters.gulli.GulliUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1UpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdater
@@ -35,6 +36,7 @@ class UpdateRouterConfig {
 
         DailymotionUpdaterConfig::class,
         FranceTvUpdaterConfig::class,
+        GulliUpdaterConfig::class,
         MyTf1UpdaterConfig::class,
         RSSUpdaterConfig::class,
         UploadUpdaterConfig::class,
