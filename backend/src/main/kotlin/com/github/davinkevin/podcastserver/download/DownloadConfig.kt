@@ -1,11 +1,13 @@
 package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import com.github.davinkevin.podcastserver.service.MessagingTemplate
+import com.github.davinkevin.podcastserver.messaging.Message
+import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.web.reactive.function.server.router
+import reactor.core.publisher.DirectProcessor
 
 /**
  * Created by kevin on 17/09/2019
@@ -46,5 +48,9 @@ class DownloadRouterConfig {
 }
 
 @Configuration
-@Import(DownloadRouterConfig::class, ItemDownloadManager::class, DownloadRepository::class, MessagingTemplate::class)
+@Import(
+        DownloadRouterConfig::class,
+        ItemDownloadManager::class,
+        DownloadRepository::class
+)
 class DownloadConfig

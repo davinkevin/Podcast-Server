@@ -16,7 +16,7 @@ export default class DownloadManager {
         "ngInject";
         this.$http = $http;
 
-        const sse = new EventSource("/api/sse");
+        const sse = new EventSource("/api/v1/sse");
 
         sse.addEventListener("updating", (m) =>  {
           this.updating$.onNext(JSON.parse(m.data));

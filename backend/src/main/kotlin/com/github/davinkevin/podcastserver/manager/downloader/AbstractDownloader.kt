@@ -4,7 +4,7 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import com.github.davinkevin.podcastserver.service.MessagingTemplate
+import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
@@ -16,7 +16,6 @@ import java.nio.file.PathMatcher
 import java.nio.file.attribute.PosixFilePermission.*
 import java.time.Clock
 import java.time.OffsetDateTime
-import javax.annotation.PostConstruct
 
 abstract class AbstractDownloader(
         private val downloadRepository: DownloadRepository,

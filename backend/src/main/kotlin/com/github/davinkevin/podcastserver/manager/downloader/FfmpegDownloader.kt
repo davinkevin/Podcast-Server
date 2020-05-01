@@ -5,6 +5,7 @@ import arrow.core.Failure
 import arrow.core.Try
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.*
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import net.bramp.ffmpeg.builder.FFmpegBuilder
