@@ -278,7 +278,7 @@ class YoutubeByApiUpdaterTest(
     )
     class LocalTestConfiguration {
 
-        @Bean fun api(): Api = Api(youtube = "key", dailymotion = "another-value")
+        @Bean fun api(): Api = Api(youtube = "key")
         @Bean fun remapYoutubeToMock() = remapToMockServer("www.youtube.com")
         @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
 
