@@ -5,6 +5,7 @@ namespace: podcast-server
 
 resources:
   - ../base/
+  - backend-headless.yaml
   - local-ingress/local-ingress.yaml
   - ui-v1.yaml
 
