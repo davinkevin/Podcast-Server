@@ -246,18 +246,35 @@ class MessageSyncClientTest {
     }
 
     @Nested
-    @DisplayName("shoudl forward to")
+    @DisplayName("should forward to")
     @ExtendWith(MockServer::class)
     inner class ShouldForwardTo {
 
-        @BeforeEach
-        fun beforeEach() {
-            whenever(server.ssl).thenReturn(Ssl().apply { isEnabled = true })
+        @Test
+        fun `http backend due to ssl properties null`(backend: WireMockServer) {
+            /* Given */
+            whenever(server.ssl).thenReturn(null)
+            val syncClient = MessageSyncClient(message, dns, wcb, cluster, server)
+            backend.stubFor(post("/api/v1/sse/sync")
+                    .withRequestBody(equalToJson(""" {"event": "updating", "body":true} """))
+                    .willReturn(ok())
+            )
+            syncClient.postConstruct()
+
+            /* When */
+            messages.onNext(UpdateMessage(true))
+
+            /* Then */
+            await().atMost(Duration.FIVE_SECONDS).untilAsserted {
+                backend.verify(1, postRequestedFor(urlEqualTo("/api/v1/sse/sync")))
+            }
         }
+
 
         @Test
         fun `https backend`(backend: WireMockServer) {
             /* Given */
+            whenever(server.ssl).thenReturn(Ssl().apply { isEnabled = true })
             val syncClient = MessageSyncClient(message, dns, wcb, cluster, server)
             backend.stubFor(post("/api/v1/sse/sync")
                     .withRequestBody(equalToJson(""" {"event": "updating", "body":true} """))

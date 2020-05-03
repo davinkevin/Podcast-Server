@@ -39,7 +39,7 @@ class MessageSyncClient(
 
     private fun <T> send(message: Message<T>, addr: InetAddress): Mono<Void> {
         log.debug("send $message to ${addr.hostAddress}")
-        val proto = if(server.ssl.isEnabled) "https" else "http"
+        val proto = if(server.ssl != null && server.ssl.isEnabled) "https" else "http"
         return wcb
                 .clone()
                 .baseUrl("""$proto://${addr.hostAddress}:${server.port}""")
