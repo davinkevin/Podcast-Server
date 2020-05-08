@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloader
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.*
 import com.nhaarman.mockitokotlin2.any
@@ -31,7 +32,6 @@ class DownloaderSelectorTest(
     @Autowired val applicationContext: ApplicationContext
 ) {
 
-    @MockBean private lateinit var httpDownloader: HTTPDownloader
     @MockBean private lateinit var ffmpegDownloader: FfmpegDownloader
     @MockBean private lateinit var rtmpDownloader: RTMPDownloader
     @MockBean private lateinit var youtubeDLownloader: YoutubeDlDownloader
@@ -40,7 +40,7 @@ class DownloaderSelectorTest(
 
     @BeforeEach
     fun beforeEach() {
-        val downloaders = setOf(httpDownloader, ffmpegDownloader, rtmpDownloader, youtubeDLownloader)
+        val downloaders = setOf(ffmpegDownloader, rtmpDownloader, youtubeDLownloader)
 
         downloaders.forEach { whenever(it.compatibility(any())).thenCallRealMethod()}
 
@@ -67,7 +67,7 @@ class DownloaderSelectorTest(
         @JvmStatic
         fun urlToDownloader() =
                 Stream.of(
-                        DownloaderArgument("http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/tnt/tnt1217/tnt1217.mp3", HTTPDownloader::class),
+                        DownloaderArgument("http://foo.bar.com/a/path/with/file.mp3", YoutubeDlDownloader::class),
                         DownloaderArgument("http://foo.bar.com/a/path/with/file.m3u8", FfmpegDownloader::class),
                         DownloaderArgument("rtmp://ma.video.free.fr/video.mp4/audio/tnt/tnt1217/tnt1217.mp3", RTMPDownloader::class),
                         DownloaderArgument("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata", YoutubeDlDownloader::class)

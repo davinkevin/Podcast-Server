@@ -94,20 +94,9 @@
             <version>1.12.2</version>
         </dependency>
         <dependency>
-            <groupId>com.github.axet</groupId>
-            <artifactId>wget</artifactId>
-            <version>1.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.sapher</groupId>
+            <groupId>com.github.pedroviniv</groupId>
             <artifactId>youtubedl-java</artifactId>
-            <version>ef1bdc8c2e3e7eac134bc4ea9fae37318e79771a</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
-        <dependency>
-            <groupId>com.mashape.unirest</groupId>
-            <artifactId>unirest-java</artifactId>
-            <version>1.4.9</version>
+            <version>ef7110605d23eaaae4796312163bcf84c7099311</version>
         </dependency>
         <!-- http://mvnrepository.com/artifact/com.jayway.jsonpath/json-path -->
         <dependency>
