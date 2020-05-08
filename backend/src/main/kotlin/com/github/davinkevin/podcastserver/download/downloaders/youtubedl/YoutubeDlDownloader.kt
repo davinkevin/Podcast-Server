@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import arrow.core.Try
-import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
@@ -40,13 +38,17 @@ class YoutubeDlDownloader(
 
         target = computeTargetFile(downloadingInformation)
 
-        Try.invoke { youtubeDl.download(url, target!!, DownloadProgressCallback { p, _ ->
-            val broadcast = downloadingInformation.item.progression < p.roundToInt()
-            if (broadcast) {
-                downloadingInformation = downloadingInformation.progression(p.roundToInt())
-                broadcast(downloadingInformation.item)
-            }
-        }) }.getOrElse { throw RuntimeException(it.message) }
+        try {
+            youtubeDl.download(url, target!!, DownloadProgressCallback { p, _ ->
+                val broadcast = downloadingInformation.item.progression < p.roundToInt()
+                if (broadcast) {
+                    downloadingInformation = downloadingInformation.progression(p.roundToInt())
+                    broadcast(downloadingInformation.item)
+                }
+            })
+        } catch (e: Exception) {
+            throw RuntimeException(e.message)
+        }
 
         finishDownload()
 
@@ -67,7 +69,7 @@ class YoutubeDlDownloader(
             val fileNameWithoutAnyExtension = removeExtension(removeExtension(t.fileName.toString()));
 
             target = t.resolveSibling("$fileNameWithoutAnyExtension.$realExtension$temporaryExtension")
-            Try.invoke { Files.move(savedPath, target!!) }
+            Files.move(savedPath, target!!)
         }
 
         super.finishDownload()
