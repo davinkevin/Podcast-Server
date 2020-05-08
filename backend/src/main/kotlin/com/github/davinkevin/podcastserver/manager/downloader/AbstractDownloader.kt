@@ -17,7 +17,7 @@ import java.nio.file.attribute.PosixFilePermission.*
 import java.time.Clock
 import java.time.OffsetDateTime
 
-abstract class AbstractDownloader(
+public abstract class AbstractDownloader(
         private val downloadRepository: DownloadRepository,
         private val podcastServerParameters: PodcastServerParameters,
         private val template: MessagingTemplate,

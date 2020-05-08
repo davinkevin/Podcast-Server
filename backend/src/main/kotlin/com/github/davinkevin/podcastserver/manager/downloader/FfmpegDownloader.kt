@@ -75,7 +75,7 @@ class FfmpegDownloader(
 
         return Try {
             val command = FFmpegBuilder()
-                    .setUserAgent(downloadingInformation.userAgent ?: UrlService.USER_AGENT_DESKTOP)
+                    .setUserAgent(downloadingInformation.userAgent ?: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
                     .addInput(url)
                     .addOutput(subTarget.toAbsolutePath().toString())
                     .setFormat("mp4")
