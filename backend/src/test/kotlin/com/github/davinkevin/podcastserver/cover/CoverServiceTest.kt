@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.ItemInformation
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.PodcastInformation
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.service.FileService
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.AfterEach
@@ -96,4 +96,4 @@ class CoverServiceTest (
 }
 
 private fun randomCover(itemTitle: String, podcastTitle: String) =
-        DeleteCoverInformation(randomUUID(), "png", ItemInformation(randomUUID(), itemTitle), PodcastInformation(randomUUID(), podcastTitle))
+        DeleteCoverInformation(randomUUID(), "png", Item(randomUUID(), itemTitle), Podcast(randomUUID(), podcastTitle))
