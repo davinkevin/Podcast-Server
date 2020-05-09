@@ -114,7 +114,7 @@ stages:
 
 👷 backend-base-image:
   stage: 👷‍ build
-  needs: [⬇ backend]
+  needs: []
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
