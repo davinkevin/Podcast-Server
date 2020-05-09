@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.item.DeleteItemInformation
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.PodcastForItem
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
+import com.github.davinkevin.podcastserver.podcast.DeletePodcastInformation
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -316,6 +317,29 @@ class FileServiceTest(
                     /* Then */
                     .expectSubscription()
                     .expectNext(false)
+                    .verifyComplete()
+        }
+
+    }
+
+    @Nested
+    @DisplayName("should delete podcast")
+    inner class ShouldDeletePodcast {
+
+        @Test
+        fun `with files in it`() {
+            /* Given */
+            val podcast = DeletePodcastInformation(id = UUID.randomUUID(), title = "podcast-title")
+            val folder = tempFolder.resolve(podcast.title)
+            Files.createDirectory(folder)
+            Files.createFile(folder.resolve("file1.mp3"))
+            Files.createFile(folder.resolve("file2.mp3"))
+
+            /* When */
+            StepVerifier.create(fileService.deletePodcast(podcast))
+                    /* Then */
+                    .expectSubscription()
+                    .then { assertThat(folder).doesNotExist() }
                     .verifyComplete()
         }
 
