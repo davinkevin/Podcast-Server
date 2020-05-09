@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.ItemInformation
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.PodcastInformation
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.tables.Cover.COVER
@@ -44,10 +44,10 @@ class CoverRepository(private val query: DSLContext) {
                                 .orderBy(COVER.ID.asc()))
                 .map {
                     DeleteCoverInformation(
-                            it[COVER.ID],
-                            it[COVER.URL].substringAfterLast("."),
-                            ItemInformation(it[ITEM.ID], it[ITEM.TITLE]),
-                            PodcastInformation(it[PODCAST.ID], it[PODCAST.TITLE])
+                            id = it[COVER.ID],
+                            extension = it[COVER.URL].substringAfterLast("."),
+                            item = Item(it[ITEM.ID], it[ITEM.TITLE]),
+                            podcast = Podcast(it[PODCAST.ID], it[PODCAST.TITLE])
                     )
                 }
 
@@ -55,12 +55,7 @@ class CoverRepository(private val query: DSLContext) {
 }
 
 data class CoverForCreation(val width: Int, val height: Int, val url: URI)
-data class DeleteCoverInformation(
-        val id: UUID,
-        val extension: String,
-        val item: ItemInformation,
-        val podcast: PodcastInformation
-) {
-    data class ItemInformation(val id: UUID, val title: String)
-    data class PodcastInformation(val id: UUID, val title: String)
+data class DeleteCoverInformation(val id: UUID, val extension: String, val item: Item, val podcast: Podcast) {
+    data class Item(val id: UUID, val title: String)
+    data class Podcast(val id: UUID, val title: String)
 }

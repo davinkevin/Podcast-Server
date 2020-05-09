@@ -13,7 +13,6 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.Assertions.assertThat
@@ -28,9 +27,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.FileSystemUtils
@@ -298,8 +295,8 @@ class FileServiceTest(
             /* When */
             StepVerifier.create(fileService.deleteCover(DeleteCoverInformation(
                     UUID.randomUUID(), "png",
-                    ItemInformation(itemId, "foo"),
-                    PodcastInformation(UUID.randomUUID(), podcastName)
+                    Item(itemId, "foo"),
+                    Podcast(UUID.randomUUID(), podcastName)
             )))
                     /* Then */
                     .expectSubscription()
@@ -313,8 +310,8 @@ class FileServiceTest(
             /* When */
             StepVerifier.create(fileService.deleteCover(DeleteCoverInformation(
                     UUID.randomUUID(), "png",
-                    ItemInformation(UUID.randomUUID(), "foo"),
-                    PodcastInformation(UUID.randomUUID(), podcastName)
+                    Item(UUID.randomUUID(), "foo"),
+                    Podcast(UUID.randomUUID(), podcastName)
             )))
                     /* Then */
                     .expectSubscription()

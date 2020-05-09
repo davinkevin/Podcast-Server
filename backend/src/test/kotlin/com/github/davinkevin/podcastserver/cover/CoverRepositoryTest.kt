@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.ItemInformation
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.PodcastInformation
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
+import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations.insertInto
@@ -9,6 +9,8 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import com.github.davinkevin.podcastserver.DELETE_ALL
+import com.github.davinkevin.podcastserver.database.tables.Cover.*
+import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -20,7 +22,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
-import java.time.OffsetDateTime
+import java.net.URI
 import java.time.OffsetDateTime.now
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
@@ -40,6 +42,49 @@ class CoverRepositoryTest(
 ) {
 
     @Nested
+    @DisplayName("should save cover")
+    inner class ShouldSaveCover {
+
+        private val operation = sequenceOf(DELETE_ALL, INSERT_COVER_DATA)
+
+        @BeforeEach
+        fun beforeEach() = DbSetup(db, operation).launch()
+
+        @Test
+        fun `with success`() {
+            /* Given */
+            val url = URI("https//foo.bar.com/cover/image.png")
+            val cover = CoverForCreation(
+                    width = 100,
+                    height = 200,
+                    url = url
+            )
+            /* When */
+            StepVerifier.create(repository.save(cover).log())
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.width).isEqualTo(100)
+                        assertThat(it.height).isEqualTo(200)
+                        assertThat(it.url).isEqualTo(url)
+                    }
+                    .verifyComplete()
+
+            val r = query.selectFrom(COVER).fetch()
+            assertThat(r).hasSize(10)
+
+            val coverRecord = r.first { it[COVER.URL] == url.toASCIIString() }
+            assertThat(coverRecord.id).isNotNull()
+            assertThat(coverRecord.width).isEqualTo(100)
+            assertThat(coverRecord.height).isEqualTo(200)
+            assertThat(coverRecord.url).isEqualTo(url.toASCIIString())
+
+        }
+
+    }
+    
+    @Nested
     @DisplayName("should find cover older than")
     inner class ShouldFindCoverOlderThan {
 
@@ -52,7 +97,7 @@ class CoverRepositoryTest(
         fun `99999 days and find nothing`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findCoverOlderThan(OffsetDateTime.now().minusDays(99999)))
+            StepVerifier.create(repository.findCoverOlderThan(now().minusDays(99999)))
                     /* Then */
                     .expectSubscription()
                     .verifyComplete()
@@ -62,51 +107,51 @@ class CoverRepositoryTest(
         fun `1 day and find everything`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findCoverOlderThan(OffsetDateTime.now().minusDays(1)))
+            StepVerifier.create(repository.findCoverOlderThan(now().minusDays(1)))
                     /* Then */
                     .expectSubscription()
                     .expectNext(
                             DeleteCoverInformation(
                                     id=fromString("1ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), title="Appload 1"),
-                                    podcast=PodcastInformation(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                                    item=Item(id= fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), title="Appload 1"),
+                                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
                             ),
                             DeleteCoverInformation(
                                     id=fromString("1f050dc4-6a2e-46c3-8276-43098c011e68"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), title="Geek INC 123"),
-                                    podcast=PodcastInformation(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                                    item=Item(id= fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), title="Geek INC 123"),
+                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                             ),
                             DeleteCoverInformation(
                                     id=fromString("2ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), title="Appload 2"),
-                                    podcast=PodcastInformation(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                                    item=Item(id= fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), title="Appload 2"),
+                                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
                             ),
                             DeleteCoverInformation(
                                     id=fromString("2f050dc4-6a2e-46c3-8276-43098c011e68"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), title="Geek INC 124"),
-                                    podcast=PodcastInformation(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                                    item=Item(id= fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), title="Geek INC 124"),
+                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                             ),
                             DeleteCoverInformation(
                                     id=fromString("3ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), title="Appload 3"),
-                                    podcast=PodcastInformation(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                                    item=Item(id= fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), title="Appload 3"),
+                                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
                             ),
                             DeleteCoverInformation(
                                     id=fromString("3f050dc4-6a2e-46c3-8276-43098c011e68"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 122"),
-                                    podcast=PodcastInformation(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                                    item=Item(id= fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 122"),
+                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                             ),
                             DeleteCoverInformation(
                                     id=fromString("4f050dc4-6a2e-46c3-8276-43098c011e68"),
                                     extension="png",
-                                    item=ItemInformation(id= fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 126"),
-                                    podcast=PodcastInformation(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                                    item=Item(id= fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 126"),
+                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                             )
                     )
                     .verifyComplete()
@@ -114,7 +159,8 @@ class CoverRepositoryTest(
 
 
     }
-
+    
+    
     @TestConfiguration
     class LocalTestConfiguration {
         @Bean fun db(datasource: DataSource) = DataSourceDestination(datasource)
@@ -127,7 +173,7 @@ private val formatter = DateTimeFormatterBuilder()
         .append(ISO_LOCAL_TIME)
         .toFormatter()
 
-private val INSERT_COVER_DATA = CompositeOperation.sequenceOf(
+private val INSERT_COVER_DATA = sequenceOf(
         insertInto("COVER")
                 .columns("ID", "URL", "WIDTH", "HEIGHT")
                 .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
