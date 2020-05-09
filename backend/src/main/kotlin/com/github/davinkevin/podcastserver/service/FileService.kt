@@ -51,6 +51,7 @@ class FileService(
 
         Files.deleteIfExists(file)
                 .toMono()
+                .then()
     }
 
     fun deleteItem(item: DeleteItemInformation) = Mono.defer {
