@@ -126,9 +126,9 @@ class FileService(
                         Files.write(file, it.byteArray) }
                     .then()
 
-    fun movePodcast(oldPodcast: Podcast, newTitle: String): Mono<Void> = Mono.defer {
-        val oldLocation = p.rootfolder.resolve(oldPodcast.title)
-        val newLocation = p.rootfolder.resolve(newTitle)
+    fun movePodcast(details: MovePodcastDetails): Mono<Void> = Mono.defer {
+        val oldLocation = p.rootfolder.resolve(details.from)
+        val newLocation = p.rootfolder.resolve(details.to)
 
         log.info("Move podcast from $oldLocation to $newLocation")
 
@@ -155,3 +155,5 @@ private fun CoverForPodcast.extension(): String {
     return if(ext.isBlank()) "jpg" else ext
 }
 private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
+
+data class MovePodcastDetails(val id: UUID, val from: String, val to: String)
