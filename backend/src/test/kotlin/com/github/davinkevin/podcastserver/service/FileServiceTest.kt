@@ -41,6 +41,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
+
 /**
  * Created by kevin on 2019-02-12
  */
@@ -343,6 +344,37 @@ class FileServiceTest(
                     .verifyComplete()
         }
 
+    }
+
+    @Nested
+    @DisplayName("should move podcast")
+    inner class ShouldMovePodcastDetails {
+        @Test
+        fun `with files in it`() {
+            /* Given */
+            val moveOperation = MovePodcastDetails(
+                    id = UUID.randomUUID(),
+                    from = "podcast to move",
+                    to = "New Title"
+            )
+
+            val folder = tempFolder.resolve(moveOperation.from)
+            val newFolder = tempFolder.resolve(moveOperation.to)
+            Files.createDirectory(folder)
+            Files.createFile(folder.resolve("file1.mp3"))
+            Files.createFile(folder.resolve("file2.mp3"))
+            /* When */
+            StepVerifier.create(fileService.movePodcast(moveOperation))
+            /* Then */
+                    .expectSubscription()
+                    .then {
+                        assertThat(folder).doesNotExist()
+                        assertThat(newFolder).exists()
+                        assertThat(newFolder.resolve("file1.mp3")).exists()
+                        assertThat(newFolder.resolve("file2.mp3")).exists()
+                    }
+                    .verifyComplete()
+        }
     }
 }
 

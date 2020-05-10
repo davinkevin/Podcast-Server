@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverRepository
 import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.MovePodcastDetails
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
 import reactor.core.publisher.Flux
@@ -67,8 +68,14 @@ class PodcastService(
                 else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width).toMono()
 
         val title =
-                if (p.title != updatePodcast.title) fileService.movePodcast(p, updatePodcast.title)
-                else Mono.empty()
+                if (p.title != updatePodcast.title) {
+                    val movePodcastDetails = MovePodcastDetails(
+                            id = updatePodcast.id,
+                            from = p.title,
+                            to = updatePodcast.title
+                    )
+                    fileService.movePodcast(movePodcastDetails)
+                } else Mono.empty()
 
         Mono.zip(tags, cover)
                 .flatMap { (t, c) ->

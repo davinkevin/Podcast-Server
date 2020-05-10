@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepository
 import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.MovePodcastDetails
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
 import com.nhaarman.mockitokotlin2.*
@@ -426,7 +427,7 @@ class PodcastServiceTest(
             verify(tagRepository, never()).save(any())
             verify(coverRepository, never()).save(any())
             verify(fileService, never()).downloadPodcastCover(any())
-            verify(fileService, never()).movePodcast(any(), any())
+            verify(fileService, never()).movePodcast(any())
         }
 
         @Nested
@@ -567,7 +568,7 @@ class PodcastServiceTest(
             fun afterEach() {
                 verify(coverRepository, never()).save(any())
                 verify(fileService, never()).downloadPodcastCover(any())
-                verify(fileService, never()).movePodcast(any(), any())
+                verify(fileService, never()).movePodcast(any())
             }
 
         }
@@ -677,7 +678,7 @@ class PodcastServiceTest(
             @AfterEach
             fun afterEach() {
                 verify(tagRepository, never()).save(any())
-                verify(fileService, never()).movePodcast(any(), any())
+                verify(fileService, never()).movePodcast(any())
             }
         }
 
@@ -700,7 +701,12 @@ class PodcastServiceTest(
                         tags = any(),
                         cover = any()
                 )).thenReturn(pAfterUpdate.toMono())
-                whenever(fileService.movePodcast(p, pToUpdate.title)).thenReturn(Mono.empty())
+                val moveOperation = MovePodcastDetails(
+                        id = p.id,
+                        from = p.title,
+                        to = pToUpdate.title
+                )
+                whenever(fileService.movePodcast(moveOperation)).thenReturn(Mono.empty())
 
                 /* When */
                 StepVerifier.create(service.update(pToUpdate))
@@ -712,7 +718,7 @@ class PodcastServiceTest(
                 verify(tagRepository, never()).save(any())
                 verify(coverRepository, never()).save(any())
                 verify(fileService, never()).downloadPodcastCover(any())
-                verify(fileService, times(1)).movePodcast(p, pToUpdate.title)
+                verify(fileService, times(1)).movePodcast(moveOperation)
             }
 
         }
