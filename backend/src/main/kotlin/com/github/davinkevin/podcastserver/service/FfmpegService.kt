@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.service
 
-import arrow.core.Try
-import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener
 import net.bramp.ffmpeg.FFmpegExecutor
@@ -10,7 +8,6 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -80,8 +77,8 @@ class FfmpegService(
 
         ffmpegExecutor.createJob(builder).run()
 
-        Try { Files.deleteIfExists(convertedAudio) }
-        Try { Files.move(tmpFile, dest, StandardCopyOption.REPLACE_EXISTING) }
+        Files.deleteIfExists(convertedAudio)
+        Files.move(tmpFile, dest, StandardCopyOption.REPLACE_EXISTING)
 
         return dest
     }
@@ -112,12 +109,13 @@ class FfmpegService(
     fun getDurationOf(url: String, userAgent: String?): Double {
 
         val duration = supplyAsync {
-            Try { ffprobe.probe(url, userAgent).getFormat().duration }
+            Result.runCatching { ffprobe.probe(url, userAgent).getFormat().duration }
                     .map { d -> d * 1000000 }
                     .getOrElse { throw RuntimeException(it) }
         }
 
-        return Try { duration.get(60, TimeUnit.SECONDS) }
+        return Result
+                .runCatching { duration.get(60, TimeUnit.SECONDS) }
                 .getOrElse {
                     duration.cancel(true)
                     throw RuntimeException("Error during probe operation", it)
@@ -130,11 +128,11 @@ class FfmpegService(
 
         runAsync(ffmpegExecutor.createJob(ffmpegBuilder, progressListener))
 
-        return Try { pl.process.get(2, TimeUnit.SECONDS) }
+        return Result.runCatching { pl.process.get(2, TimeUnit.SECONDS) }
                 .getOrElse {
                     pl.process.cancel(true)
                     log.error("error during download", it)
-                    throw RuntimeException(it)
+                    throw it
                 }
     }
 

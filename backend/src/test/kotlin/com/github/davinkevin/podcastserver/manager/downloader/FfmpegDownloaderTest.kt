@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 
-import arrow.core.Try
 import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
@@ -33,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
 import java.net.URI
+import java.util.Optional
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -96,7 +96,7 @@ class FfmpegDownloaderTest {
                     .with(DownloadingInformation(item, listOf(item.url.toASCIIString(), "http://foo.bar.com/end.mp4"), "file.mp4", "Fake UserAgent"), itemDownloadManager)
 
             FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(item.podcast.title).toFile())
-            Try { Files.createDirectories(ROOT_TEST_PATH) }
+            Files.createDirectories(ROOT_TEST_PATH)
         }
 
         @Nested
@@ -117,7 +117,7 @@ class FfmpegDownloaderTest {
                     (0..100).map { it * 5L }.forEach { sendProgress(i, it)}
                     mock<Process>()
                 }
-                whenever(processService.waitFor(any())).thenReturn(Try.Success(1))
+                whenever(processService.waitFor(any())).thenReturn(Result.success(1))
                 doAnswer { writeEmptyFileTo(it.getArgument<Path>(0).toString()); null
                 }.whenever(ffmpegService).concat(any(), anyVararg())
                 whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
@@ -154,7 +154,7 @@ class FfmpegDownloaderTest {
                 doAnswer { throw RuntimeException("Error during download of other url") }
                         .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
 
-                whenever(processService.waitFor(any())).thenReturn(Try.Success(1))
+                whenever(processService.waitFor(any())).thenReturn(Result.success(1))
 
                 /* When */
                 downloader.run()
@@ -175,7 +175,7 @@ class FfmpegDownloaderTest {
                         .whenever(ffmpegService).download(eq(item.url.toASCIIString()), any(), any())
                 doAnswer { throw RuntimeException("Error during download of other url") }
                         .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
-                whenever(processService.waitFor(any())).thenReturn(Try.Success(1))
+                whenever(processService.waitFor(any())).thenReturn(Result.success(1))
 
                 /* When */
                 downloader.run()
@@ -196,7 +196,7 @@ class FfmpegDownloaderTest {
                 }
                         .whenever(ffmpegService).download(any(), any(), any())
 
-                whenever(processService.waitFor(any())).thenReturn(arrow.core.Try.Success(1))
+                whenever(processService.waitFor(any())).thenReturn(Result.success(1))
                 whenever(ffmpegService.concat(any(), anyVararg())).then {
                     throw RuntimeException("Error during concat operation")
                 }

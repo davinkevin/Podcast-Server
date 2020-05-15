@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import arrow.core.toOption
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
@@ -20,6 +20,7 @@ import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -164,15 +165,18 @@ internal data class Thumbnails(
         @field:JsonProperty("default") val byDefault: Thumbnail? = null
 ) {
 
-    fun betterThumbnail(): arrow.core.Option<Thumbnail> =
-            when {
-                maxres != null -> maxres
-                standard != null -> standard
-                high != null -> high
-                medium != null -> medium
-                byDefault != null -> byDefault
-                else -> null
-            }.toOption()
+    fun betterThumbnail(): Optional<Thumbnail> {
+        val v =  when {
+            maxres != null -> maxres
+            standard != null -> standard
+            high != null -> high
+            medium != null -> medium
+            byDefault != null -> byDefault
+            else -> null
+        }
+
+        return Optional.ofNullable(v)
+    }
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import arrow.core.Option
-import arrow.core.getOrElse
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemPageRequest
@@ -146,11 +144,11 @@ private fun toRssItem(item: Item, host: URI): Element {
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
-    val extension = Option.fromNullable(item.fileName)
+    val extension = Optional.ofNullable(item.fileName)
             .map { FilenameUtils.getExtension(it) }
             .map { it.substringBeforeLast("?") }
             .map { ".$it" }
-            .getOrElse { "" }
+            .orElse("")
 
     val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 

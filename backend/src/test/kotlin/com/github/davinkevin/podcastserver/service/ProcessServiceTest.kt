@@ -1,12 +1,13 @@
 package com.github.davinkevin.podcastserver.service
 
 
-import arrow.core.getOrElse
+import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.verify
+import java.lang.RuntimeException
 
 /**
  * Created by kevin on 31/03/2016 for Podcast Server
@@ -56,10 +57,24 @@ class ProcessServiceTest {
         whenever(process.waitFor()).thenReturn(10)
 
         /* When */
-        val tryProcess = processService.waitFor(process)
+        val returnCode = processService.waitFor(process)
 
         /* Then */
-        assertThat(tryProcess.getOrElse { throw RuntimeException("No process found") }).isEqualTo(10)
+        assertThat(returnCode.getOrNull()).isEqualTo(10)
+        verify(process).waitFor()
+    }
+
+    @Test
+    fun `should wait and return nothing if ends up in error`() {
+        /* Given */
+        val process = mock<Process>()
+        doThrow(RuntimeException("error during waiting") ).whenever(process).waitFor()
+
+        /* When */
+        val returnCode = processService.waitFor(process)
+
+        /* Then */
+        assertThat(returnCode.isFailure).isTrue()
         verify(process).waitFor()
     }
 }

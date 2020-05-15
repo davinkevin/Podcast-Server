@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
-import arrow.core.Try
 import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
@@ -102,7 +101,7 @@ class RTMPDownloaderTest {
             )
 
             FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(item.podcast.title).toFile())
-            Try { Files.createDirectories(ROOT_TEST_PATH) }
+            Files.createDirectories(ROOT_TEST_PATH)
         }
 
         @Nested

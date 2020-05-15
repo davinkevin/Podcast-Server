@@ -1,12 +1,12 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 
-import arrow.core.Failure
-import arrow.core.Try
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.*
+import com.github.davinkevin.podcastserver.service.FfmpegService
+import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
@@ -46,52 +46,53 @@ class FfmpegDownloader(
                 .sum()
 
         val multiDownloads = downloadingInformation.urls.map { download(it) }
-        val files = multiDownloads.flatMap { it.toList() }
 
-        try {
-            if (multiDownloads.any { it.isFailure() }) {
-                throw RuntimeException("Error during download of a part",
-                        (multiDownloads.first { it.isFailure() } as Failure).exception
-                )
+        Result.runCatching {
+            if (multiDownloads.any { it.isFailure }) {
+                val cause = multiDownloads.first { it.isFailure }.exceptionOrNull()
+                throw RuntimeException("Error during download of a part", cause)
             }
 
-            ffmpegService.concat(target!!, *files.toTypedArray())
-        } catch (e: Exception) {
-            throw e
-        } finally {
-            files.forEach { Try { Files.deleteIfExists(it) } }
+            ffmpegService.concat(
+                    target!!,
+                    *multiDownloads.map { it.getOrNull()!! }.toTypedArray()
+            )
         }
 
-        if (downloadingInformation.item.status == Status.STARTED)
+        multiDownloads
+                .filter { it.isSuccess }
+                .map { it.getOrNull()!! }
+                .forEach { Result.runCatching { Files.deleteIfExists(it) } }
+
+        if (downloadingInformation.item.status == Status.STARTED) {
             finishDownload()
+        }
 
         return downloadingInformation.item
     }
 
-    private fun download(url: String): Try<Path> {
+    private fun download(url: String): Result<Path> {
         val duration = ffmpegService.getDurationOf(url, downloadingInformation.userAgent)
 
         val subTarget = generateTempFileNextTo(target!!)
 
-        return Try {
-            val command = FFmpegBuilder()
-                    .setUserAgent(downloadingInformation.userAgent ?: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
-                    .addInput(url)
-                    .addOutput(subTarget.toAbsolutePath().toString())
-                    .setFormat("mp4")
-                    .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
-                    .setVideoCodec(FfmpegService.CODEC_COPY)
-                    .setAudioCodec(FfmpegService.CODEC_COPY)
-                    .done()
+        val command = FFmpegBuilder()
+                .setUserAgent(downloadingInformation.userAgent ?: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
+                .addInput(url)
+                .addOutput(subTarget.toAbsolutePath().toString())
+                .setFormat("mp4")
+                .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
+                .setVideoCodec(FfmpegService.CODEC_COPY)
+                .setAudioCodec(FfmpegService.CODEC_COPY)
+                .done()
 
+        return Result.runCatching {
             process = ffmpegService.download(url, command, handleProgression(alreadyDoneDuration, globalDuration))
-
             processService.waitFor(process)
-
             alreadyDoneDuration += duration
             subTarget
         }
-                .fold ({ Files.deleteIfExists(subTarget); Try.raise(it) }, { Try.just(it) })
+                .onFailure { Files.deleteIfExists(subTarget) }
 
     }
 
@@ -146,5 +147,3 @@ class FfmpegDownloader(
             if (downloadingInformation.urls.map { it.toLowerCase() }.all { "m3u8" in it || "mp4" in it }) 10
             else Integer.MAX_VALUE
 }
-
-private fun <B> Try<B>.toList(): List<B> = this.fold( { listOf() }, {listOf(it)})

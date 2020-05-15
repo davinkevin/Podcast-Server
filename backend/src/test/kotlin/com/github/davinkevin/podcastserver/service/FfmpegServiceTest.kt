@@ -27,6 +27,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.attribute.PosixFilePermission.OWNER_READ
+import java.util.concurrent.TimeoutException
 
 /**
  * Created by kevin on 20/03/2016 for Podcast Server
@@ -183,7 +184,7 @@ class FfmpegServiceTest {
         assertThatThrownBy { ffmpegService.download("foo", FFmpegBuilder(), ProgressListener {}) }
 
         /* Then */
-                .isInstanceOf(RuntimeException::class.java)
+                .isInstanceOf(TimeoutException::class.java)
     }
 
 }
