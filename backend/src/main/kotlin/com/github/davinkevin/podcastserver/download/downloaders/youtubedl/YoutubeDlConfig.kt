@@ -17,7 +17,7 @@ import java.time.Clock
  * Created by kevin on 08/05/2020
  */
 @Configuration
-@EnableConfigurationProperties(ExternalTools::class)
+@EnableConfigurationProperties(ExternalTools::class, PodcastServerParameters::class)
 class YoutubeDlConfig {
 
     @Bean

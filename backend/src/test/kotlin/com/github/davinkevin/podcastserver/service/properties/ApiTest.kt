@@ -15,25 +15,21 @@ class ApiTest {
         val api = Api()
         /* Then */
 
-        assertThat(api.youtube).isEqualTo(null)
-        assertThat(api.dailymotion).isEqualTo(null)
+        assertThat(api.youtube).isEqualTo("")
     }
 
     @Test
     fun should_have_specified_values() {
         /* Given */
         val youtubeKey = "YoutubeKey"
-        val dailymotionKey = "dailymotionKey"
 
         /* When */
         val api = Api(
-                dailymotion = dailymotionKey,
                 youtube = youtubeKey
         )
 
         /* Then */
         assertThat(api.youtube).isEqualTo(youtubeKey)
-        assertThat(api.dailymotion).isEqualTo(dailymotionKey)
     }
 
 }

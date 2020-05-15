@@ -9,17 +9,18 @@ import java.time.ZonedDateTime.now
 /**
  * Created by kevin on 03/02/15.
  */
+@ConstructorBinding
 @ConfigurationProperties(value = "podcastserver")
-class PodcastServerParameters(
-        var rootfolder: Path = Paths.get("/tmp"),
-        var coverDefaultName: String = "cover",
-        var downloadExtension: String = ".psdownload",
-        var maxUpdateParallels: Int = 256,
-        var concurrentDownload: Int = 3,
-        var numberOfTry: Int = 10,
-        var numberOfDayToDownload: Long = 30L,
-        var numberOfDayToSaveCover: Long = 365L,
-        var rssDefaultNumberItem: Long = 50L
+data class PodcastServerParameters(
+        val rootfolder: Path = Paths.get("/tmp"),
+        val coverDefaultName: String = "cover",
+        val downloadExtension: String = ".psdownload",
+        val maxUpdateParallels: Int = 256,
+        val concurrentDownload: Int = 3,
+        val numberOfTry: Int = 10,
+        val numberOfDayToDownload: Long = 30L,
+        val numberOfDayToSaveCover: Long = 365L,
+        val rssDefaultNumberItem: Long = 50L
 ) {
     fun limitDownloadDate() = now().minusDays(numberOfDayToDownload)!!
     fun limitToKeepCoverOnDisk() = now().minusDays(numberOfDayToSaveCover)!!

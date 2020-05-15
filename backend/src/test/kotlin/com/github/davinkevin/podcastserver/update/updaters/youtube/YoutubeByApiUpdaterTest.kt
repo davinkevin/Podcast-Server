@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.web.reactive.function.client.WebCl
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.test.StepVerifier
 import java.net.URI
@@ -31,6 +32,9 @@ import java.util.*
  * Created by kevin on 31/08/2019
  */
 @ExtendWith(SpringExtension::class)
+@TestPropertySource(properties = [
+    "podcastserver.api.youtube = key"
+])
 class YoutubeByApiUpdaterTest(
         @Autowired val updater: YoutubeByApiUpdater
 ) {
@@ -276,8 +280,6 @@ class YoutubeByApiUpdaterTest(
             WebClientConfig::class
     )
     class LocalTestConfiguration {
-
-        @Bean fun api(): Api = Api(youtube = "key", dailymotion = "another-value")
         @Bean fun remapYoutubeToMock() = remapToMockServer("www.youtube.com")
         @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
 

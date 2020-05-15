@@ -64,7 +64,6 @@ class YoutubeDlConfigTest {
 @Configuration
 private class LocalTestConfiguration {
     @Bean fun downloadRepo(): DownloadRepository = mock()
-    @Bean fun parameters(): PodcastServerParameters = mock()
     @Bean fun template(): MessagingTemplate = mock()
     @Bean fun mimeType(): MimeTypeService = mock()
     @Bean fun clock(): Clock = mock()

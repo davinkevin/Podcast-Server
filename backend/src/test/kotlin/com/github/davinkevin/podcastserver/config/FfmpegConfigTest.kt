@@ -14,10 +14,10 @@ class FfmpegConfigTest {
     @Test
     fun `should have a bean for executor`() {
         /* Given */
-        val externalTools = ExternalTools().apply {
-            ffmpeg = "/bin/echo"
+        val externalTools = ExternalTools(
+            ffmpeg = "/bin/echo",
             ffprobe = "/bin/echo"
-        }
+        )
 
         /* When */
         val service = ffmpegConfig.ffmpegService(externalTools)
@@ -25,6 +25,4 @@ class FfmpegConfigTest {
         /* Then */
         assertThat(service).isNotNull()
     }
-
-
 }

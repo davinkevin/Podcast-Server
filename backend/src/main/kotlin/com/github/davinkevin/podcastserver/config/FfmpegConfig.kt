@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessF
 import net.bramp.ffmpeg.FFmpeg
 import net.bramp.ffmpeg.FFmpegExecutor
 import net.bramp.ffmpeg.FFprobe
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration
  * Created by kevin on 21/05/2016 for Podcast Server
  */
 @Configuration
+@EnableConfigurationProperties(ExternalTools::class)
 class FfmpegConfig {
 
     @Bean
