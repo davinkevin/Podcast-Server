@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.github.davinkevin.podcastserver.manager.worker.Updater
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import com.github.davinkevin.podcastserver.service.properties.Api
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -15,6 +16,7 @@ import reactor.netty.http.client.HttpClient
  */
 @Configuration
 @Import(ImageServiceConfig::class)
+@EnableConfigurationProperties(Api::class)
 class YoutubeUpdaterConfig {
 
     @Bean

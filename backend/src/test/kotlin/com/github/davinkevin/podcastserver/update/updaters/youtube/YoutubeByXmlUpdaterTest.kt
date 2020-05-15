@@ -48,7 +48,6 @@ class YoutubeByXmlUpdaterTest(
     )
     class LocalTestConfiguration {
         @Bean fun remapToLocalHost() = remapToMockServer("www.youtube.com")
-        @Bean fun api(): Api = Api()
     }
 
     private val channel = PodcastToUpdate(

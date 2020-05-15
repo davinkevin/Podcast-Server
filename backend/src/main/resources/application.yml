@@ -40,7 +40,7 @@ podcastserver:
  #number-of-try: 10
  #download-extension: .psdownload
  #rss-default-number-item: 50
- externaltools:
+ #externaltools:
   #rtmpdump: /usr/local/bin/rtmpdump
   #ffmpeg: /usr/local/bin/ffmpeg
   #ffprobe: /usr/local/bin/ffprobe

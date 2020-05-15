@@ -5,7 +5,6 @@ import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
-import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
@@ -22,6 +21,7 @@ import org.springframework.boot.autoconfigure.web.reactive.function.client.WebCl
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.test.StepVerifier
 import java.net.URI
@@ -31,6 +31,9 @@ import java.util.*
  * Created by kevin on 31/08/2019
  */
 @ExtendWith(SpringExtension::class)
+@TestPropertySource(properties = [
+    "podcastserver.api.youtube = key"
+])
 class YoutubeByApiUpdaterTest(
         @Autowired val updater: YoutubeByApiUpdater
 ) {
@@ -276,8 +279,6 @@ class YoutubeByApiUpdaterTest(
             WebClientConfig::class
     )
     class LocalTestConfiguration {
-
-        @Bean fun api(): Api = Api(youtube = "key")
         @Bean fun remapYoutubeToMock() = remapToMockServer("www.youtube.com")
         @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
 
