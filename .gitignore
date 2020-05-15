@@ -20,7 +20,7 @@ frontend-angular/coverage
 
 # Back End
 Backend/lib/
-Backend/**/application.yml
+Backend/src/main/**/application.yml
 Backend/build
 Backend/lan.dk.podcastserver.*
 Backend/etc

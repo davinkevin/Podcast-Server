@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.extension.repository
 
-import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
@@ -9,5 +9,4 @@ import java.time.ZoneOffset
  */
 private val oppositeOffset = ZoneOffset.ofTotalSeconds(-OffsetDateTime.now().offset.totalSeconds)
 
-fun Timestamp?.toUTC(): OffsetDateTime? = this?.toInstant()?.atOffset(ZoneOffset.UTC)?.withOffsetSameLocal(oppositeOffset)
-fun OffsetDateTime?.toTimestamp() = if(this == null) null else Timestamp.valueOf(atZoneSameInstant(ZoneOffset.UTC)?.toLocalDateTime())
+fun LocalDateTime?.toUTC(): OffsetDateTime? = this?.toInstant(ZoneOffset.UTC)?.atOffset(ZoneOffset.UTC)?.withOffsetSameLocal(oppositeOffset)

@@ -25,6 +25,8 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.time.OffsetDateTime
+import java.time.OffsetDateTime.now
+import java.time.ZonedDateTime
 import java.util.*
 
 class UpdateService(
@@ -97,22 +99,22 @@ class UpdateService(
 }
 
 
-private fun ItemFromUpdate.toCreation(podcastId: UUID, cover: CoverForCreation) = ItemForCreation(
-        title = this.title!!,
-        url = this.url.toASCIIString(),
+private fun ItemFromUpdate.toCreation(podcastId: UUID, coverCreation: CoverForCreation) = ItemForCreation(
+        title = title!!,
+        url = url.toASCIIString(),
 
-        pubDate = this.pubDate?.toOffsetDateTime(),
+        pubDate = pubDate?.toOffsetDateTime() ?: now(),
         downloadDate = null,
-        creationDate = OffsetDateTime.now(),
+        creationDate = now(),
 
-        description = this.description ?: "",
+        description = description ?: "",
         mimeType = null,
-        length = this.length,
+        length = length,
         fileName = null,
         status = Status.NOT_DOWNLOADED,
 
         podcastId = podcastId,
-        cover = this.cover?.toCreation() ?: cover
+        cover = cover?.toCreation() ?: coverCreation
 )
 
 private fun CoverFromUpdate.toCreation() = CoverForCreation(width, height, url)

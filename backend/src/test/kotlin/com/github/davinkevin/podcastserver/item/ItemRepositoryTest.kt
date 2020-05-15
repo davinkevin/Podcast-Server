@@ -1053,6 +1053,61 @@ class ItemRepositoryTest(
             assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
             assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
         }
+
+        @Test
+        fun `a simple item with download date null`() {
+            /* Given */
+            val now = now()
+            val item = ItemForCreation(
+                    title = "an item",
+                    url = "http://foo.bar.com/an_item",
+
+                    pubDate = now,
+                    downloadDate = null,
+                    creationDate = now,
+
+                    description = "a description",
+                    mimeType = "audio/mp3",
+                    length = 1234,
+                    fileName = "ofejeaoijefa.mp3",
+                    status = FINISH,
+
+                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+            )
+            val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
+            val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
+
+            /* When */
+            StepVerifier.create(repository.create(item))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.title).isEqualTo("an item")
+                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                        assertThat(it.pubDate).isEqualTo(now)
+                        assertThat(it.downloadDate).isNull()
+                        assertThat(it.creationDate).isEqualTo(now)
+                        assertThat(it.description).isEqualTo("a description")
+                        assertThat(it.mimeType).isEqualTo("audio/mp3")
+                        assertThat(it.length).isEqualTo(1234)
+                        assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
+                        assertThat(it.status).isEqualTo(FINISH)
+
+                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                        assertThat(it.cover.height).isEqualTo(100)
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.url).isEqualTo("http://foo.bar.com/cover/item.jpg")
+                    }
+                    .verifyComplete()
+
+            assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+            assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+        }
+
     }
 
     @Nested

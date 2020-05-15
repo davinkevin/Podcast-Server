@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status.*
-import com.github.davinkevin.podcastserver.extension.repository.toTimestamp
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Cover
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Podcast
@@ -11,7 +10,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
-import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -33,7 +31,7 @@ class DownloadRepository(private val query: DSLContext) {
                                 .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                         )
                         .where(
-                                ITEM.PUB_DATE.gt(Timestamp.valueOf(fromDate.toLocalDateTime()))
+                                ITEM.PUB_DATE.greaterThan(fromDate.toLocalDateTime())
                                         .and(
                                                 ITEM.STATUS.isNull.or(ITEM.STATUS.eq(NOT_DOWNLOADED))
                                         )
@@ -92,7 +90,7 @@ class DownloadRepository(private val query: DSLContext) {
                 .set(ITEM.LENGTH, length)
                 .set(ITEM.MIME_TYPE, mimeType)
                 .set(ITEM.FILE_NAME, fileName)
-                .set(ITEM.DOWNLOAD_DATE, downloadDate.toTimestamp())
+                .set(ITEM.DOWNLOAD_DATE, downloadDate.toLocalDateTime())
                 .where(ITEM.ID.eq(id))
                 .toMono()
     }

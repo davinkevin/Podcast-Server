@@ -79,7 +79,6 @@ data class PageItem(
                     totalElements = totalElements,
                     totalPages = totalPages
             )
-
         }
 
     }
@@ -89,9 +88,9 @@ data class ItemForCreation(
         val title: String,
         val url: String?,
 
-        val pubDate: OffsetDateTime?,
+        val pubDate: OffsetDateTime,
         val downloadDate: OffsetDateTime?,
-        val creationDate: OffsetDateTime?,
+        val creationDate: OffsetDateTime,
 
         val description: String?,
         val mimeType: String?,
