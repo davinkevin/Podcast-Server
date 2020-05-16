@@ -43,20 +43,23 @@ class RSSUpdater(
                         .map { it.toCoverFromUpdate() }
                         .map { Optional.of(it) }
                         .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
-                        .map { ItemFromUpdate(
-                                title = elem.getChildText("title"),
-                                pubDate = getPubDate(elem),
-                                description = elem.getChildText("description"),
-                                cover = it.orNull(),
-                                url = urlOf(elem)
-                        ) }
+                        .map {
+                            val enclosure = elem.getChild("enclosure")
+                            ItemFromUpdate(
+                                    title = elem.getChildText("title"),
+                                    pubDate = getPubDate(elem),
+                                    description = elem.getChildText("description"),
+                                    cover = it.orNull(),
+                                    url = urlOf(elem),
+
+                                    length = enclosure.getAttributeValue("length")?.toLong(),
+                                    mimeType = enclosure.getAttributeValue("type")
+                            ) }
 
                 }
     }
 
-    private fun hasEnclosure(item: Element) =
-            item.getChild("enclosure") != null ||
-                    item.getChild("origEnclosureLink", FEED_BURNER) != null
+    private fun hasEnclosure(item: Element) = item.getChild("enclosure") != null
 
     private fun urlOf(element: Element): URI {
         val url = if (element.getChild("origEnclosureLink", FEED_BURNER) != null)
@@ -76,12 +79,12 @@ class RSSUpdater(
             else -> pubDate
         }
 
-        return try {
+        return Result.runCatching {
             ZonedDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
-        } catch (e: Exception) {
-            log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), e.message)
-            null
+        } .onFailure {
+            log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), it.message)
         }
+                .getOrNull()
     }
 
     override fun signatureOf(url: URI): Mono<String> = fetchRss(url)

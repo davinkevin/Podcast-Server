@@ -108,7 +108,7 @@ private fun ItemFromUpdate.toCreation(podcastId: UUID, coverCreation: CoverForCr
         creationDate = now(),
 
         description = description ?: "",
-        mimeType = null,
+        mimeType = mimeType,
         length = length,
         fileName = null,
         status = Status.NOT_DOWNLOADED,

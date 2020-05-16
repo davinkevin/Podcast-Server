@@ -62,6 +62,7 @@ data class ItemFromUpdate(
         val title: String?,
         val pubDate: ZonedDateTime?,
         val length: Long? = null,
+        val mimeType: String? = null,
         val url: URI,
         val description: String?,
         val cover: CoverFromUpdate?
@@ -73,4 +74,12 @@ fun CoverInformation.toCoverFromUpdate() = CoverFromUpdate (
         url = this@toCoverFromUpdate.url
 )
 
-val defaultItem = ItemFromUpdate(null, ZonedDateTime.now(), null, URI("http://foo.bar"), null, null)
+val defaultItem = ItemFromUpdate(
+        title = null,
+        pubDate = ZonedDateTime.now(),
+        length = null,
+        mimeType = "",
+        url = URI("http://foo.bar"),
+        description = null,
+        cover = null
+)
