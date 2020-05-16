@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
-import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import org.jooq.DSLContext
 import org.jooq.Record18
 import org.jooq.impl.DSL.*
@@ -14,7 +13,6 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -47,7 +45,7 @@ class ItemRepository(private val query: DSLContext) {
         query
                 .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
                 .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
-                .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date.toLocalDateTime()))
+                .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
                 .and(ITEM.STATUS.eq(FINISH))
                 .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
                 .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
@@ -97,7 +95,7 @@ class ItemRepository(private val query: DSLContext) {
         query
                 .update(ITEM)
                 .set(ITEM.STATUS, NOT_DOWNLOADED)
-                .set(ITEM.DOWNLOAD_DATE, value<LocalDateTime>(null))
+                .set(ITEM.DOWNLOAD_DATE, null as OffsetDateTime?)
                 .set(ITEM.FILE_NAME, value<String>(null))
                 .set(ITEM.NUMBER_OF_FAIL, 0)
                 .where(ITEM.ID.eq(id))
@@ -183,7 +181,7 @@ class ItemRepository(private val query: DSLContext) {
                                 val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
                                 Item(
                                         it[itemId], it[itemTitle], it[itemURL],
-                                        it[itemPubDate].toUTC(), it[itemDownloadDate].toUTC(), it[itemCreationDate].toUTC(),
+                                        it[itemPubDate], it[itemDownloadDate], it[itemCreationDate],
                                         it[itemDescription], it[itemMimeType], it[itemLength], it[itemFileName], it[itemStatus],
                                         p, c
                                 )
@@ -228,9 +226,9 @@ class ItemRepository(private val query: DSLContext) {
                         .set(ITEM.ID, id)
                         .set(ITEM.TITLE, item.title)
                         .set(ITEM.URL, item.url)
-                        .set(ITEM.PUB_DATE, item.pubDate.toLocalDateTime())
-                        .set(ITEM.DOWNLOAD_DATE, item.downloadDate?.toLocalDateTime())
-                        .set(ITEM.CREATION_DATE, item.creationDate.toLocalDateTime())
+                        .set(ITEM.PUB_DATE, item.pubDate)
+                        .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
+                        .set(ITEM.CREATION_DATE, item.creationDate)
                         .set(ITEM.DESCRIPTION, item.description)
                         .set(ITEM.MIME_TYPE, item.mimeType)
                         .set(ITEM.LENGTH, item.length)
@@ -256,8 +254,9 @@ class ItemRepository(private val query: DSLContext) {
                 .doOnTerminate { log.info("Reset of item with downloading state done") }
     }
 
-    fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> {
-        return Flux.from(query
+    fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> = Flux.defer {
+        Flux.from(
+            query
                 .select(WATCH_LIST.ID, WATCH_LIST.NAME)
                 .from(WATCH_LIST
                         .innerJoin(WATCH_LIST_ITEMS)
@@ -270,12 +269,12 @@ class ItemRepository(private val query: DSLContext) {
     }
 }
 
-private fun toItem(it: Record18<UUID, String, String, LocalDateTime, LocalDateTime, LocalDateTime, String, String, Long, String, Status, UUID, String, String, UUID, String, Int, Int>): Item {
+private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDateTime, OffsetDateTime, String, String, Long, String, Status, UUID, String, String, UUID, String, Int, Int>): Item {
     val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
     val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
     return Item(
             it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
-            it[ITEM.PUB_DATE].toUTC(), it[ITEM.DOWNLOAD_DATE].toUTC(), it[ITEM.CREATION_DATE].toUTC(),
+            it[ITEM.PUB_DATE], it[ITEM.DOWNLOAD_DATE], it[ITEM.CREATION_DATE],
             it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], it[ITEM.STATUS],
             p, c
     )

@@ -1,4 +1,10 @@
 
+spring:
+  datasource:
+    username: podcast-server-user
+    password: nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
+    url: jdbc:postgresql://postgres:5432/podcast-server
+
 server:
   error:
     include-message: always

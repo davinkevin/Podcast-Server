@@ -31,7 +31,7 @@ class DownloadRepository(private val query: DSLContext) {
                                 .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                         )
                         .where(
-                                ITEM.PUB_DATE.greaterThan(fromDate.toLocalDateTime())
+                                ITEM.PUB_DATE.greaterThan(fromDate)
                                         .and(
                                                 ITEM.STATUS.isNull.or(ITEM.STATUS.eq(NOT_DOWNLOADED))
                                         )
@@ -90,7 +90,7 @@ class DownloadRepository(private val query: DSLContext) {
                 .set(ITEM.LENGTH, length)
                 .set(ITEM.MIME_TYPE, mimeType)
                 .set(ITEM.FILE_NAME, fileName)
-                .set(ITEM.DOWNLOAD_DATE, downloadDate.toLocalDateTime())
+                .set(ITEM.DOWNLOAD_DATE, downloadDate)
                 .where(ITEM.ID.eq(id))
                 .toMono()
     }

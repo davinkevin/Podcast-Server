@@ -38,9 +38,44 @@ spec:
         module: backend
         serving: "true"
     spec:
+      initContainers:
+        - name: init-db
+          image: podcastserver/init-db
+          env:
+            - name: DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: podcast-server
+                  key: database.url
+            - name: DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: podcast-server
+                  key: database.username
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: podcast-server
+                  key: database.password
       containers:
         - image: podcastserver/backend
           name: app
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: podcast-server
+                  key: database.url
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: podcast-server
+                  key: database.username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: podcast-server
+                  key: database.password
           ports:
             - name: http-port
               containerPort: 8080

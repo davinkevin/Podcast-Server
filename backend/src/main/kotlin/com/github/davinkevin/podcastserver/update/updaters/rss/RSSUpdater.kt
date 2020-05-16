@@ -70,7 +70,7 @@ class RSSUpdater(
         return URI(url.replace(" ", "+"))
     }
 
-    private fun getPubDate(item: Element): ZonedDateTime? {
+    private fun getPubDate(item: Element): ZonedDateTime {
         val pubDate = item.getChildText("pubDate") ?: ""
         val date = when {
             "EDT" in pubDate -> pubDate.replace("EDT", "+0600")
@@ -84,7 +84,7 @@ class RSSUpdater(
         } .onFailure {
             log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), it.message)
         }
-                .getOrNull()
+                .getOrDefault(ZonedDateTime.now())
     }
 
     override fun signatureOf(url: URI): Mono<String> = fetchRss(url)

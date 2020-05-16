@@ -6,9 +6,9 @@ metadata:
     app: database
 spec:
   ports:
-    - name: jdbc-h2-port
-      port: 1521
-      targetPort: 1521
+    - name: pg-port
+      port: 5432
+      targetPort: 5432
       protocol: TCP
   selector:
     app: database
@@ -22,40 +22,69 @@ metadata:
 spec:
   selector:
     matchLabels:
-      run: database
       app: database
       serving: "true"
   template:
     metadata:
       labels:
-        run: database
         app: database
         module: backend
         serving: "true"
     spec:
+      terminationGracePeriodSeconds: 90
       containers:
-        - image: oscarfonts/h2:latest
-          imagePullPolicy: Always
+        - image: postgres:12.3-alpine
+          imagePullPolicy: IfNotPresent
           name: database
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: podcast-server
+                  key: database.username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: podcast-server
+                  key: database.password
+            - name: POSTGRES_DB
+              value: podcast-server
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - su - postgres -c "pg_ctl stop -m fast"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h 127.1 -p 5432
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - exec pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h 127.1 -p 5432
           ports:
-            - name: http-port
-              containerPort: 1521
+            - name: pg-port
+              containerPort: 5432
               protocol: TCP
           volumeMounts:
             - name: database
-              mountPath: /opt/h2-data
-      volumes:
-        - name: database
-          hostPath:
-            path: /opt/podcast-server/database/
-            type: Directory
+              mountPath: /var/lib/postgresql/data
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: database-backup
 spec:
-  schedule: "03 4 * * *"
+  schedule: "30 4 * * *"
   successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
@@ -63,15 +92,27 @@ spec:
         spec:
           containers:
             - name: database-backup
-              imagePullPolicy: Never
-              image: oscarfonts/h2:latest
-              args:
+              imagePullPolicy: IfNotPresent
+              image: postgres:12.3-alpine
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: podcast-server
+                      key: database.password
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      name: podcast-server
+                      key: database.username
+                - name: POSTGRES_DB
+                  value: podcast-server
+              command:
                 - /bin/sh
+              args:
                 - -c
-                - java -cp /opt/h2/bin/h2-1.4.199.jar org.h2.tools.Script -url jdbc:h2:tcp://database:1521/podcast-server -user sa && tar zcvf backup/podcast-server-$(date +"%Y-%m-%dT%H-%M-%S").tar.gz *.sql && rm backup.sql
+                - pg_dump -h database -U "$POSTGRES_USER" "$POSTGRES_DB" > backup.sql && tar zcvf /backup/podcast-server-$(date +"%Y-%m-%dT%H-%M-%S").tar.gz *.sql && rm backup.sql
               volumeMounts:
-                - name: database
-                  mountPath: /opt/h2-data
                 - name: backup
-                  mountPath: /opt/h2-data/backup
+                  mountPath: /backup
           restartPolicy: OnFailure

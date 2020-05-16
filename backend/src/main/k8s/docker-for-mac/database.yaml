@@ -7,9 +7,9 @@ spec:
     spec:
       containers:
         - name: database
-          volumeMounts:
-            - name: database
-              mountPath: /opt/h2-data
+          env:
+            - name: POSTGRES_DB
+              value: podcast-server-k8s
       volumes:
         - name: database
           hostPath:
@@ -25,11 +25,12 @@ spec:
     spec:
       template:
         spec:
+          containers:
+            - name: database-backup
+              env:
+              - name: POSTGRES_DB
+                value: podcast-server-k8s
           volumes:
-            - name: database
-              hostPath:
-                path: /tmp/podcast-server/database/
-                type: Directory
             - name: backup
               hostPath:
                 path: /tmp/podcast-server/database/backup/

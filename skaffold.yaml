@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1
+apiVersion: skaffold/v2beta3
 kind: Config
 build:
   artifacts:
@@ -8,10 +8,14 @@ build:
         args:
           - liquibase:dropAll
           - liquibase:update
-          - jooq-codegen:generate
           - -Dmaven.test.skip
+          - -P skaffold
     - image: podcastserver/ui-v1
       context: frontend-angularjs/target/
+    - image: podcastserver/init-db
+      docker:
+        dockerfile: ./backend/src/main/database/Dockerfile
 deploy:
   kustomize:
-    path: backend/src/main/k8s/docker-for-mac/
+    paths:
+      - backend/src/main/k8s/docker-for-mac/

@@ -29,6 +29,8 @@ import java.net.URI
 import java.time.ZoneOffset
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import java.time.Duration
+import java.time.ZonedDateTime.now
 
 
 /**
@@ -88,7 +90,9 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.pubDate == null })
+            StepVerifier.create(updater.findItems(podcast)
+                    .filter { Duration.between(it.pubDate, now()).abs().seconds < 50 }
+            )
                     /* Then */
                     .expectSubscription()
                     .expectNextCount(1)

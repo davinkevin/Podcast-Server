@@ -15,9 +15,12 @@ patchesStrategicMerge:
   - fs.yaml
 
 configMapGenerator:
-  - files:
+  - name: podcast-server
+    files:
       - application.yaml
-    name: podcast-server
+    literals:
+      - database.username=podcast-server-user
+      - database.url=jdbc:postgresql://database:5432/podcast-server-k8s
   - files:
       - local-ingress/default.conf
       - local-ingress/localhost.crt
@@ -26,6 +29,7 @@ configMapGenerator:
 
 secretGenerator:
   - literals:
+      - database.password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
       - api.youtube=AN_API_KEY
     name: podcast-server
     type: Opaque

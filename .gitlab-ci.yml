@@ -16,7 +16,6 @@ variables:
     echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$TOKEN\"}}}" > /kaniko/.docker/config.json
   }
 
-
 stages:
   - ⬇ download
   - 🧪 test
@@ -85,8 +84,20 @@ stages:
   stage: 🧪 test
   image: openjdk:11
   needs: [⬇ backend]
+  services:
+    - postgres:12.3-alpine
+  variables:
+    POSTGRES_USER: test-user
+    POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
+    POSTGRES_DB: test-db
   script:
-    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate test -Ddatabase.url=jdbc:h2:/tmp/podcast-server jacoco:report
+    - |
+      ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml \
+              liquibase:dropAll \
+              liquibase:update \
+              jooq-codegen:generate \
+              test \
+              jacoco:report
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   cache:
     key:
@@ -129,8 +140,19 @@ stages:
   stage: 👷‍ build
   image: openjdk:11-slim
   needs: [🧪 backend]
+  services:
+    - postgres:12.3-alpine
+  variables:
+    POSTGRES_USER: build-user
+    POSTGRES_PASSWORD: zSR87g1xj5TyJRZwDpyhPqkLO472QHSf
+    POSTGRES_DB: build-db
   script:
-    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml liquibase:dropAll liquibase:update jooq-codegen:generate compile
+    - |
+      ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml \
+              liquibase:dropAll \
+              liquibase:update \
+              jooq-codegen:generate \
+              compile
   artifacts:
     paths:
       - backend/target
@@ -220,6 +242,42 @@ stages:
       allow_failure: true
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
+    action: stop
+
+
+🐳 init-db:
+  stage: 🐳 packaging
+  needs: []
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+    - *cicd_utils
+    - kaniko_auth_docker_hub
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/database/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+  environment:
+    name: init-db/$CI_COMMIT_REF_SLUG
+    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/init-db/tags
+    on_stop: 🗑 init-db
+
+🗑 init-db:
+  stage: 🐳 packaging
+  image: tutum/curl
+  dependencies: []
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - *cicd_utils
+  script:
+    - delete_docker_hub_image init-db
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+      when: never
+    - when: manual
+      allow_failure: true
+  environment:
+    name: init-db/$CI_COMMIT_REF_SLUG
     action: stop
 
 🐳 file-system:

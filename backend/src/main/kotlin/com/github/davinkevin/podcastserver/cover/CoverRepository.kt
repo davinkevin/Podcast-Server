@@ -40,7 +40,7 @@ class CoverRepository(private val query: DSLContext) {
                                         .innerJoin(ITEM).on(COVER.ID.eq(ITEM.COVER_ID))
                                         .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
                                 )
-                                .where(ITEM.CREATION_DATE.lessOrEqual(date.toLocalDateTime()))
+                                .where(ITEM.CREATION_DATE.lessOrEqual(date))
                                 .orderBy(COVER.ID.asc()))
                 .map {
                     DeleteCoverInformation(

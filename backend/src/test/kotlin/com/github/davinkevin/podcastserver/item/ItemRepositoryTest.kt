@@ -1196,12 +1196,12 @@ class ItemRepositoryTest(
                     /* Then */
                     .expectSubscription()
                     .assertNext {
-                        assertThat(it.name).isEqualTo("Humour Playlist")
-                        assertThat(it.id).isEqualTo(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"))
-                    }
-                    .assertNext {
                         assertThat(it.name).isEqualTo("Conférence Rewind")
                         assertThat(it.id).isEqualTo(fromString("24248480-bd04-11e5-a837-0800200c9a66"))
+                    }
+                    .assertNext {
+                        assertThat(it.name).isEqualTo("Humour Playlist")
+                        assertThat(it.id).isEqualTo(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"))
                     }
                     .verifyComplete()
         }

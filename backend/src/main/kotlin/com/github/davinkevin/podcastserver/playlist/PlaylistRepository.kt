@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
-import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -52,7 +51,7 @@ class PlaylistRepository(
                         description = it[ITEM.DESCRIPTION],
                         mimeType = it[ITEM.MIME_TYPE],
                         length = it[ITEM.LENGTH],
-                        pubDate = it[ITEM.PUB_DATE].toUTC(),
+                        pubDate = it[ITEM.PUB_DATE],
                         podcast = PlaylistWithItems.Item.Podcast(
                                 id = it[PODCAST.ID],
                                 title = it[PODCAST.TITLE]

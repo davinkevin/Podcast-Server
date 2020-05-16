@@ -3,12 +3,10 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
-import com.github.davinkevin.podcastserver.extension.repository.toUTC
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.jooq.DSLContext
 import org.jooq.TableField
 import org.jooq.impl.DSL
-import org.jooq.types.DayToSecond
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
@@ -18,7 +16,7 @@ import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.sql.Date
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.time.ZonedDateTime
 import java.util.*
@@ -44,7 +42,7 @@ class PodcastRepository(private val query: DSLContext) {
 
                 Podcast (
                         p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.SIGNATURE], p[PODCAST.URL],
-                        p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE].toUTC(),
+                        p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE],
                         p[PODCAST.TYPE],
 
                         tags,
@@ -98,7 +96,7 @@ class PodcastRepository(private val query: DSLContext) {
 
                                 Podcast (
                                         p[PODCAST.ID], p[PODCAST.TITLE], p[PODCAST.DESCRIPTION], p[PODCAST.SIGNATURE] ,p[PODCAST.URL],
-                                        p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE].toUTC(),
+                                        p[PODCAST.HAS_TO_BE_DELETED], p[PODCAST.LAST_UPDATE],
                                         p[PODCAST.TYPE],
 
                                         t,
@@ -112,7 +110,7 @@ class PodcastRepository(private val query: DSLContext) {
     fun findStatByTypeAndPubDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.PUB_DATE)
     fun findStatByTypeAndDownloadDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.DOWNLOAD_DATE)
 
-    private fun findStatByTypeAndField(month: Int, field: TableField<ItemRecord, LocalDateTime>): Flux<StatsPodcastType> {
+    private fun findStatByTypeAndField(month: Int, field: TableField<ItemRecord, OffsetDateTime>): Flux<StatsPodcastType> {
         val date = DSL.trunc(field)
         val startDate = ZonedDateTime.now().minusMonths(month.toLong())
         val numberOfDays = Duration.between(startDate, ZonedDateTime.now()).toDays()
@@ -139,7 +137,7 @@ class PodcastRepository(private val query: DSLContext) {
     fun findStatByPodcastIdAndCreationDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.CREATION_DATE)
     fun findStatByPodcastIdAndDownloadDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.DOWNLOAD_DATE)
 
-    private fun findStatOfOnField(pid: UUID, month: Int, field: TableField<ItemRecord, LocalDateTime>): Flux<NumberOfItemByDateWrapper> = Flux.defer {
+    private fun findStatOfOnField(pid: UUID, month: Int, field: TableField<ItemRecord, OffsetDateTime>): Flux<NumberOfItemByDateWrapper> = Flux.defer {
         val date = DSL.trunc(field)
         val startDate = ZonedDateTime.now().minusMonths(month.toLong())
         val numberOfDays = Duration.between(startDate, ZonedDateTime.now()).toDays()
@@ -226,7 +224,7 @@ class PodcastRepository(private val query: DSLContext) {
     fun updateLastUpdate(podcastId: UUID): Mono<Void> {
         return query
                 .update(PODCAST)
-                .set(PODCAST.LAST_UPDATE, now().toLocalDateTime())
+                .set(PODCAST.LAST_UPDATE, now())
                 .where(PODCAST.ID.eq(podcastId))
                 .toMono()
                 .then()
