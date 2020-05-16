@@ -44,7 +44,7 @@ class RSSUpdater(
                         .map { Optional.of(it) }
                         .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
                         .map {
-                            val enclosure = elem.getChild("enclosure")
+                            val enclosure = elem.enclosure()
                             ItemFromUpdate(
                                     title = elem.getChildText("title"),
                                     pubDate = getPubDate(elem),
@@ -59,13 +59,13 @@ class RSSUpdater(
                 }
     }
 
-    private fun hasEnclosure(item: Element) = item.getChild("enclosure") != null
+    private fun hasEnclosure(item: Element) = item.enclosure() != null
 
     private fun urlOf(element: Element): URI {
         val url = if (element.getChild("origEnclosureLink", FEED_BURNER) != null)
             element.getChildText("origEnclosureLink", FEED_BURNER)
         else
-            element.getChild("enclosure").getAttributeValue("url")
+            element.enclosure().getAttributeValue("url")
 
         return URI(url.replace(" ", "+"))
     }
@@ -115,3 +115,5 @@ class RSSUpdater(
         private val FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0")
     }
 }
+
+private fun Element.enclosure() = this.getChild("enclosure")

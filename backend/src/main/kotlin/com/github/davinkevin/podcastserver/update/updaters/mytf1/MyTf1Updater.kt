@@ -54,7 +54,8 @@ class MyTf1Updater(
                         description = video.decoration.description,
                         pubDate = video.date,
                         url = URI("$baseVideoUrl/${video.slug}.html"),
-                        cover = it.orNull()
+                        cover = it.orNull(),
+                        mimeType = "video/mp4"
                 ) }
     }
 

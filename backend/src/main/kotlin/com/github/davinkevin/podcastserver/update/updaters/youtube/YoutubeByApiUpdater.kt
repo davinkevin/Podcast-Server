@@ -138,7 +138,8 @@ internal data class YoutubeApiItem(val snippet: Snippet) {
             description = snippet.description,
             pubDate = snippet.pubDate(),
             url = URI(snippet.resourceId.url()),
-            cover = snippet.cover()
+            cover = snippet.cover(),
+            mimeType = "video/webm"
     )
 }
 

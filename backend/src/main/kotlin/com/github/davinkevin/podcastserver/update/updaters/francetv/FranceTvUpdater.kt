@@ -84,7 +84,8 @@ class FranceTvUpdater(
                             description = franceTvItem.synopsis!!,
                             pubDate = franceTvItem.pubDate(),
                             url = URI("https://www.france.tv$pathUrl"),
-                            cover = cover.orNull()
+                            cover = cover.orNull(),
+                            mimeType = "video/mp4"
                     )
                 }
                 .onErrorResume {

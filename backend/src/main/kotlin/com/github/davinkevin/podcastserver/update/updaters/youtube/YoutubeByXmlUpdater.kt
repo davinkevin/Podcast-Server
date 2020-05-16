@@ -61,7 +61,8 @@ class YoutubeByXmlUpdater(
                         url = URI(thumbnail.getAttributeValue("url")),
                         width = thumbnail.getAttributeValue("width").toInt(),
                         height = thumbnail.getAttributeValue("height").toInt()
-                )
+                ),
+                mimeType = "video/webm"
         )
     }
 

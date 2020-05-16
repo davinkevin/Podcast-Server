@@ -59,7 +59,8 @@ class GulliUpdater(
                                 description = item.description,
                                 pubDate = ZonedDateTime.parse(item.uploadDate),
                                 url = URI(url),
-                                cover = it.orNull()
+                                cover = it.orNull(),
+                                mimeType = "video/mp4"
                             )
                         }
                 }

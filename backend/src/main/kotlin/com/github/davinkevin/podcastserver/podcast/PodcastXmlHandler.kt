@@ -147,9 +147,10 @@ private fun toRssItem(item: Item, host: URI): Element {
     val extension = Optional.ofNullable(item.fileName)
             .map { FilenameUtils.getExtension(it) }
             .map { it.substringBeforeLast("?") }
+            .or { Optional.ofNullable(item.mimeType).map { it.substringAfter("/") } }
             .map { ".$it" }
             .orElse("")
-
+            
     val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
     val proxyURL = UriComponentsBuilder
@@ -170,6 +171,16 @@ private fun toRssItem(item: Item, host: URI): Element {
         }
     }
 
+    val guid = Element("guid").apply {
+        val uuidUrl = UriComponentsBuilder
+                .fromUri(host)
+                .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
+                .build(true)
+                .toUriString()
+
+        addContent(Text(uuidUrl))
+    }
+
     return Element("item").apply {
         addContent(Element("title").addContent(Text(item.title)))
         addContent(Element("description").addContent(Text(item.description)))
@@ -177,7 +188,7 @@ private fun toRssItem(item: Item, host: URI): Element {
         addContent(Element("explicit", itunesNS).addContent(Text("No")))
         addContent(Element("subtitle", itunesNS).addContent(Text(item.title)))
         addContent(Element("summary", itunesNS).addContent(Text(item.description)))
-        addContent(Element("guid").addContent(Text(proxyURL)))
+        addContent(guid)
         addContent(itunesItemThumbnail)
         addContent(thumbnail)
         addContent(itemEnclosure)

@@ -57,11 +57,12 @@ class DailymotionUpdater(
                 .flatMapIterable { it.list }
                 .flatMap { image.fetchCoverUpdateInformationOrOption(it.cover).zipWith(it.toMono()) }
                 .map { (cover, item) -> ItemFromUpdate(
-                            url = URI("https://www.dailymotion.com/video/${item.id}"),
-                            cover = cover.orNull(),
-                            title = item.title,
-                            pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(item.creationDate!!), ZoneId.of("Europe/Paris")),
-                            description = item.description!!
+                        url = URI("https://www.dailymotion.com/video/${item.id}"),
+                        cover = cover.orNull(),
+                        title = item.title,
+                        pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(item.creationDate!!), ZoneId.of("Europe/Paris")),
+                        description = item.description!!,
+                        mimeType = "video/mp4"
                 ) }
     }
 
