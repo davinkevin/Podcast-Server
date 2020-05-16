@@ -35,6 +35,7 @@ stages:
     key: trivy-database
     paths:
       - .trivy
+  retry: 2
 
 ⬇ backend:
   stage: ⬇ download
