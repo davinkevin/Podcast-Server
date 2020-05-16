@@ -141,8 +141,9 @@ public abstract class AbstractDownloader(
                 Files.createDirectories(finalFile.parent) // # Should explode !
             }
 
-            if (!(Files.exists(finalFile) || Files.exists(finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)))) {
-                return finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
+            val fileWithTemporaryExtension = finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
+            if (!Files.exists(finalFile) && !Files.exists(fileWithTemporaryExtension)) {
+                return fileWithTemporaryExtension
             }
 
             log.info("Doublon sur le fichier en lien avec {} - {}, {}", info.item.podcast.title, info.item.id, info.item.title)
@@ -162,7 +163,10 @@ public abstract class AbstractDownloader(
     }
 
     private fun computeDestinationFile(info: DownloadingInformation): Path {
-        return podcastServerParameters.rootfolder.resolve(info.item.podcast.title).resolve(info.filename)
+        val filename = info.filename
+                .replace("\n".toRegex(), "")
+                .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
+        return podcastServerParameters.rootfolder.resolve(info.item.podcast.title).resolve(filename)
     }
 
     internal fun saveStateOfItem(item: DownloadingItem) {

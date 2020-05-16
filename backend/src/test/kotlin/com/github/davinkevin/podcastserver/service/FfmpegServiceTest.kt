@@ -48,9 +48,9 @@ class FfmpegServiceTest {
         val job: FFmpegJob = mock()
         whenever(ffmpegExecutor.createJob(any())).thenReturn(job)
         val output = Paths.get("/tmp/output.mp4")
-        val input1 = Paths.get("/tmp/input1.mp4")
-        val input2 = Paths.get("/tmp/input2.mp4")
-        val input3 = Paths.get("/tmp/input3.mp4")
+        val input1 = Files.createTempFile("should_concat_files_1", ".mp4")
+        val input2 = Files.createTempFile("should_concat_files_2", ".mp4")
+        val input3 = Files.createTempFile("should_concat_files_3", ".mp4")
 
         /* When */
         ffmpegService.concat(output, input1, input2, input3)
@@ -67,7 +67,7 @@ class FfmpegServiceTest {
         )
         assertThat(
                 executorBuilderCaptor.value.build()
-                        .any { it.startsWith("/tmp/ffmpeg-list-") && it.endsWith(".txt") }
+                        .any { it.contains("ffmpeg-list-") && it.endsWith(".txt") }
         ).isTrue()
     }
 
@@ -77,8 +77,8 @@ class FfmpegServiceTest {
         val tmp = Paths.get("/tmp")
         whenever(ffmpegExecutor.createJob(any())).then { throw RuntimeException() }
         val output = tmp.resolve("output.mp4")
-        val input1 = tmp.resolve("input1.mp4")
-        val input2 = tmp.resolve("input2.mp4")
+        val input1 = Files.createTempFile("should_concat_files_1", ".mp4")
+        val input2 = Files.createTempFile("should_concat_files_2", ".mp4")
 
         /* When */
         ffmpegService.concat(output, input1, input2)

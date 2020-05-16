@@ -8,6 +8,7 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
+import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -24,18 +25,20 @@ class FfmpegService(
         private val ffprobe: FFprobe
 ) {
 
-    private val log = LoggerFactory.getLogger(this.javaClass.name)!!
+    private val log = LoggerFactory.getLogger(FfmpegService::class.java)
     private val separator = System.getProperty("line.separator")
 
     /* Concat files */
     fun concat(target: Path, vararg files: Path) {
 
-        val listOfFiles = Files.createTempFile(target.parent, "ffmpeg-list-", ".txt")
+        val tmpFolder = Files.createTempDirectory("podcast-server-ffmpeg-download-")
+        val listOfFiles = Files.createTempFile(tmpFolder, "ffmpeg-list-", ".txt")
 
-        try {
+        Result.runCatching {
             Files.deleteIfExists(target)
 
-            val filesStrings = files.toList()
+            val filesStrings = files
+                    .map { Files.move(it, Files.createTempFile(tmpFolder, "ffmpeg-file-", ""), StandardCopyOption.REPLACE_EXISTING) }
                     .map { f -> f.fileName.toString() }
                     .map { p -> "file '$p'" }
                     .reduce { acc, s -> "$acc$separator$s" }
@@ -52,11 +55,10 @@ class FfmpegService(
                     .done()
 
             ffmpegExecutor.createJob(builder).run()
-        } catch (e: Exception) {
-            log.error("Error during Ffmpeg conversion", e)
-        } finally {
-            Files.deleteIfExists(listOfFiles)
         }
+                .onFailure { log.error("Error during Ffmpeg conversion", it) }
+
+        FileSystemUtils.deleteRecursively(tmpFolder)
     }
 
     /* Merge Audio and Video Files */
