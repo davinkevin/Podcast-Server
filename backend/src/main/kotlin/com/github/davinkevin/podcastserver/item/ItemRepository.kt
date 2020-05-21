@@ -129,14 +129,12 @@ class ItemRepository(private val query: DSLContext) {
                         or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
                     }
 
-                    val podcastCondition = if(podcastId == null) trueCondition() else {
-                        ITEM.PODCAST_ID.eq(podcastId)
-                    }
+                    val podcastCondition = if(podcastId == null) trueCondition() else ITEM.PODCAST_ID.eq(podcastId)
 
                     val filterConditions = and(statusesCondition, tagsCondition, queryCondition, podcastCondition)
 
-                    val i = query
-                            .select(
+                    val filteredItems = name("FILTERED_ITEMS").`as`(
+                            select(
                                     ITEM.ID, ITEM.TITLE, ITEM.URL,
                                     ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
                                     ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
@@ -147,21 +145,24 @@ class ItemRepository(private val query: DSLContext) {
                             .where(filterConditions)
                             .orderBy(page.sort.toOrderBy(), ITEM.ID.asc())
                             .limit((page.size * page.page), page.size)
-                            .asTable("FILTERED_ITEMS")
+                    )
 
-                    val itemId = i.field(ITEM.ID)
-                    val itemTitle = i.field(ITEM.TITLE)
-                    val itemURL = i.field(ITEM.URL)
-                    val itemPubDate = i.field(ITEM.PUB_DATE)
-                    val itemDownloadDate = i.field(ITEM.DOWNLOAD_DATE)
-                    val itemCreationDate = i.field(ITEM.CREATION_DATE)
-                    val itemDescription = i.field(ITEM.DESCRIPTION)
-                    val itemMimeType = i.field(ITEM.MIME_TYPE)
-                    val itemLength = i.field(ITEM.LENGTH)
-                    val itemFileName = i.field(ITEM.FILE_NAME)
-                    val itemStatus = i.field(ITEM.STATUS)
+                    val itemId = filteredItems.field(ITEM.ID)
+                    val itemTitle = filteredItems.field(ITEM.TITLE)
+                    val itemURL = filteredItems.field(ITEM.URL)
+                    val itemPubDate = filteredItems.field(ITEM.PUB_DATE)
+                    val itemDownloadDate = filteredItems.field(ITEM.DOWNLOAD_DATE)
+                    val itemCreationDate = filteredItems.field(ITEM.CREATION_DATE)
+                    val itemDescription = filteredItems.field(ITEM.DESCRIPTION)
+                    val itemMimeType = filteredItems.field(ITEM.MIME_TYPE)
+                    val itemLength = filteredItems.field(ITEM.LENGTH)
+                    val itemFileName = filteredItems.field(ITEM.FILE_NAME)
+                    val itemStatus = filteredItems.field(ITEM.STATUS)
+                    val itemCoverId = filteredItems.field(ITEM.COVER_ID)
+                    val itemPodcastId = filteredItems.field(ITEM.PODCAST_ID)
 
                     val content: Mono<List<Item>> = Flux.from(query
+                            .with(filteredItems)
                             .select(
                                     itemId, itemTitle, itemURL,
                                     itemPubDate, itemDownloadDate, itemCreationDate,
@@ -172,9 +173,9 @@ class ItemRepository(private val query: DSLContext) {
                                     COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
                             )
                             .from(
-                                    i
-                                            .innerJoin(COVER).on(i.field(ITEM.COVER_ID).eq(COVER.ID))
-                                            .innerJoin(PODCAST).on(i.field(ITEM.PODCAST_ID).eq(PODCAST.ID)))
+                                    filteredItems
+                                            .innerJoin(COVER).on(itemCoverId.eq(COVER.ID))
+                                            .innerJoin(PODCAST).on(itemPodcastId.eq(PODCAST.ID)))
                     )
                             .map {
                                 val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
@@ -256,14 +257,14 @@ class ItemRepository(private val query: DSLContext) {
 
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> = Flux.defer {
         Flux.from(
-            query
-                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-                .from(WATCH_LIST
-                        .innerJoin(WATCH_LIST_ITEMS)
-                        .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
-                )
-                .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
-                .orderBy(WATCH_LIST.ID)
+                query
+                        .select(WATCH_LIST.ID, WATCH_LIST.NAME)
+                        .from(WATCH_LIST
+                                .innerJoin(WATCH_LIST_ITEMS)
+                                .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
+                        )
+                        .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+                        .orderBy(WATCH_LIST.ID)
         )
                 .map { ItemPlaylist(it[WATCH_LIST.ID], it[WATCH_LIST.NAME]) }
     }
