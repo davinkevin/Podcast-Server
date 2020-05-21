@@ -167,7 +167,7 @@ stages:
 👷 backend:
   stage: 👷‍ build
   image: openjdk:11-slim
-  needs: [🧪 backend]
+  needs: [⬇ backend]
   services:
     - postgres:12.3-alpine
   variables:
@@ -189,6 +189,7 @@ stages:
       files:
         - backend/pom.xml
       prefix: "backend"
+    policy: pull
     paths:
       - .m2/
 
