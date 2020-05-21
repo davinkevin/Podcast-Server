@@ -29,6 +29,21 @@ variables:
     paths:
       - .trivy
 
+.delete-docker-image:
+  image: tutum/curl
+  dependencies: []
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - *cicd_utils
+  script:
+    - delete_docker_hub_image $COMPONENT
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+      when: never
+    - when: manual
+      allow_failure: true
+
 stages:
   - ⬇ download
   - 🧪 test
@@ -239,24 +254,13 @@ stages:
 
 🗑 backend:
   stage: 🐳 packaging
-  image: tutum/curl
-  dependencies: []
-  variables:
-    GIT_STRATEGY: none
-  before_script:
-    - *cicd_utils
+  extends: [ .delete-docker-image ]
   script:
     - delete_docker_hub_image backend
     - delete_docker_hub_image backend-base-image
-  rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
-      when: never
-    - when: manual
-      allow_failure: true
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     action: stop
-
 
 🐳 init-db:
   stage: 🐳 packaging
@@ -276,19 +280,9 @@ stages:
 
 🗑 init-db:
   stage: 🐳 packaging
-  image: tutum/curl
-  dependencies: []
+  extends: [ .delete-docker-image ]
   variables:
-    GIT_STRATEGY: none
-  before_script:
-    - *cicd_utils
-  script:
-    - delete_docker_hub_image init-db
-  rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
-      when: never
-    - when: manual
-      allow_failure: true
+    COMPONENT: init-db
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     action: stop
@@ -315,19 +309,9 @@ stages:
 
 🗑 file-system:
   stage: 🐳 packaging
-  image: tutum/curl
-  dependencies: []
+  extends: [ .delete-docker-image ]
   variables:
-    GIT_STRATEGY: none
-  before_script:
-    - *cicd_utils
-  script:
-    - delete_docker_hub_image file-system
-  rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
-      when: never
-    - when: manual
-      allow_failure: true
+    COMPONENT: file-system
   environment:
     name: file-system/$CI_COMMIT_REF_SLUG
     action: stop
@@ -354,19 +338,9 @@ stages:
 
 🗑 ui:
   stage: 🐳 packaging
-  image: tutum/curl
-  dependencies: []
+  extends: [ .delete-docker-image ]
   variables:
-    GIT_STRATEGY: none
-  before_script:
-    - *cicd_utils
-  script:
-    - delete_docker_hub_image ui
-  rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
-      when: never
-    - when: manual
-      allow_failure: true
+    COMPONENT: ui
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     action: stop
