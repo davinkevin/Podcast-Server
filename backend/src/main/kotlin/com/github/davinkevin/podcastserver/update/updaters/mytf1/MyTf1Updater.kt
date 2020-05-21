@@ -2,10 +2,10 @@ package com.github.davinkevin.podcastserver.update.updaters.mytf1
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.Type
+import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
 import org.springframework.util.DigestUtils
@@ -49,14 +49,16 @@ class MyTf1Updater(
     private fun toItem(video: TF1GraphQLResult.Video, baseVideoUrl: String): Mono<ItemFromUpdate> {
         return image
                 .fetchCoverUpdateInformationOrOption(video.bestCover())
-                .map { ItemFromUpdate(
-                        title = video.title,
-                        description = video.decoration.description,
-                        pubDate = video.date,
-                        url = URI("$baseVideoUrl/${video.slug}.html"),
-                        cover = it.orNull(),
-                        mimeType = "video/mp4"
-                ) }
+                .map {
+                    ItemFromUpdate(
+                            title = video.title,
+                            description = video.decoration.description,
+                            pubDate = video.date,
+                            url = URI("$baseVideoUrl/${video.slug}.html"),
+                            cover = it.orNull(),
+                            mimeType = "video/mp4"
+                    )
+                }
     }
 
     override fun signatureOf(url: URI): Mono<String> {
@@ -119,8 +121,6 @@ class MyTf1Updater(
         return null
     }
 
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
-    override fun blockingSignatureOf(url: URI): String = TODO("not required anymore...")
     override fun type() = Type("MyTF1", "MyTF1")
 
     override fun compatibility(url: String?) =

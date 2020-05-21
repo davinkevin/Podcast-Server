@@ -3,9 +3,8 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
-import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
@@ -47,7 +46,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `from channel`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate (UUID.randomUUID(), URI("https://www.youtube.com/user/joueurdugrenier"), "noSign")
+            val podcast = PodcastToUpdate(UUID.randomUUID(), URI("https://www.youtube.com/user/joueurdugrenier"), "noSign")
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
@@ -71,7 +70,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `from playlist`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate (UUID.randomUUID(), URI("http://www.youtube.com/playlist?list=PL43OynbWaTMJf3TBZJ5A414D5f7UQ8kwL"), "noSign")
+            val podcast = PodcastToUpdate(UUID.randomUUID(), URI("http://www.youtube.com/playlist?list=PL43OynbWaTMJf3TBZJ5A414D5f7UQ8kwL"), "noSign")
 
             backend.apply {
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=PL43OynbWaTMJf3TBZJ5A414D5f7UQ8kwL&key=key")
@@ -92,7 +91,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `and handle error on items`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
+            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
@@ -116,7 +115,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `and handle error on playlist id searching`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
+            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
@@ -141,7 +140,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `and returns empty if no result`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign" )
+            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
                 stubFor(get("/user/androiddevelopers")
@@ -197,7 +196,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `with success`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
+            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
@@ -219,7 +218,7 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `with default value if error happen`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate ( url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign" )
+            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
@@ -244,32 +243,6 @@ class YoutubeByApiUpdaterTest(
         val type = updater.type()
         assertThat(type.name).isEqualTo("Youtube")
         assertThat(type.key).isEqualTo("Youtube")
-    }
-
-    @Nested
-    @DisplayName("blocking")
-    inner class Blocking {
-
-        @Test
-        fun `should not serve items with blocking method`() {
-            /* Given */
-            val podcast = PodcastToUpdate (UUID.randomUUID(), URI("https://www.youtube.com/user/joueurdugrenier"), "noSign")
-            /* When */
-            assertThatThrownBy { updater.blockingFindItems(podcast) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-
-        @Test
-        fun `should not sign podcast with blocking method`() {
-            /* Given */
-            val podcast = PodcastToUpdate (UUID.randomUUID(), URI("https://www.youtube.com/user/joueurdugrenier"), "noSign")
-
-            /* When */
-            assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
     }
 
     @TestConfiguration

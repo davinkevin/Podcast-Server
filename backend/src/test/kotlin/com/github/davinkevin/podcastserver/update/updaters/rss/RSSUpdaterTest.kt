@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.update.updaters.rss
 
 import com.github.davinkevin.podcastserver.*
 import com.github.davinkevin.podcastserver.config.WebClientConfig
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -237,30 +237,6 @@ class RSSUpdaterTest(
             val compatibility = updater.compatibility(url)
             /* Then */
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
-        }
-    }
-
-
-    @Nested
-    @DisplayName("blocking")
-    inner class Blocking {
-
-        @Test
-        fun `should not serve items with blocking method`() {
-            /* Given */
-            /* When */
-            Assertions.assertThatThrownBy { updater.blockingFindItems(podcast) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-
-        @Test
-        fun `should not sign podcast with blocking method`() {
-            /* Given */
-            /* When */
-            Assertions.assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
         }
     }
 

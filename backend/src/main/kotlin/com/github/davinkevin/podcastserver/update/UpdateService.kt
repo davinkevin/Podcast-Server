@@ -6,9 +6,9 @@ import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
@@ -24,9 +24,7 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
-import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
-import java.time.ZonedDateTime
 import java.util.*
 
 class UpdateService(

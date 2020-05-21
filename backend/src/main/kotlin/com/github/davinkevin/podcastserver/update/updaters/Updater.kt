@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.manager.worker
+package com.github.davinkevin.podcastserver.update.updaters
 
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
@@ -16,10 +16,6 @@ val defaultPodcast = PodcastToUpdate(id = UUID.randomUUID(), url = URI("https://
 val NO_MODIFICATION = UpdatePodcastInformation(defaultPodcast, setOf(), "")
 
 interface Updater {
-
-    fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate>
-
-    fun blockingSignatureOf(url: URI): String
 
     fun update(podcast: PodcastToUpdate): Mono<UpdatePodcastInformation> {
         log.info("podcast {} starts update", podcast.url)
@@ -42,16 +38,9 @@ interface Updater {
                 .onErrorResume { Mono.empty() }
     }
 
-    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = try {
-        blockingFindItems(podcast).toFlux()
-    } catch (e: Exception) { Flux.error(e) }
-
-    fun signatureOf(url: URI): Mono<String> = try {
-        blockingSignatureOf(url).toMono()
-    } catch (e: Exception) { Mono.error(e) }
-
+    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate>
+    fun signatureOf(url: URI): Mono<String>
     fun type(): Type
-
     fun compatibility(url: String?): Int
 }
 
@@ -68,7 +57,7 @@ data class ItemFromUpdate(
         val cover: CoverFromUpdate?
 )
 data class CoverFromUpdate(val width: Int, val height: Int, val url: URI)
-fun CoverInformation.toCoverFromUpdate() = CoverFromUpdate (
+fun CoverInformation.toCoverFromUpdate() = CoverFromUpdate(
         height = this@toCoverFromUpdate.height,
         width = this@toCoverFromUpdate.width,
         url = this@toCoverFromUpdate.url

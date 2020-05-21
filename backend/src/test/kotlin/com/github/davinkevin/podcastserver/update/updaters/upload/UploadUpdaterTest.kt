@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.upload
 
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -23,7 +23,7 @@ class UploadUpdaterTest(
         @Autowired private val updater: UploadUpdater
 ) {
 
-    private var podcast = PodcastToUpdate (
+    private var podcast = PodcastToUpdate(
             url = URI("http://foo.bar.com"),
             signature = "noSign",
             id = UUID.randomUUID()
@@ -54,7 +54,6 @@ class UploadUpdaterTest(
         val type = updater.type()
 
         /* Then */
-        assertThat(type).isSameAs(UploadUpdater.TYPE)
         assertThat(type.key).isEqualTo("upload")
         assertThat(type.name).isEqualTo("Upload")
     }
@@ -83,29 +82,4 @@ class UploadUpdaterTest(
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
         }
     }
-
-
-    @Nested
-    @DisplayName("blocking")
-    inner class Blocking {
-
-        @Test
-        fun `should not serve items with blocking method`() {
-            /* Given */
-            /* When */
-            Assertions.assertThatThrownBy { updater.blockingFindItems(podcast) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-
-        @Test
-        fun `should not sign podcast with blocking method`() {
-            /* Given */
-            /* When */
-            Assertions.assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-    }
-
 }

@@ -2,10 +2,10 @@ package com.github.davinkevin.podcastserver.update.updaters.dailymotion
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.Type
+import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
 import org.springframework.util.DigestUtils
@@ -56,18 +56,17 @@ class DailymotionUpdater(
                 .bodyToMono<DailymotionDetailsResult>()
                 .flatMapIterable { it.list }
                 .flatMap { image.fetchCoverUpdateInformationOrOption(it.cover).zipWith(it.toMono()) }
-                .map { (cover, item) -> ItemFromUpdate(
-                        url = URI("https://www.dailymotion.com/video/${item.id}"),
-                        cover = cover.orNull(),
-                        title = item.title,
-                        pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(item.creationDate!!), ZoneId.of("Europe/Paris")),
-                        description = item.description!!,
-                        mimeType = "video/mp4"
-                ) }
+                .map { (cover, item) ->
+                    ItemFromUpdate(
+                            url = URI("https://www.dailymotion.com/video/${item.id}"),
+                            cover = cover.orNull(),
+                            title = item.title,
+                            pubDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(item.creationDate!!), ZoneId.of("Europe/Paris")),
+                            description = item.description!!,
+                            mimeType = "video/mp4"
+                    )
+                }
     }
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
-    override fun blockingSignatureOf(url: URI): String = TODO("not required anymore...")
 
     override fun type() = Type("Dailymotion", "Dailymotion")
     override fun compatibility(url: String?) =

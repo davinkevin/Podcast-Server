@@ -3,10 +3,10 @@ package com.github.davinkevin.podcastserver.update.updaters.gulli
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Type
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.Type
+import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import org.jsoup.Jsoup
 import org.springframework.util.DigestUtils
@@ -54,13 +54,14 @@ class GulliUpdater(
                 }
                 .flatMap { (item, url) -> image
                         .fetchCoverUpdateInformationOrOption(item.thumbnailUrl)
-                        .map { ItemFromUpdate(
-                                title = item.name,
-                                description = item.description,
-                                pubDate = ZonedDateTime.parse(item.uploadDate),
-                                url = URI(url),
-                                cover = it.orNull(),
-                                mimeType = "video/mp4"
+                        .map {
+                            ItemFromUpdate(
+                                    title = item.name,
+                                    description = item.description,
+                                    pubDate = ZonedDateTime.parse(item.uploadDate),
+                                    url = URI(url),
+                                    cover = it.orNull(),
+                                    mimeType = "video/mp4"
                             )
                         }
                 }
@@ -81,9 +82,6 @@ class GulliUpdater(
                 .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
                 .switchIfEmpty("".toMono())
     }
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
-    override fun blockingSignatureOf(url: URI): String = TODO("not required anymore...")
 
     override fun type() = Type("Gulli", "Gulli")
     override fun compatibility(url: String?): Int =

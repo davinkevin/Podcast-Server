@@ -3,11 +3,9 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
-import com.github.davinkevin.podcastserver.service.image.ImageService
-import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -320,29 +317,6 @@ class YoutubeByXmlUpdaterTest(
             val compatibility = updater.compatibility(url)
             /* Then */
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
-        }
-    }
-
-    @Nested
-    @DisplayName("blocking")
-    inner class Blocking {
-
-        @Test
-        fun `should not serve items with blocking method`() {
-            /* Given */
-            /* When */
-            assertThatThrownBy { updater.blockingFindItems(channel) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-
-        @Test
-        fun `should not sign podcast with blocking method`() {
-            /* Given */
-            /* When */
-            assertThatThrownBy { updater.blockingSignatureOf(channel.url) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
         }
     }
 }

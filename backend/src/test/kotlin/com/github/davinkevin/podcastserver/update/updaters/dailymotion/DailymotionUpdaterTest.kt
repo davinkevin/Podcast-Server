@@ -3,8 +3,8 @@ package com.github.davinkevin.podcastserver.update.updaters.dailymotion
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -235,29 +235,4 @@ class DailymotionUpdaterTest(
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
         }
     }
-
-    @Nested
-    @DisplayName("blocking")
-    inner class Blocking {
-
-        @Test
-        fun `should not serve items with blocking method`() {
-            /* Given */
-            /* When */
-            Assertions.assertThatThrownBy { updater.blockingFindItems(podcast) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-
-        @Test
-        fun `should not sign podcast with blocking method`() {
-            /* Given */
-            /* When */
-            Assertions.assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-    }
-
-
 }

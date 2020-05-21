@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.manager.worker.*
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
@@ -19,6 +18,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.updaters.*
 
 class RSSUpdater(
         private val imageService: ImageService,
@@ -26,9 +26,6 @@ class RSSUpdater(
 ) : Updater {
 
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
-    override fun blockingSignatureOf(url: URI) = TODO("not required anymore...")
 
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         return fetchRss(podcast.url)
@@ -54,7 +51,8 @@ class RSSUpdater(
 
                                     length = enclosure.getAttributeValue("length")?.toLong(),
                                     mimeType = enclosure.getAttributeValue("type")
-                            ) }
+                            )
+                        }
 
                 }
     }

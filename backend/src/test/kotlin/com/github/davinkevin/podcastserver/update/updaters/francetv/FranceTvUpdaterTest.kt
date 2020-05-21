@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.update.updaters.francetv
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -348,28 +348,4 @@ class FranceTvUpdaterTest(
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
         }
     }
-
-    @Nested
-    @DisplayName("blocking")
-    inner class Blocking {
-
-        @Test
-        fun `should not serve items with blocking method`() {
-            /* Given */
-            /* When */
-            assertThatThrownBy { updater.blockingFindItems(podcast) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-
-        @Test
-        fun `should not sign podcast with blocking method`() {
-            /* Given */
-            /* When */
-            assertThatThrownBy { updater.blockingSignatureOf(podcast.url) }
-                    /* Then */
-                    .hasMessage("An operation is not implemented: not required anymore...")
-        }
-    }
-
 }

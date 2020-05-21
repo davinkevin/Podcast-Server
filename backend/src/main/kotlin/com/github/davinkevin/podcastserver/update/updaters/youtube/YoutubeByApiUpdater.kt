@@ -3,10 +3,10 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.manager.worker.CoverFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.ItemFromUpdate
-import com.github.davinkevin.podcastserver.manager.worker.PodcastToUpdate
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
@@ -33,9 +33,6 @@ class YoutubeByApiUpdater(
 ): Updater {
 
     private val log = LoggerFactory.getLogger(this.javaClass.name)!!
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
-    override fun blockingSignatureOf(url: URI): String = TODO("not required anymore...")
 
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         log.debug("find items of {}", podcast.url)
@@ -148,7 +145,7 @@ internal data class Snippet(val title: String, val resourceId: ResourceId, val d
     fun pubDate() = ZonedDateTime.parse(publishedAt, DateTimeFormatter.ISO_DATE_TIME)!!
     fun cover() = this.thumbnails
             .betterThumbnail()
-            .map { CoverFromUpdate (url = URI(it.url!!), width = it.width!!, height = it.height!! ) }
+            .map { CoverFromUpdate(url = URI(it.url!!), width = it.width!!, height = it.height!!) }
             .orNull()
 }
 

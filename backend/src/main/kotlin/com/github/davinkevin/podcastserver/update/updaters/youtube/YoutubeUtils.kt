@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import com.github.davinkevin.podcastserver.manager.worker.Type
+import com.github.davinkevin.podcastserver.update.updaters.Type
 import java.net.URI
 
 /**

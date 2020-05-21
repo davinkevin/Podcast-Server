@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import com.github.davinkevin.podcastserver.manager.worker.Updater
+import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import com.github.davinkevin.podcastserver.service.properties.Api
 import org.springframework.boot.context.properties.EnableConfigurationProperties

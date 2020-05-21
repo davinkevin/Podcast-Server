@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.manager.worker.*
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
@@ -23,6 +22,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.updaters.*
 
 class FranceTvUpdater(
         private val franceTvClient: WebClient,
@@ -32,9 +32,6 @@ class FranceTvUpdater(
 ): Updater {
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)
-
-    override fun blockingFindItems(podcast: PodcastToUpdate): Set<ItemFromUpdate> = TODO("not required anymore...")
-    override fun blockingSignatureOf(url: URI): String = TODO("not required anymore...")
 
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
 
