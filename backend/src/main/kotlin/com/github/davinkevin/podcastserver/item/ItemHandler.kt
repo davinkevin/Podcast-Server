@@ -203,7 +203,7 @@ private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
 data class ItemHAL(
         val id: UUID, val title: String, val url: String?,
         val pubDate: OffsetDateTime?, val downloadDate: OffsetDateTime?, val creationDate: OffsetDateTime?,
-        val description: String?, val mimeType: String?, val length: Long?, val fileName: String?, val status: Status,
+        val description: String?, val mimeType: String, val length: Long?, val fileName: String?, val status: Status,
         val podcast: PodcastHAL, val cover: CoverHAL
 ) {
     val podcastId = podcast.id

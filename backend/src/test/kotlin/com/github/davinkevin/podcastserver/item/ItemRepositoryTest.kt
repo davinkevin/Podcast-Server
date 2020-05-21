@@ -19,11 +19,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.dao.DataIntegrityViolationException
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime.now
@@ -293,12 +295,12 @@ class ItemRepositoryTest(
                         .values(fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), "Other Podcast", "http://fake.url.com/other/rss", "YOUTUBE", true)
                         .build()!!,
                 insertInto("ITEM")
-                        .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION").apply {
+                        .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION", "MIME_TYPE").apply {
                             val max = 50
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "audio/mp3") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc", "video/mp4") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc", "unknown/unknown") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc", "video/webm") }
                         }.build()!!,
                 insertInto("TAG")
                         .columns("ID", "NAME")
@@ -1108,6 +1110,66 @@ class ItemRepositoryTest(
             assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
         }
 
+        @Test
+        fun `but fail because mimetype is empty`() {
+            /* Given */
+            val item = ItemForCreation(
+                    title = "an item",
+                    url = "http://foo.bar.com/an_item",
+
+                    pubDate = now(),
+                    downloadDate = now(),
+                    creationDate = now(),
+
+                    description = "a description",
+                    mimeType = "",
+                    length = 1234,
+                    fileName = "ofejeaoijefa.mp3",
+                    status = FINISH,
+
+                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+            )
+
+            /* When */
+            StepVerifier.create(repository.create(item))
+                    /* Then */
+                    .expectSubscription()
+                    .expectError(DataIntegrityViolationException::class.java)
+                    .verify()
+        }
+
+        @Test
+        fun `but fail because mimetype does not contain slash`() {
+            /* Given */
+            val item = ItemForCreation(
+                    title = "an item",
+                    url = "http://foo.bar.com/an_item",
+
+                    pubDate = now(),
+                    downloadDate = now(),
+                    creationDate = now(),
+
+                    description = "a description",
+                    mimeType = "foo",
+                    length = 1234,
+                    fileName = "ofejeaoijefa.mp3",
+                    status = FINISH,
+
+                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+            )
+
+            /* When */
+            StepVerifier.create(repository.create(item))
+                    /* Then */
+                    .expectSubscription()
+                    .expectError(DataIntegrityViolationException::class.java)
+                    .verify()
+        }
+
+
+
     }
 
     @Nested
@@ -1116,10 +1178,10 @@ class ItemRepositoryTest(
 
         private val itemDownloadingStateOperation = sequenceOf(operation, sequenceOf(
                 insertInto("ITEM")
-                        .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION")
-                        .values(fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 140", "http://fakeurl.com/geekinc.140.mp3", "geekinc.140.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(15).format(DB_DATE_FORMATTER), now().minusDays(15).format(DB_DATE_FORMATTER), now().minusMonths(2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
-                        .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "geekinc.141.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), PAUSED, now().minusDays(1).format(DB_DATE_FORMATTER), null, now().minusWeeks(2).format(DB_DATE_FORMATTER), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
-                        .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "geekinc.142.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(1).format(DB_DATE_FORMATTER), null, now().minusWeeks(1).format(DB_DATE_FORMATTER), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc")
+                        .columns("ID", "TITLE", "URL", "FILE_NAME", "PODCAST_ID", "STATUS", "PUB_DATE", "DOWNLOAD_DATE", "CREATION_DATE", "NUMBER_OF_FAIL", "COVER_ID", "DESCRIPTION", "MIME_TYPE")
+                        .values(fromString("0a774612-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 140", "http://fakeurl.com/geekinc.140.mp3", "geekinc.140.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(15).format(DB_DATE_FORMATTER), now().minusDays(15).format(DB_DATE_FORMATTER), now().minusMonths(2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
+                        .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "geekinc.141.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), PAUSED, now().minusDays(1).format(DB_DATE_FORMATTER), null, now().minusWeeks(2).format(DB_DATE_FORMATTER), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
+                        .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "geekinc.142.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), STARTED, now().minusDays(1).format(DB_DATE_FORMATTER), null, now().minusWeeks(1).format(DB_DATE_FORMATTER), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
                         .build()
         ))
 

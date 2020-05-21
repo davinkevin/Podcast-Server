@@ -17,7 +17,7 @@ data class PlaylistWithItems(val id: UUID, val name: String, val items: Collecti
             val fileName: String?,
 
             val description: String?,
-            val mimeType: String?,
+            val mimeType: String,
             val length: Long?,
 
             val pubDate: OffsetDateTime?,

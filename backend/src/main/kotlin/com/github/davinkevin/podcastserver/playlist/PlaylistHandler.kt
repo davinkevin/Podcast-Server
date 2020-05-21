@@ -123,7 +123,7 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
 
             val proxyURL: URI,
             val description: String?,
-            val mimeType: String?,
+            val mimeType: String,
 
             val podcast: Podcast,
             val cover: Cover) {
@@ -229,7 +229,7 @@ private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
             setAttribute("length", item.length.toString())
         }
 
-        if(item.mimeType?.isNotEmpty() == true) {
+        if(item.mimeType.isNotEmpty()) {
             setAttribute("type", item.mimeType)
         }
     }

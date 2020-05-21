@@ -51,7 +51,7 @@ data class ItemFromUpdate(
         val title: String?,
         val pubDate: ZonedDateTime?,
         val length: Long? = null,
-        val mimeType: String? = null,
+        val mimeType: String,
         val url: URI,
         val description: String?,
         val cover: CoverFromUpdate?

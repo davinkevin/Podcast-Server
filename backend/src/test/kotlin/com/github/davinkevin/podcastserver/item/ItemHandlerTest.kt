@@ -52,7 +52,7 @@ class ItemHandlerTest(
             creationDate = now(),
 
             description = "desc",
-            mimeType = null,
+            mimeType = "audio/mp3",
             length = 100,
             fileName = null,
             status = Status.NOT_DOWNLOADED,
@@ -216,7 +216,7 @@ class ItemHandlerTest(
                 creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
 
                 description = "desc",
-                mimeType = null,
+                mimeType = "audio/mp3",
                 length = 100,
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
@@ -262,7 +262,7 @@ class ItemHandlerTest(
                            "id":"27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
                            "isDownloaded":false,
                            "length":100,
-                           "mimeType":null,
+                           "mimeType":"audio/mp3",
                            "podcast":{
                               "id":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
                               "title":"Podcast Bar",
@@ -344,7 +344,7 @@ class ItemHandlerTest(
                 creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
 
                 description = "desc",
-                mimeType = null,
+                mimeType = "audio/mp3",
                 length = 100,
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
@@ -389,7 +389,7 @@ class ItemHandlerTest(
                            "id":"27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
                            "isDownloaded":false,
                            "length":100,
-                           "mimeType":null,
+                           "mimeType":"audio/mp3",
                            "podcast":{
                               "id":"8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9",
                               "title":"Podcast Bar",
@@ -420,7 +420,7 @@ class ItemHandlerTest(
                 downloadDate = OffsetDateTime.of(2019, 6, 25, 5, 30, 54, 34, ZoneOffset.ofHours(2)),
 
                 description = "desc",
-                mimeType = null,
+                mimeType = "audio/mp3",
                 length = 100,
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
@@ -472,7 +472,7 @@ class ItemHandlerTest(
                               "id": "27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
                               "isDownloaded": false,
                               "length": 100,
-                              "mimeType": null,
+                              "mimeType": "audio/mp3",
                               "podcast": {
                                 "id": "dd16b2eb-657e-4064-b470-5b99397ce729",
                                 "title": "Podcast title",
@@ -532,7 +532,7 @@ class ItemHandlerTest(
                               "id": "27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
                               "isDownloaded": false,
                               "length": 100,
-                              "mimeType": null,
+                              "mimeType": "audio/mp3",
                               "podcast": {
                                 "id": "dd16b2eb-657e-4064-b470-5b99397ce729",
                                 "title": "Podcast title",
@@ -592,7 +592,7 @@ class ItemHandlerTest(
                               "id": "27184b1a-7642-4ffd-ac7e-14fb36f7f15c",
                               "isDownloaded": false,
                               "length": 100,
-                              "mimeType": null,
+                              "mimeType": "audio/mp3",
                               "podcast": {
                                 "id": "dd16b2eb-657e-4064-b470-5b99397ce729",
                                 "title": "Podcast title",
@@ -633,7 +633,7 @@ class ItemHandlerTest(
                 creationDate = now(),
 
                 description = "desc",
-                mimeType = null,
+                mimeType = "audio/mp3",
                 length = 100,
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,

@@ -166,7 +166,7 @@ private fun toRssItem(item: Item, host: URI): Element {
             setAttribute("length", item.length.toString())
         }
 
-        if(item.mimeType?.isNotEmpty() == true) {
+        if(item.mimeType.isNotEmpty()) {
             setAttribute("type", item.mimeType)
         }
     }

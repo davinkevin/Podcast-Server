@@ -153,7 +153,7 @@ class FileServiceTest(
                     creationDate = OffsetDateTime.now(),
 
                     description = "desc",
-                    mimeType = null,
+                    mimeType = "audio/mp3",
                     length = 100,
                     fileName = null,
                     status = Status.NOT_DOWNLOADED,

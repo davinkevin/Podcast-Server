@@ -168,6 +168,20 @@ class RSSUpdaterTest(
                     .expectNextCount(1)
                     .verifyComplete()
         }
+
+        @Test
+        fun `should support enclosure without type`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast).filter { it.mimeType.contains("unknown") })
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextCount(1)
+                    .verifyComplete()
+        }
     }
 
     @Nested
@@ -185,7 +199,7 @@ class RSSUpdaterTest(
             StepVerifier.create(updater.signatureOf(podcast.url))
                     /* Then */
                     .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("9fd84a178f4b4d93384e4affb55b7d10") }
+                    .assertNext { assertThat(it).isEqualTo("baf07ee03f27ddb7ea8114d766021993") }
                     .verifyComplete()
         }
 

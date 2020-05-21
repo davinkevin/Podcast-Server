@@ -50,7 +50,7 @@ class RSSUpdater(
                                     url = urlOf(elem),
 
                                     length = enclosure.getAttributeValue("length")?.toLong(),
-                                    mimeType = enclosure.getAttributeValue("type")
+                                    mimeType = mimeTypeOf(elem)
                             )
                         }
 
@@ -66,6 +66,11 @@ class RSSUpdater(
             element.enclosure().getAttributeValue("url")
 
         return URI(url.replace(" ", "+"))
+    }
+
+    private fun mimeTypeOf(elem: Element): String {
+        val type = elem.enclosure().getAttributeValue("type")
+        return if (!type.isNullOrEmpty()) type else "unknown/unknown"
     }
 
     private fun getPubDate(item: Element): ZonedDateTime {

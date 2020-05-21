@@ -24,7 +24,7 @@ data class Item(
         val creationDate: OffsetDateTime?,
 
         val description: String?,
-        val mimeType: String?,
+        val mimeType: String,
         val length: Long?,
         val fileName: String?,
         val status: Status,
@@ -93,7 +93,7 @@ data class ItemForCreation(
         val creationDate: OffsetDateTime,
 
         val description: String?,
-        val mimeType: String?,
+        val mimeType: String,
         val length: Long?,
         val fileName: String?,
         val status: Status,
