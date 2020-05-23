@@ -1,3 +1,7 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
 
 variables:
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
@@ -56,11 +60,6 @@ variables:
     - frontend-angularjs/**/*
     - ui/**/*
 
-.rule-not-in-merge-request-id:
-  - &rule-not-in-merge-request-id
-    if: '$CI_MERGE_REQUEST_ID'
-    when: never
-
 .not-on-master:
   - &rule-not-on-master
     if: '$CI_COMMIT_REF_NAME == "master"'
@@ -68,22 +67,18 @@ variables:
 
 .only-on-backend-changes:
   rules:
-    - *rule-not-in-merge-request-id
     - *changes_backend_files
 
 .only-on-files-system-changes:
   rules:
-    - *rule-not-in-merge-request-id
     - *changes_files_system_files
 
 .only-on-frontend-changes:
   rules:
-    - *rule-not-in-merge-request-id
     - *changes_frontend_files
 
 .only-on-changes:
   rules:
-    - *rule-not-in-merge-request-id
     - *changes_frontend_files
     - *changes_files_system_files
     - *changes_backend_files
@@ -351,7 +346,6 @@ stages:
     GIT_STRATEGY: none
     COMPONENT: init-d
   rules:
-    - *rule-not-in-merge-request-id
     - *rule-not-on-master
     - <<: *changes_backend_files
       when: manual
@@ -388,7 +382,6 @@ stages:
     GIT_STRATEGY: none
     COMPONENT: file-system
   rules:
-    - *rule-not-in-merge-request-id
     - *rule-not-on-master
     - <<: *changes_files_system_files
       when: manual
@@ -424,7 +417,6 @@ stages:
   variables:
     COMPONENT: ui
   rules:
-    - *rule-not-in-merge-request-id
     - *rule-not-on-master
     - <<: *changes_frontend_files
       when: manual
