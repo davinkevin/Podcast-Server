@@ -38,45 +38,55 @@ variables:
     - *cicd_utils
   script:
     - delete_docker_hub_image $COMPONENT
-  rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
-      when: never
-    - when: manual
-      allow_failure: true
+
+.backend_files:
+  - &changes_backend_files
+    changes:
+    - backend/**/*
+
+.files_system_files:
+  - &changes_files_system_files
+    changes:
+    - files-system/**/*
+
+.frontend_files:
+  - &changes_frontend_files
+    changes:
+    - frontend-angular/**/*
+    - frontend-angularjs/**/*
+    - ui/**/*
+
+.rule-not-in-merge-request-id:
+  - &rule-not-in-merge-request-id
+    if: '$CI_MERGE_REQUEST_ID'
+    when: never
+
+.not-on-master:
+  - &rule-not-on-master
+    if: '$CI_COMMIT_REF_NAME == "master"'
+    when: never
 
 .only-on-backend-changes:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
-      when: never
-    - changes:
-        - backend/**/*
+    - *rule-not-in-merge-request-id
+    - *changes_backend_files
 
 .only-on-files-system-changes:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
-      when: never
-    - changes:
-        - files-system/**/*
+    - *rule-not-in-merge-request-id
+    - *changes_files_system_files
 
 .only-on-frontend-changes:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
-      when: never
-    - changes:
-        - frontend-angular/**/*
-        - frontend-angularjs/**/*
-        - ui/**/*
+    - *rule-not-in-merge-request-id
+    - *changes_frontend_files
 
 .only-on-changes:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
-      when: never
-    - changes:
-        - backend/**/*
-        - files-system/**/*
-        - frontend-angular/**/*
-        - frontend-angularjs/**/*
-        - ui/**/*
+    - *rule-not-in-merge-request-id
+    - *changes_frontend_files
+    - *changes_files_system_files
+    - *changes_backend_files
 
 stages:
   - ⬇ download
@@ -300,10 +310,19 @@ stages:
 
 🗑 backend:
   stage: 🐳 packaging
-  extends: [ .delete-docker-image, .only-on-backend-changes ]
+  extends: [ .delete-docker-image ]
+  variables:
+    GIT_STRATEGY: none
   script:
     - delete_docker_hub_image backend
     - delete_docker_hub_image backend-base-image
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+      when: never
+    - changes:
+        - backend/**/*
+      when: manual
+      allow_failure: true
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     action: stop
@@ -327,9 +346,16 @@ stages:
 
 🗑 init-db:
   stage: 🐳 packaging
-  extends: [ .delete-docker-image, .only-on-backend-changes ]
+  extends: [ .delete-docker-image ]
   variables:
-    COMPONENT: init-db
+    GIT_STRATEGY: none
+    COMPONENT: init-d
+  rules:
+    - *rule-not-in-merge-request-id
+    - *rule-not-on-master
+    - <<: *changes_backend_files
+      when: manual
+      allow_failure: true
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     action: stop
@@ -357,9 +383,16 @@ stages:
 
 🗑 file-system:
   stage: 🐳 packaging
-  extends: [ .delete-docker-image, .only-on-files-system-changes ]
+  extends: [ .delete-docker-image ]
   variables:
+    GIT_STRATEGY: none
     COMPONENT: file-system
+  rules:
+    - *rule-not-in-merge-request-id
+    - *rule-not-on-master
+    - <<: *changes_files_system_files
+      when: manual
+      allow_failure: true
   environment:
     name: file-system/$CI_COMMIT_REF_SLUG
     action: stop
@@ -387,9 +420,15 @@ stages:
 
 🗑 ui:
   stage: 🐳 packaging
-  extends: [ .delete-docker-image, .only-on-frontend-changes ]
+  extends: [ .delete-docker-image ]
   variables:
     COMPONENT: ui
+  rules:
+    - *rule-not-in-merge-request-id
+    - *rule-not-on-master
+    - <<: *changes_frontend_files
+      when: manual
+      allow_failure: true
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     action: stop
@@ -404,7 +443,7 @@ stages:
 
 🔎 init-db:
   stage: 🔎 Security Analysis
-  extends: [.container-scanning-with-trivy]
+  extends: [.container-scanning-with-trivy, .only-on-backend-changes]
   needs: [⬇ container analysis db, 🐳 init-db]
   script:
     - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
