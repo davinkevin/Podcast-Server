@@ -334,6 +334,7 @@ stages:
     - kaniko_auth_docker_hub
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/database/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/database/Dockerfile --destination podcastserver/init-db:latest ; fi
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/init-db/tags
