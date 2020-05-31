@@ -208,7 +208,7 @@ stages:
     - *cicd_utils
     - kaniko_auth_docker_hub
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/docker/base-image/Dockerfile --destination podcastserver/backend-base-image:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/base-image/Dockerfile --destination podcastserver/backend-base-image:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
 👷 backend:
   stage: 👷‍ build
