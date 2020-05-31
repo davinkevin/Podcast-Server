@@ -179,6 +179,7 @@ stages:
     policy: pull
     paths:
       - .m2/
+  retry: 2
 
 🧪 ui-v2:
   stage: 🧪 test
