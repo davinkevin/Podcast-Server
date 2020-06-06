@@ -6,15 +6,15 @@ build:
       context: backend
       jib:
         args:
-          - liquibase:dropAll
-          - liquibase:update
+          - flyway:clean
+          - flyway:migrate
           - -Dmaven.test.skip
           - -P skaffold
     - image: podcastserver/ui-v1
       context: frontend-angularjs/target/
     - image: podcastserver/init-db
       docker:
-        dockerfile: ./backend/src/main/database/Dockerfile
+        dockerfile: ./database/Dockerfile
 deploy:
   kustomize:
     paths:

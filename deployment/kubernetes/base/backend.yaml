@@ -42,17 +42,17 @@ spec:
         - name: init-db
           image: podcastserver/init-db
           env:
-            - name: DATASOURCE_URL
+            - name: FLYWAY_URL
               valueFrom:
                 configMapKeyRef:
                   name: podcast-server
                   key: database.url
-            - name: DATASOURCE_USERNAME
+            - name: FLYWAY_USER
               valueFrom:
                 configMapKeyRef:
                   name: podcast-server
                   key: database.username
-            - name: DATASOURCE_PASSWORD
+            - name: FLYWAY_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: podcast-server

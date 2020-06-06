@@ -298,24 +298,18 @@
                 </configuration>
             </plugin>
             <!-- Liquibase -->
+
             <plugin>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>42.2.12</version>
-                    </dependency>
-                </dependencies>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.8.9</version>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>6.4.3</version>
                 <configuration>
-                    <changeLogFile>src/main/database/changelog/changelog.xml</changeLogFile>
-                    <driver>org.postgresql.Driver</driver>
                     <url>${database.url}</url>
-                    <username>${database.user}</username>
+                    <user>${database.user}</user>
                     <password>${database.password}</password>
-                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                    <locations>
+                        <location>filesystem:../database/migrations</location>
+                    </locations>
                 </configuration>
             </plugin>
             <plugin>

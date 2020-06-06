@@ -20,7 +20,7 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 ### Building components for local use: 
 
 * building base-image: `docker build -t podcastserver/backend-base-image:master -f backend/src/main/docker/base-image/Dockerfile .`
-* building backend: `mvn clean liquibase:dropAll liquibase:update jooq-codegen:generate compile jib:dockerBuild -Ddatabase.url=jdbc:h2:/tmp/podcast-server -Dtag=local-dev`
+* building backend: `mvn clean flyway:clean flyway:migrate jooq-codegen:generate compile jib:dockerBuild -Ddatabase.url=jdbc:h2:/tmp/podcast-server -Dtag=local-dev`
 * building ui: `env CI_COMMIT_TAG=latest ./ui/build.sh` (with both front already built before)
 * building fs: `env CI_COMMIT_TAG=latest ./files-system/build.sh`
 
