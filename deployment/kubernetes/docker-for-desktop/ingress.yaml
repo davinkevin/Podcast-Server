@@ -5,25 +5,24 @@ metadata:
 spec:
   tls:
     - hosts:
-        - podcast-server.tk
+        - localhost
       secretName: podcast-server-tls
   rules:
-    - host: podcast-server.tk
+    - host: localhost
       http:
         paths:
           - path: /api
             backend:
-              serviceName: podcast-server
+              serviceName: backend
               servicePort: 8080
           - path: /actuator
             backend:
-              serviceName: podcast-server
+              serviceName: backend
               servicePort: 8080
           - path: /data
             backend:
               serviceName: fs
               servicePort: 80
-          - path: /
-            backend:
-              serviceName: ui
+          - backend:
+              serviceName: ui-v1
               servicePort: 80

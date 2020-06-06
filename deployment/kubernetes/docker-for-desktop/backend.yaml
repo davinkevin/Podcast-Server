@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: podcast-server
+  name: backend
 spec:
+  replicas: 1
   template:
     spec:
       containers:
         - name: app
-          image: podcastserver/backend:latest
-          imagePullPolicy: Always
           env:
             - name: PODCASTSERVER_API_YOUTUBE
               valueFrom:
                 secretKeyRef:
                   name: podcast-server
                   key: api.youtube
+                  optional: true
           volumeMounts:
             - name: podcast-server-config
               mountPath: /application.yaml
@@ -27,5 +27,5 @@ spec:
             name: podcast-server
         - name: podcasts-files
           hostPath:
-            path: /opt/podcast-server/files/
+            path: /tmp/podcast-server/files/
             type: Directory

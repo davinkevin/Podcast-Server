@@ -18,4 +18,4 @@ build:
 deploy:
   kustomize:
     paths:
-      - backend/src/main/k8s/docker-for-mac/
+      - deployment/kubernetes/docker-for-desktop/

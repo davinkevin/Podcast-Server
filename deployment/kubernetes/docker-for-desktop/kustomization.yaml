@@ -4,15 +4,14 @@ kind: Kustomization
 namespace: podcast-server
 
 resources:
-  - ../base/
-  - backend-headless.yaml
-  - local-ingress/local-ingress.yaml
+  - git::https://gitlab.com/davinkevin/home-server.git//podcast-server/base/
   - ui-v1.yaml
 
 patchesStrategicMerge:
   - backend.yaml
   - database.yaml
   - fs.yaml
+  - ingress.yaml
 
 configMapGenerator:
   - name: podcast-server
@@ -21,13 +20,13 @@ configMapGenerator:
     literals:
       - database.username=podcast-server-user
       - database.url=jdbc:postgresql://database:5432/podcast-server-k8s
-  - files:
-      - local-ingress/default.conf
-      - local-ingress/localhost.crt
-      - local-ingress/localhost.key
-    name: local-ingress
 
 secretGenerator:
+  - name: podcast-server-tls
+    files:
+      - ingress/tls.crt
+      - ingress/tls.key
+    type: kubernetes.io/tls
   - literals:
       - database.password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
       - api.youtube=AN_API_KEY
