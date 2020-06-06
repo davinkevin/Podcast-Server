@@ -26,6 +26,8 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 
 ### Start components with Skaffold:
 
+**Requirement**: Having a kubernetes ingress available in your `docker-for-desktop` install ([procject-contour](https://projectcontour.io/getting-started/))
+
 * Set up your kubernetes context to `docker-for-desktop`
 * Start every components: `./dev.sh`
 * Access the application on `https://localhost/` and/or define a name alias in your `/etc/hosts` file
