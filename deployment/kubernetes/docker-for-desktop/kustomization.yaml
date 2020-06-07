@@ -4,19 +4,20 @@ kind: Kustomization
 namespace: podcast-server
 
 resources:
-  - git::https://gitlab.com/davinkevin/home-server.git//podcast-server/base/
-  - ui-v1.yaml
+  - ../base/
+  - ui/ui-v1.yaml
+  - ingress/ingress.yaml
 
 patchesStrategicMerge:
-  - backend.yaml
-  - database.yaml
-  - fs.yaml
-  - ingress.yaml
+  - backend/backend.yaml
+  - database/database.yaml
+  - files-system/fs.yaml
+  - ingress/ingress.yaml
 
 configMapGenerator:
   - name: podcast-server
     files:
-      - application.yaml
+      - backend/application.yaml
     literals:
       - database.username=podcast-server-user
       - database.url=jdbc:postgresql://database:5432/podcast-server-k8s
