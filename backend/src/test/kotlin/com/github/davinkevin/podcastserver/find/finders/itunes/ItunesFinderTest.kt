@@ -8,8 +8,7 @@ import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.okJson
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -72,7 +71,11 @@ class ItunesFinderTest(
     fun `should find url`(backend: WireMockServer) {
         /* GIVEN */
         val url = "https://podcasts.apple.com/fr/podcast/positron/id662892474"
-        backend.stubFor(get("/lookup?id=662892474").willReturn(okJson(fileAsString("/remote/podcast/itunes/lookup.json"))))
+        backend.stubFor(get("/lookup?id=662892474").willReturn(
+                ok(fileAsString("/remote/podcast/itunes/lookup.json"))
+                        .withHeader("Content-Type", "text/javascript;charset=utf-8")
+                )
+        )
         val podcastInformation = FindPodcastInformation(
                 title = "Positron",
                 description = "Zapping de bons plans !<br /> <br /> Positron, c'est une émissions dynamique qui vous promet de « ne plus jamais vous ennuyer » en vous recommandant des livres, films, séries ou albums que vous ne connaissez peut-être pas encore, mais que vous adorerez bientôt !",
@@ -92,7 +95,12 @@ class ItunesFinderTest(
     }
 
     @TestConfiguration
-    @Import(ItunesFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
+    @Import(
+            ItunesFinderConfig::class,
+            WebClientAutoConfiguration::class,
+            JacksonAutoConfiguration::class,
+            WebClientConfig::class
+    )
     class LocalTestConfiguration {
         @Bean fun remapToMockServer() = remapToMockServer("podcasts.apple.com")
     }

@@ -22,12 +22,8 @@ class ItunesFinderConfig {
     fun itunesFinder(om: ObjectMapper, rssFinder: RSSFinder, wcb: WebClient.Builder): ItunesFinder {
         val wc = wcb
                 .clone()
+                .codecs { c -> c.defaultCodecs().jackson2JsonDecoder(Jackson2JsonDecoder(om, TEXT_JAVASCRIPT_UTF8)) }
                 .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect { _, res -> res.status().code() in 300..399 }))
-                .exchangeStrategies(
-                        ExchangeStrategies.builder()
-                                .codecs { c -> c.defaultCodecs().jackson2JsonDecoder(Jackson2JsonDecoder(om, TEXT_JAVASCRIPT_UTF8)) }
-                                .build()
-                )
                 .baseUrl("https://itunes.apple.com/")
                 .build()
 
