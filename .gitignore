@@ -28,3 +28,5 @@ Backend/etc
 
 
 /lan.dk.podcastserver.entity.Item/
+/backend/buildSrc/build/
+/backend/buildSrc/gradle/wrapper/

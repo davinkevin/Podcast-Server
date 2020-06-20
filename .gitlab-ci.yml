@@ -4,9 +4,12 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
   MAVEN_USER_HOME: $CI_PROJECT_DIR/.m2
+
 
 .cicd_utils: &cicd_utils |
   function delete_docker_hub_image() {
@@ -45,6 +48,7 @@ variables:
 
 .backend_files:
   - &changes_backend_files
+    when: always
     changes:
     - backend/**/*
 
@@ -109,14 +113,14 @@ stages:
   extends: [ .only-on-backend-changes ]
   image: openjdk:11-slim
   script:
-    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml dependency:resolve dependency:resolve-plugins
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ downloadDependencies
   cache:
     key:
       files:
-        - backend/pom.xml
+        - backend/build.gradle.kts
       prefix: "backend"
     paths:
-      - .m2/
+      - .gradle/
 
 ⬇ ui-v1:
   stage: ⬇ download
@@ -163,22 +167,19 @@ stages:
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
     POSTGRES_DB: test-db
   script:
-    - |
-      ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml \
-              flyway:clean \
-              flyway:migrate \
-              jooq-codegen:generate \
-              test \
-              jacoco:report
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ test
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
+  artifacts:
+    reports:
+      junit: backend/build/test-results/test/TEST-*.xml
   cache:
     key:
       files:
-        - backend/pom.xml
+        - backend/build.gradle.kts
       prefix: "backend"
     policy: pull
     paths:
-      - .m2/
+      - .gradle/
   retry: 2
 
 🧪 ui-v2:
@@ -223,23 +224,17 @@ stages:
     POSTGRES_PASSWORD: zSR87g1xj5TyJRZwDpyhPqkLO472QHSf
     POSTGRES_DB: build-db
   script:
-    - |
-      ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml \
-              flyway:clean \
-              flyway:migrate \
-              jooq-codegen:generate \
-              compile
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ compileJava compileKotlin
   artifacts:
     paths:
-      - backend/target
+      - backend/build
   cache:
     key:
       files:
-        - backend/pom.xml
+        - backend/build.gradle.kts
       prefix: "backend"
-    policy: pull
     paths:
-      - .m2/
+      - .gradle/
   retry: 2
 
 👷 ui-v1:
@@ -290,16 +285,15 @@ stages:
   image: openjdk:11-slim
   needs: [👷 backend, 👷 backend-base-image]
   script:
-    - ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml jib:build -Dtag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG} -Dbase-image-tag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - if [ "$CI_COMMIT_REF_SLUG" == "master" ]; then ./mvnw $MAVEN_CLI_OPTS -f backend/pom.xml jib:build -Dtag=latest -Dbase-image-tag=${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG} ; fi
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ jib -x jooq-codegen-primary
   cache:
     key:
       files:
-        - backend/pom.xml
+        - backend/build.gradle.kts
       prefix: "backend"
     policy: pull
     paths:
-      - .m2/
+      - .gradle/
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/backend/tags

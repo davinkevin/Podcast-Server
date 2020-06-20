@@ -6,10 +6,7 @@ build:
       context: backend
       jib:
         args:
-          - flyway:clean
-          - flyway:migrate
-          - -Dmaven.test.skip
-          - -P skaffold
+          - -Pskaffold=true
     - image: podcastserver/ui-v1
       context: frontend-angularjs/target/
     - image: podcastserver/init-db
