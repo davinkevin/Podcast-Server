@@ -48,7 +48,6 @@ variables:
 
 .backend_files:
   - &changes_backend_files
-    when: always
     changes:
     - backend/**/*
 
