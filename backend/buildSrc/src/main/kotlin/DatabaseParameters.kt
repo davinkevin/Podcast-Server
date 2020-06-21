@@ -6,9 +6,5 @@ data class DatabaseParameters(
         val url: String,
         val user: String,
         val password: String,
-        val sqlFiles: List<String> = listOf("filesystem:../database/migrations")
+        val sqlFiles: String = "/flyway/migrations/"
 )
-
-fun databaseParameters(project: Project): DatabaseParameters {
-    return project.extensions.extraProperties["databaseParameters"] as DatabaseParameters
-}

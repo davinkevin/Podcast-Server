@@ -10,7 +10,8 @@ if (env.containsKey("POSTGRES_DB") && env.containsKey("POSTGRES_USER") && env.co
     val databaseParameters by extra(DatabaseParameters(
             url = "jdbc:postgresql://postgres:5432/${env["POSTGRES_DB"]}",
             user = env["POSTGRES_USER"]!!,
-            password = env["POSTGRES_PASSWORD"]!!
+            password = env["POSTGRES_PASSWORD"]!!,
+            sqlFiles = "$buildDir/flyway/migrations/"
     ))
 }
 

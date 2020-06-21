@@ -1,10 +1,10 @@
-import com.gitlab.davinkevin.podcastserver.backend.build.databaseParameters
+import com.gitlab.davinkevin.podcastserver.backend.build.DatabaseParameters
 import com.rohanprabhu.gradle.plugins.kdjooq.*
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import com.gitlab.davinkevin.podcastserver.backend.build.*
+import java.nio.file.*
 
 plugins {
 	id("org.springframework.boot") version "2.3.1.RELEASE"
@@ -76,11 +76,17 @@ gitProperties {
 	dotGitDirectory = "${project.rootDir}/../.git"
 }
 
+tasks.register<Copy>("copyMigrations") {
+	from("${project.rootDir}/../database/migrations/")
+	include("*.sql")
+	into(db.sqlFiles)
+}
+
 flyway {
 	url = db.url
 	user = db.user
 	password = db.password
-	locations = db.sqlFiles.toTypedArray()
+	locations = arrayOf("filesystem:${db.sqlFiles}")
 }
 
 jooqGenerator {
@@ -88,6 +94,8 @@ jooqGenerator {
 	jooqVersion = "3.13.2"
 
 	configuration("primary", project.sourceSets.getByName("main")) {
+
+		databaseSources = listOf(db.sqlFiles)
 
 		configuration = jooqCodegenConfiguration {
 			jdbc {
@@ -130,6 +138,9 @@ jooqGenerator {
 	}
 }
 
+project.tasks["flywayMigrate"].dependsOn("copyMigrations")
+project.tasks["jooq-codegen-primary"].dependsOn("flywayMigrate")
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 	systemProperty("user.timezone", "UTC")
@@ -147,10 +158,6 @@ tasks.withType<KotlinCompile> {
 		jvmTarget = "11"
 	}
 }
-
-@Suppress("PropertyName")
-val `jooq-codegen-primary` by project.tasks
-`jooq-codegen-primary`.dependsOn("flywayMigrate")
 
 jib {
 	val imageTags: Set<String>? by project.extra
