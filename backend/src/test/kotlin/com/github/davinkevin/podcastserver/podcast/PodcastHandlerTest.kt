@@ -451,6 +451,67 @@ class PodcastHandlerTest(
 
         }
 
+        @Test
+        fun `a podcast without URL`() {
+            /* Given */
+            whenever(podcastService.update(any())).thenReturn(p.toMono())
+            /* When */
+            rest
+                    .put()
+                    .uri("/api/v1/podcasts/${p.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(""" {
+                        "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
+                        "title": "foo",
+                        "url": null,
+                        "hasToBeDeleted": true,
+                        "tags": [
+                            { "id": "47402ee0-0b7a-4ded-981a-79dce25b2b42", "name": "first_tag" },
+                            { "id": "c2bb2e6a-32d3-47cd-995d-67e6a32ff87e", "name": "second_tag" },
+                            { "id": null, "name": "unknown_tag" }
+                        ],
+                        "cover": {
+                            "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
+                        }
+                    }""")
+                    /* Then */
+                    .exchange()
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo(""" {
+                              "cover": {
+                                "height": 1200,
+                                "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
+                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "width": 600
+                              },
+                              "hasToBeDeleted": true,
+                              "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
+                              "lastUpdate": "2019-04-09T11:12:13+02:00",
+                              "tags": [
+                                {
+                                  "id": "47402ee0-0b7a-4ded-981a-79dce25b2b42",
+                                  "name": "first_tag"
+                                },
+                                {
+                                  "id": "c2bb2e6a-32d3-47cd-995d-67e6a32ff87e",
+                                  "name": "second_tag"
+                                },
+                                {
+                                  "id": "a0eb24c3-9b46-4ab6-9f2b-6474d8e2456c",
+                                  "name": "third_tag"
+                                }
+                              ],
+                              "title": "foo",
+                              "type": "RSS",
+                              "url": "http://foo.bar.com/val.rss"
+                            } """)
+                    }
+
+        }
+
+
     }
 
     @Nested

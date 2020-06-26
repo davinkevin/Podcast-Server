@@ -171,7 +171,7 @@ private data class CoverForCreationHAL(val width: Int, val height: Int, val url:
 private data class PodcastUpdateHAL(
         val id: UUID,
         val title: String,
-        val url: URI,
+        val url: URI?,
         val hasToBeDeleted: Boolean,
         val tags: Collection<TagForCreationHAL>?,
         val cover: CoverForCreationHAL
