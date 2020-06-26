@@ -3,7 +3,7 @@ import com.gitlab.davinkevin.podcastserver.backend.build.*
 val env: Map<String, String> = System.getenv()!!
 
 if (env.containsKey("CI")) {
-    val imageTag by extra(generateTagsList())
+    val imageTags by extra(generateTagsList())
 }
 
 if (env.containsKey("POSTGRES_DB") && env.containsKey("POSTGRES_USER") && env.containsKey("POSTGRES_PASSWORD")) {
@@ -24,8 +24,9 @@ fun generateTagsList(): Set<String> {
         return setOf(CI_COMMIT_TAG)
     }
 
-    if(CI_COMMIT_TAG != "master") {
+    if(CI_COMMIT_REF_SLUG != "master") {
         return setOf(CI_COMMIT_REF_SLUG)
     }
-    return setOf(CI_COMMIT_REF_SLUG, "master")
+
+    return setOf(CI_COMMIT_REF_SLUG, "latest")
 }
