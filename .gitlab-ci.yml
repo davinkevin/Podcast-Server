@@ -50,6 +50,7 @@ variables:
   - &changes_backend_files
     changes:
     - backend/**/*
+    - database/**/*
 
 .files_system_files:
   - &changes_files_system_files
