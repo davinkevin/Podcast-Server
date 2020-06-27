@@ -30,16 +30,13 @@ class DownloadRepository(private val query: DSLContext) {
                                 .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
                                 .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                         )
-                        .where(
-                                ITEM.PUB_DATE.greaterThan(fromDate)
-                                        .and(
-                                                ITEM.STATUS.isNull.or(ITEM.STATUS.eq(NOT_DOWNLOADED))
-                                        )
-                                        .and(ITEM.NUMBER_OF_FAIL.isNull.or(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry)))
-                        )
+                        .where(ITEM.PUB_DATE.greaterThan(fromDate))
+                        .and(ITEM.STATUS.eq(NOT_DOWNLOADED))
+                        .and(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry))
+                        .orderBy(ITEM.PUB_DATE.asc())
         )
                 .map { DownloadingItem(
-                        it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL] ?: 0, 0,
+                        it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL], 0,
                         Podcast(it[PODCAST.ID], it[PODCAST.TITLE]),
                         Cover(it[COVER.ID], URI(it[COVER.URL]))
                 ) }
