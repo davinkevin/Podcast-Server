@@ -141,12 +141,23 @@ jooqGenerator {
 project.tasks["flywayMigrate"].dependsOn("copyMigrations")
 project.tasks["jooq-codegen-primary"].dependsOn("flywayMigrate")
 
+tasks.jacocoTestReport {
+	reports {
+		xml.isEnabled = true
+		xml.destination  = File("$buildDir/reports/jacoco/report.xml")
+		html.isEnabled = false
+	}
+	executionData(File("$buildDir/jacoco/test.exec"))
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 	systemProperty("user.timezone", "UTC")
 	systemProperty("spring.datasource.url", db.url)
 	systemProperty("spring.datasource.username", db.user)
 	systemProperty("spring.datasource.password", db.password)
+
+	finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.withType<KotlinCompile> {
