@@ -7,13 +7,13 @@ Back-end : [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2030290b1
 
 Front-end : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
 
-Docker : [![Image Layer IO](https://badge.imagelayers.io/davinkevin/podcast-server:latest.svg)](https://imagelayers.io/?images=davinkevin/podcast-server:latest 'Get your own badge on imagelayers.io')
+Docker images : [![Backend](https://badgen.net/badge/docker/backend/blue?icon=docker)](https://hub.docker.com/r/podcastserver/backend) [![UI](https://badgen.net/badge/docker/ui/blue?icon=docker)](https://hub.docker.com/r/podcastserver/ui) [![File-System](https://badgen.net/badge/docker/file-system/blue?icon=docker)](https://hub.docker.com/r/podcastserver/file-system) [![Init-db](https://badgen.net/badge/docker/file-system/blue?icon=docker)](https://hub.docker.com/r/podcastserver/init-db)
 
 Application design to be your Podcast local proxy in your lan network.
 
-It also works on many sources like Youtube, Dailymotion, CanalPlus... Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
+It also works on many sources like Youtube, Dailymotion, CanalPlus… Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
 
-The application is available in [fat-jar](https://github.com/davinkevin/Podcast-Server/releases) format or in [docker images](https://hub.docker.com/r/podcastserver/) 
+The application is available in [docker images](https://hub.docker.com/r/podcastserver/), see docker links above.
 
 ## Run in local env: 
 
@@ -35,7 +35,7 @@ The application is available in [fat-jar](https://github.com/davinkevin/Podcast-
 
 ## License
 
-Copyright 2018 DAVIN KEVIN
+Copyright 2020 DAVIN KEVIN
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
