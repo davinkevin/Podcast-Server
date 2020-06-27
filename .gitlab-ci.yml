@@ -172,6 +172,7 @@ stages:
   artifacts:
     reports:
       junit: backend/build/test-results/test/TEST-*.xml
+  coverage: '/^Coverage:\s(\d+\.\d+%)/'
   cache:
     key:
       files:

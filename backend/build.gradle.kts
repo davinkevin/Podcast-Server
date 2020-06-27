@@ -4,7 +4,6 @@ import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.nio.file.*
 
 plugins {
 	id("org.springframework.boot") version "2.3.1.RELEASE"
@@ -13,6 +12,7 @@ plugins {
 	id("org.flywaydb.flyway") version "6.4.4"
 	id("com.rohanprabhu.kotlin-dsl-jooq") version "0.4.6"
 	id("com.google.cloud.tools.jib") version "2.4.0"
+	id("de.jansauer.printcoverage") version "2.0.0"
 
 	kotlin("jvm") version "1.3.72"
 	kotlin("plugin.spring") version "1.3.72"
@@ -144,10 +144,10 @@ project.tasks["jooq-codegen-primary"].dependsOn("flywayMigrate")
 tasks.jacocoTestReport {
 	reports {
 		xml.isEnabled = true
-		xml.destination  = File("$buildDir/reports/jacoco/report.xml")
 		html.isEnabled = false
 	}
 	executionData(File("$buildDir/jacoco/test.exec"))
+	finalizedBy(tasks.printCoverage)
 }
 
 tasks.withType<Test> {
