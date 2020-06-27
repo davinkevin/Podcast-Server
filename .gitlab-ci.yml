@@ -341,7 +341,7 @@ stages:
   extends: [ .delete-docker-image ]
   variables:
     GIT_STRATEGY: none
-    COMPONENT: init-d
+    COMPONENT: init-db
   rules:
     - *rule-not-on-master
     - <<: *changes_backend_files
