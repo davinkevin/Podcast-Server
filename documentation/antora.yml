@@ -1,0 +1,6 @@
+name: documentation
+title: Documentation
+version: "1.0.0"
+start_page: introduction.adoc
+nav:
+  - modules/ROOT/nav.adoc

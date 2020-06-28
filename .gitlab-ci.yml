@@ -64,6 +64,11 @@ variables:
     - frontend-angularjs/**/*
     - ui/**/*
 
+.documentation_files:
+  - &changes_documentation_files
+    changes:
+      - documentation/**/*
+
 .not-on-master:
   - &rule-not-on-master
     if: '$CI_COMMIT_REF_NAME == "master"'
@@ -81,7 +86,11 @@ variables:
   rules:
     - *changes_frontend_files
 
-.only-on-changes:
+.only-on-documentation-changes:
+  rules:
+    - *changes_documentation_files
+
+.only-on-code-change:
   rules:
     - *changes_frontend_files
     - *changes_files_system_files
@@ -96,7 +105,7 @@ stages:
 
 ⬇ container analysis db:
   stage: ⬇ download
-  extends: [ .only-on-changes ]
+  extends: [ .only-on-code-change ]
   image:
     name: aquasec/trivy
     entrypoint: [""]
@@ -279,6 +288,16 @@ stages:
     paths:
       - .yarn
       - frontend-angular/node_modules/
+
+👷 documentation:
+  stage: 👷‍ build
+  extends: [ .only-on-documentation-changes ]
+  image: antora/antora
+  script:
+    - antora generate documentation/documentation.yml --to-dir documentation/dist
+  artifacts:
+    paths:
+      - documentation/dist/
 
 🐳 backend:
   stage: 🐳 packaging

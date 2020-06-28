@@ -1,0 +1,11 @@
+site:
+  title: Podcast Server Documentation
+  start_page: documentation::introduction.adoc
+content:
+  sources:
+    - url: ./../
+      start_path: documentation
+      branches: HEAD
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
