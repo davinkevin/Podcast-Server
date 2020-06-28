@@ -57,7 +57,7 @@ class DownloadRepository(private val query: DSLContext) {
                 .where(ITEM.ID.eq(id))
                 .toMono()
                 .map { DownloadingItem(
-                        it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL] ?: 0,0,
+                        it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL],0,
                         Podcast(it[PODCAST.ID], it[PODCAST.TITLE]),
                         Cover(it[COVER.ID], URI(it[COVER.URL]))
                 ) }
