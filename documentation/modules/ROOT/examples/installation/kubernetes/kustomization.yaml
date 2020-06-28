@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: podcast-server # <1>
+
+bases:
+  - git::https://gitlab.com/davinkevin/Podcast-Server.git//deployment/kubernetes/base/
+
+resources:
+  - ingress.yaml # <2>
+
+patchesStrategicMerge:
+  - backend.yaml # <3>
+  - database.yaml # <4>
+  - fs.yaml # <5>
+
+configMapGenerator:
+  - files:
+      - application.yaml # <6>
+    literals:
+      - database.username=podcast-server-user # <7>
+      - database.url=jdbc:postgresql://database:5432/podcast-server # <8>
+    name: podcast-server
+
+secretGenerator:
+  - name: podcast-server
+    literals:
+      - api.youtube=foo # <9>
+      - database.password=bar # <10>

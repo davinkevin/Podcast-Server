@@ -1,2 +1,85 @@
 = On Kubernetes
 
+== Requirements
+
+=== Kubernetes Cluster
+
+To be able to run the *Podcast-Server*, you have to install a `Kubernetes` cluster. `Kubernetes` is used as a deployment
+platform, but you don't have to configure it for high availability. The main goal of the *Podcast-Server* is to be run
+in your local network, managed `Kubernetes` (like GKE, AKS, EKS…) are not a coherent solution.
+
+You can install `Kubernetes` version 1.14+ with:
+
+* https://k3s.io/[K3S]
+* https://microk8s.io/[MicroK8S]
+* https://github.com/kubernetes/minikube[Minikube]
+* https://www.docker.com/products/docker-desktop[Docker for Desktop]
+
+Then, configure your `kubectl` client to be able to access your installed cluster.
+
+=== Command Line Tools
+
+You need to have the following tools installed and available in the `PATH`:
+
+* `kpt` (https://googlecontainertools.github.io/kpt/installation/[installation instruction])
+* `kustomize` (https://kubernetes-sigs.github.io/kustomize/installation/[installation instruction])
+
+== Installation
+
+=== Namespace creation
+
+First, you need to create a namespace for the application.
+
+[source, shell script]
+----
+$ kubectl create namespace podcast-server
+----
+
+=== Package Download
+
+First, you need to create a `kustomization.yaml` with the following format:
+
+//- Command to execute it from a custom branch
+//- kpt pkg get "https://gitlab.com/davinkevin/Podcast-Server.git/deployment/kpt/podcast-server@c68e8f48fc3917c26da94a17f7d8e2f2e1fcd501" podcast-server
+
+[source, shell script]
+----
+$ kpt pkg get "https://gitlab.com/davinkevin/Podcast-Server.git/deployment/kpt/podcast-server" podcast-server
+fetching package /deployment/kpt/podcast-server from https://gitlab.com/davinkevin/Podcast-Server to podcast-server
+----
+
+=== Application Configuration
+
+You can change configuration by running the followin command:
+
+[source, shell script]
+----
+$ kpt cfg set podcast-server <parameter-name> <parameter-value>
+----
+
+==== Application parameters
+
+You can configure the following parameters:
+
+* `concurrent-download` which is the number of concurrent download.
+* `max-update-parallels` which is the number of concurrent update.
+* `number-of-day-to-download` which is the number of day to download.
+* `number-of-day-to-save-cover` which is the number of day to keep covers.
+
+==== Installation Configuration
+
+* `database.password` which is the password of the `password` of the database.
+* `domain` which is the domain used at the kubernetes ingress level.
+* `install-location` which is the path of the directory used to store files of the application (covers, podcasts, items, database files…).
+
+=== Application Deployment
+
+After the configuration is done, you have to execute the following command:
+
+[source, shell script]
+----
+$ kustomize build . | kubectl apply -f -
+----
+
+After few minutes (in order to download images and install the application), you will be able to access the app with
+the url `https://<domain>/` (which is a value defined in the previous chapter).
