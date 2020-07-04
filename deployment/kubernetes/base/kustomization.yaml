@@ -6,3 +6,14 @@ resources:
   - database.yaml
   - fs.yaml
   - ui.yaml
+
+
+configMapGenerator:
+  - name: podcast-server
+    literals:
+      - database.username=podcast-server-user
+      - database.url=jdbc:postgresql://database:5432/podcast-server
+      - root-folder=/podcasts
+
+secretGenerator:
+  - name: podcast-server

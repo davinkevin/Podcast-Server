@@ -75,9 +75,6 @@ spec:
             - name: pg-port
               containerPort: 5432
               protocol: TCP
-          volumeMounts:
-            - name: database
-              mountPath: /var/lib/postgresql/data
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -112,7 +109,4 @@ spec:
               args:
                 - -c
                 - pg_dump -h database -U "$POSTGRES_USER" "$POSTGRES_DB" > backup.sql && tar zcvf /backup/podcast-server-$(date +"%Y-%m-%dT%H-%M-%S").tar.gz *.sql && rm backup.sql
-              volumeMounts:
-                - name: backup
-                  mountPath: /backup
           restartPolicy: OnFailure

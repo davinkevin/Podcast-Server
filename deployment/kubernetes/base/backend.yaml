@@ -76,6 +76,42 @@ spec:
                 secretKeyRef:
                   name: podcast-server
                   key: database.password
+            - name: PODCASTSERVER_API_YOUTUBE
+              valueFrom:
+                secretKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: api.youtube
+            - name: PODCASTSERVER_ROOTFOLDER
+              valueFrom:
+                configMapKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: root-folder
+            - name: PODCASTSERVER_CONCURRENT_DOWNLOAD
+              valueFrom:
+                configMapKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: concurrent-download
+            - name: PODCASTSERVER_MAX_UPDATE_PARALLELS
+              valueFrom:
+                configMapKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: max-update-parallels
+            - name: PODCASTSERVER_NUMBER_OF_DAY_TO_DOWNLOAD
+              valueFrom:
+                configMapKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: number-of-day-to-download
+            - name: PODCASTSERVER_NUMBER_OF_DAY_TO_SAVE_COVER
+              valueFrom:
+                configMapKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: number-of-day-to-save-cover
           ports:
             - name: http-port
               containerPort: 8080

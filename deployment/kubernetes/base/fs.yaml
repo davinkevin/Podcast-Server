@@ -46,11 +46,3 @@ spec:
             - name: http-port
               containerPort: 80
               protocol: TCP
-          volumeMounts:
-            - name: podcasts-files
-              mountPath: /var/www/podcast-server-files/data
-      volumes:
-        - name: podcasts-files
-          hostPath:
-            path: /opt/podcast-server/files/
-            type: Directory
