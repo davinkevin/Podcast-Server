@@ -12,6 +12,5 @@
     <modules>
         <module>frontend-angularjs</module>
         <module>frontend-angular</module>
-        <module>backend</module>
     </modules>
 </project>
