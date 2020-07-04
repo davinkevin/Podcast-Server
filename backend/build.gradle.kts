@@ -172,20 +172,24 @@ tasks.withType<KotlinCompile> {
 
 jib {
 	val imageTags: Set<String>? by project.extra
+	val ciTags = imageTags?.toList() ?: emptyList()
 	val providedTag = project.findProperty("tag")?.toString()
 	val baseImageTag =  providedTag ?: "master"
 	val jibTags = when {
-		imageTags != null -> imageTags
-		providedTag != null -> setOf(providedTag)
-		else -> setOf(OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmssSSS"))!!)
+		ciTags.isNotEmpty() -> ciTags
+		providedTag != null -> listOf(providedTag)
+		else -> listOf(OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmssSSS"))!!)
 	}
+
+	val (firstTag) = jibTags
+	val others = jibTags.drop(1)
 
 	from {
 		image = "podcastserver/backend-base-image:${baseImageTag}"
 	}
 	to {
-		image = "podcastserver/backend"
-		tags = jibTags
+		image = "podcastserver/backend:${firstTag}"
+		tags = others.toSet()
 		auth {
 			username = System.getenv("DOCKER_IO_USER")
 			password = System.getenv("DOCKER_IO_PASSWORD")
