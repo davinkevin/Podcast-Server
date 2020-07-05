@@ -1,10 +1,14 @@
 package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.database.Tables.*
+import com.github.davinkevin.podcastserver.database.tables.Tag
+import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
+import org.jooq.Result
+import org.jooq.impl.DSL
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
@@ -552,8 +556,99 @@ class DownloadRepositoryTest(
             query.truncate(PODCAST).cascade().execute()
             query.truncate(COVER).cascade().execute()
         }
-
-
     }
 
+    @Nested
+    @DisplayName("should stop item")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class ShouldStopItem {
+
+        private val itemId1 = UUID.fromString("63106eba-b89b-11ea-b3de-0242ac130004")
+        private val coverId = UUID.fromString("32ec6d44-b880-11ea-b3de-0242ac130004")
+        private val podcastId = UUID.fromString("32ec6d44-b880-11ea-b3de-0242ac130004")
+        private val itemCoverId1 = UUID.fromString("e0010c64-b89a-11ea-b3de-0242ac130004")
+
+        @BeforeAll
+        fun beforeAll() {
+            val itemCoverId2 = UUID.fromString("5a75e2de-5393-4f5e-9707-e5e806ada10f")
+            val itemCoverId3 = UUID.fromString("4e9e654c-7c30-4ff5-826b-a39eb1f57e79")
+            val itemCoverId4 = UUID.fromString("bd567872-55da-4801-8d3e-4bf2e79c2b65")
+
+            val itemId2 = UUID.fromString("9ec458db-9ac8-4553-a5d0-ce5559f6e225")
+            val itemId3 = UUID.fromString("7a52242b-9002-4615-b1cd-4fe1cb55f079")
+            val itemId4 = UUID.fromString("2efb65e3-25cc-4944-8234-98082df21e84")
+
+            query.insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+                    .values(coverId, 100, 100, "https://foo.bac.com/cover.jpg")
+                    .execute()
+
+            val p = PODCAST
+            query.insertInto(p, p.ID, p.DESCRIPTION, p.HAS_TO_BE_DELETED, p.LAST_UPDATE, p.SIGNATURE, p.TITLE, p.TYPE, p.URL, p.COVER_ID)
+                    .values(podcastId, "desc", true, OffsetDateTime.now(), "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId)
+                    .execute()
+
+            val c = COVER
+            query.insertInto(c, c.ID, c.HEIGHT, c.WIDTH, c.URL)
+                    .values(itemCoverId1, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId2, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId3, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId4, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .execute()
+
+            val i = ITEM
+            val now = OffsetDateTime.now()
+            val oneDayAgo = OffsetDateTime.now().minusDays(1)
+            val twoDayAgo = OffsetDateTime.now().minusDays(2)
+            val threeDayAgo = OffsetDateTime.now().minusDays(3)
+            query.insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.COVER_ID, i.PODCAST_ID)
+                    .values(itemId1, now, now, now, "desc item 1", "", 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", "", 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", "", 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", "", 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .execute()
+        }
+
+        @Test
+        fun `with success`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repo.stopItem(itemId1))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(1)
+                    .verifyComplete()
+
+            val numberOfStoppedItems = query.selectCount().from(ITEM).where(ITEM.STATUS.eq(Status.STOPPED)).fetchOne(DSL.count())
+            assertThat(numberOfStoppedItems).isEqualTo(1)
+        }
+
+
+
+        @Test
+        fun `and let others in same state as before`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repo.stopItem(itemId1))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(1)
+                    .verifyComplete()
+
+            val notStoppedItems = query
+                    .selectFrom(ITEM)
+                    .where(ITEM.STATUS.notEqual(Status.STOPPED))
+                    .fetch()
+
+            assertThat(notStoppedItems).hasSize(3)
+            assertThat(notStoppedItems.map { it[ITEM.STATUS] }).containsOnly(Status.NOT_DOWNLOADED)
+        }
+
+        @AfterAll
+        fun afterAll() {
+            query.truncate(ITEM).cascade().execute()
+            query.truncate(PODCAST).cascade().execute()
+            query.truncate(COVER).cascade().execute()
+        }
+
+    }
 }
