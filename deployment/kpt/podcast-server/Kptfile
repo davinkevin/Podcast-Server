@@ -1,0 +1,126 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: .
+packageMetadata:
+  tags:
+  - kpt.dev/app=podcast-server
+  shortDescription: kpt package for Podcast Server application
+openAPI:
+  definitions:
+    io.k8s.cli.setters.max-update-parallels:
+      maximum: 512
+      type: integer
+      x-k8s-cli:
+        setter:
+          name: max-update-parallels
+          value: "15"
+          description: "number of max parallels download"
+    io.k8s.cli.substitutions.max-update-parallels:
+      x-k8s-cli:
+        substitution:
+          name: max-update-parallels
+          pattern: "max-update-parallels=MAX_UPDATE_PARALLELS"
+          values:
+          - marker: MAX_UPDATE_PARALLELS
+            ref: '#/definitions/io.k8s.cli.setters.max-update-parallels'
+    io.k8s.cli.setters.concurrent-download:
+      maximum: 512
+      type: integer
+      x-k8s-cli:
+        setter:
+          name: concurrent-download
+          value: "126"
+          description: "number of max concurrent download"
+    io.k8s.cli.substitutions.concurrent-download:
+      x-k8s-cli:
+        substitution:
+          name: concurrent-download
+          pattern: "concurrent-download=CONCURRENT_DOWNLOAD"
+          values:
+          - marker: CONCURRENT_DOWNLOAD
+            ref: '#/definitions/io.k8s.cli.setters.concurrent-download'
+    io.k8s.cli.setters.number-of-day-to-download:
+      maximum: 356
+      type: integer
+      x-k8s-cli:
+        setter:
+          name: number-of-day-to-download
+          value: "31"
+          description: "number of day to download"
+    io.k8s.cli.substitutions.number-of-day-to-download:
+      x-k8s-cli:
+        substitution:
+          name: number-of-day-to-download
+          pattern: "number-of-day-to-download=NUMBER_OF_DAY_TO_DOWNLOAD"
+          values:
+          - marker: NUMBER_OF_DAY_TO_DOWNLOAD
+            ref: '#/definitions/io.k8s.cli.setters.number-of-day-to-download'
+    io.k8s.cli.setters.number-of-day-to-save-cover:
+      maximum: 356
+      type: integer
+      x-k8s-cli:
+        setter:
+          name: number-of-day-to-save-cover
+          value: "128"
+          description: "number of day to save cover"
+    io.k8s.cli.substitutions.number-of-day-to-save-cover:
+      x-k8s-cli:
+        substitution:
+          name: number-of-day-to-save-cover
+          pattern: "number-of-day-to-save-cover=NUMBER_OF_DAY_TO_SAVE_COVER"
+          values:
+          - marker: NUMBER_OF_DAY_TO_SAVE_COVER
+            ref: '#/definitions/io.k8s.cli.setters.number-of-day-to-save-cover'
+    io.k8s.cli.setters.install-location:
+      type: "string"
+      pattern: "^/.+[^/]+$"
+      x-k8s-cli:
+        setter:
+          name: install-location
+          value: /tmp/podcast-server
+          description: "Install directory of the application"
+    io.k8s.cli.substitutions.install-location.files:
+      x-k8s-cli:
+        substitution:
+          name: install-location
+          pattern: INSTALL_LOCATION/files
+          values:
+          - marker: INSTALL_LOCATION
+            ref: '#/definitions/io.k8s.cli.setters.install-location'
+    io.k8s.cli.substitutions.install-location.database:
+      x-k8s-cli:
+        substitution:
+          name: install-location
+          pattern: INSTALL_LOCATION/database/
+          values:
+          - marker: INSTALL_LOCATION
+            ref: '#/definitions/io.k8s.cli.setters.install-location'
+    io.k8s.cli.substitutions.install-location.database-backup:
+      x-k8s-cli:
+        substitution:
+          name: install-location
+          pattern: INSTALL_LOCATION/database/backup/
+          values:
+          - marker: INSTALL_LOCATION
+            ref: '#/definitions/io.k8s.cli.setters.install-location'
+    io.k8s.cli.setters.domain:
+      x-k8s-cli:
+        setter:
+          name: "domain"
+          value: "localhost"
+          description: "Domain name declared in the Ingress object"
+    io.k8s.cli.setters.database.password:
+      x-k8s-cli:
+        setter:
+          name: database.password
+          value: "TR8D=k`oXcrVJV=@zvtiqHy39F"
+          description: "Database password"
+    io.k8s.cli.substitutions.database.password:
+      x-k8s-cli:
+        substitution:
+          name: database.password
+          pattern: "database.password=PASSWORD"
+          values:
+          - marker: PASSWORD
+            ref: '#/definitions/io.k8s.cli.setters.database.password'

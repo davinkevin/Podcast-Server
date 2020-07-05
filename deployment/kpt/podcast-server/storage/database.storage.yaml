@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  template:
+    spec:
+      containers:
+      - name: database
+        volumeMounts:
+        - name: database
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: database
+        hostPath:
+          path: /tmp/podcast-server/database/ # {"$ref":"#/definitions/io.k8s.cli.substitutions.install-location.database"}
+          type: Directory
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: database-backup
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: database-backup
+            volumeMounts:
+            - name: backup
+              mountPath: /var/lib/postgresql/data
+          volumes:
+          - name: backup
+            hostPath:
+              path: /tmp/podcast-server/database/backup/ # {"$ref":"#/definitions/io.k8s.cli.substitutions.install-location.database-backup"}
+              type: Directory

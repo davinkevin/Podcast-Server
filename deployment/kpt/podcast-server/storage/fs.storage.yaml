@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fs
+spec:
+  template:
+    spec:
+      containers:
+      - name: fs
+        volumeMounts:
+        - name: podcasts-files
+          mountPath: /var/www/podcast-server-files/data
+      volumes:
+      - name: podcasts-files
+        hostPath:
+          path: /tmp/podcast-server/files # {"$ref":"#/definitions/io.k8s.cli.substitutions.install-location.files"}
+          type: Directory
