@@ -41,11 +41,11 @@ $ kubectl create namespace podcast-server
 First, you need to create a `kustomization.yaml` with the following format:
 
 //- Command to execute it from a custom branch
-//- kpt pkg get "https://gitlab.com/davinkevin/Podcast-Server.git/deployment/kpt/podcast-server@c68e8f48fc3917c26da94a17f7d8e2f2e1fcd501" podcast-server
+//- kpt pkg get "https://gitlab.com/davinkevin/Podcast-Server.git/distribution/kpt/podcast-server@c68e8f48fc3917c26da94a17f7d8e2f2e1fcd501" podcast-server
 
 [source, shell script]
 ----
-$ kpt pkg get "https://gitlab.com/davinkevin/Podcast-Server.git/deployment/kpt/podcast-server" podcast-server
+$ kpt pkg get "https://gitlab.com/davinkevin/Podcast-Server.git/distribution/kpt/podcast-server" podcast-server
 fetching package /deployment/kpt/podcast-server from https://gitlab.com/davinkevin/Podcast-Server to podcast-server
 ----
 
