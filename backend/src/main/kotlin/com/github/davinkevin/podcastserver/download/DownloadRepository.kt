@@ -91,6 +91,4 @@ class DownloadRepository(private val query: DSLContext) {
                 .where(ITEM.ID.eq(id))
                 .toMono()
     }
-
-
 }
