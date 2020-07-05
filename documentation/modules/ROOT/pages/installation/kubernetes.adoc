@@ -26,6 +26,7 @@ You need to have the following tools installed and available in the `PATH`:
 
 == Installation
 
+[#namespace-creation]
 === Namespace creation
 
 First, you need to create a namespace for the application.
@@ -68,6 +69,7 @@ You can configure the following parameters:
 
 ==== Installation Configuration
 
+* `namespace` which is the namespace used to deploy the App (see link:#namespace-creation[namespace creation]).
 * `database.password` which is the password of the `password` of the database.
 * `domain` which is the domain used at the kubernetes ingress level.
 * `install-location` which is the path of the directory used to store files of the application (covers, podcasts, items, database files…).
@@ -78,7 +80,7 @@ After the configuration is done, you have to execute the following command:
 
 [source, shell script]
 ----
-$ kustomize build . | kubectl apply -f -
+$ kustomize build podcast-server | kubectl apply -f -
 ----
 
 After few minutes (in order to download images and install the application), you will be able to access the app with

@@ -24,6 +24,10 @@ The application is available in [docker images](https://hub.docker.com/r/podcast
 * Access the application on `https://localhost/` and/or define a name alias in your `/etc/hosts` file
 * (optional) if you want to rebuild the frontend (ui-v1) on change, execute `./mvnw -f frontend-angularjs/pom.xml frontend:gulp@skaffold-watch` in another terminal
 
+## Install 
+
+To see how to install the application, follow the [install documentation](https://gitlab.com/davinkevin/Podcast-Server/-/blob/master/documentation/modules/ROOT/pages/installation/)
+
 ## License
 
 Copyright 2020 DAVIN KEVIN

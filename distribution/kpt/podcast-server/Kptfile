@@ -110,6 +110,12 @@ openAPI:
           name: "domain"
           value: "localhost"
           description: "Domain name declared in the Ingress object"
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: "namespace"
+          value: "podcast-server"
+          description: "Kubernetes namespace where the app will be installed"
     io.k8s.cli.setters.database.password:
       x-k8s-cli:
         setter:
