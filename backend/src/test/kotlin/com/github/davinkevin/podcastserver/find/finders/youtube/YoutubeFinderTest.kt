@@ -42,21 +42,22 @@ class YoutubeFinderTest(
         @Test
         fun `information about a youtube podcast with its url`(backend: WireMockServer) {
             /* Given */
-            val url = "http://localhost:5555/user/cauetofficiel"
-            val coverUrl = URI("https://yt3.ggpht.com/-83tzNbjW090/AAAAAAAAAAI/AAAAAAAAAAA/Vj6_1jPZOVc/s1400-c-k-no/photo.jpg")
+            val url = "http://localhost:5555/user/joueurdugrenier"
+            val coverUrl = URI("https://yt3.ggpht.com/a/AATXAJzzJHBMXD4K4L5FX4X_TnfKO16Wy9M4pzlshph5=s900-c-k-c0xffffffff-no-rj-mo")
+
             whenever(image.fetchCoverInformation(coverUrl))
                     .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
 
-            backend.stubFor(get("/user/cauetofficiel")
-                    .willReturn(ok(fileAsString("/remote/podcast/youtube/youtube.cauetofficiel.html"))))
+            backend.stubFor(get("/user/joueurdugrenier")
+                    .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))
                     /* Then */
                     .expectSubscription()
                     .assertNext { podcast ->
-                        assertThat(podcast.title).isEqualTo("Cauet")
-                        assertThat(podcast.description).isEqualTo("La chaîne officielle de Cauet, c'est toujours plus de kiff et de partage ! Des vidéos exclusives de C'Cauet sur NRJ tous les soirs de 19h à 22h. Des défis in...")
+                        assertThat(podcast.title).isEqualTo("Joueur Du Grenier")
+                        assertThat(podcast.description).isEqualTo("Test de jeux à la con !")
 
                         assertThat(podcast.cover).isNotNull
                         assertThat(podcast.cover!!.url).isEqualTo(coverUrl)
@@ -78,9 +79,9 @@ class YoutubeFinderTest(
         @Test
         fun `should set default value for information not found`(backend: WireMockServer) {
             /* Given */
-            val url = "http://localhost:5555/user/cauetofficiel"
-            backend.stubFor(get("/user/cauetofficiel")
-                    .willReturn(ok(fileAsString("/remote/podcast/youtube/youtube.cauetofficiel.withoutDescAndCoverAndTitle.html"))))
+            val url = "http://localhost:5555/user/joueurdugrenier"
+            backend.stubFor(get("/user/joueurdugrenier")
+                    .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.withoutDescAndCoverAndTitle.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))

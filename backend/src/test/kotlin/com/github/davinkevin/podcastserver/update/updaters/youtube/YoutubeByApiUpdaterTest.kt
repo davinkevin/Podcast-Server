@@ -120,12 +120,6 @@ class YoutubeByApiUpdaterTest(
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
                         .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier-without-external-id.html"))))
-
-                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
-
-                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key&pageToken=CDIQAA")
-                        .willReturn(notFound()))
             }
 
             /* When */

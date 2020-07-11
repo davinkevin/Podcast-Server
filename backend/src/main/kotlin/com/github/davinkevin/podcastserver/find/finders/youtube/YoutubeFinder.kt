@@ -45,10 +45,8 @@ class YoutubeFinder(
             ) }
 
     private fun findCover(page: Document): Mono<Optional<FindCoverInformation>> {
-        return page
-                .select("img.channel-header-profile-image")
-                .attr("src")
-                .replace("s100", "s1400")
+        return page.select("meta[property=og:image]")
+                .attr("content")
                 .toMono()
                 .filter { it.isNotEmpty() }
                 .flatMap { imageService.fetchCoverInformationOrOption(URI(it)) }

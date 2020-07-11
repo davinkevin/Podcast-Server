@@ -110,12 +110,9 @@ class YoutubeByXmlUpdater(
                 .uri(path)
                 .retrieve()
                 .bodyToMono<String>()
-                .map {
-                    val html = Jsoup.parse(it, "https://www.youtube.com")
-                    val elem = html.select("[data-channel-external-id]").first()
-                    val id = elem.attr("data-channel-external-id")
-                    "channel_id" to id
-                }
+                .map { Jsoup.parse(it, "https://www.youtube.com") }
+                .flatMap { Mono.justOrEmpty(it.select("meta[itemprop=channelId]").firstOrNull()) }
+                .map { "channel_id" to it.attr("content") }
     }
 
     override fun type() = type
