@@ -7,9 +7,9 @@ spec:
     spec:
       containers:
         - name: database
-          env:
-            - name: POSTGRES_DB
-              value: podcast-server-k8s
+          volumeMounts:
+            - name: database
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: database
           hostPath:
@@ -27,9 +27,9 @@ spec:
         spec:
           containers:
             - name: database-backup
-              env:
-              - name: POSTGRES_DB
-                value: podcast-server-k8s
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
           volumes:
             - name: backup
               hostPath:

@@ -15,4 +15,4 @@ build:
 deploy:
   kustomize:
     paths:
-      - deployment/kubernetes/docker-for-desktop/
+      - distribution/kubernetes/docker-for-desktop/

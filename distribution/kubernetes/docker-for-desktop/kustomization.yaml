@@ -14,22 +14,15 @@ patchesStrategicMerge:
   - files-system/fs.yaml
   - ingress/ingress.yaml
 
-configMapGenerator:
-  - name: podcast-server
-    files:
-      - backend/application.yaml
-    literals:
-      - database.username=podcast-server-user
-      - database.url=jdbc:postgresql://database:5432/podcast-server-k8s
-
 secretGenerator:
   - name: podcast-server-tls
     files:
       - ingress/tls.crt
       - ingress/tls.key
     type: kubernetes.io/tls
-  - literals:
+  - name: podcast-server
+    behavior: merge
+    literals:
       - database.password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
       - api.youtube=AN_API_KEY
-    name: podcast-server
     type: Opaque
