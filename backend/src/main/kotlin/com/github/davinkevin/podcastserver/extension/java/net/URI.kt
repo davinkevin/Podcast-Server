@@ -1,11 +1,16 @@
 package com.github.davinkevin.podcastserver.extension.java.net
 
-import org.apache.commons.io.FilenameUtils
 import java.net.URI
 
 /**
  * Created by kevin on 12/07/2020
  */
-fun URI.extension(): String = FilenameUtils
-        .getExtension(this.toASCIIString())
-        .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
+fun URI.extension(): String {
+    val path = this.path
+
+    if(!path.contains(".")) {
+        return "jpg"
+    }
+
+    return path.substringAfterLast(".")
+}
