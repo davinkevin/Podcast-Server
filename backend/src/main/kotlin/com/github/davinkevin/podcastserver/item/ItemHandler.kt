@@ -198,8 +198,6 @@ class ItemHandler(
     }
 }
 
-private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
-
 data class ItemHAL(
         val id: UUID, val title: String, val url: String?,
         val pubDate: OffsetDateTime?, val downloadDate: OffsetDateTime?, val creationDate: OffsetDateTime?,
@@ -233,9 +231,9 @@ data class PodcastHAL(val id: UUID, val title: String, val url: String?)
 
 fun toItemHAL(i: Item): ItemHAL {
 
-    val extension = i.cover
-            .extension()
-            .substringBeforeLast("?")
+    val extension = FilenameUtils
+            .getExtension(i.cover.url)
+            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", i.podcast.id.toString(), "items", i.id.toString(), "cover.$extension")

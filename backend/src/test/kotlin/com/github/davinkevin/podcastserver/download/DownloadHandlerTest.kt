@@ -8,6 +8,7 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Ignore
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -138,6 +139,112 @@ class DownloadHandlerTest(
                         }""")
                     }
         }
+
+        @Test
+        fun `with cover with extension containing parameters`() {
+            /* Given */
+            val dlItem = DownloadingItem(
+                    id = UUID.fromString("7caba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                    url = URI("https://foo.bar.com/2"),
+                    title = "item2",
+                    status = Status.STARTED,
+                    progression = 10,
+                    numberOfFail = 0,
+                    podcast = DownloadingItem.Podcast(
+                            id = UUID.fromString("acaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                            title = "podcast"
+                    ),
+                    cover = DownloadingItem.Cover(
+                            id = UUID.fromString("ccaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                            url = URI("https://foo.bar.com/item2/url")
+                    )
+            )
+
+            whenever(idm.downloading).thenReturn(Flux.just(dlItem))
+
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/downloads/downloading")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                           "items":[
+                              {
+                                 "id":"7caba8f2-4f2f-49f0-a520-a48bc628d81f",
+                                 "title":"item2",
+                                 "status":"STARTED",
+                                 "progression": 10,
+                                 "podcast":{
+                                    "id":"acaba8f2-4f2f-49f0-a520-a48bc628d81f",
+                                    "title":"podcast"
+                                 },
+                                 "cover":{
+                                    "id":"ccaba8f2-4f2f-49f0-a520-a48bc628d81f",
+                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.jpg"
+                                 }
+                              }
+                           ]
+                        }""")
+                    }
+        }
+
+        @Test
+        fun `with cover without extension`() {
+            /* Given */
+            val dlItem = DownloadingItem(
+                    id = UUID.fromString("7caba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                    url = URI("https://foo.bar.com/2"),
+                    title = "item2",
+                    status = Status.STARTED,
+                    progression = 10,
+                    numberOfFail = 0,
+                    podcast = DownloadingItem.Podcast(
+                            id = UUID.fromString("acaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                            title = "podcast"
+                    ),
+                    cover = DownloadingItem.Cover(
+                            id = UUID.fromString("ccaba8f2-4f2f-49f0-a520-a48bc628d81f"),
+                            url = URI("https://foo.bar.com/item2/url.png?foo=bar")
+                    )
+            )
+
+            whenever(idm.downloading).thenReturn(Flux.just(dlItem))
+
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/downloads/downloading")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                           "items":[
+                              {
+                                 "id":"7caba8f2-4f2f-49f0-a520-a48bc628d81f",
+                                 "title":"item2",
+                                 "status":"STARTED",
+                                 "progression": 10,
+                                 "podcast":{
+                                    "id":"acaba8f2-4f2f-49f0-a520-a48bc628d81f",
+                                    "title":"podcast"
+                                 },
+                                 "cover":{
+                                    "id":"ccaba8f2-4f2f-49f0-a520-a48bc628d81f",
+                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
+                                 }
+                              }
+                           ]
+                        }""")
+                    }
+        }
+
+
     }
 
     @Nested

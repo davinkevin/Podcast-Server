@@ -134,8 +134,9 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
 }
 
 private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
-    val extension = (FilenameUtils.getExtension(cover.url.toASCIIString()) ?: "jpg")
-            .substringBeforeLast("?")
+    val extension = FilenameUtils
+            .getExtension(cover.url.toASCIIString())
+            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
@@ -198,8 +199,10 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
 }
 
 private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
+    val coverExtension = FilenameUtils
+            .getExtension(item.cover.url.toASCIIString())
+            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
 
-    val coverExtension = (FilenameUtils.getExtension(item.cover.url.toASCIIString()) ?: "jpg").substringBeforeLast("?")
     val coverUrl = UriComponentsBuilder.fromUri(host)
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
             .build(true)
