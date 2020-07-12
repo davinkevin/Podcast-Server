@@ -179,6 +179,8 @@ stages:
     - ./backend/gradlew $GRADLE_OPTS -p backend/ test
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
+    paths:
+      - backend/build/reports/jacoco/test/html/**/*
     reports:
       junit: backend/build/test-results/test/TEST-*.xml
   coverage: '/^Coverage:\s(\d+\.\d+%)/'

@@ -144,7 +144,7 @@ project.tasks["jooq-codegen-primary"].dependsOn("flywayMigrate")
 tasks.jacocoTestReport {
 	reports {
 		xml.isEnabled = true
-		html.isEnabled = false
+		html.isEnabled = true
 	}
 	executionData(File("$buildDir/jacoco/test.exec"))
 	finalizedBy(tasks.printCoverage)
