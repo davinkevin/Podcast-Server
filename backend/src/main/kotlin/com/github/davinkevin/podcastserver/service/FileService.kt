@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.service
 
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation
-import com.github.davinkevin.podcastserver.item.CoverForItem
 import com.github.davinkevin.podcastserver.item.DeleteItemInformation
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
@@ -111,7 +110,7 @@ class FileService(
 
     fun downloadItemCover(item: Item): Mono<Void> =
             wcb.clone()
-                    .baseUrl(item.cover.url)
+                    .baseUrl(item.cover.url.toASCIIString())
                     .build()
                     .get()
                     .accept(MediaType.APPLICATION_OCTET_STREAM)
@@ -154,6 +153,6 @@ private fun CoverForPodcast.extension(): String {
 
     return if(ext.isBlank()) "jpg" else ext
 }
-private fun CoverForItem.extension() = FilenameUtils.getExtension(url) ?: "jpg"
+private fun Item.Cover.extension() = FilenameUtils.getExtension(url.toASCIIString()) ?: "jpg"
 
 data class MovePodcastDetails(val id: UUID, val from: String, val to: String)

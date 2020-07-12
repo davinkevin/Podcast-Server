@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.item
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.FileService
 import org.apache.commons.io.FilenameUtils
@@ -86,7 +87,7 @@ class ItemHandler(
                                     .pathSegment("data", item.podcast.title, it)
                                     .build().toUri()
                         }
-                        .switchIfEmpty { URI(item.cover.url).toMono() }
+                        .switchIfEmpty { item.cover.url.toMono() }
                 }
                 .doOnNext { log.debug("Redirect cover to {}", it)}
                 .flatMap { seeOther(it).build() }
@@ -231,9 +232,7 @@ data class PodcastHAL(val id: UUID, val title: String, val url: String?)
 
 fun toItemHAL(i: Item): ItemHAL {
 
-    val extension = FilenameUtils
-            .getExtension(i.cover.url)
-            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
+    val extension = i.cover.url.extension()
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", i.podcast.id.toString(), "items", i.id.toString(), "cover.$extension")

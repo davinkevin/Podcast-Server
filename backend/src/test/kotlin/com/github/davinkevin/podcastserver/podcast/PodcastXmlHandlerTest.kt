@@ -197,14 +197,14 @@ class PodcastXmlHandlerTest(
     @DisplayName("should generate rss")
     inner class ShouldGenerateRss {
 
-        private val coverForItem = CoverForItem(
+        private val coverForItem = Item.Cover(
                 id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                url = "https://external.domain.tld/foo/bar.png",
+                url = URI("https://external.domain.tld/foo/bar.png"),
                 width = 200,
                 height = 200
         )
 
-        private val podcastForItem = PodcastForItem(
+        private val podcastForItem = Item.Podcast(
                 id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast title",
                 url = "https://foo.bar.com/app/file.rss"

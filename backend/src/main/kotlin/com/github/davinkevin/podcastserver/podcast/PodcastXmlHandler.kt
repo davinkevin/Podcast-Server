@@ -135,7 +135,7 @@ private val ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itun
 
 private fun toRssItem(item: Item, host: URI): Element {
 
-    val coverExtension = (FilenameUtils.getExtension(item.cover.url) ?: "jpg").substringBeforeLast("?")
+    val coverExtension = (FilenameUtils.getExtension(item.cover.url.toASCIIString()) ?: "jpg").substringBeforeLast("?")
     val coverUrl = UriComponentsBuilder.fromUri(host)
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
             .build(true)

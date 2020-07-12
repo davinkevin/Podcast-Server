@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
@@ -134,9 +135,7 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
 }
 
 private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
-    val extension = FilenameUtils
-            .getExtension(cover.url.toASCIIString())
-            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
+    val extension = cover.url.extension()
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
@@ -199,9 +198,7 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
 }
 
 private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
-    val coverExtension = FilenameUtils
-            .getExtension(item.cover.url.toASCIIString())
-            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
+    val coverExtension = item.cover.url.extension()
 
     val coverUrl = UriComponentsBuilder.fromUri(host)
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")

@@ -228,7 +228,7 @@ class ItemRepositoryTest(
                         assertThat(it.url).isEqualTo("http://fakeurl.com/geekinc.126.mp3")
                         assertThat(it.fileName).isEqualTo(null)
                         assertThat(it.fileName).isEqualTo(null)
-                        assertThat(it.podcast).isEqualTo(PodcastForItem(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
+                        assertThat(it.podcast).isEqualTo(Item.Podcast(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
                         assertThat(it.status).isEqualTo(NOT_DOWNLOADED)
                         assertThat((it.downloadDate == null)).isEqualTo(true)
                     }
@@ -1015,7 +1015,7 @@ class ItemRepositoryTest(
 
                         assertThat(it.cover.height).isEqualTo(100)
                         assertThat(it.cover.width).isEqualTo(100)
-                        assertThat(it.cover.url).isEqualTo("http://foo.bar.com/cover/item.jpg")
+                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
                     }
                     .verifyComplete()
 
@@ -1102,7 +1102,7 @@ class ItemRepositoryTest(
 
                         assertThat(it.cover.height).isEqualTo(100)
                         assertThat(it.cover.width).isEqualTo(100)
-                        assertThat(it.cover.url).isEqualTo("http://foo.bar.com/cover/item.jpg")
+                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
                     }
                     .verifyComplete()
 

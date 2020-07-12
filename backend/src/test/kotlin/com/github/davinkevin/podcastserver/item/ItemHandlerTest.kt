@@ -16,11 +16,11 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
+import java.net.URI
 import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -57,14 +57,14 @@ class ItemHandlerTest(
             fileName = null,
             status = Status.NOT_DOWNLOADED,
 
-            podcast = PodcastForItem(
+            podcast = Item.Podcast(
                     id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
                     title = "Podcast Bar",
                     url = "https://external.domain.tld/bar.rss"
             ),
-            cover = CoverForItem(
+            cover = Item.Cover(
                     id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                    url = "https://external.domain.tld/foo/bar.png",
+                    url = URI("https://external.domain.tld/foo/bar.png"),
                     width = 200,
                     height = 200
             )
@@ -169,7 +169,7 @@ class ItemHandlerTest(
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
             whenever(fileService.coverExists(any<Item>())).then {
                 val item = it.getArgument<Item>(0)
-                val extension = FilenameUtils.getExtension(item.cover.url)
+                val extension = FilenameUtils.getExtension(item.cover.url.toASCIIString())
                 "${item.id}.$extension".toMono()
             }
 
@@ -221,14 +221,14 @@ class ItemHandlerTest(
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
 
-                podcast = PodcastForItem(
+                podcast = Item.Podcast(
                         id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
                         title = "Podcast Bar",
                         url = "https://external.domain.tld/bar.rss"
                 ),
-                cover = CoverForItem(
+                cover = Item.Cover(
                         id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = "https://external.domain.tld/foo/bar.png",
+                        url = URI("https://external.domain.tld/foo/bar.png"),
                         width = 200,
                         height = 200
                 )
@@ -349,14 +349,14 @@ class ItemHandlerTest(
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
 
-                podcast = PodcastForItem(
+                podcast = Item.Podcast(
                         id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
                         title = "Podcast Bar",
                         url = "https://external.domain.tld/bar.rss"
                 ),
-                cover = CoverForItem(
+                cover = Item.Cover(
                         id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = "https://external.domain.tld/foo/bar.png",
+                        url = URI("https://external.domain.tld/foo/bar.png"),
                         width = 200,
                         height = 200
                 )
@@ -425,14 +425,14 @@ class ItemHandlerTest(
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
 
-                podcast = PodcastForItem(
+                podcast = Item.Podcast(
                         id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
                         title = "Podcast title",
                         url = "https://foo.bar.com/app/file.rss"
                 ),
-                cover = CoverForItem(
+                cover = Item.Cover(
                         id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = "https://external.domain.tld/foo/bar.png",
+                        url = URI("https://external.domain.tld/foo/bar.png"),
                         width = 200,
                         height = 200
                 )
@@ -638,14 +638,14 @@ class ItemHandlerTest(
                 fileName = null,
                 status = Status.NOT_DOWNLOADED,
 
-                podcast = PodcastForItem(
+                podcast = Item.Podcast(
                         id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
                         title = "Podcast Bar",
                         url = "https://external.domain.tld/bar.rss"
                 ),
-                cover = CoverForItem(
+                cover = Item.Cover(
                         id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = "https://external.domain.tld/foo/bar.png",
+                        url = URI("https://external.domain.tld/foo/bar.png"),
                         width = 200,
                         height = 200
                 )

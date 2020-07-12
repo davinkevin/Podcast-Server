@@ -3,10 +3,8 @@ package com.github.davinkevin.podcastserver.service
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.*
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.item.CoverForItem
 import com.github.davinkevin.podcastserver.item.DeleteItemInformation
 import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.item.PodcastForItem
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastInformation
 import com.github.davinkevin.podcastserver.podcast.Podcast
@@ -158,14 +156,14 @@ class FileServiceTest(
                     fileName = null,
                     status = Status.NOT_DOWNLOADED,
 
-                    podcast = PodcastForItem(
+                    podcast = Item.Podcast(
                             id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
                             title = "Podcast Bar",
                             url = "https://external.domain.tld/bar.rss"
                     ),
-                    cover = CoverForItem(
+                    cover = Item.Cover(
                             id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                            url = "https://external.domain.tld/foo/bar.png",
+                            url = URI("https://external.domain.tld/foo/bar.png"),
                             width = 200,
                             height = 200
                     )

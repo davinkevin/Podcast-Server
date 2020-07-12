@@ -2,6 +2,8 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
+import org.apache.commons.io.FilenameUtils
+import java.net.URI
 import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.util.*
@@ -29,24 +31,14 @@ data class Item(
         val fileName: String?,
         val status: Status,
 
-        val podcast: PodcastForItem,
-        val cover: CoverForItem
+        val podcast: Podcast,
+        val cover: Cover
 ) {
     fun isDownloaded() = Status.FINISH == status
+
+    data class Podcast(val id: UUID, val title: String, val url: String?)
+    data class Cover(val id: UUID, val url: URI, val width: Int, val height: Int)
 }
-
-data class PodcastForItem(
-        val id: UUID,
-        val title: String,
-        val url: String?
-)
-
-data class CoverForItem (
-        val id: UUID,
-        val url: String,
-        val width: Int,
-        val height: Int
-)
 
 data class ItemSort(val direction: String, val field: String)
 data class ItemPageRequest(val page: Int, val size: Int, val sort: ItemSort)

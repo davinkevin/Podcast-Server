@@ -23,6 +23,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
+import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -58,14 +59,14 @@ class ItemServiceTest(
             fileName = null,
             status = NOT_DOWNLOADED,
 
-            podcast = PodcastForItem(
+            podcast = Item.Podcast(
                     id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
                     title = "Podcast Bar",
                     url = "https://external.domain.tld/bar.rss"
             ),
-            cover = CoverForItem(
+            cover = Item.Cover(
                     id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                    url = "https://external.domain.tld/foo/bar.png",
+                    url = URI("https://external.domain.tld/foo/bar.png"),
                     width = 200,
                     height = 200
             )

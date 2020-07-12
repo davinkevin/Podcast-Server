@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.apache.commons.io.FilenameUtils
@@ -107,9 +108,7 @@ private data class DownloadingItemHAL(
 }
 
 private fun toDownloadingItem(item: DownloadingItem): DownloadingItemHAL {
-    val extension = FilenameUtils
-            .getExtension(item.cover.url.toASCIIString())
-            .let { if (it.isEmpty()) "jpg" else it.substringBeforeLast("?") }
+    val extension = item.cover.url.extension()
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$extension")

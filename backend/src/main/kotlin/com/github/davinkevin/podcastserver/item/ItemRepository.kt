@@ -13,6 +13,7 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -178,8 +179,8 @@ class ItemRepository(private val query: DSLContext) {
                                             .innerJoin(PODCAST).on(itemPodcastId.eq(PODCAST.ID)))
                     )
                             .map {
-                                val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
-                                val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
+                                val c = Item.Cover(it[COVER.ID], URI(it[COVER.URL]), it[COVER.WIDTH], it[COVER.HEIGHT])
+                                val p = Item.Podcast(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
                                 Item(
                                         it[itemId], it[itemTitle], it[itemURL],
                                         it[itemPubDate], it[itemDownloadDate], it[itemCreationDate],
@@ -271,8 +272,8 @@ class ItemRepository(private val query: DSLContext) {
 }
 
 private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDateTime, OffsetDateTime, String, String, Long, String, Status, UUID, String, String, UUID, String, Int, Int>): Item {
-    val c = CoverForItem(it[COVER.ID], it[COVER.URL], it[COVER.WIDTH], it[COVER.HEIGHT])
-    val p = PodcastForItem(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
+    val c = Item.Cover(it[COVER.ID], URI(it[COVER.URL]), it[COVER.WIDTH], it[COVER.HEIGHT])
+    val p = Item.Podcast(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
     return Item(
             it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
             it[ITEM.PUB_DATE], it[ITEM.DOWNLOAD_DATE], it[ITEM.CREATION_DATE],
