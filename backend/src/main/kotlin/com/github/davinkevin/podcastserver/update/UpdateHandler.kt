@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.update
 
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
@@ -8,8 +7,7 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 class UpdateHandler(
-        private val update: UpdateService,
-        private val idm: ItemDownloadManager
+        private val update: UpdateService
 ) {
 
     fun updateAll(r: ServerRequest): Mono<ServerResponse> {
