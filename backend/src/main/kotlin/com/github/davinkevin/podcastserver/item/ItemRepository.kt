@@ -4,7 +4,9 @@ import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import org.jooq.DSLContext
+import org.jooq.Field
 import org.jooq.Record18
+import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
@@ -116,25 +118,25 @@ class ItemRepository(private val query: DSLContext) {
                 .collectList()
                 .flatMap { tagIds ->
 
-                    val statusesCondition = if (statuses.isEmpty()) trueCondition() else ITEM.STATUS.`in`(statuses)
-                    val tagsCondition = if (tagIds.isEmpty()) trueCondition() else {
-                        val multipleTagsCondition = tagIds.map {
-                            value(it).`in`(query
-                                    .select(PODCAST_TAGS.TAGS_ID)
-                                    .from(PODCAST_TAGS)
-                                    .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID))
-                            ) }
-                        and(multipleTagsCondition)
+                    val statusesCondition = if (statuses.isEmpty()) noCondition() else ITEM.STATUS.`in`(statuses)
+                    val tagsCondition = if (tagIds.isEmpty()) noCondition() else {
+                        tagIds
+                                .map {
+                                    value(it).`in`(query
+                                        .select(PODCAST_TAGS.TAGS_ID)
+                                        .from(PODCAST_TAGS)
+                                        .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID)))
+                                }
+                                .reduce(DSL::and)
                     }
-                    val queryCondition = if (q.isNullOrEmpty()) trueCondition() else {
-                        or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
-                    }
+                    val queryCondition = if (q.isNullOrEmpty()) noCondition()
+                    else or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
 
-                    val podcastCondition = if(podcastId == null) trueCondition() else ITEM.PODCAST_ID.eq(podcastId)
+                    val podcastCondition = if(podcastId == null) noCondition() else ITEM.PODCAST_ID.eq(podcastId)
 
                     val filterConditions = and(statusesCondition, tagsCondition, queryCondition, podcastCondition)
 
-                    val filteredItems = name("FILTERED_ITEMS").`as`(
+                    val fi = name("FILTERED_ITEMS").`as`(
                             select(
                                     ITEM.ID, ITEM.TITLE, ITEM.URL,
                                     ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
@@ -144,48 +146,43 @@ class ItemRepository(private val query: DSLContext) {
                             )
                             .from(ITEM)
                             .where(filterConditions)
-                            .orderBy(page.sort.toOrderBy(), ITEM.ID.asc())
+                            .orderBy(page.sort.toOrderBy(ITEM.DOWNLOAD_DATE, ITEM.PUB_DATE), ITEM.ID.asc())
                             .limit((page.size * page.page), page.size)
                     )
 
-                    val itemId = filteredItems.field(ITEM.ID)
-                    val itemTitle = filteredItems.field(ITEM.TITLE)
-                    val itemURL = filteredItems.field(ITEM.URL)
-                    val itemPubDate = filteredItems.field(ITEM.PUB_DATE)
-                    val itemDownloadDate = filteredItems.field(ITEM.DOWNLOAD_DATE)
-                    val itemCreationDate = filteredItems.field(ITEM.CREATION_DATE)
-                    val itemDescription = filteredItems.field(ITEM.DESCRIPTION)
-                    val itemMimeType = filteredItems.field(ITEM.MIME_TYPE)
-                    val itemLength = filteredItems.field(ITEM.LENGTH)
-                    val itemFileName = filteredItems.field(ITEM.FILE_NAME)
-                    val itemStatus = filteredItems.field(ITEM.STATUS)
-                    val itemCoverId = filteredItems.field(ITEM.COVER_ID)
-                    val itemPodcastId = filteredItems.field(ITEM.PODCAST_ID)
-
                     val content: Mono<List<Item>> = Flux.from(query
-                            .with(filteredItems)
+                            .with(fi)
                             .select(
-                                    itemId, itemTitle, itemURL,
-                                    itemPubDate, itemDownloadDate, itemCreationDate,
-                                    itemDescription, itemMimeType, itemLength,
-                                    itemFileName, itemStatus,
+                                    fi.field(ITEM.ID), fi.field(ITEM.TITLE), fi.field(ITEM.URL),
+                                    fi.field(ITEM.PUB_DATE), fi.field(ITEM.DOWNLOAD_DATE), fi.field(ITEM.CREATION_DATE),
+                                    fi.field(ITEM.DESCRIPTION), fi.field(ITEM.MIME_TYPE), fi.field(ITEM.LENGTH),
+                                    fi.field(ITEM.FILE_NAME), fi.field(ITEM.STATUS),
 
                                     PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
                                     COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
                             )
                             .from(
-                                    filteredItems
-                                            .innerJoin(COVER).on(itemCoverId.eq(COVER.ID))
-                                            .innerJoin(PODCAST).on(itemPodcastId.eq(PODCAST.ID)))
+                                    fi
+                                            .innerJoin(COVER).on(fi.field(ITEM.COVER_ID).eq(COVER.ID))
+                                            .innerJoin(PODCAST).on(fi.field(ITEM.PODCAST_ID).eq(PODCAST.ID))
+                            )
+                            .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE), fi.field(ITEM.PUB_DATE)), fi.field(ITEM.ID))
                     )
-                            .map {
-                                val c = Item.Cover(it[COVER.ID], URI(it[COVER.URL]), it[COVER.WIDTH], it[COVER.HEIGHT])
-                                val p = Item.Podcast(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
-                                Item(
-                                        it[itemId], it[itemTitle], it[itemURL],
-                                        it[itemPubDate], it[itemDownloadDate], it[itemCreationDate],
-                                        it[itemDescription], it[itemMimeType], it[itemLength], it[itemFileName], it[itemStatus],
-                                        p, c
+                            .map { (
+                                           id, title, url,
+                                           pubDate, downloadDate, creationDate,
+                                           description, mimeType, length,
+                                           fileName, status,
+
+                                           podcastId, podcastTitle, podcastUrl,
+                                           coverId, coverUrl, coverWidth, coverHeight
+                                   ) -> Item(
+                                        id, title, url,
+                                        pubDate, downloadDate, creationDate,
+                                        description, mimeType, length, fileName, status,
+
+                                        Item.Podcast(podcastId, podcastTitle, podcastUrl),
+                                        Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
                                 )
                             }
                             .collectList()
@@ -282,11 +279,10 @@ private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDate
     )
 }
 
-private fun ItemSort.toOrderBy() = when(field) {
-    "downloadDate" -> ITEM.DOWNLOAD_DATE
-    else -> ITEM.PUB_DATE
+private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T>) = when(field) {
+    "downloadDate" -> downloadDate
+    else -> defaultField
 }.let { when(direction.toUpperCase()) {
     "ASC" -> it.asc()
     else -> it.desc()
 } }
-
