@@ -52,7 +52,7 @@ class FranceTvFinderTest(
         @Test
         fun `information about france tv podcast with its url`(backend: WireMockServer) {
             /* Given */
-            val url = "https://www.france.tv/france-2/secrets-d-histoire/"
+            val url = "https://www.france.tv/france-3/secrets-d-histoire/"
 
             whenever(image.fetchCoverInformation(any())).thenReturn(CoverInformation(
                     url = URI("https://foo.bar.com"),
@@ -60,8 +60,8 @@ class FranceTvFinderTest(
                     width = 456
             ).toMono())
 
-            backend.stubFor(get("/france-2/secrets-d-histoire/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
+            backend.stubFor(get("/france-3/secrets-d-histoire/")
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v3/secrets-d-histoire.home.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))
@@ -84,11 +84,11 @@ class FranceTvFinderTest(
         @Test
         fun `information about france tv podcast with its url with no cover`(backend: WireMockServer) {
             /* Given */
-            val url = "https://www.france.tv/france-2/secrets-d-histoire/"
+            val url = "https://www.france.tv/france-3/secrets-d-histoire/"
 
             whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
-            backend.stubFor(get("/france-2/secrets-d-histoire/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/secrets-d-histoire.home.html"))))
+            backend.stubFor(get("/france-3/secrets-d-histoire/")
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v3/secrets-d-histoire.home.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))

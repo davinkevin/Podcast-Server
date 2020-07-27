@@ -55,9 +55,12 @@ class UpdateService(
                 .flatMap {pu -> updaters.of(pu.url).update(pu) }
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .sequential()
-                .doOnTerminate { liveUpdate.isUpdating(false).also { log.info("End of the global update") } }
-                .doOnTerminate { if (download) idm.launchDownload() }
-                .subscribe()
+                .collectList()
+                .subscribe {
+                    liveUpdate.isUpdating(false)
+                    log.info("End of the global update with ${it.size} found")
+                    if (download) idm.launchDownload()
+                }
 
         return Mono.empty()
     }

@@ -39,15 +39,17 @@ class FranceTvUpdater(
 
         log.debug("Fetch $url")
 
-        val replayUrl = "${podcast.url}/replay-videos/ajax/?page=0"
-                .substringAfter("https://www.france.tv/")
+        val replay = replayUrl(podcast.url)
 
         return franceTvClient
                 .get()
-                .uri(replayUrl)
+                .uri(replay)
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, url) }
+                .flatMapIterable { it.select(".c-wall") }
+                .flatMapIterable { it.select(".c-card-video") }
+                .filter { it.classNames().none { c -> c.contains("unavailable") } }
                 .flatMapIterable { it.select("a[href]") }
                 .map { it.attr("href") }
                 .flatMap { urlToItem(it) }
@@ -64,7 +66,7 @@ class FranceTvUpdater(
                 .map { it.html() }
                 .filter { "FTVPlayerVideos" in it }
                 .toMono()
-                .map { it.substringAfter("=").trim(';') }
+                .map { it.substringAfterLast("FTVPlayerVideos = ").trim(';') }
                 .flatMapIterable { mapper.readValue<Set<FranceTvPageItem>>(it) }
                 .filter { it.contentId in pathUrl }
                 .toMono()
@@ -93,19 +95,22 @@ class FranceTvUpdater(
 
     override fun signatureOf(url: URI): Mono<String> {
 
-        val replayUrl = "${url.toASCIIString()}/replay-videos/ajax/?page=0"
-                .substringAfter("https://www.france.tv/")
+        val replay = replayUrl(url)
 
         return franceTvClient
                 .get()
-                .uri(replayUrl)
+                .uri(replay)
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, url.toASCIIString()) }
+                .flatMapIterable { it.select(".c-wall") }
+                .flatMapIterable { it.select(".c-card-video") }
+                .filter { it.classNames().none { c -> c.contains("unavailable") } }
                 .flatMapIterable { it.select("a[href]") }
                 .map { it.attr("href") }
                 .sort()
                 .reduce { t, u -> """$t-$u""" }
+                .log()
                 .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
                 .switchIfEmpty("".toMono())
     }
@@ -115,6 +120,12 @@ class FranceTvUpdater(
     override fun compatibility(url: String?): Int {
         return if (!url.isNullOrEmpty() && "www.france.tv" in url) 1
         else Integer.MAX_VALUE
+    }
+
+    private fun replayUrl(url: URI): String {
+        return "${url.toASCIIString()}/toutes-les-videos/"
+                .substringAfter("https://www.france.tv/")
+
     }
 }
 
@@ -134,21 +145,24 @@ private data class FranceTvItem(
 ) {
 
     fun title(): String? {
-        var title = titre
+        val season = saison ?: ""
+        val ep = episode ?: ""
+        val subTitle = sousTitre ?: ""
 
-        if (!saison.isNullOrEmpty()) {
-            title = "$title - S$saison"
+        return when {
+            season.isNotEmpty() && ep.isNotEmpty() && subTitle.isNotEmpty() -> "$titre - S${season}E$episode - $subTitle"
+
+            season.isEmpty() && ep.isNotEmpty() && subTitle.isNotEmpty() -> "$titre - E$ep - $subTitle"
+            season.isEmpty() && ep.isNotEmpty() && subTitle.isEmpty() -> "$titre - E$ep"
+            season.isEmpty() && ep.isEmpty()    && subTitle.isNotEmpty() -> "$titre - $subTitle"
+
+            season.isNotEmpty() && ep.isEmpty() && subTitle.isNotEmpty() -> "$titre - S${season} - $subTitle"
+            season.isNotEmpty() && ep.isEmpty() && subTitle.isEmpty() -> "$titre - S${season}"
+
+            season.isNotEmpty() && ep.isNotEmpty() && subTitle.isEmpty() -> "$titre - S${season}E$ep"
+
+            else -> "$titre"
         }
-
-        if (!episode.isNullOrEmpty()) {
-            title = "${title}E$episode"
-        }
-
-        if (!sousTitre.isNullOrEmpty()) {
-            title = "$title - $sousTitre"
-        }
-
-        return title
     }
 
     fun pubDate(): ZonedDateTime {
