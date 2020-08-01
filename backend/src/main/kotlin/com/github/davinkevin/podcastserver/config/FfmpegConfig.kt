@@ -19,7 +19,6 @@ class FfmpegConfig {
 
     @Bean
     fun ffmpegService(externalTools: ExternalTools): FfmpegService {
-
         val processFunc = CustomRunProcessFunc()
 
         val ffmpeg = FFmpeg(externalTools.ffmpeg, processFunc)

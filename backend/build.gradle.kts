@@ -1,5 +1,6 @@
 import com.gitlab.davinkevin.podcastserver.backend.build.DatabaseParameters
 import com.rohanprabhu.gradle.plugins.kdjooq.*
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.OffsetDateTime
@@ -158,6 +159,9 @@ tasks.withType<Test> {
 	systemProperty("spring.datasource.password", db.password)
 
 	finalizedBy(tasks.jacocoTestReport)
+	testLogging {
+		exceptionFormat = TestExceptionFormat.FULL
+	}
 }
 
 tasks.withType<KotlinCompile> {

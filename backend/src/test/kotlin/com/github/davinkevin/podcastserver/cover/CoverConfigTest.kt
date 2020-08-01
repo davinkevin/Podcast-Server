@@ -63,12 +63,9 @@ class CoverConfigTest {
             assertThat(it).hasSingleBean(CoverHandler::class.java)
         }
     }
-
 }
 
-@Configuration
 private class LocalTestConfiguration {
-
     @Bean fun query(): DSLContext = mock()
     @Bean fun file(): FileService = mock()
 

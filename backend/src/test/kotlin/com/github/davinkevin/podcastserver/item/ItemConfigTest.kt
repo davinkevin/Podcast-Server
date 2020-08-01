@@ -48,14 +48,12 @@ class ItemConfigTest {
     }
 }
 
-@Configuration
 class MockForResetAtStartupConfig {
     @Bean @Primary fun mockItemRepository(): ItemRepository = mock<ItemRepository>().apply {
         whenever(this.resetItemWithDownloadingState()).thenReturn(Mono.empty())
     }
 }
 
-@Configuration
 class ItemDependencyMockConfig {
     @Bean @Primary fun mockJOOQ(): DSLContext = mock()
     @Bean @Primary fun mockItemService(): ItemService = mock()
