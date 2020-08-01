@@ -63,7 +63,11 @@ export default class PodcastItemsListComponent {
     }
 
     loadPage() {
-        this.currentPage = (this.currentPage < 1) ? 1 : (this.currentPage > Math.ceil(this.totalItems / this.itemPerPage)) ? Math.ceil(this.totalItems / this.itemPerPage) : this.currentPage;
+        this.currentPage = (this.currentPage < 1)
+            ? 1
+            : (this.currentPage > Math.ceil(this.totalItems / this.itemPerPage))
+                ? Math.max(Math.ceil(this.totalItems / this.itemPerPage), 1)
+                : this.currentPage;
         this.searchParameters = {page: this.currentPage-1};
         return this.itemService.getItemForPodcastWithPagination(this.podcast, this.searchParameters)
             .then(itemsResponse => {
