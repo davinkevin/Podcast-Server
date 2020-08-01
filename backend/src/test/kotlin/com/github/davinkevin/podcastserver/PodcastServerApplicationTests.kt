@@ -12,7 +12,7 @@ import org.springframework.test.context.TestPropertySources
  * Created by kevin on 13/03/2020
  */
 @SpringBootTest
-@EnabledOnOs(OS.LINUX)
+@EnabledOnOs(OS.LINUX, OS.MAC)
 @TestPropertySource(properties = [
     "podcastserver.externaltools.ffmpeg=/bin/echo",
     "podcastserver.externaltools.ffprobe=/bin/echo"
