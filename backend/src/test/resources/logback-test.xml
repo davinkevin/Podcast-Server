@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
-
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
-        </encoder>
-    </appender>
-
-    <logger name="org.springframework" level="OFF" />
-
-    <root level="info">
-        <appender-ref ref="STDOUT" />
-    </root>
-
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <logger name="org.springframework" level="OFF"/>
+    <logger name="org.eclipse.jetty" level="OFF"/>
 </configuration>

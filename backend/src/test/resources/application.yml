@@ -4,7 +4,14 @@ spring:
     username: podcast-server-user
     password: nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
     url: jdbc:postgresql://postgres:5432/podcast-server
+  main:
+    banner-mode: "off"
 
 server:
   error:
     include-message: always
+
+logging:
+  level:
+    org.springframework: "off"
+    org.eclipse.jetty: "off"
