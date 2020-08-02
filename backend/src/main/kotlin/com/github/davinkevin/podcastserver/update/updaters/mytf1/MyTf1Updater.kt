@@ -123,9 +123,10 @@ class MyTf1Updater(
 
     override fun type() = Type("MyTF1", "MyTF1")
 
-    override fun compatibility(url: String?) =
-            if ("www.tf1.fr" in (url ?: "")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "www.tf1.fr" in url -> 1
+        else -> Integer.MAX_VALUE
+    }
 
     companion object {
         private const val graphqlEndpoints = "/graphql/web"

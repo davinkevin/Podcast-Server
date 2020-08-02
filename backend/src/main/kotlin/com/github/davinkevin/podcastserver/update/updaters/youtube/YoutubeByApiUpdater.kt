@@ -117,7 +117,7 @@ class YoutubeByApiUpdater(
             else channelId
 
     override fun type() = type
-    override fun compatibility(url: String?) = _compatibility(url)
+    override fun compatibility(url: String): Int = youtubeCompatibility(url)
 
     companion object {
         private const val MAX_PAGE = 10

@@ -105,6 +105,31 @@ class DailymotionFinderTest(
                         }
                         .verifyComplete()
             }
+
+            @Test
+            fun `information about dailymotion podcast with no description`(backend: WireMockServer) {
+                /* Given */
+                val url = "https://www.dailymotion.com/karimdebbache"
+
+                whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
+
+                backend.stubFor(get(urlPathEqualTo("/user/karimdebbache"))
+                        .withQueryParam("fields", equalTo("avatar_720_url,description,username"))
+                        .willReturn(okJson(fileAsString("/remote/podcast/dailymotion/karimdebbache-without-description.json"))))
+
+                /* When */
+                StepVerifier.create(finder.findInformation(url))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.url).isEqualTo(URI(url))
+                            assertThat(it.title).isEqualTo("karimdebbache")
+                            assertThat(it.type).isEqualTo("Dailymotion")
+                            assertThat(it.description).isEqualTo("")
+                        }
+                        .verifyComplete()
+            }
+
         }
 
         @Nested

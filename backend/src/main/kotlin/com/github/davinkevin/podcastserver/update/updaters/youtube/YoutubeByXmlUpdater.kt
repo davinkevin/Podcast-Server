@@ -116,7 +116,7 @@ class YoutubeByXmlUpdater(
     }
 
     override fun type() = type
-    override fun compatibility(url: String?) = _compatibility(url)
+    override fun compatibility(url: String): Int = youtubeCompatibility(url)
 
     companion object {
         private const val PLAYLIST_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?playlist_id=%s"

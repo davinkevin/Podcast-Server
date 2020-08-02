@@ -26,5 +26,5 @@ class NoOpFinder : Finder {
         ).toMono()
     }
 
-    override fun compatibility(url: String?) = Int.MAX_VALUE
+    override fun compatibility(url: String): Int = Int.MAX_VALUE
 }

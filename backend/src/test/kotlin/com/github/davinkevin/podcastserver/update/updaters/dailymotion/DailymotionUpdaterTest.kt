@@ -224,15 +224,5 @@ class DailymotionUpdaterTest(
             /* Then */
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
         }
-
-        @Test
-        fun `should not be compatible because url is null`() {
-            /* Given */
-            val url = null
-            /* When */
-            val compatibility = updater.compatibility(url)
-            /* Then */
-            assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
-        }
     }
 }

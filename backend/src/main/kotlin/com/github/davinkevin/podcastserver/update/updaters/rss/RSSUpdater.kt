@@ -109,9 +109,10 @@ class RSSUpdater(
 
     override fun type() = Type("RSS", "RSS")
 
-    override fun compatibility(url: String?) =
-            if((url ?: "").startsWith("http", true)) Integer.MAX_VALUE - 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        url.startsWith("http", true) -> Integer.MAX_VALUE - 1
+        else -> Integer.MAX_VALUE
+    }
 
     companion object {
         private val MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")

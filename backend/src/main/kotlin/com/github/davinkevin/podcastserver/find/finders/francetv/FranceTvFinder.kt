@@ -50,8 +50,8 @@ class FranceTvFinder(
         return image.fetchCoverInformationOrOption(coverUrl)
     }
 
-    override fun compatibility(url: String?): Int {
-        return if((url ?: "").contains("www.france.tv")) 1
-        else Int.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "www.france.tv" in url -> 1
+        else -> Int.MAX_VALUE
     }
 }

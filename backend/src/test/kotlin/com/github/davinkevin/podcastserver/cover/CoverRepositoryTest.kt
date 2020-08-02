@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations.insertInto
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
-import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
 import com.github.davinkevin.podcastserver.DELETE_ALL
 import com.github.davinkevin.podcastserver.database.tables.Cover.*

@@ -14,7 +14,7 @@ class UploadUpdater : Updater {
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = Flux.empty()
     override fun signatureOf(url: URI): Mono<String> = "".toMono()
     override fun type(): Type = TYPE
-    override fun compatibility(url: String?) = Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = Integer.MAX_VALUE
 }
 
 private val TYPE = Type("upload", "Upload")

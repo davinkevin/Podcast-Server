@@ -12,7 +12,8 @@ internal const val PLAYLIST_URL_PART = "playlist?list="
 internal fun isPlaylist(url: URI) = url.toASCIIString().contains(PLAYLIST_URL_PART)
 
 internal val type = Type("Youtube", "Youtube")
-internal fun _compatibility(url: String?) =
-        if ((url ?: "").contains("youtube.com/")) 1
-        else Integer.MAX_VALUE
+internal fun youtubeCompatibility(url: String) = when {
+        "youtube.com/" in url -> 1
+        else -> Integer.MAX_VALUE
+}
 

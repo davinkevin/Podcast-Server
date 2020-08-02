@@ -3,11 +3,12 @@ package com.github.davinkevin.podcastserver.update.updaters.gulli
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
-import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import org.jsoup.Jsoup
 import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
@@ -19,7 +20,6 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.time.ZonedDateTime
-import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 14/03/2020
@@ -84,9 +84,10 @@ class GulliUpdater(
     }
 
     override fun type() = Type("Gulli", "Gulli")
-    override fun compatibility(url: String?): Int =
-            if ((url ?: "").contains("replay.gulli.fr")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "replay.gulli.fr" in url -> 1
+        else -> Integer.MAX_VALUE
+    }
 }
 
 private data class GulliItem(

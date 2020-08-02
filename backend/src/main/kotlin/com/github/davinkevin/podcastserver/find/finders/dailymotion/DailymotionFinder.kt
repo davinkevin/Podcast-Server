@@ -49,9 +49,9 @@ class DailymotionFinder(
                 ) }
     }
 
-    override fun compatibility(url: String?): Int {
-        return if ((url ?: "").contains("www.dailymotion.com")) 1
-        else Int.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "www.dailymotion.com" in url -> 1
+        else -> Int.MAX_VALUE
     }
 }
 

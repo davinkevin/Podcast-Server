@@ -204,15 +204,6 @@ class MyTf1FinderTest(
             /* Then */
             assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
         }
-
-        @Test
-        fun `should not be compatible with null value`() {
-            /* Given */
-            /* When */
-            val compatibility = finder.compatibility(null)
-            /* Then */
-            assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
-        }
     }
 
 }

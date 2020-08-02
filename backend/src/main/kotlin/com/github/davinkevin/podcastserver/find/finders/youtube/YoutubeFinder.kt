@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.find.finders.Finder
-import com.github.davinkevin.podcastserver.update.updaters.youtube._compatibility
+import com.github.davinkevin.podcastserver.update.updaters.youtube.youtubeCompatibility
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
@@ -53,7 +53,7 @@ class YoutubeFinder(
                 .switchIfEmpty { Optional.empty<FindCoverInformation>().toMono() }
     }
 
-    override fun compatibility(url: String?) = _compatibility(url)
+    override fun compatibility(url: String): Int = youtubeCompatibility(url)
 }
 
 private fun Document.meta(s: String) = this.select("meta[name=$s]").attr("content")

@@ -27,8 +27,7 @@ class ItunesFinder(
                     .map { it["results"][0]["feedUrl"].asText() }
                     .flatMap { rssFinder.findInformation(it) }
 
-    override fun compatibility(url: String?): Int = when {
-        url.isNullOrEmpty() -> Int.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
         "itunes.apple.com" in url -> 1
         "podcasts.apple.com" in url -> 1
         else -> Integer.MAX_VALUE

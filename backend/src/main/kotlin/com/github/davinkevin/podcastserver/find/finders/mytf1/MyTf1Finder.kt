@@ -62,8 +62,9 @@ class MyTf1Finder(
         return image.fetchCoverInformationOrOption(url)
     }
 
-    override fun compatibility(url: String?) =
-            if (StringUtils.contains(url, "www.tf1.fr")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "www.tf1.fr" in url -> 1
+        else -> Integer.MAX_VALUE
+    }
 
 }

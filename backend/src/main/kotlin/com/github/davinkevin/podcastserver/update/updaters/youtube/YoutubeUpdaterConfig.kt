@@ -34,7 +34,7 @@ class YoutubeUpdaterConfig {
                 .baseUrl("https://www.youtube.com")
                 .build()
 
-        if (key.isNullOrEmpty()) {
+        if (key.isEmpty()) {
          return YoutubeByXmlUpdater(youtubeClient)
         }
 

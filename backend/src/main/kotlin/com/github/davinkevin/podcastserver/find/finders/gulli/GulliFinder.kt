@@ -48,7 +48,8 @@ class GulliFinder(
         return image.fetchCoverInformationOrOption(URI(imgTag.attr("src")))
     }
 
-    override fun compatibility(url: String?) =
-            if ((url ?: "").contains("replay.gulli.fr")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "replay.gulli.fr" in url -> 1
+        else -> Integer.MAX_VALUE
+    }
 }

@@ -56,5 +56,5 @@ class RSSFinder(
         return imageService.fetchCoverInformationOrOption(URI(url))
     }
 
-    override fun compatibility(url: String?) = Integer.MAX_VALUE - 1
+    override fun compatibility(url: String): Int = Integer.MAX_VALUE - 1
 }

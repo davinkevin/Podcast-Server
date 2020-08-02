@@ -69,9 +69,10 @@ class DailymotionUpdater(
     }
 
     override fun type() = Type("Dailymotion", "Dailymotion")
-    override fun compatibility(url: String?) =
-            if ("www.dailymotion.com" in (url ?: "")) 1
-            else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "www.dailymotion.com" in url -> 1
+        else -> Integer.MAX_VALUE
+    }
 }
 
 // http://www.dailymotion.com/karimdebbache

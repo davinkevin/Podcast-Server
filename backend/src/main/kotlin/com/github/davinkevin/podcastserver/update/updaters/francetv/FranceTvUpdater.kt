@@ -117,9 +117,9 @@ class FranceTvUpdater(
 
     override fun type() = Type("FranceTv", "France•tv")
 
-    override fun compatibility(url: String?): Int {
-        return if (!url.isNullOrEmpty() && "www.france.tv" in url) 1
-        else Integer.MAX_VALUE
+    override fun compatibility(url: String): Int = when {
+        "www.france.tv" in url -> 1
+        else -> Integer.MAX_VALUE
     }
 
     private fun replayUrl(url: URI): String {

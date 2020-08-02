@@ -156,15 +156,6 @@ class GulliFinderTest(
         assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
     }
 
-    @Test
-    fun `should not be compatible with null value`() {
-        /* Given */
-        /* When */
-        val compatibility = finder.compatibility(null)
-        /* Then */
-        assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
-    }
-
     @TestConfiguration
     @Import(GulliFinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
     class LocalTestConfiguration {

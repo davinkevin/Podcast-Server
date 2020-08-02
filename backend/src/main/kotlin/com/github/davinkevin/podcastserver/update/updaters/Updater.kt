@@ -41,7 +41,7 @@ interface Updater {
     fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate>
     fun signatureOf(url: URI): Mono<String>
     fun type(): Type
-    fun compatibility(url: String?): Int
+    fun compatibility(url: String): Int
 }
 
 

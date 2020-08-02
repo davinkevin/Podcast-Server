@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono
  */
 interface Finder {
     fun findInformation(url: String): Mono<FindPodcastInformation>
-    fun compatibility(url: String?): Int
+    fun compatibility(url: String): Int
 }
