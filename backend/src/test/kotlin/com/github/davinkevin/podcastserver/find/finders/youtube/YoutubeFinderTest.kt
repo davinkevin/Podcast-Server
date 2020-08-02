@@ -5,8 +5,6 @@ import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -26,6 +24,7 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.tomakehurst.wiremock.client.WireMock.*
 
 @ExtendWith(SpringExtension::class)
 class YoutubeFinderTest(
@@ -64,6 +63,39 @@ class YoutubeFinderTest(
                     }
                     .verifyComplete()
         }
+
+        @Test
+        fun `information about a youtube podcast with its url after redirect`(backend: WireMockServer) {
+            /* Given */
+            val url = "http://localhost:5555/user/joueurdugrenier"
+            val coverUrl = URI("https://yt3.ggpht.com/a/AATXAJzzJHBMXD4K4L5FX4X_TnfKO16Wy9M4pzlshph5=s900-c-k-c0xffffffff-no-rj-mo")
+
+            whenever(image.fetchCoverInformation(coverUrl))
+                    .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
+
+            backend.apply {
+                stubFor(get("/user/joueurdugrenier")
+                        .willReturn(permanentRedirect("http://localhost:5555/user/joueurdugrenier-after-redirect")))
+
+                stubFor(get("/user/joueurdugrenier-after-redirect")
+                        .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+
+            }
+
+            /* When */
+            StepVerifier.create(finder.findInformation(url))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext { podcast ->
+                        assertThat(podcast.title).isEqualTo("Joueur Du Grenier")
+                        assertThat(podcast.description).isEqualTo("Test de jeux à la con !")
+
+                        assertThat(podcast.cover).isNotNull
+                        assertThat(podcast.cover!!.url).isEqualTo(coverUrl)
+                    }
+                    .verifyComplete()
+        }
+
 
         @Test
         fun `should not find podcast for this url`() {

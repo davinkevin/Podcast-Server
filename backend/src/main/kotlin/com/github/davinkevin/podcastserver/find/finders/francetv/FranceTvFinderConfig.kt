@@ -19,7 +19,7 @@ class FranceTvFinderConfig {
     @Bean
     fun franceTvFinder(wcb: WebClient.Builder, imageService: ImageService): FranceTvFinder {
         val client = wcb.clone()
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect { _, res -> res.status().code() in 300..399 }))
+                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
                 .baseUrl("https://www.france.tv/")
                 .build()
 

@@ -6,8 +6,7 @@ import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.okXml
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -42,7 +41,7 @@ class RSSFinderTest(
         private val podcastUrl = "http://localhost:5555/rss.xml"
 
         @Test
-        fun `information about an rss podcast with his url`(backend: WireMockServer) {
+        fun `information about an rss podcast with its url`(backend: WireMockServer) {
             /* Given */
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
@@ -60,6 +59,32 @@ class RSSFinderTest(
                     }
                     .verifyComplete()
         }
+
+        @Test
+        fun `information about an rss podcast with its url following redirections`(backend: WireMockServer) {
+            /* Given */
+            backend.apply {
+                stubFor(get("/rss.xml")
+                        .willReturn(permanentRedirect("http://localhost:5555/rss-after-redirect.xml")))
+
+                stubFor(get("/rss-after-redirect.xml")
+                        .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
+            }
+            whenever(image.fetchCoverInformation(URI(COVER_URL))).thenReturn(CoverInformation(100, 100, URI(COVER_URL)).toMono())
+
+            /* When */
+            StepVerifier.create(finder.findInformation(podcastUrl))
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext { podcast ->
+                        assertThat(podcast.title).isEqualToIgnoringCase("Les Grandes Gueules du Sport")
+                        assertThat(podcast.description).isEqualToIgnoringCase("Grand en gueule, fort en sport ! ")
+                        assertThat(podcast.cover).isNotNull
+                        assertThat(podcast.cover!!.url).isEqualTo(URI(COVER_URL))
+                    }
+                    .verifyComplete()
+        }
+
 
         @Test
         fun `information with itunes cover`(backend: WireMockServer) {

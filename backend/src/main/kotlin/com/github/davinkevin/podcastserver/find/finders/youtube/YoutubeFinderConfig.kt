@@ -17,7 +17,7 @@ class YoutubeFinderConfig {
     fun youtubeFinder(imageService: ImageService, wcb: WebClient.Builder): YoutubeFinder {
         val builder = wcb
                 .clone()
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect { _, res -> res.status().code() in 300..399 }))
+                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
 
         return YoutubeFinder(imageService, builder)
     }

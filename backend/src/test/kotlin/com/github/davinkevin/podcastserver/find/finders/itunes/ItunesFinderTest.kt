@@ -71,11 +71,16 @@ class ItunesFinderTest(
     fun `should find url`(backend: WireMockServer) {
         /* GIVEN */
         val url = "https://podcasts.apple.com/fr/podcast/positron/id662892474"
-        backend.stubFor(get("/lookup?id=662892474").willReturn(
-                ok(fileAsString("/remote/podcast/itunes/lookup.json"))
-                        .withHeader("Content-Type", "text/javascript;charset=utf-8")
-                )
-        )
+        backend.apply {
+            stubFor(get("/lookup?id=662892474")
+                    .willReturn(permanentRedirect("https://itunes.apple.com/after-redirect")))
+
+            stubFor(get("/after-redirect").willReturn(
+                    ok(fileAsString("/remote/podcast/itunes/lookup.json"))
+                            .withHeader("Content-Type", "text/javascript;charset=utf-8")
+            ))
+
+        }
         val podcastInformation = FindPodcastInformation(
                 title = "Positron",
                 description = "Zapping de bons plans !<br /> <br /> Positron, c'est une émissions dynamique qui vous promet de « ne plus jamais vous ennuyer » en vous recommandant des livres, films, séries ou albums que vous ne connaissez peut-être pas encore, mais que vous adorerez bientôt !",
