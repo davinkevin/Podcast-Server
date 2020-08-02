@@ -9,6 +9,7 @@ import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -191,6 +192,181 @@ class PodcastXmlHandlerTest(
                         </opml>
                     """.trimIndent())
         }
+
+        @Nested
+        @DisplayName("with variable header configuration as host")
+        inner class WithVariableHeaderConfigurationAsHost {
+
+            @BeforeEach
+            fun beforeEach() {
+                whenever(podcastService.findAll()).thenReturn(listOf(podcast1).toFlux())
+            }
+
+            @Test
+            fun `with no header configuration, everything comes from url`() {
+                /* Given */
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/podcasts/opml")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .xml("""
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <opml version="2.0">
+                          <head>
+                            <title>Podcast-Server</title>
+                          </head>
+                          <body>
+                            <outline htmlUrl="https://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
+                                        text="Podcast first" description="desc" 
+                                        title="Podcast first" type="rss" version="RSS2" 
+                                        xmlUrl="https://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    />
+                          </body>
+                        </opml>
+                    """.trimIndent())
+            }
+
+            @Nested
+            @DisplayName("on host")
+            inner class OnHost {
+
+                @Test
+                fun `with Host header coming from the load balancer`() {
+                    /* Given */
+
+                    /* When */
+                    rest
+                            .get()
+                            .uri("https://localhost:8080/api/v1/podcasts/opml")
+                            .header("Host", "custom-host")
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .xml("""
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <opml version="2.0">
+                                  <head>
+                                    <title>Podcast-Server</title>
+                                  </head>
+                                  <body>
+                                    <outline htmlUrl="https://custom-host:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
+                                        text="Podcast first" description="desc" 
+                                        title="Podcast first" type="rss" version="RSS2" 
+                                        xmlUrl="https://custom-host:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    />
+                                  </body>
+                                </opml>
+                            """.trimIndent())
+                }
+
+                @Test
+                fun `with X-Forwarded-Host header coming from the load balancer`() {
+                    /* Given */
+
+                    /* When */
+                    rest
+                            .get()
+                            .uri("https://localhost:8080/api/v1/podcasts/opml")
+                            .header("X-Forwarded-Host", "custom-host")
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .xml("""
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <opml version="2.0">
+                                  <head>
+                                    <title>Podcast-Server</title>
+                                  </head>
+                                  <body>
+                                    <outline htmlUrl="https://custom-host:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
+                                        text="Podcast first" description="desc" 
+                                        title="Podcast first" type="rss" version="RSS2" 
+                                        xmlUrl="https://custom-host:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    />
+                                  </body>
+                                </opml>
+                            """.trimIndent())
+                }
+            }
+
+            @Nested
+            @DisplayName("on scheme")
+            inner class OnScheme {
+                @Test
+                fun `with X-Forwarded-Proto header coming from the load balancer`() {
+                    /* Given */
+
+                    /* When */
+                    rest
+                            .get()
+                            .uri("https://localhost:8080/api/v1/podcasts/opml")
+                            .header("X-Forwarded-Proto", "http")
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .xml("""
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <opml version="2.0">
+                                  <head>
+                                    <title>Podcast-Server</title>
+                                  </head>
+                                  <body>
+                                    <outline htmlUrl="http://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
+                                        text="Podcast first" description="desc" 
+                                        title="Podcast first" type="rss" version="RSS2" 
+                                        xmlUrl="http://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    />
+                                  </body>
+                                </opml>
+                            """.trimIndent())
+                }
+            }
+
+            @Nested
+            @DisplayName("on port")
+            inner class OnPort {
+
+                @Test
+                fun `with X-Forwarded-Port header coming from the load balancer`() {
+                    /* Given */
+
+                    /* When */
+                    rest
+                            .get()
+                            .uri("https://localhost:8080/api/v1/podcasts/opml")
+                            .header("X-Forwarded-Port", "9876")
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .xml("""
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <opml version="2.0">
+                                  <head>
+                                    <title>Podcast-Server</title>
+                                  </head>
+                                  <body>
+                                    <outline htmlUrl="https://localhost:9876/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
+                                        text="Podcast first" description="desc" 
+                                        title="Podcast first" type="rss" version="RSS2" 
+                                        xmlUrl="https://localhost:9876/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    />
+                                  </body>
+                                </opml>
+                            """.trimIndent())
+                }
+                
+            }
+
+        }
+
     }
 
     @Nested
